@@ -36,11 +36,11 @@ const ServicesSection = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <p className="text-sm tracking-[0.3em] uppercase font-body font-medium text-primary mb-3">
+          <p className="text-xs tracking-[0.4em] uppercase font-body font-medium text-muted-foreground mb-3">
             Wat wij bieden
           </p>
-          <h2 className="text-3xl md:text-5xl font-display font-bold">
-            Onze <span className="text-gradient-gold">Diensten</span>
+          <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground">
+            Onze Diensten
           </h2>
         </motion.div>
 
@@ -52,18 +52,18 @@ const ServicesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.15 }}
-              className="group relative overflow-hidden bg-card border border-border hover:border-primary/50 transition-all duration-500"
+              className="group relative overflow-hidden bg-card border border-border hover:border-foreground/25 transition-all duration-500"
             >
               <div className="h-56 overflow-hidden">
                 <img
                   src={service.image}
                   alt={service.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale group-hover:grayscale-0"
                 />
               </div>
               <div className="p-6 lg:p-8">
-                <service.icon className="w-8 h-8 text-primary mb-4" />
-                <h3 className="text-xl font-display font-semibold mb-3">
+                <service.icon className="w-7 h-7 text-foreground/70 mb-4" />
+                <h3 className="text-lg font-display font-semibold mb-3 text-foreground">
                   {service.title}
                 </h3>
                 <p className="text-muted-foreground font-body font-light leading-relaxed text-sm">

@@ -40,16 +40,16 @@ const Navbar = () => {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-body font-medium tracking-widest uppercase text-foreground/80 hover:text-primary transition-colors duration-300"
+              className="text-xs font-body font-medium tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
             >
               {link.label}
             </a>
           ))}
           <a
             href="tel:+31600000000"
-            className="flex items-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-2.5 text-sm font-semibold tracking-wider uppercase transition-all hover:shadow-gold"
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-xs font-semibold tracking-[0.15em] uppercase transition-all hover:bg-foreground/90"
           >
-            <Phone className="w-4 h-4" />
+            <Phone className="w-3.5 h-3.5" />
             Bel Ons
           </a>
         </div>
@@ -78,16 +78,16 @@ const Navbar = () => {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="text-sm font-body font-medium tracking-widest uppercase text-foreground/80 hover:text-primary transition-colors"
+                  className="text-xs font-body font-medium tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {link.label}
                 </a>
               ))}
               <a
                 href="tel:+31600000000"
-                className="flex items-center gap-2 bg-gradient-gold text-primary-foreground px-6 py-3 text-sm font-semibold tracking-wider uppercase"
+                className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 text-xs font-semibold tracking-[0.15em] uppercase"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="w-3.5 h-3.5" />
                 Bel Ons
               </a>
             </div>

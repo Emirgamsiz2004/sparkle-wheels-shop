@@ -14,7 +14,7 @@ const Footer = () => {
               <a
                 key={item}
                 href={`#${item.toLowerCase().replace(" ", "-")}`}
-                className="text-xs tracking-widest uppercase font-body text-muted-foreground hover:text-primary transition-colors"
+                className="text-xs tracking-[0.15em] uppercase font-body text-muted-foreground hover:text-foreground transition-colors"
               >
                 {item}
               </a>
