@@ -13,6 +13,8 @@ export interface Car {
   mileage: number;
   fuel: string;
   transmission: string;
+  engine: string;
+  nap: boolean;
   image: string;
 }
 
@@ -25,6 +27,8 @@ export const placeholderCars: Car[] = [
     mileage: 68000,
     fuel: "Benzine",
     transmission: "Handgeschakeld",
+    engine: "1.4 TSI 150pk",
+    nap: true,
     image: car1,
   },
   {
@@ -35,6 +39,8 @@ export const placeholderCars: Car[] = [
     mileage: 54000,
     fuel: "Benzine",
     transmission: "Automaat",
+    engine: "2.0i 184pk",
+    nap: true,
     image: car2,
   },
   {
@@ -45,6 +51,8 @@ export const placeholderCars: Car[] = [
     mileage: 42000,
     fuel: "Benzine",
     transmission: "Automaat",
+    engine: "1.3 136pk",
+    nap: true,
     image: car3,
   },
   {
@@ -55,6 +63,8 @@ export const placeholderCars: Car[] = [
     mileage: 61000,
     fuel: "Benzine",
     transmission: "Automaat",
+    engine: "1.5 TFSI 150pk",
+    nap: true,
     image: car4,
   },
   {
@@ -65,6 +75,8 @@ export const placeholderCars: Car[] = [
     mileage: 72000,
     fuel: "Benzine",
     transmission: "Handgeschakeld",
+    engine: "1.5 TSI 130pk",
+    nap: true,
     image: car5,
   },
   {
@@ -75,6 +87,8 @@ export const placeholderCars: Car[] = [
     mileage: 58000,
     fuel: "Benzine",
     transmission: "Handgeschakeld",
+    engine: "1.2 Turbo 110pk",
+    nap: true,
     image: car6,
   },
 ];
