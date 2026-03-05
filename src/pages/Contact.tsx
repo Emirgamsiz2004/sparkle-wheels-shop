@@ -1,8 +1,18 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle, Send } from "lucide-react";
 import { Link } from "react-router-dom";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+const contactFormSchema = z.object({
+  naam: z.string().trim().min(1, "Vul uw naam in").max(100),
+  email: z.string().trim().email("Vul een geldig e-mailadres in").max(255),
+  telefoon: z.string().trim().max(20).optional(),
+  bericht: z.string().trim().min(1, "Vul een bericht in").max(2000),
+});
 
 const contactDetails = [
   {
@@ -42,9 +52,89 @@ const openingHours = [
   { day: "Woensdag", time: "09:00 - 18:00" },
   { day: "Donderdag", time: "09:00 - 18:00" },
   { day: "Vrijdag", time: "09:00 - 18:00" },
-  { day: "Zaterdag", time: "10:00 - 18:00" },
-  { day: "Zondag", time: "10:00 - 18:00" },
+  { day: "Zaterdag", time: "10:00 - 17:00" },
+  { day: "Zondag", time: "10:00 - 17:00" },
 ];
+
+const ContactForm = () => {
+  const [formData, setFormData] = useState({ naam: "", email: "", telefoon: "", bericht: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const { toast } = useToast();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = contactFormSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    const message = `Hallo, ik ben ${encodeURIComponent(result.data.naam)}.%0A%0AE-mail: ${encodeURIComponent(result.data.email)}${result.data.telefoon ? `%0ATelefoon: ${encodeURIComponent(result.data.telefoon)}` : ""}%0A%0A${encodeURIComponent(result.data.bericht)}`;
+    window.open(`https://wa.me/31612693825?text=${message}`, "_blank");
+
+    setSubmitted(true);
+    toast({ title: "Bericht verstuurd", description: "We nemen zo snel mogelijk contact met u op." });
+  };
+
+  if (submitted) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <div className="w-12 h-12 border-2 border-foreground flex items-center justify-center mb-4">
+          <Send className="w-5 h-5 text-foreground" />
+        </div>
+        <p className="text-foreground font-display font-semibold mb-2">Bedankt voor uw bericht!</p>
+        <p className="text-muted-foreground font-body text-sm font-light">We nemen zo snel mogelijk contact met u op.</p>
+        <button
+          onClick={() => { setSubmitted(false); setFormData({ naam: "", email: "", telefoon: "", bericht: "" }); }}
+          className="mt-6 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Nog een bericht sturen
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="grid sm:grid-cols-2 gap-5">
+        <div>
+          <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Naam *</label>
+          <input type="text" name="naam" value={formData.naam} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Uw naam" />
+          {errors.naam && <p className="text-xs text-red-400 mt-1 font-body">{errors.naam}</p>}
+        </div>
+        <div>
+          <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">E-mail *</label>
+          <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="uw@email.nl" />
+          {errors.email && <p className="text-xs text-red-400 mt-1 font-body">{errors.email}</p>}
+        </div>
+      </div>
+      <div>
+        <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Telefoon</label>
+        <input type="tel" name="telefoon" value={formData.telefoon} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="06 - 0000 0000" />
+      </div>
+      <div>
+        <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Bericht *</label>
+        <textarea name="bericht" value={formData.bericht} onChange={handleChange} rows={5} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Waar kunnen wij u mee helpen?" />
+        {errors.bericht && <p className="text-xs text-red-400 mt-1 font-body">{errors.bericht}</p>}
+      </div>
+      <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
+        <Send className="w-3.5 h-3.5" />
+        Verstuur Bericht
+        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+      </button>
+    </form>
+  );
+};
 
 const Contact = () => {
   return (
@@ -172,26 +262,46 @@ const Contact = () => {
             </motion.div>
           </div>
 
-          {/* WhatsApp CTA */}
+          {/* Contact form + WhatsApp */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-16 md:mt-20 text-center"
+            className="mt-16 md:mt-20"
           >
-            <p className="text-muted-foreground font-body font-light mb-6 text-sm">
-              Liever direct appen? Stuur ons een WhatsApp bericht.
-            </p>
-            <a
-              href="https://wa.me/31612693825?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20auto."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-xs font-semibold tracking-[0.15em] uppercase transition-all duration-300"
-            >
-              <MessageCircle className="w-4 h-4" />
-              WhatsApp Ons
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            <div className="grid lg:grid-cols-2 gap-px bg-border">
+              {/* Form */}
+              <div className="bg-card p-6 md:p-10">
+                <p className="text-[10px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground mb-2">
+                  Bericht
+                </p>
+                <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-6">
+                  Stuur ons een bericht
+                </h3>
+                <ContactForm />
+              </div>
+
+              {/* WhatsApp CTA side */}
+              <div className="bg-card p-6 md:p-10 flex flex-col items-center justify-center text-center">
+                <MessageCircle className="w-10 h-10 text-green-500 mb-6" />
+                <h3 className="text-xl font-display font-bold text-foreground mb-3">
+                  Liever direct appen?
+                </h3>
+                <p className="text-muted-foreground font-body font-light mb-8 text-sm max-w-xs leading-relaxed">
+                  Stuur ons een WhatsApp bericht en we reageren zo snel mogelijk.
+                </p>
+                <a
+                  href="https://wa.me/31612693825?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20auto."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-xs font-semibold tracking-[0.15em] uppercase transition-all duration-300"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  WhatsApp Ons
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
