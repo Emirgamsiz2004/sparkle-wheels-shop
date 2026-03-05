@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           eerste_eigenaar: boolean | null
           email: string
+          financiering: boolean | null
           foto_urls: string[] | null
           id: string
           kenteken: string | null
@@ -32,6 +33,7 @@ export type Database = {
           naam: string
           onderhoudsboekje: boolean | null
           opmerkingen: string | null
+          recente_reparaties: boolean | null
           rookvrij: boolean | null
           schadevrij: boolean | null
           telefoon: string
@@ -44,6 +46,7 @@ export type Database = {
           created_at?: string
           eerste_eigenaar?: boolean | null
           email: string
+          financiering?: boolean | null
           foto_urls?: string[] | null
           id?: string
           kenteken?: string | null
@@ -54,6 +57,7 @@ export type Database = {
           naam: string
           onderhoudsboekje?: boolean | null
           opmerkingen?: string | null
+          recente_reparaties?: boolean | null
           rookvrij?: boolean | null
           schadevrij?: boolean | null
           telefoon: string
@@ -66,6 +70,7 @@ export type Database = {
           created_at?: string
           eerste_eigenaar?: boolean | null
           email?: string
+          financiering?: boolean | null
           foto_urls?: string[] | null
           id?: string
           kenteken?: string | null
@@ -76,6 +81,7 @@ export type Database = {
           naam?: string
           onderhoudsboekje?: boolean | null
           opmerkingen?: string | null
+          recente_reparaties?: boolean | null
           rookvrij?: boolean | null
           schadevrij?: boolean | null
           telefoon?: string

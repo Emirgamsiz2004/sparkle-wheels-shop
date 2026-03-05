@@ -21,13 +21,14 @@ interface FormData {
   brandstof: string;
   transmissie: string;
   kleur: string;
-  // Stap 3: Staat
+  // Stap 3: Staat & opmerkingen
   schadevrij: boolean | null;
   onderhoudsboekje: boolean | null;
   apkGeldig: boolean | null;
   rookvrij: boolean | null;
   eersteEigenaar: boolean | null;
-  // Stap 3: Staat & opmerkingen
+  financiering: boolean | null;
+  recenteReparaties: boolean | null;
   opmerkingen: string;
 }
 
@@ -48,6 +49,8 @@ const initialData: FormData = {
   apkGeldig: null,
   rookvrij: null,
   eersteEigenaar: null,
+  financiering: null,
+  recenteReparaties: null,
   opmerkingen: "",
 };
 
@@ -269,6 +272,8 @@ const Consignatie = () => {
         apk_geldig: data.apkGeldig,
         rookvrij: data.rookvrij,
         eerste_eigenaar: data.eersteEigenaar,
+        financiering: data.financiering,
+        recente_reparaties: data.recenteReparaties,
         opmerkingen: data.opmerkingen || null,
       });
 
@@ -436,6 +441,8 @@ const Consignatie = () => {
                     <YesNoToggle label="Is de APK nog geldig?" value={data.apkGeldig} onChange={(v) => update("apkGeldig", v)} />
                     <YesNoToggle label="Is de auto rookvrij bereden?" value={data.rookvrij} onChange={(v) => update("rookvrij", v)} />
                     <YesNoToggle label="Bent u de eerste eigenaar?" value={data.eersteEigenaar} onChange={(v) => update("eersteEigenaar", v)} />
+                    <YesNoToggle label="Rust er nog een financiering op de auto?" value={data.financiering} onChange={(v) => update("financiering", v)} />
+                    <YesNoToggle label="Zijn er recent reparaties uitgevoerd?" value={data.recenteReparaties} onChange={(v) => update("recenteReparaties", v)} />
                   </div>
 
                   <div className="space-y-2">
