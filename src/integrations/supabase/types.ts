@@ -36,6 +36,7 @@ export type Database = {
           recente_reparaties: boolean | null
           rookvrij: boolean | null
           schadevrij: boolean | null
+          staat: string | null
           telefoon: string
           transmissie: string | null
         }
@@ -60,6 +61,7 @@ export type Database = {
           recente_reparaties?: boolean | null
           rookvrij?: boolean | null
           schadevrij?: boolean | null
+          staat?: string | null
           telefoon: string
           transmissie?: string | null
         }
@@ -84,6 +86,7 @@ export type Database = {
           recente_reparaties?: boolean | null
           rookvrij?: boolean | null
           schadevrij?: boolean | null
+          staat?: string | null
           telefoon?: string
           transmissie?: string | null
         }
