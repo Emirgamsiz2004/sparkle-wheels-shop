@@ -1,0 +1,1 @@
+ALTER TABLE public.consignatie_aanmeldingen ADD COLUMN staat text;

@@ -27,8 +27,7 @@ interface FormData {
   apkGeldig: boolean | null;
   rookvrij: boolean | null;
   eersteEigenaar: boolean | null;
-  financiering: boolean | null;
-  recenteReparaties: boolean | null;
+  staat: string;
   opmerkingen: string;
 }
 
@@ -49,8 +48,7 @@ const initialData: FormData = {
   apkGeldig: null,
   rookvrij: null,
   eersteEigenaar: null,
-  financiering: null,
-  recenteReparaties: null,
+  staat: "",
   opmerkingen: "",
 };
 
@@ -272,8 +270,7 @@ const Consignatie = () => {
         apk_geldig: data.apkGeldig,
         rookvrij: data.rookvrij,
         eerste_eigenaar: data.eersteEigenaar,
-        financiering: data.financiering,
-        recente_reparaties: data.recenteReparaties,
+        staat: data.staat || null,
         opmerkingen: data.opmerkingen || null,
       });
 
@@ -441,8 +438,29 @@ const Consignatie = () => {
                     <YesNoToggle label="Is de APK nog geldig?" value={data.apkGeldig} onChange={(v) => update("apkGeldig", v)} />
                     <YesNoToggle label="Is de auto rookvrij bereden?" value={data.rookvrij} onChange={(v) => update("rookvrij", v)} />
                     <YesNoToggle label="Bent u de eerste eigenaar?" value={data.eersteEigenaar} onChange={(v) => update("eersteEigenaar", v)} />
-                    <YesNoToggle label="Rust er nog een financiering op de auto?" value={data.financiering} onChange={(v) => update("financiering", v)} />
-                    <YesNoToggle label="Zijn er recent reparaties uitgevoerd?" value={data.recenteReparaties} onChange={(v) => update("recenteReparaties", v)} />
+                  </div>
+
+                  {/* Staat van het voertuig */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-body font-medium tracking-[0.2em] uppercase text-muted-foreground">
+                      Staat van het voertuig
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 mt-3">
+                      {["Nieuwstaat", "Kleine gebruikssporen", "Zichtbare schade / diepe krassen", "Flinke beschadigingen"].map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => update("staat", opt)}
+                          className={`px-4 py-3 text-[10px] font-body font-medium tracking-[0.1em] uppercase text-left transition-all duration-200 border ${
+                            data.staat === opt
+                              ? "bg-foreground text-background border-foreground"
+                              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="space-y-2">
