@@ -8,6 +8,7 @@ import Voorraad from "./pages/Voorraad";
 import Consignatie from "./pages/Consignatie";
 import Contact from "./pages/Contact";
 import OverOns from "./pages/OverOns";
+import InEnVerkoop from "./pages/InEnVerkoop";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/consignatie" element={<Consignatie />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/over-ons" element={<OverOns />} />
+          <Route path="/diensten/in-en-verkoop" element={<InEnVerkoop />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
