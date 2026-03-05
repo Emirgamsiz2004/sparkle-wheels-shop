@@ -12,6 +12,7 @@ interface FormData {
   telefoon: string;
   email: string;
   // Stap 2: Voertuiggegevens
+  kenteken: string;
   merk: string;
   model: string;
   bouwjaar: string;
@@ -33,6 +34,7 @@ const initialData: FormData = {
   naam: "",
   telefoon: "",
   email: "",
+  kenteken: "",
   merk: "",
   model: "",
   bouwjaar: "",
@@ -271,6 +273,7 @@ const Consignatie = () => {
 
               {step === 2 && (
                 <div className="space-y-8">
+                  <InputField label="Kenteken" value={data.kenteken} onChange={(v) => update("kenteken", v)} placeholder="Bijv. AB-123-CD" />
                   <InputField label="Merk" value={data.merk} onChange={(v) => update("merk", v)} placeholder="Bijv. Volkswagen" />
                   <InputField label="Model" value={data.model} onChange={(v) => update("model", v)} placeholder="Bijv. Golf" />
                   <div className="grid grid-cols-2 gap-6">
