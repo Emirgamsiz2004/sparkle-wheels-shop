@@ -64,9 +64,9 @@ const Navbar = () => {
           >
             <Phone className="w-3 h-3 relative z-10" />
             <span className="relative overflow-hidden h-[14px]">
-              <span className="block transition-transform duration-300 ease-out group-hover:-translate-y-[14px]">
-                <span className="h-[14px] flex items-center">Bel Ons</span>
-                <span className="h-[14px] flex items-center absolute left-0 top-[14px] whitespace-nowrap">06-12693825</span>
+              <span className="flex flex-col transition-transform duration-300 ease-out group-hover:-translate-y-[14px]">
+                <span className="h-[14px] flex items-center whitespace-nowrap">Bel Ons</span>
+                <span className="h-[14px] flex items-center whitespace-nowrap">06-12693825</span>
               </span>
             </span>
           </a>
@@ -118,9 +118,9 @@ const Navbar = () => {
               >
                 <Phone className="w-3 h-3 relative z-10" />
                 <span className="relative overflow-hidden h-[14px]">
-                  <span className="block transition-transform duration-300 ease-out group-hover:-translate-y-[14px]">
-                    <span className="h-[14px] flex items-center">Bel Ons</span>
-                    <span className="h-[14px] flex items-center absolute left-0 top-[14px] whitespace-nowrap">06-12693825</span>
+                  <span className="flex flex-col transition-transform duration-300 ease-out group-hover:-translate-y-[14px]">
+                    <span className="h-[14px] flex items-center whitespace-nowrap">Bel Ons</span>
+                    <span className="h-[14px] flex items-center whitespace-nowrap">06-12693825</span>
                   </span>
                 </span>
               </a>
