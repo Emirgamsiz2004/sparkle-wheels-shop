@@ -30,7 +30,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
-          className="group flex items-center gap-3 bg-foreground text-background px-8 py-4 text-xs md:text-sm font-body font-semibold tracking-[0.2em] uppercase hover:bg-foreground/90 transition-all duration-300"
+          className="group flex items-center gap-3 border-b border-foreground/30 hover:border-foreground pb-2.5 text-xs md:text-sm font-body font-medium tracking-[0.3em] uppercase text-foreground/70 hover:text-foreground transition-all duration-300"
         >
           Bekijk Ons Aanbod
         </motion.a>
