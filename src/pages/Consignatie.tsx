@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Upload, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Upload, X, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
   // Stap 1: Persoonlijke gegevens
@@ -52,6 +53,43 @@ const initialData: FormData = {
 
 const totalSteps = 4;
 
+const brandstofMap: Record<string, string> = {
+  "Benzine": "Benzine",
+  "Diesel": "Diesel",
+  "Elektriciteit": "Elektrisch",
+  "LPG": "LPG",
+};
+
+const formatKenteken = (input: string) => {
+  return input.toUpperCase().replace(/[^A-Z0-9]/g, "");
+};
+
+const fetchRdwData = async (kenteken: string) => {
+  const formatted = formatKenteken(kenteken);
+  if (formatted.length < 6) return null;
+
+  const response = await fetch(
+    `https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=${formatted}`
+  );
+  if (!response.ok) return null;
+
+  const data = await response.json();
+  if (!data || data.length === 0) return null;
+
+  const vehicle = data[0];
+  return {
+    merk: vehicle.merk || "",
+    model: vehicle.handelsbenaming || "",
+    bouwjaar: vehicle.datum_eerste_toelating
+      ? vehicle.datum_eerste_toelating.substring(0, 4)
+      : "",
+    brandstof: brandstofMap[vehicle.brandstof_omschrijving] || vehicle.brandstof_omschrijving || "",
+    kleur: vehicle.eerste_kleur
+      ? vehicle.eerste_kleur.charAt(0).toUpperCase() + vehicle.eerste_kleur.slice(1).toLowerCase()
+      : "",
+  };
+};
+
 const YesNoToggle = ({
   label,
   value,
@@ -96,24 +134,32 @@ const InputField = ({
   onChange,
   type = "text",
   placeholder,
+  disabled = false,
+  suffix,
 }: {
   label: string;
   value: string;
   onChange: (val: string) => void;
   type?: string;
   placeholder?: string;
+  disabled?: boolean;
+  suffix?: React.ReactNode;
 }) => (
   <div className="space-y-2">
     <label className="text-[10px] font-body font-medium tracking-[0.2em] uppercase text-muted-foreground">
       {label}
     </label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/50 transition-colors"
-    />
+    <div className="relative">
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+        className={`w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/50 transition-colors ${disabled ? "text-muted-foreground" : ""}`}
+      />
+      {suffix && <div className="absolute right-0 top-1/2 -translate-y-1/2">{suffix}</div>}
+    </div>
   </div>
 );
 
@@ -122,11 +168,13 @@ const SelectField = ({
   value,
   onChange,
   options,
+  disabled = false,
 }: {
   label: string;
   value: string;
   onChange: (val: string) => void;
   options: string[];
+  disabled?: boolean;
 }) => (
   <div className="space-y-2">
     <label className="text-[10px] font-body font-medium tracking-[0.2em] uppercase text-muted-foreground">
@@ -135,7 +183,8 @@ const SelectField = ({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground focus:outline-none focus:border-foreground/50 transition-colors appearance-none cursor-pointer"
+      disabled={disabled}
+      className={`w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground focus:outline-none focus:border-foreground/50 transition-colors appearance-none cursor-pointer ${disabled ? "text-muted-foreground" : ""}`}
     >
       <option value="" className="bg-card text-foreground">Selecteer...</option>
       {options.map((opt) => (
@@ -152,15 +201,45 @@ const Consignatie = () => {
   const [data, setData] = useState<FormData>(initialData);
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
+  const [rdwLoading, setRdwLoading] = useState(false);
+  const [rdwFetched, setRdwFetched] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) =>
     setData((prev) => ({ ...prev, [key]: value }));
+
+  const handleKentekenLookup = async () => {
+    if (!data.kenteken || data.kenteken.replace(/[^A-Z0-9]/gi, "").length < 6) {
+      toast.error("Voer een geldig kenteken in");
+      return;
+    }
+    setRdwLoading(true);
+    try {
+      const rdwData = await fetchRdwData(data.kenteken);
+      if (rdwData) {
+        setData((prev) => ({
+          ...prev,
+          merk: rdwData.merk || prev.merk,
+          model: rdwData.model || prev.model,
+          bouwjaar: rdwData.bouwjaar || prev.bouwjaar,
+          brandstof: rdwData.brandstof || prev.brandstof,
+          kleur: rdwData.kleur || prev.kleur,
+        }));
+        setRdwFetched(true);
+        toast.success("Voertuiggegevens gevonden!");
+      } else {
+        toast.error("Geen voertuig gevonden bij dit kenteken");
+      }
+    } catch {
+      toast.error("Kon de RDW niet bereiken. Vul de gegevens handmatig in.");
+    }
+    setRdwLoading(false);
+  };
 
   const handlePhotoAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const newPhotos = [...photos, ...files].slice(0, 10);
     setPhotos(newPhotos);
-
     const newUrls = newPhotos.map((file) => URL.createObjectURL(file));
     setPhotoPreviewUrls(newUrls);
   };
@@ -186,12 +265,77 @@ const Consignatie = () => {
     }
   };
 
-  const handleSubmit = () => {
-    toast.success("Uw aanmelding is verzonden! Wij nemen zo snel mogelijk contact met u op.");
-    setData(initialData);
-    setPhotos([]);
-    setPhotoPreviewUrls([]);
-    setStep(1);
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      // Upload foto's naar storage
+      const photoUrls: string[] = [];
+      for (const photo of photos) {
+        const fileName = `${Date.now()}-${photo.name}`;
+        const { data: uploadData, error } = await supabase.storage
+          .from("consignatie-fotos")
+          .upload(fileName, photo);
+        if (!error && uploadData) {
+          const { data: urlData } = supabase.storage
+            .from("consignatie-fotos")
+            .getPublicUrl(uploadData.path);
+          photoUrls.push(urlData.publicUrl);
+        }
+      }
+
+      // Sla aanmelding op in database
+      const { error: dbError } = await supabase.from("consignatie_aanmeldingen").insert({
+        naam: data.naam,
+        telefoon: data.telefoon,
+        email: data.email,
+        kenteken: data.kenteken || null,
+        merk: data.merk,
+        model: data.model,
+        bouwjaar: data.bouwjaar,
+        km_stand: data.kmStand,
+        brandstof: data.brandstof,
+        transmissie: data.transmissie,
+        kleur: data.kleur,
+        schadevrij: data.schadevrij,
+        onderhoudsboekje: data.onderhoudsboekje,
+        apk_geldig: data.apkGeldig,
+        rookvrij: data.rookvrij,
+        eerste_eigenaar: data.eersteEigenaar,
+        opmerkingen: data.opmerkingen || null,
+        foto_urls: photoUrls,
+      });
+
+      if (dbError) throw dbError;
+
+      // Stuur WhatsApp notificatie
+      try {
+        await supabase.functions.invoke("send-whatsapp-notification", {
+          body: {
+            naam: data.naam,
+            telefoon: data.telefoon,
+            merk: data.merk,
+            model: data.model,
+            bouwjaar: data.bouwjaar,
+            kenteken: data.kenteken,
+            kmStand: data.kmStand,
+          },
+        });
+      } catch {
+        // WhatsApp notificatie is niet kritiek
+        console.log("WhatsApp notificatie kon niet worden verzonden");
+      }
+
+      toast.success("Uw aanmelding is verzonden! Wij nemen zo snel mogelijk contact met u op.");
+      setData(initialData);
+      setPhotos([]);
+      setPhotoPreviewUrls([]);
+      setRdwFetched(false);
+      setStep(1);
+    } catch (error) {
+      console.error("Submit error:", error);
+      toast.error("Er ging iets mis bij het versturen. Probeer het opnieuw.");
+    }
+    setSubmitting(false);
   };
 
   const stepLabels = ["Uw Gegevens", "Voertuig", "Staat", "Foto's & Verzenden"];
@@ -273,7 +417,38 @@ const Consignatie = () => {
 
               {step === 2 && (
                 <div className="space-y-8">
-                  <InputField label="Kenteken" value={data.kenteken} onChange={(v) => update("kenteken", v)} placeholder="Bijv. AB-123-CD" />
+                  <InputField
+                    label="Kenteken (optioneel)"
+                    value={data.kenteken}
+                    onChange={(v) => {
+                      update("kenteken", v);
+                      setRdwFetched(false);
+                    }}
+                    placeholder="Bijv. AB123CD"
+                    suffix={
+                      <button
+                        type="button"
+                        onClick={handleKentekenLookup}
+                        disabled={rdwLoading || !data.kenteken}
+                        className="flex items-center gap-1.5 px-4 py-1.5 text-[9px] tracking-[0.15em] uppercase font-body font-medium bg-foreground text-background hover:bg-foreground/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        {rdwLoading ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          "Opzoeken"
+                        )}
+                      </button>
+                    }
+                  />
+                  {rdwFetched && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-[10px] font-body text-muted-foreground -mt-4"
+                    >
+                      ✓ Gegevens ingevuld via RDW. U kunt deze nog aanpassen.
+                    </motion.p>
+                  )}
                   <InputField label="Merk" value={data.merk} onChange={(v) => update("merk", v)} placeholder="Bijv. Volkswagen" />
                   <InputField label="Model" value={data.model} onChange={(v) => update("model", v)} placeholder="Bijv. Golf" />
                   <div className="grid grid-cols-2 gap-6">
@@ -300,7 +475,6 @@ const Consignatie = () => {
 
               {step === 4 && (
                 <div className="space-y-10">
-                  {/* Photo upload */}
                   <div>
                     <p className="text-[10px] font-body font-medium tracking-[0.2em] uppercase text-muted-foreground mb-4">
                       Foto's (max. 10)
@@ -334,7 +508,6 @@ const Consignatie = () => {
                     </div>
                   </div>
 
-                  {/* Opmerkingen */}
                   <div className="space-y-2">
                     <label className="text-[10px] font-body font-medium tracking-[0.2em] uppercase text-muted-foreground">
                       Opmerkingen
@@ -381,10 +554,17 @@ const Consignatie = () => {
             ) : (
               <button
                 onClick={handleSubmit}
-                className="flex items-center gap-2 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300"
+                disabled={submitting}
+                className="flex items-center gap-2 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300 disabled:opacity-50"
               >
-                Versturen
-                <Check className="w-3.5 h-3.5" />
+                {submitting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <>
+                    Versturen
+                    <Check className="w-3.5 h-3.5" />
+                  </>
+                )}
               </button>
             )}
           </div>
