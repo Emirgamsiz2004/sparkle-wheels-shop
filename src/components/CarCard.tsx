@@ -10,7 +10,7 @@ const CarCard = ({ car }: CarCardProps) => {
   return (
     <Link
       to={`/voorraad/${car.id}`}
-      className="group bg-background block"
+      className="group bg-background block h-full flex flex-col"
     >
       <div className="aspect-[16/10] overflow-hidden">
         <img
@@ -19,7 +19,7 @@ const CarCard = ({ car }: CarCardProps) => {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
       </div>
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-2 mb-3">
           <h3 className="text-sm md:text-base font-display font-semibold text-foreground group-hover:text-foreground/80 transition-colors leading-tight">
             {car.title}
@@ -28,7 +28,7 @@ const CarCard = ({ car }: CarCardProps) => {
             € {car.price.toLocaleString("nl-NL")}
           </p>
         </div>
-        <div className="flex items-center gap-3 text-muted-foreground border-t border-border pt-3">
+        <div className="flex items-center gap-3 text-muted-foreground border-t border-border pt-3 mt-auto">
           <span className="flex items-center gap-1.5 text-[10px] md:text-[11px] font-body tracking-wide">
             <Calendar className="w-3 h-3" />
             {car.year}
