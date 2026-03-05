@@ -21,9 +21,14 @@ const Footer = () => {
             ))}
           </div>
 
-          <p className="text-[10px] text-muted-foreground font-body tracking-wider">
-            © {new Date().getFullYear()} PLA Auto's
-          </p>
+          <div className="flex flex-col items-center md:items-end gap-1">
+            <p className="text-[10px] text-muted-foreground font-body tracking-wider">
+              © {new Date().getFullYear()} PLA Auto's
+            </p>
+            <p className="text-[10px] text-muted-foreground/70 font-body tracking-wider">
+              KvK: 12345678
+            </p>
+          </div>
         </div>
       </div>
     </footer>
