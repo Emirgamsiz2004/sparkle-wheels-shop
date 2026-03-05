@@ -9,7 +9,7 @@ const stats = [
 
 const AboutSection = () => {
   return (
-    <section id="over-ons" className="py-28 lg:py-36 bg-card">
+    <section id="over-ons" className="py-16 md:py-28 lg:py-36 bg-card">
       <div className="container mx-auto px-6 lg:px-16">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <motion.div
@@ -38,7 +38,7 @@ const AboutSection = () => {
               </p>
             </div>
 
-            <div className="flex gap-12 pt-8 border-t border-border">
+            <div className="flex gap-8 md:gap-12 pt-8 border-t border-border">
               {stats.map((stat) => (
                 <div key={stat.label}>
                   <p className="text-2xl md:text-3xl font-display font-bold text-foreground mb-1">
@@ -59,14 +59,14 @@ const AboutSection = () => {
             transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="aspect-[3/4] overflow-hidden">
+            <div className="aspect-[4/3] lg:aspect-[3/4] overflow-hidden">
               <img
                 src={aboutImg}
-                alt="PLA Auto's werkplaats"
+                alt="Platin Automotive werkplaats"
                 className="w-full h-full object-cover grayscale"
               />
             </div>
-            <div className="absolute -bottom-4 -right-4 w-full h-full border border-foreground/8 -z-10" />
+            <div className="hidden lg:block absolute -bottom-4 -right-4 w-full h-full border border-foreground/8 -z-10" />
           </motion.div>
         </div>
       </div>

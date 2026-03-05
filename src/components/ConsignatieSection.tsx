@@ -22,14 +22,14 @@ const steps = [
 
 const ConsignatieSection = () => {
   return (
-    <section id="consignatie" className="py-28 lg:py-36 bg-background">
+    <section id="consignatie" className="py-16 md:py-28 lg:py-36 bg-background">
       <div className="container mx-auto px-6 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mb-16"
+          className="mb-10 md:mb-16"
         >
           <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
             Consignatie
@@ -52,7 +52,7 @@ const ConsignatieSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.15 }}
-              className="bg-card p-10 group"
+              className="bg-card p-6 md:p-10 group"
             >
               <span className="text-[10px] font-body font-medium tracking-[0.3em] text-muted-foreground">
                 {step.number}

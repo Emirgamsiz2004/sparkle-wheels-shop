@@ -8,14 +8,14 @@ const InventorySection = () => {
   const featured = placeholderCars.slice(0, 3);
 
   return (
-    <section id="voorraad" className="py-28 lg:py-36 bg-card">
+    <section id="voorraad" className="py-16 md:py-28 lg:py-36 bg-card">
       <div className="container mx-auto px-6 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="flex items-end justify-between mb-16"
+          className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-16"
         >
           <div>
             <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">

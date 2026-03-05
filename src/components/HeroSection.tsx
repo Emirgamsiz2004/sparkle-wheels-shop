@@ -4,7 +4,7 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
   return (
-    <section id="home" className="relative h-screen w-full overflow-hidden">
+    <section id="home" className="relative h-[100svh] w-full overflow-hidden">
       {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
@@ -20,7 +20,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
+          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-extrabold leading-[0.95] mb-8 md:mb-12 text-foreground tracking-tight"
         >
           Betrouwbare Occasions
         </motion.h1>
@@ -30,7 +30,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
-          className="group flex items-center gap-3 border-b border-foreground/30 hover:border-foreground pb-2.5 text-xs md:text-sm font-body font-medium tracking-[0.3em] uppercase text-foreground/70 hover:text-foreground transition-all duration-300"
+          className="group flex items-center gap-3 border-b border-foreground/30 hover:border-foreground pb-2.5 text-[10px] md:text-sm font-body font-medium tracking-[0.3em] uppercase text-foreground/70 hover:text-foreground transition-all duration-300"
         >
           Bekijk Ons Aanbod
         </motion.a>
