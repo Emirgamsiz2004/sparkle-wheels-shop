@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-6 lg:px-16 py-8 md:py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <a href="#home">
-            <img src={logo} alt="PLA Auto's" className="h-10 md:h-12 w-auto opacity-60 hover:opacity-100 transition-opacity" />
+            <img src={logo} alt="Platin Automotive" className="h-10 md:h-14 w-auto opacity-60 hover:opacity-100 transition-opacity" />
           </a>
 
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">

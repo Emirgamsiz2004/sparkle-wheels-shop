@@ -56,7 +56,7 @@ const Navbar = () => {
     >
       <div className="container mx-auto flex items-center justify-between py-5 px-6 lg:px-16">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo} alt="Platin Automotive" className="h-9 md:h-12 w-auto" />
+          <img src={logo} alt="Platin Automotive" className="h-10 md:h-14 w-auto" />
         </Link>
 
         {/* Desktop nav */}
