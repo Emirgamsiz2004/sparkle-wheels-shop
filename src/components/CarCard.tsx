@@ -27,7 +27,7 @@ const CarCard = ({ car }: CarCardProps) => {
         )}
       </div>
       <div className="p-4 md:p-6 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="flex items-start justify-between gap-2 mb-4">
           <h3 className="text-sm md:text-base font-display font-semibold text-foreground leading-tight">
             {car.title}
           </h3>
@@ -35,26 +35,23 @@ const CarCard = ({ car }: CarCardProps) => {
             € {car.price.toLocaleString("nl-NL")}
           </p>
         </div>
-        <div className="flex items-center gap-3 text-muted-foreground border-t border-border pt-3 mt-auto flex-wrap">
-          <span className="flex items-center gap-1.5 text-[10px] md:text-[11px] font-body tracking-wide">
-            <Calendar className="w-3 h-3" />
-            {car.year}
-          </span>
-          <span className="w-px h-3 bg-border" />
-          <span className="flex items-center gap-1.5 text-[10px] md:text-[11px] font-body tracking-wide">
-            <Gauge className="w-3 h-3" />
-            {car.mileage.toLocaleString("nl-NL")} km
-          </span>
-          <span className="w-px h-3 bg-border" />
-          <span className="flex items-center gap-1.5 text-[10px] md:text-[11px] font-body tracking-wide">
-            <Settings2 className="w-3 h-3" />
-            {car.transmission}
-          </span>
-          <span className="w-px h-3 bg-border" />
-          <span className="flex items-center gap-1.5 text-[10px] md:text-[11px] font-body tracking-wide">
-            <Fuel className="w-3 h-3" />
-            {car.engine}
-          </span>
+        <div className="grid grid-cols-2 gap-y-2.5 gap-x-4 border-t border-border pt-3 mt-auto">
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Calendar className="w-3 h-3 shrink-0" />
+            <span className="text-[10px] md:text-[11px] font-body tracking-wide">{car.year}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Gauge className="w-3 h-3 shrink-0" />
+            <span className="text-[10px] md:text-[11px] font-body tracking-wide">{car.mileage.toLocaleString("nl-NL")} km</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Settings2 className="w-3 h-3 shrink-0" />
+            <span className="text-[10px] md:text-[11px] font-body tracking-wide">{car.transmission}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Fuel className="w-3 h-3 shrink-0" />
+            <span className="text-[10px] md:text-[11px] font-body tracking-wide">{car.engine}</span>
+          </div>
         </div>
       </div>
     </Link>
