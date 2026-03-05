@@ -22,7 +22,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-5xl md:text-7xl lg:text-8xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
         >
-          Exclusieve Auto's
+          Betrouwbare Occasions
         </motion.h1>
 
         <motion.a
