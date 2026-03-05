@@ -9,6 +9,7 @@ const services = [
   { label: "Onderhoud & Reparatie", href: "/diensten/onderhoud-reparatie" },
   { label: "Auto Detailing", href: "/diensten/auto-detailing" },
   { label: "Auto Zoeken", href: "/diensten/auto-zoeken" },
+  { label: "Auto Customizing", href: "/diensten/auto-customizing" },
 ];
 
 const navLinks = [
