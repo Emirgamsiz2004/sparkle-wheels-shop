@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, ArrowRight } from "lucide-react";
 
 const contactInfo = [
-  { icon: Phone, label: "Telefoon", value: "+31 6 00 00 00 00", href: "tel:+31600000000" },
-  { icon: Mail, label: "E-mail", value: "info@plaautos.nl", href: "mailto:info@plaautos.nl" },
-  { icon: MapPin, label: "Adres", value: "Straatnaam 1, Stad", href: "#" },
+  { icon: Phone, label: "Telefoon", value: "06 - 1269 3825", href: "tel:+31612693825" },
+  { icon: Mail, label: "E-mail", value: "info@platinautomotive.nl", href: "mailto:info@platinautomotive.nl" },
+  { icon: MapPin, label: "Adres", value: "Cilinderweg 99, Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+Roelofarendsveen" },
   { icon: Clock, label: "Openingstijden", value: "Ma-Za: 09:00 - 18:00", href: "#" },
 ];
 
@@ -31,7 +31,7 @@ const ContactSection = () => {
               Heeft u vragen of wilt u een afspraak maken? Wij helpen u graag verder.
             </p>
             <a
-              href="tel:+31600000000"
+              href="tel:+31612693825"
               className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300"
             >
               <Phone className="w-3.5 h-3.5" />
