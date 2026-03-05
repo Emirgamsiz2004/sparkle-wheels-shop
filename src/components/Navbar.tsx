@@ -6,7 +6,7 @@ import logo from "@/assets/logo.svg";
 
 const services = [
   { label: "In- & Verkoop", href: "/diensten/in-en-verkoop", isPage: true },
-  { label: "Onderhoud & Reparatie", href: "#diensten" },
+  { label: "Onderhoud & Reparatie", href: "/diensten/onderhoud-reparatie", isPage: true },
   { label: "Auto Detailing", href: "#diensten" },
 ];
 

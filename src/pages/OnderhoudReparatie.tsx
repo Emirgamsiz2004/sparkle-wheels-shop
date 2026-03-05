@@ -1,0 +1,337 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, Wrench, Clock, Euro, MessageCircle, Phone, CheckCircle, Send } from "lucide-react";
+import { Link } from "react-router-dom";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import onderhoudImg from "@/assets/onderhoud.jpg";
+
+const diensten = [
+  "Olie verversen",
+  "Remmen vervangen",
+  "Distributieriem",
+  "APK-keuring",
+  "Banden wisselen",
+  "Airco service",
+  "Diagnose & storing",
+  "Accu vervangen",
+];
+
+const offerteSchema = z.object({
+  naam: z.string().trim().min(1, "Vul uw naam in").max(100),
+  telefoon: z.string().trim().min(1, "Vul uw telefoonnummer in").max(20),
+  auto: z.string().trim().min(1, "Vul uw auto in").max(100),
+  omschrijving: z.string().trim().min(1, "Beschrijf kort wat er moet gebeuren").max(1000),
+});
+
+const OfferteForm = () => {
+  const [formData, setFormData] = useState({ naam: "", telefoon: "", auto: "", omschrijving: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const { toast } = useToast();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = offerteSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    const message = `Hallo, ik wil graag een offerte aanvragen.%0A%0ANaam: ${encodeURIComponent(result.data.naam)}%0ATelefoon: ${encodeURIComponent(result.data.telefoon)}%0AAuto: ${encodeURIComponent(result.data.auto)}%0A%0A${encodeURIComponent(result.data.omschrijving)}`;
+    window.open(`https://wa.me/31612693825?text=${message}`, "_blank");
+
+    setSubmitted(true);
+    toast({ title: "Offerte verstuurd", description: "We nemen zo snel mogelijk contact met u op." });
+  };
+
+  if (submitted) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <div className="w-12 h-12 border-2 border-foreground flex items-center justify-center mb-4">
+          <Send className="w-5 h-5 text-foreground" />
+        </div>
+        <p className="text-foreground font-display font-semibold mb-2">Bedankt voor uw aanvraag!</p>
+        <p className="text-muted-foreground font-body text-sm font-light">We nemen zo snel mogelijk contact met u op met een prijsindicatie.</p>
+        <button
+          onClick={() => { setSubmitted(false); setFormData({ naam: "", telefoon: "", auto: "", omschrijving: "" }); }}
+          className="mt-6 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Nog een aanvraag doen
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="grid sm:grid-cols-2 gap-5">
+        <div>
+          <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Naam *</label>
+          <input type="text" name="naam" value={formData.naam} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Uw naam" />
+          {errors.naam && <p className="text-xs text-red-400 mt-1 font-body">{errors.naam}</p>}
+        </div>
+        <div>
+          <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Telefoon *</label>
+          <input type="tel" name="telefoon" value={formData.telefoon} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="06 - 0000 0000" />
+          {errors.telefoon && <p className="text-xs text-red-400 mt-1 font-body">{errors.telefoon}</p>}
+        </div>
+      </div>
+      <div>
+        <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Auto (merk, model, bouwjaar) *</label>
+        <input type="text" name="auto" value={formData.auto} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. Volkswagen Golf 2019" />
+        {errors.auto && <p className="text-xs text-red-400 mt-1 font-body">{errors.auto}</p>}
+      </div>
+      <div>
+        <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Wat moet er gebeuren? *</label>
+        <textarea name="omschrijving" value={formData.omschrijving} onChange={handleChange} rows={4} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Beschrijf kort het probleem of de werkzaamheden..." />
+        {errors.omschrijving && <p className="text-xs text-red-400 mt-1 font-body">{errors.omschrijving}</p>}
+      </div>
+      <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
+        <Send className="w-3.5 h-3.5" />
+        Offerte Aanvragen
+        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+      </button>
+    </form>
+  );
+};
+
+const OnderhoudReparatie = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+
+      {/* Hero */}
+      <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${onderhoudImg})` }}
+        >
+          <div className="absolute inset-0 bg-background/80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        </div>
+        <div className="relative z-10 flex flex-col justify-end h-full container mx-auto px-6 lg:px-16 pb-12 md:pb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors mb-8"
+            >
+              <ArrowRight className="w-3.5 h-3.5 rotate-180" />
+              Terug naar home
+            </Link>
+            <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
+              Diensten
+            </p>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-foreground tracking-tight">
+              Onderhoud & Reparatie
+            </h1>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Intro */}
+      <section className="py-16 md:py-28 bg-card">
+        <div className="container mx-auto px-6 lg:px-16">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6 leading-tight">
+                Vakkundig onderhoud
+                <br />
+                voor uw auto.
+              </h2>
+              <div className="space-y-4">
+                <p className="text-muted-foreground font-body font-light leading-relaxed">
+                  Of het nu gaat om een simpele oliewissel of een complexere reparatie — 
+                  bij Platin Automotive bent u aan het juiste adres. Wij voeren klein onderhoud 
+                  en reparaties uit met dezelfde zorg en aandacht als voor onze eigen auto's.
+                </p>
+                <p className="text-muted-foreground font-body font-light leading-relaxed">
+                  Geen onnodige werkzaamheden, geen verrassingen op de factuur. 
+                  Wij zijn eerlijk over wat er moet gebeuren en wat het kost. 
+                  Altijd vooraf een duidelijke prijsindicatie.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="grid grid-cols-3 gap-px bg-border">
+                {[
+                  { icon: Euro, label: "Scherpe prijzen" },
+                  { icon: Clock, label: "Snel geholpen" },
+                  { icon: Wrench, label: "Vakwerk" },
+                ].map((item) => (
+                  <div key={item.label} className="bg-background p-5 md:p-6 flex flex-col items-center text-center">
+                    <item.icon className="w-5 h-5 text-muted-foreground mb-3" />
+                    <span className="text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Diensten overzicht */}
+      <section className="py-16 md:py-28 bg-background">
+        <div className="container mx-auto px-6 lg:px-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="mb-12 md:mb-16"
+          >
+            <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
+              Werkzaamheden
+            </p>
+            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight">
+              Wat wij voor u doen
+            </h2>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
+            {diensten.map((dienst, i) => (
+              <motion.div
+                key={dienst}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+                className="bg-card p-5 md:p-6 flex items-center gap-3 group"
+              >
+                <CheckCircle className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+                <span className="text-sm font-body text-foreground">{dienst}</span>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="text-xs font-body font-light text-muted-foreground mt-6"
+          >
+            Staat uw werkzaamheid er niet bij? Neem contact op — wij kijken graag wat we voor u kunnen betekenen.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Offerte + Quick contact */}
+      <section className="py-16 md:py-28 bg-card">
+        <div className="container mx-auto px-6 lg:px-16">
+          <div className="grid lg:grid-cols-2 gap-px bg-border">
+            {/* Offerte formulier */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="bg-background p-6 md:p-10"
+            >
+              <p className="text-[10px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground mb-2">
+                Offerte
+              </p>
+              <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-2">
+                Vraag een offerte aan
+              </h3>
+              <p className="text-xs font-body font-light text-muted-foreground leading-relaxed mb-8">
+                Vul het formulier in en wij geven u zo snel mogelijk een prijsindicatie. Vrijblijvend en zonder verplichtingen.
+              </p>
+              <OfferteForm />
+            </motion.div>
+
+            {/* Snel contact */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="bg-background p-6 md:p-10 flex flex-col"
+            >
+              <p className="text-[10px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground mb-2">
+                Snel contact
+              </p>
+              <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-2">
+                Liever direct contact?
+              </h3>
+              <p className="text-xs font-body font-light text-muted-foreground leading-relaxed mb-8">
+                Bel ons of stuur een WhatsApp berichtje. Wij reageren snel en kunnen u direct een inschatting geven.
+              </p>
+
+              <div className="space-y-4 mb-8">
+                <a
+                  href="tel:+31612693825"
+                  className="group flex items-center gap-4 p-4 border border-border hover:border-foreground/30 transition-all duration-300"
+                >
+                  <Phone className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <div>
+                    <p className="text-sm font-display font-semibold text-foreground">Bel ons</p>
+                    <p className="text-xs font-body text-muted-foreground">06 - 1269 3825</p>
+                  </div>
+                </a>
+                <a
+                  href="https://wa.me/31612693825?text=Hallo%2C%20ik%20wil%20graag%20een%20offerte%20voor%20onderhoud%2Freparatie."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-4 p-4 border border-border hover:border-foreground/30 transition-all duration-300"
+                >
+                  <MessageCircle className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="text-sm font-display font-semibold text-foreground">WhatsApp</p>
+                    <p className="text-xs font-body text-muted-foreground">Stuur een berichtje</p>
+                  </div>
+                </a>
+              </div>
+
+              <div className="mt-auto pt-8 border-t border-border">
+                <p className="text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-4">
+                  Openingstijden
+                </p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm font-body">
+                    <span className="text-muted-foreground">Ma t/m Vr</span>
+                    <span className="text-foreground">09:00 - 18:00</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-body">
+                    <span className="text-muted-foreground">Za & Zo</span>
+                    <span className="text-foreground">10:00 - 17:00</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default OnderhoudReparatie;
