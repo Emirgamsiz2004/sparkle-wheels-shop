@@ -27,14 +27,14 @@ const services = [
 
 const ServicesSection = () => {
   return (
-    <section id="diensten" className="py-28 lg:py-36 bg-background">
+    <section id="diensten" className="py-16 md:py-28 lg:py-36 bg-background">
       <div className="container mx-auto px-6 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="flex items-end justify-between mb-16"
+          className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-16"
         >
           <div>
             <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
@@ -57,14 +57,14 @@ const ServicesSection = () => {
               transition={{ duration: 0.6, delay: i * 0.15 }}
               className="group bg-background"
             >
-              <div className="h-64 overflow-hidden">
+              <div className="h-48 md:h-64 overflow-hidden">
                 <img
                   src={service.image}
                   alt={service.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale group-hover:grayscale-0"
                 />
               </div>
-              <div className="p-8">
+              <div className="p-5 md:p-8">
                 <div className="flex items-start justify-between mb-4">
                   <span className="text-[10px] font-body font-medium text-muted-foreground tracking-wider">
                     {service.num}

@@ -10,7 +10,7 @@ const contactInfo = [
 
 const ContactSection = () => {
   return (
-    <section id="contact" className="py-28 lg:py-36 bg-background">
+    <section id="contact" className="py-16 md:py-28 lg:py-36 bg-background">
       <div className="container mx-auto px-6 lg:px-16">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <motion.div
@@ -45,13 +45,13 @@ const ContactSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="grid grid-cols-2 gap-px bg-border"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-border"
           >
             {contactInfo.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className="group bg-card hover:bg-accent p-8 transition-all duration-300"
+                className="group bg-card hover:bg-accent p-6 md:p-8 transition-all duration-300"
               >
                 <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-foreground mb-6 transition-colors" />
                 <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground mb-2">
