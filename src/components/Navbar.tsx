@@ -1,14 +1,20 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.svg";
+
+const services = [
+  { label: "In- & Verkoop", href: "#diensten" },
+  { label: "Onderhoud & Reparatie", href: "#diensten" },
+  { label: "Auto Detailing", href: "#diensten" },
+];
 
 const navLinks = [
   { label: "Home", href: "#home" },
   { label: "Voorraad", href: "#voorraad" },
   { label: "Consignatie", href: "/consignatie", isPage: true },
-  { label: "Diensten", href: "#diensten" },
+  { label: "Diensten", href: "#diensten", hasDropdown: true },
   { label: "Over Ons", href: "#over-ons" },
   { label: "Contact", href: "#contact" },
 ];
@@ -40,7 +46,34 @@ const Navbar = () => {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-10">
           {navLinks.map((link) =>
-            (link as any).isPage ? (
+            (link as any).hasDropdown ? (
+              <div key={link.href} className="relative group/dropdown">
+                <a
+                  href={link.href}
+                  className="flex items-center gap-1 text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
+                >
+                  {link.label}
+                  <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover/dropdown:rotate-180" />
+                </a>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition-all duration-300">
+                  <motion.div
+                    className="bg-card border border-border min-w-[200px] py-2 shadow-lg shadow-background/50"
+                    initial={false}
+                  >
+                    {services.map((service, i) => (
+                      <a
+                        key={service.label}
+                        href={service.href}
+                        className="block px-5 py-3 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
+                        style={{ transitionDelay: `${i * 30}ms` }}
+                      >
+                        {service.label}
+                      </a>
+                    ))}
+                  </motion.div>
+                </div>
+              </div>
+            ) : (link as any).isPage ? (
               <Link
                 key={link.href}
                 to={link.href}
