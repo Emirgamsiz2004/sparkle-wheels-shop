@@ -1,11 +1,10 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Clock, Star, MessageCircle, Phone, CheckCircle, Send, ShieldCheck } from "lucide-react";
+import { ArrowRight, Sparkles, Star, MessageCircle, Phone, CheckCircle, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
-import { z } from "zod";
-import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import BookingForm from "@/components/BookingForm";
+import FloatingCTA from "@/components/FloatingCTA";
 import detailingImg from "@/assets/detailing.jpg";
 
 const diensten = [
@@ -19,98 +18,11 @@ const diensten = [
   "Geur- & bacteriebehandeling",
 ];
 
-const offerteSchema = z.object({
-  naam: z.string().trim().min(1, "Vul uw naam in").max(100),
-  telefoon: z.string().trim().min(1, "Vul uw telefoonnummer in").max(20),
-  auto: z.string().trim().min(1, "Vul uw auto in").max(100),
-  omschrijving: z.string().trim().min(1, "Beschrijf kort wat u wilt laten doen").max(1000),
-});
-
-const OfferteForm = () => {
-  const [formData, setFormData] = useState({ naam: "", telefoon: "", auto: "", omschrijving: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitted, setSubmitted] = useState(false);
-  const { toast } = useToast();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = offerteSchema.safeParse(formData);
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
-      });
-      setErrors(fieldErrors);
-      return;
-    }
-
-    const message = `Hallo, ik wil graag een offerte voor detailing.%0A%0ANaam: ${encodeURIComponent(result.data.naam)}%0ATelefoon: ${encodeURIComponent(result.data.telefoon)}%0AAuto: ${encodeURIComponent(result.data.auto)}%0A%0A${encodeURIComponent(result.data.omschrijving)}`;
-    window.open(`https://wa.me/31612693825?text=${message}`, "_blank");
-
-    setSubmitted(true);
-    toast({ title: "Aanvraag verstuurd", description: "We nemen zo snel mogelijk contact met u op." });
-  };
-
-  if (submitted) {
-    return (
-      <div className="flex flex-col items-center justify-center py-10 text-center">
-        <div className="w-12 h-12 border-2 border-foreground flex items-center justify-center mb-4">
-          <Send className="w-5 h-5 text-foreground" />
-        </div>
-        <p className="text-foreground font-display font-semibold mb-2">Bedankt voor uw aanvraag!</p>
-        <p className="text-muted-foreground font-body text-sm font-light">We nemen zo snel mogelijk contact met u op.</p>
-        <button
-          onClick={() => { setSubmitted(false); setFormData({ naam: "", telefoon: "", auto: "", omschrijving: "" }); }}
-          className="mt-6 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Nog een aanvraag doen
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid sm:grid-cols-2 gap-5">
-        <div>
-          <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Naam *</label>
-          <input type="text" name="naam" value={formData.naam} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Uw naam" />
-          {errors.naam && <p className="text-xs text-red-400 mt-1 font-body">{errors.naam}</p>}
-        </div>
-        <div>
-          <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Telefoon *</label>
-          <input type="tel" name="telefoon" value={formData.telefoon} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="06 - 0000 0000" />
-          {errors.telefoon && <p className="text-xs text-red-400 mt-1 font-body">{errors.telefoon}</p>}
-        </div>
-      </div>
-      <div>
-        <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Auto (merk, model, bouwjaar) *</label>
-        <input type="text" name="auto" value={formData.auto} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. BMW 3-serie 2020" />
-        {errors.auto && <p className="text-xs text-red-400 mt-1 font-body">{errors.auto}</p>}
-      </div>
-      <div>
-        <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Wat wilt u laten doen? *</label>
-        <textarea name="omschrijving" value={formData.omschrijving} onChange={handleChange} rows={4} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Bijv. volledig interieur en exterieur, alleen poetsen, specifieke behandeling..." />
-        {errors.omschrijving && <p className="text-xs text-red-400 mt-1 font-body">{errors.omschrijving}</p>}
-      </div>
-      <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
-        <Send className="w-3.5 h-3.5" />
-        Offerte Aanvragen
-        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-      </button>
-    </form>
-  );
-};
-
 const AutoDetailing = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      <FloatingCTA targetId="afspraak" label="Afspraak maken" />
 
       {/* Hero */}
       <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
@@ -242,11 +154,11 @@ const AutoDetailing = () => {
         </div>
       </section>
 
-      {/* Offerte + Quick contact */}
-      <section className="py-16 md:py-28 bg-card">
+      {/* Afspraak + Quick contact */}
+      <section id="afspraak" className="py-16 md:py-28 bg-card">
         <div className="container mx-auto px-6 lg:px-16">
           <div className="grid lg:grid-cols-2 gap-px bg-border">
-            {/* Offerte formulier */}
+            {/* Afspraak formulier */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -255,15 +167,15 @@ const AutoDetailing = () => {
               className="bg-background p-6 md:p-10"
             >
               <p className="text-[10px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground mb-2">
-                Offerte
+                Direct inplannen
               </p>
               <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-2">
-                Vraag een offerte aan
+                Maak een afspraak
               </h3>
               <p className="text-xs font-body font-light text-muted-foreground leading-relaxed mb-8">
-                Vertel ons wat u wilt laten doen en wij geven u zo snel mogelijk een prijsindicatie. Vrijblijvend en zonder verplichtingen.
+                Kies een datum en tijd die u uitkomt. Wij bevestigen uw afspraak zo snel mogelijk. Vrijblijvend en zonder verplichtingen.
               </p>
-              <OfferteForm />
+              <BookingForm dienst="detailing" />
             </motion.div>
 
             {/* Snel contact */}
