@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const steps = [
   {
@@ -73,13 +74,13 @@ const ConsignatieSection = () => {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="mt-12"
         >
-          <a
-            href="#contact"
+          <Link
+            to="/consignatie"
             className="inline-flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Meld uw auto aan
             <ArrowRight className="w-3.5 h-3.5" />
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

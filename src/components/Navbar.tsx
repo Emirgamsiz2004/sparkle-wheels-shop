@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.svg";
 
 const navLinks = [
   { label: "Home", href: "#home" },
   { label: "Voorraad", href: "#voorraad" },
+  { label: "Consignatie", href: "/consignatie", isPage: true },
   { label: "Diensten", href: "#diensten" },
   { label: "Over Ons", href: "#over-ons" },
   { label: "Contact", href: "#contact" },
@@ -37,15 +39,25 @@ const Navbar = () => {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-10">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) =>
+            (link as any).isPage ? (
+              <Link
+                key={link.href}
+                to={link.href}
+                className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
+                {link.label}
+              </a>
+            )
+          )}
           <a
             href="tel:+31600000000"
             className="flex items-center gap-2 bg-foreground text-background px-5 py-2.5 text-[10px] font-semibold tracking-[0.2em] uppercase transition-all hover:bg-foreground/90"
@@ -74,16 +86,27 @@ const Navbar = () => {
             className="md:hidden bg-background/98 backdrop-blur-lg border-b border-border"
           >
             <div className="flex flex-col items-center gap-6 py-10">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) =>
+                (link as any).isPage ? (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                )
+              )}
               <a
                 href="tel:+31600000000"
                 className="flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase"
