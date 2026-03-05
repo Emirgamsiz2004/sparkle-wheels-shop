@@ -65,7 +65,7 @@ const Navbar = () => {
             <Phone className="w-3 h-3 relative z-10" />
             <span className="relative overflow-hidden h-[14px]">
               <span className="flex flex-col transition-transform duration-300 ease-out group-hover:-translate-y-[14px]">
-                <span className="h-[14px] flex items-center whitespace-nowrap">Bel Ons</span>
+                <span className="h-[14px] flex items-center whitespace-nowrap">Neem Contact Op</span>
                 <span className="h-[14px] flex items-center whitespace-nowrap">06-12693825</span>
               </span>
             </span>
@@ -119,7 +119,7 @@ const Navbar = () => {
                 <Phone className="w-3 h-3 relative z-10" />
                 <span className="relative overflow-hidden h-[14px]">
                   <span className="flex flex-col transition-transform duration-300 ease-out group-hover:-translate-y-[14px]">
-                    <span className="h-[14px] flex items-center whitespace-nowrap">Bel Ons</span>
+                    <span className="h-[14px] flex items-center whitespace-nowrap">Neem Contact Op</span>
                     <span className="h-[14px] flex items-center whitespace-nowrap">06-12693825</span>
                   </span>
                 </span>
