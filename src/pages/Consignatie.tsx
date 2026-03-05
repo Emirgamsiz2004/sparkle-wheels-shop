@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, FileCheck, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, FileCheck, Lock, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -541,6 +541,10 @@ const Consignatie = () => {
             <div className="flex flex-col items-center gap-2">
               <FileCheck className="w-6 h-6 text-foreground" strokeWidth={1.5} />
               <span className="text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground">NAP Controle</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Building2 className="w-6 h-6 text-foreground" strokeWidth={1.5} />
+              <span className="text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground">KvK Geregistreerd</span>
             </div>
             <div className="flex flex-col items-center gap-2">
               <Lock className="w-6 h-6 text-foreground" strokeWidth={1.5} />
