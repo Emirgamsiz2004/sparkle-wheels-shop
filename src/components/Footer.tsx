@@ -3,7 +3,7 @@ import logo from "@/assets/logo.svg";
 const Footer = () => {
   return (
     <footer className="bg-card border-t border-border">
-      <div className="container mx-auto px-6 lg:px-16 py-8 md:py-12">
+      <div className="container mx-auto px-4 lg:px-8 py-8 md:py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <a href="#home">
             <img src={logo} alt="Platin Automotive" className="h-10 md:h-14 w-auto opacity-60 hover:opacity-100 transition-opacity" />
@@ -27,9 +27,6 @@ const Footer = () => {
             </p>
             <p className="text-[10px] text-muted-foreground/70 font-body tracking-wider">
               Cilinderweg 99, 2371 DZ Roelofarendsveen
-            </p>
-            <p className="text-[10px] text-muted-foreground/70 font-body tracking-wider">
-              KvK: 99146193 · BTW: NL868825463B01
             </p>
           </div>
         </div>
