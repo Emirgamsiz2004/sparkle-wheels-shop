@@ -33,9 +33,14 @@ const ConsignatieSection = () => {
           <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
             Consignatie
           </p>
-          <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground tracking-tight">
+          <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground tracking-tight mb-5">
             Wilt u uw auto verkopen?
           </h2>
+          <p className="text-sm md:text-base font-body font-light text-muted-foreground leading-relaxed max-w-2xl">
+            Geen gedoe met eindeloos adverteren, onderhandelen of wantrouwige kopers. 
+            Wij nemen het volledige verkoopproces uit handen — van taxatie tot overdracht. 
+            U betaalt pas bij een succesvolle verkoop. Geen risico, geen verborgen kosten.
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-px bg-border">
