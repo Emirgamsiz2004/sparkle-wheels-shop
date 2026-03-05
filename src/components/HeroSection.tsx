@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
@@ -15,65 +15,25 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-start justify-center h-full px-6 lg:px-16 max-w-6xl mx-auto">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: 48 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="h-px bg-foreground/50 mb-8"
-        />
-
-        <motion.p
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-[10px] md:text-xs tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-5"
-        >
-          In- & Verkoop · Onderhoud · Detailing
-        </motion.p>
-
+      <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-display font-extrabold leading-[0.95] mb-8 text-foreground tracking-tight"
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="text-5xl md:text-7xl lg:text-8xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
         >
-          Uw auto
-          <br />
-          <span className="text-gradient">in de beste</span>
-          <br />
-          handen.
+          Exclusieve Auto's
         </motion.h1>
 
-        <motion.p
+        <motion.a
+          href="#voorraad"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-sm md:text-base text-muted-foreground max-w-sm mb-10 font-body font-light leading-relaxed"
+          transition={{ duration: 0.8, delay: 0.7 }}
+          className="group flex items-center gap-3 border-b-2 border-foreground/50 hover:border-foreground pb-3 text-sm md:text-base font-body font-medium tracking-[0.3em] uppercase text-foreground/80 hover:text-foreground transition-all duration-300"
         >
-          Persoonlijke service, eerlijke prijzen en vakmanschap waar u op kunt vertrouwen.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.0 }}
-          className="flex flex-col sm:flex-row gap-4"
-        >
-          <a
-            href="#diensten"
-            className="group flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300"
-          >
-            Bekijk Diensten
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-          </a>
-          <a
-            href="#contact"
-            className="flex items-center gap-3 border border-foreground/20 text-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:border-foreground/50 hover:bg-foreground/5 transition-all duration-300"
-          >
-            Neem Contact Op
-          </a>
-        </motion.div>
+          Bekijk Ons Aanbod
+        </motion.a>
       </div>
 
       {/* Scroll indicator */}
