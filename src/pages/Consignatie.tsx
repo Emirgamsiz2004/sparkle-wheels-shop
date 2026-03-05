@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, FileCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, FileCheck, HelpCircle, Euro, Clock, Handshake } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -527,12 +527,52 @@ const Consignatie = () => {
         </div>
       </section>
 
-      {/* Vertrouwen */}
-      <section className="border-t border-border py-16">
-        <div className="container mx-auto px-6 lg:px-16 max-w-2xl">
-          <p className="text-[9px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground text-center mb-8">
-            Waarom bij ons?
+      {/* Hoe werkt het */}
+      <section className="border-t border-border py-16 md:py-24">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3 text-center">
+            Veelgestelde vragen
           </p>
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-12 text-center">
+            Hoe werkt consignatie?
+          </h2>
+
+          <div className="grid sm:grid-cols-2 gap-px bg-border">
+            <div className="bg-card p-6 md:p-8">
+              <Euro className="w-5 h-5 text-muted-foreground mb-4" />
+              <h3 className="text-sm font-display font-semibold text-foreground mb-2">Wat kost het?</h3>
+              <p className="text-xs font-body font-light text-muted-foreground leading-relaxed">
+                U betaalt pas bij een succesvolle verkoop. Geen voorafkosten, geen risico. Wij spreken vooraf een eerlijke commissie af.
+              </p>
+            </div>
+            <div className="bg-card p-6 md:p-8">
+              <Clock className="w-5 h-5 text-muted-foreground mb-4" />
+              <h3 className="text-sm font-display font-semibold text-foreground mb-2">Hoe lang duurt het?</h3>
+              <p className="text-xs font-body font-light text-muted-foreground leading-relaxed">
+                Dat verschilt per auto, maar de meeste auto's worden binnen enkele weken verkocht. U kunt altijd tussentijds opzeggen.
+              </p>
+            </div>
+            <div className="bg-card p-6 md:p-8">
+              <Handshake className="w-5 h-5 text-muted-foreground mb-4" />
+              <h3 className="text-sm font-display font-semibold text-foreground mb-2">Wat regelen wij?</h3>
+              <p className="text-xs font-body font-light text-muted-foreground leading-relaxed">
+                Alles. Van foto's en advertenties tot onderhandelingen en de uiteindelijke overdracht. U hoeft niets te doen.
+              </p>
+            </div>
+            <div className="bg-card p-6 md:p-8">
+              <HelpCircle className="w-5 h-5 text-muted-foreground mb-4" />
+              <h3 className="text-sm font-display font-semibold text-foreground mb-2">Kan ik mijn auto nog gebruiken?</h3>
+              <p className="text-xs font-body font-light text-muted-foreground leading-relaxed">
+                Ja, u mag uw auto blijven rijden zolang deze nog niet verkocht is. We maken daar duidelijke afspraken over.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Vertrouwen */}
+      <section className="border-t border-border py-12">
+        <div className="container mx-auto px-6 lg:px-16 max-w-2xl">
           <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16">
             <div className="flex flex-col items-center gap-2">
               <ShieldCheck className="w-6 h-6 text-foreground" strokeWidth={1.5} />
