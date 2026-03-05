@@ -16,7 +16,7 @@ const navLinks = [
   { label: "Consignatie", href: "/consignatie", isPage: true },
   { label: "Diensten", href: "#diensten", hasDropdown: true },
   { label: "Over Ons", href: "#over-ons" },
-  { label: "Contact", href: "#contact" },
+  { label: "Contact", href: "/contact", isPage: true },
 ];
 
 const Navbar = () => {
