@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
@@ -10,30 +11,61 @@ const HeroSection = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
         style={{ backgroundImage: `url(${heroBg})` }}
       >
-        <div className="absolute inset-0 bg-background/75" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/20" />
+        <div className="absolute inset-0 bg-background/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
+      {/* Content — left aligned like VDM */}
+      <div className="relative z-10 flex flex-col justify-center h-full px-6 md:px-[90px] max-w-[1920px] mx-auto">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-extrabold leading-[0.95] mb-8 md:mb-12 text-foreground tracking-tight"
+          className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-extrabold leading-[0.95] mb-6 text-foreground tracking-tight"
         >
-          Betrouwbare Occasions
+          Platin Automotive
         </motion.h1>
 
-        <motion.a
-          href="#voorraad"
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-          className="group flex items-center gap-3 border-b border-foreground/30 hover:border-foreground pb-2.5 text-[10px] md:text-sm font-body font-medium tracking-[0.3em] uppercase text-foreground/70 hover:text-foreground transition-all duration-300"
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/60 mb-4"
         >
-          Bekijk Ons Aanbod
-        </motion.a>
+          Kwaliteit & Betrouwbaarheid
+        </motion.p>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="text-xl sm:text-2xl md:text-4xl font-display font-light italic text-foreground/80 mb-10 leading-snug"
+        >
+          Auto's, service
+          <br />
+          & vertrouwen
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="flex flex-wrap gap-4"
+        >
+          <a
+            href="#voorraad"
+            className="bg-foreground/15 backdrop-blur-sm border border-foreground/20 hover:bg-foreground/25 px-8 py-3.5 text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground transition-all duration-300"
+          >
+            Bekijk ons aanbod
+          </a>
+          <Link
+            to="/consignatie"
+            className="border-b border-foreground/30 hover:border-foreground pb-1 self-end text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-all duration-300"
+          >
+            Consignatie verkoop
+          </Link>
+        </motion.div>
       </div>
 
       {/* Scroll indicator */}
