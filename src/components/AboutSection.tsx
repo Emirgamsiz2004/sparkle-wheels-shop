@@ -1,49 +1,52 @@
 import { motion } from "framer-motion";
-import { Shield, Heart, Award } from "lucide-react";
+import aboutImg from "@/assets/about.jpg";
 
-const values = [
-  { icon: Shield, label: "Betrouwbaar" },
-  { icon: Heart, label: "Persoonlijk" },
-  { icon: Award, label: "Vakkundig" },
+const stats = [
+  { value: "100%", label: "Transparant" },
+  { value: "∞", label: "Passie" },
+  { value: "24/7", label: "Bereikbaar" },
 ];
 
 const AboutSection = () => {
   return (
-    <section id="over-ons" className="py-24 lg:py-32 bg-card">
-      <div className="container mx-auto px-4 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+    <section id="over-ons" className="py-28 lg:py-36 bg-card">
+      <div className="container mx-auto px-6 lg:px-16">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-xs tracking-[0.4em] uppercase font-body font-medium text-muted-foreground mb-3">
+            <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
               Over Ons
             </p>
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-6 text-foreground">
-              Passie voor Auto's
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-8 text-foreground tracking-tight leading-tight">
+              Jong, ambitieus
+              <br />
+              & gedreven.
             </h2>
-            <p className="text-muted-foreground font-body font-light leading-relaxed mb-4">
-              Wij zijn een jong en ambitieus autobedrijf met een passie voor kwaliteit.
-              Hoewel we nog aan het begin staan, werken we met dezelfde toewijding en
-              professionaliteit als de gevestigde namen in de branche.
-            </p>
-            <p className="text-muted-foreground font-body font-light leading-relaxed mb-8">
-              Bij ons draait alles om eerlijkheid, transparantie en persoonlijke aandacht.
-              Of u nu op zoek bent naar een betrouwbare auto, onderhoud nodig heeft of uw
-              auto weer als nieuw wilt laten glimmen — wij staan voor u klaar.
-            </p>
+            <div className="space-y-4 mb-10">
+              <p className="text-muted-foreground font-body font-light leading-relaxed">
+                Wij zijn een startend autobedrijf met een grote passie voor kwaliteit.
+                Hoewel we nog aan het begin staan, werken we met dezelfde toewijding en
+                professionaliteit als de gevestigde namen.
+              </p>
+              <p className="text-muted-foreground font-body font-light leading-relaxed">
+                Eerlijkheid, transparantie en persoonlijke aandacht — dat is waar wij voor staan.
+                Of u nu zoekt naar een betrouwbare auto, onderhoud of detailing.
+              </p>
+            </div>
 
-            <div className="flex gap-8">
-              {values.map((v) => (
-                <div key={v.label} className="flex flex-col items-center gap-2">
-                  <div className="w-14 h-14 flex items-center justify-center border border-border">
-                    <v.icon className="w-5 h-5 text-foreground/70" />
-                  </div>
-                  <span className="text-xs tracking-[0.15em] uppercase font-body font-medium text-muted-foreground">
-                    {v.label}
-                  </span>
+            <div className="flex gap-12 pt-8 border-t border-border">
+              {stats.map((stat) => (
+                <div key={stat.label}>
+                  <p className="text-2xl md:text-3xl font-display font-bold text-foreground mb-1">
+                    {stat.value}
+                  </p>
+                  <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground">
+                    {stat.label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -56,19 +59,14 @@ const AboutSection = () => {
             transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="aspect-square bg-secondary border border-border overflow-hidden">
-              <div className="w-full h-full flex items-center justify-center bg-gradient-dark">
-                <div className="text-center p-8">
-                  <p className="text-6xl md:text-8xl font-display font-bold text-foreground">
-                    PLA
-                  </p>
-                  <p className="text-xs tracking-[0.5em] uppercase font-body text-muted-foreground mt-2">
-                    Auto's
-                  </p>
-                </div>
-              </div>
+            <div className="aspect-[3/4] overflow-hidden">
+              <img
+                src={aboutImg}
+                alt="PLA Auto's werkplaats"
+                className="w-full h-full object-cover grayscale"
+              />
             </div>
-            <div className="absolute -bottom-4 -right-4 w-full h-full border border-foreground/10 -z-10" />
+            <div className="absolute -bottom-4 -right-4 w-full h-full border border-foreground/8 -z-10" />
           </motion.div>
         </div>
       </div>

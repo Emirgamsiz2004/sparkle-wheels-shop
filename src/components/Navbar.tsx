@@ -29,27 +29,27 @@ const Navbar = () => {
         scrolled ? "bg-background/95 backdrop-blur-md border-b border-border" : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between py-4 px-4 lg:px-8">
+      <div className="container mx-auto flex items-center justify-between py-5 px-6 lg:px-16">
         <a href="#home" className="flex items-center gap-3">
-          <img src={logo} alt="PLA Auto's" className="h-10 w-auto" />
+          <img src={logo} alt="PLA Auto's" className="h-8 w-auto" />
         </a>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-10">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-xs font-body font-medium tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
+              className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
             >
               {link.label}
             </a>
           ))}
           <a
             href="tel:+31600000000"
-            className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-xs font-semibold tracking-[0.15em] uppercase transition-all hover:bg-foreground/90"
+            className="flex items-center gap-2 bg-foreground text-background px-5 py-2.5 text-[10px] font-semibold tracking-[0.2em] uppercase transition-all hover:bg-foreground/90"
           >
-            <Phone className="w-3.5 h-3.5" />
+            <Phone className="w-3 h-3" />
             Bel Ons
           </a>
         </div>
@@ -59,7 +59,7 @@ const Navbar = () => {
           className="md:hidden text-foreground"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
-          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
@@ -72,22 +72,22 @@ const Navbar = () => {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-background/98 backdrop-blur-lg border-b border-border"
           >
-            <div className="flex flex-col items-center gap-6 py-8">
+            <div className="flex flex-col items-center gap-6 py-10">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="text-xs font-body font-medium tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {link.label}
                 </a>
               ))}
               <a
                 href="tel:+31600000000"
-                className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 text-xs font-semibold tracking-[0.15em] uppercase"
+                className="flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase"
               >
-                <Phone className="w-3.5 h-3.5" />
+                <Phone className="w-3 h-3" />
                 Bel Ons
               </a>
             </div>

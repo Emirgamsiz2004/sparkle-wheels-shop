@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowRight } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
@@ -7,49 +7,51 @@ const HeroSection = () => {
     <section id="home" className="relative h-screen w-full overflow-hidden">
       {/* Background image */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
         style={{ backgroundImage: `url(${heroBg})` }}
       >
-        <div className="absolute inset-0 bg-background/70" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+        <div className="absolute inset-0 bg-background/75" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/20" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+      <div className="relative z-10 flex flex-col items-start justify-center h-full px-6 lg:px-16 max-w-6xl mx-auto">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: 48 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="h-px bg-foreground/50 mb-8"
+        />
+
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-xs md:text-sm tracking-[0.4em] uppercase font-body font-medium text-muted-foreground mb-6"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-[10px] md:text-xs tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-5"
         >
-          Kwaliteit & Vakmanschap
+          In- & Verkoop · Onderhoud · Detailing
         </motion.p>
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-tight mb-6 text-foreground"
+          className="text-5xl md:text-7xl lg:text-8xl font-display font-extrabold leading-[0.95] mb-8 text-foreground tracking-tight"
         >
-          Auto's, Service
+          Uw auto
           <br />
-          & Detailing
+          <span className="text-gradient">in de beste</span>
+          <br />
+          handen.
         </motion.h1>
-
-        <motion.div
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="w-16 h-px bg-foreground/40 mb-6"
-        />
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-sm md:text-base text-muted-foreground max-w-md mb-10 font-body font-light"
+          className="text-sm md:text-base text-muted-foreground max-w-sm mb-10 font-body font-light leading-relaxed"
         >
-          In- en verkoop van auto's, klein onderhoud, reparaties en professionele auto detailing.
+          Persoonlijke service, eerlijke prijzen en vakmanschap waar u op kunt vertrouwen.
         </motion.p>
 
         <motion.div
@@ -60,15 +62,16 @@ const HeroSection = () => {
         >
           <a
             href="#diensten"
-            className="bg-primary text-primary-foreground px-8 py-3.5 text-xs font-semibold tracking-[0.2em] uppercase hover:bg-foreground/90 transition-all duration-300"
+            className="group flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300"
           >
-            Onze Diensten
+            Bekijk Diensten
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
           </a>
           <a
             href="#contact"
-            className="border border-foreground/25 text-foreground px-8 py-3.5 text-xs font-semibold tracking-[0.2em] uppercase hover:border-foreground/60 transition-all duration-300"
+            className="flex items-center gap-3 border border-foreground/20 text-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:border-foreground/50 hover:bg-foreground/5 transition-all duration-300"
           >
-            Contact
+            Neem Contact Op
           </a>
         </motion.div>
       </div>
@@ -79,13 +82,13 @@ const HeroSection = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-foreground/30 hover:text-foreground/60 transition-colors"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-foreground/25 hover:text-foreground/50 transition-colors"
       >
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
+          animate={{ y: [0, 6, 0] }}
+          transition={{ repeat: Infinity, duration: 2.5 }}
         >
-          <ChevronDown className="w-5 h-5" />
+          <ChevronDown className="w-4 h-4" />
         </motion.div>
       </motion.a>
     </section>
