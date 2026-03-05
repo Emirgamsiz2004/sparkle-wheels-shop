@@ -5,6 +5,7 @@ import logo from "@/assets/logo.svg";
 
 const navLinks = [
   { label: "Home", href: "#home" },
+  { label: "Voorraad", href: "#voorraad" },
   { label: "Diensten", href: "#diensten" },
   { label: "Over Ons", href: "#over-ons" },
   { label: "Contact", href: "#contact" },
