@@ -5,7 +5,7 @@ const contactInfo = [
   { icon: Phone, label: "Telefoon", value: "06 - 1269 3825", href: "tel:+31612693825" },
   { icon: Mail, label: "E-mail", value: "info@platinautomotive.nl", href: "mailto:info@platinautomotive.nl" },
   { icon: MapPin, label: "Adres", value: "Cilinderweg 99, Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+Roelofarendsveen" },
-  { icon: Clock, label: "Openingstijden", value: "Ma t/m Vr: 09:00 - 18:00\nZa & Zo: 10:00 - 18:00", href: "#" },
+  { icon: Clock, label: "Openingstijden", value: "Ma t/m Vr: 09:00 - 18:00\nZa & Zo: 10:00 - 17:00", href: "#" },
 ];
 
 const ContactSection = () => {
