@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, FileCheck, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -523,6 +523,29 @@ const Consignatie = () => {
                 )}
               </button>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* Vertrouwen */}
+      <section className="border-t border-border py-16">
+        <div className="container mx-auto px-6 lg:px-16 max-w-2xl">
+          <p className="text-[9px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground text-center mb-8">
+            Waarom bij ons?
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16">
+            <div className="flex flex-col items-center gap-2">
+              <ShieldCheck className="w-6 h-6 text-foreground" strokeWidth={1.5} />
+              <span className="text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground">RDW Erkend</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <FileCheck className="w-6 h-6 text-foreground" strokeWidth={1.5} />
+              <span className="text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground">NAP Controle</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Lock className="w-6 h-6 text-foreground" strokeWidth={1.5} />
+              <span className="text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground">Veilig & Transparant</span>
+            </div>
           </div>
         </div>
       </section>
