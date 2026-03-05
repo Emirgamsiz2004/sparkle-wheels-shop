@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.svg";
 
 const services = [
-  { label: "In- & Verkoop", href: "#diensten" },
+  { label: "In- & Verkoop", href: "/diensten/in-en-verkoop", isPage: true },
   { label: "Onderhoud & Reparatie", href: "#diensten" },
   { label: "Auto Detailing", href: "#diensten" },
 ];
@@ -61,14 +61,25 @@ const Navbar = () => {
                     initial={false}
                   >
                     {services.map((service, i) => (
-                      <a
-                        key={service.label}
-                        href={service.href}
-                        className="block px-5 py-3 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
-                        style={{ transitionDelay: `${i * 30}ms` }}
-                      >
-                        {service.label}
-                      </a>
+                      service.isPage ? (
+                        <Link
+                          key={service.label}
+                          to={service.href}
+                          className="block px-5 py-3 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
+                          style={{ transitionDelay: `${i * 30}ms` }}
+                        >
+                          {service.label}
+                        </Link>
+                      ) : (
+                        <a
+                          key={service.label}
+                          href={service.href}
+                          className="block px-5 py-3 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
+                          style={{ transitionDelay: `${i * 30}ms` }}
+                        >
+                          {service.label}
+                        </a>
+                      )
                     ))}
                   </motion.div>
                 </div>
