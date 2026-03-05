@@ -20,7 +20,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
+          className="text-4xl md:text-6xl lg:text-7xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
         >
           Betrouwbare Occasions
         </motion.h1>
@@ -30,7 +30,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
-          className="group flex items-center gap-3 border-b-2 border-foreground/50 hover:border-foreground pb-3 text-sm md:text-base font-body font-medium tracking-[0.3em] uppercase text-foreground/80 hover:text-foreground transition-all duration-300"
+          className="group flex items-center gap-3 bg-foreground text-background px-8 py-4 text-xs md:text-sm font-body font-semibold tracking-[0.2em] uppercase hover:bg-foreground/90 transition-all duration-300"
         >
           Bekijk Ons Aanbod
         </motion.a>
