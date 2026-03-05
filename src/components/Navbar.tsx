@@ -60,10 +60,15 @@ const Navbar = () => {
           )}
           <a
             href="tel:+31612693825"
-            className="flex items-center gap-2 bg-foreground text-background px-5 py-2.5 text-[10px] font-semibold tracking-[0.2em] uppercase transition-all hover:bg-foreground/90"
+            className="group relative flex items-center gap-2 bg-foreground text-background px-5 py-2.5 text-[10px] font-semibold tracking-[0.2em] uppercase transition-all hover:bg-foreground/90 overflow-hidden h-[38px]"
           >
-            <Phone className="w-3 h-3" />
-            Bel Ons
+            <Phone className="w-3 h-3 relative z-10" />
+            <span className="relative overflow-hidden h-[14px]">
+              <span className="flex flex-col transition-transform duration-300 ease-out group-hover:-translate-y-[14px]">
+                <span className="h-[14px] flex items-center">Bel Ons</span>
+                <span className="h-[14px] flex items-center">06-12693825</span>
+              </span>
+            </span>
           </a>
         </div>
 
@@ -109,10 +114,15 @@ const Navbar = () => {
               )}
               <a
                 href="tel:+31612693825"
-                className="flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase"
+                className="group relative flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase overflow-hidden h-[42px]"
               >
-                <Phone className="w-3 h-3" />
-                Bel Ons
+                <Phone className="w-3 h-3 relative z-10" />
+                <span className="relative overflow-hidden h-[14px]">
+                  <span className="flex flex-col transition-transform duration-300 ease-out group-hover:-translate-y-[14px]">
+                    <span className="h-[14px] flex items-center">Bel Ons</span>
+                    <span className="h-[14px] flex items-center">06-12693825</span>
+                  </span>
+                </span>
               </a>
             </div>
           </motion.div>

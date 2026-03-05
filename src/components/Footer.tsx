@@ -28,6 +28,9 @@ const Footer = () => {
             <p className="text-[10px] text-muted-foreground/70 font-body tracking-wider">
               Cilinderweg 99, 2371 DZ Roelofarendsveen
             </p>
+            <p className="text-[10px] text-muted-foreground/70 font-body tracking-wider">
+              KvK: 99146193 · BTW: NL868825463B01
+            </p>
           </div>
         </div>
       </div>
