@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles, Star, MessageCircle, Phone, CheckCircle, ShieldCh
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import BookingForm from "@/components/BookingForm";
+import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
 import detailingImg from "@/assets/detailing.jpg";
 
@@ -175,7 +175,7 @@ const AutoDetailing = () => {
               <p className="text-xs font-body font-light text-muted-foreground leading-relaxed mb-8">
                 Kies een datum en tijd die u uitkomt. Wij bevestigen uw afspraak zo snel mogelijk. Vrijblijvend en zonder verplichtingen.
               </p>
-              <BookingForm dienst="detailing" />
+              <ServiceForm dienst="detailing" />
             </motion.div>
 
             {/* Snel contact */}

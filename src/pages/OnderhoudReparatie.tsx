@@ -3,7 +3,7 @@ import { ArrowRight, Wrench, Clock, Euro, MessageCircle, Phone, CheckCircle } fr
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import BookingForm from "@/components/BookingForm";
+import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
 import onderhoudImg from "@/assets/onderhoud.jpg";
 
@@ -175,7 +175,7 @@ const OnderhoudReparatie = () => {
               <p className="text-xs font-body font-light text-muted-foreground leading-relaxed mb-8">
                 Kies een datum en tijd die u uitkomt. Wij bevestigen uw afspraak zo snel mogelijk. Vrijblijvend en zonder verplichtingen.
               </p>
-              <BookingForm dienst="onderhoud" />
+              <ServiceForm dienst="onderhoud" />
             </motion.div>
 
             {/* Snel contact */}
