@@ -10,6 +10,7 @@ import Contact from "./pages/Contact";
 import OverOns from "./pages/OverOns";
 import InEnVerkoop from "./pages/InEnVerkoop";
 import OnderhoudReparatie from "./pages/OnderhoudReparatie";
+import AutoDetailing from "./pages/AutoDetailing";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/over-ons" element={<OverOns />} />
           <Route path="/diensten/in-en-verkoop" element={<InEnVerkoop />} />
           <Route path="/diensten/onderhoud-reparatie" element={<OnderhoudReparatie />} />
+          <Route path="/diensten/auto-detailing" element={<AutoDetailing />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -1,29 +1,29 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Wrench, Clock, Euro, MessageCircle, Phone, CheckCircle, Send } from "lucide-react";
+import { ArrowRight, Sparkles, Clock, Star, MessageCircle, Phone, CheckCircle, Send, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import onderhoudImg from "@/assets/onderhoud.jpg";
+import detailingImg from "@/assets/detailing.jpg";
 
 const diensten = [
-  "Olie verversen",
-  "Filters vervangen",
-  "Remblokken & schijven",
-  "Banden wisselen",
-  "Airco service",
-  "Vloeistoffen bijvullen",
-  "Bougies vervangen",
-  "Accu vervangen",
+  "Uitgebreide handwas",
+  "Polijsten & ontkrassen",
+  "Interieur dieptereiniging",
+  "Stoelen & bekleding reinigen",
+  "Leder behandeling",
+  "Velgen & banden dressing",
+  "Ramen & ruiten polijsten",
+  "Geur- & bacteriebehandeling",
 ];
 
 const offerteSchema = z.object({
   naam: z.string().trim().min(1, "Vul uw naam in").max(100),
   telefoon: z.string().trim().min(1, "Vul uw telefoonnummer in").max(20),
   auto: z.string().trim().min(1, "Vul uw auto in").max(100),
-  omschrijving: z.string().trim().min(1, "Beschrijf kort wat er moet gebeuren").max(1000),
+  omschrijving: z.string().trim().min(1, "Beschrijf kort wat u wilt laten doen").max(1000),
 });
 
 const OfferteForm = () => {
@@ -49,11 +49,11 @@ const OfferteForm = () => {
       return;
     }
 
-    const message = `Hallo, ik wil graag een offerte aanvragen.%0A%0ANaam: ${encodeURIComponent(result.data.naam)}%0ATelefoon: ${encodeURIComponent(result.data.telefoon)}%0AAuto: ${encodeURIComponent(result.data.auto)}%0A%0A${encodeURIComponent(result.data.omschrijving)}`;
+    const message = `Hallo, ik wil graag een offerte voor detailing.%0A%0ANaam: ${encodeURIComponent(result.data.naam)}%0ATelefoon: ${encodeURIComponent(result.data.telefoon)}%0AAuto: ${encodeURIComponent(result.data.auto)}%0A%0A${encodeURIComponent(result.data.omschrijving)}`;
     window.open(`https://wa.me/31612693825?text=${message}`, "_blank");
 
     setSubmitted(true);
-    toast({ title: "Offerte verstuurd", description: "We nemen zo snel mogelijk contact met u op." });
+    toast({ title: "Aanvraag verstuurd", description: "We nemen zo snel mogelijk contact met u op." });
   };
 
   if (submitted) {
@@ -63,7 +63,7 @@ const OfferteForm = () => {
           <Send className="w-5 h-5 text-foreground" />
         </div>
         <p className="text-foreground font-display font-semibold mb-2">Bedankt voor uw aanvraag!</p>
-        <p className="text-muted-foreground font-body text-sm font-light">We nemen zo snel mogelijk contact met u op met een prijsindicatie.</p>
+        <p className="text-muted-foreground font-body text-sm font-light">We nemen zo snel mogelijk contact met u op.</p>
         <button
           onClick={() => { setSubmitted(false); setFormData({ naam: "", telefoon: "", auto: "", omschrijving: "" }); }}
           className="mt-6 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -90,12 +90,12 @@ const OfferteForm = () => {
       </div>
       <div>
         <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Auto (merk, model, bouwjaar) *</label>
-        <input type="text" name="auto" value={formData.auto} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. Volkswagen Golf 2019" />
+        <input type="text" name="auto" value={formData.auto} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. BMW 3-serie 2020" />
         {errors.auto && <p className="text-xs text-red-400 mt-1 font-body">{errors.auto}</p>}
       </div>
       <div>
-        <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Wat moet er gebeuren? *</label>
-        <textarea name="omschrijving" value={formData.omschrijving} onChange={handleChange} rows={4} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Beschrijf kort het probleem of de werkzaamheden..." />
+        <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Wat wilt u laten doen? *</label>
+        <textarea name="omschrijving" value={formData.omschrijving} onChange={handleChange} rows={4} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Bijv. volledig interieur en exterieur, alleen poetsen, specifieke behandeling..." />
         {errors.omschrijving && <p className="text-xs text-red-400 mt-1 font-body">{errors.omschrijving}</p>}
       </div>
       <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
@@ -107,7 +107,7 @@ const OfferteForm = () => {
   );
 };
 
-const OnderhoudReparatie = () => {
+const AutoDetailing = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -116,7 +116,7 @@ const OnderhoudReparatie = () => {
       <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${onderhoudImg})` }}
+          style={{ backgroundImage: `url(${detailingImg})` }}
         >
           <div className="absolute inset-0 bg-background/80" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
@@ -138,7 +138,7 @@ const OnderhoudReparatie = () => {
               Diensten
             </p>
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-foreground tracking-tight">
-              Onderhoud & Reparatie
+              Auto Detailing
             </h1>
           </motion.div>
         </div>
@@ -155,21 +155,21 @@ const OnderhoudReparatie = () => {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6 leading-tight">
-                Betrouwbaar onderhoud
+                Uw auto als nieuw,
                 <br />
-                voor uw auto.
+                tot in de details.
               </h2>
               <div className="space-y-4">
-                 <p className="text-muted-foreground font-body font-light leading-relaxed">
-                   Bij Platin Automotive kunt u terecht voor al uw klein onderhoud. 
-                   Van een oliewissel tot het vervangen van remblokken — wij zorgen ervoor 
-                   dat uw auto in topconditie blijft.
-                 </p>
-                 <p className="text-muted-foreground font-body font-light leading-relaxed">
-                   Wij richten ons bewust op onderhoud en kleine reparaties. 
-                   Geen onnodige werkzaamheden, geen verrassingen op de factuur. 
-                   Altijd vooraf een duidelijke prijsindicatie.
-                 </p>
+                <p className="text-muted-foreground font-body font-light leading-relaxed">
+                  Bij Platin Automotive geven we uw auto de behandeling die het verdient. 
+                  Van een uitgebreide handwas tot een complete interieur- en exterieurreiniging — 
+                  wij maken uw auto zo goed als nieuw.
+                </p>
+                <p className="text-muted-foreground font-body font-light leading-relaxed">
+                  Of uw auto nu toe is aan een grondige poetsbeurt of u wilt hem in showroom-conditie 
+                  brengen: wij pakken het professioneel aan. Elke auto wordt met de hand behandeld 
+                  en krijgt de aandacht die het verdient.
+                </p>
               </div>
             </motion.div>
 
@@ -181,9 +181,9 @@ const OnderhoudReparatie = () => {
             >
               <div className="grid grid-cols-3 gap-px bg-border">
                 {[
-                  { icon: Euro, label: "Scherpe prijzen" },
-                  { icon: Clock, label: "Snel geholpen" },
-                  { icon: Wrench, label: "Vakwerk" },
+                  { icon: Sparkles, label: "Als nieuw" },
+                  { icon: ShieldCheck, label: "Bescherming" },
+                  { icon: Star, label: "Premium" },
                 ].map((item) => (
                   <div key={item.label} className="bg-background p-5 md:p-6 flex flex-col items-center text-center">
                     <item.icon className="w-5 h-5 text-muted-foreground mb-3" />
@@ -207,7 +207,7 @@ const OnderhoudReparatie = () => {
             className="mb-12 md:mb-16"
           >
             <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
-              Werkzaamheden
+              Behandelingen
             </p>
             <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight">
               Wat wij voor u doen
@@ -237,7 +237,7 @@ const OnderhoudReparatie = () => {
             transition={{ delay: 0.4 }}
             className="text-xs font-body font-light text-muted-foreground mt-6"
           >
-            Staat uw werkzaamheid er niet bij? Neem contact op — wij kijken graag wat we voor u kunnen betekenen.
+            Wilt u iets speciaals laten doen? Neem contact op — wij denken graag met u mee.
           </motion.p>
         </div>
       </section>
@@ -261,7 +261,7 @@ const OnderhoudReparatie = () => {
                 Vraag een offerte aan
               </h3>
               <p className="text-xs font-body font-light text-muted-foreground leading-relaxed mb-8">
-                Vul het formulier in en wij geven u zo snel mogelijk een prijsindicatie. Vrijblijvend en zonder verplichtingen.
+                Vertel ons wat u wilt laten doen en wij geven u zo snel mogelijk een prijsindicatie. Vrijblijvend en zonder verplichtingen.
               </p>
               <OfferteForm />
             </motion.div>
@@ -296,7 +296,7 @@ const OnderhoudReparatie = () => {
                   </div>
                 </a>
                 <a
-                  href="https://wa.me/31612693825?text=Hallo%2C%20ik%20wil%20graag%20een%20offerte%20voor%20onderhoud%2Freparatie."
+                  href="https://wa.me/31612693825?text=Hallo%2C%20ik%20wil%20graag%20informatie%20over%20auto%20detailing."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-4 p-4 border border-border hover:border-foreground/30 transition-all duration-300"
@@ -334,4 +334,4 @@ const OnderhoudReparatie = () => {
   );
 };
 
-export default OnderhoudReparatie;
+export default AutoDetailing;
