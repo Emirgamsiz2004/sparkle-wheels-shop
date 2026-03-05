@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, FileCheck, HelpCircle, Euro, Clock, Handshake } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, FileCheck, HelpCircle, Euro, Clock, Handshake, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -527,8 +527,22 @@ const Consignatie = () => {
         </div>
       </section>
 
+      {/* Scroll hint */}
+      <motion.a
+        href="#consignatie-faq"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="flex flex-col items-center gap-2 py-8 text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <span className="text-[10px] tracking-[0.2em] uppercase font-body font-medium">Meer info</span>
+        <motion.div animate={{ y: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
+          <ChevronDown className="w-4 h-4" />
+        </motion.div>
+      </motion.a>
+
       {/* Hoe werkt het */}
-      <section className="border-t border-border py-16 md:py-24">
+      <section id="consignatie-faq" className="border-t border-border py-16 md:py-24">
         <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
           <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3 text-center">
             Veelgestelde vragen
