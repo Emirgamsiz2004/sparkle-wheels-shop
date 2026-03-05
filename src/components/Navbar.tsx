@@ -15,7 +15,7 @@ const navLinks = [
   { label: "Voorraad", href: "#voorraad" },
   { label: "Consignatie", href: "/consignatie", isPage: true },
   { label: "Diensten", href: "#diensten", hasDropdown: true },
-  { label: "Over Ons", href: "#over-ons" },
+  { label: "Over Ons", href: "/over-ons", isPage: true },
   { label: "Contact", href: "/contact", isPage: true },
 ];
 
