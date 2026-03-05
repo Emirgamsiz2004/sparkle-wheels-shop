@@ -54,12 +54,13 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
     className="group bg-background"
   >
     <Link to={service.href} className="block">
-      <div className="h-48 md:h-64 overflow-hidden">
+      <div className="h-48 md:h-64 overflow-hidden relative">
         <img
           src={service.image}
           alt={service.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale group-hover:grayscale-0"
+          className="w-full h-full object-cover grayscale transition-opacity duration-500"
         />
+        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-500" />
       </div>
       <div className="p-5 md:p-8">
         <div className="flex items-start justify-between mb-4">
