@@ -40,7 +40,7 @@ const Navbar = () => {
     >
       <div className="container mx-auto flex items-center justify-between py-5 px-6 lg:px-16">
         <a href="#home" className="flex items-center gap-3">
-          <img src={logo} alt="Platin Automotive" className="h-10 md:h-14 w-auto" />
+          <img src={logo} alt="Platin Automotive" className="h-8 md:h-10 w-auto" />
         </a>
 
         {/* Desktop nav */}
@@ -55,18 +55,14 @@ const Navbar = () => {
                   {link.label}
                   <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover/dropdown:rotate-180" />
                 </a>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition-all duration-300">
-                  <motion.div
-                    className="bg-card border border-border min-w-[200px] py-2 shadow-lg shadow-background/50"
-                    initial={false}
-                  >
-                    {services.map((service, i) => (
+                <div className="absolute top-full left-0 pt-2 opacity-0 invisible translate-y-1 group-hover/dropdown:opacity-100 group-hover/dropdown:visible group-hover/dropdown:translate-y-0 transition-all duration-200 ease-out">
+                  <div className="bg-card border border-border min-w-[190px] py-1.5 shadow-lg shadow-background/50">
+                    {services.map((service) => (
                       service.isPage ? (
                         <Link
                           key={service.label}
                           to={service.href}
-                          className="block px-5 py-3 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
-                          style={{ transitionDelay: `${i * 30}ms` }}
+                          className="block px-4 py-2.5 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors duration-150"
                         >
                           {service.label}
                         </Link>
@@ -74,14 +70,13 @@ const Navbar = () => {
                         <a
                           key={service.label}
                           href={service.href}
-                          className="block px-5 py-3 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
-                          style={{ transitionDelay: `${i * 30}ms` }}
+                          className="block px-4 py-2.5 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors duration-150"
                         >
                           {service.label}
                         </a>
                       )
                     ))}
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             ) : (link as any).isPage ? (
