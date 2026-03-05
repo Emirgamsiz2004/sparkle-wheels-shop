@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Upload, X, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -27,7 +27,7 @@ interface FormData {
   apkGeldig: boolean | null;
   rookvrij: boolean | null;
   eersteEigenaar: boolean | null;
-  // Stap 4: Foto's & opmerkingen
+  // Stap 3: Staat & opmerkingen
   opmerkingen: string;
 }
 
@@ -51,7 +51,7 @@ const initialData: FormData = {
   opmerkingen: "",
 };
 
-const totalSteps = 4;
+const totalSteps = 3;
 
 const brandstofMap: Record<string, string> = {
   "Benzine": "Benzine",
@@ -199,8 +199,6 @@ const SelectField = ({
 const Consignatie = () => {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<FormData>(initialData);
-  const [photos, setPhotos] = useState<File[]>([]);
-  const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFetched, setRdwFetched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -236,19 +234,6 @@ const Consignatie = () => {
     setRdwLoading(false);
   };
 
-  const handlePhotoAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const newPhotos = [...photos, ...files].slice(0, 10);
-    setPhotos(newPhotos);
-    const newUrls = newPhotos.map((file) => URL.createObjectURL(file));
-    setPhotoPreviewUrls(newUrls);
-  };
-
-  const removePhoto = (index: number) => {
-    const newPhotos = photos.filter((_, i) => i !== index);
-    setPhotos(newPhotos);
-    setPhotoPreviewUrls(newPhotos.map((file) => URL.createObjectURL(file)));
-  };
 
   const canProceed = () => {
     switch (step) {
@@ -258,8 +243,6 @@ const Consignatie = () => {
         return data.merk && data.model && data.bouwjaar && data.kmStand;
       case 3:
         return true;
-      case 4:
-        return true;
       default:
         return false;
     }
@@ -268,21 +251,6 @@ const Consignatie = () => {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      // Upload foto's naar storage
-      const photoUrls: string[] = [];
-      for (const photo of photos) {
-        const fileName = `${Date.now()}-${photo.name}`;
-        const { data: uploadData, error } = await supabase.storage
-          .from("consignatie-fotos")
-          .upload(fileName, photo);
-        if (!error && uploadData) {
-          const { data: urlData } = supabase.storage
-            .from("consignatie-fotos")
-            .getPublicUrl(uploadData.path);
-          photoUrls.push(urlData.publicUrl);
-        }
-      }
-
       // Sla aanmelding op in database
       const { error: dbError } = await supabase.from("consignatie_aanmeldingen").insert({
         naam: data.naam,
@@ -302,7 +270,6 @@ const Consignatie = () => {
         rookvrij: data.rookvrij,
         eerste_eigenaar: data.eersteEigenaar,
         opmerkingen: data.opmerkingen || null,
-        foto_urls: photoUrls,
       });
 
       if (dbError) throw dbError;
@@ -327,8 +294,6 @@ const Consignatie = () => {
 
       toast.success("Uw aanmelding is verzonden! Wij nemen zo snel mogelijk contact met u op.");
       setData(initialData);
-      setPhotos([]);
-      setPhotoPreviewUrls([]);
       setRdwFetched(false);
       setStep(1);
     } catch (error) {
@@ -338,7 +303,7 @@ const Consignatie = () => {
     setSubmitting(false);
   };
 
-  const stepLabels = ["Uw Gegevens", "Voertuig", "Staat", "Foto's & Verzenden"];
+  const stepLabels = ["Uw Gegevens", "Voertuig", "Staat & Verzenden"];
 
   return (
     <div className="min-h-screen bg-background">
@@ -464,64 +429,30 @@ const Consignatie = () => {
               )}
 
               {step === 3 && (
-                <div>
-                  <YesNoToggle label="Is de auto schadevrij?" value={data.schadevrij} onChange={(v) => update("schadevrij", v)} />
-                  <YesNoToggle label="Heeft u een onderhoudsboekje?" value={data.onderhoudsboekje} onChange={(v) => update("onderhoudsboekje", v)} />
-                  <YesNoToggle label="Is de APK nog geldig?" value={data.apkGeldig} onChange={(v) => update("apkGeldig", v)} />
-                  <YesNoToggle label="Is de auto rookvrij bereden?" value={data.rookvrij} onChange={(v) => update("rookvrij", v)} />
-                  <YesNoToggle label="Bent u de eerste eigenaar?" value={data.eersteEigenaar} onChange={(v) => update("eersteEigenaar", v)} />
-                </div>
-              )}
-
-              {step === 4 && (
-                <div className="space-y-10">
+                <div className="space-y-8">
                   <div>
-                    <p className="text-[10px] font-body font-medium tracking-[0.2em] uppercase text-muted-foreground mb-4">
-                      Foto's (max. 10)
-                    </p>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                      {photoPreviewUrls.map((url, i) => (
-                        <div key={i} className="relative aspect-square bg-card overflow-hidden group">
-                          <img src={url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() => removePhoto(i)}
-                            className="absolute top-1 right-1 bg-background/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="w-3 h-3 text-foreground" />
-                          </button>
-                        </div>
-                      ))}
-                      {photos.length < 10 && (
-                        <label className="aspect-square border border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-foreground/30 transition-colors">
-                          <Upload className="w-4 h-4 text-muted-foreground mb-1" />
-                          <span className="text-[9px] font-body text-muted-foreground">Toevoegen</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={handlePhotoAdd}
-                            className="hidden"
-                          />
-                        </label>
-                      )}
-                    </div>
+                    <YesNoToggle label="Is de auto schadevrij?" value={data.schadevrij} onChange={(v) => update("schadevrij", v)} />
+                    <YesNoToggle label="Heeft u een onderhoudsboekje?" value={data.onderhoudsboekje} onChange={(v) => update("onderhoudsboekje", v)} />
+                    <YesNoToggle label="Is de APK nog geldig?" value={data.apkGeldig} onChange={(v) => update("apkGeldig", v)} />
+                    <YesNoToggle label="Is de auto rookvrij bereden?" value={data.rookvrij} onChange={(v) => update("rookvrij", v)} />
+                    <YesNoToggle label="Bent u de eerste eigenaar?" value={data.eersteEigenaar} onChange={(v) => update("eersteEigenaar", v)} />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-body font-medium tracking-[0.2em] uppercase text-muted-foreground">
-                      Opmerkingen
+                      Opmerkingen (optioneel)
                     </label>
                     <textarea
                       value={data.opmerkingen}
                       onChange={(e) => update("opmerkingen", e.target.value)}
                       placeholder="Heeft u nog iets toe te voegen? Bijv. extra opties, recente reparaties, vraagprijs..."
-                      rows={4}
+                      rows={3}
                       className="w-full bg-transparent border border-border p-4 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none"
                     />
                   </div>
                 </div>
               )}
+
             </motion.div>
           </AnimatePresence>
 
