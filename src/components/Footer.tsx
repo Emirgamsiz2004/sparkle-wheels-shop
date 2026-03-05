@@ -23,10 +23,10 @@ const Footer = () => {
 
           <div className="flex flex-col items-center md:items-end gap-1">
             <p className="text-[10px] text-muted-foreground font-body tracking-wider">
-              © {new Date().getFullYear()} PLA Auto's
+              © {new Date().getFullYear()} Platin Automotive
             </p>
             <p className="text-[10px] text-muted-foreground/70 font-body tracking-wider">
-              KvK: 12345678
+              Cilinderweg 99, 2371 DZ Roelofarendsveen
             </p>
           </div>
         </div>
