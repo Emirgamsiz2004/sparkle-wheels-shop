@@ -2,3 +2,7 @@ project_id = "leykexzdvatuyitkxdxs"
 
 [functions.send-whatsapp-notification]
 verify_jwt = false
+
+[functions.vwe-taxatie]
+verify_jwt = true
+
