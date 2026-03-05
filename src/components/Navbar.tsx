@@ -54,7 +54,7 @@ const Navbar = () => {
         scrolled ? "bg-background/95 backdrop-blur-md border-b border-border" : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex items-center justify-between py-5 px-[90px] max-w-[1920px]">
+      <div className="mx-auto flex items-center justify-between py-5 px-5 md:px-[90px] max-w-[1920px]">
         <Link to="/" className="flex items-center gap-3">
           <img src={logo} alt="Platin Automotive" className="h-8 md:h-9 w-auto" />
         </Link>
