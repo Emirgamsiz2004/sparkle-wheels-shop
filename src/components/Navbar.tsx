@@ -7,9 +7,9 @@ import logo from "@/assets/logo.svg";
 const services = [
   { label: "In- & Verkoop", href: "/diensten/in-en-verkoop" },
   { label: "Onderhoud & Reparatie", href: "/diensten/onderhoud-reparatie" },
-  { label: "Auto Detailing", href: "/diensten/auto-detailing" },
-  { label: "Auto Zoeken", href: "/diensten/auto-zoeken" },
-  { label: "Auto Customizing", href: "/diensten/auto-customizing" },
+  { label: "Detailing", href: "/diensten/auto-detailing" },
+  { label: "Customizing", href: "/diensten/auto-customizing" },
+  { label: "Auto op Aanvraag", href: "/diensten/auto-zoeken" },
 ];
 
 const navLinks = [
