@@ -24,24 +24,24 @@ const services = [
   },
   {
     num: "03",
-    title: "Auto Detailing",
+    title: "Detailing",
     description: "Professionele reiniging van interieur en exterieur. Uw auto als nieuw.",
     image: detailingImg,
     href: "/diensten/auto-detailing",
   },
   {
     num: "04",
-    title: "Auto Zoeken",
-    description: "Uw droomauto niet in ons aanbod? Wij zoeken hem voor u — snel en op maat.",
-    image: autoZoekenImg,
-    href: "/diensten/auto-zoeken",
-  },
-  {
-    num: "05",
-    title: "Auto Customizing",
+    title: "Customizing",
     description: "Sterrenhemels, ambient verlichting, bekleding op maat en meer. Maak uw auto uniek.",
     image: customizingImg,
     href: "/diensten/auto-customizing",
+  },
+  {
+    num: "05",
+    title: "Auto op Aanvraag",
+    description: "Uw droomauto niet in ons aanbod? Wij zoeken hem voor u — snel en op maat.",
+    image: autoZoekenImg,
+    href: "/diensten/auto-zoeken",
   },
 ];
 
@@ -83,7 +83,7 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
 const ServicesSection = () => {
   return (
     <section id="diensten" className="py-16 md:py-28 lg:py-36 bg-background">
-      <div className="container mx-auto px-6 lg:px-16">
+      <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

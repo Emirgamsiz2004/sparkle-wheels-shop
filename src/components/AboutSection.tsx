@@ -10,7 +10,7 @@ const stats = [
 const AboutSection = () => {
   return (
     <section id="over-ons" className="py-16 md:py-28 lg:py-36 bg-card">
-      <div className="container mx-auto px-6 lg:px-16">
+      <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
