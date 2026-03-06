@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Chakra Petch"', "sans-serif"],
+        display: ['"Rajdhani"', "sans-serif"],
         body: ["DM Sans", "sans-serif"],
       },
       colors: {
