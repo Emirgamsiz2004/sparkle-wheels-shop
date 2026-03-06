@@ -138,20 +138,58 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden fixed inset-0 z-[55] bg-background/70 backdrop-blur-xl flex flex-col items-center justify-center gap-8"
+            className="md:hidden fixed inset-0 z-[55] bg-background/70 backdrop-blur-xl flex flex-col items-center justify-center gap-6"
           >
             {navLinks.map((link, i) => (
-              <motion.button
+              <motion.div
                 key={link.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.3, delay: i * 0.05 }}
-                onClick={() => { handleNavClick(link.href, link.section); setMobileOpen(false); }}
-                className="text-sm font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+                className="flex flex-col items-center"
               >
-                {link.label}
-              </motion.button>
+                {(link as any).hasDropdown ? (
+                  <>
+                    <button
+                      onClick={() => setDienstenOpen(!dienstenOpen)}
+                      className="flex items-center gap-2 text-sm font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${dienstenOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {dienstenOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden flex flex-col items-center gap-3 mt-3"
+                        >
+                          {services.map((service) => (
+                            <Link
+                              key={service.label}
+                              to={service.href}
+                              onClick={() => { setMobileOpen(false); setDienstenOpen(false); }}
+                              className="text-xs font-body font-light tracking-[0.2em] uppercase text-muted-foreground/70 hover:text-foreground transition-colors"
+                            >
+                              {service.label}
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => { handleNavClick(link.href, link.section); setMobileOpen(false); setDienstenOpen(false); }}
+                    className="text-sm font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </button>
+                )}
+              </motion.div>
             ))}
             <motion.a
               initial={{ opacity: 0, y: 20 }}
