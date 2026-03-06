@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/logo.png";
 
 const services = [
   { label: "In- & Verkoop", href: "/diensten/in-en-verkoop" },
