@@ -11,46 +11,37 @@ const HeroSection = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
         style={{ backgroundImage: `url(${heroBg})` }}
       >
-        <div className="absolute inset-0 bg-background/50" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
+        <div className="absolute inset-0 bg-background/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
       </div>
 
-      {/* Content — left aligned like VDM */}
+      {/* Content — left aligned */}
       <div className="relative z-10 flex flex-col justify-center h-full px-6 md:px-[90px] max-w-[1920px] mx-auto">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-extrabold leading-[0.95] mb-6 text-foreground tracking-tight"
-        >
-          Platin Automotive
-        </motion.h1>
-
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/60 mb-4"
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/50 mb-5"
         >
           Kwaliteit & Betrouwbaarheid
         </motion.p>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-xl sm:text-2xl md:text-4xl font-display font-light italic text-foreground/80 mb-10 leading-snug"
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
         >
-          Auto's, service
+          Uw auto,
           <br />
-          & vertrouwen
-        </motion.p>
+          onze passie.
+        </motion.h1>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
           className="flex flex-wrap gap-4"
         >
           <a
