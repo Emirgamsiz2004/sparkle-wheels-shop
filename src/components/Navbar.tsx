@@ -51,7 +51,7 @@ const Navbar = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled || mobileOpen ? "bg-background/90 backdrop-blur-xl border-b border-border" : "bg-transparent"
+        scrolled || mobileOpen ? "bg-background/70 backdrop-blur-xl border-b border-border" : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex items-center justify-between py-5 px-5 md:px-[90px] max-w-[1920px]">
@@ -134,7 +134,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background/90 backdrop-blur-xl border-b border-border overflow-hidden"
+            className="md:hidden bg-background/70 backdrop-blur-xl border-b border-border overflow-hidden"
           >
             <div className="flex flex-col items-center gap-6 py-10">
               {navLinks.map((link) => (
