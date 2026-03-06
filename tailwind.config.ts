@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"MuseoModerno"', "sans-serif"],
+        display: ['"Chakra Petch"', "sans-serif"],
         body: ["DM Sans", "sans-serif"],
       },
       colors: {
