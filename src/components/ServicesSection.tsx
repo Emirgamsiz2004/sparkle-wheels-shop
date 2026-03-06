@@ -24,24 +24,24 @@ const services = [
   },
   {
     num: "03",
-    title: "Auto Detailing",
+    title: "Detailing",
     description: "Professionele reiniging van interieur en exterieur. Uw auto als nieuw.",
     image: detailingImg,
     href: "/diensten/auto-detailing",
   },
   {
     num: "04",
-    title: "Auto Zoeken",
-    description: "Uw droomauto niet in ons aanbod? Wij zoeken hem voor u — snel en op maat.",
-    image: autoZoekenImg,
-    href: "/diensten/auto-zoeken",
-  },
-  {
-    num: "05",
-    title: "Auto Customizing",
+    title: "Customizing",
     description: "Sterrenhemels, ambient verlichting, bekleding op maat en meer. Maak uw auto uniek.",
     image: customizingImg,
     href: "/diensten/auto-customizing",
+  },
+  {
+    num: "05",
+    title: "Auto op Aanvraag",
+    description: "Uw droomauto niet in ons aanbod? Wij zoeken hem voor u — snel en op maat.",
+    image: autoZoekenImg,
+    href: "/diensten/auto-zoeken",
   },
 ];
 
