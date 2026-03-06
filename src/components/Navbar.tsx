@@ -51,7 +51,7 @@ const Navbar = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled || mobileOpen ? "bg-background/95 backdrop-blur-md border-b border-border" : "bg-transparent"
+        scrolled || mobileOpen ? "bg-background/90 backdrop-blur-xl border-b border-border" : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex items-center justify-between py-5 px-5 md:px-[90px] max-w-[1920px]">
@@ -111,10 +111,19 @@ const Navbar = () => {
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden text-foreground"
+          className="md:hidden text-foreground relative w-5 h-5"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <motion.span
+            key={mobileOpen ? "close" : "open"}
+            initial={{ opacity: 0, rotate: mobileOpen ? -90 : 90, scale: 0.5 }}
+            animate={{ opacity: 1, rotate: 0, scale: 1 }}
+            exit={{ opacity: 0, rotate: mobileOpen ? 90 : -90, scale: 0.5 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </motion.span>
         </button>
       </div>
 
@@ -125,7 +134,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background border-b border-border overflow-hidden"
+            className="md:hidden bg-background/90 backdrop-blur-xl border-b border-border overflow-hidden"
           >
             <div className="flex flex-col items-center gap-6 py-10">
               {navLinks.map((link) => (
