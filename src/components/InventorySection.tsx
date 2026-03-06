@@ -9,7 +9,7 @@ const InventorySection = () => {
 
   return (
     <section id="voorraad" className="py-16 md:py-28 lg:py-36 bg-card">
-      <div className="container mx-auto px-6 lg:px-16">
+      <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
