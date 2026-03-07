@@ -16,9 +16,13 @@ import AutoCustomizing from "./pages/AutoCustomizing";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
+
+// ⬇️ Zet op false om de volledige site te tonen
+const UNDER_CONSTRUCTION = true;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -27,22 +31,29 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/voorraad" element={<Voorraad />} />
-          <Route path="/consignatie" element={<Consignatie />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/over-ons" element={<OverOns />} />
-          <Route path="/diensten/in-en-verkoop" element={<InEnVerkoop />} />
-          <Route path="/diensten/onderhoud-reparatie" element={<OnderhoudReparatie />} />
-          <Route path="/diensten/auto-detailing" element={<AutoDetailing />} />
-          <Route path="/diensten/auto-zoeken" element={<AutoZoeken />} />
-          <Route path="/diensten/auto-customizing" element={<AutoCustomizing />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {UNDER_CONSTRUCTION ? (
+          <Routes>
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="*" element={<UnderConstruction />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/voorraad" element={<Voorraad />} />
+            <Route path="/consignatie" element={<Consignatie />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/over-ons" element={<OverOns />} />
+            <Route path="/diensten/in-en-verkoop" element={<InEnVerkoop />} />
+            <Route path="/diensten/onderhoud-reparatie" element={<OnderhoudReparatie />} />
+            <Route path="/diensten/auto-detailing" element={<AutoDetailing />} />
+            <Route path="/diensten/auto-zoeken" element={<AutoZoeken />} />
+            <Route path="/diensten/auto-customizing" element={<AutoCustomizing />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        )}
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
