@@ -670,9 +670,16 @@ serve(async (req) => {
 
     // Step 1 & 2: RDW + VWE parallel
     console.log("Step 1+2: RDW + VWE parallel...");
+    const emptyVwe = {
+      vin: null, inkoopwaarde: null, verkoopwaarde: null, nieuwprijs: null, handelsprijs: null,
+      merk: null, model: null, bouwjaar: null, brandstof: null, kmStand: null, opties: [],
+    };
     const [rdwData, vweData] = await Promise.all([
       fetchRdwData(kenteken),
-      fetchVweData(kenteken),
+      fetchVweData(kenteken).catch((err) => {
+        console.error("VWE failed (continuing without):", err.message);
+        return emptyVwe;
+      }),
     ]);
     console.log("VWE VIN:", vweData.vin);
     console.log("VWE opties count:", vweData.opties.length);
