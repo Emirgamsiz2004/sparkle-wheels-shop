@@ -15,6 +15,7 @@ import AutoZoeken from "./pages/AutoZoeken";
 import AutoCustomizing from "./pages/AutoCustomizing";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import DealAnalyzer from "./pages/DealAnalyzer";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
