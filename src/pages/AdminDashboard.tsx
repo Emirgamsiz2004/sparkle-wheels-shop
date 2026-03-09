@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogOut, Phone, Mail, Calendar, Loader2, Search, ExternalLink } from "lucide-react";
+import { LogOut, Phone, Mail, Calendar, Loader2, Search, ExternalLink, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
