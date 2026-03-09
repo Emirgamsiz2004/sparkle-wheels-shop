@@ -85,7 +85,7 @@ async function fetchVweData(kenteken: string) {
   const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
   // Request all relevant rubrieken including VIN info
-  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOpties/><atlOptieFabriek/><atlOptiePakket/><atlOptieStandaard/><atlVoertuigBasic/></rubrieken></request>`;
+  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOpties/><atlOptieFabriek/><atlOptiePakket/><atlOptieStandaard/></rubrieken></request>`;
 
   const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
