@@ -43,7 +43,11 @@ async function fetchVweTaxatie(kenteken: string) {
     body: `requestXml=${encodeURIComponent(requestXml)}`,
   });
 
-  if (!response.ok) throw new Error(`VWE API error [${response.status}]`);
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error("VWE API error body:", errorBody.substring(0, 1000));
+    throw new Error(`VWE API error [${response.status}]: ${errorBody.substring(0, 200)}`);
+  }
 
   const xmlText = await response.text();
 
