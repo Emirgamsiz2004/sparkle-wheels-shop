@@ -286,23 +286,16 @@ async function scrapeMarktListings(merk: string, model: string, bouwjaar: string
         for (const item of items) {
           bronnen.push(item.url);
           
-          // Extract prices from content using regex
-          const content = (item.markdown || "") + " " + (item.description || "") + " " + (item.title || "");
-          const priceMatches = content.match(/€\s*([\d.]+(?:,\d+)?)/g) || [];
-          for (const pm of priceMatches) {
-            const numStr = pm.replace("€", "").replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
-            const num = parseFloat(numStr);
-            if (num >= 500 && num <= 500000) {
-              extractedPrices.push(num);
-            }
-          }
+          // Extract prices from description and title (NOT from full markdown which contains filter UI)
+          const priceText = (item.description || "") + " " + (item.title || "");
           
-          // Also try to find prices like "14.950" or "€ 14.950,-" 
-          const priceMatches2 = content.match(/(\d{1,3}(?:\.\d{3})+)(?:,-)?/g) || [];
-          for (const pm of priceMatches2) {
-            const numStr = pm.replace(/\./g, "").replace(",-", "");
-            const num = parseInt(numStr);
-            if (num >= 1000 && num <= 500000) {
+          // Match patterns like "€ 14.950" or "€14.950,-" or "€ 8.900"
+          const priceMatches = priceText.match(/€\s*(\d{1,3}(?:\.\d{3})*(?:,\d+)?)/g) || [];
+          for (const pm of priceMatches) {
+            const numStr = pm.replace("€", "").replace(/\s/g, "").replace(/\./g, "").replace(",", ".").replace(",-", "");
+            const num = parseFloat(numStr);
+            // Only accept realistic car prices (€2000 - €200000)
+            if (num >= 2000 && num <= 200000) {
               extractedPrices.push(num);
             }
           }
