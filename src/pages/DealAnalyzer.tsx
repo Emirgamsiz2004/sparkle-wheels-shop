@@ -483,10 +483,49 @@ const DealAnalyzer = () => {
                 </div>
               )}
 
-              {/* Opties */}
+              {/* Bekende Kwalen */}
+              {result.bekende_kwalen && (
+                <div className="p-6 bg-destructive/5 border border-destructive/20">
+                  <SectionTitle>⚠️ Bekende Problemen & Kwalen</SectionTitle>
+                  <p className="text-sm font-body text-foreground leading-relaxed whitespace-pre-line">
+                    {result.bekende_kwalen}
+                  </p>
+                </div>
+              )}
+
+              {/* SilverDAT Fabrieksopties */}
+              {result.silverdat_opties && result.silverdat_opties.length > 0 && (
+                <div className="p-6 bg-card border border-border">
+                  <SectionTitle>SilverDAT Fabrieksopties ({result.silverdat_opties.length})</SectionTitle>
+                  <p className="text-xs font-body text-muted-foreground mb-4">
+                    Exacte fabrieksuitrusting op basis van VIN-decodering
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {result.silverdat_opties.map((optie, i) => (
+                      <div key={i} className="flex items-center justify-between gap-2 px-3 py-2 bg-background border border-border">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${optie.type === "standaard" ? "bg-muted-foreground" : "bg-green-500"}`} />
+                          <span className="text-xs font-body text-foreground truncate">{optie.naam}</span>
+                        </div>
+                        {optie.prijs && optie.prijs > 0 && (
+                          <span className="text-[10px] font-body text-muted-foreground flex-shrink-0">
+                            €{optie.prijs.toLocaleString("nl-NL")}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[9px] font-body text-muted-foreground mt-3">
+                    <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted-foreground" /> Standaard</span>
+                    <span className="inline-flex items-center gap-1 ml-4"><span className="w-2 h-2 rounded-full bg-green-500" /> Optioneel (extra)</span>
+                  </p>
+                </div>
+              )}
+
+              {/* VWE/Autotelex Opties */}
               {result.voertuig_opties && result.voertuig_opties.length > 0 && (
                 <div className="p-6 bg-card border border-border">
-                  <SectionTitle>Voertuig Opties ({result.voertuig_opties.length})</SectionTitle>
+                  <SectionTitle>VWE/Autotelex Opties ({result.voertuig_opties.length})</SectionTitle>
                   {result.opties_analyse && (
                     <p className="text-sm font-body text-foreground mb-4 leading-relaxed">{result.opties_analyse}</p>
                   )}
@@ -494,11 +533,12 @@ const DealAnalyzer = () => {
                     {result.voertuig_opties.map((optie, i) => (
                       <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border text-xs font-body text-foreground">
                         <Package className="w-3 h-3 text-muted-foreground" />
-                        {optie.omschrijving}
+                        {optie.omschrijving || optie.naam}
                       </span>
                     ))}
                   </div>
                 </div>
+              )}
               )}
 
               {/* Markt Listings */}
