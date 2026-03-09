@@ -539,7 +539,6 @@ const DealAnalyzer = () => {
                   </div>
                 </div>
               )}
-              )}
 
               {/* Markt Listings */}
               {result.markt_listings && result.markt_listings.length > 0 && (
