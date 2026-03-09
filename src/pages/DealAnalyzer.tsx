@@ -23,7 +23,17 @@ interface MarktListing {
 
 interface Optie {
   code: string | null;
-  omschrijving: string;
+  omschrijving?: string;
+  naam?: string;
+  type?: string;
+  prijs?: number | null;
+}
+
+interface SilverDatOptie {
+  naam: string;
+  fabrikantcode: string | null;
+  type: string;
+  prijs: number | null;
 }
 
 interface DealResult {
@@ -40,6 +50,8 @@ interface DealResult {
   aantal_eigenaren: string | null;
   apk_status: string | null;
   voertuig_opties: Optie[];
+  silverdat_opties: SilverDatOptie[];
+  bekende_kwalen: string;
   vwe_inkoopwaarde: number | null;
   vwe_verkoopwaarde: number | null;
   vwe_handelsprijs: number | null;
