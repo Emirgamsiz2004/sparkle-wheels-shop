@@ -515,21 +515,42 @@ serve(async (req) => {
     console.log("RDW VIN:", rdwData.vin);
     console.log("VWE opties count:", vweData.opties.length);
 
+    // Step 2b: SilverDAT VIN (if VIN available)
+    let silverDatData: any = null;
+    if (rdwData.vin) {
+      console.log("Step 2b: Fetching SilverDAT VIN equipment...");
+      silverDatData = await fetchSilverDatVin(rdwData.vin);
+      console.log("SilverDAT opties count:", silverDatData?.fabrieksopties?.length || 0);
+    }
+
     const merk = rdwData.merk || vweData.merk || "onbekend";
     const model = rdwData.handelsbenaming || vweData.model || "onbekend";
     const bouwjaar = rdwData.datum_eerste_toelating || vweData.bouwjaar;
 
-    // Step 3 & 4: Firecrawl + Perplexity parallel
-    console.log("Step 3+4: Firecrawl scraping + Perplexity parallel...");
-    const [scraped, marktData] = await Promise.all([
+    // Combine all options: VWE + SilverDAT
+    const alleOpties = [
+      ...vweData.opties,
+      ...(silverDatData?.fabrieksopties || []).map((o: any) => ({
+        code: o.fabrikantcode,
+        omschrijving: o.naam,
+        type: o.type,
+        prijs: o.prijs,
+      })),
+    ];
+
+    // Step 3, 4a, 4b: Firecrawl + Perplexity bekende kwalen + marktanalyse (all parallel)
+    console.log("Step 3+4: Firecrawl + Perplexity (kwalen + markt) parallel...");
+    const [scraped, kwalenData, marktData] = await Promise.all([
       scrapeMarktListings(merk, model, bouwjaar),
-      fetchMarktEnHistorie(merk, model, bouwjaar, rdwData.vin, vweData.opties),
+      fetchBekendeKwalen(merk, model, bouwjaar, null),
+      fetchMarktAnalyse(merk, model, bouwjaar, alleOpties),
     ]);
     console.log("Scraped listings:", scraped.listings.length);
+    console.log("Kwalen tekst length:", kwalenData.kwalen.length);
 
-    // Step 5: AI Scoring
+    // Step 5: AI Scoring (with kwalen included)
     console.log("Step 5: AI scoring...");
-    const aiResult = await generateAiScore(rdwData, vweData, marktData, scraped.listings, vweData.opties, extraInput);
+    const aiResult = await generateAiScore(rdwData, vweData, { ...marktData, kwalen: kwalenData.kwalen }, scraped.listings, alleOpties, extraInput);
     console.log("AI score:", aiResult.score);
 
     // Step 6: Save to database
@@ -549,14 +570,14 @@ serve(async (req) => {
       kleur: rdwData.eerste_kleur,
       vermogen: rdwData.vermogen,
       vin: rdwData.vin,
-      voertuig_opties: vweData.opties,
+      voertuig_opties: alleOpties,
       opties_populariteit: {},
       vwe_inkoopwaarde: vweData.inkoopwaarde ? Number(vweData.inkoopwaarde) : null,
       vwe_verkoopwaarde: vweData.verkoopwaarde ? Number(vweData.verkoopwaarde) : null,
       vwe_nieuwprijs: vweData.nieuwprijs ? Number(vweData.nieuwprijs) : null,
       vwe_handelsprijs: vweData.handelsprijs ? Number(vweData.handelsprijs) : null,
       markt_analyse_tekst: marktData.analyseTekst,
-      markt_bronnen: [...marktData.bronnen, ...scraped.bronnen],
+      markt_bronnen: [...marktData.bronnen, ...scraped.bronnen, ...kwalenData.bronnen],
       markt_listings: scraped.listings,
       gemiddelde_marktprijs: aiResult.gemiddelde_marktprijs || null,
       laagste_marktprijs: null,
@@ -588,6 +609,9 @@ serve(async (req) => {
         data: {
           id: savedDeal?.id,
           ...dealRecord,
+          silverdat_opties: silverDatData?.fabrieksopties || [],
+          silverdat_kleuren: silverDatData?.kleuren || [],
+          bekende_kwalen: kwalenData.kwalen,
           opties_analyse: aiResult.opties_analyse || null,
           aandachtspunten: aiResult.aandachtspunten || [],
         },
