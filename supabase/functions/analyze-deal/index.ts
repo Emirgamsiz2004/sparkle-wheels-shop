@@ -378,7 +378,53 @@ async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrap
     nieuw: "Nieuw (7mm+)", goed: "Goed (4-7mm)", matig: "Matig (2-4mm)", vervangen: "Moet vervangen (<2mm)"
   };
 
+  // Calculate reference prices for context
+  const vweInkoop = vweData.inkoopwaarde ? Number(vweData.inkoopwaarde) : null;
+  const vweVerkoop = vweData.verkoopwaarde ? Number(vweData.verkoopwaarde) : null;
+  const vweHandel = vweData.handelsprijs ? Number(vweData.handelsprijs) : null;
+  const vraagprijs = extraInput.vraagprijs ? Number(extraInput.vraagprijs) : null;
+
+  // Pre-calculate margin if possible
+  let margeInfo = "";
+  if (vraagprijs && vweVerkoop) {
+    const brutomarge = vweVerkoop - vraagprijs;
+    const margePerc = ((brutomarge / vweVerkoop) * 100).toFixed(1);
+    margeInfo = `\n\n⚠️ VOORBEREKENDE MARGE:
+- Bruto marge (verkoopwaarde - inkoopprijs): €${brutomarge} (${margePerc}%)
+- ${brutomarge < 0 ? "NEGATIEVE MARGE! Je koopt BOVEN de verkoopwaarde! Dit is een SLECHTE deal." : brutomarge < 1000 ? "Zeer lage marge, nauwelijks winstgevend na kosten." : brutomarge < 2500 ? "Krappe marge, risicovol." : "Gezonde marge."}`;
+  }
+  if (vraagprijs && vweInkoop) {
+    const verschilInkoop = vweInkoop - vraagprijs;
+    margeInfo += `\n- Verschil met VWE inkoopwaarde: €${verschilInkoop} (${verschilInkoop > 0 ? "onder inkoopwaarde = goed" : verschilInkoop === 0 ? "gelijk aan inkoopwaarde = neutraal" : "BOVEN inkoopwaarde = slecht"})`;
+  }
+  if (vraagprijs && vweHandel) {
+    const verschilHandel = vweHandel - vraagprijs;
+    margeInfo += `\n- Verschil met VWE handelsprijs: €${verschilHandel} (${verschilHandel > 0 ? "onder handelsprijs = goed" : "BOVEN handelsprijs = slecht"})`;
+  }
+
   const prompt = `Je bent een auto-inkoop expert voor een Nederlands autobedrijf. Analyseer deze deal en geef een score van 0-100.
+
+KRITISCH BELANGRIJK - SCORINGSREGELS:
+De score MOET gebaseerd zijn op harde rekenkundige logica:
+
+MARGE BEREKENING (dit is de BELANGRIJKSTE factor):
+- Als de inkoopprijs HOGER is dan de VWE verkoopwaarde → Score MAXIMAAL 20 (zeer slechte deal, je verliest geld)
+- Als de inkoopprijs HOGER is dan de VWE handelsprijs → Score MAXIMAAL 35 (slechte deal)
+- Als de inkoopprijs GELIJK is aan de VWE inkoopwaarde → Score rond 40-50 (gemiddeld, weinig marge)
+- Als de inkoopprijs ONDER de VWE inkoopwaarde → Score 50-70 (redelijke tot goede deal)
+- Als de inkoopprijs 20%+ ONDER de VWE inkoopwaarde → Score 70-85 (goede deal)
+- Als de inkoopprijs 30%+ ONDER de VWE inkoopwaarde → Score 85-100 (uitstekende deal)
+
+Score labels:
+- 0-20: Slechte deal (verlies)
+- 21-40: Matige deal
+- 41-55: Redelijke deal
+- 56-70: Goede deal  
+- 71-85: Zeer goede deal
+- 86-100: Uitstekende deal
+
+De geschatte verkoopprijs moet REALISTISCH zijn op basis van marktdata. Gebruik de VWE verkoopwaarde en live advertenties als referentie. Trek kosten af voor opknappen, APK, etc.
+${margeInfo}
 
 VWE Taxatiegegevens:
 - Inkoopwaarde: €${vweData.inkoopwaarde || "onbekend"}
@@ -417,18 +463,9 @@ ${marktData.analyseTekst}
 BEKENDE PROBLEMEN EN KWALEN VAN DIT MODEL:
 ${marktData.kwalen || "Geen specifieke kwalen gevonden."}
 
-${extraInput.vraagprijs ? `Gevraagde inkoopprijs door klant: €${extraInput.vraagprijs}` : "Geen inkoopprijs opgegeven."}
+${extraInput.vraagprijs ? `Gevraagde inkoopprijs door klant: €${extraInput.vraagprijs}` : "Geen inkoopprijs opgegeven — geef dan alleen een marktanalyse zonder deal-score."}
 
-Beoordeel op basis van:
-1. Verschil tussen inkoopprijs en markt-/verkoopwaarde (margepotentieel)
-2. Marktliquiditeit (hoeveel vergelijkbare auto's, hoe snel verkoopt dit model)
-3. Seizoensgebondenheid
-4. Risicofactoren (aantal eigenaren, APK, BEKENDE KWALEN van dit model, schade, onderhoudsboekje)
-5. Waarde van de opties (zijn ze populair/waardeverhogend?)
-6. Verschil met live advertenties qua prijsstelling
-7. Fysieke staat: banden, rookvrij, schade, aantal sleutels – dit beïnvloedt opknapkosten
-8. De extra opmerkingen van de inkoper
-9. Specifieke kwalen/problemen van dit model die extra kosten kunnen veroorzaken`;
+Beoordeel op basis van de SCORINGSREGELS hierboven. De marge-berekening is al voorgedaan, gebruik die als leidraad.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
