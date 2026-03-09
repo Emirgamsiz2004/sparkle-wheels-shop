@@ -23,7 +23,7 @@ import ScrollToTop from "./components/ScrollToTop";
 const queryClient = new QueryClient();
 
 // ⬇️ Zet op false om de volledige site te tonen
-const UNDER_CONSTRUCTION = true;
+const UNDER_CONSTRUCTION = false;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
