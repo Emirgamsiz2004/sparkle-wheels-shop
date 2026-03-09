@@ -33,7 +33,7 @@ const extractAllXmlValues = (xml: string, tag: string): string[] => {
 
 // Helper to decode VWE SOAP response
 function decodeVweResponse(responseText: string): string {
-  const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
+  const resultMatch = responseText.match(/<(?:standaardDataRequestResult|DataRequestResult)>([\s\S]*?)<\/(?:standaardDataRequestResult|DataRequestResult)>/i);
   return (resultMatch ? resultMatch[1] : responseText)
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
 }
