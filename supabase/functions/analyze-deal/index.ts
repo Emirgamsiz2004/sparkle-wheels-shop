@@ -434,7 +434,7 @@ serve(async (req) => {
       eerdere_advertenties: [],
       aantal_eigenaren: rdwData.aantal_eigenaren,
       apk_status: rdwData.apk_vervaldatum,
-      inkoopprijs_klant: vraagprijs ? Number(vraagprijs) : null,
+      inkoopprijs_klant: extraInput.vraagprijs,
       deal_score: aiResult.score,
       ai_advies: aiResult.advies,
       score_factoren: aiResult.score_factoren,
