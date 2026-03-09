@@ -229,7 +229,7 @@ Antwoord alleen met feiten en cijfers, geen meningen.`;
 }
 
 // ─── Step 5: AI Scoring met uitgebreide data ───
-async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrapedListings: any[], opties: any[], vraagprijs: number | null) {
+async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrapedListings: any[], opties: any[], extraInput: any) {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY niet geconfigureerd");
 
@@ -238,6 +238,13 @@ async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrap
   ).join("\n");
 
   const optiesSummary = opties.map(o => o.omschrijving).join(", ");
+
+  const staatLabels: Record<string, string> = {
+    nieuwstaat: "Nieuwstaat", zeer_goed: "Zeer goed", goed: "Goed", redelijk: "Redelijk", matig: "Matig"
+  };
+  const bandenLabels: Record<string, string> = {
+    nieuw: "Nieuw (7mm+)", goed: "Goed (4-7mm)", matig: "Matig (2-4mm)", vervangen: "Moet vervangen (<2mm)"
+  };
 
   const prompt = `Je bent een auto-inkoop expert voor een Nederlands autobedrijf. Analyseer deze deal en geef een score van 0-100.
 
@@ -256,6 +263,16 @@ RDW Voertuigdata:
 - APK vervaldatum: ${rdwData.apk_vervaldatum || "onbekend"}
 - Brandstof: ${rdwData.brandstof || vweData.brandstof || "onbekend"}
 
+Inspectie-input van inkoper:
+- KM-stand: ${extraInput.km_stand || vweData.kmStand || "onbekend"} km
+- Staat voertuig: ${extraInput.staat ? staatLabels[extraInput.staat] || extraInput.staat : "niet opgegeven"}
+- Schadevrij: ${extraInput.schadevrij === true ? "Ja" : extraInput.schadevrij === false ? "Nee (schade aanwezig)" : "niet opgegeven"}
+- Onderhoudsboekje: ${extraInput.onderhoudsboekje === true ? "Ja, aanwezig" : extraInput.onderhoudsboekje === false ? "Nee, niet aanwezig" : "niet opgegeven"}
+- Rookvrij: ${extraInput.rookvrij === true ? "Ja" : extraInput.rookvrij === false ? "Nee (er is gerookt)" : "niet opgegeven"}
+- Aantal sleutels: ${extraInput.aantal_sleutels || "niet opgegeven"}
+- Bandenprofiel: ${extraInput.bandenprofiel ? bandenLabels[extraInput.bandenprofiel] || extraInput.bandenprofiel : "niet opgegeven"}
+- Extra opmerkingen: ${extraInput.opmerkingen || "geen"}
+
 Opties op dit voertuig:
 ${optiesSummary || "Geen opties gevonden"}
 
@@ -265,15 +282,17 @@ ${listingsSummary || "Geen advertenties gevonden"}
 Marktanalyse:
 ${marktData.analyseTekst}
 
-${vraagprijs ? `Gevraagde inkoopprijs door klant: €${vraagprijs}` : "Geen inkoopprijs opgegeven."}
+${extraInput.vraagprijs ? `Gevraagde inkoopprijs door klant: €${extraInput.vraagprijs}` : "Geen inkoopprijs opgegeven."}
 
 Beoordeel op basis van:
 1. Verschil tussen inkoopprijs en markt-/verkoopwaarde (margepotentieel)
 2. Marktliquiditeit (hoeveel vergelijkbare auto's, hoe snel verkoopt dit model)
 3. Seizoensgebondenheid
-4. Risicofactoren (aantal eigenaren, APK, bekende problemen)
+4. Risicofactoren (aantal eigenaren, APK, bekende problemen, schade, onderhoudsboekje)
 5. Waarde van de opties (zijn ze populair/waardeverhogend?)
-6. Verschil met live advertenties qua prijsstelling`;
+6. Verschil met live advertenties qua prijsstelling
+7. Fysieke staat: banden, rookvrij, schade, aantal sleutels – dit beïnvloedt opknapkosten
+8. De extra opmerkingen van de inkoper`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
