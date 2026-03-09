@@ -53,6 +53,7 @@ const App = () => (
             <Route path="/diensten/auto-customizing" element={<AutoCustomizing />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/deals" element={<DealAnalyzer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         )}
