@@ -414,17 +414,21 @@ ${listingsSummary || "Geen advertenties gevonden"}
 Marktanalyse:
 ${marktData.analyseTekst}
 
+BEKENDE PROBLEMEN EN KWALEN VAN DIT MODEL:
+${marktData.kwalen || "Geen specifieke kwalen gevonden."}
+
 ${extraInput.vraagprijs ? `Gevraagde inkoopprijs door klant: €${extraInput.vraagprijs}` : "Geen inkoopprijs opgegeven."}
 
 Beoordeel op basis van:
 1. Verschil tussen inkoopprijs en markt-/verkoopwaarde (margepotentieel)
 2. Marktliquiditeit (hoeveel vergelijkbare auto's, hoe snel verkoopt dit model)
 3. Seizoensgebondenheid
-4. Risicofactoren (aantal eigenaren, APK, bekende problemen, schade, onderhoudsboekje)
+4. Risicofactoren (aantal eigenaren, APK, BEKENDE KWALEN van dit model, schade, onderhoudsboekje)
 5. Waarde van de opties (zijn ze populair/waardeverhogend?)
 6. Verschil met live advertenties qua prijsstelling
 7. Fysieke staat: banden, rookvrij, schade, aantal sleutels – dit beïnvloedt opknapkosten
-8. De extra opmerkingen van de inkoper`;
+8. De extra opmerkingen van de inkoper
+9. Specifieke kwalen/problemen van dit model die extra kosten kunnen veroorzaken`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
