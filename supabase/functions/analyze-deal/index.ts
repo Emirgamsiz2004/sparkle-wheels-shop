@@ -259,27 +259,78 @@ async function scrapeMarktListings(merk: string, model: string, bouwjaar: string
   return { listings: results, bronnen: [...new Set(bronnen)] };
 }
 
-// ─── Step 4: Perplexity – Schadehistorie & marktanalyse ───
-async function fetchMarktEnHistorie(merk: string, model: string, bouwjaar: string | null, vin: string | null, opties: any[]) {
+// ─── Step 4a: Perplexity – Bekende problemen & kwalen ───
+async function fetchBekendeKwalen(merk: string, model: string, bouwjaar: string | null, motorcode: string | null) {
+  const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
+  if (!PERPLEXITY_API_KEY) return { kwalen: [], bronnen: [] };
+
+  const jaar = bouwjaar ? bouwjaar.substring(0, 4) : "";
+  
+  const query = `Wat zijn de bekende problemen, kwalen en aandachtspunten bij de ${merk} ${model} ${jaar ? `bouwjaar ${jaar}` : ""}?
+${motorcode ? `Motorcode: ${motorcode}` : ""}
+
+Zoek specifiek naar:
+1. Veelvoorkomende technische defecten en storingen
+2. Bekende problemen met motor, versnellingsbak, elektronica
+3. Typische slijtdelen die vaak kapot gaan
+4. Roestgevoelige plekken
+5. Terugroepacties van de fabrikant
+6. Problemen gemeld op autofora en klachtensites
+7. Kostbare reparaties waar kopers vaak mee te maken krijgen
+
+Geef concrete, feitelijke informatie met kilometerstand/leeftijd wanneer problemen vaak optreden.`;
+
+  try {
+    const response = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "sonar-pro",
+        messages: [
+          { role: "system", content: "Je bent een expert automonteur en voertuigspecialist. Geef gedetailleerde technische informatie over bekende problemen van specifieke automodellen. Focus op feiten, geen meningen." },
+          { role: "user", content: query },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn("Perplexity kwalen error:", response.status);
+      return { kwalen: "", bronnen: [] };
+    }
+
+    const data = await response.json();
+    return {
+      kwalen: data.choices?.[0]?.message?.content || "",
+      bronnen: data.citations || [],
+    };
+  } catch (e) {
+    console.error("Perplexity kwalen error:", e);
+    return { kwalen: "", bronnen: [] };
+  }
+}
+
+// ─── Step 4b: Perplexity – Marktanalyse ───
+async function fetchMarktAnalyse(merk: string, model: string, bouwjaar: string | null, opties: any[]) {
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
   if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY niet geconfigureerd");
 
   const jaar = bouwjaar ? bouwjaar.substring(0, 4) : "";
-  const optiesList = opties.slice(0, 10).map(o => o.omschrijving).join(", ");
+  const optiesList = opties.slice(0, 10).map(o => o.omschrijving || o.naam).join(", ");
 
-  const query = `Geef een uitgebreide marktanalyse voor een ${merk} ${model} ${jaar ? `uit ${jaar}` : ""}.
-${vin ? `VIN: ${vin}` : ""}
-${optiesList ? `Belangrijke opties: ${optiesList}` : ""}
+  const query = `Geef een marktanalyse voor een ${merk} ${model} ${jaar ? `uit ${jaar}` : ""}.
+${optiesList ? `Opties: ${optiesList}` : ""}
 
 Beantwoord het volgende:
 1. Gemiddelde vraagprijs, laagste en hoogste prijs op basis van actuele advertenties (Marktplaats, AutoScout24, AutoTrack)
-2. Geschat aantal vergelijkbare exemplaren te koop
+2. Geschat aantal vergelijkbare exemplaren te koop in Nederland
 3. Gemiddelde standtijd voor dit model
-4. Bekende problemen of aandachtspunten voor dit specifieke model/bouwjaar
-5. Hoe populair zijn de genoemde opties? Welke zijn waardeverhogend?
-6. Seizoensinvloed op de verkoop van dit type auto
-7. Zijn er bekende terugroepacties voor dit model?
-Antwoord alleen met feiten en cijfers, geen meningen.`;
+4. Hoe populair zijn de genoemde opties? Welke verhogen de waarde significant?
+5. Seizoensinvloed op de verkoop van dit type auto
+
+Antwoord alleen met feiten en cijfers.`;
 
   const response = await fetch("https://api.perplexity.ai/chat/completions", {
     method: "POST",
