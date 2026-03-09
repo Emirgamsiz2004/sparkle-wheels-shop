@@ -63,7 +63,7 @@ async function fetchRdwData(kenteken: string) {
   };
 }
 
-// ─── Step 2: VWE SOAP – Taxatie + opties ───
+// ─── Step 2: VWE SOAP – Taxatie + Autotelex opties ───
 async function fetchVweData(kenteken: string) {
   const VWE_USERNAME = Deno.env.get("VWE_USERNAME");
   const VWE_PASSWORD = Deno.env.get("VWE_PASSWORD");
@@ -72,7 +72,7 @@ async function fetchVweData(kenteken: string) {
   const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
   // Request taxatie + opties rubrieken
-  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOpties/></rubrieken></request>`;
+  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOpties/><atlOptieFabriek/><atlOptiePakket/><atlOptieStandaard/></rubrieken></request>`;
 
   const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -99,12 +99,13 @@ async function fetchVweData(kenteken: string) {
   const decoded = (resultMatch ? resultMatch[1] : responseText)
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
 
-  // Extract options
+  // Extract options from multiple sources
   const optieOmschrijvingen = extractAllXmlValues(decoded, "optieomschrijving");
   const optieCodes = extractAllXmlValues(decoded, "optiecode");
   const opties = optieOmschrijvingen.map((omschr, i) => ({
     code: optieCodes[i] || null,
     omschrijving: omschr,
+    type: "autotelex",
   }));
 
   return {
@@ -119,6 +120,86 @@ async function fetchVweData(kenteken: string) {
     kmStand: extractXmlValue(decoded, "tellerstand") || extractXmlValue(decoded, "Tellerstand"),
     opties,
   };
+}
+
+// ─── Step 2b: SilverDAT VIN – Fabrieksuitrusting via VIN ───
+async function fetchSilverDatVin(vin: string) {
+  const VWE_USERNAME = Deno.env.get("VWE_USERNAME");
+  const VWE_PASSWORD = Deno.env.get("VWE_PASSWORD");
+  if (!VWE_USERNAME || !VWE_PASSWORD || !vin) return null;
+
+  console.log("SilverDAT: fetching VIN equipment for", vin);
+
+  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><vin>${vin}</vin></parameters><rubrieken><datVoertuig/></rubrieken></request>`;
+
+  const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <standaardDataRequest xmlns="http://hetextranet.nl/InterData">
+      <requestXml>${escapeXml(innerXml)}</requestXml>
+    </standaardDataRequest>
+  </soap:Body>
+</soap:Envelope>`;
+
+  try {
+    const response = await fetch("https://interdata.vwe.nl/DataAanvraag.asmx", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/xml; charset=utf-8",
+        SOAPAction: "http://hetextranet.nl/InterData/standaardDataRequest",
+      },
+      body: soapEnvelope,
+    });
+
+    const responseText = await response.text();
+    if (!response.ok) {
+      console.warn("SilverDAT VIN error:", response.status);
+      return null;
+    }
+
+    const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
+    const decoded = (resultMatch ? resultMatch[1] : responseText)
+      .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+
+    // Extract SilverDAT uitrustingen
+    const uitrustingNamen = extractAllXmlValues(decoded, "uitrusting-naam");
+    const standaardOfOptioneel = extractAllXmlValues(decoded, "standaardofoptioneel");
+    const fabrikantcodes = extractAllXmlValues(decoded, "fabrikantcode");
+    const prijzen = extractAllXmlValues(decoded, "prijs");
+
+    const fabrieksopties = uitrustingNamen.map((naam, i) => ({
+      naam,
+      fabrikantcode: fabrikantcodes[i] || null,
+      type: standaardOfOptioneel[i] || "onbekend",
+      prijs: prijzen[i] ? Number(prijzen[i]) : null,
+    }));
+
+    // Extract kleuren
+    const kleurcodes = extractAllXmlValues(decoded, "kleurcode");
+    const kleurbeschrijvingen = extractAllXmlValues(decoded, "kleurbeschrijving");
+    const kleuren = kleurcodes.map((code, i) => ({
+      code,
+      beschrijving: kleurbeschrijvingen[i] || null,
+    }));
+
+    // Extract model info
+    const datModel = extractXmlValue(decoded, "model");
+    const datSubmodel = extractXmlValue(decoded, "submodel");
+    const datecode = extractXmlValue(decoded, "datecode");
+
+    console.log("SilverDAT: found", fabrieksopties.length, "equipment items");
+
+    return {
+      fabrieksopties,
+      kleuren,
+      model: datModel,
+      submodel: datSubmodel,
+      datecode,
+    };
+  } catch (e) {
+    console.error("SilverDAT VIN error:", e);
+    return null;
+  }
 }
 
 // ─── Step 3: Firecrawl – Marktplaats & AutoScout24 scraping ───
@@ -178,27 +259,78 @@ async function scrapeMarktListings(merk: string, model: string, bouwjaar: string
   return { listings: results, bronnen: [...new Set(bronnen)] };
 }
 
-// ─── Step 4: Perplexity – Schadehistorie & marktanalyse ───
-async function fetchMarktEnHistorie(merk: string, model: string, bouwjaar: string | null, vin: string | null, opties: any[]) {
+// ─── Step 4a: Perplexity – Bekende problemen & kwalen ───
+async function fetchBekendeKwalen(merk: string, model: string, bouwjaar: string | null, motorcode: string | null) {
+  const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
+  if (!PERPLEXITY_API_KEY) return { kwalen: [], bronnen: [] };
+
+  const jaar = bouwjaar ? bouwjaar.substring(0, 4) : "";
+  
+  const query = `Wat zijn de bekende problemen, kwalen en aandachtspunten bij de ${merk} ${model} ${jaar ? `bouwjaar ${jaar}` : ""}?
+${motorcode ? `Motorcode: ${motorcode}` : ""}
+
+Zoek specifiek naar:
+1. Veelvoorkomende technische defecten en storingen
+2. Bekende problemen met motor, versnellingsbak, elektronica
+3. Typische slijtdelen die vaak kapot gaan
+4. Roestgevoelige plekken
+5. Terugroepacties van de fabrikant
+6. Problemen gemeld op autofora en klachtensites
+7. Kostbare reparaties waar kopers vaak mee te maken krijgen
+
+Geef concrete, feitelijke informatie met kilometerstand/leeftijd wanneer problemen vaak optreden.`;
+
+  try {
+    const response = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "sonar-pro",
+        messages: [
+          { role: "system", content: "Je bent een expert automonteur en voertuigspecialist. Geef gedetailleerde technische informatie over bekende problemen van specifieke automodellen. Focus op feiten, geen meningen." },
+          { role: "user", content: query },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn("Perplexity kwalen error:", response.status);
+      return { kwalen: "", bronnen: [] };
+    }
+
+    const data = await response.json();
+    return {
+      kwalen: data.choices?.[0]?.message?.content || "",
+      bronnen: data.citations || [],
+    };
+  } catch (e) {
+    console.error("Perplexity kwalen error:", e);
+    return { kwalen: "", bronnen: [] };
+  }
+}
+
+// ─── Step 4b: Perplexity – Marktanalyse ───
+async function fetchMarktAnalyse(merk: string, model: string, bouwjaar: string | null, opties: any[]) {
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
   if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY niet geconfigureerd");
 
   const jaar = bouwjaar ? bouwjaar.substring(0, 4) : "";
-  const optiesList = opties.slice(0, 10).map(o => o.omschrijving).join(", ");
+  const optiesList = opties.slice(0, 10).map(o => o.omschrijving || o.naam).join(", ");
 
-  const query = `Geef een uitgebreide marktanalyse voor een ${merk} ${model} ${jaar ? `uit ${jaar}` : ""}.
-${vin ? `VIN: ${vin}` : ""}
-${optiesList ? `Belangrijke opties: ${optiesList}` : ""}
+  const query = `Geef een marktanalyse voor een ${merk} ${model} ${jaar ? `uit ${jaar}` : ""}.
+${optiesList ? `Opties: ${optiesList}` : ""}
 
 Beantwoord het volgende:
 1. Gemiddelde vraagprijs, laagste en hoogste prijs op basis van actuele advertenties (Marktplaats, AutoScout24, AutoTrack)
-2. Geschat aantal vergelijkbare exemplaren te koop
+2. Geschat aantal vergelijkbare exemplaren te koop in Nederland
 3. Gemiddelde standtijd voor dit model
-4. Bekende problemen of aandachtspunten voor dit specifieke model/bouwjaar
-5. Hoe populair zijn de genoemde opties? Welke zijn waardeverhogend?
-6. Seizoensinvloed op de verkoop van dit type auto
-7. Zijn er bekende terugroepacties voor dit model?
-Antwoord alleen met feiten en cijfers, geen meningen.`;
+4. Hoe populair zijn de genoemde opties? Welke verhogen de waarde significant?
+5. Seizoensinvloed op de verkoop van dit type auto
+
+Antwoord alleen met feiten en cijfers.`;
 
   const response = await fetch("https://api.perplexity.ai/chat/completions", {
     method: "POST",
@@ -237,7 +369,7 @@ async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrap
     `- ${l.titel} (${l.bron}): ${l.beschrijving}`
   ).join("\n");
 
-  const optiesSummary = opties.map(o => o.omschrijving).join(", ");
+  const optiesSummary = opties.map(o => o.omschrijving || o.naam).join(", ");
 
   const staatLabels: Record<string, string> = {
     nieuwstaat: "Nieuwstaat", zeer_goed: "Zeer goed", goed: "Goed", redelijk: "Redelijk", matig: "Matig"
@@ -282,17 +414,21 @@ ${listingsSummary || "Geen advertenties gevonden"}
 Marktanalyse:
 ${marktData.analyseTekst}
 
+BEKENDE PROBLEMEN EN KWALEN VAN DIT MODEL:
+${marktData.kwalen || "Geen specifieke kwalen gevonden."}
+
 ${extraInput.vraagprijs ? `Gevraagde inkoopprijs door klant: €${extraInput.vraagprijs}` : "Geen inkoopprijs opgegeven."}
 
 Beoordeel op basis van:
 1. Verschil tussen inkoopprijs en markt-/verkoopwaarde (margepotentieel)
 2. Marktliquiditeit (hoeveel vergelijkbare auto's, hoe snel verkoopt dit model)
 3. Seizoensgebondenheid
-4. Risicofactoren (aantal eigenaren, APK, bekende problemen, schade, onderhoudsboekje)
+4. Risicofactoren (aantal eigenaren, APK, BEKENDE KWALEN van dit model, schade, onderhoudsboekje)
 5. Waarde van de opties (zijn ze populair/waardeverhogend?)
 6. Verschil met live advertenties qua prijsstelling
 7. Fysieke staat: banden, rookvrij, schade, aantal sleutels – dit beïnvloedt opknapkosten
-8. De extra opmerkingen van de inkoper`;
+8. De extra opmerkingen van de inkoper
+9. Specifieke kwalen/problemen van dit model die extra kosten kunnen veroorzaken`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -383,21 +519,42 @@ serve(async (req) => {
     console.log("RDW VIN:", rdwData.vin);
     console.log("VWE opties count:", vweData.opties.length);
 
+    // Step 2b: SilverDAT VIN (if VIN available)
+    let silverDatData: any = null;
+    if (rdwData.vin) {
+      console.log("Step 2b: Fetching SilverDAT VIN equipment...");
+      silverDatData = await fetchSilverDatVin(rdwData.vin);
+      console.log("SilverDAT opties count:", silverDatData?.fabrieksopties?.length || 0);
+    }
+
     const merk = rdwData.merk || vweData.merk || "onbekend";
     const model = rdwData.handelsbenaming || vweData.model || "onbekend";
     const bouwjaar = rdwData.datum_eerste_toelating || vweData.bouwjaar;
 
-    // Step 3 & 4: Firecrawl + Perplexity parallel
-    console.log("Step 3+4: Firecrawl scraping + Perplexity parallel...");
-    const [scraped, marktData] = await Promise.all([
+    // Combine all options: VWE + SilverDAT
+    const alleOpties = [
+      ...vweData.opties,
+      ...(silverDatData?.fabrieksopties || []).map((o: any) => ({
+        code: o.fabrikantcode,
+        omschrijving: o.naam,
+        type: o.type,
+        prijs: o.prijs,
+      })),
+    ];
+
+    // Step 3, 4a, 4b: Firecrawl + Perplexity bekende kwalen + marktanalyse (all parallel)
+    console.log("Step 3+4: Firecrawl + Perplexity (kwalen + markt) parallel...");
+    const [scraped, kwalenData, marktData] = await Promise.all([
       scrapeMarktListings(merk, model, bouwjaar),
-      fetchMarktEnHistorie(merk, model, bouwjaar, rdwData.vin, vweData.opties),
+      fetchBekendeKwalen(merk, model, bouwjaar, null),
+      fetchMarktAnalyse(merk, model, bouwjaar, alleOpties),
     ]);
     console.log("Scraped listings:", scraped.listings.length);
+    console.log("Kwalen tekst length:", kwalenData.kwalen.length);
 
-    // Step 5: AI Scoring
+    // Step 5: AI Scoring (with kwalen included)
     console.log("Step 5: AI scoring...");
-    const aiResult = await generateAiScore(rdwData, vweData, marktData, scraped.listings, vweData.opties, extraInput);
+    const aiResult = await generateAiScore(rdwData, vweData, { ...marktData, kwalen: kwalenData.kwalen }, scraped.listings, alleOpties, extraInput);
     console.log("AI score:", aiResult.score);
 
     // Step 6: Save to database
@@ -417,14 +574,14 @@ serve(async (req) => {
       kleur: rdwData.eerste_kleur,
       vermogen: rdwData.vermogen,
       vin: rdwData.vin,
-      voertuig_opties: vweData.opties,
+      voertuig_opties: alleOpties,
       opties_populariteit: {},
       vwe_inkoopwaarde: vweData.inkoopwaarde ? Number(vweData.inkoopwaarde) : null,
       vwe_verkoopwaarde: vweData.verkoopwaarde ? Number(vweData.verkoopwaarde) : null,
       vwe_nieuwprijs: vweData.nieuwprijs ? Number(vweData.nieuwprijs) : null,
       vwe_handelsprijs: vweData.handelsprijs ? Number(vweData.handelsprijs) : null,
       markt_analyse_tekst: marktData.analyseTekst,
-      markt_bronnen: [...marktData.bronnen, ...scraped.bronnen],
+      markt_bronnen: [...marktData.bronnen, ...scraped.bronnen, ...kwalenData.bronnen],
       markt_listings: scraped.listings,
       gemiddelde_marktprijs: aiResult.gemiddelde_marktprijs || null,
       laagste_marktprijs: null,
@@ -456,6 +613,9 @@ serve(async (req) => {
         data: {
           id: savedDeal?.id,
           ...dealRecord,
+          silverdat_opties: silverDatData?.fabrieksopties || [],
+          silverdat_kleuren: silverDatData?.kleuren || [],
+          bekende_kwalen: kwalenData.kwalen,
           opties_analyse: aiResult.opties_analyse || null,
           aandachtspunten: aiResult.aandachtspunten || [],
         },
