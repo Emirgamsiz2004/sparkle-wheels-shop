@@ -84,10 +84,8 @@ async function fetchVweData(kenteken: string) {
 
   const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-  // Use the correct VWE StandardDataRequest XML format
-  // Root: <bericht>, auth needs <naam>, <wachtwoord>, <berichtsoort>
-  // Rubrieken are specified inside the bericht structure
-  const innerXml = `<bericht><authenticatie><naam>${VWE_USERNAME}</naam><wachtwoord>${VWE_PASSWORD}</wachtwoord><berichtsoort>SB-RDWA-ATL</berichtsoort></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOptieFabriek/><atlOptiePakket/><atlOptieStandaard/><rdwInfoBasic/></rubrieken></bericht>`;
+  // VWE StandardDataRequest: rubrieken are determined by berichtsoort, not specified separately
+  const innerXml = `<bericht><authenticatie><naam>${VWE_USERNAME}</naam><wachtwoord>${VWE_PASSWORD}</wachtwoord><berichtsoort>SB-RDWA-ATL</berichtsoort></authenticatie><parameters><kenteken>${clean}</kenteken></parameters></bericht>`;
 
   const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
