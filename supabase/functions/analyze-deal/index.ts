@@ -63,7 +63,7 @@ async function fetchRdwData(kenteken: string) {
   };
 }
 
-// ─── Step 2: VWE SOAP – Taxatie + opties ───
+// ─── Step 2: VWE SOAP – Taxatie + Autotelex opties ───
 async function fetchVweData(kenteken: string) {
   const VWE_USERNAME = Deno.env.get("VWE_USERNAME");
   const VWE_PASSWORD = Deno.env.get("VWE_PASSWORD");
@@ -72,7 +72,7 @@ async function fetchVweData(kenteken: string) {
   const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
   // Request taxatie + opties rubrieken
-  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOpties/></rubrieken></request>`;
+  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOpties/><atlOptieFabriek/><atlOptiePakket/><atlOptieStandaard/></rubrieken></request>`;
 
   const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -99,12 +99,13 @@ async function fetchVweData(kenteken: string) {
   const decoded = (resultMatch ? resultMatch[1] : responseText)
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
 
-  // Extract options
+  // Extract options from multiple sources
   const optieOmschrijvingen = extractAllXmlValues(decoded, "optieomschrijving");
   const optieCodes = extractAllXmlValues(decoded, "optiecode");
   const opties = optieOmschrijvingen.map((omschr, i) => ({
     code: optieCodes[i] || null,
     omschrijving: omschr,
+    type: "autotelex",
   }));
 
   return {
@@ -119,6 +120,86 @@ async function fetchVweData(kenteken: string) {
     kmStand: extractXmlValue(decoded, "tellerstand") || extractXmlValue(decoded, "Tellerstand"),
     opties,
   };
+}
+
+// ─── Step 2b: SilverDAT VIN – Fabrieksuitrusting via VIN ───
+async function fetchSilverDatVin(vin: string) {
+  const VWE_USERNAME = Deno.env.get("VWE_USERNAME");
+  const VWE_PASSWORD = Deno.env.get("VWE_PASSWORD");
+  if (!VWE_USERNAME || !VWE_PASSWORD || !vin) return null;
+
+  console.log("SilverDAT: fetching VIN equipment for", vin);
+
+  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><vin>${vin}</vin></parameters><rubrieken><datVoertuig/></rubrieken></request>`;
+
+  const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <standaardDataRequest xmlns="http://hetextranet.nl/InterData">
+      <requestXml>${escapeXml(innerXml)}</requestXml>
+    </standaardDataRequest>
+  </soap:Body>
+</soap:Envelope>`;
+
+  try {
+    const response = await fetch("https://interdata.vwe.nl/DataAanvraag.asmx", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/xml; charset=utf-8",
+        SOAPAction: "http://hetextranet.nl/InterData/standaardDataRequest",
+      },
+      body: soapEnvelope,
+    });
+
+    const responseText = await response.text();
+    if (!response.ok) {
+      console.warn("SilverDAT VIN error:", response.status);
+      return null;
+    }
+
+    const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
+    const decoded = (resultMatch ? resultMatch[1] : responseText)
+      .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+
+    // Extract SilverDAT uitrustingen
+    const uitrustingNamen = extractAllXmlValues(decoded, "uitrusting-naam");
+    const standaardOfOptioneel = extractAllXmlValues(decoded, "standaardofoptioneel");
+    const fabrikantcodes = extractAllXmlValues(decoded, "fabrikantcode");
+    const prijzen = extractAllXmlValues(decoded, "prijs");
+
+    const fabrieksopties = uitrustingNamen.map((naam, i) => ({
+      naam,
+      fabrikantcode: fabrikantcodes[i] || null,
+      type: standaardOfOptioneel[i] || "onbekend",
+      prijs: prijzen[i] ? Number(prijzen[i]) : null,
+    }));
+
+    // Extract kleuren
+    const kleurcodes = extractAllXmlValues(decoded, "kleurcode");
+    const kleurbeschrijvingen = extractAllXmlValues(decoded, "kleurbeschrijving");
+    const kleuren = kleurcodes.map((code, i) => ({
+      code,
+      beschrijving: kleurbeschrijvingen[i] || null,
+    }));
+
+    // Extract model info
+    const datModel = extractXmlValue(decoded, "model");
+    const datSubmodel = extractXmlValue(decoded, "submodel");
+    const datecode = extractXmlValue(decoded, "datecode");
+
+    console.log("SilverDAT: found", fabrieksopties.length, "equipment items");
+
+    return {
+      fabrieksopties,
+      kleuren,
+      model: datModel,
+      submodel: datSubmodel,
+      datecode,
+    };
+  } catch (e) {
+    console.error("SilverDAT VIN error:", e);
+    return null;
+  }
 }
 
 // ─── Step 3: Firecrawl – Marktplaats & AutoScout24 scraping ───
