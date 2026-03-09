@@ -249,34 +249,121 @@ const DealAnalyzer = () => {
             Voer een kenteken in voor een uitgebreide analyse: RDW data, VWE taxatie, opties, live marktprijzen en AI-scoring.
           </p>
 
-          <form onSubmit={handleAnalyze} className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">Kenteken</label>
-              <input
-                type="text"
-                value={kenteken}
-                onChange={(e) => setKenteken(e.target.value.toUpperCase())}
-                placeholder="XX-999-X"
-                className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/50 transition-colors tracking-widest"
+          <form onSubmit={handleAnalyze} className="space-y-6">
+            {/* Row 1: Kenteken + KM + Vraagprijs */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">Kenteken *</label>
+                <input
+                  type="text"
+                  value={kenteken}
+                  onChange={(e) => setKenteken(e.target.value.toUpperCase())}
+                  placeholder="XX-999-X"
+                  className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/50 transition-colors tracking-widest"
+                  disabled={loading}
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">KM-stand</label>
+                <input
+                  type="number"
+                  value={kmStand}
+                  onChange={(e) => setKmStand(e.target.value)}
+                  placeholder="bijv. 85000"
+                  className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/50 transition-colors"
+                  disabled={loading}
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">Vraagprijs klant</label>
+                <input
+                  type="number"
+                  value={vraagprijs}
+                  onChange={(e) => setVraagprijs(e.target.value)}
+                  placeholder="€ 0"
+                  className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/50 transition-colors"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            {/* Row 2: Staat + Bandenprofiel + Sleutels */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">Staat voertuig</label>
+                <select
+                  value={staat}
+                  onChange={(e) => setStaat(e.target.value)}
+                  className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground focus:outline-none focus:border-foreground/50 transition-colors appearance-none"
+                  disabled={loading}
+                >
+                  <option value="" className="bg-card">Selecteer...</option>
+                  <option value="nieuwstaat" className="bg-card">Nieuwstaat</option>
+                  <option value="zeer_goed" className="bg-card">Zeer goed</option>
+                  <option value="goed" className="bg-card">Goed</option>
+                  <option value="redelijk" className="bg-card">Redelijk</option>
+                  <option value="matig" className="bg-card">Matig</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">Bandenprofiel</label>
+                <select
+                  value={bandenprofiel}
+                  onChange={(e) => setBandenprofiel(e.target.value)}
+                  className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground focus:outline-none focus:border-foreground/50 transition-colors appearance-none"
+                  disabled={loading}
+                >
+                  <option value="" className="bg-card">Selecteer...</option>
+                  <option value="nieuw" className="bg-card">Nieuw (7mm+)</option>
+                  <option value="goed" className="bg-card">Goed (4-7mm)</option>
+                  <option value="matig" className="bg-card">Matig (2-4mm)</option>
+                  <option value="vervangen" className="bg-card">Moet vervangen (&lt;2mm)</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">Aantal sleutels</label>
+                <input
+                  type="number"
+                  value={aantalSleutels}
+                  onChange={(e) => setAantalSleutels(e.target.value)}
+                  placeholder="bijv. 2"
+                  min="0"
+                  max="5"
+                  className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/50 transition-colors"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            {/* Row 3: Toggle chips */}
+            <div>
+              <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-3 block">Voertuigconditie</label>
+              <div className="flex flex-wrap gap-2">
+                <ToggleChip label={schadevrij === true ? "✓ Schadevrij" : schadevrij === false ? "✗ Schade" : "Schadevrij?"} active={schadevrij} onClick={() => setSchadevrij(toggleBool(schadevrij))} disabled={loading} />
+                <ToggleChip label={onderhoudsboekje === true ? "✓ Onderhoudsboekje" : onderhoudsboekje === false ? "✗ Geen boekje" : "Onderhoudsboekje?"} active={onderhoudsboekje} onClick={() => setOnderhoudsboekje(toggleBool(onderhoudsboekje))} disabled={loading} />
+                <ToggleChip label={rookvrij === true ? "✓ Rookvrij" : rookvrij === false ? "✗ Gerookt" : "Rookvrij?"} active={rookvrij} onClick={() => setRookvrij(toggleBool(rookvrij))} disabled={loading} />
+              </div>
+            </div>
+
+            {/* Row 4: Opmerkingen */}
+            <div>
+              <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">Extra opmerkingen</label>
+              <textarea
+                value={opmerkingen}
+                onChange={(e) => setOpmerkingen(e.target.value)}
+                placeholder="Bijv. lakschade rechter deur, nieuwe distributieriem, winterbanden aanwezig..."
+                rows={2}
+                className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/50 transition-colors resize-none"
                 disabled={loading}
               />
             </div>
-            <div className="w-full sm:w-48">
-              <label className="text-[9px] font-body tracking-[0.2em] uppercase text-muted-foreground mb-1.5 block">Vraagprijs klant (optioneel)</label>
-              <input
-                type="number"
-                value={vraagprijs}
-                onChange={(e) => setVraagprijs(e.target.value)}
-                placeholder="€ 0"
-                className="w-full bg-transparent border-b border-border py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground/50 transition-colors"
-                disabled={loading}
-              />
-            </div>
-            <div className="flex items-end">
+
+            {/* Submit */}
+            <div className="flex justify-end">
               <button
                 type="submit"
                 disabled={loading || !kenteken.trim()}
-                className="flex items-center gap-2 px-8 py-3 bg-foreground text-background text-[10px] tracking-[0.15em] uppercase font-body font-semibold hover:bg-foreground/90 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-10 py-3 bg-foreground text-background text-[10px] tracking-[0.15em] uppercase font-body font-semibold hover:bg-foreground/90 transition-all disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
                 Analyseer
