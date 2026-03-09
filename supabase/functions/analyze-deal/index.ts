@@ -84,15 +84,15 @@ async function fetchVweData(kenteken: string) {
 
   const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-  // VWE StandardDataRequest: rubrieken are determined by berichtsoort, not specified separately
-  const innerXml = `<bericht><authenticatie><naam>${VWE_USERNAME}</naam><wachtwoord>${VWE_PASSWORD}</wachtwoord><berichtsoort>SB-RDWA-ATL</berichtsoort></authenticatie><parameters><kenteken>${clean}</kenteken></parameters></bericht>`;
+  // Use DataRequest method (older, but compatible with this account)
+  const innerXml = `<bericht><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord><berichtsoort>VWE-TXN</berichtsoort></authenticatie><parameters><kenteken>${clean}</kenteken></parameters></bericht>`;
 
   const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
-    <standaardDataRequest xmlns="http://hetextranet.nl/InterData">
-      <requestXml>${escapeXml(innerXml)}</requestXml>
-    </standaardDataRequest>
+    <DataRequest xmlns="http://hetextranet.nl/InterData">
+      <XMLBody>${escapeXml(innerXml)}</XMLBody>
+    </DataRequest>
   </soap:Body>
 </soap:Envelope>`;
 
