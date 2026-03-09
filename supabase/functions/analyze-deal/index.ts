@@ -114,6 +114,17 @@ async function fetchVweData(kenteken: string) {
   console.log("VWE decoded XML (first 2000 chars):", decoded.substring(0, 2000));
   console.log("VWE decoded XML (2000-4000):", decoded.substring(2000, 4000));
 
+  // Check for VWE error response
+  const errorCode = extractXmlValue(decoded, "code");
+  const errorMsg = extractXmlValue(decoded, "omschrijving");
+  if (errorCode && errorCode !== "0" && errorMsg && errorMsg.includes("niet correct")) {
+    console.warn("VWE error:", errorCode, errorMsg);
+    return {
+      vin: null, inkoopwaarde: null, verkoopwaarde: null, nieuwprijs: null, handelsprijs: null,
+      merk: null, model: null, bouwjaar: null, brandstof: null, kmStand: null, opties: [],
+    };
+  }
+
   // Try to extract VIN from various possible tags
   const vin = extractXmlValue(decoded, "vin") 
     || extractXmlValue(decoded, "VIN") 
