@@ -92,6 +92,123 @@ export type Database = {
         }
         Relationships: []
       }
+      deals: {
+        Row: {
+          aantal_eigenaren: string | null
+          aantal_vergelijkbaar: number | null
+          ai_advies: string | null
+          apk_status: string | null
+          bouwjaar: string | null
+          brandstof: string | null
+          carrosserie: string | null
+          created_at: string
+          deal_score: number | null
+          eerdere_advertenties: Json | null
+          gemiddelde_marktprijs: number | null
+          geschatte_standtijd: string | null
+          geschatte_verkoopprijs: number | null
+          hoogste_marktprijs: number | null
+          id: string
+          inkoopprijs_klant: number | null
+          kenteken: string
+          kleur: string | null
+          km_stand: string | null
+          laagste_marktprijs: number | null
+          markt_analyse_tekst: string | null
+          markt_bronnen: Json | null
+          markt_listings: Json | null
+          merk: string | null
+          model: string | null
+          opties_populariteit: Json | null
+          schade_historie: Json | null
+          score_factoren: Json | null
+          transmissie: string | null
+          vermogen: string | null
+          vin: string | null
+          voertuig_opties: Json | null
+          vwe_handelsprijs: number | null
+          vwe_inkoopwaarde: number | null
+          vwe_nieuwprijs: number | null
+          vwe_verkoopwaarde: number | null
+        }
+        Insert: {
+          aantal_eigenaren?: string | null
+          aantal_vergelijkbaar?: number | null
+          ai_advies?: string | null
+          apk_status?: string | null
+          bouwjaar?: string | null
+          brandstof?: string | null
+          carrosserie?: string | null
+          created_at?: string
+          deal_score?: number | null
+          eerdere_advertenties?: Json | null
+          gemiddelde_marktprijs?: number | null
+          geschatte_standtijd?: string | null
+          geschatte_verkoopprijs?: number | null
+          hoogste_marktprijs?: number | null
+          id?: string
+          inkoopprijs_klant?: number | null
+          kenteken: string
+          kleur?: string | null
+          km_stand?: string | null
+          laagste_marktprijs?: number | null
+          markt_analyse_tekst?: string | null
+          markt_bronnen?: Json | null
+          markt_listings?: Json | null
+          merk?: string | null
+          model?: string | null
+          opties_populariteit?: Json | null
+          schade_historie?: Json | null
+          score_factoren?: Json | null
+          transmissie?: string | null
+          vermogen?: string | null
+          vin?: string | null
+          voertuig_opties?: Json | null
+          vwe_handelsprijs?: number | null
+          vwe_inkoopwaarde?: number | null
+          vwe_nieuwprijs?: number | null
+          vwe_verkoopwaarde?: number | null
+        }
+        Update: {
+          aantal_eigenaren?: string | null
+          aantal_vergelijkbaar?: number | null
+          ai_advies?: string | null
+          apk_status?: string | null
+          bouwjaar?: string | null
+          brandstof?: string | null
+          carrosserie?: string | null
+          created_at?: string
+          deal_score?: number | null
+          eerdere_advertenties?: Json | null
+          gemiddelde_marktprijs?: number | null
+          geschatte_standtijd?: string | null
+          geschatte_verkoopprijs?: number | null
+          hoogste_marktprijs?: number | null
+          id?: string
+          inkoopprijs_klant?: number | null
+          kenteken?: string
+          kleur?: string | null
+          km_stand?: string | null
+          laagste_marktprijs?: number | null
+          markt_analyse_tekst?: string | null
+          markt_bronnen?: Json | null
+          markt_listings?: Json | null
+          merk?: string | null
+          model?: string | null
+          opties_populariteit?: Json | null
+          schade_historie?: Json | null
+          score_factoren?: Json | null
+          transmissie?: string | null
+          vermogen?: string | null
+          vin?: string | null
+          voertuig_opties?: Json | null
+          vwe_handelsprijs?: number | null
+          vwe_inkoopwaarde?: number | null
+          vwe_nieuwprijs?: number | null
+          vwe_verkoopwaarde?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
