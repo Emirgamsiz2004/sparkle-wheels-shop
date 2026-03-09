@@ -369,7 +369,7 @@ async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrap
     `- ${l.titel} (${l.bron}): ${l.beschrijving}`
   ).join("\n");
 
-  const optiesSummary = opties.map(o => o.omschrijving).join(", ");
+  const optiesSummary = opties.map(o => o.omschrijving || o.naam).join(", ");
 
   const staatLabels: Record<string, string> = {
     nieuwstaat: "Nieuwstaat", zeer_goed: "Zeer goed", goed: "Goed", redelijk: "Redelijk", matig: "Matig"
