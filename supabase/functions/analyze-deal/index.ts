@@ -411,7 +411,7 @@ serve(async (req) => {
       model,
       bouwjaar: bouwjaar?.substring(0, 4) || null,
       brandstof: rdwData.brandstof || vweData.brandstof,
-      km_stand: vweData.kmStand,
+      km_stand: km_stand || vweData.kmStand,
       transmissie: null,
       carrosserie: rdwData.inrichting,
       kleur: rdwData.eerste_kleur,
