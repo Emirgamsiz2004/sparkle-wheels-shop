@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, Loader2, TrendingUp, BarChart3, ShieldCheck, Sun, ExternalLink, Package, AlertCircle, Car, Hash, Calendar, Fuel, Gauge, Users, Shield } from "lucide-react";
+import { ArrowLeft, Search, Loader2, TrendingUp, BarChart3, ShieldCheck, Sun, ExternalLink, Package, AlertCircle, Car, Hash, Calendar, Fuel, Gauge, Users, Shield, Wrench, Calculator } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
@@ -34,6 +34,19 @@ interface SilverDatOptie {
   fabrikantcode: string | null;
   type: string;
   prijs: number | null;
+}
+
+interface OpknapkostenItem {
+  item: string;
+  bedrag: number;
+  toelichting?: string;
+}
+
+interface GescRaptePrijzen {
+  laagste: number | null;
+  gemiddeld: number | null;
+  hoogste: number | null;
+  aantal: number;
 }
 
 interface DealResult {
@@ -69,6 +82,10 @@ interface DealResult {
   geschatte_standtijd: string | null;
   opties_analyse: string | null;
   aandachtspunten: string[];
+  geschatte_opknapkosten: number;
+  opknapkosten_detail: OpknapkostenItem[];
+  netto_marge: number | null;
+  gescrapte_prijzen: GescRaptePrijzen;
 }
 
 const formatCurrency = (value: number | null) => {
@@ -469,6 +486,68 @@ const DealAnalyzer = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Opknapkosten Calculator */}
+              {result.opknapkosten_detail && result.opknapkosten_detail.length > 0 && (
+                <div className="p-6 bg-card border border-border">
+                  <SectionTitle>🔧 Geschatte Opknapkosten</SectionTitle>
+                  <div className="space-y-2 mb-4">
+                    {result.opknapkosten_detail.map((item, i) => (
+                      <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <Wrench className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-sm font-body text-foreground">{item.item}</span>
+                          </div>
+                          {item.toelichting && (
+                            <p className="text-[10px] font-body text-muted-foreground mt-0.5 ml-5">{item.toelichting}</p>
+                          )}
+                        </div>
+                        <span className="text-sm font-display font-bold text-foreground ml-4">
+                          {formatCurrency(item.bedrag)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between pt-3 border-t-2 border-foreground/20">
+                    <div className="flex items-center gap-2">
+                      <Calculator className="w-4 h-4 text-foreground" />
+                      <span className="text-sm font-body font-semibold text-foreground">Totaal opknapkosten</span>
+                    </div>
+                    <span className="text-lg font-display font-black text-foreground">
+                      {formatCurrency(result.geschatte_opknapkosten)}
+                    </span>
+                  </div>
+                  {result.netto_marge !== null && result.netto_marge !== undefined && (
+                    <div className={`mt-4 p-3 border ${result.netto_marge >= 0 ? "bg-green-500/5 border-green-500/20" : "bg-destructive/5 border-destructive/20"}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-body tracking-[0.15em] uppercase text-muted-foreground">Netto marge na kosten</span>
+                        <span className={`text-lg font-display font-black ${result.netto_marge >= 0 ? "text-green-500" : "text-destructive"}`}>
+                          {result.netto_marge >= 0 ? "+" : ""}{formatCurrency(result.netto_marge)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Gescrapte Prijzen */}
+              {result.gescrapte_prijzen && result.gescrapte_prijzen.aantal > 0 && (
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="p-4 bg-card border border-border text-center">
+                    <p className="text-[9px] font-body text-muted-foreground uppercase tracking-wider mb-1">Laagste gevonden</p>
+                    <p className="text-lg font-display font-bold text-foreground">{formatCurrency(result.gescrapte_prijzen.laagste)}</p>
+                  </div>
+                  <div className="p-4 bg-card border border-border text-center">
+                    <p className="text-[9px] font-body text-muted-foreground uppercase tracking-wider mb-1">Gemiddeld ({result.gescrapte_prijzen.aantal} prijzen)</p>
+                    <p className="text-lg font-display font-bold text-foreground">{formatCurrency(result.gescrapte_prijzen.gemiddeld)}</p>
+                  </div>
+                  <div className="p-4 bg-card border border-border text-center">
+                    <p className="text-[9px] font-body text-muted-foreground uppercase tracking-wider mb-1">Hoogste gevonden</p>
+                    <p className="text-lg font-display font-bold text-foreground">{formatCurrency(result.gescrapte_prijzen.hoogste)}</p>
+                  </div>
+                </div>
+              )}
 
               {/* Score Factoren */}
               {result.score_factoren && (

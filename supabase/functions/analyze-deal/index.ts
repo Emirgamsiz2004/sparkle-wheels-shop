@@ -11,20 +11,34 @@ const escapeXml = (str: string) =>
   str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 
 const extractXmlValue = (xml: string, tag: string): string | null => {
-  const regex = new RegExp(`<${tag}[^>]*>([^<]+)</${tag}>`, "i");
-  const match = xml.match(regex);
-  return match ? match[1] : null;
+  // Try multiple patterns: exact tag, case-insensitive
+  const patterns = [
+    new RegExp(`<${tag}>([^<]*)</${tag}>`, "i"),
+    new RegExp(`<${tag}[^>]*>([^<]*)</${tag}>`, "i"),
+  ];
+  for (const regex of patterns) {
+    const match = xml.match(regex);
+    if (match && match[1]?.trim()) return match[1].trim();
+  }
+  return null;
 };
 
 const extractAllXmlValues = (xml: string, tag: string): string[] => {
   const regex = new RegExp(`<${tag}[^>]*>([^<]+)</${tag}>`, "gi");
-  const matches = [];
+  const matches: string[] = [];
   let m;
-  while ((m = regex.exec(xml)) !== null) matches.push(m[1]);
+  while ((m = regex.exec(xml)) !== null) matches.push(m[1].trim());
   return matches;
 };
 
-// ─── Step 1: RDW Open Data – VIN + basisgegevens ───
+// Helper to decode VWE SOAP response
+function decodeVweResponse(responseText: string): string {
+  const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
+  return (resultMatch ? resultMatch[1] : responseText)
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+}
+
+// ─── Step 1: RDW Open Data – basisgegevens ───
 async function fetchRdwData(kenteken: string) {
   const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
   console.log("RDW: fetching for", clean);
@@ -40,7 +54,6 @@ async function fetchRdwData(kenteken: string) {
   const b = brandstoffen[0] || {};
 
   return {
-    vin: v.voertuignummer || null,
     merk: v.merk || null,
     handelsbenaming: v.handelsbenaming || null,
     inrichting: v.inrichting || null,
@@ -63,7 +76,7 @@ async function fetchRdwData(kenteken: string) {
   };
 }
 
-// ─── Step 2: VWE SOAP – Taxatie + Autotelex opties ───
+// ─── Step 2: VWE SOAP – Taxatie + Opties + VIN ───
 async function fetchVweData(kenteken: string) {
   const VWE_USERNAME = Deno.env.get("VWE_USERNAME");
   const VWE_PASSWORD = Deno.env.get("VWE_PASSWORD");
@@ -71,15 +84,15 @@ async function fetchVweData(kenteken: string) {
 
   const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-  // Request taxatie + opties rubrieken
-  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOpties/><atlOptieFabriek/><atlOptiePakket/><atlOptieStandaard/></rubrieken></request>`;
+  // Use DataRequest method (older, but compatible with this account)
+  const innerXml = `<bericht><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord><berichtsoort>VWE-TXN</berichtsoort></authenticatie><parameters><kenteken>${clean}</kenteken></parameters></bericht>`;
 
   const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
-    <standaardDataRequest xmlns="http://hetextranet.nl/InterData">
-      <requestXml>${escapeXml(innerXml)}</requestXml>
-    </standaardDataRequest>
+    <DataRequest xmlns="http://hetextranet.nl/InterData">
+      <XMLBody>${escapeXml(innerXml)}</XMLBody>
+    </DataRequest>
   </soap:Body>
 </soap:Envelope>`;
 
@@ -95,26 +108,81 @@ async function fetchVweData(kenteken: string) {
   const responseText = await response.text();
   if (!response.ok) throw new Error(`VWE API error [${response.status}]`);
 
-  const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
-  const decoded = (resultMatch ? resultMatch[1] : responseText)
-    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+  const decoded = decodeVweResponse(responseText);
+  
+  // Log a portion of decoded XML for debugging
+  console.log("VWE decoded XML (first 2000 chars):", decoded.substring(0, 2000));
+  console.log("VWE decoded XML (2000-4000):", decoded.substring(2000, 4000));
 
-  // Extract options from multiple sources
-  const optieOmschrijvingen = extractAllXmlValues(decoded, "optieomschrijving");
-  const optieCodes = extractAllXmlValues(decoded, "optiecode");
-  const opties = optieOmschrijvingen.map((omschr, i) => ({
-    code: optieCodes[i] || null,
-    omschrijving: omschr,
-    type: "autotelex",
-  }));
+  // Check for VWE error response
+  const errorCode = extractXmlValue(decoded, "code");
+  const errorMsg = extractXmlValue(decoded, "omschrijving");
+  if (errorCode && errorCode !== "0" && errorMsg && errorMsg.includes("niet correct")) {
+    console.warn("VWE error:", errorCode, errorMsg);
+    return {
+      vin: null, inkoopwaarde: null, verkoopwaarde: null, nieuwprijs: null, handelsprijs: null,
+      merk: null, model: null, bouwjaar: null, brandstof: null, kmStand: null, opties: [],
+    };
+  }
+
+  // Try to extract VIN from various possible tags
+  const vin = extractXmlValue(decoded, "vin") 
+    || extractXmlValue(decoded, "VIN") 
+    || extractXmlValue(decoded, "chassisnummer")
+    || extractXmlValue(decoded, "Chassisnummer")
+    || extractXmlValue(decoded, "voertuigidentificatienummer")
+    || null;
+  console.log("VWE extracted VIN:", vin);
+
+  // Extract options - try many possible tag names
+  const optieOmschrijvingen = [
+    ...extractAllXmlValues(decoded, "optieomschrijving"),
+    ...extractAllXmlValues(decoded, "OptieOmschrijving"),
+    ...extractAllXmlValues(decoded, "omschrijving"),
+    ...extractAllXmlValues(decoded, "Omschrijving"),
+  ];
+  
+  const optieCodes = [
+    ...extractAllXmlValues(decoded, "optiecode"),
+    ...extractAllXmlValues(decoded, "OptieCode"),
+    ...extractAllXmlValues(decoded, "code"),
+    ...extractAllXmlValues(decoded, "Code"),
+  ];
+
+  // Deduplicate options by description
+  const seenOpties = new Set<string>();
+  const opties: any[] = [];
+  for (let i = 0; i < optieOmschrijvingen.length; i++) {
+    const omschr = optieOmschrijvingen[i];
+    if (omschr && !seenOpties.has(omschr.toLowerCase())) {
+      seenOpties.add(omschr.toLowerCase());
+      opties.push({
+        code: optieCodes[i] || null,
+        omschrijving: omschr,
+        type: "autotelex",
+      });
+    }
+  }
+
+  console.log("VWE opties found after parsing:", opties.length);
+  if (opties.length > 0) console.log("VWE first 3 opties:", JSON.stringify(opties.slice(0, 3)));
+
+  // Extract taxatie values - try multiple case variations
+  const inkoopwaarde = extractXmlValue(decoded, "inkoopwaarde") || extractXmlValue(decoded, "Inkoopwaarde") || extractXmlValue(decoded, "InkoopWaarde");
+  const verkoopwaarde = extractXmlValue(decoded, "verkoopwaarde") || extractXmlValue(decoded, "Verkoopwaarde") || extractXmlValue(decoded, "VerkoopWaarde");
+  const nieuwprijs = extractXmlValue(decoded, "nieuwprijs") || extractXmlValue(decoded, "Nieuwprijs") || extractXmlValue(decoded, "NieuwPrijs");
+  const handelsprijs = extractXmlValue(decoded, "handelsprijs") || extractXmlValue(decoded, "Handelsprijs") || extractXmlValue(decoded, "HandelsPrijs");
+
+  console.log("VWE taxatie - inkoop:", inkoopwaarde, "verkoop:", verkoopwaarde, "handel:", handelsprijs, "nieuw:", nieuwprijs);
 
   return {
-    inkoopwaarde: extractXmlValue(decoded, "inkoopwaarde") || extractXmlValue(decoded, "Inkoopwaarde"),
-    verkoopwaarde: extractXmlValue(decoded, "verkoopwaarde") || extractXmlValue(decoded, "Verkoopwaarde"),
-    nieuwprijs: extractXmlValue(decoded, "nieuwprijs") || extractXmlValue(decoded, "Nieuwprijs"),
-    handelsprijs: extractXmlValue(decoded, "handelsprijs") || extractXmlValue(decoded, "Handelsprijs"),
+    vin,
+    inkoopwaarde,
+    verkoopwaarde,
+    nieuwprijs,
+    handelsprijs,
     merk: extractXmlValue(decoded, "merk") || extractXmlValue(decoded, "Merk"),
-    model: extractXmlValue(decoded, "handelsbenaming") || extractXmlValue(decoded, "Handelsbenaming"),
+    model: extractXmlValue(decoded, "handelsbenaming") || extractXmlValue(decoded, "Handelsbenaming") || extractXmlValue(decoded, "model") || extractXmlValue(decoded, "Model"),
     bouwjaar: extractXmlValue(decoded, "datumeerstetoelating") || extractXmlValue(decoded, "DatumEersteToelating"),
     brandstof: extractXmlValue(decoded, "brandstof") || extractXmlValue(decoded, "Brandstof"),
     kmStand: extractXmlValue(decoded, "tellerstand") || extractXmlValue(decoded, "Tellerstand"),
@@ -157,9 +225,8 @@ async function fetchSilverDatVin(vin: string) {
       return null;
     }
 
-    const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
-    const decoded = (resultMatch ? resultMatch[1] : responseText)
-      .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+    const decoded = decodeVweResponse(responseText);
+    console.log("SilverDAT decoded (first 1000 chars):", decoded.substring(0, 1000));
 
     // Extract SilverDAT uitrustingen
     const uitrustingNamen = extractAllXmlValues(decoded, "uitrusting-naam");
@@ -174,27 +241,12 @@ async function fetchSilverDatVin(vin: string) {
       prijs: prijzen[i] ? Number(prijzen[i]) : null,
     }));
 
-    // Extract kleuren
-    const kleurcodes = extractAllXmlValues(decoded, "kleurcode");
-    const kleurbeschrijvingen = extractAllXmlValues(decoded, "kleurbeschrijving");
-    const kleuren = kleurcodes.map((code, i) => ({
-      code,
-      beschrijving: kleurbeschrijvingen[i] || null,
-    }));
-
-    // Extract model info
-    const datModel = extractXmlValue(decoded, "model");
-    const datSubmodel = extractXmlValue(decoded, "submodel");
-    const datecode = extractXmlValue(decoded, "datecode");
-
     console.log("SilverDAT: found", fabrieksopties.length, "equipment items");
 
     return {
       fabrieksopties,
-      kleuren,
-      model: datModel,
-      submodel: datSubmodel,
-      datecode,
+      model: extractXmlValue(decoded, "model"),
+      submodel: extractXmlValue(decoded, "submodel"),
     };
   } catch (e) {
     console.error("SilverDAT VIN error:", e);
@@ -207,18 +259,20 @@ async function scrapeMarktListings(merk: string, model: string, bouwjaar: string
   const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
   if (!FIRECRAWL_API_KEY) {
     console.warn("FIRECRAWL_API_KEY not set, skipping market scraping");
-    return { listings: [], bronnen: [] };
+    return { listings: [], bronnen: [], extractedPrices: [] };
   }
 
   const jaar = bouwjaar ? bouwjaar.substring(0, 4) : "";
+  // More specific queries to get individual listings with prices
   const queries = [
-    `${merk} ${model} ${jaar} te koop site:marktplaats.nl`,
-    `${merk} ${model} ${jaar} te koop site:autoscout24.nl`,
+    `${merk} ${model} ${jaar} te koop prijs site:marktplaats.nl`,
+    `${merk} ${model} ${jaar} occasion prijs site:autoscout24.nl`,
     `${merk} ${model} ${jaar} te koop site:autotrack.nl`,
   ];
 
   const results: any[] = [];
   const bronnen: string[] = [];
+  const extractedPrices: number[] = [];
 
   for (const query of queries) {
     try {
@@ -242,6 +296,21 @@ async function scrapeMarktListings(merk: string, model: string, bouwjaar: string
         const items = data.data || [];
         for (const item of items) {
           bronnen.push(item.url);
+          
+          // Extract prices from description and title (NOT from full markdown which contains filter UI)
+          const priceText = (item.description || "") + " " + (item.title || "");
+          
+          // Match patterns like "€ 14.950" or "€14.950,-" or "€ 8.900"
+          const priceMatches = priceText.match(/€\s*(\d{1,3}(?:\.\d{3})*(?:,\d+)?)/g) || [];
+          for (const pm of priceMatches) {
+            const numStr = pm.replace("€", "").replace(/\s/g, "").replace(/\./g, "").replace(",", ".").replace(",-", "");
+            const num = parseFloat(numStr);
+            // Only accept realistic car prices (€2000 - €200000)
+            if (num >= 2000 && num <= 200000) {
+              extractedPrices.push(num);
+            }
+          }
+
           results.push({
             titel: item.title || "",
             url: item.url || "",
@@ -256,16 +325,20 @@ async function scrapeMarktListings(merk: string, model: string, bouwjaar: string
     }
   }
 
-  return { listings: results, bronnen: [...new Set(bronnen)] };
+  // Deduplicate and sort prices
+  const uniquePrices = [...new Set(extractedPrices)].sort((a, b) => a - b);
+  console.log("Extracted prices from listings:", uniquePrices.length, uniquePrices.slice(0, 10));
+
+  return { listings: results, bronnen: [...new Set(bronnen)], extractedPrices: uniquePrices };
 }
 
 // ─── Step 4a: Perplexity – Bekende problemen & kwalen ───
 async function fetchBekendeKwalen(merk: string, model: string, bouwjaar: string | null, motorcode: string | null) {
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
-  if (!PERPLEXITY_API_KEY) return { kwalen: [], bronnen: [] };
+  if (!PERPLEXITY_API_KEY) return { kwalen: "", bronnen: [] };
 
   const jaar = bouwjaar ? bouwjaar.substring(0, 4) : "";
-  
+
   const query = `Wat zijn de bekende problemen, kwalen en aandachtspunten bij de ${merk} ${model} ${jaar ? `bouwjaar ${jaar}` : ""}?
 ${motorcode ? `Motorcode: ${motorcode}` : ""}
 
@@ -360,8 +433,8 @@ Antwoord alleen met feiten en cijfers.`;
   };
 }
 
-// ─── Step 5: AI Scoring met uitgebreide data ───
-async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrapedListings: any[], opties: any[], extraInput: any) {
+// ─── Step 5: AI Scoring met uitgebreide data + kostencalculator ───
+async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrapedListings: any[], opties: any[], extraInput: any, extractedPrices: number[]) {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY niet geconfigureerd");
 
@@ -378,13 +451,25 @@ async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrap
     nieuw: "Nieuw (7mm+)", goed: "Goed (4-7mm)", matig: "Matig (2-4mm)", vervangen: "Moet vervangen (<2mm)"
   };
 
-  // Calculate reference prices for context
+  // Calculate reference prices
   const vweInkoop = vweData.inkoopwaarde ? Number(vweData.inkoopwaarde) : null;
   const vweVerkoop = vweData.verkoopwaarde ? Number(vweData.verkoopwaarde) : null;
   const vweHandel = vweData.handelsprijs ? Number(vweData.handelsprijs) : null;
   const vraagprijs = extraInput.vraagprijs ? Number(extraInput.vraagprijs) : null;
 
-  // Pre-calculate margin if possible
+  // Price analysis from scraped data
+  let prijsAnalyse = "";
+  if (extractedPrices.length > 0) {
+    const avg = Math.round(extractedPrices.reduce((a, b) => a + b, 0) / extractedPrices.length);
+    const min = extractedPrices[0];
+    const max = extractedPrices[extractedPrices.length - 1];
+    prijsAnalyse = `\n\nGESCRAPTE MARKTPRIJZEN (uit ${extractedPrices.length} gevonden prijzen):
+- Laagste gevonden prijs: €${min.toLocaleString("nl-NL")}
+- Gemiddelde prijs: €${avg.toLocaleString("nl-NL")}
+- Hoogste gevonden prijs: €${max.toLocaleString("nl-NL")}`;
+  }
+
+  // Pre-calculate margin
   let margeInfo = "";
   if (vraagprijs && vweVerkoop) {
     const brutomarge = vweVerkoop - vraagprijs;
@@ -415,6 +500,12 @@ MARGE BEREKENING (dit is de BELANGRIJKSTE factor):
 - Als de inkoopprijs 20%+ ONDER de VWE inkoopwaarde → Score 70-85 (goede deal)
 - Als de inkoopprijs 30%+ ONDER de VWE inkoopwaarde → Score 85-100 (uitstekende deal)
 
+ALS VWE TAXATIEGEGEVENS ONTBREKEN:
+- Gebruik dan de gescrapte marktprijzen en Perplexity marktanalyse als referentie
+- Als de inkoopprijs HOGER is dan de gemiddelde marktprijs → Slechte deal
+- Als de inkoopprijs GELIJK is aan de laagste marktprijs → Matige deal  
+- Als de inkoopprijs 20%+ ONDER de gemiddelde marktprijs → Goede deal
+
 Score labels:
 - 0-20: Slechte deal (verlies)
 - 21-40: Matige deal
@@ -423,20 +514,35 @@ Score labels:
 - 71-85: Zeer goede deal
 - 86-100: Uitstekende deal
 
-De geschatte verkoopprijs moet REALISTISCH zijn op basis van marktdata. Gebruik de VWE verkoopwaarde en live advertenties als referentie. Trek kosten af voor opknappen, APK, etc.
+OPKNAPKOSTEN - Bereken geschatte kosten:
+Schat de totale opknapkosten op basis van alle beschikbare informatie:
+- APK kosten (als APK bijna verlopen of verlopen)
+- Schade reparatie (als niet schadevrij)
+- Banden vervangen (als bandenprofiel matig/vervangen)
+- Schoonmaak/detailing: €250-500
+- Transport/logistiek: €100-300
+- Ontbrekend onderhoudsboekje: -€500 waardevermindering
+- 1 sleutel ipv 2: -€200-500 waardevermindering
+- Rooklucht verwijderen: €200-400
+- Eventuele bekende problemen van dit model
+
+Trek deze kosten af van de bruto marge voor de netto marge berekening.
+
+De geschatte verkoopprijs moet REALISTISCH zijn op basis van marktdata. Gebruik de VWE verkoopwaarde en live advertenties als referentie.
 ${margeInfo}
+${prijsAnalyse}
 
 VWE Taxatiegegevens:
-- Inkoopwaarde: €${vweData.inkoopwaarde || "onbekend"}
-- Verkoopwaarde: €${vweData.verkoopwaarde || "onbekend"}
-- Handelsprijs: €${vweData.handelsprijs || "onbekend"}
-- Nieuwprijs: €${vweData.nieuwprijs || "onbekend"}
+- Inkoopwaarde: ${vweData.inkoopwaarde ? `€${vweData.inkoopwaarde}` : "NIET BESCHIKBAAR"}
+- Verkoopwaarde: ${vweData.verkoopwaarde ? `€${vweData.verkoopwaarde}` : "NIET BESCHIKBAAR"}
+- Handelsprijs: ${vweData.handelsprijs ? `€${vweData.handelsprijs}` : "NIET BESCHIKBAAR"}
+- Nieuwprijs: ${vweData.nieuwprijs ? `€${vweData.nieuwprijs}` : "NIET BESCHIKBAAR"}
 
 RDW Voertuigdata:
-- VIN: ${rdwData.vin || "onbekend"}
+- VIN: ${vweData.vin || "onbekend"}
 - Merk/Model: ${rdwData.merk || vweData.merk || "onbekend"} ${rdwData.handelsbenaming || vweData.model || ""}
 - Eerste toelating: ${rdwData.datum_eerste_toelating || vweData.bouwjaar || "onbekend"}
-- Catalogusprijs: €${rdwData.catalogusprijs || "onbekend"}
+- Catalogusprijs: ${rdwData.catalogusprijs ? `€${rdwData.catalogusprijs}` : "onbekend"}
 - Aantal eigenaren: ${rdwData.aantal_eigenaren || "onbekend"}
 - APK vervaldatum: ${rdwData.apk_vervaldatum || "onbekend"}
 - Brandstof: ${rdwData.brandstof || vweData.brandstof || "onbekend"}
@@ -474,9 +580,9 @@ Beoordeel op basis van de SCORINGSREGELS hierboven. De marge-berekening is al vo
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: "google/gemini-2.5-pro",
       messages: [
-        { role: "system", content: "Je bent een auto-inkoop expert. Antwoord altijd in het Nederlands." },
+        { role: "system", content: "Je bent een auto-inkoop expert. Antwoord altijd in het Nederlands. Wees streng en realistisch in je beoordeling." },
         { role: "user", content: prompt },
       ],
       tools: [
@@ -488,25 +594,40 @@ Beoordeel op basis van de SCORINGSREGELS hierboven. De marge-berekening is al vo
             parameters: {
               type: "object",
               properties: {
-                score: { type: "number", description: "Score van 0-100" },
-                advies: { type: "string", description: "Uitgebreid advies in 3-5 zinnen" },
+                score: { type: "number", description: "Score van 0-100 gebaseerd op de scoringsregels" },
+                advies: { type: "string", description: "Uitgebreid advies in 3-5 zinnen over de deal" },
                 score_factoren: {
                   type: "object",
                   properties: {
-                    marge_potentieel: { type: "number", description: "Score 0-25" },
-                    markt_liquiditeit: { type: "number", description: "Score 0-25" },
+                    marge_potentieel: { type: "number", description: "Score 0-25 voor winstpotentieel" },
+                    markt_liquiditeit: { type: "number", description: "Score 0-25 voor hoe snel je het kunt verkopen" },
                     risico_factor: { type: "number", description: "Score 0-25 (hoger = minder risico)" },
-                    seizoen_timing: { type: "number", description: "Score 0-25" },
+                    seizoen_timing: { type: "number", description: "Score 0-25 voor timing" },
                   },
                   required: ["marge_potentieel", "markt_liquiditeit", "risico_factor", "seizoen_timing"],
                 },
-                geschatte_verkoopprijs: { type: "number", description: "Geschatte verkoopprijs in euros" },
+                geschatte_verkoopprijs: { type: "number", description: "Realistische geschatte verkoopprijs in euros" },
                 geschatte_standtijd: { type: "string", description: "Geschatte standtijd in dagen/weken" },
-                opties_analyse: { type: "string", description: "Korte analyse van de opties en hun waarde" },
-                aandachtspunten: { type: "array", items: { type: "string" }, description: "Lijst van aandachtspunten/risico's" },
+                opties_analyse: { type: "string", description: "Korte analyse van de opties en hun waarde-effect" },
+                aandachtspunten: { type: "array", items: { type: "string" }, description: "Lijst van aandachtspunten en risico's" },
                 gemiddelde_marktprijs: { type: "number", description: "Gemiddelde marktprijs op basis van alle data" },
+                geschatte_opknapkosten: { type: "number", description: "Totaal geschatte opknapkosten in euros" },
+                opknapkosten_detail: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      item: { type: "string", description: "Kostenpost" },
+                      bedrag: { type: "number", description: "Geschatte kosten in euros" },
+                      toelichting: { type: "string", description: "Waarom deze kosten nodig zijn" },
+                    },
+                    required: ["item", "bedrag"],
+                  },
+                  description: "Gedetailleerde lijst van opknapkosten",
+                },
+                netto_marge: { type: "number", description: "Geschatte netto marge na opknapkosten" },
               },
-              required: ["score", "advies", "score_factoren"],
+              required: ["score", "advies", "score_factoren", "geschatte_opknapkosten", "opknapkosten_detail", "netto_marge"],
             },
           },
         },
@@ -553,15 +674,17 @@ serve(async (req) => {
       fetchRdwData(kenteken),
       fetchVweData(kenteken),
     ]);
-    console.log("RDW VIN:", rdwData.vin);
+    console.log("VWE VIN:", vweData.vin);
     console.log("VWE opties count:", vweData.opties.length);
 
-    // Step 2b: SilverDAT VIN (if VIN available)
+    // Step 2b: SilverDAT VIN (if VIN available from VWE)
     let silverDatData: any = null;
-    if (rdwData.vin) {
+    if (vweData.vin) {
       console.log("Step 2b: Fetching SilverDAT VIN equipment...");
-      silverDatData = await fetchSilverDatVin(rdwData.vin);
+      silverDatData = await fetchSilverDatVin(vweData.vin);
       console.log("SilverDAT opties count:", silverDatData?.fabrieksopties?.length || 0);
+    } else {
+      console.log("No VIN available, skipping SilverDAT");
     }
 
     const merk = rdwData.merk || vweData.merk || "onbekend";
@@ -587,11 +710,12 @@ serve(async (req) => {
       fetchMarktAnalyse(merk, model, bouwjaar, alleOpties),
     ]);
     console.log("Scraped listings:", scraped.listings.length);
+    console.log("Extracted prices:", scraped.extractedPrices.length);
     console.log("Kwalen tekst length:", kwalenData.kwalen.length);
 
-    // Step 5: AI Scoring (with kwalen included)
+    // Step 5: AI Scoring (with kwalen + extracted prices)
     console.log("Step 5: AI scoring...");
-    const aiResult = await generateAiScore(rdwData, vweData, { ...marktData, kwalen: kwalenData.kwalen }, scraped.listings, alleOpties, extraInput);
+    const aiResult = await generateAiScore(rdwData, vweData, { ...marktData, kwalen: kwalenData.kwalen }, scraped.listings, alleOpties, extraInput, scraped.extractedPrices);
     console.log("AI score:", aiResult.score);
 
     // Step 6: Save to database
@@ -610,7 +734,7 @@ serve(async (req) => {
       carrosserie: rdwData.inrichting,
       kleur: rdwData.eerste_kleur,
       vermogen: rdwData.vermogen,
-      vin: rdwData.vin,
+      vin: vweData.vin,
       voertuig_opties: alleOpties,
       opties_populariteit: {},
       vwe_inkoopwaarde: vweData.inkoopwaarde ? Number(vweData.inkoopwaarde) : null,
@@ -621,8 +745,8 @@ serve(async (req) => {
       markt_bronnen: [...marktData.bronnen, ...scraped.bronnen, ...kwalenData.bronnen],
       markt_listings: scraped.listings,
       gemiddelde_marktprijs: aiResult.gemiddelde_marktprijs || null,
-      laagste_marktprijs: null,
-      hoogste_marktprijs: null,
+      laagste_marktprijs: scraped.extractedPrices.length > 0 ? scraped.extractedPrices[0] : null,
+      hoogste_marktprijs: scraped.extractedPrices.length > 0 ? scraped.extractedPrices[scraped.extractedPrices.length - 1] : null,
       aantal_vergelijkbaar: scraped.listings.length,
       schade_historie: [],
       eerdere_advertenties: [],
@@ -651,10 +775,18 @@ serve(async (req) => {
           id: savedDeal?.id,
           ...dealRecord,
           silverdat_opties: silverDatData?.fabrieksopties || [],
-          silverdat_kleuren: silverDatData?.kleuren || [],
           bekende_kwalen: kwalenData.kwalen,
           opties_analyse: aiResult.opties_analyse || null,
           aandachtspunten: aiResult.aandachtspunten || [],
+          geschatte_opknapkosten: aiResult.geschatte_opknapkosten || 0,
+          opknapkosten_detail: aiResult.opknapkosten_detail || [],
+          netto_marge: aiResult.netto_marge || null,
+          gescrapte_prijzen: {
+            laagste: scraped.extractedPrices.length > 0 ? scraped.extractedPrices[0] : null,
+            gemiddeld: scraped.extractedPrices.length > 0 ? Math.round(scraped.extractedPrices.reduce((a, b) => a + b, 0) / scraped.extractedPrices.length) : null,
+            hoogste: scraped.extractedPrices.length > 0 ? scraped.extractedPrices[scraped.extractedPrices.length - 1] : null,
+            aantal: scraped.extractedPrices.length,
+          },
         },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
