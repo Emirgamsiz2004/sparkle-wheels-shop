@@ -33,7 +33,7 @@ const extractAllXmlValues = (xml: string, tag: string): string[] => {
 
 // Helper to decode VWE SOAP response
 function decodeVweResponse(responseText: string): string {
-  const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
+  const resultMatch = responseText.match(/<(?:standaardDataRequestResult|DataRequestResult)>([\s\S]*?)<\/(?:standaardDataRequestResult|DataRequestResult)>/i);
   return (resultMatch ? resultMatch[1] : responseText)
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
 }
@@ -100,7 +100,7 @@ async function fetchVweData(kenteken: string) {
     method: "POST",
     headers: {
       "Content-Type": "text/xml; charset=utf-8",
-      SOAPAction: "http://hetextranet.nl/InterData/standaardDataRequest",
+      SOAPAction: "http://hetextranet.nl/InterData/DataRequest",
     },
     body: soapEnvelope,
   });
@@ -670,9 +670,16 @@ serve(async (req) => {
 
     // Step 1 & 2: RDW + VWE parallel
     console.log("Step 1+2: RDW + VWE parallel...");
+    const emptyVwe = {
+      vin: null, inkoopwaarde: null, verkoopwaarde: null, nieuwprijs: null, handelsprijs: null,
+      merk: null, model: null, bouwjaar: null, brandstof: null, kmStand: null, opties: [],
+    };
     const [rdwData, vweData] = await Promise.all([
       fetchRdwData(kenteken),
-      fetchVweData(kenteken),
+      fetchVweData(kenteken).catch((err) => {
+        console.error("VWE failed (continuing without):", err.message);
+        return emptyVwe;
+      }),
     ]);
     console.log("VWE VIN:", vweData.vin);
     console.log("VWE opties count:", vweData.opties.length);
