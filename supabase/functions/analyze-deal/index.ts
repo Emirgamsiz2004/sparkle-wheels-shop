@@ -100,7 +100,7 @@ async function fetchVweData(kenteken: string) {
     method: "POST",
     headers: {
       "Content-Type": "text/xml; charset=utf-8",
-      SOAPAction: "http://hetextranet.nl/InterData/standaardDataRequest",
+      SOAPAction: "http://hetextranet.nl/InterData/DataRequest",
     },
     body: soapEnvelope,
   });
