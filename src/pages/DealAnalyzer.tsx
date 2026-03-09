@@ -124,13 +124,44 @@ const InfoItem = ({ icon: Icon, label, value }: { icon: any; label: string; valu
   );
 };
 
+const ToggleChip = ({ label, active, onClick, disabled }: { label: string; active: boolean | null; onClick: () => void; disabled?: boolean }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className={`px-3 py-1.5 text-[10px] font-body tracking-[0.1em] uppercase border transition-all disabled:opacity-50 ${
+      active === true
+        ? "bg-foreground text-background border-foreground"
+        : active === false
+        ? "bg-destructive/10 text-destructive border-destructive/30"
+        : "bg-transparent text-muted-foreground border-border hover:border-foreground/30"
+    }`}
+  >
+    {label}
+  </button>
+);
+
 const DealAnalyzer = () => {
   const [kenteken, setKenteken] = useState("");
   const [vraagprijs, setVraagprijs] = useState("");
+  const [kmStand, setKmStand] = useState("");
+  const [staat, setStaat] = useState<string>("");
+  const [schadevrij, setSchadevrij] = useState<boolean | null>(null);
+  const [onderhoudsboekje, setOnderhoudsboekje] = useState<boolean | null>(null);
+  const [rookvrij, setRookvrij] = useState<boolean | null>(null);
+  const [aantalSleutels, setAantalSleutels] = useState("");
+  const [bandenprofiel, setBandenprofiel] = useState<string>("");
+  const [opmerkingen, setOpmerkingen] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState("");
   const [result, setResult] = useState<DealResult | null>(null);
   const navigate = useNavigate();
+
+  const toggleBool = (val: boolean | null) => {
+    if (val === null) return true;
+    if (val === true) return false;
+    return null;
+  };
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +189,18 @@ const DealAnalyzer = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("analyze-deal", {
-        body: { kenteken: kenteken.trim(), vraagprijs: vraagprijs.trim() || null },
+        body: {
+          kenteken: kenteken.trim(),
+          vraagprijs: vraagprijs.trim() || null,
+          km_stand: kmStand.trim() || null,
+          staat: staat || null,
+          schadevrij,
+          onderhoudsboekje,
+          rookvrij,
+          aantal_sleutels: aantalSleutels.trim() || null,
+          bandenprofiel: bandenprofiel || null,
+          opmerkingen: opmerkingen.trim() || null,
+        },
       });
 
       clearInterval(stepInterval);
