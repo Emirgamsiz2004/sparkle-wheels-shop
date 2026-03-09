@@ -36,6 +36,19 @@ interface SilverDatOptie {
   prijs: number | null;
 }
 
+interface OpknapkostenItem {
+  item: string;
+  bedrag: number;
+  toelichting?: string;
+}
+
+interface GescRaptePrijzen {
+  laagste: number | null;
+  gemiddeld: number | null;
+  hoogste: number | null;
+  aantal: number;
+}
+
 interface DealResult {
   kenteken: string;
   merk: string;
@@ -69,6 +82,10 @@ interface DealResult {
   geschatte_standtijd: string | null;
   opties_analyse: string | null;
   aandachtspunten: string[];
+  geschatte_opknapkosten: number;
+  opknapkosten_detail: OpknapkostenItem[];
+  netto_marge: number | null;
+  gescrapte_prijzen: GescRaptePrijzen;
 }
 
 const formatCurrency = (value: number | null) => {
