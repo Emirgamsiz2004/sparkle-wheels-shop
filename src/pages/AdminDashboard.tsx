@@ -148,13 +148,22 @@ const AdminDashboard = () => {
               Dashboard
             </span>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Uitloggen
-          </button>
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => navigate("/admin/deals")}
+              className="flex items-center gap-2 text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              Deal Analyzer
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-[10px] tracking-[0.15em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Uitloggen
+            </button>
+          </div>
         </div>
       </header>
 
