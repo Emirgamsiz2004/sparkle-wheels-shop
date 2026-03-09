@@ -7,15 +7,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const INTERDATA_URL = "https://interdata.vwe.nl/DataAanvraag.asmx";
-
 const escapeXml = (str: string) =>
-  str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
+  str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 
 const extractXmlValue = (xml: string, tag: string): string | null => {
   const regex = new RegExp(`<${tag}[^>]*>([^<]+)</${tag}>`, "i");
@@ -23,14 +16,63 @@ const extractXmlValue = (xml: string, tag: string): string | null => {
   return match ? match[1] : null;
 };
 
-async function fetchVweTaxatie(kenteken: string) {
+const extractAllXmlValues = (xml: string, tag: string): string[] => {
+  const regex = new RegExp(`<${tag}[^>]*>([^<]+)</${tag}>`, "gi");
+  const matches = [];
+  let m;
+  while ((m = regex.exec(xml)) !== null) matches.push(m[1]);
+  return matches;
+};
+
+// ─── Step 1: RDW Open Data – VIN + basisgegevens ───
+async function fetchRdwData(kenteken: string) {
+  const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  console.log("RDW: fetching for", clean);
+
+  const [voertuigRes, brandstofRes] = await Promise.all([
+    fetch(`https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=${clean}`),
+    fetch(`https://opendata.rdw.nl/resource/8ys7-d773.json?kenteken=${clean}`),
+  ]);
+
+  const voertuigen = await voertuigRes.json();
+  const brandstoffen = await brandstofRes.json();
+  const v = voertuigen[0] || {};
+  const b = brandstoffen[0] || {};
+
+  return {
+    vin: v.voertuignummer || null,
+    merk: v.merk || null,
+    handelsbenaming: v.handelsbenaming || null,
+    inrichting: v.inrichting || null,
+    eerste_kleur: v.eerste_kleur || null,
+    datum_eerste_toelating: v.datum_eerste_toelating || null,
+    datum_eerste_afgifte: v.datum_eerste_afgifte_nederland || null,
+    catalogusprijs: v.catalogusprijs ? Number(v.catalogusprijs) : null,
+    aantal_cilinders: v.aantal_cilinders || null,
+    cilinderinhoud: v.cilinderinhoud || null,
+    vermogen: v.vermogen_massarijklaar ? `${v.vermogen_massarijklaar} kW` : null,
+    massa: v.massa_rijklaar || null,
+    brandstof: b.brandstof_omschrijving || null,
+    brandstof_verbruik: b.brandstof_verbruik_gecombineerd || null,
+    co2_uitstoot: b.co2_uitstoot_gecombineerd || null,
+    apk_vervaldatum: v.vervaldatum_apk || null,
+    wam_verzekerd: v.wam_verzekerd || null,
+    aantal_eigenaren: v.aantal_eigenaren || null,
+    export_indicator: v.export_indicator || null,
+    gestolen: v.openstaande_terugroepactie_indicator || null,
+  };
+}
+
+// ─── Step 2: VWE SOAP – Taxatie + opties ───
+async function fetchVweData(kenteken: string) {
   const VWE_USERNAME = Deno.env.get("VWE_USERNAME");
   const VWE_PASSWORD = Deno.env.get("VWE_PASSWORD");
   if (!VWE_USERNAME || !VWE_PASSWORD) throw new Error("VWE credentials niet geconfigureerd");
 
-  const cleanKenteken = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const clean = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${cleanKenteken}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/></rubrieken></request>`;
+  // Request taxatie + opties rubrieken
+  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${clean}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/><atlOpties/></rubrieken></request>`;
 
   const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -41,59 +83,121 @@ async function fetchVweTaxatie(kenteken: string) {
   </soap:Body>
 </soap:Envelope>`;
 
-  console.log("Sending SOAP request to VWE...");
-
-  const response = await fetch(INTERDATA_URL, {
+  const response = await fetch("https://interdata.vwe.nl/DataAanvraag.asmx", {
     method: "POST",
     headers: {
       "Content-Type": "text/xml; charset=utf-8",
-      "SOAPAction": "http://hetextranet.nl/InterData/standaardDataRequest",
+      SOAPAction: "http://hetextranet.nl/InterData/standaardDataRequest",
     },
     body: soapEnvelope,
   });
 
   const responseText = await response.text();
+  if (!response.ok) throw new Error(`VWE API error [${response.status}]`);
 
-  if (!response.ok) {
-    console.error("VWE API error body:", responseText.substring(0, 1000));
-    throw new Error(`VWE API error [${response.status}]: ${responseText.substring(0, 200)}`);
-  }
-
-  console.log("VWE response (first 500 chars):", responseText.substring(0, 500));
-
-  // Extract the result string from SOAP response
   const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
-  const resultXml = resultMatch ? resultMatch[1] : responseText;
-  
-  // The result might be entity-encoded XML, decode it
-  const decodedXml = resultXml
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'");
+  const decoded = (resultMatch ? resultMatch[1] : responseText)
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+
+  // Extract options
+  const optieOmschrijvingen = extractAllXmlValues(decoded, "optieomschrijving");
+  const optieCodes = extractAllXmlValues(decoded, "optiecode");
+  const opties = optieOmschrijvingen.map((omschr, i) => ({
+    code: optieCodes[i] || null,
+    omschrijving: omschr,
+  }));
 
   return {
-    inkoopwaarde: extractXmlValue(decodedXml, "inkoopwaarde") || extractXmlValue(decodedXml, "Inkoopwaarde"),
-    verkoopwaarde: extractXmlValue(decodedXml, "verkoopwaarde") || extractXmlValue(decodedXml, "Verkoopwaarde"),
-    nieuwprijs: extractXmlValue(decodedXml, "nieuwprijs") || extractXmlValue(decodedXml, "Nieuwprijs"),
-    handelsprijs: extractXmlValue(decodedXml, "handelsprijs") || extractXmlValue(decodedXml, "Handelsprijs"),
-    merk: extractXmlValue(decodedXml, "merk") || extractXmlValue(decodedXml, "Merk"),
-    model: extractXmlValue(decodedXml, "handelsbenaming") || extractXmlValue(decodedXml, "Handelsbenaming"),
-    bouwjaar: extractXmlValue(decodedXml, "datumeerstetoelating") || extractXmlValue(decodedXml, "DatumEersteToelating"),
-    brandstof: extractXmlValue(decodedXml, "brandstof") || extractXmlValue(decodedXml, "Brandstof"),
-    kmStand: extractXmlValue(decodedXml, "tellerstand") || extractXmlValue(decodedXml, "Tellerstand"),
+    inkoopwaarde: extractXmlValue(decoded, "inkoopwaarde") || extractXmlValue(decoded, "Inkoopwaarde"),
+    verkoopwaarde: extractXmlValue(decoded, "verkoopwaarde") || extractXmlValue(decoded, "Verkoopwaarde"),
+    nieuwprijs: extractXmlValue(decoded, "nieuwprijs") || extractXmlValue(decoded, "Nieuwprijs"),
+    handelsprijs: extractXmlValue(decoded, "handelsprijs") || extractXmlValue(decoded, "Handelsprijs"),
+    merk: extractXmlValue(decoded, "merk") || extractXmlValue(decoded, "Merk"),
+    model: extractXmlValue(decoded, "handelsbenaming") || extractXmlValue(decoded, "Handelsbenaming"),
+    bouwjaar: extractXmlValue(decoded, "datumeerstetoelating") || extractXmlValue(decoded, "DatumEersteToelating"),
+    brandstof: extractXmlValue(decoded, "brandstof") || extractXmlValue(decoded, "Brandstof"),
+    kmStand: extractXmlValue(decoded, "tellerstand") || extractXmlValue(decoded, "Tellerstand"),
+    opties,
   };
 }
 
-async function fetchMarktData(merk: string, model: string, bouwjaar: string | null) {
+// ─── Step 3: Firecrawl – Marktplaats & AutoScout24 scraping ───
+async function scrapeMarktListings(merk: string, model: string, bouwjaar: string | null) {
+  const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
+  if (!FIRECRAWL_API_KEY) {
+    console.warn("FIRECRAWL_API_KEY not set, skipping market scraping");
+    return { listings: [], bronnen: [] };
+  }
+
+  const jaar = bouwjaar ? bouwjaar.substring(0, 4) : "";
+  const queries = [
+    `${merk} ${model} ${jaar} te koop site:marktplaats.nl`,
+    `${merk} ${model} ${jaar} te koop site:autoscout24.nl`,
+    `${merk} ${model} ${jaar} te koop site:autotrack.nl`,
+  ];
+
+  const results: any[] = [];
+  const bronnen: string[] = [];
+
+  for (const query of queries) {
+    try {
+      const res = await fetch("https://api.firecrawl.dev/v1/search", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${FIRECRAWL_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query,
+          limit: 5,
+          lang: "nl",
+          country: "nl",
+          scrapeOptions: { formats: ["markdown"] },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const items = data.data || [];
+        for (const item of items) {
+          bronnen.push(item.url);
+          results.push({
+            titel: item.title || "",
+            url: item.url || "",
+            bron: new URL(item.url || "https://unknown.com").hostname,
+            beschrijving: item.description || "",
+            content_snippet: (item.markdown || "").substring(0, 500),
+          });
+        }
+      }
+    } catch (e) {
+      console.error(`Firecrawl search error for "${query}":`, e);
+    }
+  }
+
+  return { listings: results, bronnen: [...new Set(bronnen)] };
+}
+
+// ─── Step 4: Perplexity – Schadehistorie & marktanalyse ───
+async function fetchMarktEnHistorie(merk: string, model: string, bouwjaar: string | null, vin: string | null, opties: any[]) {
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
   if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY niet geconfigureerd");
 
   const jaar = bouwjaar ? bouwjaar.substring(0, 4) : "";
-  const query = `Wat zijn de huidige marktprijzen in Nederland voor een ${merk} ${model} ${jaar ? `uit ${jaar}` : ""}? 
-Geef de gemiddelde vraagprijs, laagste prijs en hoogste prijs op basis van actuele advertenties op AutoTrack, AutoScout24 en Marktplaats. 
-Geef ook het geschatte aantal exemplaren te koop en hoe snel dit model verkoopt (gemiddelde standtijd).
+  const optiesList = opties.slice(0, 10).map(o => o.omschrijving).join(", ");
+
+  const query = `Geef een uitgebreide marktanalyse voor een ${merk} ${model} ${jaar ? `uit ${jaar}` : ""}.
+${vin ? `VIN: ${vin}` : ""}
+${optiesList ? `Belangrijke opties: ${optiesList}` : ""}
+
+Beantwoord het volgende:
+1. Gemiddelde vraagprijs, laagste en hoogste prijs op basis van actuele advertenties (Marktplaats, AutoScout24, AutoTrack)
+2. Geschat aantal vergelijkbare exemplaren te koop
+3. Gemiddelde standtijd voor dit model
+4. Bekende problemen of aandachtspunten voor dit specifieke model/bouwjaar
+5. Hoe populair zijn de genoemde opties? Welke zijn waardeverhogend?
+6. Seizoensinvloed op de verkoop van dit type auto
+7. Zijn er bekende terugroepacties voor dit model?
 Antwoord alleen met feiten en cijfers, geen meningen.`;
 
   const response = await fetch("https://api.perplexity.ai/chat/completions", {
@@ -103,7 +207,7 @@ Antwoord alleen met feiten en cijfers, geen meningen.`;
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "sonar",
+      model: "sonar-pro",
       messages: [
         { role: "system", content: "Je bent een expert in de Nederlandse automarkt. Geef alleen feitelijke marktdata." },
         { role: "user", content: query },
@@ -118,15 +222,22 @@ Antwoord alleen met feiten en cijfers, geen meningen.`;
   }
 
   const data = await response.json();
-  const content = data.choices?.[0]?.message?.content || "";
-  const citations = data.citations || [];
-
-  return { analyseTekst: content, bronnen: citations };
+  return {
+    analyseTekst: data.choices?.[0]?.message?.content || "",
+    bronnen: data.citations || [],
+  };
 }
 
-async function generateAiScore(vweData: any, marktData: any, vraagprijs: number | null) {
+// ─── Step 5: AI Scoring met uitgebreide data ───
+async function generateAiScore(rdwData: any, vweData: any, marktData: any, scrapedListings: any[], opties: any[], vraagprijs: number | null) {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY niet geconfigureerd");
+
+  const listingsSummary = scrapedListings.slice(0, 8).map(l =>
+    `- ${l.titel} (${l.bron}): ${l.beschrijving}`
+  ).join("\n");
+
+  const optiesSummary = opties.map(o => o.omschrijving).join(", ");
 
   const prompt = `Je bent een auto-inkoop expert voor een Nederlands autobedrijf. Analyseer deze deal en geef een score van 0-100.
 
@@ -134,8 +245,22 @@ VWE Taxatiegegevens:
 - Inkoopwaarde: €${vweData.inkoopwaarde || "onbekend"}
 - Verkoopwaarde: €${vweData.verkoopwaarde || "onbekend"}
 - Handelsprijs: €${vweData.handelsprijs || "onbekend"}
-- Merk/Model: ${vweData.merk || "onbekend"} ${vweData.model || ""}
-- Bouwjaar: ${vweData.bouwjaar || "onbekend"}
+- Nieuwprijs: €${vweData.nieuwprijs || "onbekend"}
+
+RDW Voertuigdata:
+- VIN: ${rdwData.vin || "onbekend"}
+- Merk/Model: ${rdwData.merk || vweData.merk || "onbekend"} ${rdwData.handelsbenaming || vweData.model || ""}
+- Eerste toelating: ${rdwData.datum_eerste_toelating || vweData.bouwjaar || "onbekend"}
+- Catalogusprijs: €${rdwData.catalogusprijs || "onbekend"}
+- Aantal eigenaren: ${rdwData.aantal_eigenaren || "onbekend"}
+- APK vervaldatum: ${rdwData.apk_vervaldatum || "onbekend"}
+- Brandstof: ${rdwData.brandstof || vweData.brandstof || "onbekend"}
+
+Opties op dit voertuig:
+${optiesSummary || "Geen opties gevonden"}
+
+Live marktadvertenties gevonden:
+${listingsSummary || "Geen advertenties gevonden"}
 
 Marktanalyse:
 ${marktData.analyseTekst}
@@ -143,10 +268,12 @@ ${marktData.analyseTekst}
 ${vraagprijs ? `Gevraagde inkoopprijs door klant: €${vraagprijs}` : "Geen inkoopprijs opgegeven."}
 
 Beoordeel op basis van:
-1. Verschil tussen inkoopprijs en marktwaarde (marge potentieel)
-2. Marktliquiditeit (hoe snel verkoopt dit model)
+1. Verschil tussen inkoopprijs en markt-/verkoopwaarde (margepotentieel)
+2. Marktliquiditeit (hoeveel vergelijkbare auto's, hoe snel verkoopt dit model)
 3. Seizoensgebondenheid
-4. Risicofactoren`;
+4. Risicofactoren (aantal eigenaren, APK, bekende problemen)
+5. Waarde van de opties (zijn ze populair/waardeverhogend?)
+6. Verschil met live advertenties qua prijsstelling`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -155,7 +282,7 @@ Beoordeel op basis van:
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
+      model: "google/gemini-2.5-flash",
       messages: [
         { role: "system", content: "Je bent een auto-inkoop expert. Antwoord altijd in het Nederlands." },
         { role: "user", content: prompt },
@@ -170,7 +297,7 @@ Beoordeel op basis van:
               type: "object",
               properties: {
                 score: { type: "number", description: "Score van 0-100" },
-                advies: { type: "string", description: "Kort advies in 2-3 zinnen" },
+                advies: { type: "string", description: "Uitgebreid advies in 3-5 zinnen" },
                 score_factoren: {
                   type: "object",
                   properties: {
@@ -183,6 +310,9 @@ Beoordeel op basis van:
                 },
                 geschatte_verkoopprijs: { type: "number", description: "Geschatte verkoopprijs in euros" },
                 geschatte_standtijd: { type: "string", description: "Geschatte standtijd in dagen/weken" },
+                opties_analyse: { type: "string", description: "Korte analyse van de opties en hun waarde" },
+                aandachtspunten: { type: "array", items: { type: "string" }, description: "Lijst van aandachtspunten/risico's" },
+                gemiddelde_marktprijs: { type: "number", description: "Gemiddelde marktprijs op basis van alle data" },
               },
               required: ["score", "advies", "score_factoren"],
             },
@@ -206,6 +336,7 @@ Beoordeel op basis van:
   return JSON.parse(toolCall.function.arguments);
 }
 
+// ─── Main handler ───
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -220,26 +351,35 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Analyzing deal for kenteken: ${kenteken}`);
+    console.log(`=== Analyzing deal for: ${kenteken} ===`);
 
-    // Step 1: VWE Taxatie
-    console.log("Step 1: Fetching VWE taxatie...");
-    const vweData = await fetchVweTaxatie(kenteken);
-    console.log("VWE data:", JSON.stringify(vweData));
+    // Step 1 & 2: RDW + VWE parallel
+    console.log("Step 1+2: RDW + VWE parallel...");
+    const [rdwData, vweData] = await Promise.all([
+      fetchRdwData(kenteken),
+      fetchVweData(kenteken),
+    ]);
+    console.log("RDW VIN:", rdwData.vin);
+    console.log("VWE opties count:", vweData.opties.length);
 
-    // Step 2: Perplexity markt search
-    const merk = vweData.merk || "onbekend";
-    const model = vweData.model || "onbekend";
-    console.log("Step 2: Fetching markt data via Perplexity...");
-    const marktData = await fetchMarktData(merk, model, vweData.bouwjaar);
-    console.log("Markt data fetched, length:", marktData.analyseTekst.length);
+    const merk = rdwData.merk || vweData.merk || "onbekend";
+    const model = rdwData.handelsbenaming || vweData.model || "onbekend";
+    const bouwjaar = rdwData.datum_eerste_toelating || vweData.bouwjaar;
 
-    // Step 3: AI Scoring
-    console.log("Step 3: Generating AI score...");
-    const aiResult = await generateAiScore(vweData, marktData, vraagprijs ? Number(vraagprijs) : null);
-    console.log("AI result:", JSON.stringify(aiResult));
+    // Step 3 & 4: Firecrawl + Perplexity parallel
+    console.log("Step 3+4: Firecrawl scraping + Perplexity parallel...");
+    const [scraped, marktData] = await Promise.all([
+      scrapeMarktListings(merk, model, bouwjaar),
+      fetchMarktEnHistorie(merk, model, bouwjaar, rdwData.vin, vweData.opties),
+    ]);
+    console.log("Scraped listings:", scraped.listings.length);
 
-    // Step 4: Save to database
+    // Step 5: AI Scoring
+    console.log("Step 5: AI scoring...");
+    const aiResult = await generateAiScore(rdwData, vweData, marktData, scraped.listings, vweData.opties, vraagprijs ? Number(vraagprijs) : null);
+    console.log("AI score:", aiResult.score);
+
+    // Step 6: Save to database
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -248,15 +388,31 @@ serve(async (req) => {
       kenteken: kenteken.toUpperCase().replace(/[^A-Z0-9]/g, ""),
       merk,
       model,
-      bouwjaar: vweData.bouwjaar?.substring(0, 4) || null,
-      brandstof: vweData.brandstof,
+      bouwjaar: bouwjaar?.substring(0, 4) || null,
+      brandstof: rdwData.brandstof || vweData.brandstof,
       km_stand: vweData.kmStand,
+      transmissie: null,
+      carrosserie: rdwData.inrichting,
+      kleur: rdwData.eerste_kleur,
+      vermogen: rdwData.vermogen,
+      vin: rdwData.vin,
+      voertuig_opties: vweData.opties,
+      opties_populariteit: {},
       vwe_inkoopwaarde: vweData.inkoopwaarde ? Number(vweData.inkoopwaarde) : null,
       vwe_verkoopwaarde: vweData.verkoopwaarde ? Number(vweData.verkoopwaarde) : null,
       vwe_nieuwprijs: vweData.nieuwprijs ? Number(vweData.nieuwprijs) : null,
       vwe_handelsprijs: vweData.handelsprijs ? Number(vweData.handelsprijs) : null,
       markt_analyse_tekst: marktData.analyseTekst,
-      markt_bronnen: marktData.bronnen,
+      markt_bronnen: [...marktData.bronnen, ...scraped.bronnen],
+      markt_listings: scraped.listings,
+      gemiddelde_marktprijs: aiResult.gemiddelde_marktprijs || null,
+      laagste_marktprijs: null,
+      hoogste_marktprijs: null,
+      aantal_vergelijkbaar: scraped.listings.length,
+      schade_historie: [],
+      eerdere_advertenties: [],
+      aantal_eigenaren: rdwData.aantal_eigenaren,
+      apk_status: rdwData.apk_vervaldatum,
       inkoopprijs_klant: vraagprijs ? Number(vraagprijs) : null,
       deal_score: aiResult.score,
       ai_advies: aiResult.advies,
@@ -271,9 +427,7 @@ serve(async (req) => {
       .select()
       .single();
 
-    if (saveError) {
-      console.error("Save error:", saveError);
-    }
+    if (saveError) console.error("Save error:", saveError);
 
     return new Response(
       JSON.stringify({
@@ -281,6 +435,8 @@ serve(async (req) => {
         data: {
           id: savedDeal?.id,
           ...dealRecord,
+          opties_analyse: aiResult.opties_analyse || null,
+          aandachtspunten: aiResult.aandachtspunten || [],
         },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
