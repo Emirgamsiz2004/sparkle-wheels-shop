@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, Loader2, TrendingUp, BarChart3, ShieldCheck, Sun, ExternalLink, Package, AlertCircle, Car, Hash, Calendar, Fuel, Gauge, Users, Shield } from "lucide-react";
+import { ArrowLeft, Search, Loader2, TrendingUp, BarChart3, ShieldCheck, Sun, ExternalLink, Package, AlertCircle, Car, Hash, Calendar, Fuel, Gauge, Users, Shield, Wrench, Calculator } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
