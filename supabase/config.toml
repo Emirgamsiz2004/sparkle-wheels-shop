@@ -4,8 +4,11 @@ project_id = "leykexzdvatuyitkxdxs"
 verify_jwt = false
 
 [functions.vwe-taxatie]
-verify_jwt = true
+verify_jwt = false
 
 [functions.analyze-deal]
-verify_jwt = true
+verify_jwt = false
+
+[functions.firecrawl-search]
+verify_jwt = false
 
