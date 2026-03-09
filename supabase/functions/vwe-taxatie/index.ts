@@ -8,6 +8,14 @@ const corsHeaders = {
 
 const INTERDATA_URL = "https://interdata.vwe.nl/DataAanvraag.asmx";
 
+const escapeXml = (str: string) =>
+  str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -26,41 +34,46 @@ serve(async (req) => {
       );
     }
 
-    // Kenteken opschonen (alleen letters en cijfers)
     const cleanKenteken = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-    // Interdata standaard request XML voor taxatie info
-    const requestXml = `<?xml version="1.0" encoding="UTF-8"?>
-<request>
-  <authenticatie>
-    <gebruikersnaam>${VWE_USERNAME}</gebruikersnaam>
-    <wachtwoord>${VWE_PASSWORD}</wachtwoord>
-  </authenticatie>
-  <parameters>
-    <kenteken>${cleanKenteken}</kenteken>
-  </parameters>
-  <rubrieken>
-    <atlTaxatieInfoBasic/>
-    <atlTaxatieOnline/>
-  </rubrieken>
-</request>`;
+    const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${cleanKenteken}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/></rubrieken></request>`;
+
+    const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <standaardDataRequest xmlns="http://hetextranet.nl/InterData">
+      <requestXml>${escapeXml(innerXml)}</requestXml>
+    </standaardDataRequest>
+  </soap:Body>
+</soap:Envelope>`;
 
     const response = await fetch(INTERDATA_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "text/xml; charset=utf-8",
+        "SOAPAction": "http://hetextranet.nl/InterData/standaardDataRequest",
       },
-      body: `requestXml=${encodeURIComponent(requestXml)}`,
+      body: soapEnvelope,
     });
 
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`VWE API error [${response.status}]: ${errorText}`);
+      throw new Error(`VWE API error [${response.status}]: ${responseText.substring(0, 200)}`);
     }
 
-    const xmlText = await response.text();
+    // Extract result from SOAP response
+    const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
+    const resultXml = resultMatch ? resultMatch[1] : responseText;
 
-    // Parse relevante waarden uit XML response
+    // Decode entity-encoded XML
+    const decodedXml = resultXml
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'");
+
     const extractValue = (xml: string, tag: string): string | null => {
       const regex = new RegExp(`<${tag}[^>]*>([^<]+)</${tag}>`, "i");
       const match = xml.match(regex);
@@ -68,12 +81,12 @@ serve(async (req) => {
     };
 
     const taxatieData = {
-      inkoopwaarde: extractValue(xmlText, "inkoopwaarde") || extractValue(xmlText, "Inkoopwaarde"),
-      verkoopwaarde: extractValue(xmlText, "verkoopwaarde") || extractValue(xmlText, "Verkoopwaarde"),
-      nieuwprijs: extractValue(xmlText, "nieuwprijs") || extractValue(xmlText, "Nieuwprijs"),
-      dagwaarde: extractValue(xmlText, "dagwaarde") || extractValue(xmlText, "Dagwaarde"),
-      handelsprijs: extractValue(xmlText, "handelsprijs") || extractValue(xmlText, "Handelsprijs"),
-      raw_response: xmlText, // Voor debugging
+      inkoopwaarde: extractValue(decodedXml, "inkoopwaarde") || extractValue(decodedXml, "Inkoopwaarde"),
+      verkoopwaarde: extractValue(decodedXml, "verkoopwaarde") || extractValue(decodedXml, "Verkoopwaarde"),
+      nieuwprijs: extractValue(decodedXml, "nieuwprijs") || extractValue(decodedXml, "Nieuwprijs"),
+      dagwaarde: extractValue(decodedXml, "dagwaarde") || extractValue(decodedXml, "Dagwaarde"),
+      handelsprijs: extractValue(decodedXml, "handelsprijs") || extractValue(decodedXml, "Handelsprijs"),
+      raw_response: decodedXml,
     };
 
     return new Response(

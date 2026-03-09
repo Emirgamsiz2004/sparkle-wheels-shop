@@ -9,6 +9,14 @@ const corsHeaders = {
 
 const INTERDATA_URL = "https://interdata.vwe.nl/DataAanvraag.asmx";
 
+const escapeXml = (str: string) =>
+  str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+
 const extractXmlValue = (xml: string, tag: string): string | null => {
   const regex = new RegExp(`<${tag}[^>]*>([^<]+)</${tag}>`, "i");
   const match = xml.match(regex);
@@ -22,45 +30,59 @@ async function fetchVweTaxatie(kenteken: string) {
 
   const cleanKenteken = kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-  const requestXml = `<?xml version="1.0" encoding="UTF-8"?>
-<request>
-  <authenticatie>
-    <gebruikersnaam>${VWE_USERNAME}</gebruikersnaam>
-    <wachtwoord>${VWE_PASSWORD}</wachtwoord>
-  </authenticatie>
-  <parameters>
-    <kenteken>${cleanKenteken}</kenteken>
-  </parameters>
-  <rubrieken>
-    <atlTaxatieInfoBasic/>
-    <atlTaxatieOnline/>
-  </rubrieken>
-</request>`;
+  const innerXml = `<request><authenticatie><gebruikersnaam>${VWE_USERNAME}</gebruikersnaam><wachtwoord>${VWE_PASSWORD}</wachtwoord></authenticatie><parameters><kenteken>${cleanKenteken}</kenteken></parameters><rubrieken><atlTaxatieInfoBasic/><atlTaxatieOnline/></rubrieken></request>`;
+
+  const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <standaardDataRequest xmlns="http://hetextranet.nl/InterData">
+      <requestXml>${escapeXml(innerXml)}</requestXml>
+    </standaardDataRequest>
+  </soap:Body>
+</soap:Envelope>`;
+
+  console.log("Sending SOAP request to VWE...");
 
   const response = await fetch(INTERDATA_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `requestXml=${encodeURIComponent(requestXml)}`,
+    headers: {
+      "Content-Type": "text/xml; charset=utf-8",
+      "SOAPAction": "http://hetextranet.nl/InterData/standaardDataRequest",
+    },
+    body: soapEnvelope,
   });
 
+  const responseText = await response.text();
+
   if (!response.ok) {
-    const errorBody = await response.text();
-    console.error("VWE API error body:", errorBody.substring(0, 1000));
-    throw new Error(`VWE API error [${response.status}]: ${errorBody.substring(0, 200)}`);
+    console.error("VWE API error body:", responseText.substring(0, 1000));
+    throw new Error(`VWE API error [${response.status}]: ${responseText.substring(0, 200)}`);
   }
 
-  const xmlText = await response.text();
+  console.log("VWE response (first 500 chars):", responseText.substring(0, 500));
+
+  // Extract the result string from SOAP response
+  const resultMatch = responseText.match(/<standaardDataRequestResult>([\s\S]*?)<\/standaardDataRequestResult>/i);
+  const resultXml = resultMatch ? resultMatch[1] : responseText;
+  
+  // The result might be entity-encoded XML, decode it
+  const decodedXml = resultXml
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'");
 
   return {
-    inkoopwaarde: extractXmlValue(xmlText, "inkoopwaarde") || extractXmlValue(xmlText, "Inkoopwaarde"),
-    verkoopwaarde: extractXmlValue(xmlText, "verkoopwaarde") || extractXmlValue(xmlText, "Verkoopwaarde"),
-    nieuwprijs: extractXmlValue(xmlText, "nieuwprijs") || extractXmlValue(xmlText, "Nieuwprijs"),
-    handelsprijs: extractXmlValue(xmlText, "handelsprijs") || extractXmlValue(xmlText, "Handelsprijs"),
-    merk: extractXmlValue(xmlText, "merk") || extractXmlValue(xmlText, "Merk"),
-    model: extractXmlValue(xmlText, "handelsbenaming") || extractXmlValue(xmlText, "Handelsbenaming"),
-    bouwjaar: extractXmlValue(xmlText, "datumeerstetoelating") || extractXmlValue(xmlText, "DatumEersteToelating"),
-    brandstof: extractXmlValue(xmlText, "brandstof") || extractXmlValue(xmlText, "Brandstof"),
-    kmStand: extractXmlValue(xmlText, "tellerstand") || extractXmlValue(xmlText, "Tellerstand"),
+    inkoopwaarde: extractXmlValue(decodedXml, "inkoopwaarde") || extractXmlValue(decodedXml, "Inkoopwaarde"),
+    verkoopwaarde: extractXmlValue(decodedXml, "verkoopwaarde") || extractXmlValue(decodedXml, "Verkoopwaarde"),
+    nieuwprijs: extractXmlValue(decodedXml, "nieuwprijs") || extractXmlValue(decodedXml, "Nieuwprijs"),
+    handelsprijs: extractXmlValue(decodedXml, "handelsprijs") || extractXmlValue(decodedXml, "Handelsprijs"),
+    merk: extractXmlValue(decodedXml, "merk") || extractXmlValue(decodedXml, "Merk"),
+    model: extractXmlValue(decodedXml, "handelsbenaming") || extractXmlValue(decodedXml, "Handelsbenaming"),
+    bouwjaar: extractXmlValue(decodedXml, "datumeerstetoelating") || extractXmlValue(decodedXml, "DatumEersteToelating"),
+    brandstof: extractXmlValue(decodedXml, "brandstof") || extractXmlValue(decodedXml, "Brandstof"),
+    kmStand: extractXmlValue(decodedXml, "tellerstand") || extractXmlValue(decodedXml, "Tellerstand"),
   };
 }
 
