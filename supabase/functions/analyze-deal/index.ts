@@ -362,13 +362,15 @@ serve(async (req) => {
   }
 
   try {
-    const { kenteken, vraagprijs } = await req.json();
+    const { kenteken, vraagprijs, km_stand, staat, schadevrij, onderhoudsboekje, rookvrij, aantal_sleutels, bandenprofiel, opmerkingen } = await req.json();
     if (!kenteken) {
       return new Response(
         JSON.stringify({ success: false, error: "Kenteken is verplicht" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const extraInput = { vraagprijs: vraagprijs ? Number(vraagprijs) : null, km_stand, staat, schadevrij, onderhoudsboekje, rookvrij, aantal_sleutels, bandenprofiel, opmerkingen };
 
     console.log(`=== Analyzing deal for: ${kenteken} ===`);
 
@@ -395,7 +397,7 @@ serve(async (req) => {
 
     // Step 5: AI Scoring
     console.log("Step 5: AI scoring...");
-    const aiResult = await generateAiScore(rdwData, vweData, marktData, scraped.listings, vweData.opties, vraagprijs ? Number(vraagprijs) : null);
+    const aiResult = await generateAiScore(rdwData, vweData, marktData, scraped.listings, vweData.opties, extraInput);
     console.log("AI score:", aiResult.score);
 
     // Step 6: Save to database
