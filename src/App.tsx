@@ -15,6 +15,7 @@ import AutoZoeken from "./pages/AutoZoeken";
 import AutoCustomizing from "./pages/AutoCustomizing";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import DealAnalyzer from "./pages/DealAnalyzer";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
@@ -35,6 +36,7 @@ const App = () => (
           <Routes>
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/deals" element={<DealAnalyzer />} />
             <Route path="*" element={<UnderConstruction />} />
           </Routes>
         ) : (
@@ -51,6 +53,7 @@ const App = () => (
             <Route path="/diensten/auto-customizing" element={<AutoCustomizing />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/deals" element={<DealAnalyzer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         )}
