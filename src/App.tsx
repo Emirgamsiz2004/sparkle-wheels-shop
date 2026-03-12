@@ -24,6 +24,7 @@ import AdminFinancieelPage from "./pages/admin/AdminFinancieelPage";
 import AdminBTWPage from "./pages/admin/AdminBTWPage";
 import DealAnalyzer from "./pages/DealAnalyzer";
 import AdminMoneybirdPage from "./pages/admin/AdminMoneybirdPage";
+import AdminInstellingenPage from "./pages/admin/AdminInstellingenPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
