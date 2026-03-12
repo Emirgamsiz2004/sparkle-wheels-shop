@@ -51,8 +51,8 @@ const AdminFinancieelPage = () => {
             <option value={String(currentYear)}>{currentYear}</option>
             <option value={String(currentYear - 1)}>{currentYear - 1}</option>
           </select>
-          <button onClick={exportExcel} className="inline-flex items-center gap-2 px-4 py-2.5 bg-card text-foreground text-sm font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors">
-            <Download className="w-4 h-4" /> Exporteer CSV
+          <button onClick={exportExcel} className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors">
+            <Download className="w-3.5 h-3.5" /> Exporteer CSV
           </button>
         </div>
       </div>
