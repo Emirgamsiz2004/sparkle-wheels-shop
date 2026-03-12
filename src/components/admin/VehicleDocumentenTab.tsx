@@ -67,8 +67,8 @@ const VehicleDocumentenTab = ({ vehicleId }: { vehicleId: string }) => {
       <div className="flex justify-end">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background text-sm font-medium hover:bg-foreground/90">
-              <Plus className="w-4 h-4" /> Document Uploaden
+            <button className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors">
+              <Plus className="w-3.5 h-3.5" /> Document Uploaden
             </button>
           </DialogTrigger>
           <DialogContent>

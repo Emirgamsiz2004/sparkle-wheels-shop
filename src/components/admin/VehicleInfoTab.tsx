@@ -65,9 +65,9 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-6 py-2.5 bg-foreground text-background text-sm font-medium hover:bg-foreground/90 transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
-          {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+          {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
           Wijzigingen Opslaan
         </button>
       </CardContent>
