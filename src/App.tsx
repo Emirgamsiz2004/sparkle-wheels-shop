@@ -54,6 +54,7 @@ const App = () => (
                 <Route path="financieel" element={<AdminFinancieelPage />} />
                 <Route path="btw" element={<AdminBTWPage />} />
                 <Route path="moneybird" element={<AdminMoneybirdPage />} />
+                <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
