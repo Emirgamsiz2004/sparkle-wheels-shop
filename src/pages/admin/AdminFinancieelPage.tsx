@@ -67,9 +67,10 @@ const AdminFinancieelPage = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-secondary border-b border-border">
-                    {["Voertuig", "Inkoopdatum", "Verkoopdatum", "Inkoopprijs", "Kosten", "Kostprijs", "Verkoopprijs", "Brutomarge", "BTW", "Nettomarge", "Marge %"].map((h) => (
-                      <th key={h} className="text-left px-4 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest whitespace-nowrap">{h}</th>
-                    ))}
+                     {["Voertuig", "Inkoopdatum", "Verkoopdatum", "Inkoopprijs", "Kosten", "Kostprijs", "Verkoopprijs", "Brutomarge", "BTW", "Nettomarge", "Marge %", "Drive"].map((h) => (
+                       <th key={h} className="text-left px-4 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest whitespace-nowrap">{h}</th>
+                     ))}
+
                   </tr>
                 </thead>
                 <tbody>
