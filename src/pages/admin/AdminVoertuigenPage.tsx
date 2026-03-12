@@ -38,8 +38,8 @@ const AdminVoertuigenPage = () => {
           <h1 className="text-2xl font-bold text-foreground">Voertuigen</h1>
           <p className="text-sm text-muted-foreground mt-1">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
         </div>
-        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors">
-          <Plus className="w-4 h-4" /> Nieuw Voertuig
+        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors">
+          <Plus className="w-3.5 h-3.5" /> Nieuw Voertuig
         </Link>
       </div>
 
