@@ -21,7 +21,7 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
   };
 
   return (
-    <Card className="bg-white border-gray-200 shadow-sm">
+    <Card>
       <CardContent className="p-6 space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} />
@@ -31,14 +31,14 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
           <Field label="Kenteken" value={form.kenteken} onChange={(v) => update("kenteken", v.toUpperCase())} />
           <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Brandstof</label>
-            <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1F3864]/20">
+            <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>
+            <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
               <option value="benzine">Benzine</option><option value="diesel">Diesel</option><option value="elektrisch">Elektrisch</option><option value="hybride">Hybride</option><option value="lpg">LPG</option>
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Status</label>
-            <select value={form.status} onChange={(e) => update("status", e.target.value as Vehicle["status"])} className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1F3864]/20">
+            <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Status</label>
+            <select value={form.status} onChange={(e) => update("status", e.target.value as Vehicle["status"])} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
               <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="verkocht">Verkocht</option>
             </select>
           </div>
@@ -48,8 +48,8 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
           <Field label="Verkoopprijs (€)" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} />
         </div>
 
-        <div className="border-t border-gray-100 pt-5">
-          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Kopergegevens</h3>
+        <div className="border-t border-border pt-5">
+          <h3 className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-3">Kopergegevens</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Field label="Naam koper" value={form.koperNaam || ""} onChange={(v) => update("koperNaam", v || undefined)} />
             <Field label="E-mail koper" value={form.koperEmail || ""} onChange={(v) => update("koperEmail", v || undefined)} />
@@ -58,14 +58,14 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Opmerkingen</label>
-          <textarea value={form.opmerkingen || ""} onChange={(e) => update("opmerkingen", e.target.value || undefined)} rows={3} className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1F3864]/20 resize-none" />
+          <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Opmerkingen</label>
+          <textarea value={form.opmerkingen || ""} onChange={(e) => update("opmerkingen", e.target.value || undefined)} rows={3} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none" />
         </div>
 
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1F3864] text-white text-sm font-medium rounded-lg hover:bg-[#172d52] transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-foreground text-background text-sm font-medium hover:bg-foreground/90 transition-colors disabled:opacity-50"
         >
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
           Wijzigingen Opslaan
@@ -79,8 +79,8 @@ const Field = ({ label, value, onChange, type = "text" }: {
   label: string; value: any; onChange: (v: string) => void; type?: string;
 }) => (
   <div>
-    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1F3864]/20" />
+    <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
   </div>
 );
 

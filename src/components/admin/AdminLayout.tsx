@@ -27,8 +27,8 @@ const AdminLayout = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f7]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1F3864]" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground" />
       </div>
     );
   }
@@ -38,7 +38,7 @@ const AdminLayout = () => {
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + "/");
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-background">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -46,16 +46,16 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#1F3864] text-white flex flex-col transition-transform lg:translate-x-0 ${
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border text-foreground flex flex-col transition-transform lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="p-6 flex items-center justify-between">
           <Link to="/admin/dashboard" className="flex items-center gap-3">
-            <img src={logo} alt="Platin" className="h-7 w-auto brightness-0 invert" />
-            <span className="text-xs font-semibold tracking-widest uppercase text-[#C9A84C]">Admin</span>
+            <img src={logo} alt="Platin" className="h-7 w-auto" />
+            <span className="text-[10px] font-semibold tracking-[0.3em] uppercase text-muted-foreground">Admin</span>
           </Link>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-white/60 hover:text-white">
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -66,10 +66,10 @@ const AdminLayout = () => {
               key={item.path}
               to={item.path}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-sm text-sm font-medium transition-colors ${
                 isActive(item.path)
-                  ? "bg-white/15 text-white"
-                  : "text-white/60 hover:text-white hover:bg-white/8"
+                  ? "bg-foreground/10 text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
               }`}
             >
               <item.icon className="w-4 h-4 flex-shrink-0" />
@@ -78,11 +78,11 @@ const AdminLayout = () => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
-          <p className="text-xs text-white/50 truncate mb-2 px-2">{user.email}</p>
+        <div className="p-4 border-t border-border">
+          <p className="text-xs text-muted-foreground truncate mb-2 px-2">{user.email}</p>
           <button
             onClick={signOut}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/8 rounded-lg transition-colors w-full"
+            className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-foreground/5 rounded-sm transition-colors w-full"
           >
             <LogOut className="w-4 h-4" />
             Uitloggen
@@ -91,10 +91,10 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen admin-content bg-[#f5f5f7]">
+      <div className="flex-1 flex flex-col min-h-screen">
         {/* Mobile header */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-          <button onClick={() => setSidebarOpen(true)} className="text-gray-600">
+        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-card border-b border-border">
+          <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground">
             <Menu className="w-6 h-6" />
           </button>
           <img src={logo} alt="Platin" className="h-6" />

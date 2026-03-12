@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Vehicle } from "@/types/vehicle";
 
 const AdminVoertuigNieuwPage = () => {
@@ -28,13 +28,13 @@ const AdminVoertuigNieuwPage = () => {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
+      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="w-4 h-4" /> Terug
       </button>
 
-      <h1 className="text-2xl font-bold text-gray-900">Nieuw Voertuig</h1>
+      <h1 className="text-2xl font-bold text-foreground">Nieuw Voertuig</h1>
 
-      <Card className="bg-white border-gray-200 shadow-sm">
+      <Card>
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
@@ -45,22 +45,15 @@ const AdminVoertuigNieuwPage = () => {
               <Field label="Kenteken" value={form.kenteken} onChange={(v) => update("kenteken", v.toUpperCase())} />
               <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
               <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Brandstof</label>
-                <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1F3864]/20">
-                  <option value="benzine">Benzine</option>
-                  <option value="diesel">Diesel</option>
-                  <option value="elektrisch">Elektrisch</option>
-                  <option value="hybride">Hybride</option>
-                  <option value="lpg">LPG</option>
+                <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>
+                <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+                  <option value="benzine">Benzine</option><option value="diesel">Diesel</option><option value="elektrisch">Elektrisch</option><option value="hybride">Hybride</option><option value="lpg">LPG</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Status</label>
-                <select value={form.status} onChange={(e) => update("status", e.target.value)} className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1F3864]/20">
-                  <option value="inkoop">Inkoop</option>
-                  <option value="in_behandeling">In behandeling</option>
-                  <option value="te_koop">Te koop</option>
-                  <option value="verkocht">Verkocht</option>
+                <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Status</label>
+                <select value={form.status} onChange={(e) => update("status", e.target.value)} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+                  <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="verkocht">Verkocht</option>
                 </select>
               </div>
               <Field label="Inkoopdatum" type="date" value={form.inkoopDatum} onChange={(v) => update("inkoopDatum", v)} />
@@ -68,14 +61,14 @@ const AdminVoertuigNieuwPage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Opmerkingen</label>
-              <textarea value={form.opmerkingen} onChange={(e) => update("opmerkingen", e.target.value)} rows={3} className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1F3864]/20 resize-none" />
+              <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Opmerkingen</label>
+              <textarea value={form.opmerkingen} onChange={(e) => update("opmerkingen", e.target.value)} rows={3} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none" />
             </div>
 
             <button
               type="submit"
               disabled={saving || !form.merk || !form.model}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1F3864] text-white text-sm font-medium rounded-lg hover:bg-[#172d52] transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-foreground text-background text-sm font-medium hover:bg-foreground/90 transition-colors disabled:opacity-50"
             >
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
               Opslaan
@@ -91,14 +84,8 @@ const Field = ({ label, value, onChange, type = "text", required = false }: {
   label: string; value: any; onChange: (v: string) => void; type?: string; required?: boolean;
 }) => (
   <div>
-    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">{label}</label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      required={required}
-      className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1F3864]/20"
-    />
+    <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
   </div>
 );
 
