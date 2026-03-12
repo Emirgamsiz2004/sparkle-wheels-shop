@@ -77,7 +77,8 @@ const App = () => (
                 <Route path="voertuigen/nieuw" element={<AdminVoertuigNieuwPage />} />
                 <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
                 <Route path="financieel" element={<AdminFinancieelPage />} />
-                <Route path="btw" element={<AdminBTWPage />} />
+              <Route path="btw" element={<AdminBTWPage />} />
+                <Route path="moneybird" element={<AdminMoneybirdPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<NotFound />} />
