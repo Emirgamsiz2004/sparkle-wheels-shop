@@ -81,4 +81,22 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Admin panel utilities */
+  .profit-positive {
+    color: hsl(152 55% 42%);
+  }
+  .profit-negative {
+    color: hsl(0 65% 50%);
+  }
+  .badge-profit {
+    background: hsl(152 55% 42% / 0.12);
+    color: hsl(152 55% 42%);
+    border: 1px solid hsl(152 55% 42% / 0.25);
+  }
+  .badge-loss {
+    background: hsl(0 65% 50% / 0.12);
+    color: hsl(0 65% 50%);
+    border: 1px solid hsl(0 65% 50% / 0.25);
+  }
 }
