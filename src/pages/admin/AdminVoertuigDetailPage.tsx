@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
-import { ArrowLeft, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, ShoppingCart } from "lucide-react";
 import { statusLabels, statusColors } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
 import VehicleKostenTab from "@/components/admin/VehicleKostenTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
 import VehicleFotosTab from "@/components/admin/VehicleFotosTab";
 import VehicleFinancieelTab from "@/components/admin/VehicleFinancieelTab";
+import VerkoopDialog from "@/components/admin/VerkoopDialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -24,8 +25,9 @@ const tabItems = [
 const AdminVoertuigDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost } = useVehicles();
+  const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
   const [activeTab, setActiveTab] = useState("info");
+  const [verkoopOpen, setVerkoopOpen] = useState(false);
 
   const vehicle = vehicles.find((v) => v.id === id);
 
@@ -45,6 +47,10 @@ const AdminVoertuigDetailPage = () => {
   const handleDelete = async () => {
     await deleteVehicle(vehicle.id);
     navigate("/admin/voertuigen");
+  };
+
+  const handleVerkoopComplete = () => {
+    refetch();
   };
 
   return (
@@ -90,25 +96,36 @@ const AdminVoertuigDetailPage = () => {
             )}
           </div>
         </div>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <button className="inline-flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-              <Trash2 className="w-3.5 h-3.5" /> Verwijderen
+        <div className="flex items-center gap-2">
+          {/* Verkopen button — only when status is te_koop */}
+          {vehicle.status === "te_koop" && (
+            <button
+              onClick={() => setVerkoopOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors"
+            >
+              <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
             </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="bg-card border-border rounded-xl">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Voertuig verwijderen?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Dit verwijdert {vehicle.merk} {vehicle.model} en alle bijbehorende kosten, documenten en foto's. Dit kan niet ongedaan worden gemaakt.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="rounded-lg">Annuleren</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 rounded-lg">Verwijderen</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          )}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="inline-flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                <Trash2 className="w-3.5 h-3.5" /> Verwijderen
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-card border-border rounded-xl">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Voertuig verwijderen?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Dit verwijdert {vehicle.merk} {vehicle.model} en alle bijbehorende kosten, documenten en foto's. Dit kan niet ongedaan worden gemaakt.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="rounded-lg">Annuleren</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 rounded-lg">Verwijderen</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -136,6 +153,14 @@ const AdminVoertuigDetailPage = () => {
         {activeTab === "fotos" && <VehicleFotosTab vehicleId={vehicle.id} />}
         {activeTab === "financieel" && <VehicleFinancieelTab vehicle={vehicle} />}
       </div>
+
+      {/* Verkoop Dialog */}
+      <VerkoopDialog
+        vehicle={vehicle}
+        open={verkoopOpen}
+        onOpenChange={setVerkoopOpen}
+        onComplete={handleVerkoopComplete}
+      />
     </div>
   );
 };

@@ -33,7 +33,15 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
     date: c.date,
     invoiceRef: c.invoice_ref || undefined,
     btwPercentage: Number(c.btw_percentage) || 21,
+    leverancier: c.leverancier || undefined,
+    filePath: c.file_path || undefined,
+    fileName: c.file_name || undefined,
+    moneybirdId: c.moneybird_id || undefined,
+    moneybirdSyncedAt: c.moneybird_synced_at || undefined,
   })),
+  betaalmethode: row.betaalmethode || undefined,
+  totaleKosten: Number(row.totale_kosten) || 0,
+  kostprijsCalc: Number(row.kostprijs) || 0,
 });
 
 export function useVehicles() {
@@ -134,15 +142,40 @@ export function useVehicles() {
       date: cost.date,
       invoice_ref: cost.invoiceRef || null,
       btw_percentage: cost.btwPercentage || 21,
+      leverancier: cost.leverancier || null,
+      file_path: cost.filePath || null,
+      file_name: cost.fileName || null,
     } as any);
     if (error) { toast.error('Fout bij toevoegen kosten'); return; }
+    // Recalculate totale_kosten and kostprijs
+    await recalcVehicleCosts(vehicleId);
+    // Insert make_event
+    const vehicle = vehicles.find(v => v.id === vehicleId);
+    if (vehicle) {
+      await supabase.from('make_events').insert({
+        event_type: 'vehicle_cost.created',
+        payload: { ...cost, vehicle_id: vehicleId, kenteken: vehicle.kenteken, merk: vehicle.merk, model: vehicle.model },
+      } as any);
+    }
     toast.success('Kosten toegevoegd');
     fetchVehicles();
   };
 
-  const removeCost = async (costId: string) => {
+  const recalcVehicleCosts = async (vehicleId: string) => {
+    const { data: costs } = await supabase.from('vehicle_costs').select('amount').eq('vehicle_id', vehicleId);
+    const totalKosten = (costs || []).reduce((s: number, c: any) => s + Number(c.amount), 0);
+    const { data: vData } = await supabase.from('vehicles').select('inkoopprijs').eq('id', vehicleId).single();
+    const inkoopprijs = Number(vData?.inkoopprijs) || 0;
+    await supabase.from('vehicles').update({
+      totale_kosten: totalKosten,
+      kostprijs: inkoopprijs + totalKosten,
+    } as any).eq('id', vehicleId);
+  };
+
+  const removeCost = async (costId: string, vehicleId?: string) => {
     const { error } = await supabase.from('vehicle_costs').delete().eq('id', costId);
     if (error) { toast.error('Fout bij verwijderen kosten'); return; }
+    if (vehicleId) await recalcVehicleCosts(vehicleId);
     fetchVehicles();
   };
 

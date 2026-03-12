@@ -6,6 +6,11 @@ export interface CostItem {
   date: string;
   invoiceRef?: string;
   btwPercentage?: number;
+  leverancier?: string;
+  filePath?: string;
+  fileName?: string;
+  moneybirdId?: string;
+  moneybirdSyncedAt?: string;
 }
 
 export interface Vehicle {
@@ -27,6 +32,9 @@ export interface Vehicle {
   koperNaam?: string;
   koperEmail?: string;
   koperTelefoon?: string;
+  betaalmethode?: string;
+  totaleKosten?: number;
+  kostprijsCalc?: number;
   googleDriveFolderId?: string | null;
   googleDriveFolderUrl?: string | null;
   googleDriveSynced?: boolean;
