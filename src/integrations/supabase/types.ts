@@ -448,6 +448,51 @@ export type Database = {
         }
         Relationships: []
       }
+      document_checklist_items: {
+        Row: {
+          document_id: string | null
+          id: string
+          naam: string
+          vehicle_id: string
+          verplicht: boolean | null
+          voltooid: boolean | null
+          voltooid_op: string | null
+        }
+        Insert: {
+          document_id?: string | null
+          id?: string
+          naam: string
+          vehicle_id: string
+          verplicht?: boolean | null
+          voltooid?: boolean | null
+          voltooid_op?: string | null
+        }
+        Update: {
+          document_id?: string | null
+          id?: string
+          naam?: string
+          vehicle_id?: string
+          verplicht?: boolean | null
+          voltooid?: boolean | null
+          voltooid_op?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_checklist_items_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_checklist_items_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inkoop_candidates: {
         Row: {
           bouwjaar: number
@@ -517,6 +562,33 @@ export type Database = {
         }
         Relationships: []
       }
+      make_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json | null
+          processed: boolean | null
+          processed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json | null
+          processed?: boolean | null
+          processed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          processed?: boolean | null
+          processed_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -564,8 +636,13 @@ export type Database = {
           created_at: string
           date: string | null
           description: string
+          file_name: string | null
+          file_path: string | null
           id: string
           invoice_ref: string | null
+          leverancier: string | null
+          moneybird_id: string | null
+          moneybird_synced_at: string | null
           vehicle_id: string
         }
         Insert: {
@@ -575,8 +652,13 @@ export type Database = {
           created_at?: string
           date?: string | null
           description: string
+          file_name?: string | null
+          file_path?: string | null
           id?: string
           invoice_ref?: string | null
+          leverancier?: string | null
+          moneybird_id?: string | null
+          moneybird_synced_at?: string | null
           vehicle_id: string
         }
         Update: {
@@ -586,8 +668,13 @@ export type Database = {
           created_at?: string
           date?: string | null
           description?: string
+          file_name?: string | null
+          file_path?: string | null
           id?: string
           invoice_ref?: string | null
+          leverancier?: string | null
+          moneybird_id?: string | null
+          moneybird_synced_at?: string | null
           vehicle_id?: string
         }
         Relationships: [
@@ -693,6 +780,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          betaalmethode: string | null
           bouwjaar: number | null
           brandstof: string | null
           created_at: string
@@ -708,15 +796,18 @@ export type Database = {
           koper_email: string | null
           koper_naam: string | null
           koper_telefoon: string | null
+          kostprijs: number | null
           merk: string
           model: string
           opmerkingen: string | null
           status: string | null
+          totale_kosten: number | null
           user_id: string | null
           verkoop_datum: string | null
           verkoopprijs: number | null
         }
         Insert: {
+          betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
           created_at?: string
@@ -732,15 +823,18 @@ export type Database = {
           koper_email?: string | null
           koper_naam?: string | null
           koper_telefoon?: string | null
+          kostprijs?: number | null
           merk: string
           model: string
           opmerkingen?: string | null
           status?: string | null
+          totale_kosten?: number | null
           user_id?: string | null
           verkoop_datum?: string | null
           verkoopprijs?: number | null
         }
         Update: {
+          betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
           created_at?: string
@@ -756,10 +850,12 @@ export type Database = {
           koper_email?: string | null
           koper_naam?: string | null
           koper_telefoon?: string | null
+          kostprijs?: number | null
           merk?: string
           model?: string
           opmerkingen?: string | null
           status?: string | null
+          totale_kosten?: number | null
           user_id?: string | null
           verkoop_datum?: string | null
           verkoopprijs?: number | null
