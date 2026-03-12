@@ -2,7 +2,7 @@ export interface CostItem {
   id: string;
   description: string;
   amount: number;
-  category: 'inkoop' | 'reparatie' | 'keuring' | 'transport' | 'overig';
+  category: 'transport' | 'veilingkosten' | 'taxatie_keuring' | 'poetsen_detailing' | 'onderhoud_reparatie' | 'marketing' | 'overig';
   date: string;
   invoiceRef?: string;
   btwPercentage?: number;
@@ -34,6 +34,10 @@ export const calcKostprijs = (vehicle: Vehicle): number => {
   return vehicle.inkoopprijs + totalKosten;
 };
 
+export const calcTotalKosten = (vehicle: Vehicle): number => {
+  return vehicle.kosten.reduce((sum, k) => sum + k.amount, 0);
+};
+
 export const calcWinst = (vehicle: Vehicle): number => {
   return vehicle.verkoopprijs - calcKostprijs(vehicle);
 };
@@ -42,6 +46,16 @@ export const calcMarge = (vehicle: Vehicle): number => {
   const kostprijs = calcKostprijs(vehicle);
   if (kostprijs === 0) return 0;
   return (calcWinst(vehicle) / kostprijs) * 100;
+};
+
+export const calcBtwMarge = (vehicle: Vehicle): number => {
+  const winst = calcWinst(vehicle);
+  if (winst <= 0) return 0;
+  return winst * (21 / 121);
+};
+
+export const calcNettoMarge = (vehicle: Vehicle): number => {
+  return calcWinst(vehicle) - calcBtwMarge(vehicle);
 };
 
 export const formatEuro = (amount: number): string => {
@@ -70,10 +84,10 @@ export const statusLabels: Record<Vehicle['status'], string> = {
 };
 
 export const statusColors: Record<Vehicle['status'], string> = {
-  inkoop: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-  in_behandeling: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  te_koop: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  verkocht: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  inkoop: 'bg-blue-100 text-blue-700 border-blue-200',
+  in_behandeling: 'bg-amber-100 text-amber-700 border-amber-200',
+  te_koop: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  verkocht: 'bg-gray-100 text-gray-600 border-gray-200',
 };
 
 export const brandstofLabels: Record<Vehicle['brandstof'], string> = {
@@ -85,10 +99,12 @@ export const brandstofLabels: Record<Vehicle['brandstof'], string> = {
 };
 
 export const costCategories: Record<CostItem['category'], string> = {
-  inkoop: 'Inkoop',
-  reparatie: 'Reparatie',
-  keuring: 'Keuring / APK',
   transport: 'Transport',
+  veilingkosten: 'Veilingkosten',
+  taxatie_keuring: 'Taxatie / Keuring',
+  poetsen_detailing: 'Poetsen / Detailing',
+  onderhoud_reparatie: 'Onderhoud / Reparatie',
+  marketing: 'Marketing',
   overig: 'Overig',
 };
 
@@ -162,9 +178,9 @@ export const interesseLabels: Record<InkoopCandidate['interesseStatus'], string>
 };
 
 export const interesseColors: Record<InkoopCandidate['interesseStatus'], string> = {
-  nieuw: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-  interessant: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  bod_gedaan: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  afgewezen: 'bg-red-500/15 text-red-400 border-red-500/30',
-  ingekocht: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  nieuw: 'bg-blue-100 text-blue-700 border-blue-200',
+  interessant: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  bod_gedaan: 'bg-amber-100 text-amber-700 border-amber-200',
+  afgewezen: 'bg-red-100 text-red-700 border-red-200',
+  ingekocht: 'bg-purple-100 text-purple-700 border-purple-200',
 };
