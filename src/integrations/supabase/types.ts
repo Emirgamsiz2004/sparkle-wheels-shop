@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
       automation_results: {
         Row: {
           afbeelding_url: string | null
@@ -581,9 +605,12 @@ export type Database = {
           created_at: string
           file_path: string
           file_size: number | null
+          google_drive_file_id: string | null
+          google_drive_url: string | null
           id: string
           mime_type: string | null
           naam: string
+          synced_from_drive: boolean | null
           type: string | null
           vehicle_id: string
         }
@@ -591,9 +618,12 @@ export type Database = {
           created_at?: string
           file_path: string
           file_size?: number | null
+          google_drive_file_id?: string | null
+          google_drive_url?: string | null
           id?: string
           mime_type?: string | null
           naam: string
+          synced_from_drive?: boolean | null
           type?: string | null
           vehicle_id: string
         }
@@ -601,9 +631,12 @@ export type Database = {
           created_at?: string
           file_path?: string
           file_size?: number | null
+          google_drive_file_id?: string | null
+          google_drive_url?: string | null
           id?: string
           mime_type?: string | null
           naam?: string
+          synced_from_drive?: boolean | null
           type?: string | null
           vehicle_id?: string
         }
@@ -621,6 +654,8 @@ export type Database = {
         Row: {
           created_at: string
           file_path: string
+          google_drive_file_id: string | null
+          google_drive_url: string | null
           id: string
           is_hoofdfoto: boolean | null
           vehicle_id: string
@@ -629,6 +664,8 @@ export type Database = {
         Insert: {
           created_at?: string
           file_path: string
+          google_drive_file_id?: string | null
+          google_drive_url?: string | null
           id?: string
           is_hoofdfoto?: boolean | null
           vehicle_id: string
@@ -637,6 +674,8 @@ export type Database = {
         Update: {
           created_at?: string
           file_path?: string
+          google_drive_file_id?: string | null
+          google_drive_url?: string | null
           id?: string
           is_hoofdfoto?: boolean | null
           vehicle_id?: string
@@ -657,6 +696,9 @@ export type Database = {
           bouwjaar: number | null
           brandstof: string | null
           created_at: string
+          google_drive_folder_id: string | null
+          google_drive_folder_url: string | null
+          google_drive_synced: boolean | null
           id: string
           inkoop_datum: string | null
           inkoopprijs: number | null
@@ -678,6 +720,9 @@ export type Database = {
           bouwjaar?: number | null
           brandstof?: string | null
           created_at?: string
+          google_drive_folder_id?: string | null
+          google_drive_folder_url?: string | null
+          google_drive_synced?: boolean | null
           id?: string
           inkoop_datum?: string | null
           inkoopprijs?: number | null
@@ -699,6 +744,9 @@ export type Database = {
           bouwjaar?: number | null
           brandstof?: string | null
           created_at?: string
+          google_drive_folder_id?: string | null
+          google_drive_folder_url?: string | null
+          google_drive_synced?: boolean | null
           id?: string
           inkoop_datum?: string | null
           inkoopprijs?: number | null
