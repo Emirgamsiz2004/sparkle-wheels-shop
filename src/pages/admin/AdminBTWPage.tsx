@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { formatEuroDecimal, calcBtwMarge } from "@/types/vehicle";
-import { Card, CardContent } from "@/components/ui/card";
 import { Info, Loader2 } from "lucide-react";
 
 const quarters = [
@@ -50,7 +49,7 @@ const AdminBTWPage = () => {
           <h1 className="text-2xl font-bold text-foreground">BTW Overzicht</h1>
           <p className="text-sm text-muted-foreground mt-1">Kwartaaloverzicht margeregeling</p>
         </div>
-        <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="px-3 py-2 text-sm bg-card border border-border text-foreground">
+        <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="px-3 py-2.5 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all">
           <option value={currentYear}>{currentYear}</option>
           <option value={currentYear - 1}>{currentYear - 1}</option>
         </select>
@@ -60,54 +59,50 @@ const AdminBTWPage = () => {
         {quarters.map((q) => {
           const data = getQuarterData(q.months);
           return (
-            <Card key={q.q}>
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-foreground">{q.label}</h3>
-                  <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Deadline: {q.deadline}</span>
+            <div key={q.q} className="bg-card rounded-xl border border-border p-5 hover:border-primary/20 transition-colors duration-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-foreground">{q.label}</h3>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-widest bg-accent/50 px-2 py-0.5 rounded">{q.deadline}</span>
+              </div>
+              <div className="space-y-2.5">
+                <Row label="BTW Ontvangen (marge)" value={formatEuroDecimal(data.btwOntvangen)} />
+                <Row label="BTW Betaald (kosten)" value={formatEuroDecimal(data.btwBetaald)} />
+                <div className="border-t border-border pt-2.5">
+                  <Row label={data.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"} value={formatEuroDecimal(Math.abs(data.teBetalen))} bold color={data.teBetalen < 0} />
                 </div>
-                <div className="space-y-2">
-                  <Row label="BTW Ontvangen (marge)" value={formatEuroDecimal(data.btwOntvangen)} />
-                  <Row label="BTW Betaald (kosten)" value={formatEuroDecimal(data.btwBetaald)} />
-                  <div className="border-t border-border pt-2">
-                    <Row label={data.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"} value={formatEuroDecimal(Math.abs(data.teBetalen))} bold color={data.teBetalen < 0} />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">{data.count} voertuig{data.count !== 1 ? "en" : ""} verkocht</p>
-                </div>
-              </CardContent>
-            </Card>
+                <p className="text-xs text-muted-foreground mt-1">{data.count} voertuig{data.count !== 1 ? "en" : ""} verkocht</p>
+              </div>
+            </div>
           );
         })}
       </div>
 
       {/* Year total */}
-      <Card>
-        <CardContent className="p-5">
-          <h3 className="text-sm font-semibold text-foreground mb-3">Jaaroverzicht {year}</h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Ontvangen</p>
-              <p className="text-lg font-bold text-foreground">{formatEuroDecimal(yearTotal.ontvangen)}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Betaald</p>
-              <p className="text-lg font-bold text-foreground">{formatEuroDecimal(yearTotal.betaald)}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{yearTotal.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
-              <p className={`text-lg font-bold ${yearTotal.teBetalen >= 0 ? "text-red-500" : "text-emerald-500"}`}>
-                {formatEuroDecimal(Math.abs(yearTotal.teBetalen))}
-              </p>
-            </div>
+      <div className="bg-card rounded-xl border border-border p-5">
+        <h3 className="text-sm font-semibold text-foreground mb-4">Jaaroverzicht {year}</h3>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Ontvangen</p>
+            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(yearTotal.ontvangen)}</p>
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Betaald</p>
+            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(yearTotal.betaald)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{yearTotal.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
+            <p className={`text-xl font-bold ${yearTotal.teBetalen >= 0 ? "text-red-400" : "text-emerald-400"}`}>
+              {formatEuroDecimal(Math.abs(yearTotal.teBetalen))}
+            </p>
+          </div>
+        </div>
+      </div>
 
-      <div className="flex items-start gap-2 px-4 py-3 bg-secondary rounded-sm border border-border">
-        <Info className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+      <div className="flex items-start gap-3 px-4 py-3.5 bg-primary/5 rounded-xl border border-primary/10">
+        <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
         <p className="text-xs text-muted-foreground">
           Aangifte doen via <strong className="text-foreground">Mijn Belastingdienst Zakelijk</strong> op{" "}
-          <a href="https://mbd.belastingdienst.nl" target="_blank" rel="noopener noreferrer" className="underline text-foreground">mbd.belastingdienst.nl</a>
+          <a href="https://mbd.belastingdienst.nl" target="_blank" rel="noopener noreferrer" className="underline text-primary hover:text-primary/80">mbd.belastingdienst.nl</a>
         </p>
       </div>
     </div>
@@ -117,7 +112,7 @@ const AdminBTWPage = () => {
 const Row = ({ label, value, bold, color }: { label: string; value: string; bold?: boolean; color?: boolean }) => (
   <div className="flex items-center justify-between">
     <span className={`text-sm ${bold ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{label}</span>
-    <span className={`text-sm ${bold ? "font-bold" : ""} ${color ? "text-emerald-500" : bold ? "text-foreground" : "text-foreground"}`}>{value}</span>
+    <span className={`text-sm ${bold ? "font-bold" : ""} ${color ? "text-emerald-400" : bold ? "text-foreground" : "text-foreground"}`}>{value}</span>
   </div>
 );
 
