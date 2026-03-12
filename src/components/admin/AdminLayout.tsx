@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen } from "lucide-react";
+import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen, Settings } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/logo.svg";
 
@@ -12,6 +12,7 @@ const navItems = [
   { label: "BTW Overzicht", icon: Receipt, path: "/admin/btw" },
   { label: "Moneybird", icon: BookOpen, path: "/admin/moneybird" },
   { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
+  { label: "Instellingen", icon: Settings, path: "/admin/instellingen" },
 ];
 
 const AdminLayout = () => {

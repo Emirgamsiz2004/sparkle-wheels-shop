@@ -3,6 +3,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { formatEuroDecimal, calcKostprijs, calcTotalKosten, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Download } from "lucide-react";
+import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
 const AdminFinancieelPage = () => {
   const { vehicles, loading } = useVehicles();
@@ -66,9 +67,10 @@ const AdminFinancieelPage = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-secondary border-b border-border">
-                    {["Voertuig", "Inkoopdatum", "Verkoopdatum", "Inkoopprijs", "Kosten", "Kostprijs", "Verkoopprijs", "Brutomarge", "BTW", "Nettomarge", "Marge %"].map((h) => (
-                      <th key={h} className="text-left px-4 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest whitespace-nowrap">{h}</th>
-                    ))}
+                     {["Voertuig", "Inkoopdatum", "Verkoopdatum", "Inkoopprijs", "Kosten", "Kostprijs", "Verkoopprijs", "Brutomarge", "BTW", "Nettomarge", "Marge %", "Drive"].map((h) => (
+                       <th key={h} className="text-left px-4 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest whitespace-nowrap">{h}</th>
+                     ))}
+
                   </tr>
                 </thead>
                 <tbody>
@@ -87,6 +89,7 @@ const AdminFinancieelPage = () => {
                         <td className="px-4 py-3 text-muted-foreground">{formatEuroDecimal(calcBtwMarge(v))}</td>
                         <td className={`px-4 py-3 font-medium ${netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(netto)}</td>
                         <td className={`px-4 py-3 ${netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{calcMarge(v).toFixed(1)}%</td>
+                        <td className="px-4 py-3"><GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} /></td>
                       </tr>
                     );
                   })}
@@ -99,7 +102,8 @@ const AdminFinancieelPage = () => {
                     <td className={`px-4 py-3 ${totals.bruto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(totals.bruto)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{formatEuroDecimal(totals.btw)}</td>
                     <td className={`px-4 py-3 ${totals.netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(totals.netto)}</td>
-                    <td className="px-4 py-3">—</td>
+                     <td className="px-4 py-3">—</td>
+                     <td className="px-4 py-3">—</td>
                   </tr>
                 </tbody>
               </table>

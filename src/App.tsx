@@ -24,6 +24,7 @@ import AdminFinancieelPage from "./pages/admin/AdminFinancieelPage";
 import AdminBTWPage from "./pages/admin/AdminBTWPage";
 import DealAnalyzer from "./pages/DealAnalyzer";
 import AdminMoneybirdPage from "./pages/admin/AdminMoneybirdPage";
+import AdminInstellingenPage from "./pages/admin/AdminInstellingenPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="financieel" element={<AdminFinancieelPage />} />
                 <Route path="btw" element={<AdminBTWPage />} />
                 <Route path="moneybird" element={<AdminMoneybirdPage />} />
+                <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
@@ -79,6 +81,7 @@ const App = () => (
                 <Route path="financieel" element={<AdminFinancieelPage />} />
               <Route path="btw" element={<AdminBTWPage />} />
                 <Route path="moneybird" element={<AdminMoneybirdPage />} />
+                <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<NotFound />} />

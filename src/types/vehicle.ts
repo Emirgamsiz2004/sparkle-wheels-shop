@@ -27,6 +27,9 @@ export interface Vehicle {
   koperNaam?: string;
   koperEmail?: string;
   koperTelefoon?: string;
+  googleDriveFolderId?: string | null;
+  googleDriveFolderUrl?: string | null;
+  googleDriveSynced?: boolean;
 }
 
 export const calcKostprijs = (vehicle: Vehicle): number => {

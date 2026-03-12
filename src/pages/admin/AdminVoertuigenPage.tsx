@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Plus, Search, Loader2, Eye } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, statusLabels, statusColors } from "@/types/vehicle";
 import { Card, CardContent } from "@/components/ui/card";
+import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
 const tabs: { label: string; value: string }[] = [
   { label: "Alle", value: "alle" },
@@ -84,7 +85,7 @@ const AdminVoertuigenPage = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-secondary border-b border-border">
-                    {["Voertuig", "Kenteken", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Actie"].map((h, i) => (
+                     {["Voertuig", "Kenteken", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive", "Actie"].map((h, i) => (
                       <th key={h} className={`${i >= 2 && i <= 4 ? "text-right" : i >= 5 ? "text-center" : "text-left"} px-5 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest`}>{h}</th>
                     ))}
                   </tr>
@@ -108,6 +109,9 @@ const AdminVoertuigenPage = () => {
                         </td>
                         <td className="px-5 py-3 text-center">
                           <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded border ${statusColors[v.status]}`}>{statusLabels[v.status]}</span>
+                        </td>
+                        <td className="px-5 py-3 text-center">
+                          <GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} />
                         </td>
                         <td className="px-5 py-3 text-center">
                           <Link to={`/admin/voertuigen/${v.id}`} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
