@@ -172,9 +172,10 @@ export function useVehicles() {
     } as any).eq('id', vehicleId);
   };
 
-  const removeCost = async (costId: string) => {
+  const removeCost = async (costId: string, vehicleId?: string) => {
     const { error } = await supabase.from('vehicle_costs').delete().eq('id', costId);
     if (error) { toast.error('Fout bij verwijderen kosten'); return; }
+    if (vehicleId) await recalcVehicleCosts(vehicleId);
     fetchVehicles();
   };
 
