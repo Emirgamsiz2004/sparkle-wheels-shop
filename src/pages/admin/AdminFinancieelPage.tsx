@@ -3,6 +3,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { formatEuroDecimal, calcKostprijs, calcTotalKosten, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Download } from "lucide-react";
+import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
 const AdminFinancieelPage = () => {
   const { vehicles, loading } = useVehicles();
