@@ -9,11 +9,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface Photo {
-  id: string;
-  file_path: string;
-  is_hoofdfoto: boolean | null;
-  volgorde: number | null;
-  created_at: string;
+  id: string; file_path: string; is_hoofdfoto: boolean | null; volgorde: number | null; created_at: string;
 }
 
 const BUCKET = "vehicle-photos";
@@ -26,92 +22,73 @@ const VehicleFotosTab = ({ vehicleId }: { vehicleId: string }) => {
 
   const fetchPhotos = async () => {
     const { data } = await supabase.from("vehicle_photos").select("*").eq("vehicle_id", vehicleId).order("volgorde", { ascending: true });
-    setPhotos((data as Photo[]) || []);
-    setLoading(false);
+    setPhotos((data as Photo[]) || []); setLoading(false);
   };
 
   useEffect(() => { fetchPhotos(); }, [vehicleId]);
 
-  const getPublicUrl = (path: string) => {
-    const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
-    return data.publicUrl;
-  };
+  const getPublicUrl = (path: string) => supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 
   const handleUpload = async (files: FileList | null) => {
     if (!files) return;
     setUploading(true);
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const ext = file.name.split(".").pop();
+      const file = files[i]; const ext = file.name.split(".").pop();
       const path = `${vehicleId}/${Date.now()}-${i}.${ext}`;
       const { error: storageError } = await supabase.storage.from(BUCKET).upload(path, file);
       if (storageError) { toast.error(`Upload mislukt: ${file.name}`); continue; }
-      await supabase.from("vehicle_photos").insert({
-        vehicle_id: vehicleId,
-        file_path: path,
-        volgorde: photos.length + i,
-        is_hoofdfoto: photos.length === 0 && i === 0,
-      } as any);
+      await supabase.from("vehicle_photos").insert({ vehicle_id: vehicleId, file_path: path, volgorde: photos.length + i, is_hoofdfoto: photos.length === 0 && i === 0 } as any);
     }
-    toast.success("Foto's geüpload");
-    setUploading(false);
-    fetchPhotos();
+    toast.success("Foto's geüpload"); setUploading(false); fetchPhotos();
   };
 
   const setHoofd = async (photoId: string) => {
     await supabase.from("vehicle_photos").update({ is_hoofdfoto: false } as any).eq("vehicle_id", vehicleId);
     await supabase.from("vehicle_photos").update({ is_hoofdfoto: true } as any).eq("id", photoId);
-    toast.success("Hoofdfoto ingesteld");
-    fetchPhotos();
+    toast.success("Hoofdfoto ingesteld"); fetchPhotos();
   };
 
   const handleDelete = async (photo: Photo) => {
     await supabase.storage.from(BUCKET).remove([photo.file_path]);
     await supabase.from("vehicle_photos").delete().eq("id", photo.id);
-    toast.success("Foto verwijderd");
-    fetchPhotos();
+    toast.success("Foto verwijderd"); fetchPhotos();
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#1F3864] text-white text-sm font-medium rounded-lg hover:bg-[#172d52] cursor-pointer">
+        <label className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background text-sm font-medium hover:bg-foreground/90 cursor-pointer">
           {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           Foto's Uploaden
           <input type="file" accept="image/*" multiple onChange={(e) => handleUpload(e.target.files)} className="hidden" />
         </label>
       </div>
 
-      <Card className="bg-white border-gray-200 shadow-sm">
+      <Card>
         <CardContent className="p-6">
           {loading ? (
-            <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
+            <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
           ) : photos.length === 0 ? (
-            <div className="text-center py-12 text-sm text-gray-400">Nog geen foto's geüpload.</div>
+            <div className="text-center py-12 text-sm text-muted-foreground">Nog geen foto's geüpload.</div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {photos.map((photo) => (
-                <div key={photo.id} className="relative group aspect-square rounded-lg overflow-hidden bg-gray-100">
-                  <img
-                    src={getPublicUrl(photo.file_path)}
-                    alt="Voertuig foto"
-                    className="w-full h-full object-cover cursor-pointer"
-                    onClick={() => setLightbox(getPublicUrl(photo.file_path))}
-                  />
+                <div key={photo.id} className="relative group aspect-square overflow-hidden bg-secondary">
+                  <img src={getPublicUrl(photo.file_path)} alt="Voertuig foto" className="w-full h-full object-cover cursor-pointer" onClick={() => setLightbox(getPublicUrl(photo.file_path))} />
                   {photo.is_hoofdfoto && (
-                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 bg-[#C9A84C] text-white text-[10px] font-bold rounded uppercase">
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 bg-foreground text-background text-[10px] font-bold uppercase tracking-wider">
                       <Star className="w-3 h-3" /> Hoofdfoto
                     </span>
                   )}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3 gap-2">
                     {!photo.is_hoofdfoto && (
-                      <button onClick={() => setHoofd(photo.id)} className="px-2 py-1 bg-white text-gray-900 text-xs font-medium rounded hover:bg-gray-100">
+                      <button onClick={() => setHoofd(photo.id)} className="px-2 py-1 bg-foreground text-background text-xs font-medium hover:bg-foreground/90">
                         <Star className="w-3 h-3 inline mr-1" />Hoofdfoto
                       </button>
                     )}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <button className="px-2 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700">
+                        <button className="px-2 py-1 bg-red-600 text-white text-xs font-medium hover:bg-red-700">
                           <Trash2 className="w-3 h-3 inline mr-1" />Verwijder
                         </button>
                       </AlertDialogTrigger>
@@ -134,10 +111,9 @@ const VehicleFotosTab = ({ vehicleId }: { vehicleId: string }) => {
         </CardContent>
       </Card>
 
-      {/* Lightbox */}
       {lightbox && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
-          <button className="absolute top-4 right-4 text-white hover:text-gray-300"><X className="w-6 h-6" /></button>
+          <button className="absolute top-4 right-4 text-foreground hover:text-muted-foreground"><X className="w-6 h-6" /></button>
           <img src={lightbox} alt="Foto" className="max-w-full max-h-[90vh] object-contain" onClick={(e) => e.stopPropagation()} />
         </div>
       )}

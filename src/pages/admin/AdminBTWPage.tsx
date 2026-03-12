@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
-import { formatEuroDecimal, calcBtwMarge, Vehicle } from "@/types/vehicle";
+import { formatEuroDecimal, calcBtwMarge } from "@/types/vehicle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Info, Loader2 } from "lucide-react";
 
@@ -22,50 +22,35 @@ const AdminBTWPage = () => {
   });
 
   const getQuarterData = (months: number[]) => {
-    const qVehicles = verkocht.filter((v) => {
-      const month = new Date(v.verkoopDatum!).getMonth();
-      return months.includes(month);
-    });
-
+    const qVehicles = verkocht.filter((v) => months.includes(new Date(v.verkoopDatum!).getMonth()));
     const btwOntvangen = qVehicles.reduce((s, v) => s + calcBtwMarge(v), 0);
-
-    // BTW betaald on costs within this quarter
     const btwBetaald = qVehicles.reduce((s, v) => {
       return s + v.kosten.reduce((cs, k) => {
         if (k.date) {
           const m = new Date(k.date).getMonth();
-          if (months.includes(m) && new Date(k.date).getFullYear() === year) {
-            return cs + k.amount * ((k.btwPercentage || 21) / 100);
-          }
+          if (months.includes(m) && new Date(k.date).getFullYear() === year) return cs + k.amount * ((k.btwPercentage || 21) / 100);
         }
         return cs;
       }, 0);
     }, 0);
-
     return { btwOntvangen, btwBetaald, teBetalen: btwOntvangen - btwBetaald, count: qVehicles.length };
   };
 
   const yearTotal = quarters.reduce((acc, q) => {
     const d = getQuarterData(q.months);
-    return {
-      ontvangen: acc.ontvangen + d.btwOntvangen,
-      betaald: acc.betaald + d.btwBetaald,
-      teBetalen: acc.teBetalen + d.teBetalen,
-    };
+    return { ontvangen: acc.ontvangen + d.btwOntvangen, betaald: acc.betaald + d.btwBetaald, teBetalen: acc.teBetalen + d.teBetalen };
   }, { ontvangen: 0, betaald: 0, teBetalen: 0 });
 
-  if (loading) {
-    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>;
-  }
+  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">BTW Overzicht</h1>
-          <p className="text-sm text-gray-500 mt-1">Kwartaaloverzicht margeregeling</p>
+          <h1 className="text-2xl font-bold text-foreground">BTW Overzicht</h1>
+          <p className="text-sm text-muted-foreground mt-1">Kwartaaloverzicht margeregeling</p>
         </div>
-        <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg">
+        <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="px-3 py-2 text-sm bg-card border border-border text-foreground">
           <option value={currentYear}>{currentYear}</option>
           <option value={currentYear - 1}>{currentYear - 1}</option>
         </select>
@@ -75,24 +60,19 @@ const AdminBTWPage = () => {
         {quarters.map((q) => {
           const data = getQuarterData(q.months);
           return (
-            <Card key={q.q} className="bg-white border-gray-200 shadow-sm">
+            <Card key={q.q}>
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-gray-900">{q.label}</h3>
-                  <span className="text-[10px] text-gray-400 uppercase">Deadline: {q.deadline}</span>
+                  <h3 className="text-sm font-semibold text-foreground">{q.label}</h3>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Deadline: {q.deadline}</span>
                 </div>
                 <div className="space-y-2">
                   <Row label="BTW Ontvangen (marge)" value={formatEuroDecimal(data.btwOntvangen)} />
                   <Row label="BTW Betaald (kosten)" value={formatEuroDecimal(data.btwBetaald)} />
-                  <div className="border-t border-gray-100 pt-2">
-                    <Row
-                      label={data.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}
-                      value={formatEuroDecimal(Math.abs(data.teBetalen))}
-                      bold
-                      color={data.teBetalen < 0}
-                    />
+                  <div className="border-t border-border pt-2">
+                    <Row label={data.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"} value={formatEuroDecimal(Math.abs(data.teBetalen))} bold color={data.teBetalen < 0} />
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">{data.count} voertuig{data.count !== 1 ? "en" : ""} verkocht</p>
+                  <p className="text-xs text-muted-foreground mt-1">{data.count} voertuig{data.count !== 1 ? "en" : ""} verkocht</p>
                 </div>
               </CardContent>
             </Card>
@@ -101,21 +81,21 @@ const AdminBTWPage = () => {
       </div>
 
       {/* Year total */}
-      <Card className="bg-white border-gray-200 shadow-sm">
+      <Card>
         <CardContent className="p-5">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Jaaroverzicht {year}</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-3">Jaaroverzicht {year}</h3>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className="text-xs text-gray-500 uppercase mb-1">BTW Ontvangen</p>
-              <p className="text-lg font-bold text-gray-900">{formatEuroDecimal(yearTotal.ontvangen)}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Ontvangen</p>
+              <p className="text-lg font-bold text-foreground">{formatEuroDecimal(yearTotal.ontvangen)}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase mb-1">BTW Betaald</p>
-              <p className="text-lg font-bold text-gray-900">{formatEuroDecimal(yearTotal.betaald)}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Betaald</p>
+              <p className="text-lg font-bold text-foreground">{formatEuroDecimal(yearTotal.betaald)}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase mb-1">{yearTotal.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
-              <p className={`text-lg font-bold ${yearTotal.teBetalen >= 0 ? "text-red-600" : "text-emerald-600"}`}>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{yearTotal.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
+              <p className={`text-lg font-bold ${yearTotal.teBetalen >= 0 ? "text-red-500" : "text-emerald-500"}`}>
                 {formatEuroDecimal(Math.abs(yearTotal.teBetalen))}
               </p>
             </div>
@@ -123,11 +103,11 @@ const AdminBTWPage = () => {
         </CardContent>
       </Card>
 
-      <div className="flex items-start gap-2 px-4 py-3 bg-blue-50 rounded-lg border border-blue-100">
-        <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-        <p className="text-xs text-blue-700">
-          Aangifte doen via <strong>Mijn Belastingdienst Zakelijk</strong> op{" "}
-          <a href="https://mbd.belastingdienst.nl" target="_blank" rel="noopener noreferrer" className="underline">mbd.belastingdienst.nl</a>
+      <div className="flex items-start gap-2 px-4 py-3 bg-secondary rounded-sm border border-border">
+        <Info className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+        <p className="text-xs text-muted-foreground">
+          Aangifte doen via <strong className="text-foreground">Mijn Belastingdienst Zakelijk</strong> op{" "}
+          <a href="https://mbd.belastingdienst.nl" target="_blank" rel="noopener noreferrer" className="underline text-foreground">mbd.belastingdienst.nl</a>
         </p>
       </div>
     </div>
@@ -136,8 +116,8 @@ const AdminBTWPage = () => {
 
 const Row = ({ label, value, bold, color }: { label: string; value: string; bold?: boolean; color?: boolean }) => (
   <div className="flex items-center justify-between">
-    <span className={`text-sm ${bold ? "font-semibold text-gray-900" : "text-gray-500"}`}>{label}</span>
-    <span className={`text-sm ${bold ? "font-bold" : ""} ${color ? "text-emerald-600" : bold ? "text-gray-900" : "text-gray-700"}`}>{value}</span>
+    <span className={`text-sm ${bold ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{label}</span>
+    <span className={`text-sm ${bold ? "font-bold" : ""} ${color ? "text-emerald-500" : bold ? "text-foreground" : "text-foreground"}`}>{value}</span>
   </div>
 );
 
