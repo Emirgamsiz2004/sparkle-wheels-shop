@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X } from "lucide-react";
+import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/logo.svg";
 
@@ -10,6 +10,7 @@ const navItems = [
   { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
   { label: "Financieel", icon: Wallet, path: "/admin/financieel" },
   { label: "BTW Overzicht", icon: Receipt, path: "/admin/btw" },
+  { label: "Moneybird", icon: BookOpen, path: "/admin/moneybird" },
   { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
 ];
 

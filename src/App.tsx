@@ -23,6 +23,7 @@ import AdminVoertuigDetailPage from "./pages/admin/AdminVoertuigDetailPage";
 import AdminFinancieelPage from "./pages/admin/AdminFinancieelPage";
 import AdminBTWPage from "./pages/admin/AdminBTWPage";
 import DealAnalyzer from "./pages/DealAnalyzer";
+import AdminMoneybirdPage from "./pages/admin/AdminMoneybirdPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
