@@ -33,7 +33,15 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
     date: c.date,
     invoiceRef: c.invoice_ref || undefined,
     btwPercentage: Number(c.btw_percentage) || 21,
+    leverancier: c.leverancier || undefined,
+    filePath: c.file_path || undefined,
+    fileName: c.file_name || undefined,
+    moneybirdId: c.moneybird_id || undefined,
+    moneybirdSyncedAt: c.moneybird_synced_at || undefined,
   })),
+  betaalmethode: row.betaalmethode || undefined,
+  totaleKosten: Number(row.totale_kosten) || 0,
+  kostprijsCalc: Number(row.kostprijs) || 0,
 });
 
 export function useVehicles() {
