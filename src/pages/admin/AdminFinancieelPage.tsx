@@ -89,6 +89,7 @@ const AdminFinancieelPage = () => {
                         <td className="px-4 py-3 text-muted-foreground">{formatEuroDecimal(calcBtwMarge(v))}</td>
                         <td className={`px-4 py-3 font-medium ${netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(netto)}</td>
                         <td className={`px-4 py-3 ${netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{calcMarge(v).toFixed(1)}%</td>
+                        <td className="px-4 py-3"><GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} /></td>
                       </tr>
                     );
                   })}
