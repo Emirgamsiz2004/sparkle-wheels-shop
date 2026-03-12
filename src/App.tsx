@@ -23,6 +23,7 @@ import AdminVoertuigDetailPage from "./pages/admin/AdminVoertuigDetailPage";
 import AdminFinancieelPage from "./pages/admin/AdminFinancieelPage";
 import AdminBTWPage from "./pages/admin/AdminBTWPage";
 import DealAnalyzer from "./pages/DealAnalyzer";
+import AdminMoneybirdPage from "./pages/admin/AdminMoneybirdPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
@@ -51,6 +52,7 @@ const App = () => (
                 <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
                 <Route path="financieel" element={<AdminFinancieelPage />} />
                 <Route path="btw" element={<AdminBTWPage />} />
+                <Route path="moneybird" element={<AdminMoneybirdPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
@@ -75,7 +77,8 @@ const App = () => (
                 <Route path="voertuigen/nieuw" element={<AdminVoertuigNieuwPage />} />
                 <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
                 <Route path="financieel" element={<AdminFinancieelPage />} />
-                <Route path="btw" element={<AdminBTWPage />} />
+              <Route path="btw" element={<AdminBTWPage />} />
+                <Route path="moneybird" element={<AdminMoneybirdPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<NotFound />} />

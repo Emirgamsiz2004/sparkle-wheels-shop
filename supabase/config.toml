@@ -12,3 +12,6 @@ verify_jwt = false
 [functions.firecrawl-search]
 verify_jwt = false
 
+[functions.moneybird]
+verify_jwt = false
+
