@@ -52,6 +52,7 @@ const App = () => (
                 <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
                 <Route path="financieel" element={<AdminFinancieelPage />} />
                 <Route path="btw" element={<AdminBTWPage />} />
+                <Route path="moneybird" element={<AdminMoneybirdPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
