@@ -24,6 +24,7 @@ import AdminFinancieelPage from "./pages/admin/AdminFinancieelPage";
 import AdminBTWPage from "./pages/admin/AdminBTWPage";
 import DealAnalyzer from "./pages/DealAnalyzer";
 import AdminMoneybirdPage from "./pages/admin/AdminMoneybirdPage";
+import AdminInkoopPage from "./pages/admin/AdminInkoopPage";
 import AdminInstellingenPage from "./pages/admin/AdminInstellingenPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
@@ -49,6 +50,7 @@ const App = () => (
                 <Route index element={<AdminDashboardPage />} />
                 <Route path="dashboard" element={<AdminDashboardPage />} />
                 <Route path="voertuigen" element={<AdminVoertuigenPage />} />
+                <Route path="inkoop" element={<AdminInkoopPage />} />
                 <Route path="voertuigen/nieuw" element={<AdminVoertuigNieuwPage />} />
                 <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
                 <Route path="financieel" element={<AdminFinancieelPage />} />
@@ -76,6 +78,7 @@ const App = () => (
                 <Route index element={<AdminDashboardPage />} />
                 <Route path="dashboard" element={<AdminDashboardPage />} />
                 <Route path="voertuigen" element={<AdminVoertuigenPage />} />
+                <Route path="inkoop" element={<AdminInkoopPage />} />
                 <Route path="voertuigen/nieuw" element={<AdminVoertuigNieuwPage />} />
                 <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
                 <Route path="financieel" element={<AdminFinancieelPage />} />

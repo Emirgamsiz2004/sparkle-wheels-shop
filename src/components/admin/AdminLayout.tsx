@@ -1,13 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen, Settings } from "lucide-react";
+import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen, Settings, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/logo.svg";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
   { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
+  { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
   { label: "Financieel", icon: Wallet, path: "/admin/financieel" },
   { label: "BTW Overzicht", icon: Receipt, path: "/admin/btw" },
   { label: "Moneybird", icon: BookOpen, path: "/admin/moneybird" },

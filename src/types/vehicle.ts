@@ -181,9 +181,9 @@ export const interesseLabels: Record<InkoopCandidate['interesseStatus'], string>
 };
 
 export const interesseColors: Record<InkoopCandidate['interesseStatus'], string> = {
-  nieuw: 'bg-blue-100 text-blue-700 border-blue-200',
-  interessant: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  bod_gedaan: 'bg-amber-100 text-amber-700 border-amber-200',
-  afgewezen: 'bg-red-100 text-red-700 border-red-200',
-  ingekocht: 'bg-purple-100 text-purple-700 border-purple-200',
+  nieuw: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  interessant: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  bod_gedaan: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  afgewezen: 'bg-red-500/15 text-red-400 border-red-500/30',
+  ingekocht: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
 };
