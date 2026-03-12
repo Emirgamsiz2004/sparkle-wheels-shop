@@ -21,7 +21,7 @@ const AdminLogin = () => {
     if (error) {
       toast.error("Ongeldige inloggegevens");
     } else {
-      navigate("/admin");
+      navigate("/admin/dashboard");
     }
     setLoading(false);
   };
