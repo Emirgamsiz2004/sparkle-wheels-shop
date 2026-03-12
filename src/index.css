@@ -6,6 +6,7 @@
 
 @layer base {
   :root {
+    /* Public website — pure black monochrome */
     --background: 0 0% 3%;
     --foreground: 0 0% 95%;
 
@@ -44,6 +45,48 @@
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 13%;
     --sidebar-ring: 0 0% 50%;
+  }
+
+  /* Admin panel — warm anthracite palette */
+  .admin-theme {
+    --background: 220 6% 10%;
+    --foreground: 220 10% 92%;
+
+    --card: 220 6% 13%;
+    --card-foreground: 220 10% 92%;
+
+    --popover: 220 6% 13%;
+    --popover-foreground: 220 10% 92%;
+
+    --primary: 220 60% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 5% 17%;
+    --secondary-foreground: 220 10% 75%;
+
+    --muted: 220 5% 20%;
+    --muted-foreground: 220 5% 55%;
+
+    --accent: 220 6% 22%;
+    --accent-foreground: 220 10% 92%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 5% 18%;
+    --input: 220 5% 18%;
+    --ring: 220 60% 55%;
+
+    --radius: 0.625rem;
+
+    --sidebar-background: 220 6% 8%;
+    --sidebar-foreground: 220 10% 92%;
+    --sidebar-primary: 220 60% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 6% 14%;
+    --sidebar-accent-foreground: 220 10% 92%;
+    --sidebar-border: 220 5% 15%;
+    --sidebar-ring: 220 60% 55%;
   }
 }
 
@@ -84,20 +127,20 @@
 
   /* Admin panel utilities */
   .profit-positive {
-    color: hsl(152 55% 42%);
+    color: hsl(152 55% 48%);
   }
   .profit-negative {
-    color: hsl(0 65% 50%);
+    color: hsl(0 65% 55%);
   }
   .badge-profit {
-    background: hsl(152 55% 42% / 0.12);
-    color: hsl(152 55% 42%);
-    border: 1px solid hsl(152 55% 42% / 0.25);
+    background: hsl(152 55% 48% / 0.12);
+    color: hsl(152 55% 48%);
+    border: 1px solid hsl(152 55% 48% / 0.25);
   }
   .badge-loss {
-    background: hsl(0 65% 50% / 0.12);
-    color: hsl(0 65% 50%);
-    border: 1px solid hsl(0 65% 50% / 0.25);
+    background: hsl(0 65% 55% / 0.12);
+    color: hsl(0 65% 55%);
+    border: 1px solid hsl(0 65% 55% / 0.25);
   }
 
 }

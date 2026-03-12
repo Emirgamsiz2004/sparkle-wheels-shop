@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { formatEuroDecimal, calcKostprijs, calcTotalKosten, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge } from "@/types/vehicle";
-import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Download } from "lucide-react";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
@@ -47,70 +46,67 @@ const AdminFinancieelPage = () => {
           <p className="text-sm text-muted-foreground mt-1">Overzicht van alle verkochte voertuigen</p>
         </div>
         <div className="flex items-center gap-3">
-          <select value={yearFilter} onChange={(e) => setYearFilter(e.target.value)} className="px-3 py-2 text-sm bg-card border border-border text-foreground">
+          <select value={yearFilter} onChange={(e) => setYearFilter(e.target.value)} className="px-3 py-2.5 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all">
             <option value="alle">Alle jaren</option>
             <option value={String(currentYear)}>{currentYear}</option>
             <option value={String(currentYear - 1)}>{currentYear - 1}</option>
           </select>
-          <button onClick={exportExcel} className="inline-flex items-center gap-2 px-4 py-2 bg-card text-foreground text-sm font-medium border border-border hover:bg-secondary">
+          <button onClick={exportExcel} className="inline-flex items-center gap-2 px-4 py-2.5 bg-card text-foreground text-sm font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors">
             <Download className="w-4 h-4" /> Exporteer CSV
           </button>
         </div>
       </div>
 
-      <Card className="overflow-hidden">
-        <CardContent className="p-0">
-          {filtered.length === 0 ? (
-            <div className="px-6 py-16 text-center text-sm text-muted-foreground">Nog geen verkochte voertuigen in deze periode.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-secondary border-b border-border">
-                     {["Voertuig", "Inkoopdatum", "Verkoopdatum", "Inkoopprijs", "Kosten", "Kostprijs", "Verkoopprijs", "Brutomarge", "BTW", "Nettomarge", "Marge %", "Drive"].map((h) => (
-                       <th key={h} className="text-left px-4 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest whitespace-nowrap">{h}</th>
-                     ))}
-
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((v) => {
-                    const netto = calcNettoMarge(v);
-                    return (
-                      <tr key={v.id} className="border-b border-border hover:bg-secondary/50">
-                        <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">{v.merk} {v.model} ({v.bouwjaar})</td>
-                        <td className="px-4 py-3 text-muted-foreground">{v.inkoopDatum ? new Date(v.inkoopDatum).toLocaleDateString("nl-NL") : "—"}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{v.verkoopDatum ? new Date(v.verkoopDatum).toLocaleDateString("nl-NL") : "—"}</td>
-                        <td className="px-4 py-3 text-foreground">{formatEuroDecimal(v.inkoopprijs)}</td>
-                        <td className="px-4 py-3 text-foreground">{formatEuroDecimal(calcTotalKosten(v))}</td>
-                        <td className="px-4 py-3 text-foreground font-medium">{formatEuroDecimal(calcKostprijs(v))}</td>
-                        <td className="px-4 py-3 text-foreground">{formatEuroDecimal(v.verkoopprijs)}</td>
-                        <td className={`px-4 py-3 font-medium ${calcWinst(v) >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(calcWinst(v))}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{formatEuroDecimal(calcBtwMarge(v))}</td>
-                        <td className={`px-4 py-3 font-medium ${netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(netto)}</td>
-                        <td className={`px-4 py-3 ${netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{calcMarge(v).toFixed(1)}%</td>
-                        <td className="px-4 py-3"><GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} /></td>
-                      </tr>
-                    );
-                  })}
-                  <tr className="bg-secondary border-t-2 border-border font-bold">
-                    <td className="px-4 py-3 text-foreground" colSpan={3}>Totaal</td>
-                    <td className="px-4 py-3 text-foreground">{formatEuroDecimal(totals.inkoop)}</td>
-                    <td className="px-4 py-3 text-foreground">{formatEuroDecimal(totals.kosten)}</td>
-                    <td className="px-4 py-3 text-foreground">{formatEuroDecimal(totals.kostprijs)}</td>
-                    <td className="px-4 py-3 text-foreground">{formatEuroDecimal(totals.verkoop)}</td>
-                    <td className={`px-4 py-3 ${totals.bruto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(totals.bruto)}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{formatEuroDecimal(totals.btw)}</td>
-                    <td className={`px-4 py-3 ${totals.netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(totals.netto)}</td>
-                     <td className="px-4 py-3">—</td>
-                     <td className="px-4 py-3">—</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
+        {filtered.length === 0 ? (
+          <div className="px-6 py-16 text-center text-sm text-muted-foreground">Nog geen verkochte voertuigen in deze periode.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-accent/20">
+                  {["Voertuig", "Inkoopdatum", "Verkoopdatum", "Inkoopprijs", "Kosten", "Kostprijs", "Verkoopprijs", "Brutomarge", "BTW", "Nettomarge", "Marge %", "Drive"].map((h) => (
+                    <th key={h} className="text-left px-4 py-3.5 text-[10px] font-medium text-muted-foreground uppercase tracking-widest whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((v) => {
+                  const netto = calcNettoMarge(v);
+                  return (
+                    <tr key={v.id} className="border-b border-border/50 hover:bg-accent/20 transition-colors">
+                      <td className="px-4 py-3.5 font-medium text-foreground whitespace-nowrap">{v.merk} {v.model} ({v.bouwjaar})</td>
+                      <td className="px-4 py-3.5 text-muted-foreground">{v.inkoopDatum ? new Date(v.inkoopDatum).toLocaleDateString("nl-NL") : "—"}</td>
+                      <td className="px-4 py-3.5 text-muted-foreground">{v.verkoopDatum ? new Date(v.verkoopDatum).toLocaleDateString("nl-NL") : "—"}</td>
+                      <td className="px-4 py-3.5 text-foreground">{formatEuroDecimal(v.inkoopprijs)}</td>
+                      <td className="px-4 py-3.5 text-foreground">{formatEuroDecimal(calcTotalKosten(v))}</td>
+                      <td className="px-4 py-3.5 text-foreground font-medium">{formatEuroDecimal(calcKostprijs(v))}</td>
+                      <td className="px-4 py-3.5 text-foreground">{formatEuroDecimal(v.verkoopprijs)}</td>
+                      <td className={`px-4 py-3.5 font-medium ${calcWinst(v) >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatEuroDecimal(calcWinst(v))}</td>
+                      <td className="px-4 py-3.5 text-muted-foreground">{formatEuroDecimal(calcBtwMarge(v))}</td>
+                      <td className={`px-4 py-3.5 font-medium ${netto >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatEuroDecimal(netto)}</td>
+                      <td className={`px-4 py-3.5 ${netto >= 0 ? "text-emerald-400" : "text-red-400"}`}>{calcMarge(v).toFixed(1)}%</td>
+                      <td className="px-4 py-3.5"><GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} /></td>
+                    </tr>
+                  );
+                })}
+                <tr className="bg-accent/30 border-t-2 border-border font-bold">
+                  <td className="px-4 py-3.5 text-foreground" colSpan={3}>Totaal</td>
+                  <td className="px-4 py-3.5 text-foreground">{formatEuroDecimal(totals.inkoop)}</td>
+                  <td className="px-4 py-3.5 text-foreground">{formatEuroDecimal(totals.kosten)}</td>
+                  <td className="px-4 py-3.5 text-foreground">{formatEuroDecimal(totals.kostprijs)}</td>
+                  <td className="px-4 py-3.5 text-foreground">{formatEuroDecimal(totals.verkoop)}</td>
+                  <td className={`px-4 py-3.5 ${totals.bruto >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatEuroDecimal(totals.bruto)}</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">{formatEuroDecimal(totals.btw)}</td>
+                  <td className={`px-4 py-3.5 ${totals.netto >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatEuroDecimal(totals.netto)}</td>
+                  <td className="px-4 py-3.5">—</td>
+                  <td className="px-4 py-3.5">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
