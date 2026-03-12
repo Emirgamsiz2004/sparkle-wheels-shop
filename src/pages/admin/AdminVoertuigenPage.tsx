@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Plus, Search, Loader2, Eye } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, statusLabels, statusColors } from "@/types/vehicle";
 import { Card, CardContent } from "@/components/ui/card";
+import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
 const tabs: { label: string; value: string }[] = [
   { label: "Alle", value: "alle" },
