@@ -85,7 +85,7 @@ const AdminVoertuigenPage = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-secondary border-b border-border">
-                    {["Voertuig", "Kenteken", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Actie"].map((h, i) => (
+                     {["Voertuig", "Kenteken", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive", "Actie"].map((h, i) => (
                       <th key={h} className={`${i >= 2 && i <= 4 ? "text-right" : i >= 5 ? "text-center" : "text-left"} px-5 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest`}>{h}</th>
                     ))}
                   </tr>
