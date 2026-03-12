@@ -56,21 +56,21 @@ const AdminDashboardPage = () => {
       <div className="flex flex-wrap gap-3">
         <Link
           to="/admin/voertuigen/nieuw"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors"
         >
-          <Plus className="w-4 h-4" /> Nieuwe Auto Toevoegen
+          <Plus className="w-3.5 h-3.5" /> Nieuwe Auto Toevoegen
         </Link>
         <Link
           to="/admin/financieel"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-card text-foreground text-sm font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
         >
-          <Wallet className="w-4 h-4" /> Kosten Overzicht
+          <Wallet className="w-3.5 h-3.5" /> Kosten Overzicht
         </Link>
         <Link
           to="/admin/btw"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-card text-foreground text-sm font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
         >
-          <Receipt className="w-4 h-4" /> BTW Overzicht
+          <Receipt className="w-3.5 h-3.5" /> BTW Overzicht
         </Link>
       </div>
 

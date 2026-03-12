@@ -58,8 +58,8 @@ const VehicleFotosTab = ({ vehicleId }: { vehicleId: string }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <label className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background text-sm font-medium hover:bg-foreground/90 cursor-pointer">
-          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+        <label className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 cursor-pointer transition-colors">
+          {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
           Foto's Uploaden
           <input type="file" accept="image/*" multiple onChange={(e) => handleUpload(e.target.files)} className="hidden" />
         </label>
