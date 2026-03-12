@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Download, Trash2, FileText, Loader2 } from "lucide-react";
+import { Plus, Download, Trash2, FileText, Loader2, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -11,6 +12,7 @@ import {
 
 interface Doc {
   id: string; naam: string; type: string | null; file_path: string; file_size: number | null; mime_type: string | null; created_at: string;
+  google_drive_file_id: string | null; google_drive_url: string | null; synced_from_drive: boolean | null;
 }
 
 const docTypes = ["Inkoopverklaring", "Verkoopovereenkomst", "Kentekenbewijs", "Carpass", "Factuur", "Overig"];
@@ -37,7 +39,7 @@ const VehicleDocumentenTab = ({ vehicleId }: { vehicleId: string }) => {
     const { error: storageError } = await supabase.storage.from("vehicle-documents").upload(path, form.file);
     if (storageError) { toast.error("Upload mislukt"); setUploading(false); return; }
     const { error } = await supabase.from("vehicle_documents").insert({ vehicle_id: vehicleId, naam: form.naam, type: form.type, file_path: path, file_size: form.file.size, mime_type: form.file.type } as any);
-    if (error) { toast.error("Opslaan mislukt"); } else { toast.success("Document geüpload"); }
+    if (error) { toast.error("Opslaan mislukt"); } else { toast.success("Document geüpload! Wordt automatisch gesynchroniseerd naar Google Drive..."); }
     setUploading(false); setOpen(false); setForm({ naam: "", type: "Overig", file: null }); fetchDocs();
   };
 
@@ -113,11 +115,34 @@ const VehicleDocumentenTab = ({ vehicleId }: { vehicleId: string }) => {
                         {doc.type && <span className="px-1.5 py-0.5 bg-secondary text-muted-foreground rounded text-[10px] font-medium">{doc.type}</span>}
                         <span>{formatSize(doc.file_size)}</span>
                         <span>{new Date(doc.created_at).toLocaleDateString("nl-NL")}</span>
+                        {/* Drive sync status */}
+                        {doc.google_drive_url ? (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: "rgba(25, 103, 210, 0.1)", color: "#1967D2" }}>
+                            ✅ In Drive
+                          </span>
+                        ) : (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-secondary text-muted-foreground rounded text-[10px] font-medium">
+                                ⏳ Wacht op sync...
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>Dit document wordt automatisch gesynchroniseerd via Make.com</TooltipContent>
+                          </Tooltip>
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => handleDownload(doc)} className="p-1.5 text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
+                    {doc.google_drive_url && (
+                      <a href={doc.google_drive_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:opacity-80" style={{ color: "#1967D2" }}>
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#1967D2"><path d="M7.71 3.5L1.15 15l3.44 5.97h6.47l-3.44-5.97L7.71 3.5zm1.14 0l6.47 11.5H21.85L15.29 3.5H8.85zm6.56 12.5L12 21.97h12.85L21.41 16H15.41z" /></svg>
+                        Bekijk in Drive →
+                      </a>
+                    )}
+                    {!doc.synced_from_drive && (
+                      <button onClick={() => handleDownload(doc)} className="p-1.5 text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
+                    )}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <button className="p-1.5 text-muted-foreground hover:text-red-500"><Trash2 className="w-4 h-4" /></button>

@@ -68,6 +68,28 @@ const AdminVoertuigDetailPage = () => {
               <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{vehicle.kenteken}</span>
             )}
           </div>
+
+          {/* Google Drive status */}
+          <div className="mt-3">
+            {vehicle.googleDriveFolderUrl ? (
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium rounded border" style={{ backgroundColor: "rgba(25, 103, 210, 0.1)", color: "#1967D2", borderColor: "rgba(25, 103, 210, 0.2)" }}>
+                  ✅ Google Drive Gekoppeld
+                </span>
+                <a href={vehicle.googleDriveFolderUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-medium hover:opacity-80" style={{ color: "#1967D2" }}>
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#1967D2"><path d="M7.71 3.5L1.15 15l3.44 5.97h6.47l-3.44-5.97L7.71 3.5zm1.14 0l6.47 11.5H21.85L15.29 3.5H8.85zm6.56 12.5L12 21.97h12.85L21.41 16H15.41z" /></svg>
+                  Open map in Drive →
+                </a>
+              </div>
+            ) : (
+              <div>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium rounded border bg-secondary text-muted-foreground border-border">
+                  📁 Google Drive: Niet gekoppeld
+                </span>
+                <p className="text-[10px] text-muted-foreground mt-1">Wordt automatisch aangemaakt via Make.com zodra je een auto toevoegt</p>
+              </div>
+            )}
+          </div>
         </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>

@@ -10,6 +10,7 @@ import {
 
 interface Photo {
   id: string; file_path: string; is_hoofdfoto: boolean | null; volgorde: number | null; created_at: string;
+  google_drive_file_id: string | null; google_drive_url: string | null;
 }
 
 const BUCKET = "vehicle-photos";
@@ -39,7 +40,7 @@ const VehicleFotosTab = ({ vehicleId }: { vehicleId: string }) => {
       if (storageError) { toast.error(`Upload mislukt: ${file.name}`); continue; }
       await supabase.from("vehicle_photos").insert({ vehicle_id: vehicleId, file_path: path, volgorde: photos.length + i, is_hoofdfoto: photos.length === 0 && i === 0 } as any);
     }
-    toast.success("Foto's geüpload"); setUploading(false); fetchPhotos();
+    toast.success("Foto's geüpload! Wordt automatisch gesynchroniseerd naar Google Drive..."); setUploading(false); fetchPhotos();
   };
 
   const setHoofd = async (photoId: string) => {
@@ -75,6 +76,10 @@ const VehicleFotosTab = ({ vehicleId }: { vehicleId: string }) => {
               {photos.map((photo) => (
                 <div key={photo.id} className="relative group aspect-square overflow-hidden bg-secondary">
                   <img src={getPublicUrl(photo.file_path)} alt="Voertuig foto" className="w-full h-full object-cover cursor-pointer" onClick={() => setLightbox(getPublicUrl(photo.file_path))} />
+                  {/* Drive sync overlay */}
+                  <span className={`absolute top-2 right-2 text-xs px-1 py-0.5 rounded ${photo.google_drive_url ? "bg-[#1967D2]/90 text-white" : "bg-secondary/90 text-muted-foreground"}`}>
+                    {photo.google_drive_url ? "✅" : "⏳"}
+                  </span>
                   {photo.is_hoofdfoto && (
                     <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 bg-foreground text-background text-[10px] font-bold uppercase tracking-wider">
                       <Star className="w-3 h-3" /> Hoofdfoto

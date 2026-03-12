@@ -22,6 +22,9 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
   koperNaam: row.koper_naam || undefined,
   koperEmail: row.koper_email || undefined,
   koperTelefoon: row.koper_telefoon || undefined,
+  googleDriveFolderId: row.google_drive_folder_id || null,
+  googleDriveFolderUrl: row.google_drive_folder_url || null,
+  googleDriveSynced: row.google_drive_synced || false,
   kosten: costs.map(c => ({
     id: c.id,
     description: c.description,
