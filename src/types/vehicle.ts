@@ -32,6 +32,9 @@ export interface Vehicle {
   koperNaam?: string;
   koperEmail?: string;
   koperTelefoon?: string;
+  betaalmethode?: string;
+  totaleKosten?: number;
+  kostprijsCalc?: number;
   googleDriveFolderId?: string | null;
   googleDriveFolderUrl?: string | null;
   googleDriveSynced?: boolean;
