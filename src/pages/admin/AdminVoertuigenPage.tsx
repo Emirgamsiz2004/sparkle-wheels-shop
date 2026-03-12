@@ -111,6 +111,9 @@ const AdminVoertuigenPage = () => {
                           <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded border ${statusColors[v.status]}`}>{statusLabels[v.status]}</span>
                         </td>
                         <td className="px-5 py-3 text-center">
+                          <GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} />
+                        </td>
+                        <td className="px-5 py-3 text-center">
                           <Link to={`/admin/voertuigen/${v.id}`} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
                             <Eye className="w-3.5 h-3.5" /> Bekijk
                           </Link>

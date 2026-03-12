@@ -12,6 +12,7 @@ const navItems = [
   { label: "BTW Overzicht", icon: Receipt, path: "/admin/btw" },
   { label: "Moneybird", icon: BookOpen, path: "/admin/moneybird" },
   { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
+  { label: "Instellingen", icon: Settings, path: "/admin/instellingen" },
 ];
 
 const AdminLayout = () => {

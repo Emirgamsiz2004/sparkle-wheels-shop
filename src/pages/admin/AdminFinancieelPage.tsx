@@ -102,7 +102,8 @@ const AdminFinancieelPage = () => {
                     <td className={`px-4 py-3 ${totals.bruto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(totals.bruto)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{formatEuroDecimal(totals.btw)}</td>
                     <td className={`px-4 py-3 ${totals.netto >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatEuroDecimal(totals.netto)}</td>
-                    <td className="px-4 py-3">—</td>
+                     <td className="px-4 py-3">—</td>
+                     <td className="px-4 py-3">—</td>
                   </tr>
                 </tbody>
               </table>

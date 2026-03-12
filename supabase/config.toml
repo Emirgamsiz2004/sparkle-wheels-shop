@@ -15,3 +15,6 @@ verify_jwt = false
 [functions.moneybird]
 verify_jwt = false
 
+[functions.make-webhook-handler]
+verify_jwt = false
+
