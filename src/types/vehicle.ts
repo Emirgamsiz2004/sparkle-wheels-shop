@@ -6,6 +6,11 @@ export interface CostItem {
   date: string;
   invoiceRef?: string;
   btwPercentage?: number;
+  leverancier?: string;
+  filePath?: string;
+  fileName?: string;
+  moneybirdId?: string;
+  moneybirdSyncedAt?: string;
 }
 
 export interface Vehicle {
