@@ -24,7 +24,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/50 mb-5"
         >
-          Platin Automotive · Roelofarendsveen
+          Platin Automotive
         </motion.p>
 
         <motion.h1
