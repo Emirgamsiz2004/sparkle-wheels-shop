@@ -64,7 +64,7 @@ const App = () => (
           ) : (
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/voorraad" element={<Voorraad />} />
+              {/* <Route path="/voorraad" element={<Voorraad />} /> Verborgen tot echte voorraad gekoppeld is */}
               <Route path="/consignatie" element={<Consignatie />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/over-ons" element={<OverOns />} />

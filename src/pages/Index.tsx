@@ -12,7 +12,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      <InventorySection />
+      {/* <InventorySection /> Verborgen tot echte voorraad gekoppeld is */}
       <ConsignatieSection />
       <ServicesSection />
       <AboutSection />
