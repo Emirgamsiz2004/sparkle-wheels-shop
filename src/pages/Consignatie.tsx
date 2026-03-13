@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, FileCheck, HelpCircle, Euro, Clock, Handshake, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -309,6 +310,12 @@ const Consignatie = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Auto Verkopen via Consignatie | Platin Automotive Roelofarendsveen</title>
+        <meta name="description" content="Uw auto verkopen zonder gedoe? Wij regelen het. Consignatie verkoop bij Platin Automotive — u betaalt pas bij succesvolle verkoop." />
+        <link rel="canonical" href="https://platinautomotive.nl/consignatie" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
       <Navbar />
 
       <section className="pt-32 pb-28 lg:pb-36">

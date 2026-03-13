@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle, Send } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -139,6 +140,12 @@ const ContactForm = () => {
 const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Contact | Platin Automotive Roelofarendsveen</title>
+        <meta name="description" content="Neem contact op met Platin Automotive in Roelofarendsveen. Bel 06-12693825, stuur een WhatsApp of kom langs op Cilinderweg 99." />
+        <link rel="canonical" href="https://platinautomotive.nl/contact" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
       <Navbar />
 
       <section className="pt-32 pb-16 md:pb-28 lg:pb-36">

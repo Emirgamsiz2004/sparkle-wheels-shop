@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { ArrowRight, Wrench, Clock, Euro, MessageCircle, Phone, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -21,6 +22,12 @@ const diensten = [
 const OnderhoudReparatie = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Auto Onderhoud & Reparatie Roelofarendsveen | Platin Automotive</title>
+        <meta name="description" content="Klein onderhoud en reparaties in Roelofarendsveen. Olie verversen, remmen, APK-klaar maken. Snel, eerlijk en door vakmensen." />
+        <link rel="canonical" href="https://platinautomotive.nl/diensten/onderhoud-reparatie" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
       <Navbar />
       <FloatingCTA targetId="afspraak" label="Afspraak maken" />
 

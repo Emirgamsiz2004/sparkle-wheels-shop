@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { ArrowRight, Palette, Star, Wrench, Phone, MessageCircle, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -20,6 +21,12 @@ const customOptions = [
 const AutoCustomizing = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Auto Customizing — Sterrenhemels & Ambient Verlichting | Platin Automotive</title>
+        <meta name="description" content="Sterrenhemels, ambient verlichting, bekleding op maat. Maak uw auto uniek bij Platin Automotive in Roelofarendsveen." />
+        <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-customizing" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
       <Navbar />
       <FloatingCTA targetId="afspraak" label="Afspraak maken" />
 

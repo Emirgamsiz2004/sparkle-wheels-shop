@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { ArrowRight, Search, Send, Car, MessageCircle, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -63,6 +64,12 @@ const AutoZoeken = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Auto op Aanvraag Zoeken | Platin Automotive Roelofarendsveen</title>
+        <meta name="description" content="Uw droomauto niet in ons aanbod? Wij zoeken hem voor u. Snel, persoonlijk en op maat. Neem contact op met Platin Automotive." />
+        <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-zoeken" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
       <Navbar />
 
       {/* Hero */}
