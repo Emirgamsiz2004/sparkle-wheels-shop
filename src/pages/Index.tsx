@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import InventorySection from "@/components/InventorySection";
+// import InventorySection from "@/components/InventorySection"; // Verborgen tot echte voorraad gekoppeld is
 import ConsignatieSection from "@/components/ConsignatieSection";
 import ServicesSection from "@/components/ServicesSection";
 import AboutSection from "@/components/AboutSection";
@@ -12,7 +12,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      <InventorySection />
+      {/* <InventorySection /> Verborgen tot echte voorraad gekoppeld is */}
       <ConsignatieSection />
       <ServicesSection />
       <AboutSection />
