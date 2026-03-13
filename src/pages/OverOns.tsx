@@ -51,6 +51,12 @@ const timeline = [
 const OverOns = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Over Ons | Platin Automotive Roelofarendsveen</title>
+        <meta name="description" content="Maak kennis met Platin Automotive — een jong, ambitieus autobedrijf in Roelofarendsveen. Persoonlijk, eerlijk en gedreven." />
+        <link rel="canonical" href="https://platinautomotive.nl/over-ons" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
       <Navbar />
 
       {/* Hero */}

@@ -10,6 +10,12 @@ import { placeholderCars } from "@/data/cars";
 const Voorraad = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Occasions Voorraad | Platin Automotive Roelofarendsveen</title>
+        <meta name="description" content="Bekijk ons actuele aanbod occasions in Roelofarendsveen. Alle auto's zijn gecontroleerd en rijklaar. Platin Automotive — eerlijke prijzen." />
+        <link rel="canonical" href="https://platinautomotive.nl/voorraad" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
       <Navbar />
 
       <section className="pt-32 pb-28 lg:pb-36">
