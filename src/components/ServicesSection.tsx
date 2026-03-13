@@ -13,6 +13,7 @@ const services = [
     title: "In- & Verkoop",
     description: "Betrouwbare auto's tegen eerlijke prijzen. Persoonlijk advies en volledige transparantie.",
     image: verkoopImg,
+    alt: "Occasions kopen en verkopen Roelofarendsveen",
     href: "/diensten/in-en-verkoop",
   },
   {
@@ -20,6 +21,7 @@ const services = [
     title: "Onderhoud & Reparatie",
     description: "Klein onderhoud en reparaties door vakmensen. Van olie verversen tot remmen.",
     image: onderhoudImg,
+    alt: "Auto onderhoud en reparatie Roelofarendsveen",
     href: "/diensten/onderhoud-reparatie",
   },
   {
@@ -27,6 +29,7 @@ const services = [
     title: "Detailing",
     description: "Professionele reiniging van interieur en exterieur. Uw auto als nieuw.",
     image: detailingImg,
+    alt: "Professionele auto detailing Roelofarendsveen",
     href: "/diensten/auto-detailing",
   },
   {
@@ -34,6 +37,7 @@ const services = [
     title: "Customizing",
     description: "Sterrenhemels, ambient verlichting, bekleding op maat en meer. Maak uw auto uniek.",
     image: customizingImg,
+    alt: "Auto customizing sterrenhemels Roelofarendsveen",
     href: "/diensten/auto-customizing",
   },
   {
@@ -41,6 +45,7 @@ const services = [
     title: "Auto op Aanvraag",
     description: "Uw droomauto niet in ons aanbod? Wij zoeken hem voor u — snel en op maat.",
     image: autoZoekenImg,
+    alt: "Auto op aanvraag zoeken Nederland",
     href: "/diensten/auto-zoeken",
   },
 ];
