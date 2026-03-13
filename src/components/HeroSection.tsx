@@ -24,20 +24,18 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/50 mb-5"
         >
-          Platin Automotive · Roelofarendsveen
+          Platin Automotive
         </motion.p>
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
+          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
         >
           Occasions kopen
           <br />
-          & verkopen in
-          <br />
-          Roelofarendsveen
+          & verkopen
         </motion.h1>
 
         <motion.div
