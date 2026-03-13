@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { ArrowRight, Wrench, Clock, Euro, MessageCircle, Phone, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";

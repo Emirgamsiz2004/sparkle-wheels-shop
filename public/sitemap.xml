@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://platinautomotive.nl/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://platinautomotive.nl/voorraad</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://platinautomotive.nl/consignatie</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://platinautomotive.nl/diensten/in-en-verkoop</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://platinautomotive.nl/diensten/onderhoud-reparatie</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://platinautomotive.nl/diensten/auto-detailing</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://platinautomotive.nl/diensten/auto-customizing</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://platinautomotive.nl/diensten/auto-zoeken</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://platinautomotive.nl/over-ons</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://platinautomotive.nl/contact</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+</urlset>

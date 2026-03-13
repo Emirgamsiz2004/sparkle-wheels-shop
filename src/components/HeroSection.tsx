@@ -24,7 +24,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/50 mb-5"
         >
-          Kwaliteit & Betrouwbaarheid
+          Platin Automotive · Roelofarendsveen
         </motion.p>
 
         <motion.h1
@@ -33,9 +33,11 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
         >
-          Uw auto,
+          Occasions kopen
           <br />
-          onze passie.
+          & verkopen in
+          <br />
+          Roelofarendsveen
         </motion.h1>
 
         <motion.div

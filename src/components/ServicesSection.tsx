@@ -62,7 +62,7 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
       <div className="h-48 md:h-64 overflow-hidden relative">
         <img
           src={service.image}
-          alt={service.title}
+          alt={service.alt}
           className="w-full h-full object-cover grayscale transition-opacity duration-500"
         />
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-500" />

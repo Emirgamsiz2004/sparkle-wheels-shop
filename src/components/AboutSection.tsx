@@ -62,7 +62,7 @@ const AboutSection = () => {
             <div className="aspect-[4/3] lg:aspect-[3/4] overflow-hidden">
               <img
                 src={aboutImg}
-                alt="Platin Automotive werkplaats"
+                alt="Platin Automotive werkplaats Roelofarendsveen"
                 className="w-full h-full object-cover grayscale"
               />
             </div>
