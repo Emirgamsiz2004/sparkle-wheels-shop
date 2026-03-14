@@ -96,6 +96,7 @@ const App = () => (
           )}
           <WhatsAppButton />
         </BrowserRouter>
+      </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
