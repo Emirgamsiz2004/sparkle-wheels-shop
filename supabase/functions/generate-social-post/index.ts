@@ -58,17 +58,17 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 
 Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we apart toe).`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [{ role: "user", content: prompt }],
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 500,
-        temperature: 0.7,
+        messages: [{ role: "user", content: prompt }],
       }),
     });
 
@@ -79,19 +79,13 @@ Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we ap
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits op, voeg credits toe in je workspace." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      throw new Error("AI gateway error");
+      console.error("Anthropic API error:", response.status, t);
+      throw new Error("Anthropic API error");
     }
 
     const data = await response.json();
-    const caption = data.choices?.[0]?.message?.content?.trim() ?? "";
+    const caption = data.content?.[0]?.text?.trim() ?? "";
 
     // Generate hashtags
     const merkLower = merk.toLowerCase().replace(/\s/g, "");
