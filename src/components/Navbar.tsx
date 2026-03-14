@@ -197,7 +197,7 @@ const Navbar = () => {
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.3, delay: navLinks.length * 0.05 }}
               href="tel:+31612693825"
-              className="group relative flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase overflow-hidden h-[42px] mt-4"
+              className="group relative flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase overflow-hidden h-[42px] mt-4 hover:bg-primary hover:text-primary-foreground transition-all"
             >
               <Phone className="w-3 h-3 relative z-10" />
               <span className="relative overflow-hidden h-[14px]">
