@@ -41,7 +41,7 @@ const AdminLayout = () => {
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + "/");
 
   return (
-    <div className="admin-theme min-h-screen flex bg-background">
+    <div className="admin-theme min-h-screen flex bg-background overflow-x-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -63,7 +63,7 @@ const AdminLayout = () => {
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-3 space-y-0.5">
+        <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
           {navItems.map((item) => (
             <Link
               key={item.path}
@@ -81,30 +81,44 @@ const AdminLayout = () => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-[hsl(var(--sidebar-border))]">
-          <p className="text-[11px] text-muted-foreground truncate mb-2.5 px-1">{user.email}</p>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-2 px-3 py-2 text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-all duration-200 w-full"
+        <div className="p-3 border-t border-[hsl(var(--sidebar-border))] space-y-0.5">
+          <Link
+            to="/admin/instellingen"
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+              isActive("/admin/instellingen")
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+            }`}
           >
-            <LogOut className="w-4 h-4" />
-            Uitloggen
-          </button>
+            <Settings className={`w-[18px] h-[18px] flex-shrink-0 ${isActive("/admin/instellingen") ? 'text-primary' : ''}`} />
+            Instellingen
+          </Link>
+          <div className="pt-2 border-t border-[hsl(var(--sidebar-border))] mt-2">
+            <p className="text-[11px] text-muted-foreground truncate mb-1.5 px-3">{user.email}</p>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-3 px-3 py-2.5 text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-all duration-200 w-full"
+            >
+              <LogOut className="w-[18px] h-[18px]" />
+              Uitloggen
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Mobile header */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-card border-b border-border">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0">
+        {/* Mobile header — sticky */}
+        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-card border-b border-border">
           <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground hover:text-foreground transition-colors">
             <Menu className="w-5 h-5" />
           </button>
-          <img src={logo} alt="Platin" className="h-5 brightness-0 invert opacity-80" />
+          <img src={logo} alt="Platin" className="h-5 brightness-0 invert opacity-80" style={{ imageRendering: "auto" }} />
           <div className="w-5" />
         </header>
 
-        <main className="flex-1 p-4 md:p-5 lg:p-8 overflow-auto">
+        <main className="flex-1 p-4 md:p-5 lg:p-8 overflow-x-hidden">
           <Outlet />
         </main>
       </div>
