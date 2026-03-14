@@ -69,7 +69,7 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
       </div>
       <div className="p-5 md:p-8">
         <div className="flex items-start justify-between mb-4">
-          <span className="text-[10px] font-body font-medium text-primary tracking-wider">
+          <span className="text-[10px] font-body font-medium text-muted-foreground tracking-wider">
             {service.num}
           </span>
           <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all duration-300" />
