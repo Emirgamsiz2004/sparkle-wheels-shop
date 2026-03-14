@@ -14,7 +14,6 @@ const navItems = [
   { label: "Moneybird", icon: BookOpen, path: "/admin/moneybird" },
   { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
   { label: "Social Media", icon: Megaphone, path: "/admin/social-media" },
-  { label: "Instellingen", icon: Settings, path: "/admin/instellingen" },
 ];
 
 const AdminLayout = () => {
