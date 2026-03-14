@@ -69,7 +69,7 @@ const Footer = () => {
                 className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
                 aria-label="Marktplaats"
               >
-                <MarktplaatsIcon className="w-3.5 h-3.5" />
+                <img src={marktplaatsIcon} alt="Marktplaats" className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" />
               </a>
             </div>
             <p className="text-[10px] text-muted-foreground font-body tracking-wider">
