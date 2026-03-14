@@ -55,7 +55,13 @@ const AdminLayout = () => {
       >
         <div className="p-5 flex items-center justify-between">
           <Link to="/admin/dashboard" className="flex items-center gap-3">
-            <img src={logo} alt="Platin" className="h-6 w-auto brightness-0 invert opacity-80" />
+            <img
+              src={logo}
+              alt="Platin"
+              className="h-7 w-auto object-contain"
+              loading="eager"
+              decoding="sync"
+            />
             <span className="text-[9px] font-semibold tracking-[0.3em] uppercase text-muted-foreground">Admin</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground transition-colors">
