@@ -42,7 +42,7 @@ Toon: ${toonInstructie[toon] || "Schrijf professioneel en to-the-point."}
 Schrijf de caption in dit EXACTE formaat:
 [Emoji passend bij auto] [Merk] [Model] | [Jaar] | [Transmissie]
 
-[1-2 zinnen beschrijving van de auto in de gekozen toon]
+[Schrijf 1-2 zinnen die de auto aantrekkelijk omschrijven. Noem NIET alleen de kleur. Beschrijf in plaats daarvan de sfeer, het karakter of de staat van de auto. Voorbeelden van goede zinnen: "Strakke GTI in nette staat — rijklaar en direct beschikbaar." of "Een sportieve daily driver die er scherp uitziet en gewoon rijdt." of "Weinig kilometers voor zijn leeftijd, goed onderhouden en instapklaar." Pas de stijl aan op de gekozen toon.]
 
 📋 Specs:
 › Bouwjaar: [jaar]
