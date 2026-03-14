@@ -1,4 +1,5 @@
 import logo from "@/assets/logo.png";
+import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import { Link } from "react-router-dom";
 
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -65,13 +66,10 @@ const Footer = () => {
                 href="https://www.marktplaats.nl"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                className="group w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
                 aria-label="Marktplaats"
               >
-                <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <polyline points="7 4 13 12 7 20" />
-                  <polyline points="13 4 19 12 13 20" />
-                </svg>
+                <img src={marktplaatsLogo} alt="Marktplaats" className="w-4 h-4 brightness-50 opacity-60 group-hover:opacity-100 transition-opacity" />
               </a>
             </div>
             <p className="text-[10px] text-muted-foreground font-body tracking-wider">
