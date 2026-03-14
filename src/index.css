@@ -6,45 +6,45 @@
 
 @layer base {
   :root {
-    /* Public website — pure black monochrome */
-    --background: 0 0% 3%;
-    --foreground: 0 0% 95%;
+    /* Public website — warm Claude-inspired palette */
+    --background: 30 15% 12%;
+    --foreground: 30 10% 75%;
 
-    --card: 0 0% 6%;
-    --card-foreground: 0 0% 95%;
+    --card: 30 12% 15%;
+    --card-foreground: 30 10% 78%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 30 12% 15%;
+    --popover-foreground: 30 10% 78%;
 
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 3%;
+    --primary: 15 70% 55%;
+    --primary-foreground: 30 15% 98%;
 
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 80%;
+    --secondary: 30 10% 18%;
+    --secondary-foreground: 30 10% 68%;
 
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 62%;
+    --muted: 30 8% 20%;
+    --muted-foreground: 30 8% 50%;
 
-    --accent: 0 0% 16%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 15 70% 55%;
+    --accent-foreground: 30 15% 98%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 13%;
-    --input: 0 0% 13%;
-    --ring: 0 0% 50%;
+    --border: 30 8% 20%;
+    --input: 30 8% 20%;
+    --ring: 15 70% 55%;
 
     --radius: 0rem;
 
-    --sidebar-background: 0 0% 3%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 0 0% 3%;
-    --sidebar-accent: 0 0% 10%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 13%;
-    --sidebar-ring: 0 0% 50%;
+    --sidebar-background: 30 15% 10%;
+    --sidebar-foreground: 30 10% 75%;
+    --sidebar-primary: 15 70% 55%;
+    --sidebar-primary-foreground: 30 15% 98%;
+    --sidebar-accent: 30 10% 18%;
+    --sidebar-accent-foreground: 30 10% 75%;
+    --sidebar-border: 30 8% 18%;
+    --sidebar-ring: 15 70% 55%;
   }
 
   /* Admin panel — warm anthracite palette, monochrome */
@@ -108,18 +108,18 @@
   }
 
   ::selection {
-    background: hsl(0 0% 95%);
-    color: hsl(0 0% 3%);
+    background: hsl(15 70% 55%);
+    color: hsl(30 15% 98%);
   }
 }
 
 @layer utilities {
   .bg-gradient-dark {
-    background: linear-gradient(180deg, hsl(0 0% 3%) 0%, hsl(0 0% 6%) 100%);
+    background: linear-gradient(180deg, hsl(30 15% 12%) 0%, hsl(30 12% 15%) 100%);
   }
   
   .text-gradient {
-    background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 60%) 100%);
+    background: linear-gradient(135deg, hsl(30 10% 80%) 0%, hsl(30 8% 50%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
