@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Eye } from "lucide-react";
+import { Plus, Search, Loader2, Eye, ChevronRight } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, statusLabels, statusColors } from "@/types/vehicle";
+import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
 const tabs: { label: string; value: string }[] = [
@@ -17,6 +18,7 @@ const AdminVoertuigenPage = () => {
   const { vehicles, loading } = useVehicles();
   const [filter, setFilter] = useState("alle");
   const [search, setSearch] = useState("");
+  const isMobile = useIsMobile();
 
   const filtered = vehicles.filter((v) => {
     if (filter !== "alle" && v.status !== filter) return false;
@@ -32,53 +34,94 @@ const AdminVoertuigenPage = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Voertuigen</h1>
-          <p className="text-sm text-muted-foreground mt-1">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl md:text-2xl font-bold text-foreground">Voertuigen</h1>
+          <p className="text-xs md:text-sm text-muted-foreground mt-0.5">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
         </div>
-        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors">
-          <Plus className="w-3.5 h-3.5" /> Nieuw Voertuig
+        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors shrink-0">
+          <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Nieuw</span> <span className="sm:hidden">Nieuw</span>
         </Link>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex gap-1 bg-card border border-border rounded-lg p-1">
-          {tabs.map((t) => (
-            <button
-              key={t.value}
-              onClick={() => setFilter(t.value)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
-                filter === t.value ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+      <div className="space-y-3">
+        <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
+          <div className="flex gap-1 bg-card border border-border rounded-lg p-1 min-w-max">
+            {tabs.map((t) => (
+              <button
+                key={t.value}
+                onClick={() => setFilter(t.value)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 whitespace-nowrap ${
+                  filter === t.value ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="relative flex-1 max-w-xs">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Zoek op merk, model, kenteken..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 text-foreground placeholder:text-muted-foreground transition-all"
+            className="w-full sm:max-w-xs pl-9 pr-4 py-2 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 text-foreground placeholder:text-muted-foreground transition-all"
           />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
-        {filtered.length === 0 ? (
-          <div className="px-6 py-16 text-center text-sm text-muted-foreground">
-            {vehicles.length === 0 ? (
-              <>Nog geen auto's toegevoegd. <Link to="/admin/voertuigen/nieuw" className="text-primary hover:underline">Voeg je eerste voertuig toe →</Link></>
-            ) : "Geen voertuigen gevonden voor deze filters."}
-          </div>
-        ) : (
+      {/* Content */}
+      {filtered.length === 0 ? (
+        <div className="bg-card rounded-xl border border-border px-6 py-16 text-center text-sm text-muted-foreground">
+          {vehicles.length === 0 ? (
+            <>Nog geen auto's toegevoegd. <Link to="/admin/voertuigen/nieuw" className="text-primary hover:underline">Voeg je eerste voertuig toe →</Link></>
+          ) : "Geen voertuigen gevonden voor deze filters."}
+        </div>
+      ) : isMobile ? (
+        /* Mobile: Card view */
+        <div className="space-y-2">
+          {filtered.map((v) => {
+            const winst = calcWinst(v);
+            return (
+              <Link
+                key={v.id}
+                to={`/admin/voertuigen/${v.id}`}
+                className="flex items-center justify-between gap-3 bg-card border border-border rounded-xl p-3.5 active:bg-accent/30 transition-all"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-semibold text-sm text-foreground">{v.merk} {v.model}</p>
+                    <span className="text-xs text-muted-foreground">({v.bouwjaar})</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-md border ${statusColors[v.status]}`}>
+                      {statusLabels[v.status]}
+                    </span>
+                    {v.kenteken && (
+                      <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">{v.kenteken}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="text-xs text-muted-foreground">Inkoop: {formatEuro(v.inkoopprijs)}</span>
+                    {v.verkoopprijs > 0 && (
+                      <span className={`text-xs font-medium ${winst >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                        {formatEuro(winst)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        /* Desktop: Table view */
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -122,8 +165,8 @@ const AdminVoertuigenPage = () => {
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
