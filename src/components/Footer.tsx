@@ -1,6 +1,5 @@
 import logo from "@/assets/logo.png";
 import { Link } from "react-router-dom";
-import { Link } from "react-router-dom";
 
 const InstagramIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
