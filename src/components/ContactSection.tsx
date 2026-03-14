@@ -32,7 +32,7 @@ const ContactSection = () => {
             </p>
             <a
               href="tel:+31612693825"
-              className="group inline-flex items-center gap-3 bg-primary text-primary-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary/85 transition-all duration-300"
+              className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
             >
               <Phone className="w-3.5 h-3.5" />
               Bel Direct
