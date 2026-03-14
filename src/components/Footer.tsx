@@ -66,10 +66,14 @@ const Footer = () => {
                 href="https://www.marktplaats.nl"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                className="group w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all overflow-hidden"
                 aria-label="Marktplaats"
               >
-                <img src={marktplaatsLogo} alt="Marktplaats" className="w-4 h-4 brightness-50 opacity-60 group-hover:opacity-100 transition-opacity" />
+                <img
+                  src={marktplaatsLogo}
+                  alt=""
+                  className="w-5 h-5 invert sepia brightness-[0.6] opacity-50 group-hover:opacity-80 transition-opacity"
+                />
               </a>
             </div>
             <p className="text-[10px] text-muted-foreground font-body tracking-wider">
