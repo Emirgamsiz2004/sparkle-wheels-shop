@@ -68,9 +68,9 @@ const Footer = () => {
                 className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
                 aria-label="Marktplaats"
               >
-                <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <polyline points="7 4 13 12 7 20" />
-                  <polyline points="13 4 19 12 13 20" />
+                <svg viewBox="0 0 100 100" className="w-4 h-4" fill="currentColor" aria-hidden="true">
+                  <path d="M55 15 C40 15, 30 25, 30 38 L30 50 L20 50 L45 80 L70 50 L60 50 L60 38 C60 32, 55 28, 50 28 C48 28, 46 29, 45 31 L45 20 C48 17, 51 15, 55 15 Z" />
+                  <path d="M55 15 C70 15, 80 28, 80 42 L80 50 L70 50 L70 42 C70 33, 65 27, 58 25" />
                 </svg>
               </a>
             </div>
