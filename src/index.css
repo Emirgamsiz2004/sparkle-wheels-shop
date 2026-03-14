@@ -31,6 +31,10 @@
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
+    /* WhatsApp green brand color */
+    --whatsapp: 142 70% 49%;
+    --whatsapp-foreground: 0 0% 100%;
+
     --border: 30 8% 20%;
     --input: 30 8% 20%;
     --ring: 15 70% 55%;
