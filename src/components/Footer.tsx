@@ -1,4 +1,5 @@
 import logo from "@/assets/logo.png";
+import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import { Link } from "react-router-dom";
 
 const InstagramIcon = ({ className }: { className?: string }) => (
