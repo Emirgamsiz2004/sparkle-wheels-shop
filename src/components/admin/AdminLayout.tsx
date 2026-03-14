@@ -120,7 +120,13 @@ const AdminLayout = () => {
           <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground hover:text-foreground transition-colors">
             <Menu className="w-5 h-5" />
           </button>
-          <img src={logo} alt="Platin" className="h-5 brightness-0 invert opacity-80" style={{ imageRendering: "auto" }} />
+          <img
+            src={logo}
+            alt="Platin"
+            className="h-6 w-auto object-contain"
+            loading="eager"
+            decoding="sync"
+          />
           <div className="w-5" />
         </header>
 
