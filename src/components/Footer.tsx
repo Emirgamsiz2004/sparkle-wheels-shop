@@ -1,5 +1,6 @@
 import logo from "@/assets/logo.png";
 import { Link } from "react-router-dom";
+import { Instagram, MessageCircle } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -28,7 +29,37 @@ const Footer = () => {
             ))}
           </div>
 
-          <div className="flex flex-col items-center md:items-end gap-1">
+          <div className="flex flex-col items-center md:items-end gap-3">
+            {/* Social icons */}
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.instagram.com/platin_automotive"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                aria-label="Instagram"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href="https://wa.me/31612693825"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                aria-label="WhatsApp"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href="https://www.marktplaats.nl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                aria-label="Marktplaats"
+              >
+                <span className="text-[9px] font-display font-bold leading-none">MP</span>
+              </a>
+            </div>
             <p className="text-[10px] text-muted-foreground font-body tracking-wider">
               © {new Date().getFullYear()} Platin Automotive
             </p>
