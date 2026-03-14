@@ -52,7 +52,7 @@ const HeroSection = () => {
           </a>
           <Link
             to="/consignatie"
-            className="border-b border-foreground/30 hover:border-foreground pb-1 self-end text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-all duration-300"
+            className="border-b border-foreground/30 hover:border-primary hover:text-primary pb-1 self-end text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground/60 transition-all duration-300"
           >
             Consignatie verkoop
           </Link>

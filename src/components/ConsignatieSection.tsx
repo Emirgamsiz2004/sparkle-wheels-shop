@@ -76,7 +76,7 @@ const ConsignatieSection = () => {
         >
           <Link
             to="/consignatie"
-            className="inline-flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Meld uw auto aan
             <ArrowRight className="w-3.5 h-3.5" />
