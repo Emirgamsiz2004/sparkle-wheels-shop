@@ -3,7 +3,7 @@ import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen, Settings, ShoppingCart, Megaphone } from "lucide-react";
 import { useState } from "react";
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
@@ -55,7 +55,13 @@ const AdminLayout = () => {
       >
         <div className="p-5 flex items-center justify-between">
           <Link to="/admin/dashboard" className="flex items-center gap-3">
-            <img src={logo} alt="Platin" className="h-6 w-auto brightness-0 invert opacity-80" />
+            <img
+              src={logo}
+              alt="Platin"
+              className="h-7 w-auto object-contain"
+              loading="eager"
+              decoding="sync"
+            />
             <span className="text-[9px] font-semibold tracking-[0.3em] uppercase text-muted-foreground">Admin</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground transition-colors">
@@ -114,7 +120,13 @@ const AdminLayout = () => {
           <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground hover:text-foreground transition-colors">
             <Menu className="w-5 h-5" />
           </button>
-          <img src={logo} alt="Platin" className="h-5 brightness-0 invert opacity-80" style={{ imageRendering: "auto" }} />
+          <img
+            src={logo}
+            alt="Platin"
+            className="h-6 w-auto object-contain"
+            loading="eager"
+            decoding="sync"
+          />
           <div className="w-5" />
         </header>
 
