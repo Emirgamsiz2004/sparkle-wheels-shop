@@ -36,16 +36,16 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="bg-card rounded-xl border border-border p-5 hover:border-primary/20 transition-colors duration-200">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{kpi.label}</span>
-              <div className="w-9 h-9 rounded-lg bg-accent/50 flex items-center justify-center">
-                <kpi.icon className={`w-4 h-4 ${kpi.color}`} />
+          <div key={kpi.label} className="bg-card rounded-xl border border-border p-3.5 md:p-5 hover:border-primary/20 transition-colors duration-200">
+            <div className="flex items-center justify-between mb-2 md:mb-3">
+              <span className="text-[9px] md:text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{kpi.label}</span>
+              <div className="w-7 h-7 md:w-9 md:h-9 rounded-lg bg-accent/50 flex items-center justify-center">
+                <kpi.icon className={`w-3.5 md:w-4 h-3.5 md:h-4 ${kpi.color}`} />
               </div>
             </div>
-            <p className={`text-2xl font-bold ${kpi.color}`}>
+            <p className={`text-lg md:text-2xl font-bold ${kpi.color}`}>
               {kpi.value}
             </p>
           </div>
