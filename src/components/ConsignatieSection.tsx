@@ -54,7 +54,7 @@ const ConsignatieSection = () => {
               transition={{ duration: 0.6, delay: i * 0.15 }}
               className="bg-card p-6 md:p-10 group"
             >
-              <span className="text-[10px] font-body font-medium tracking-[0.3em] text-primary">
+              <span className="text-[10px] font-body font-medium tracking-[0.3em] text-muted-foreground">
                 {step.number}
               </span>
               <h3 className="text-xl font-display font-semibold text-foreground mt-4 mb-3">
