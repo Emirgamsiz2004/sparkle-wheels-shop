@@ -199,6 +199,10 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                 <Input value={model} onChange={(e) => setModel(e.target.value)} placeholder="Polo GTI" />
               </div>
               <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground">Motorinhoud</label>
+                <Input value={motorinhoud} onChange={(e) => setMotorinhoud(e.target.value)} placeholder="1.8 TSI" />
+              </div>
+              <div className="space-y-1.5">
                 <label className="text-xs text-muted-foreground">Jaar</label>
                 <Input type="number" value={jaar} onChange={(e) => setJaar(e.target.value ? Number(e.target.value) : "")} placeholder="2019" />
               </div>
