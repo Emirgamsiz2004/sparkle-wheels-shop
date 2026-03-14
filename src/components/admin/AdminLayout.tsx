@@ -105,7 +105,7 @@ const AdminLayout = () => {
           <div className="w-5" />
         </header>
 
-        <main className="flex-1 p-5 lg:p-8 overflow-auto">
+        <main className="flex-1 p-4 md:p-5 lg:p-8 overflow-auto">
           <Outlet />
         </main>
       </div>
