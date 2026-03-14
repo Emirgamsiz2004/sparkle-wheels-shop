@@ -56,7 +56,7 @@ const Footer = () => {
                 className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
                 aria-label="Instagram"
               >
-                <Instagram className="w-3.5 h-3.5" />
+                <InstagramIcon className="w-3.5 h-3.5" />
               </a>
               <a
                 href="https://wa.me/31612693825"
@@ -65,7 +65,7 @@ const Footer = () => {
                 className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
                 aria-label="WhatsApp"
               >
-                <MessageCircle className="w-3.5 h-3.5" />
+                <WhatsAppIcon className="w-3.5 h-3.5" />
               </a>
               <a
                 href="https://www.marktplaats.nl"
@@ -74,7 +74,7 @@ const Footer = () => {
                 className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
                 aria-label="Marktplaats"
               >
-                <span className="text-[9px] font-display font-bold leading-none">MP</span>
+                <MarktplaatsIcon className="w-3.5 h-3.5" />
               </a>
             </div>
             <p className="text-[10px] text-muted-foreground font-body tracking-wider">
