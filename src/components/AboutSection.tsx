@@ -41,7 +41,7 @@ const AboutSection = () => {
             <div className="flex gap-8 md:gap-12 pt-8 border-t border-border">
               {stats.map((stat) => (
                 <div key={stat.label}>
-                  <p className="text-2xl md:text-3xl font-display font-bold text-foreground mb-1">
+                  <p className="text-2xl md:text-3xl font-display font-bold text-primary mb-1">
                     {stat.value}
                   </p>
                   <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground">
@@ -63,7 +63,7 @@ const AboutSection = () => {
               <img
                 src={aboutImg}
                 alt="Platin Automotive werkplaats Roelofarendsveen"
-                className="w-full h-full object-cover grayscale"
+                className="w-full h-full object-cover"
               />
             </div>
             <div className="hidden lg:block absolute -bottom-4 -right-4 w-full h-full border border-foreground/8 -z-10" />

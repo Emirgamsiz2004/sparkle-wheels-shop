@@ -99,7 +99,7 @@ const Navbar = () => {
             )}
             <a
               href="tel:+31612693825"
-              className="group relative flex items-center gap-2 bg-foreground text-background px-5 py-2.5 text-[10px] font-semibold tracking-[0.2em] uppercase transition-all hover:bg-foreground/90 overflow-hidden h-[38px]"
+              className="group relative flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-[10px] font-semibold tracking-[0.2em] uppercase transition-all hover:bg-primary/85 overflow-hidden h-[38px]"
             >
               <Phone className="w-3 h-3 relative z-10" />
               <span className="relative overflow-hidden h-[14px]">
@@ -197,7 +197,7 @@ const Navbar = () => {
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.3, delay: navLinks.length * 0.05 }}
               href="tel:+31612693825"
-              className="group relative flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase overflow-hidden h-[42px] mt-4"
+              className="group relative flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase overflow-hidden h-[42px] mt-4"
             >
               <Phone className="w-3 h-3 relative z-10" />
               <span className="relative overflow-hidden h-[14px]">

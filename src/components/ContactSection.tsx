@@ -32,7 +32,7 @@ const ContactSection = () => {
             </p>
             <a
               href="tel:+31612693825"
-              className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300"
+              className="group inline-flex items-center gap-3 bg-primary text-primary-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary/85 transition-all duration-300"
             >
               <Phone className="w-3.5 h-3.5" />
               Bel Direct
@@ -53,7 +53,7 @@ const ContactSection = () => {
                 href={item.href}
                 className="group bg-card hover:bg-accent p-6 md:p-8 transition-all duration-300"
               >
-                <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-foreground mb-6 transition-colors" />
+                <item.icon className="w-5 h-5 text-primary mb-6 transition-colors" />
                 <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground mb-2">
                   {item.label}
                 </p>
