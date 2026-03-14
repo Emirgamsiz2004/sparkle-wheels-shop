@@ -20,6 +20,18 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const kleurEmoji = (k: string): string => {
+      const map: Record<string, string> = {
+        rood: "🔴", blauw: "🔵", zwart: "⚫", wit: "⚪",
+        grijs: "🔘", zilver: "🔘", groen: "🟢", oranje: "🟠",
+        geel: "🟡", paars: "🟣", bruin: "🟤",
+      };
+      return map[k.toLowerCase().trim()] || "⚫";
+    };
+
+    const emoji = kleurEmoji(kleur);
+    const motorLabel = motorinhoud ? ` ${motorinhoud}` : "";
+
     const toonInstructie: Record<string, string> = {
       "Professioneel & Nuchter": "Schrijf zakelijk, nuchter en to-the-point. Geen overdreven enthousiasme.",
       "Enthousiast & Energiek": "Schrijf energiek en enthousiast. Maak de lezer enthousiast over de auto.",
@@ -40,9 +52,8 @@ Bijzonderheden: ${bijzonderheden || "geen specifieke bijzonderheden"}
 Platform: ${platform}
 Toon: ${toonInstructie[toon] || "Schrijf professioneel en to-the-point."}
 
-Schrijf de caption in dit EXACTE formaat:
-[Emoji passend bij auto] [Merk] [Model]${motorinhoud ? ` [motorinhoud: ${motorinhoud}]` : ""} | [Jaar] | [Transmissie]
-${motorinhoud ? `Voorbeeld: 🔴 Volkswagen Polo GTI ${motorinhoud} | ${jaar} | ${transmissie}` : `Voorbeeld: 🔴 Volkswagen Polo GTI | ${jaar} | ${transmissie}`}
+De caption MOET beginnen met EXACT deze eerste regel (kopieer letterlijk, verander NIETS):
+${emoji} ${merk} ${model}${motorLabel} | ${jaar} | ${transmissie}
 
 [Schrijf 1-2 zinnen die de auto aantrekkelijk omschrijven. Noem NIET alleen de kleur. Beschrijf in plaats daarvan de sfeer, het karakter of de staat van de auto. Voorbeelden van goede zinnen: "Strakke GTI in nette staat — rijklaar en direct beschikbaar." of "Een sportieve daily driver die er scherp uitziet en gewoon rijdt." of "Weinig kilometers voor zijn leeftijd, goed onderhouden en instapklaar." Pas de stijl aan op de gekozen toon.]
 
