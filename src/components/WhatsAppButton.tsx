@@ -1,14 +1,20 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle } from "lucide-react";
 
 const WhatsAppButton = () => {
   const [visible, setVisible] = useState(false);
+  const location = useLocation();
+
+  const isAdmin = location.pathname.startsWith("/admin");
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 800);
     return () => clearTimeout(timer);
   }, []);
+
+  if (isAdmin) return null;
 
   return (
     <AnimatePresence>
