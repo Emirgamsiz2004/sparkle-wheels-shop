@@ -28,7 +28,8 @@ const WhatsAppButton = () => {
             href="https://wa.me/31612693825"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg shadow-green-500/30 transition-all duration-300 hover:scale-110"
+            className="flex items-center justify-center w-14 h-14 bg-[hsl(142,70%,49%)] hover:bg-[hsl(142,70%,43%)] text-white rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+            style={{ boxShadow: "0 10px 25px -5px hsl(142 70% 49% / 0.4)" }}
             aria-label="WhatsApp"
           >
             <MessageCircle className="w-7 h-7 fill-current" />
