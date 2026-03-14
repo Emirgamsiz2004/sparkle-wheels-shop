@@ -41,6 +41,7 @@ const AdminSocialMediaPage = () => {
   const [transmissie, setTransmissie] = useState("Handgeschakeld");
   const [kleur, setKleur] = useState("");
   const [bijzonderheden, setBijzonderheden] = useState("");
+  const [motorinhoud, setMotorinhoud] = useState("");
   const [typeAuto, setTypeAuto] = useState("Hatchback");
   const [toon, setToon] = useState("Professioneel & Nuchter");
   const [platform, setPlatform] = useState("Beide");
@@ -111,7 +112,7 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
         body: {
           merk, model, jaar, kilometerstand: formatNumber(km as number),
           prijs: formatNumber(prijs as number), transmissie, kleur,
-          bijzonderheden, type_auto: typeAuto, toon, platform,
+          bijzonderheden, type_auto: typeAuto, toon, platform, motorinhoud,
         },
       });
 
