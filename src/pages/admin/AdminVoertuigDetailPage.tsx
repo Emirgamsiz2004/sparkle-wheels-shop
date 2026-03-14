@@ -15,11 +15,11 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const tabItems = [
-  { key: "info", label: "📋 Info" },
-  { key: "kosten", label: "💸 Kosten" },
-  { key: "documenten", label: "📄 Documenten" },
-  { key: "fotos", label: "📸 Foto's" },
-  { key: "financieel", label: "💰 Financieel" },
+  { key: "info", label: "Info", emoji: "📋" },
+  { key: "kosten", label: "Kosten", emoji: "💸" },
+  { key: "documenten", label: "Docs", emoji: "📄" },
+  { key: "fotos", label: "Foto's", emoji: "📸" },
+  { key: "financieel", label: "Financieel", emoji: "💰" },
 ];
 
 const AdminVoertuigDetailPage = () => {
@@ -54,50 +54,48 @@ const AdminVoertuigDetailPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <button onClick={() => navigate("/admin/voertuigen")} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Terug naar voertuigen
+        <ArrowLeft className="w-4 h-4" /> Terug
       </button>
 
-      {/* Header */}
-      <div className="flex items-start justify-between">
+      {/* Header — stacked on mobile */}
+      <div className="space-y-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            {vehicle.merk} {vehicle.model} {vehicle.bouwjaar} <span className="text-muted-foreground font-normal">— {vehicle.kleur || "Onbekend"}</span>
+          <h1 className="text-lg md:text-2xl font-bold text-foreground leading-tight">
+            {vehicle.merk} {vehicle.model} {vehicle.bouwjaar}
           </h1>
-          <div className="flex items-center gap-3 mt-2.5">
-            <span className={`inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border ${statusColors[vehicle.status]}`}>
-              {statusLabels[vehicle.status]}
-            </span>
-            {vehicle.kenteken && (
-              <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider bg-accent/50 px-2 py-0.5 rounded">{vehicle.kenteken}</span>
-            )}
-          </div>
-
-          {/* Google Drive status */}
-          <div className="mt-3">
-            {vehicle.googleDriveFolderUrl ? (
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border" style={{ backgroundColor: "rgba(25, 103, 210, 0.1)", color: "#5b9bef", borderColor: "rgba(25, 103, 210, 0.2)" }}>
-                  ✅ Google Drive Gekoppeld
-                </span>
-                <a href={vehicle.googleDriveFolderUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-medium hover:opacity-80 transition-opacity" style={{ color: "#5b9bef" }}>
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M7.71 3.5L1.15 15l3.44 5.97h6.47l-3.44-5.97L7.71 3.5zm1.14 0l6.47 11.5H21.85L15.29 3.5H8.85zm6.56 12.5L12 21.97h12.85L21.41 16H15.41z" /></svg>
-                  Open map in Drive →
-                </a>
-              </div>
-            ) : (
-              <div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border bg-accent/30 text-muted-foreground border-border">
-                  📁 Google Drive: Niet gekoppeld
-                </span>
-                <p className="text-[10px] text-muted-foreground mt-1">Wordt automatisch aangemaakt via Make.com zodra je een auto toevoegt</p>
-              </div>
-            )}
-          </div>
+          <span className="text-sm text-muted-foreground">{vehicle.kleur || "Onbekend"}</span>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border ${statusColors[vehicle.status]}`}>
+            {statusLabels[vehicle.status]}
+          </span>
+          {vehicle.kenteken && (
+            <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider bg-accent/50 px-2 py-0.5 rounded">{vehicle.kenteken}</span>
+          )}
+        </div>
+
+        {/* Google Drive status */}
+        <div>
+          {vehicle.googleDriveFolderUrl ? (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border" style={{ backgroundColor: "rgba(25, 103, 210, 0.1)", color: "#5b9bef", borderColor: "rgba(25, 103, 210, 0.2)" }}>
+                ✅ Google Drive
+              </span>
+              <a href={vehicle.googleDriveFolderUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-medium hover:opacity-80 transition-opacity" style={{ color: "#5b9bef" }}>
+                Open map →
+              </a>
+            </div>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border bg-accent/30 text-muted-foreground border-border">
+              📁 Drive: Niet gekoppeld
+            </span>
+          )}
+        </div>
+
+        {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Verkopen button — only when status is te_koop */}
           {vehicle.status === "te_koop" && (
             <button
               onClick={() => setVerkoopOpen(true)}
@@ -112,11 +110,11 @@ const AdminVoertuigDetailPage = () => {
                 <Trash2 className="w-3.5 h-3.5" /> Verwijderen
               </button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-card border-border rounded-xl">
+            <AlertDialogContent className="bg-card border-border rounded-xl max-w-[calc(100vw-2rem)]">
               <AlertDialogHeader>
                 <AlertDialogTitle>Voertuig verwijderen?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Dit verwijdert {vehicle.merk} {vehicle.model} en alle bijbehorende kosten, documenten en foto's. Dit kan niet ongedaan worden gemaakt.
+                  Dit verwijdert {vehicle.merk} {vehicle.model} en alle bijbehorende data. Dit kan niet ongedaan worden gemaakt.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -128,21 +126,24 @@ const AdminVoertuigDetailPage = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-card border border-border rounded-lg p-1">
-        {tabItems.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setActiveTab(t.key)}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-              activeTab === t.key
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      {/* Tabs — scrollable on mobile */}
+      <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
+        <div className="flex gap-1 bg-card border border-border rounded-lg p-1 min-w-max">
+          {tabItems.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium rounded-md transition-all duration-200 whitespace-nowrap ${
+                activeTab === t.key
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+              }`}
+            >
+              <span className="md:hidden">{t.emoji}</span>
+              <span className="hidden md:inline">{t.emoji} {t.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tab Content */}
@@ -154,7 +155,6 @@ const AdminVoertuigDetailPage = () => {
         {activeTab === "financieel" && <VehicleFinancieelTab vehicle={vehicle} />}
       </div>
 
-      {/* Verkoop Dialog */}
       <VerkoopDialog
         vehicle={vehicle}
         open={verkoopOpen}

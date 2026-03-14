@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { formatEuroDecimal, calcKostprijs, calcTotalKosten, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import { Loader2, Download } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
 const AdminFinancieelPage = () => {
   const { vehicles, loading } = useVehicles();
   const currentYear = new Date().getFullYear();
   const [yearFilter, setYearFilter] = useState<string>("alle");
+  const isMobile = useIsMobile();
 
   const filtered = vehicles.filter((v) => {
     if (v.status !== "verkocht") return false;
@@ -39,28 +41,96 @@ const AdminFinancieelPage = () => {
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Financieel Overzicht</h1>
-          <p className="text-sm text-muted-foreground mt-1">Overzicht van alle verkochte voertuigen</p>
+          <h1 className="text-xl md:text-2xl font-bold text-foreground">Financieel Overzicht</h1>
+          <p className="text-xs md:text-sm text-muted-foreground mt-0.5">Overzicht van alle verkochte voertuigen</p>
         </div>
-        <div className="flex items-center gap-3">
-          <select value={yearFilter} onChange={(e) => setYearFilter(e.target.value)} className="px-3 py-2.5 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all">
+        <div className="flex items-center gap-2">
+          <select value={yearFilter} onChange={(e) => setYearFilter(e.target.value)} className="px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all">
             <option value="alle">Alle jaren</option>
             <option value={String(currentYear)}>{currentYear}</option>
             <option value={String(currentYear - 1)}>{currentYear - 1}</option>
           </select>
-          <button onClick={exportExcel} className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors">
-            <Download className="w-3.5 h-3.5" /> Exporteer CSV
+          <button onClick={exportExcel} className="inline-flex items-center gap-1.5 px-3 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors">
+            <Download className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Exporteer</span> CSV
           </button>
         </div>
       </div>
 
+      {/* Totals summary cards on mobile */}
+      {isMobile && filtered.length > 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-card rounded-xl border border-border p-3">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Totale Omzet</p>
+            <p className="text-lg font-bold text-foreground">{formatEuroDecimal(totals.verkoop)}</p>
+          </div>
+          <div className="bg-card rounded-xl border border-border p-3">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Netto Winst</p>
+            <p className={`text-lg font-bold ${totals.netto >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatEuroDecimal(totals.netto)}</p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         {filtered.length === 0 ? (
           <div className="px-6 py-16 text-center text-sm text-muted-foreground">Nog geen verkochte voertuigen in deze periode.</div>
+        ) : isMobile ? (
+          /* Mobile: Card list */
+          <div className="divide-y divide-border">
+            {filtered.map((v) => {
+              const netto = calcNettoMarge(v);
+              return (
+                <div key={v.id} className="p-3.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-sm text-foreground">{v.merk} {v.model} ({v.bouwjaar})</p>
+                    <span className={`text-xs font-semibold ${netto >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {formatEuroDecimal(netto)}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Inkoop</p>
+                      <p className="text-xs font-medium">{formatEuroDecimal(v.inkoopprijs)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Kosten</p>
+                      <p className="text-xs font-medium">{formatEuroDecimal(calcTotalKosten(v))}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Verkoop</p>
+                      <p className="text-xs font-medium">{formatEuroDecimal(v.verkoopprijs)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                    <span>{v.verkoopDatum ? new Date(v.verkoopDatum).toLocaleDateString("nl-NL") : "—"}</span>
+                    <span className={`font-medium ${calcMarge(v) >= 0 ? "text-emerald-400" : "text-red-400"}`}>{calcMarge(v).toFixed(1)}%</span>
+                  </div>
+                </div>
+              );
+            })}
+            {/* Totaal row */}
+            <div className="p-3.5 bg-accent/30">
+              <p className="text-xs font-bold text-foreground mb-2">Totaal</p>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Inkoop</p>
+                  <p className="text-xs font-bold">{formatEuroDecimal(totals.inkoop)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Kosten</p>
+                  <p className="text-xs font-bold">{formatEuroDecimal(totals.kosten)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Verkoop</p>
+                  <p className="text-xs font-bold">{formatEuroDecimal(totals.verkoop)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
+          /* Desktop: Table */
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

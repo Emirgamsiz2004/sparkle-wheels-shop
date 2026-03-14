@@ -29,23 +29,23 @@ const AdminDashboardPage = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5 md:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">Overzicht van je bedrijf</p>
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-xs md:text-sm text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="bg-card rounded-xl border border-border p-5 hover:border-primary/20 transition-colors duration-200">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{kpi.label}</span>
-              <div className="w-9 h-9 rounded-lg bg-accent/50 flex items-center justify-center">
-                <kpi.icon className={`w-4 h-4 ${kpi.color}`} />
+          <div key={kpi.label} className="bg-card rounded-xl border border-border p-3.5 md:p-5 hover:border-primary/20 transition-colors duration-200">
+            <div className="flex items-center justify-between mb-2 md:mb-3">
+              <span className="text-[9px] md:text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{kpi.label}</span>
+              <div className="w-7 h-7 md:w-9 md:h-9 rounded-lg bg-accent/50 flex items-center justify-center">
+                <kpi.icon className={`w-3.5 md:w-4 h-3.5 md:h-4 ${kpi.color}`} />
               </div>
             </div>
-            <p className={`text-2xl font-bold ${kpi.color}`}>
+            <p className={`text-lg md:text-2xl font-bold ${kpi.color}`}>
               {kpi.value}
             </p>
           </div>
@@ -53,24 +53,24 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2 md:gap-3">
         <Link
           to="/admin/voertuigen/nieuw"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors"
         >
-          <Plus className="w-3.5 h-3.5" /> Nieuwe Auto Toevoegen
+          <Plus className="w-3.5 h-3.5" /> Nieuwe Auto
         </Link>
         <Link
           to="/admin/financieel"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
         >
-          <Wallet className="w-3.5 h-3.5" /> Kosten Overzicht
+          <Wallet className="w-3.5 h-3.5" /> Kosten
         </Link>
         <Link
           to="/admin/btw"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
         >
-          <Receipt className="w-3.5 h-3.5" /> BTW Overzicht
+          <Receipt className="w-3.5 h-3.5" /> BTW
         </Link>
       </div>
 
