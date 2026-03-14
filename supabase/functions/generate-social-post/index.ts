@@ -14,7 +14,7 @@ serve(async (req) => {
   try {
     const {
       merk, model, jaar, kilometerstand, prijs, transmissie,
-      kleur, bijzonderheden, type_auto, toon, platform,
+      kleur, bijzonderheden, type_auto, toon, platform, motorinhoud,
     } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
