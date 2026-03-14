@@ -29,10 +29,10 @@ const AdminDashboardPage = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5 md:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">Overzicht van je bedrijf</p>
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-xs md:text-sm text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
       </div>
 
       {/* KPI Cards */}
