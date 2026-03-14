@@ -63,7 +63,7 @@ const AboutSection = () => {
               <img
                 src={aboutImg}
                 alt="Platin Automotive werkplaats Roelofarendsveen"
-                className="w-full h-full object-cover grayscale"
+                className="w-full h-full object-cover"
               />
             </div>
             <div className="hidden lg:block absolute -bottom-4 -right-4 w-full h-full border border-foreground/8 -z-10" />
