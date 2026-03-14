@@ -66,7 +66,7 @@ const Footer = () => {
                 href="https://www.marktplaats.nl"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                className="group w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
                 aria-label="Marktplaats"
               >
                 <img src={marktplaatsLogo} alt="Marktplaats" className="w-4 h-4 brightness-50 opacity-60 group-hover:opacity-100 transition-opacity" />
