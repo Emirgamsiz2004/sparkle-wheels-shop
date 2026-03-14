@@ -70,7 +70,7 @@ const AdminSocialMediaPage = () => {
     setKm(v.kilometerstand || "");
     setPrijs(v.verkoopprijs || "");
     setKleur(v.kleur || "");
-    setTransmissie(v.brandstof === "automaat" ? "Automaat" : "Handgeschakeld");
+    setTransmissie("Handgeschakeld");
   };
 
   const generateFallback = () => {
