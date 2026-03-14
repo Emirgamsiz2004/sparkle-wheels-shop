@@ -112,7 +112,7 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
         body: {
           merk, model, jaar, kilometerstand: formatNumber(km as number),
           prijs: formatNumber(prijs as number), transmissie, kleur,
-          bijzonderheden, type_auto: typeAuto, toon, platform,
+          bijzonderheden, type_auto: typeAuto, toon, platform, motorinhoud,
         },
       });
 
