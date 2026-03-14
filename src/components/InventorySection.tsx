@@ -27,7 +27,7 @@ const InventorySection = () => {
           </div>
           <Link
             to="/voorraad"
-            className="hidden md:flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="hidden md:flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Bekijk alles
             <ArrowRight className="w-3.5 h-3.5" />
@@ -57,7 +57,7 @@ const InventorySection = () => {
         >
           <Link
             to="/voorraad"
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary/85 transition-all duration-300"
+            className="inline-flex items-center gap-2 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
           >
             Bekijk Hele Voorraad
             <ArrowRight className="w-3.5 h-3.5" />

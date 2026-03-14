@@ -54,7 +54,7 @@ const ConsignatieSection = () => {
               transition={{ duration: 0.6, delay: i * 0.15 }}
               className="bg-card p-6 md:p-10 group"
             >
-              <span className="text-[10px] font-body font-medium tracking-[0.3em] text-primary">
+              <span className="text-[10px] font-body font-medium tracking-[0.3em] text-muted-foreground">
                 {step.number}
               </span>
               <h3 className="text-xl font-display font-semibold text-foreground mt-4 mb-3">
@@ -76,7 +76,7 @@ const ConsignatieSection = () => {
         >
           <Link
             to="/consignatie"
-            className="inline-flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Meld uw auto aan
             <ArrowRight className="w-3.5 h-3.5" />
