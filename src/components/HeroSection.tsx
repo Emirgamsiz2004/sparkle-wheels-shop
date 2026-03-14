@@ -46,7 +46,7 @@ const HeroSection = () => {
         >
           <a
             href="#voorraad"
-            className="bg-foreground/15 backdrop-blur-sm border border-foreground/20 hover:bg-foreground/25 px-8 py-3.5 text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground transition-all duration-300"
+            className="bg-primary text-primary-foreground hover:bg-primary/85 px-8 py-3.5 text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase transition-all duration-300"
           >
             Bekijk ons aanbod
           </a>

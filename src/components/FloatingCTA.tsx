@@ -38,7 +38,7 @@ const FloatingCTA = ({ targetId, label = "Afspraak maken" }: FloatingCTAProps) =
         >
           <button
             onClick={handleClick}
-            className="group flex items-center gap-2.5 bg-foreground text-background px-5 py-3 shadow-lg shadow-foreground/20 hover:bg-foreground/90 transition-all duration-300"
+            className="group flex items-center gap-2.5 bg-primary text-primary-foreground px-5 py-3 shadow-lg shadow-primary/20 hover:bg-primary/85 transition-all duration-300"
           >
             <CalendarCheck className="w-4 h-4" />
             <span className="text-[10px] font-semibold tracking-[0.15em] uppercase">{label}</span>

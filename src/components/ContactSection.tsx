@@ -53,7 +53,7 @@ const ContactSection = () => {
                 href={item.href}
                 className="group bg-card hover:bg-accent p-6 md:p-8 transition-all duration-300"
               >
-                <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-foreground mb-6 transition-colors" />
+                <item.icon className="w-5 h-5 text-primary mb-6 transition-colors" />
                 <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground mb-2">
                   {item.label}
                 </p>
