@@ -31,6 +31,7 @@ import AdminInkoopPage from "./pages/admin/AdminInkoopPage";
 import AdminInstellingenPage from "./pages/admin/AdminInstellingenPage";
 import AdminSocialMediaPage from "./pages/admin/AdminSocialMediaPage";
 import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
+import AdminBlogPage from "./pages/admin/AdminBlogPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
@@ -64,6 +65,7 @@ const App = () => (
                 <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="social-media" element={<AdminSocialMediaPage />} />
                 <Route path="advertenties" element={<AdminAdvertentiesPage />} />
+                <Route path="blog" element={<AdminBlogPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
@@ -96,6 +98,7 @@ const App = () => (
                 <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="social-media" element={<AdminSocialMediaPage />} />
                 <Route path="advertenties" element={<AdminAdvertentiesPage />} />
+                <Route path="blog" element={<AdminBlogPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<NotFound />} />

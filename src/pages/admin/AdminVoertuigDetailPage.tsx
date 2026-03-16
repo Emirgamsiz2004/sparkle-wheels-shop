@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
-import { ArrowLeft, Trash2, Loader2, ShoppingCart } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Trash2, Loader2, ShoppingCart, FileText } from "lucide-react";
+import { toast } from "sonner";
 import { statusLabels, statusColors } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
 import VehicleKostenTab from "@/components/admin/VehicleKostenTab";
@@ -28,6 +30,7 @@ const AdminVoertuigDetailPage = () => {
   const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
   const [activeTab, setActiveTab] = useState("info");
   const [verkoopOpen, setVerkoopOpen] = useState(false);
+  const [blogGenerating, setBlogGenerating] = useState(false);
 
   const vehicle = vehicles.find((v) => v.id === id);
 
@@ -51,6 +54,30 @@ const AdminVoertuigDetailPage = () => {
 
   const handleVerkoopComplete = () => {
     refetch();
+  };
+
+  const handleGenerateBlog = async () => {
+    setBlogGenerating(true);
+    toast.info("Blogpost wordt aangemaakt...");
+    try {
+      const { error } = await supabase.functions.invoke("generate-blog-post", {
+        body: {
+          merk: vehicle.merk,
+          model: vehicle.model,
+          jaar: vehicle.bouwjaar,
+          km: vehicle.kilometerstand,
+          kleur: vehicle.kleur,
+          prijs: vehicle.verkoopprijs,
+          car_id: vehicle.id,
+        },
+      });
+      if (error) throw error;
+      toast.success("✓ Blogpost succesvol aangemaakt");
+    } catch (err) {
+      console.error("Blog generation error:", err);
+      toast.error("Blogpost genereren mislukt");
+    }
+    setBlogGenerating(false);
   };
 
   return (
@@ -96,6 +123,14 @@ const AdminVoertuigDetailPage = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleGenerateBlog}
+            disabled={blogGenerating}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-accent text-foreground hover:bg-accent/80 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {blogGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+            Genereer blogpost
+          </button>
           {vehicle.status === "te_koop" && (
             <button
               onClick={() => setVerkoopOpen(true)}
