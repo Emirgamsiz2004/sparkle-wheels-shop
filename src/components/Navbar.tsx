@@ -14,7 +14,7 @@ const services = [
 
 const navLinks = [
   { label: "Home", href: "/", section: "home" },
-  { label: "Voorraad", href: "/voorraad", section: "voorraad" },
+  { label: "Voorraad", href: "/voorraad" },
   { label: "Consignatie", href: "/consignatie" },
   { label: "Blog", href: "/blog" },
   { label: "Diensten", href: "/#diensten", section: "diensten", hasDropdown: true },
