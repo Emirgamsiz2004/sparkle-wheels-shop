@@ -84,6 +84,19 @@ const AdminLogin = () => {
             />
           </div>
 
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-4 h-4 rounded border-border bg-secondary/50 text-primary focus:ring-primary/30 accent-primary"
+            />
+            <label htmlFor="rememberMe" className="text-xs font-body text-muted-foreground cursor-pointer select-none">
+              Inloggegevens onthouden
+            </label>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
