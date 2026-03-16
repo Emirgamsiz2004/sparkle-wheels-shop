@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
+import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
 
 interface Props {
   vehicle: Vehicle;
@@ -59,10 +60,10 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
           <div className="sm:col-span-2">
             <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} onValidKenteken={handleRdwLookup} loading={rdwLoading} />
           </div>
-          <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} highlight={rdwFields.has("merk")} />
-          <Field label="Model" value={form.model} onChange={(v) => update("model", v)} highlight={rdwFields.has("model")} />
+          <Field label="Merk" value={form.merk} onChange={(v) => update("merk", capitalizeMerk(v))} highlight={rdwFields.has("merk")} />
+          <Field label="Model" value={form.model} onChange={(v) => update("model", capitalizeModel(v))} highlight={rdwFields.has("model")} />
           <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} highlight={rdwFields.has("bouwjaar")} />
-          <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", v)} highlight={rdwFields.has("kleur")} />
+          <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", capitalizeKleur(v))} highlight={rdwFields.has("kleur")} />
           <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
           <div>
             <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>

@@ -14,6 +14,7 @@ import { Copy, Sparkles, Loader2, Lock } from "lucide-react";
 import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
+import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
 const formatNumber = (n: number | undefined) =>
   n ? n.toLocaleString("nl-NL") : "";
 
@@ -226,11 +227,11 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Merk</label>
-                  <Input value={merk} onChange={(e) => { setMerk(e.target.value); clearRdw("merk"); }} placeholder="Volkswagen" className={rdwBg("merk")} />
+                  <Input value={merk} onChange={(e) => { setMerk(capitalizeMerk(e.target.value)); clearRdw("merk"); }} placeholder="Volkswagen" className={rdwBg("merk")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Model</label>
-                  <Input value={model} onChange={(e) => { setModel(e.target.value); clearRdw("model"); }} placeholder="Polo GTI" className={rdwBg("model")} />
+                  <Input value={model} onChange={(e) => { setModel(capitalizeModel(e.target.value)); clearRdw("model"); }} placeholder="Polo GTI" className={rdwBg("model")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Jaar</label>
@@ -256,7 +257,7 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Kleur</label>
-                  <Input value={kleur} onChange={(e) => { setKleur(e.target.value); clearRdw("kleur"); }} placeholder="Wit" className={rdwBg("kleur")} />
+                  <Input value={kleur} onChange={(e) => { setKleur(capitalizeKleur(e.target.value)); clearRdw("kleur"); }} placeholder="Wit" className={rdwBg("kleur")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Vraagprijs (€)</label>
