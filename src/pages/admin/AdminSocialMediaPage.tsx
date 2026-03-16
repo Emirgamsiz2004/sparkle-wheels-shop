@@ -354,9 +354,8 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                     <p className="text-sm text-muted-foreground">Genereer eerst een post om hashtags te zien.</p>
                   )}
                 </TabsContent>
-              </Tabs>
-            </Card>
-          )}
+            </Tabs>
+          </Card>
 
           {/* Instagram Preview */}
           {caption && platform !== "Marktplaats" && (
