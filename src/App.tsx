@@ -28,6 +28,7 @@ import AdminMoneybirdPage from "./pages/admin/AdminMoneybirdPage";
 import AdminInkoopPage from "./pages/admin/AdminInkoopPage";
 import AdminInstellingenPage from "./pages/admin/AdminInstellingenPage";
 import AdminSocialMediaPage from "./pages/admin/AdminSocialMediaPage";
+import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
