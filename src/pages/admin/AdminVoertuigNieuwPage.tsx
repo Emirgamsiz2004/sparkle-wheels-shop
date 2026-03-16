@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Vehicle } from "@/types/vehicle";
+import KentekenInput from "@/components/admin/KentekenInput";
 
 const AdminVoertuigNieuwPage = () => {
   const navigate = useNavigate();
