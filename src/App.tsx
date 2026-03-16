@@ -72,6 +72,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/voorraad" element={<Voorraad />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/consignatie" element={<Consignatie />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/over-ons" element={<OverOns />} />
