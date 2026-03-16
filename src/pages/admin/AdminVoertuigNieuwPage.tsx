@@ -79,7 +79,7 @@ const AdminVoertuigNieuwPage = () => {
     navigate("/admin/voertuigen");
   };
 
-  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800" : "";
+  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-accent/40 border-primary/30" : "";
 
   return (
     <div className="max-w-2xl space-y-6">
