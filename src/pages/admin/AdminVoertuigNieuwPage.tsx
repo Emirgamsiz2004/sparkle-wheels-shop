@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Vehicle } from "@/types/vehicle";
+import KentekenInput from "@/components/admin/KentekenInput";
 
 const AdminVoertuigNieuwPage = () => {
   const navigate = useNavigate();
@@ -36,11 +37,13 @@ const AdminVoertuigNieuwPage = () => {
       <div className="bg-card rounded-xl border border-border p-6">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} />
+            </div>
             <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} required />
             <Field label="Model" value={form.model} onChange={(v) => update("model", v)} required />
             <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} />
             <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", v)} />
-            <Field label="Kenteken" value={form.kenteken} onChange={(v) => update("kenteken", v.toUpperCase())} />
             <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>
