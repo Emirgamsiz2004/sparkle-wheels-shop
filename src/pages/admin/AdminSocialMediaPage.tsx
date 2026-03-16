@@ -299,7 +299,6 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
         {/* Right column — Output */}
         <div className="space-y-6">
           <Card className="p-5">
-            <Card className="p-5">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="w-full">
                   <TabsTrigger value="caption" className="flex-1">Caption</TabsTrigger>
