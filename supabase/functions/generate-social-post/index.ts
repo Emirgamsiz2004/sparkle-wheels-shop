@@ -107,7 +107,25 @@ Toon: ${toonInstructie[toon] || "Schrijf professioneel en to-the-point."}
 De caption MOET beginnen met EXACT deze eerste regel (kopieer letterlijk, verander NIETS):
 ${emoji} ${merk} ${model}${motorLabel} | ${jaar} | ${transmissie}
 
-[Schrijf 1-2 zinnen die de auto aantrekkelijk omschrijven. Noem NIET alleen de kleur. Beschrijf in plaats daarvan de sfeer, het karakter of de staat van de auto. Voorbeelden van goede zinnen: "Strakke GTI in nette staat — rijklaar en direct beschikbaar." of "Een sportieve daily driver die er scherp uitziet en gewoon rijdt." of "Weinig kilometers voor zijn leeftijd, goed onderhouden en instapklaar." Pas de stijl aan op de gekozen toon.]
+Schrijf een beschrijving van 2-3 zinnen die past bij een social media post over deze auto. Regels:
+
+- De eerste zin is een HAAK — een statement, vraag of observatie die iemand doet stoppen met scrollen. Geen saaie opsomming. Denk aan: een gevoel oproepen, FOMO creëren, de doelgroep aanspreken, of iets verrassends over de auto benoemen.
+- De tweede zin voegt iets toe over het karakter of de situatie van de auto — waarom is dit juist nu interessant? Lage km, bijzondere staat, zeldzame uitvoering, of een voordeel voor de koper.
+- Optionele derde zin: een subtiele call to action die uitnodigt zonder opdringerig te zijn.
+
+Voorbeelden van goede eerste zinnen:
+- 'Bijna nieuw, zonder de nieuwprijs.' (voor lage km auto)
+- 'Voor wie niet wil wachten op de ideale auto.' (voor instapklaar voertuig)
+- 'Dit is wat 5.000 km op een nieuwe auto betekent.' (specifiek en concreet)
+- 'Weinig mensen rijden in iets als dit voor deze prijs.' (schaarste)
+- 'Soms komt de perfecte auto gewoon op het juiste moment voorbij.' (gevoel)
+
+Pas de toon aan op het gekozen toonprofiel:
+- Professioneel & Nuchter: droog, to the point, geen overdrijving
+- Enthousiast & Energiek: levendig, actief taalgebruik, lichte energie
+- Luxe & Exclusief: rustig, zelfverzekerd, wekt gevoel van kwaliteit
+
+Schrijf NOOIT: 'betrouwbare', 'direct inzetbaar', 'mooie auto', 'geweldige staat' of andere vage superlatieven zonder bewijs. Gebruik altijd concrete details uit de voertuiggegevens om claims te onderbouwen.
 
 📋 Specs:
 › Bouwjaar: [jaar]
