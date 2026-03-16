@@ -4,11 +4,15 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Vehicle } from "@/types/vehicle";
 import KentekenInput from "@/components/admin/KentekenInput";
+import { fetchRdwData } from "@/lib/rdw";
+import { cn } from "@/lib/utils";
 
 const AdminVoertuigNieuwPage = () => {
   const navigate = useNavigate();
   const { addVehicle } = useVehicles();
   const [saving, setSaving] = useState(false);
+  const [rdwLoading, setRdwLoading] = useState(false);
+  const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
   const [form, setForm] = useState({
     merk: "", model: "", bouwjaar: new Date().getFullYear(), kleur: "",
     kenteken: "", kilometerstand: 0, brandstof: "benzine" as Vehicle["brandstof"],
@@ -16,7 +20,32 @@ const AdminVoertuigNieuwPage = () => {
     inkoopprijs: 0, verkoopprijs: 0, opmerkingen: "",
   });
 
-  const update = (key: string, value: any) => setForm((f) => ({ ...f, [key]: value }));
+  const update = (key: string, value: any) => {
+    setForm((f) => ({ ...f, [key]: value }));
+    setRdwFields((prev) => { const next = new Set(prev); next.delete(key); return next; });
+  };
+
+  const handleRdwLookup = async (kenteken: string) => {
+    setRdwLoading(true);
+    const data = await fetchRdwData(kenteken);
+    if (data) {
+      const filled = new Set<string>();
+      const updates: Record<string, any> = {};
+      if (data.merk) { updates.merk = data.merk; filled.add("merk"); }
+      if (data.model) { updates.model = data.model; filled.add("model"); }
+      if (data.bouwjaar) { updates.bouwjaar = data.bouwjaar; filled.add("bouwjaar"); }
+      if (data.kleur) { updates.kleur = data.kleur; filled.add("kleur"); }
+      if (data.brandstof) {
+        const bf = data.brandstof.toLowerCase() as Vehicle["brandstof"];
+        if (["benzine", "diesel", "elektrisch", "hybride", "lpg"].includes(bf)) {
+          updates.brandstof = bf; filled.add("brandstof");
+        }
+      }
+      setForm((f) => ({ ...f, ...updates }));
+      setRdwFields(filled);
+    }
+    setRdwLoading(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +54,8 @@ const AdminVoertuigNieuwPage = () => {
     setSaving(false);
     navigate("/admin/voertuigen");
   };
+
+  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800" : "";
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -38,16 +69,16 @@ const AdminVoertuigNieuwPage = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} />
+              <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} onValidKenteken={handleRdwLookup} loading={rdwLoading} />
             </div>
-            <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} required />
-            <Field label="Model" value={form.model} onChange={(v) => update("model", v)} required />
-            <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} />
-            <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", v)} />
+            <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} required highlight={rdwFields.has("merk")} />
+            <Field label="Model" value={form.model} onChange={(v) => update("model", v)} required highlight={rdwFields.has("model")} />
+            <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} highlight={rdwFields.has("bouwjaar")} />
+            <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", v)} highlight={rdwFields.has("kleur")} />
             <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>
-              <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className="w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all">
+              <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", rdwBg("brandstof"))}>
                 <option value="benzine">Benzine</option><option value="diesel">Diesel</option><option value="elektrisch">Elektrisch</option><option value="hybride">Hybride</option><option value="lpg">LPG</option>
               </select>
             </div>
@@ -80,12 +111,12 @@ const AdminVoertuigNieuwPage = () => {
   );
 };
 
-const Field = ({ label, value, onChange, type = "text", required = false }: {
-  label: string; value: any; onChange: (v: string) => void; type?: string; required?: boolean;
+const Field = ({ label, value, onChange, type = "text", required = false, highlight = false }: {
+  label: string; value: any; onChange: (v: string) => void; type?: string; required?: boolean; highlight?: boolean;
 }) => (
   <div>
     <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className="w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all" />
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", highlight && "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800")} />
   </div>
 );
 

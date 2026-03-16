@@ -3,6 +3,8 @@ import { Vehicle } from "@/types/vehicle";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import KentekenInput from "@/components/admin/KentekenInput";
+import { fetchRdwData } from "@/lib/rdw";
+import { cn } from "@/lib/utils";
 
 interface Props {
   vehicle: Vehicle;
@@ -12,8 +14,35 @@ interface Props {
 const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
   const [form, setForm] = useState({ ...vehicle });
   const [saving, setSaving] = useState(false);
+  const [rdwLoading, setRdwLoading] = useState(false);
+  const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
 
-  const update = (key: string, value: any) => setForm((f) => ({ ...f, [key]: value }));
+  const update = (key: string, value: any) => {
+    setForm((f) => ({ ...f, [key]: value }));
+    setRdwFields((prev) => { const next = new Set(prev); next.delete(key); return next; });
+  };
+
+  const handleRdwLookup = async (kenteken: string) => {
+    setRdwLoading(true);
+    const data = await fetchRdwData(kenteken);
+    if (data) {
+      const filled = new Set<string>();
+      const updates: Record<string, any> = {};
+      if (data.merk) { updates.merk = data.merk; filled.add("merk"); }
+      if (data.model) { updates.model = data.model; filled.add("model"); }
+      if (data.bouwjaar) { updates.bouwjaar = data.bouwjaar; filled.add("bouwjaar"); }
+      if (data.kleur) { updates.kleur = data.kleur; filled.add("kleur"); }
+      if (data.brandstof) {
+        const bf = data.brandstof.toLowerCase() as Vehicle["brandstof"];
+        if (["benzine", "diesel", "elektrisch", "hybride", "lpg"].includes(bf)) {
+          updates.brandstof = bf; filled.add("brandstof");
+        }
+      }
+      setForm((f) => ({ ...f, ...updates }));
+      setRdwFields(filled);
+    }
+    setRdwLoading(false);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -21,21 +50,23 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
     setSaving(false);
   };
 
+  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800" : "";
+
   return (
     <Card>
       <CardContent className="p-6 space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} />
+            <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} onValidKenteken={handleRdwLookup} loading={rdwLoading} />
           </div>
-          <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} />
-          <Field label="Model" value={form.model} onChange={(v) => update("model", v)} />
-          <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} />
-          <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", v)} />
+          <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} highlight={rdwFields.has("merk")} />
+          <Field label="Model" value={form.model} onChange={(v) => update("model", v)} highlight={rdwFields.has("model")} />
+          <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} highlight={rdwFields.has("bouwjaar")} />
+          <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", v)} highlight={rdwFields.has("kleur")} />
           <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
           <div>
             <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>
-            <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+            <select value={form.brandstof} onChange={(e) => { update("brandstof", e.target.value); }} className={cn("w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring", rdwBg("brandstof"))}>
               <option value="benzine">Benzine</option><option value="diesel">Diesel</option><option value="elektrisch">Elektrisch</option><option value="hybride">Hybride</option><option value="lpg">LPG</option>
             </select>
           </div>
@@ -78,12 +109,12 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
   );
 };
 
-const Field = ({ label, value, onChange, type = "text" }: {
-  label: string; value: any; onChange: (v: string) => void; type?: string;
+const Field = ({ label, value, onChange, type = "text", highlight = false }: {
+  label: string; value: any; onChange: (v: string) => void; type?: string; highlight?: boolean;
 }) => (
   <div>
     <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cn("w-full px-3 py-2 text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-ring", highlight && "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800")} />
   </div>
 );
 
