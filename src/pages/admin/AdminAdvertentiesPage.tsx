@@ -60,6 +60,8 @@ const AdminAdvertentiesPage = () => {
   const [km, setKm] = useState<number | "">("");
   const [prijs, setPrijs] = useState<number | "">("");
   const [motorinhoud, setMotorinhoud] = useState("");
+  const [vermogen, setVermogen] = useState<number | "">("");
+  const [uitvoering, setUitvoering] = useState("");
   const [transmissie, setTransmissie] = useState("Handgeschakeld");
   const [kleur, setKleur] = useState("");
   const [apkTot, setApkTot] = useState("");
