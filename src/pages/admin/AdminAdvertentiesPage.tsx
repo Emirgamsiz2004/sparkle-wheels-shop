@@ -70,6 +70,13 @@ const AdminAdvertentiesPage = () => {
   const [nap, setNap] = useState(true);
   const [prijsBespreekbaar, setPrijsBespreekbaar] = useState(false);
   const [bijzonderheden, setBijzonderheden] = useState("");
+  const [brandstof, setBrandstof] = useState("");
+  const [carrosserie, setCarrosserie] = useState("");
+  const [aantalDeuren, setAantalDeuren] = useState<number | "">("");
+  const [aantalZitplaatsen, setAantalZitplaatsen] = useState<number | "">("");
+  const [gewicht, setGewicht] = useState<number | "">("");
+  const [catalogusprijs, setCatalogusprijs] = useState<number | "">("");
+  const [aantalCilinders, setAantalCilinders] = useState<number | "">("");
   const [loading, setLoading] = useState(false);
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
