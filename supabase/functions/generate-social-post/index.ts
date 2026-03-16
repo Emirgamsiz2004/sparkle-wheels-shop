@@ -17,6 +17,7 @@ serve(async (req) => {
       kleur, bijzonderheden, type_auto, toon, platform, motorinhoud,
       apk_geldig_tot, aantal_eigenaren, schadevrij, nap, prijs_bespreekbaar,
       uitvoering, vermogen, brandstof, carrosserie,
+      aantal_deuren, aantal_zitplaatsen, gewicht, nieuwprijs, aantal_cilinders,
     } = await req.json();
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
