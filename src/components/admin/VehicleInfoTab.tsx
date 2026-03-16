@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
+import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
 
 interface Props {
   vehicle: Vehicle;
