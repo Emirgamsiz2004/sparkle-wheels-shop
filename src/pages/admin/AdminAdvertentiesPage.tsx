@@ -74,6 +74,7 @@ const AdminAdvertentiesPage = () => {
     setSelectedVehicle(id);
     const v = vehicles.find((v) => v.id === id);
     if (!v) return;
+    setKenteken(v.kenteken || "");
     setMerk(v.merk);
     setModel(v.model);
     setJaar(v.bouwjaar || "");
