@@ -87,6 +87,28 @@ const AdminAdvertentiesPage = () => {
     setTransmissie("Handgeschakeld");
   };
 
+  const handleRdwLookup = async (kenteken: string) => {
+    setRdwLoading(true);
+    const data = await fetchRdwData(kenteken);
+    if (data) {
+      const filled = new Set<string>();
+      if (data.merk) { setMerk(data.merk); filled.add("merk"); }
+      if (data.model) { setModel(data.model); filled.add("model"); }
+      if (data.bouwjaar) { setJaar(data.bouwjaar); filled.add("jaar"); }
+      if (data.kleur) { setKleur(data.kleur); filled.add("kleur"); }
+      if (data.motorinhoud) { setMotorinhoud(data.motorinhoud); filled.add("motorinhoud"); }
+      if (data.apkTot) { setApkTot(data.apkTot); filled.add("apkTot"); }
+      setRdwFields(filled);
+    }
+    setRdwLoading(false);
+  };
+
+  const clearRdw = (key: string) => {
+    setRdwFields((prev) => { const next = new Set(prev); next.delete(key); return next; });
+  };
+
+  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800" : "";
+
   const handleGenerate = async () => {
     if (!merk || !model) {
       toast.error("Vul minimaal merk en model in");
