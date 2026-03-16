@@ -18,8 +18,8 @@ serve(async (req) => {
       apk_geldig_tot, aantal_eigenaren, schadevrij, nap, prijs_bespreekbaar,
     } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     let prompt: string;
     let aiModel = "google/gemini-3-flash-preview";
