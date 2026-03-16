@@ -357,8 +357,7 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
             </Tabs>
           </Card>
 
-          {/* Instagram Preview */}
-          {caption && platform !== "Marktplaats" && (
+          {caption && (
             <Card className="p-5 space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Instagram Preview</h3>
               <div className="rounded-lg border border-border bg-background p-4 space-y-2 max-w-sm">
