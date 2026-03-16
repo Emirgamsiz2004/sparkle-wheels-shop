@@ -260,6 +260,37 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                 rows={2}
               />
             </div>
+
+            {platform === "Marktplaats" && (
+              <>
+                <Separator />
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Marktplaats gegevens</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-muted-foreground">APK geldig tot</label>
+                    <Input type="date" value={apkGeldigTot} onChange={(e) => setApkGeldigTot(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-muted-foreground">Aantal eigenaren</label>
+                    <Input type="number" min={1} value={aantalEigenaren} onChange={(e) => setAantalEigenaren(Number(e.target.value) || 1)} />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-muted-foreground">Schadevrij</label>
+                    <Switch checked={schadevrij} onCheckedChange={setSchadevrij} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-muted-foreground">NAP</label>
+                    <Switch checked={nap} onCheckedChange={setNap} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-muted-foreground">Prijs bespreekbaar</label>
+                    <Switch checked={prijsBespreekbaar} onCheckedChange={setPrijsBespreekbaar} />
+                  </div>
+                </div>
+              </>
+            )}
           </Card>
 
           <Card className="p-5 space-y-4">
