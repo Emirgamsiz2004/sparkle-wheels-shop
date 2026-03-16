@@ -25,11 +25,13 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
     <Card>
       <CardContent className="p-6 space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
+            <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} />
+          </div>
           <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} />
           <Field label="Model" value={form.model} onChange={(v) => update("model", v)} />
           <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} />
           <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", v)} />
-          <Field label="Kenteken" value={form.kenteken} onChange={(v) => update("kenteken", v.toUpperCase())} />
           <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
           <div>
             <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Copy, Sparkles, Loader2, Lock } from "lucide-react";
+import KentekenInput from "@/components/admin/KentekenInput";
 
 const formatNumber = (n: number | undefined) =>
   n ? n.toLocaleString("nl-NL") : "";
