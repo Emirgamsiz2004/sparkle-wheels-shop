@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(() => localStorage.getItem("admin_email") || "");
+  const [password, setPassword] = useState(() => localStorage.getItem("admin_pw") || "");
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("admin_remember") === "true");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
