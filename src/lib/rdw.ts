@@ -9,6 +9,7 @@ export interface RdwVehicleData {
   motorinhoud: string;
   brandstof: string;
   carrosserie: string;
+  vermogen: number | null;
 }
 
 const capitalize = (s: string): string =>
