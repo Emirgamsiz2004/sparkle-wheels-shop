@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Vehicle } from "@/types/vehicle";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import KentekenInput from "@/components/admin/KentekenInput";
 
 interface Props {
   vehicle: Vehicle;
