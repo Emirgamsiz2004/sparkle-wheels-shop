@@ -10,6 +10,12 @@ export interface RdwVehicleData {
   brandstof: string;
   carrosserie: string;
   vermogen: number | null;
+  aantalDeuren: number | null;
+  aantalZitplaatsen: number | null;
+  gewicht: number | null;
+  catalogusprijs: number | null;
+  eersteToelating: string;
+  aantalCilinders: number | null;
 }
 
 const capitalize = (s: string): string =>
