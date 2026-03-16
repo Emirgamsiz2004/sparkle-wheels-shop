@@ -88,6 +88,9 @@ const App = () => (
               <Route path="/diensten/auto-detailing" element={<AutoDetailing />} />
               <Route path="/diensten/auto-zoeken" element={<AutoZoeken />} />
               <Route path="/diensten/auto-customizing" element={<AutoCustomizing />} />
+              <Route path="/privacybeleid" element={<PrivacyPolicy />} />
+              <Route path="/cookiebeleid" element={<CookiePolicy />} />
+              <Route path="/algemene-voorwaarden" element={<AlgemeneVoorwaarden />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboardPage />} />
