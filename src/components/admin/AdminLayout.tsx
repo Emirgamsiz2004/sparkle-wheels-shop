@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen, Settings, ShoppingCart, Megaphone, Newspaper } from "lucide-react";
+import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen, Settings, ShoppingCart, Megaphone, Newspaper, FileText } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 
