@@ -123,6 +123,14 @@ const AdminVoertuigDetailPage = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleGenerateBlog}
+            disabled={blogGenerating}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-accent text-foreground hover:bg-accent/80 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {blogGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+            Genereer blogpost
+          </button>
           {vehicle.status === "te_koop" && (
             <button
               onClick={() => setVerkoopOpen(true)}

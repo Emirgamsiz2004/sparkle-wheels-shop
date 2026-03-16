@@ -15,6 +15,7 @@ const navItems = [
   { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
   { label: "Social Media", icon: Megaphone, path: "/admin/social-media" },
   { label: "Advertenties", icon: Newspaper, path: "/admin/advertenties" },
+  { label: "Blog", icon: FileText, path: "/admin/blog" },
 ];
 
 const AdminLayout = () => {
