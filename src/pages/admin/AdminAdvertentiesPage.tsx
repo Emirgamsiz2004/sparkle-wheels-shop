@@ -12,7 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Copy, Sparkles, Loader2, Lock } from "lucide-react";
 import KentekenInput from "@/components/admin/KentekenInput";
-
+import { fetchRdwData } from "@/lib/rdw";
+import { cn } from "@/lib/utils";
 const formatNumber = (n: number | undefined) =>
   n ? n.toLocaleString("nl-NL") : "";
 
@@ -67,6 +68,8 @@ const AdminAdvertentiesPage = () => {
   const [prijsBespreekbaar, setPrijsBespreekbaar] = useState(false);
   const [bijzonderheden, setBijzonderheden] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rdwLoading, setRdwLoading] = useState(false);
+  const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
   const [caption, setCaption] = useState("");
   const [activeChannel, setActiveChannel] = useState("marktplaats");
 
@@ -83,6 +86,28 @@ const AdminAdvertentiesPage = () => {
     setKleur(v.kleur || "");
     setTransmissie("Handgeschakeld");
   };
+
+  const handleRdwLookup = async (kenteken: string) => {
+    setRdwLoading(true);
+    const data = await fetchRdwData(kenteken);
+    if (data) {
+      const filled = new Set<string>();
+      if (data.merk) { setMerk(data.merk); filled.add("merk"); }
+      if (data.model) { setModel(data.model); filled.add("model"); }
+      if (data.bouwjaar) { setJaar(data.bouwjaar); filled.add("jaar"); }
+      if (data.kleur) { setKleur(data.kleur); filled.add("kleur"); }
+      if (data.motorinhoud) { setMotorinhoud(data.motorinhoud); filled.add("motorinhoud"); }
+      if (data.apkTot) { setApkTot(data.apkTot); filled.add("apkTot"); }
+      setRdwFields(filled);
+    }
+    setRdwLoading(false);
+  };
+
+  const clearRdw = (key: string) => {
+    setRdwFields((prev) => { const next = new Set(prev); next.delete(key); return next; });
+  };
+
+  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800" : "";
 
   const handleGenerate = async () => {
     if (!merk || !model) {
@@ -197,19 +222,19 @@ const AdminAdvertentiesPage = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <KentekenInput value={kenteken} onChange={setKenteken} />
+                  <KentekenInput value={kenteken} onChange={setKenteken} onValidKenteken={handleRdwLookup} loading={rdwLoading} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Merk</label>
-                  <Input value={merk} onChange={(e) => setMerk(e.target.value)} placeholder="Volkswagen" />
+                  <Input value={merk} onChange={(e) => { setMerk(e.target.value); clearRdw("merk"); }} placeholder="Volkswagen" className={rdwBg("merk")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Model</label>
-                  <Input value={model} onChange={(e) => setModel(e.target.value)} placeholder="Polo GTI" />
+                  <Input value={model} onChange={(e) => { setModel(e.target.value); clearRdw("model"); }} placeholder="Polo GTI" className={rdwBg("model")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Jaar</label>
-                  <Input type="number" value={jaar} onChange={(e) => setJaar(e.target.value ? Number(e.target.value) : "")} placeholder="2019" />
+                  <Input type="number" value={jaar} onChange={(e) => { setJaar(e.target.value ? Number(e.target.value) : ""); clearRdw("jaar"); }} placeholder="2019" className={rdwBg("jaar")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Kilometerstand</label>
@@ -217,7 +242,7 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Motorinhoud</label>
-                  <Input value={motorinhoud} onChange={(e) => setMotorinhoud(e.target.value)} placeholder="1.8 TSI 192pk" />
+                  <Input value={motorinhoud} onChange={(e) => { setMotorinhoud(e.target.value); clearRdw("motorinhoud"); }} placeholder="1.8" className={rdwBg("motorinhoud")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Transmissie</label>
@@ -231,7 +256,7 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Kleur</label>
-                  <Input value={kleur} onChange={(e) => setKleur(e.target.value)} placeholder="Wit" />
+                  <Input value={kleur} onChange={(e) => { setKleur(e.target.value); clearRdw("kleur"); }} placeholder="Wit" className={rdwBg("kleur")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Vraagprijs (€)</label>
@@ -239,7 +264,7 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">APK geldig tot</label>
-                  <Input type="date" value={apkTot} onChange={(e) => setApkTot(e.target.value)} />
+                  <Input type="date" value={apkTot} onChange={(e) => { setApkTot(e.target.value); clearRdw("apkTot"); }} className={rdwBg("apkTot")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Aantal eigenaren</label>
