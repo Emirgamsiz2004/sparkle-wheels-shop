@@ -10,8 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Copy, Sparkles, Loader2, Instagram, Facebook, Trash2, ShoppingCart } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { Copy, Sparkles, Loader2, Instagram, Facebook, Trash2 } from "lucide-react";
 
 interface Hashtags {
   merkModel: string;
@@ -30,114 +29,6 @@ interface HistoryItem {
 
 const formatNumber = (n: number | undefined) =>
   n ? n.toLocaleString("nl-NL") : "";
-
-const parseMarktplaatsCaption = (raw: string) => {
-  const titelMatch = raw.match(/TITEL:\s*(.+?)(?:\n|$)/i);
-  const titel = titelMatch?.[1]?.trim() || "";
-
-  const beschrijvingMatch = raw.match(/BESCHRIJVING:\s*\n?([\s\S]*?)(?=\nSPECIFICATIES:)/i);
-  const beschrijving = beschrijvingMatch?.[1]?.trim() || "";
-
-  const specsMatch = raw.match(/SPECIFICATIES:\s*\n?([\s\S]*?)(?=\nVRAAGPRIJS:)/i);
-  const specsRaw = specsMatch?.[1]?.trim() || "";
-  const specs = specsRaw.split("\n").map((l) => {
-    const [key, ...rest] = l.replace(/^-\s*/, "").split(":");
-    return { key: key?.trim(), value: rest.join(":").trim() };
-  }).filter((s) => s.key && s.value);
-
-  const prijsMatch = raw.match(/VRAAGPRIJS:\s*(.+?)(?:\n|$)/i);
-  const prijs = prijsMatch?.[1]?.trim() || "";
-
-  const contactMatch = raw.match(/CONTACT:\s*\n?([\s\S]*?)$/i);
-  const contact = contactMatch?.[1]?.trim() || "";
-
-  // Everything after TITEL line (beschrijving + specs + prijs + contact)
-  const afterTitel = raw.replace(/.*TITEL:.*\n?/i, "").trim();
-
-  return { titel, beschrijving, specs, prijs, contact, fullBody: afterTitel };
-};
-
-const MarktplaatsPreview = ({ caption, onCopy }: { caption: string; onCopy: (text: string, label: string) => void }) => {
-  const { titel, beschrijving, specs, prijs, contact, fullBody } = parseMarktplaatsCaption(caption);
-
-  return (
-    <Card className="p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#e05c00" }}>
-          Marktplaats Preview
-        </h3>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onCopy(titel, "Titel")}
-            disabled={!titel}
-            className="gap-1.5 text-xs border-[#e05c00]/30 hover:bg-[#e05c00]/10"
-          >
-            <Copy className="w-3 h-3" /> Kopieer titel
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => onCopy(fullBody, "Advertentie")}
-            disabled={!fullBody}
-            className="gap-1.5 text-xs text-white hover:opacity-90"
-            style={{ backgroundColor: "#e05c00" }}
-          >
-            <Copy className="w-3 h-3" /> Kopieer volledige advertentie
-          </Button>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-border bg-white text-black p-6 space-y-5">
-        {/* Titel */}
-        {titel && (
-          <h2 className="text-lg font-bold leading-tight" style={{ color: "#1a1a1a" }}>
-            {titel}
-          </h2>
-        )}
-
-        {/* Prijs */}
-        {prijs && (
-          <div className="text-2xl font-extrabold" style={{ color: "#e05c00" }}>
-            {prijs}
-          </div>
-        )}
-
-        <hr className="border-gray-200" />
-
-        {/* Beschrijving */}
-        {beschrijving && (
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Beschrijving</p>
-            <p className="text-sm leading-relaxed text-gray-800">{beschrijving}</p>
-          </div>
-        )}
-
-        {/* Specs tabel */}
-        {specs.length > 0 && (
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Kenmerken</p>
-            <div className="border border-gray-200 rounded overflow-hidden">
-              {specs.map((s, i) => (
-                <div key={i} className={`flex text-sm ${i % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
-                  <span className="w-2/5 px-3 py-2 font-medium text-gray-600 border-r border-gray-200">{s.key}</span>
-                  <span className="w-3/5 px-3 py-2 text-gray-900">{s.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Contact */}
-        {contact && (
-          <div className="bg-gray-50 rounded p-4 text-sm text-gray-700 whitespace-pre-wrap">
-            {contact}
-          </div>
-        )}
-      </div>
-    </Card>
-  );
-};
 
 const AdminSocialMediaPage = () => {
   const { vehicles } = useVehicles();
@@ -159,12 +50,6 @@ const AdminSocialMediaPage = () => {
   const [hashtags, setHashtags] = useState<Hashtags | null>(null);
   const [activeTab, setActiveTab] = useState("caption");
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  // Marktplaats-specific fields
-  const [apkGeldigTot, setApkGeldigTot] = useState("");
-  const [aantalEigenaren, setAantalEigenaren] = useState(1);
-  const [schadevrij, setSchadevrij] = useState(true);
-  const [nap, setNap] = useState(true);
-  const [prijsBespreekbaar, setPrijsBespreekbaar] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("social-post-history");
@@ -228,13 +113,6 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
           merk, model, jaar, kilometerstand: formatNumber(km as number),
           prijs: formatNumber(prijs as number), transmissie, kleur,
           bijzonderheden, type_auto: typeAuto, toon, platform, motorinhoud,
-          ...(platform === "Marktplaats" && {
-            apk_geldig_tot: apkGeldigTot,
-            aantal_eigenaren: aantalEigenaren,
-            schadevrij,
-            nap,
-            prijs_bespreekbaar: prijsBespreekbaar,
-          }),
         },
       });
 
@@ -285,7 +163,7 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Social Media</h1>
-        <p className="text-muted-foreground text-sm mt-1">Genereer posts voor Instagram & Facebook</p>
+        <p className="text-muted-foreground text-sm mt-1">Genereer posts voor Instagram en Facebook</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -375,37 +253,6 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                 rows={2}
               />
             </div>
-
-            {platform === "Marktplaats" && (
-              <>
-                <Separator />
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Marktplaats gegevens</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground">APK geldig tot</label>
-                    <Input type="date" value={apkGeldigTot} onChange={(e) => setApkGeldigTot(e.target.value)} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground">Aantal eigenaren</label>
-                    <Input type="number" min={1} value={aantalEigenaren} onChange={(e) => setAantalEigenaren(Number(e.target.value) || 1)} />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs text-muted-foreground">Schadevrij</label>
-                    <Switch checked={schadevrij} onCheckedChange={setSchadevrij} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs text-muted-foreground">NAP</label>
-                    <Switch checked={nap} onCheckedChange={setNap} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs text-muted-foreground">Prijs bespreekbaar</label>
-                    <Switch checked={prijsBespreekbaar} onCheckedChange={setPrijsBespreekbaar} />
-                  </div>
-                </div>
-              </>
-            )}
           </Card>
 
           <Card className="p-5 space-y-4">
@@ -424,15 +271,12 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">Platform</label>
-              <ToggleGroup type="single" value={platform} onValueChange={(v) => v && setPlatform(v)} className="justify-start flex-wrap">
+              <ToggleGroup type="single" value={platform} onValueChange={(v) => v && setPlatform(v)} className="justify-start">
                 <ToggleGroupItem value="Instagram" className="gap-1.5 text-xs">
                   <Instagram className="w-3.5 h-3.5" /> Instagram
                 </ToggleGroupItem>
                 <ToggleGroupItem value="Facebook" className="gap-1.5 text-xs">
                   <Facebook className="w-3.5 h-3.5" /> Facebook
-                </ToggleGroupItem>
-                <ToggleGroupItem value="Marktplaats" className="gap-1.5 text-xs">
-                  <ShoppingCart className="w-3.5 h-3.5" /> Marktplaats
                 </ToggleGroupItem>
                 <ToggleGroupItem value="Beide" className="text-xs">Beide</ToggleGroupItem>
               </ToggleGroup>
@@ -447,10 +291,7 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 
         {/* Right column — Output */}
         <div className="space-y-6">
-          {platform === "Marktplaats" && caption ? (
-            <MarktplaatsPreview caption={caption} onCopy={copyToClipboard} />
-          ) : (
-            <Card className="p-5">
+          <Card className="p-5">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="w-full">
                   <TabsTrigger value="caption" className="flex-1">Caption</TabsTrigger>
@@ -506,12 +347,10 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                     <p className="text-sm text-muted-foreground">Genereer eerst een post om hashtags te zien.</p>
                   )}
                 </TabsContent>
-              </Tabs>
-            </Card>
-          )}
+            </Tabs>
+          </Card>
 
-          {/* Instagram Preview */}
-          {caption && platform !== "Marktplaats" && (
+          {caption && (
             <Card className="p-5 space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Instagram Preview</h3>
               <div className="rounded-lg border border-border bg-background p-4 space-y-2 max-w-sm">
