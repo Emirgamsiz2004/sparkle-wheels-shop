@@ -130,6 +130,8 @@ const AdminAdvertentiesPage = () => {
           schadevrij: schadevrij ? "Ja" : "Nee",
           nap: nap ? "Ja" : "Nee",
           prijs_bespreekbaar: prijsBespreekbaar ? "Ja" : "Nee",
+          uitvoering,
+          vermogen: vermogen || undefined,
         },
       });
 
