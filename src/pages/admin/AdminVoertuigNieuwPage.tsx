@@ -6,6 +6,7 @@ import { Vehicle } from "@/types/vehicle";
 import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
+import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
 
 const AdminVoertuigNieuwPage = () => {
   const navigate = useNavigate();
