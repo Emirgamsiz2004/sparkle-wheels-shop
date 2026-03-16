@@ -31,6 +31,114 @@ interface HistoryItem {
 const formatNumber = (n: number | undefined) =>
   n ? n.toLocaleString("nl-NL") : "";
 
+const parseMarktplaatsCaption = (raw: string) => {
+  const titelMatch = raw.match(/TITEL:\s*(.+?)(?:\n|$)/i);
+  const titel = titelMatch?.[1]?.trim() || "";
+
+  const beschrijvingMatch = raw.match(/BESCHRIJVING:\s*\n?([\s\S]*?)(?=\nSPECIFICATIES:)/i);
+  const beschrijving = beschrijvingMatch?.[1]?.trim() || "";
+
+  const specsMatch = raw.match(/SPECIFICATIES:\s*\n?([\s\S]*?)(?=\nVRAAGPRIJS:)/i);
+  const specsRaw = specsMatch?.[1]?.trim() || "";
+  const specs = specsRaw.split("\n").map((l) => {
+    const [key, ...rest] = l.replace(/^-\s*/, "").split(":");
+    return { key: key?.trim(), value: rest.join(":").trim() };
+  }).filter((s) => s.key && s.value);
+
+  const prijsMatch = raw.match(/VRAAGPRIJS:\s*(.+?)(?:\n|$)/i);
+  const prijs = prijsMatch?.[1]?.trim() || "";
+
+  const contactMatch = raw.match(/CONTACT:\s*\n?([\s\S]*?)$/i);
+  const contact = contactMatch?.[1]?.trim() || "";
+
+  // Everything after TITEL line (beschrijving + specs + prijs + contact)
+  const afterTitel = raw.replace(/.*TITEL:.*\n?/i, "").trim();
+
+  return { titel, beschrijving, specs, prijs, contact, fullBody: afterTitel };
+};
+
+const MarktplaatsPreview = ({ caption, onCopy }: { caption: string; onCopy: (text: string, label: string) => void }) => {
+  const { titel, beschrijving, specs, prijs, contact, fullBody } = parseMarktplaatsCaption(caption);
+
+  return (
+    <Card className="p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#e05c00" }}>
+          Marktplaats Preview
+        </h3>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onCopy(titel, "Titel")}
+            disabled={!titel}
+            className="gap-1.5 text-xs border-[#e05c00]/30 hover:bg-[#e05c00]/10"
+          >
+            <Copy className="w-3 h-3" /> Kopieer titel
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => onCopy(fullBody, "Advertentie")}
+            disabled={!fullBody}
+            className="gap-1.5 text-xs text-white hover:opacity-90"
+            style={{ backgroundColor: "#e05c00" }}
+          >
+            <Copy className="w-3 h-3" /> Kopieer volledige advertentie
+          </Button>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-border bg-white text-black p-6 space-y-5">
+        {/* Titel */}
+        {titel && (
+          <h2 className="text-lg font-bold leading-tight" style={{ color: "#1a1a1a" }}>
+            {titel}
+          </h2>
+        )}
+
+        {/* Prijs */}
+        {prijs && (
+          <div className="text-2xl font-extrabold" style={{ color: "#e05c00" }}>
+            {prijs}
+          </div>
+        )}
+
+        <hr className="border-gray-200" />
+
+        {/* Beschrijving */}
+        {beschrijving && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Beschrijving</p>
+            <p className="text-sm leading-relaxed text-gray-800">{beschrijving}</p>
+          </div>
+        )}
+
+        {/* Specs tabel */}
+        {specs.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Kenmerken</p>
+            <div className="border border-gray-200 rounded overflow-hidden">
+              {specs.map((s, i) => (
+                <div key={i} className={`flex text-sm ${i % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                  <span className="w-2/5 px-3 py-2 font-medium text-gray-600 border-r border-gray-200">{s.key}</span>
+                  <span className="w-3/5 px-3 py-2 text-gray-900">{s.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Contact */}
+        {contact && (
+          <div className="bg-gray-50 rounded p-4 text-sm text-gray-700 whitespace-pre-wrap">
+            {contact}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
+
 const AdminSocialMediaPage = () => {
   const { vehicles } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState("");
@@ -339,67 +447,71 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 
         {/* Right column — Output */}
         <div className="space-y-6">
-          <Card className="p-5">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="w-full">
-                <TabsTrigger value="caption" className="flex-1">Caption</TabsTrigger>
-                <TabsTrigger value="hashtags" className="flex-1">Hashtags</TabsTrigger>
-              </TabsList>
+          {platform === "Marktplaats" && caption ? (
+            <MarktplaatsPreview caption={caption} onCopy={copyToClipboard} />
+          ) : (
+            <Card className="p-5">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="w-full">
+                  <TabsTrigger value="caption" className="flex-1">Caption</TabsTrigger>
+                  <TabsTrigger value="hashtags" className="flex-1">Hashtags</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="caption" className="space-y-3 mt-4">
-                <Textarea
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                  rows={12}
-                  placeholder="Hier verschijnt je gegenereerde caption..."
-                  className="text-sm"
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copyToClipboard(caption, "Caption")}
-                  disabled={!caption}
-                  className="gap-1.5"
-                >
-                  <Copy className="w-3.5 h-3.5" /> Kopieer Caption
-                </Button>
-                <p className="text-[11px] text-muted-foreground">
-                  Tip: plaats de hashtags als eerste reactie op Instagram
-                </p>
-              </TabsContent>
+                <TabsContent value="caption" className="space-y-3 mt-4">
+                  <Textarea
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                    rows={12}
+                    placeholder="Hier verschijnt je gegenereerde caption..."
+                    className="text-sm"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(caption, "Caption")}
+                    disabled={!caption}
+                    className="gap-1.5"
+                  >
+                    <Copy className="w-3.5 h-3.5" /> Kopieer Caption
+                  </Button>
+                  <p className="text-[11px] text-muted-foreground">
+                    Tip: plaats de hashtags als eerste reactie op Instagram
+                  </p>
+                </TabsContent>
 
-              <TabsContent value="hashtags" className="space-y-4 mt-4">
-                {hashtags ? (
-                  <>
-                    {[
-                      { label: "🚗 Merk & Model", value: hashtags.merkModel },
-                      { label: "🏷️ Auto & Verkoop", value: hashtags.autoVerkopen },
-                      { label: "📍 Locatie", value: hashtags.locatie },
-                      { label: "✨ Extra", value: hashtags.extra },
-                    ].map((block) => (
-                      <div key={block.label} className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">{block.label}</p>
-                        <p className="text-sm break-all">{block.value}</p>
+                <TabsContent value="hashtags" className="space-y-4 mt-4">
+                  {hashtags ? (
+                    <>
+                      {[
+                        { label: "🚗 Merk & Model", value: hashtags.merkModel },
+                        { label: "🏷️ Auto & Verkoop", value: hashtags.autoVerkopen },
+                        { label: "📍 Locatie", value: hashtags.locatie },
+                        { label: "✨ Extra", value: hashtags.extra },
+                      ].map((block) => (
+                        <div key={block.label} className="space-y-1">
+                          <p className="text-xs font-medium text-muted-foreground">{block.label}</p>
+                          <p className="text-sm break-all">{block.value}</p>
+                        </div>
+                      ))}
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(allHashtags, "Hashtags")} className="gap-1.5">
+                          <Copy className="w-3.5 h-3.5" /> Kopieer Alle Hashtags
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(`${caption}\n\n${allHashtags}`, "Caption + Hashtags")} className="gap-1.5">
+                          <Copy className="w-3.5 h-3.5" /> Kopieer Alles
+                        </Button>
                       </div>
-                    ))}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      <Button variant="outline" size="sm" onClick={() => copyToClipboard(allHashtags, "Hashtags")} className="gap-1.5">
-                        <Copy className="w-3.5 h-3.5" /> Kopieer Alle Hashtags
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => copyToClipboard(`${caption}\n\n${allHashtags}`, "Caption + Hashtags")} className="gap-1.5">
-                        <Copy className="w-3.5 h-3.5" /> Kopieer Alles
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Genereer eerst een post om hashtags te zien.</p>
-                )}
-              </TabsContent>
-            </Tabs>
-          </Card>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Genereer eerst een post om hashtags te zien.</p>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </Card>
+          )}
 
           {/* Instagram Preview */}
-          {caption && (
+          {caption && platform !== "Marktplaats" && (
             <Card className="p-5 space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Instagram Preview</h3>
               <div className="rounded-lg border border-border bg-background p-4 space-y-2 max-w-sm">
