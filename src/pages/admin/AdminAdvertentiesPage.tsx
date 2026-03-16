@@ -14,6 +14,7 @@ import { Copy, Sparkles, Loader2, Lock } from "lucide-react";
 import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
+import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
 const formatNumber = (n: number | undefined) =>
   n ? n.toLocaleString("nl-NL") : "";
 
