@@ -260,7 +260,7 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                 rows={2}
               />
             </div>
-
+          </Card>
 
           <Card className="p-5 space-y-4">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Instellingen</h3>
