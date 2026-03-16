@@ -46,11 +46,15 @@ BESCHRIJVING:
 SPECIFICATIES:
 - Bouwjaar: [jaar]
 - Kilometerstand: ± [km]
-- Motorinhoud: [motorinhoud] [vermogen]pk
+- Motorinhoud: [motorinhoud] [vermogen]pk [aantal_cilinders cil. indien bekend]
 - Transmissie: [transmissie]
 - Brandstof: [brandstof]
 - Kleur: [kleur]
 - Carrosserie: [carrosserie]
+- Aantal deuren: [aantal deuren indien bekend]
+- Aantal zitplaatsen: [aantal zitplaatsen indien bekend]
+- Gewicht: [gewicht kg indien bekend]
+- Nieuwprijs: € [nieuwprijs indien bekend]
 - Aantal eigenaren: [eigenaren]
 - APK geldig tot: [apk]
 - NAP: [ja/nee]
