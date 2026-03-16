@@ -72,10 +72,10 @@ const AdminVoertuigNieuwPage = () => {
             <div className="col-span-2">
               <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} onValidKenteken={handleRdwLookup} loading={rdwLoading} />
             </div>
-            <Field label="Merk" value={form.merk} onChange={(v) => update("merk", v)} required highlight={rdwFields.has("merk")} />
-            <Field label="Model" value={form.model} onChange={(v) => update("model", v)} required highlight={rdwFields.has("model")} />
+            <Field label="Merk" value={form.merk} onChange={(v) => update("merk", capitalizeMerk(v))} required highlight={rdwFields.has("merk")} />
+            <Field label="Model" value={form.model} onChange={(v) => update("model", capitalizeModel(v))} required highlight={rdwFields.has("model")} />
             <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} highlight={rdwFields.has("bouwjaar")} />
-            <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", v)} highlight={rdwFields.has("kleur")} />
+            <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", capitalizeKleur(v))} highlight={rdwFields.has("kleur")} />
             <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>
