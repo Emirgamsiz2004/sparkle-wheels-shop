@@ -31,7 +31,115 @@ interface HistoryItem {
 const formatNumber = (n: number | undefined) =>
   n ? n.toLocaleString("nl-NL") : "";
 
-const AdminSocialMediaPage = () => {
+const parseMarktplaatsCaption = (raw: string) => {
+  const titelMatch = raw.match(/TITEL:\s*(.+?)(?:\n|$)/i);
+  const titel = titelMatch?.[1]?.trim() || "";
+
+  const beschrijvingMatch = raw.match(/BESCHRIJVING:\s*\n?([\s\S]*?)(?=\nSPECIFICATIES:)/i);
+  const beschrijving = beschrijvingMatch?.[1]?.trim() || "";
+
+  const specsMatch = raw.match(/SPECIFICATIES:\s*\n?([\s\S]*?)(?=\nVRAAGPRIJS:)/i);
+  const specsRaw = specsMatch?.[1]?.trim() || "";
+  const specs = specsRaw.split("\n").map((l) => {
+    const [key, ...rest] = l.replace(/^-\s*/, "").split(":");
+    return { key: key?.trim(), value: rest.join(":").trim() };
+  }).filter((s) => s.key && s.value);
+
+  const prijsMatch = raw.match(/VRAAGPRIJS:\s*(.+?)(?:\n|$)/i);
+  const prijs = prijsMatch?.[1]?.trim() || "";
+
+  const contactMatch = raw.match(/CONTACT:\s*\n?([\s\S]*?)$/i);
+  const contact = contactMatch?.[1]?.trim() || "";
+
+  // Everything after TITEL line (beschrijving + specs + prijs + contact)
+  const afterTitel = raw.replace(/.*TITEL:.*\n?/i, "").trim();
+
+  return { titel, beschrijving, specs, prijs, contact, fullBody: afterTitel };
+};
+
+const MarktplaatsPreview = ({ caption, onCopy }: { caption: string; onCopy: (text: string, label: string) => void }) => {
+  const { titel, beschrijving, specs, prijs, contact, fullBody } = parseMarktplaatsCaption(caption);
+
+  return (
+    <Card className="p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#e05c00" }}>
+          Marktplaats Preview
+        </h3>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onCopy(titel, "Titel")}
+            disabled={!titel}
+            className="gap-1.5 text-xs border-[#e05c00]/30 hover:bg-[#e05c00]/10"
+          >
+            <Copy className="w-3 h-3" /> Kopieer titel
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => onCopy(fullBody, "Advertentie")}
+            disabled={!fullBody}
+            className="gap-1.5 text-xs text-white hover:opacity-90"
+            style={{ backgroundColor: "#e05c00" }}
+          >
+            <Copy className="w-3 h-3" /> Kopieer volledige advertentie
+          </Button>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-border bg-white text-black p-6 space-y-5">
+        {/* Titel */}
+        {titel && (
+          <h2 className="text-lg font-bold leading-tight" style={{ color: "#1a1a1a" }}>
+            {titel}
+          </h2>
+        )}
+
+        {/* Prijs */}
+        {prijs && (
+          <div className="text-2xl font-extrabold" style={{ color: "#e05c00" }}>
+            {prijs}
+          </div>
+        )}
+
+        <hr className="border-gray-200" />
+
+        {/* Beschrijving */}
+        {beschrijving && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Beschrijving</p>
+            <p className="text-sm leading-relaxed text-gray-800">{beschrijving}</p>
+          </div>
+        )}
+
+        {/* Specs tabel */}
+        {specs.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Kenmerken</p>
+            <div className="border border-gray-200 rounded overflow-hidden">
+              {specs.map((s, i) => (
+                <div key={i} className={`flex text-sm ${i % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                  <span className="w-2/5 px-3 py-2 font-medium text-gray-600 border-r border-gray-200">{s.key}</span>
+                  <span className="w-3/5 px-3 py-2 text-gray-900">{s.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Contact */}
+        {contact && (
+          <div className="bg-gray-50 rounded p-4 text-sm text-gray-700 whitespace-pre-wrap">
+            {contact}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
+
+
   const { vehicles } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState("");
   const [merk, setMerk] = useState("");
