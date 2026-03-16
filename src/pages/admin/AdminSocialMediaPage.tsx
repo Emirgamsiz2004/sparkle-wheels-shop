@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Copy, Sparkles, Loader2, Instagram, Facebook, Trash2 } from "lucide-react";
+import { Copy, Sparkles, Loader2, Instagram, Facebook, Trash2, ShoppingCart } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface Hashtags {
   merkModel: string;
@@ -50,6 +51,12 @@ const AdminSocialMediaPage = () => {
   const [hashtags, setHashtags] = useState<Hashtags | null>(null);
   const [activeTab, setActiveTab] = useState("caption");
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  // Marktplaats-specific fields
+  const [apkGeldigTot, setApkGeldigTot] = useState("");
+  const [aantalEigenaren, setAantalEigenaren] = useState(1);
+  const [schadevrij, setSchadevrij] = useState(true);
+  const [nap, setNap] = useState(true);
+  const [prijsBespreekbaar, setPrijsBespreekbaar] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("social-post-history");
@@ -253,6 +260,37 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                 rows={2}
               />
             </div>
+
+            {platform === "Marktplaats" && (
+              <>
+                <Separator />
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Marktplaats gegevens</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-muted-foreground">APK geldig tot</label>
+                    <Input type="date" value={apkGeldigTot} onChange={(e) => setApkGeldigTot(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-muted-foreground">Aantal eigenaren</label>
+                    <Input type="number" min={1} value={aantalEigenaren} onChange={(e) => setAantalEigenaren(Number(e.target.value) || 1)} />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-muted-foreground">Schadevrij</label>
+                    <Switch checked={schadevrij} onCheckedChange={setSchadevrij} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-muted-foreground">NAP</label>
+                    <Switch checked={nap} onCheckedChange={setNap} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-muted-foreground">Prijs bespreekbaar</label>
+                    <Switch checked={prijsBespreekbaar} onCheckedChange={setPrijsBespreekbaar} />
+                  </div>
+                </div>
+              </>
+            )}
           </Card>
 
           <Card className="p-5 space-y-4">
@@ -271,12 +309,15 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">Platform</label>
-              <ToggleGroup type="single" value={platform} onValueChange={(v) => v && setPlatform(v)} className="justify-start">
+              <ToggleGroup type="single" value={platform} onValueChange={(v) => v && setPlatform(v)} className="justify-start flex-wrap">
                 <ToggleGroupItem value="Instagram" className="gap-1.5 text-xs">
                   <Instagram className="w-3.5 h-3.5" /> Instagram
                 </ToggleGroupItem>
                 <ToggleGroupItem value="Facebook" className="gap-1.5 text-xs">
                   <Facebook className="w-3.5 h-3.5" /> Facebook
+                </ToggleGroupItem>
+                <ToggleGroupItem value="Marktplaats" className="gap-1.5 text-xs">
+                  <ShoppingCart className="w-3.5 h-3.5" /> Marktplaats
                 </ToggleGroupItem>
                 <ToggleGroupItem value="Beide" className="text-xs">Beide</ToggleGroupItem>
               </ToggleGroup>
