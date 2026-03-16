@@ -116,17 +116,17 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we apart toe).`;
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: aiModel,
-        messages: [{ role: "user", content: prompt }],
+        model: "claude-sonnet-4-20250514",
         max_tokens: 800,
-        temperature: 0.7,
+        messages: [{ role: "user", content: prompt }],
       }),
     });
 
