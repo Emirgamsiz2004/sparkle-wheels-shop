@@ -22,6 +22,15 @@ const AdminLogin = () => {
     if (error) {
       toast.error("Ongeldige inloggegevens");
     } else {
+      if (rememberMe) {
+        localStorage.setItem("admin_email", email);
+        localStorage.setItem("admin_pw", password);
+        localStorage.setItem("admin_remember", "true");
+      } else {
+        localStorage.removeItem("admin_email");
+        localStorage.removeItem("admin_pw");
+        localStorage.removeItem("admin_remember");
+      }
       navigate("/admin/dashboard");
     }
     setLoading(false);
