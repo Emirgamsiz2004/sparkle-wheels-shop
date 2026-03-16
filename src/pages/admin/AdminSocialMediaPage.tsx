@@ -278,12 +278,15 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">Platform</label>
-              <ToggleGroup type="single" value={platform} onValueChange={(v) => v && setPlatform(v)} className="justify-start">
+              <ToggleGroup type="single" value={platform} onValueChange={(v) => v && setPlatform(v)} className="justify-start flex-wrap">
                 <ToggleGroupItem value="Instagram" className="gap-1.5 text-xs">
                   <Instagram className="w-3.5 h-3.5" /> Instagram
                 </ToggleGroupItem>
                 <ToggleGroupItem value="Facebook" className="gap-1.5 text-xs">
                   <Facebook className="w-3.5 h-3.5" /> Facebook
+                </ToggleGroupItem>
+                <ToggleGroupItem value="Marktplaats" className="gap-1.5 text-xs">
+                  <ShoppingCart className="w-3.5 h-3.5" /> Marktplaats
                 </ToggleGroupItem>
                 <ToggleGroupItem value="Beide" className="text-xs">Beide</ToggleGroupItem>
               </ToggleGroup>
