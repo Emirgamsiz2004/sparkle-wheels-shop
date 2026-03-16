@@ -52,6 +52,27 @@ const AdminVoertuigNieuwPage = () => {
     e.preventDefault();
     setSaving(true);
     await addVehicle({ ...form } as any);
+    
+    // Auto-generate blog post
+    toast.info("Blogpost wordt aangemaakt...");
+    try {
+      const { error } = await supabase.functions.invoke("generate-blog-post", {
+        body: {
+          merk: form.merk,
+          model: form.model,
+          jaar: form.bouwjaar,
+          km: form.kilometerstand,
+          kleur: form.kleur,
+          prijs: form.verkoopprijs,
+        },
+      });
+      if (error) throw error;
+      toast.success("✓ Auto opgeslagen en blogpost automatisch aangemaakt");
+    } catch (err) {
+      console.error("Blog generation error:", err);
+      toast.warning("Auto opgeslagen, maar blogpost genereren is mislukt");
+    }
+    
     setSaving(false);
     navigate("/admin/voertuigen");
   };
