@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(() => localStorage.getItem("admin_email") || "");
+  const [password, setPassword] = useState(() => localStorage.getItem("admin_pw") || "");
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("admin_remember") === "true");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -21,6 +22,15 @@ const AdminLogin = () => {
     if (error) {
       toast.error("Ongeldige inloggegevens");
     } else {
+      if (rememberMe) {
+        localStorage.setItem("admin_email", email);
+        localStorage.setItem("admin_pw", password);
+        localStorage.setItem("admin_remember", "true");
+      } else {
+        localStorage.removeItem("admin_email");
+        localStorage.removeItem("admin_pw");
+        localStorage.removeItem("admin_remember");
+      }
       navigate("/admin/dashboard");
     }
     setLoading(false);
@@ -72,6 +82,19 @@ const AdminLogin = () => {
               className="w-full bg-secondary/50 border border-border rounded-lg px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
               placeholder="••••••••"
             />
+          </div>
+
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-4 h-4 rounded border-border bg-secondary/50 text-primary focus:ring-primary/30 accent-primary"
+            />
+            <label htmlFor="rememberMe" className="text-xs font-body text-muted-foreground cursor-pointer select-none">
+              Inloggegevens onthouden
+            </label>
           </div>
 
           <button
