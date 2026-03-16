@@ -51,6 +51,7 @@ const MARKTPLAATS_ORANGE = "#e05c00";
 const AdminAdvertentiesPage = () => {
   const { vehicles } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState("");
+  const [kenteken, setKenteken] = useState("");
   const [merk, setMerk] = useState("");
   const [model, setModel] = useState("");
   const [jaar, setJaar] = useState<number | "">("");
