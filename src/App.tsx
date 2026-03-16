@@ -65,6 +65,7 @@ const App = () => (
                 <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="social-media" element={<AdminSocialMediaPage />} />
                 <Route path="advertenties" element={<AdminAdvertentiesPage />} />
+                <Route path="blog" element={<AdminBlogPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
