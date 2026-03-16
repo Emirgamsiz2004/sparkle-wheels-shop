@@ -227,11 +227,11 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Merk</label>
-                  <Input value={merk} onChange={(e) => { setMerk(e.target.value); clearRdw("merk"); }} placeholder="Volkswagen" className={rdwBg("merk")} />
+                  <Input value={merk} onChange={(e) => { setMerk(capitalizeMerk(e.target.value)); clearRdw("merk"); }} placeholder="Volkswagen" className={rdwBg("merk")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Model</label>
-                  <Input value={model} onChange={(e) => { setModel(e.target.value); clearRdw("model"); }} placeholder="Polo GTI" className={rdwBg("model")} />
+                  <Input value={model} onChange={(e) => { setModel(capitalizeModel(e.target.value)); clearRdw("model"); }} placeholder="Polo GTI" className={rdwBg("model")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Jaar</label>
