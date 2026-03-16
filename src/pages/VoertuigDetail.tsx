@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
@@ -16,10 +16,6 @@ import {
   Settings2,
   Paintbrush,
   Car,
-  DoorOpen,
-  Zap,
-  Users,
-  FileCheck,
   X,
   ChevronLeft,
   ChevronRight,
@@ -29,10 +25,26 @@ import Footer from "@/components/Footer";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 400 : -400,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 400 : -400,
+    opacity: 0,
+  }),
+};
+
 const VoertuigDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [slideDirection, setSlideDirection] = useState(0);
 
   const { data: vehicle, isLoading } = useQuery({
     queryKey: ["vehicle-detail", id],
@@ -70,14 +82,15 @@ const VoertuigDetail = () => {
   const photoUrls = photos?.map((p) => getPhotoUrl(p.file_path)) ?? [];
   const mainPhoto = photoUrls[selectedPhoto] ?? "/placeholder.svg";
 
-  const navigateLightbox = (dir: number) => {
+  const navigateLightbox = useCallback((dir: number) => {
+    setSlideDirection(dir);
     setSelectedPhoto((prev) => {
       const next = prev + dir;
       if (next < 0) return photoUrls.length - 1;
       if (next >= photoUrls.length) return 0;
       return next;
     });
-  };
+  }, [photoUrls.length]);
 
   const title = vehicle ? `${vehicle.merk} ${vehicle.model}` : "Laden...";
   const metaTitle = vehicle
@@ -92,7 +105,7 @@ const VoertuigDetail = () => {
         { label: "Bouwjaar", value: vehicle.bouwjaar, icon: Calendar },
         { label: "Kilometerstand", value: vehicle.kilometerstand != null ? `${vehicle.kilometerstand.toLocaleString("nl-NL")} km` : null, icon: Gauge },
         { label: "Brandstof", value: vehicle.brandstof, icon: Fuel },
-        { label: "Transmissie", value: null, icon: Settings2 }, // no transmissie column yet
+        { label: "Transmissie", value: null, icon: Settings2 },
         { label: "Kleur", value: vehicle.kleur, icon: Paintbrush },
         { label: "Status", value: vehicle.status, icon: Car },
       ].filter((s) => s.value)
@@ -140,7 +153,7 @@ const VoertuigDetail = () => {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
             <Link
               to="/voorraad"
-              className="inline-flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-300"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Terug naar voorraad
@@ -167,7 +180,7 @@ const VoertuigDetail = () => {
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
                 {photoUrls.length > 1 && (
-                  <span className="absolute bottom-3 right-3 bg-background/80 backdrop-blur-sm px-2.5 py-1 text-[9px] font-body tracking-wider uppercase text-foreground">
+                  <span className="absolute bottom-3 right-3 bg-background/80 backdrop-blur-sm px-3 py-1.5 text-[10px] font-body tracking-wider uppercase text-foreground">
                     {selectedPhoto + 1} / {photoUrls.length}
                   </span>
                 )}
@@ -175,13 +188,13 @@ const VoertuigDetail = () => {
 
               {/* Thumbnails */}
               {photoUrls.length > 1 && (
-                <div className="flex gap-1.5 mt-2 overflow-x-auto pb-2">
+                <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
                   {photoUrls.map((url, i) => (
                     <button
                       key={i}
-                      onClick={() => setSelectedPhoto(i)}
-                      className={`shrink-0 w-20 h-14 overflow-hidden border-2 transition-all ${
-                        i === selectedPhoto ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
+                      onClick={() => { setSlideDirection(i > selectedPhoto ? 1 : -1); setSelectedPhoto(i); }}
+                      className={`shrink-0 w-24 h-16 overflow-hidden border-2 transition-all duration-300 ${
+                        i === selectedPhoto ? "border-primary opacity-100" : "border-transparent opacity-50 hover:opacity-90"
                       }`}
                     >
                       <img src={url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
@@ -191,16 +204,16 @@ const VoertuigDetail = () => {
               )}
 
               {/* Specs section */}
-              <div className="mt-12">
-                <h2 className="text-lg font-display font-semibold text-foreground mb-6 tracking-tight">Specificaties</h2>
+              <div className="mt-14">
+                <h2 className="text-xl font-display font-semibold text-foreground mb-6 tracking-tight">Specificaties</h2>
                 <div className="border border-border divide-y divide-border">
                   {specs.map((spec) => (
-                    <div key={spec.label} className="flex items-center justify-between px-4 py-3">
-                      <div className="flex items-center gap-2.5 text-muted-foreground">
-                        <spec.icon className="w-3.5 h-3.5" />
-                        <span className="text-xs font-body tracking-wide">{spec.label}</span>
+                    <div key={spec.label} className="flex items-center justify-between px-5 py-4">
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <spec.icon className="w-4 h-4" />
+                        <span className="text-sm font-body tracking-wide">{spec.label}</span>
                       </div>
-                      <span className="text-xs font-body font-medium text-foreground capitalize">{spec.value}</span>
+                      <span className="text-sm font-body font-medium text-foreground capitalize">{spec.value}</span>
                     </div>
                   ))}
                 </div>
@@ -208,8 +221,8 @@ const VoertuigDetail = () => {
 
               {/* Description */}
               {vehicle.opmerkingen && (
-                <div className="mt-12">
-                  <h2 className="text-lg font-display font-semibold text-foreground mb-4 tracking-tight">Omschrijving</h2>
+                <div className="mt-14">
+                  <h2 className="text-xl font-display font-semibold text-foreground mb-5 tracking-tight">Omschrijving</h2>
                   <p className="text-sm font-body font-light text-muted-foreground leading-relaxed whitespace-pre-line">
                     {vehicle.opmerkingen}
                   </p>
@@ -227,13 +240,13 @@ const VoertuigDetail = () => {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="lg:w-[40%]"
             >
-              <div className="lg:sticky lg:top-28 space-y-6">
+              <div className="lg:sticky lg:top-28 space-y-7">
                 {/* Title */}
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight leading-tight">
+                  <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground tracking-tight leading-tight">
                     {vehicle.merk} {vehicle.model}
                   </h1>
-                  <p className="text-xs font-body text-muted-foreground mt-2 tracking-wide">
+                  <p className="text-sm font-body text-muted-foreground mt-3 tracking-wide">
                     {[vehicle.bouwjaar, vehicle.kilometerstand != null ? `${vehicle.kilometerstand.toLocaleString("nl-NL")} km` : null, vehicle.brandstof]
                       .filter(Boolean)
                       .join(" · ")}
@@ -242,15 +255,15 @@ const VoertuigDetail = () => {
 
                 {/* Price */}
                 {vehicle.verkoopprijs != null && vehicle.verkoopprijs > 0 && (
-                  <p className="text-3xl md:text-4xl font-display font-bold text-foreground">
+                  <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
                     € {vehicle.verkoopprijs.toLocaleString("nl-NL")}
                   </p>
                 )}
 
                 {/* NAP badge */}
-                <div className="flex items-center gap-1.5 bg-card border border-border px-3 py-2 w-fit">
-                  <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                  <span className="text-[9px] font-body font-semibold tracking-[0.2em] uppercase text-foreground">
+                <div className="flex items-center gap-2 bg-card border border-border px-4 py-2.5 w-fit">
+                  <ShieldCheck className="w-4 h-4 text-primary" />
+                  <span className="text-[10px] font-body font-semibold tracking-[0.2em] uppercase text-foreground">
                     NAP Check Goedgekeurd
                   </span>
                 </div>
@@ -259,32 +272,32 @@ const VoertuigDetail = () => {
                 <div className="space-y-3">
                   <a
                     href="tel:+31612693825"
-                    className="flex items-center justify-center gap-2.5 w-full bg-foreground text-background py-3.5 text-xs font-body font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all"
+                    className="group/btn relative flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase overflow-hidden transition-all duration-500 hover:bg-primary hover:border-primary hover:text-primary-foreground"
                   >
-                    <Phone className="w-4 h-4" />
-                    Bel Direct — 06-12693825
+                    <Phone className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Bel Direct — 06-12693825</span>
                   </a>
                   <a
                     href={`https://wa.me/31612693825?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2.5 w-full bg-[hsl(var(--whatsapp))] text-[hsl(var(--whatsapp-foreground))] py-3.5 text-xs font-body font-semibold tracking-[0.15em] uppercase hover:opacity-90 transition-all"
+                    className="group/wa relative flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase overflow-hidden bg-transparent transition-all duration-500 hover:border-foreground hover:bg-foreground hover:text-background"
                   >
-                    <MessageCircle className="w-4 h-4" />
-                    Stuur WhatsApp
+                    <MessageCircle className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Stuur WhatsApp</span>
                   </a>
                 </div>
 
-                <p className="text-[10px] font-body text-muted-foreground tracking-wide text-center">
+                <p className="text-[11px] font-body text-muted-foreground tracking-wide text-center">
                   Proefrit mogelijk? Neem contact op
                 </p>
 
                 {/* Quick specs in sidebar */}
-                <div className="border-t border-border pt-6 space-y-3">
+                <div className="border-t border-border pt-6 space-y-4">
                   {specs.slice(0, 4).map((spec) => (
                     <div key={spec.label} className="flex items-center justify-between">
-                      <span className="text-[11px] font-body text-muted-foreground">{spec.label}</span>
-                      <span className="text-[11px] font-body font-medium text-foreground capitalize">{spec.value}</span>
+                      <span className="text-[12px] font-body text-muted-foreground">{spec.label}</span>
+                      <span className="text-[12px] font-body font-medium text-foreground capitalize">{spec.value}</span>
                     </div>
                   ))}
                 </div>
@@ -301,12 +314,13 @@ const VoertuigDetail = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
             className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center"
             onClick={() => setLightboxOpen(false)}
           >
             <button
               onClick={() => setLightboxOpen(false)}
-              className="absolute top-5 right-5 text-foreground hover:text-primary transition-colors z-10"
+              className="absolute top-5 right-5 text-foreground hover:text-primary transition-colors duration-300 z-10"
             >
               <X className="w-6 h-6" />
             </button>
@@ -315,27 +329,37 @@ const VoertuigDetail = () => {
               <>
                 <button
                   onClick={(e) => { e.stopPropagation(); navigateLightbox(-1); }}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground hover:text-primary transition-colors z-10"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/60 hover:text-foreground transition-colors duration-300 z-10"
                 >
-                  <ChevronLeft className="w-8 h-8" />
+                  <ChevronLeft className="w-10 h-10" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); navigateLightbox(1); }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground hover:text-primary transition-colors z-10"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/60 hover:text-foreground transition-colors duration-300 z-10"
                 >
-                  <ChevronRight className="w-8 h-8" />
+                  <ChevronRight className="w-10 h-10" />
                 </button>
               </>
             )}
 
-            <img
-              src={photoUrls[selectedPhoto]}
-              alt={`${title} foto ${selectedPhoto + 1}`}
-              className="max-w-[90vw] max-h-[85vh] object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div className="relative w-[90vw] h-[85vh] flex items-center justify-center overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <AnimatePresence initial={false} custom={slideDirection} mode="popLayout">
+                <motion.img
+                  key={selectedPhoto}
+                  custom={slideDirection}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  src={photoUrls[selectedPhoto]}
+                  alt={`${title} foto ${selectedPhoto + 1}`}
+                  className="max-w-full max-h-full object-contain absolute"
+                />
+              </AnimatePresence>
+            </div>
 
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-body tracking-wider text-muted-foreground">
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[11px] font-body tracking-wider text-muted-foreground">
               {selectedPhoto + 1} / {photoUrls.length}
             </div>
           </motion.div>
