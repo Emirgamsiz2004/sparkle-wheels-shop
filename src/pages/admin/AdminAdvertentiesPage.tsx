@@ -101,6 +101,7 @@ const AdminAdvertentiesPage = () => {
       if (data.kleur) { setKleur(data.kleur); filled.add("kleur"); }
       if (data.motorinhoud) { setMotorinhoud(data.motorinhoud); filled.add("motorinhoud"); }
       if (data.apkTot) { setApkTot(data.apkTot); filled.add("apkTot"); }
+      if (data.vermogen) { setVermogen(data.vermogen); filled.add("vermogen"); }
       setRdwFields(filled);
     }
     setRdwLoading(false);
