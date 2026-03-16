@@ -30,6 +30,7 @@ const AdminVoertuigDetailPage = () => {
   const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
   const [activeTab, setActiveTab] = useState("info");
   const [verkoopOpen, setVerkoopOpen] = useState(false);
+  const [blogGenerating, setBlogGenerating] = useState(false);
 
   const vehicle = vehicles.find((v) => v.id === id);
 
