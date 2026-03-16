@@ -30,7 +30,7 @@ interface HistoryItem {
 const formatNumber = (n: number | undefined) =>
   n ? n.toLocaleString("nl-NL") : "";
 
-
+const AdminSocialMediaPage = () => {
   const { vehicles } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState("");
   const [merk, setMerk] = useState("");
