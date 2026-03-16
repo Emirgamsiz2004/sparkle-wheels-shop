@@ -22,7 +22,6 @@ serve(async (req) => {
     if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     let prompt: string;
-    let prompt: string;
 
     if (platform === "Marktplaats") {
       const bespreekbaar = prijs_bespreekbaar ? "Ja" : "Nee";
