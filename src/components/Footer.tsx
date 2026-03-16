@@ -82,6 +82,11 @@ const Footer = () => {
             <p className="text-[10px] text-muted-foreground/70 font-body tracking-wider">
               Cilinderweg 99, 2371 DZ Roelofarendsveen
             </p>
+            <div className="flex items-center gap-4 mt-1">
+              <Link to="/privacybeleid" className="text-[9px] tracking-wider uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors">Privacy</Link>
+              <Link to="/cookiebeleid" className="text-[9px] tracking-wider uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors">Cookies</Link>
+              <Link to="/algemene-voorwaarden" className="text-[9px] tracking-wider uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors">Voorwaarden</Link>
+            </div>
           </div>
         </div>
       </div>

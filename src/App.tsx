@@ -112,6 +112,7 @@ const App = () => (
             </Routes>
           )}
           <WhatsAppButton />
+          <CookieBanner />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
