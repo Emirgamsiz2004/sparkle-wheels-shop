@@ -50,12 +50,6 @@ const formatNumber = (n: number | undefined) =>
   const [hashtags, setHashtags] = useState<Hashtags | null>(null);
   const [activeTab, setActiveTab] = useState("caption");
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  // Marktplaats-specific fields
-  const [apkGeldigTot, setApkGeldigTot] = useState("");
-  const [aantalEigenaren, setAantalEigenaren] = useState(1);
-  const [schadevrij, setSchadevrij] = useState(true);
-  const [nap, setNap] = useState(true);
-  const [prijsBespreekbaar, setPrijsBespreekbaar] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("social-post-history");
