@@ -120,6 +120,13 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
           merk, model, jaar, kilometerstand: formatNumber(km as number),
           prijs: formatNumber(prijs as number), transmissie, kleur,
           bijzonderheden, type_auto: typeAuto, toon, platform, motorinhoud,
+          ...(platform === "Marktplaats" && {
+            apk_geldig_tot: apkGeldigTot,
+            aantal_eigenaren: aantalEigenaren,
+            schadevrij,
+            nap,
+            prijs_bespreekbaar: prijsBespreekbaar,
+          }),
         },
       });
 
