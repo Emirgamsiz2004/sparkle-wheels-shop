@@ -18,11 +18,11 @@ serve(async (req) => {
       apk_geldig_tot, aantal_eigenaren, schadevrij, nap, prijs_bespreekbaar,
     } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     let prompt: string;
-    let aiModel = "google/gemini-3-flash-preview";
+    let prompt: string;
 
     if (platform === "Marktplaats") {
       const bespreekbaar = prijs_bespreekbaar ? "Ja" : "Nee";
@@ -116,17 +116,17 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we apart toe).`;
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: aiModel,
-        messages: [{ role: "user", content: prompt }],
+        model: "claude-sonnet-4-20250514",
         max_tokens: 800,
-        temperature: 0.7,
+        messages: [{ role: "user", content: prompt }],
       }),
     });
 
@@ -149,7 +149,7 @@ Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we ap
     }
 
     const data = await response.json();
-    const caption = data.choices?.[0]?.message?.content?.trim() ?? "";
+    const caption = data.content?.[0]?.text?.trim() ?? "";
 
     // For Marktplaats, return caption only (no hashtags needed)
     if (platform === "Marktplaats") {
