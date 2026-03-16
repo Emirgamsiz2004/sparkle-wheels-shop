@@ -239,4 +239,88 @@ const Field = ({ label, value, onChange, type = "text", required = false, highli
   </div>
 );
 
+const PriceSuggestion = ({ merk, model, bouwjaar, kilometerstand, kenteken }: {
+  merk: string; model: string; bouwjaar: number; kilometerstand: number; kenteken: string;
+}) => {
+  const [loading, setLoading] = useState(false);
+  const [suggestion, setSuggestion] = useState<{ inkoop_min: number; inkoop_max: number; verkoop_min: number; verkoop_max: number } | null>(null);
+  const [fetched, setFetched] = useState(false);
+
+  const canFetch = merk.length > 1 && model.length > 1 && bouwjaar > 2000;
+
+  const fetchSuggestion = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("estimate-trade-in-value", {
+        body: { merk, model, bouwjaar, kilometerstand, kenteken, staat: "goed" },
+      });
+      if (error) throw error;
+      if (data?.min && data?.max) {
+        const avg = Math.round((data.min + data.max) / 2);
+        setSuggestion({
+          inkoop_min: data.min,
+          inkoop_max: data.max,
+          verkoop_min: Math.round(avg * 1.15),
+          verkoop_max: Math.round(data.max * 1.25),
+        });
+      }
+    } catch (err) {
+      console.error("Price suggestion error:", err);
+    } finally {
+      setLoading(false);
+      setFetched(true);
+    }
+  };
+
+  if (!canFetch && !suggestion) return null;
+
+  return (
+    <div className="col-span-2 bg-secondary/30 border border-border rounded-lg p-4">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-3.5 h-3.5 text-primary" />
+          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Prijsindicatie</span>
+        </div>
+        {!loading && (
+          <button
+            type="button"
+            onClick={fetchSuggestion}
+            className="text-[10px] text-primary hover:text-foreground transition-colors duration-300 font-medium uppercase tracking-wider"
+          >
+            {fetched ? "Opnieuw" : "Bereken"}
+          </button>
+        )}
+      </div>
+
+      {loading && (
+        <div className="flex items-center gap-2 py-2">
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">Marktdata ophalen...</span>
+        </div>
+      )}
+
+      {suggestion && !loading && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-background/50 rounded-md p-3">
+            <p className="text-[9px] text-muted-foreground uppercase tracking-widest mb-1">Advies inkoopprijs</p>
+            <p className="text-sm font-bold text-foreground">
+              € {suggestion.inkoop_min.toLocaleString("nl-NL")} — {suggestion.inkoop_max.toLocaleString("nl-NL")}
+            </p>
+          </div>
+          <div className="bg-background/50 rounded-md p-3">
+            <p className="text-[9px] text-muted-foreground uppercase tracking-widest mb-1">Advies verkoopprijs</p>
+            <p className="text-sm font-bold text-foreground">
+              € {suggestion.verkoop_min.toLocaleString("nl-NL")} — {suggestion.verkoop_max.toLocaleString("nl-NL")}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {!suggestion && !loading && !fetched && (
+        <p className="text-xs text-muted-foreground">Klik op "Bereken" voor een marktindicatie.</p>
+      )}
+    </div>
+  );
+};
+
 export default AdminVoertuigNieuwPage;
