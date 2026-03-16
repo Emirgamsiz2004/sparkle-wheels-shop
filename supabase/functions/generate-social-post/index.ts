@@ -33,7 +33,7 @@ serve(async (req) => {
       prompt = `Genereer een volledig geoptimaliseerde Marktplaats advertentie voor maximale vindbaarheid in de zoekbalk.
 
 Voertuiggegevens:
-Merk: ${merk}, Model: ${model}, Uitvoering: ${uitvoering || "onbekend"}, Jaar: ${jaar}, Kilometerstand: ${kilometerstand}, Motorinhoud: ${motorinhoud || "onbekend"}, Vermogen: ${vermogen || "onbekend"}pk, Transmissie: ${transmissie}, Kleur: ${kleur}, Brandstof: ${brandstof || "onbekend"}, Vraagprijs: €${prijs}, APK tot: ${apk_geldig_tot || "onbekend"}, Eigenaren: ${aantal_eigenaren || 1}, NAP: ${napTxt}, Schadevrij: ${schadevrijTxt}, Bijzonderheden: ${bijzonderheden || "geen"}, Prijs bespreekbaar: ${bespreekbaar}, Carrosserie: ${carrosserie || "onbekend"}
+Merk: ${merk}, Model: ${model}, Uitvoering: ${uitvoering || "onbekend"}, Jaar: ${jaar}, Kilometerstand: ${kilometerstand}, Motorinhoud: ${motorinhoud || "onbekend"}, Vermogen: ${vermogen || "onbekend"}pk, Transmissie: ${transmissie}, Kleur: ${kleur}, Brandstof: ${brandstof || "onbekend"}, Vraagprijs: €${prijs}, APK tot: ${apk_geldig_tot || "onbekend"}, Eigenaren: ${aantal_eigenaren || 1}, NAP: ${napTxt}, Schadevrij: ${schadevrijTxt}, Bijzonderheden: ${bijzonderheden || "geen"}, Prijs bespreekbaar: ${bespreekbaar}, Carrosserie: ${carrosserie || "onbekend"}, Aantal deuren: ${aantal_deuren || "onbekend"}, Aantal zitplaatsen: ${aantal_zitplaatsen || "onbekend"}, Gewicht: ${gewicht ? gewicht + " kg" : "onbekend"}, Nieuwprijs: ${nieuwprijs ? "€" + nieuwprijs : "onbekend"}, Aantal cilinders: ${aantal_cilinders || "onbekend"}
 
 Geef output EXACT in dit formaat:
 
