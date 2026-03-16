@@ -146,6 +146,13 @@ const AdminAdvertentiesPage = () => {
           prijs_bespreekbaar: prijsBespreekbaar ? "Ja" : "Nee",
           uitvoering,
           vermogen: vermogen || undefined,
+          brandstof: brandstof || undefined,
+          carrosserie: carrosserie || undefined,
+          aantal_deuren: aantalDeuren || undefined,
+          aantal_zitplaatsen: aantalZitplaatsen || undefined,
+          gewicht: gewicht || undefined,
+          nieuwprijs: catalogusprijs || undefined,
+          aantal_cilinders: aantalCilinders || undefined,
         },
       });
 
