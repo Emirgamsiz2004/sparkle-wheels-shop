@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { Vehicle } from "@/types/vehicle";
 import KentekenInput from "@/components/admin/KentekenInput";
