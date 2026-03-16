@@ -206,6 +206,9 @@ const AdminVoertuigNieuwPage = () => {
               <Field label="Inkoopprijs (€)" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", Number(v))} />
             )}
             <Field label="Verwachte verkoopprijs (€)" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} />
+
+            {/* Price suggestion box */}
+            <PriceSuggestion merk={form.merk} model={form.model} bouwjaar={form.bouwjaar} kilometerstand={form.kilometerstand} kenteken={form.kenteken} />
           </div>
 
           <div>
