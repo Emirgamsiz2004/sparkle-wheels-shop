@@ -68,6 +68,8 @@ const AdminAdvertentiesPage = () => {
   const [prijsBespreekbaar, setPrijsBespreekbaar] = useState(false);
   const [bijzonderheden, setBijzonderheden] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rdwLoading, setRdwLoading] = useState(false);
+  const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
   const [caption, setCaption] = useState("");
   const [activeChannel, setActiveChannel] = useState("marktplaats");
 
