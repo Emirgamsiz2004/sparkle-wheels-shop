@@ -257,7 +257,7 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Kleur</label>
-                  <Input value={kleur} onChange={(e) => { setKleur(e.target.value); clearRdw("kleur"); }} placeholder="Wit" className={rdwBg("kleur")} />
+                  <Input value={kleur} onChange={(e) => { setKleur(capitalizeKleur(e.target.value)); clearRdw("kleur"); }} placeholder="Wit" className={rdwBg("kleur")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Vraagprijs (€)</label>
