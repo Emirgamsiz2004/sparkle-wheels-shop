@@ -149,7 +149,7 @@ Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we ap
     }
 
     const data = await response.json();
-    const caption = data.choices?.[0]?.message?.content?.trim() ?? "";
+    const caption = data.content?.[0]?.text?.trim() ?? "";
 
     // For Marktplaats, return caption only (no hashtags needed)
     if (platform === "Marktplaats") {
