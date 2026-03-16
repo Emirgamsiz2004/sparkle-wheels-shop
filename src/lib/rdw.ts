@@ -10,6 +10,12 @@ export interface RdwVehicleData {
   brandstof: string;
   carrosserie: string;
   vermogen: number | null;
+  aantalDeuren: number | null;
+  aantalZitplaatsen: number | null;
+  gewicht: number | null;
+  catalogusprijs: number | null;
+  eersteToelating: string;
+  aantalCilinders: number | null;
 }
 
 const capitalize = (s: string): string =>
@@ -59,6 +65,12 @@ export async function fetchRdwData(kenteken: string): Promise<RdwVehicleData | n
       brandstof: capitalize(b?.brandstof_omschrijving || v.brandstof_omschrijving || ""),
       carrosserie: capitalize(v.inrichting || ""),
       vermogen: vermogenPk,
+      aantalDeuren: v.aantal_deuren ? Number(v.aantal_deuren) : null,
+      aantalZitplaatsen: v.aantal_zitplaatsen ? Number(v.aantal_zitplaatsen) : null,
+      gewicht: v.massa_ledig_voertuig ? Number(v.massa_ledig_voertuig) : null,
+      catalogusprijs: v.catalogusprijs ? Number(v.catalogusprijs) : null,
+      eersteToelating: formatRdwDate(v.datum_eerste_toelating || ""),
+      aantalCilinders: v.aantal_cilinders ? Number(v.aantal_cilinders) : null,
     };
 
     toast.success("Voertuiggegevens opgehaald via RDW ✓");

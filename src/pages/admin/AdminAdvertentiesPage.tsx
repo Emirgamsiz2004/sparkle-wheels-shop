@@ -70,6 +70,13 @@ const AdminAdvertentiesPage = () => {
   const [nap, setNap] = useState(true);
   const [prijsBespreekbaar, setPrijsBespreekbaar] = useState(false);
   const [bijzonderheden, setBijzonderheden] = useState("");
+  const [brandstof, setBrandstof] = useState("");
+  const [carrosserie, setCarrosserie] = useState("");
+  const [aantalDeuren, setAantalDeuren] = useState<number | "">("");
+  const [aantalZitplaatsen, setAantalZitplaatsen] = useState<number | "">("");
+  const [gewicht, setGewicht] = useState<number | "">("");
+  const [catalogusprijs, setCatalogusprijs] = useState<number | "">("");
+  const [aantalCilinders, setAantalCilinders] = useState<number | "">("");
   const [loading, setLoading] = useState(false);
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
@@ -102,6 +109,13 @@ const AdminAdvertentiesPage = () => {
       if (data.motorinhoud) { setMotorinhoud(data.motorinhoud); filled.add("motorinhoud"); }
       if (data.apkTot) { setApkTot(data.apkTot); filled.add("apkTot"); }
       if (data.vermogen) { setVermogen(data.vermogen); filled.add("vermogen"); }
+      if (data.brandstof) { setBrandstof(data.brandstof); filled.add("brandstof"); }
+      if (data.carrosserie) { setCarrosserie(data.carrosserie); filled.add("carrosserie"); }
+      if (data.aantalDeuren) { setAantalDeuren(data.aantalDeuren); filled.add("aantalDeuren"); }
+      if (data.aantalZitplaatsen) { setAantalZitplaatsen(data.aantalZitplaatsen); filled.add("aantalZitplaatsen"); }
+      if (data.gewicht) { setGewicht(data.gewicht); filled.add("gewicht"); }
+      if (data.catalogusprijs) { setCatalogusprijs(data.catalogusprijs); filled.add("catalogusprijs"); }
+      if (data.aantalCilinders) { setAantalCilinders(data.aantalCilinders); filled.add("aantalCilinders"); }
       setRdwFields(filled);
     }
     setRdwLoading(false);
@@ -132,6 +146,13 @@ const AdminAdvertentiesPage = () => {
           prijs_bespreekbaar: prijsBespreekbaar ? "Ja" : "Nee",
           uitvoering,
           vermogen: vermogen || undefined,
+          brandstof: brandstof || undefined,
+          carrosserie: carrosserie || undefined,
+          aantal_deuren: aantalDeuren || undefined,
+          aantal_zitplaatsen: aantalZitplaatsen || undefined,
+          gewicht: gewicht || undefined,
+          nieuwprijs: catalogusprijs || undefined,
+          aantal_cilinders: aantalCilinders || undefined,
         },
       });
 
@@ -273,12 +294,36 @@ const AdminAdvertentiesPage = () => {
                   <Input value={kleur} onChange={(e) => { setKleur(capitalizeKleur(e.target.value)); clearRdw("kleur"); }} placeholder="Wit" className={rdwBg("kleur")} />
                 </div>
                 <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Brandstof</label>
+                  <Input value={brandstof} onChange={(e) => { setBrandstof(e.target.value); clearRdw("brandstof"); }} placeholder="Benzine" className={rdwBg("brandstof")} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Carrosserie</label>
+                  <Input value={carrosserie} onChange={(e) => { setCarrosserie(e.target.value); clearRdw("carrosserie"); }} placeholder="Hatchback" className={rdwBg("carrosserie")} />
+                </div>
+                <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Vraagprijs (€)</label>
                   <Input type="number" value={prijs} onChange={(e) => setPrijs(e.target.value ? Number(e.target.value) : "")} placeholder="13250" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">APK geldig tot</label>
                   <Input type="date" value={apkTot} onChange={(e) => { setApkTot(e.target.value); clearRdw("apkTot"); }} className={rdwBg("apkTot")} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Aantal deuren</label>
+                  <Input type="number" value={aantalDeuren} onChange={(e) => { setAantalDeuren(e.target.value ? Number(e.target.value) : ""); clearRdw("aantalDeuren"); }} placeholder="5" className={rdwBg("aantalDeuren")} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Aantal zitplaatsen</label>
+                  <Input type="number" value={aantalZitplaatsen} onChange={(e) => { setAantalZitplaatsen(e.target.value ? Number(e.target.value) : ""); clearRdw("aantalZitplaatsen"); }} placeholder="5" className={rdwBg("aantalZitplaatsen")} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Gewicht (kg)</label>
+                  <Input type="number" value={gewicht} onChange={(e) => { setGewicht(e.target.value ? Number(e.target.value) : ""); clearRdw("gewicht"); }} placeholder="1250" className={rdwBg("gewicht")} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Nieuwprijs (€)</label>
+                  <Input type="number" value={catalogusprijs} onChange={(e) => { setCatalogusprijs(e.target.value ? Number(e.target.value) : ""); clearRdw("catalogusprijs"); }} placeholder="32000" className={rdwBg("catalogusprijs")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Aantal eigenaren</label>

@@ -17,6 +17,7 @@ serve(async (req) => {
       kleur, bijzonderheden, type_auto, toon, platform, motorinhoud,
       apk_geldig_tot, aantal_eigenaren, schadevrij, nap, prijs_bespreekbaar,
       uitvoering, vermogen, brandstof, carrosserie,
+      aantal_deuren, aantal_zitplaatsen, gewicht, nieuwprijs, aantal_cilinders,
     } = await req.json();
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
@@ -32,7 +33,7 @@ serve(async (req) => {
       prompt = `Genereer een volledig geoptimaliseerde Marktplaats advertentie voor maximale vindbaarheid in de zoekbalk.
 
 Voertuiggegevens:
-Merk: ${merk}, Model: ${model}, Uitvoering: ${uitvoering || "onbekend"}, Jaar: ${jaar}, Kilometerstand: ${kilometerstand}, Motorinhoud: ${motorinhoud || "onbekend"}, Vermogen: ${vermogen || "onbekend"}pk, Transmissie: ${transmissie}, Kleur: ${kleur}, Brandstof: ${brandstof || "onbekend"}, Vraagprijs: €${prijs}, APK tot: ${apk_geldig_tot || "onbekend"}, Eigenaren: ${aantal_eigenaren || 1}, NAP: ${napTxt}, Schadevrij: ${schadevrijTxt}, Bijzonderheden: ${bijzonderheden || "geen"}, Prijs bespreekbaar: ${bespreekbaar}, Carrosserie: ${carrosserie || "onbekend"}
+Merk: ${merk}, Model: ${model}, Uitvoering: ${uitvoering || "onbekend"}, Jaar: ${jaar}, Kilometerstand: ${kilometerstand}, Motorinhoud: ${motorinhoud || "onbekend"}, Vermogen: ${vermogen || "onbekend"}pk, Transmissie: ${transmissie}, Kleur: ${kleur}, Brandstof: ${brandstof || "onbekend"}, Vraagprijs: €${prijs}, APK tot: ${apk_geldig_tot || "onbekend"}, Eigenaren: ${aantal_eigenaren || 1}, NAP: ${napTxt}, Schadevrij: ${schadevrijTxt}, Bijzonderheden: ${bijzonderheden || "geen"}, Prijs bespreekbaar: ${bespreekbaar}, Carrosserie: ${carrosserie || "onbekend"}, Aantal deuren: ${aantal_deuren || "onbekend"}, Aantal zitplaatsen: ${aantal_zitplaatsen || "onbekend"}, Gewicht: ${gewicht ? gewicht + " kg" : "onbekend"}, Nieuwprijs: ${nieuwprijs ? "€" + nieuwprijs : "onbekend"}, Aantal cilinders: ${aantal_cilinders || "onbekend"}
 
 Geef output EXACT in dit formaat:
 
@@ -45,11 +46,15 @@ BESCHRIJVING:
 SPECIFICATIES:
 - Bouwjaar: [jaar]
 - Kilometerstand: ± [km]
-- Motorinhoud: [motorinhoud] [vermogen]pk
+- Motorinhoud: [motorinhoud] [vermogen]pk [aantal_cilinders cil. indien bekend]
 - Transmissie: [transmissie]
 - Brandstof: [brandstof]
 - Kleur: [kleur]
 - Carrosserie: [carrosserie]
+- Aantal deuren: [aantal deuren indien bekend]
+- Aantal zitplaatsen: [aantal zitplaatsen indien bekend]
+- Gewicht: [gewicht kg indien bekend]
+- Nieuwprijs: € [nieuwprijs indien bekend]
 - Aantal eigenaren: [eigenaren]
 - APK geldig tot: [apk]
 - NAP: [ja/nee]
