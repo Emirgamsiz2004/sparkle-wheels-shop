@@ -16,6 +16,7 @@ serve(async (req) => {
       merk, model, jaar, kilometerstand, prijs, transmissie,
       kleur, bijzonderheden, type_auto, toon, platform, motorinhoud,
       apk_geldig_tot, aantal_eigenaren, schadevrij, nap, prijs_bespreekbaar,
+      uitvoering, vermogen, brandstof, carrosserie,
     } = await req.json();
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
@@ -28,40 +29,48 @@ serve(async (req) => {
       const napTxt = nap ? "Ja" : "Nee";
       const schadevrijTxt = schadevrij ? "Ja" : "Nee";
 
-      prompt = `Genereer een volledige Marktplaats advertentie voor een auto met de volgende gegevens:
-Merk: ${merk}, Model: ${model}, Jaar: ${jaar}, Kilometerstand: ${kilometerstand}, Motorinhoud: ${motorinhoud || "onbekend"}, Transmissie: ${transmissie}, Kleur: ${kleur}, Vraagprijs: €${prijs}, APK tot: ${apk_geldig_tot || "onbekend"}, Eigenaren: ${aantal_eigenaren || 1}, NAP: ${napTxt}, Schadevrij: ${schadevrijTxt}, Bijzonderheden: ${bijzonderheden || "geen"}, Prijs bespreekbaar: ${bespreekbaar}
+      prompt = `Genereer een volledig geoptimaliseerde Marktplaats advertentie voor maximale vindbaarheid in de zoekbalk.
 
-Geef de output EXACT in dit formaat terug, geen afwijkingen:
+Voertuiggegevens:
+Merk: ${merk}, Model: ${model}, Uitvoering: ${uitvoering || "onbekend"}, Jaar: ${jaar}, Kilometerstand: ${kilometerstand}, Motorinhoud: ${motorinhoud || "onbekend"}, Vermogen: ${vermogen || "onbekend"}pk, Transmissie: ${transmissie}, Kleur: ${kleur}, Brandstof: ${brandstof || "onbekend"}, Vraagprijs: €${prijs}, APK tot: ${apk_geldig_tot || "onbekend"}, Eigenaren: ${aantal_eigenaren || 1}, NAP: ${napTxt}, Schadevrij: ${schadevrijTxt}, Bijzonderheden: ${bijzonderheden || "geen"}, Prijs bespreekbaar: ${bespreekbaar}, Carrosserie: ${carrosserie || "onbekend"}
 
-TITEL: [Merk] [Model] [Motorinhoud] [pk indien bekend] | [Jaar] | [Kilometerstand]km | [Kleur]
+Geef output EXACT in dit formaat:
+
+TITEL:
+[Maximaal 60 tekens. Formule: Merk + Model + Uitvoering + Motorinhoud | Jaar | ±Kmkm | meest gezochte kenmerk. Jaar MOET in de titel staan. Voorbeeld: 'Volkswagen Polo GTI 1.8 TSI | 2017 | ±119.000km | Navi']
 
 BESCHRIJVING:
-[2-3 zinnen over karakter, rijervaring en staat van de auto. Eerlijk en uitnodigend, jij/je vorm, geen overdreven superlatieven. Benoem het karakter van de auto.]
+[2-3 zinnen over karakter, rijervaring en staat. Eerlijk, uitnodigend, jij/je vorm. Benoem wat de auto bijzonder maakt als rijervaring, niet alleen technische specs.]
 
 SPECIFICATIES:
 - Bouwjaar: [jaar]
 - Kilometerstand: ± [km]
-- Motorinhoud: [motorinhoud]
+- Motorinhoud: [motorinhoud] [vermogen]pk
 - Transmissie: [transmissie]
+- Brandstof: [brandstof]
 - Kleur: [kleur]
-- Brandstof: [benzine/diesel/elektrisch]
+- Carrosserie: [carrosserie]
 - Aantal eigenaren: [eigenaren]
 - APK geldig tot: [apk]
 - NAP: [ja/nee]
 - Schadevrij: [ja/nee]
 
-VRAAGPRIJS: € [prijs][indien bespreekbaar voeg toe: ' — prijs is bespreekbaar']
+VRAAGPRIJS: € [prijs][indien bespreekbaar: ' — prijs is bespreekbaar']
 
 CONTACT:
 📞 06 – 1269 3825
 🌐 www.platinautomotive.nl
 📍 Roelofarendsveen — proefrit altijd mogelijk!
 
-Regels:
-- Titel max 60 tekens, gebruik woorden die kopers echt intypen op Marktplaats
+——
+Ook te vinden als: [genereer hier 6-8 natuurlijke zoektermen die kopers echt intypen op Marktplaats, gescheiden door komma's. Varieer op merk, model, uitvoering, bouwjaar, motorinhoud en km-stand. Voorbeeld: 'polo gti rood, vw polo gti 2017, polo 1.8 tsi, polo gti 192pk, polo sport 2017, vw polo rood']
+
+Strikte regels:
+- Titel max 60 tekens, jaar staat ALTIJD in de titel
 - Beschrijving max 3 zinnen, geen opsomming
+- Zoektermen onderaan zijn lowercase, herkenbaar als echte zoekopdrachten
 - Schrijf in jij/je vorm
-- Geen emojis behalve in het contactblok`;
+- Geen emojis behalve in contactblok`;
     } else {
       const kleurEmoji = (k: string): string => {
         const map: Record<string, string> = {
