@@ -55,6 +55,31 @@ const AdminVoertuigDetailPage = () => {
     refetch();
   };
 
+  const [blogGenerating, setBlogGenerating] = useState(false);
+  const handleGenerateBlog = async () => {
+    setBlogGenerating(true);
+    toast.info("Blogpost wordt aangemaakt...");
+    try {
+      const { error } = await supabase.functions.invoke("generate-blog-post", {
+        body: {
+          merk: vehicle.merk,
+          model: vehicle.model,
+          jaar: vehicle.bouwjaar,
+          km: vehicle.kilometerstand,
+          kleur: vehicle.kleur,
+          prijs: vehicle.verkoopprijs,
+          car_id: vehicle.id,
+        },
+      });
+      if (error) throw error;
+      toast.success("✓ Blogpost succesvol aangemaakt");
+    } catch (err) {
+      console.error("Blog generation error:", err);
+      toast.error("Blogpost genereren mislukt");
+    }
+    setBlogGenerating(false);
+  };
+
   return (
     <div className="space-y-4 md:space-y-6">
       <button onClick={() => navigate("/admin/voertuigen")} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
