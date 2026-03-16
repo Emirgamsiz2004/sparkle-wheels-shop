@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
-import { ArrowLeft, Trash2, Loader2, ShoppingCart } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Trash2, Loader2, ShoppingCart, FileText } from "lucide-react";
+import { toast } from "sonner";
 import { statusLabels, statusColors } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
 import VehicleKostenTab from "@/components/admin/VehicleKostenTab";
