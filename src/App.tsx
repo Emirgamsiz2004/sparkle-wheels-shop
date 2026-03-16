@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Voorraad from "./pages/Voorraad";
+import VoertuigDetail from "./pages/VoertuigDetail";
 import Consignatie from "./pages/Consignatie";
 import Contact from "./pages/Contact";
 import OverOns from "./pages/OverOns";
@@ -78,6 +79,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/voorraad" element={<Voorraad />} />
+              <Route path="/voorraad/:id" element={<VoertuigDetail />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/consignatie" element={<Consignatie />} />
