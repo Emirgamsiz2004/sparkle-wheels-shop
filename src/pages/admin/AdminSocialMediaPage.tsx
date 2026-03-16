@@ -10,8 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Copy, Sparkles, Loader2, Instagram, Facebook, Trash2, ShoppingCart } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { Copy, Sparkles, Loader2, Instagram, Facebook, Trash2 } from "lucide-react";
 
 interface Hashtags {
   merkModel: string;
