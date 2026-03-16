@@ -35,6 +35,10 @@ import AdminBlogPage from "./pages/admin/AdminBlogPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import CookiePolicy from "./pages/CookiePolicy";
+import AlgemeneVoorwaarden from "./pages/AlgemeneVoorwaarden";
+import CookieBanner from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
 
