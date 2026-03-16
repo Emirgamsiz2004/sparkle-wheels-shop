@@ -139,7 +139,7 @@ const MarktplaatsPreview = ({ caption, onCopy }: { caption: string; onCopy: (tex
   );
 };
 
-
+const AdminSocialMediaPage = () => {
   const { vehicles } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState("");
   const [merk, setMerk] = useState("");
