@@ -56,7 +56,6 @@ const AdminVoertuigDetailPage = () => {
     refetch();
   };
 
-  const [blogGenerating, setBlogGenerating] = useState(false);
   const handleGenerateBlog = async () => {
     setBlogGenerating(true);
     toast.info("Blogpost wordt aangemaakt...");
