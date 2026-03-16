@@ -79,7 +79,7 @@ const AdminVoertuigNieuwPage = () => {
     navigate("/admin/voertuigen");
   };
 
-  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800" : "";
+  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-accent/40 border-primary/30" : "";
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -140,7 +140,7 @@ const Field = ({ label, value, onChange, type = "text", required = false, highli
 }) => (
   <div>
     <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", highlight && "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800")} />
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", highlight && "bg-accent/40 border-primary/30")} />
   </div>
 );
 
