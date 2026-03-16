@@ -196,6 +196,9 @@ const AdminAdvertentiesPage = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2">
+                  <KentekenInput value={kenteken} onChange={setKenteken} />
+                </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Merk</label>
                   <Input value={merk} onChange={(e) => setMerk(e.target.value)} placeholder="Volkswagen" />
