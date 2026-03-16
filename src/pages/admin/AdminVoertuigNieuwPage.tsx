@@ -17,6 +17,8 @@ const AdminVoertuigNieuwPage = () => {
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
   const [isConsignatie, setIsConsignatie] = useState(false);
+  const [consignatieMarge, setConsignatieMarge] = useState(8);
+  const [garantieVerantwoordelijkheid, setGarantieVerantwoordelijkheid] = useState<"platin" | "verkoper">("platin");
   const [form, setForm] = useState({
     merk: "", model: "", bouwjaar: new Date().getFullYear(), kleur: "",
     kenteken: "", kilometerstand: 0, brandstof: "benzine" as Vehicle["brandstof"],
@@ -134,6 +136,70 @@ const AdminVoertuigNieuwPage = () => {
               </button>
               <span className="text-sm text-foreground">Consignatie</span>
             </div>
+
+            {/* Consignatie options */}
+            {isConsignatie && (
+              <div className="col-span-2 bg-secondary/30 border border-border rounded-lg p-5 space-y-5">
+                {/* Marge slider */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Consignatie marge</label>
+                    <span className="text-sm font-bold text-foreground">{consignatieMarge}%</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min={3}
+                      max={15}
+                      step={0.5}
+                      value={consignatieMarge}
+                      onChange={(e) => setConsignatieMarge(Number(e.target.value))}
+                      className="w-full h-1.5 bg-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-webkit-slider-thumb]:transition-shadow [&::-webkit-slider-thumb]:hover:shadow-lg [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-grab"
+                    />
+                    <div className="flex justify-between mt-1.5">
+                      <span className="text-[9px] text-muted-foreground">3%</span>
+                      <span className="text-[9px] text-muted-foreground">15%</span>
+                    </div>
+                  </div>
+                  {form.verkoopprijs > 0 && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Commissie bij verkoop: <span className="text-foreground font-medium">€ {Math.round(form.verkoopprijs * consignatieMarge / 100).toLocaleString("nl-NL")}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Garantie toggle */}
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-3">Garantie verantwoordelijkheid</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setGarantieVerantwoordelijkheid("platin")}
+                      className={cn(
+                        "flex-1 py-2.5 text-xs font-medium rounded-lg border transition-all duration-300",
+                        garantieVerantwoordelijkheid === "platin"
+                          ? "bg-primary/10 border-primary/40 text-foreground"
+                          : "bg-transparent border-border text-muted-foreground hover:border-foreground/20"
+                      )}
+                    >
+                      Platin Automotive
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGarantieVerantwoordelijkheid("verkoper")}
+                      className={cn(
+                        "flex-1 py-2.5 text-xs font-medium rounded-lg border transition-all duration-300",
+                        garantieVerantwoordelijkheid === "verkoper"
+                          ? "bg-primary/10 border-primary/40 text-foreground"
+                          : "bg-transparent border-border text-muted-foreground hover:border-foreground/20"
+                      )}
+                    >
+                      Verkoper
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <Field label="Inkoopdatum" type="date" value={form.inkoopDatum} onChange={(v) => update("inkoopDatum", v)} />
             {!isConsignatie && (
