@@ -16,6 +16,7 @@ const AdminVoertuigNieuwPage = () => {
   const [saving, setSaving] = useState(false);
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
+  const [isConsignatie, setIsConsignatie] = useState(false);
   const [form, setForm] = useState({
     merk: "", model: "", bouwjaar: new Date().getFullYear(), kleur: "",
     kenteken: "", kilometerstand: 0, brandstof: "benzine" as Vehicle["brandstof"],
@@ -109,11 +110,36 @@ const AdminVoertuigNieuwPage = () => {
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Status</label>
               <select value={form.status} onChange={(e) => update("status", e.target.value)} className="w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all">
-                <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="verkocht">Verkocht</option>
+                <option value="inkoop">Inkoop</option><option value="consignatie">Consignatie</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="verkocht">Verkocht</option>
               </select>
             </div>
+
+            {/* Consignatie toggle */}
+            <div className="col-span-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsConsignatie(!isConsignatie);
+                  if (!isConsignatie) update("inkoopprijs", 0);
+                }}
+                className={cn(
+                  "relative w-10 h-5 rounded-full transition-colors duration-300",
+                  isConsignatie ? "bg-primary" : "bg-secondary"
+                )}
+              >
+                <span className={cn(
+                  "absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-foreground transition-transform duration-300",
+                  isConsignatie && "translate-x-5"
+                )} />
+              </button>
+              <span className="text-sm text-foreground">Consignatie</span>
+            </div>
+
             <Field label="Inkoopdatum" type="date" value={form.inkoopDatum} onChange={(v) => update("inkoopDatum", v)} />
-            <Field label="Inkoopprijs (€)" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", Number(v))} />
+            {!isConsignatie && (
+              <Field label="Inkoopprijs (€)" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", Number(v))} />
+            )}
+            <Field label="Verwachte verkoopprijs (€)" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} />
           </div>
 
           <div>
