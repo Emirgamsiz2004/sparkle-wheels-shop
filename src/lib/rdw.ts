@@ -9,6 +9,7 @@ export interface RdwVehicleData {
   motorinhoud: string;
   brandstof: string;
   carrosserie: string;
+  vermogen: number | null;
 }
 
 const capitalize = (s: string): string =>
@@ -45,6 +46,9 @@ export async function fetchRdwData(kenteken: string): Promise<RdwVehicleData | n
       ? (Number(v.cilinderinhoud) / 1000).toFixed(1)
       : "";
 
+    const vermogenKw = b?.nettomaximumvermogen ? Number(b.nettomaximumvermogen) : null;
+    const vermogenPk = vermogenKw ? Math.round(vermogenKw * 1.36) : null;
+
     const result: RdwVehicleData = {
       merk: capitalize(v.merk || ""),
       model: capitalize(v.handelsbenaming || ""),
@@ -54,6 +58,7 @@ export async function fetchRdwData(kenteken: string): Promise<RdwVehicleData | n
       motorinhoud: cilinderinhoud,
       brandstof: capitalize(b?.brandstof_omschrijving || v.brandstof_omschrijving || ""),
       carrosserie: capitalize(v.inrichting || ""),
+      vermogen: vermogenPk,
     };
 
     toast.success("Voertuiggegevens opgehaald via RDW ✓");

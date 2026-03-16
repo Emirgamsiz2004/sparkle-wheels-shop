@@ -60,6 +60,8 @@ const AdminAdvertentiesPage = () => {
   const [km, setKm] = useState<number | "">("");
   const [prijs, setPrijs] = useState<number | "">("");
   const [motorinhoud, setMotorinhoud] = useState("");
+  const [vermogen, setVermogen] = useState<number | "">("");
+  const [uitvoering, setUitvoering] = useState("");
   const [transmissie, setTransmissie] = useState("Handgeschakeld");
   const [kleur, setKleur] = useState("");
   const [apkTot, setApkTot] = useState("");
@@ -99,6 +101,7 @@ const AdminAdvertentiesPage = () => {
       if (data.kleur) { setKleur(data.kleur); filled.add("kleur"); }
       if (data.motorinhoud) { setMotorinhoud(data.motorinhoud); filled.add("motorinhoud"); }
       if (data.apkTot) { setApkTot(data.apkTot); filled.add("apkTot"); }
+      if (data.vermogen) { setVermogen(data.vermogen); filled.add("vermogen"); }
       setRdwFields(filled);
     }
     setRdwLoading(false);
@@ -127,6 +130,8 @@ const AdminAdvertentiesPage = () => {
           schadevrij: schadevrij ? "Ja" : "Nee",
           nap: nap ? "Ja" : "Nee",
           prijs_bespreekbaar: prijsBespreekbaar ? "Ja" : "Nee",
+          uitvoering,
+          vermogen: vermogen || undefined,
         },
       });
 
@@ -233,6 +238,10 @@ const AdminAdvertentiesPage = () => {
                   <label className="text-xs text-muted-foreground">Model</label>
                   <Input value={model} onChange={(e) => { setModel(capitalizeModel(e.target.value)); clearRdw("model"); }} placeholder="Polo GTI" className={rdwBg("model")} />
                 </div>
+                <div className="col-span-2 space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Uitvoering</label>
+                  <Input value={uitvoering} onChange={(e) => setUitvoering(e.target.value)} placeholder="GTI / AMG Line / M-Sport / S-Line" className={rdwBg("uitvoering")} />
+                </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Jaar</label>
                   <Input type="number" value={jaar} onChange={(e) => { setJaar(e.target.value ? Number(e.target.value) : ""); clearRdw("jaar"); }} placeholder="2019" className={rdwBg("jaar")} />
@@ -244,6 +253,10 @@ const AdminAdvertentiesPage = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Motorinhoud</label>
                   <Input value={motorinhoud} onChange={(e) => { setMotorinhoud(e.target.value); clearRdw("motorinhoud"); }} placeholder="1.8" className={rdwBg("motorinhoud")} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Vermogen (pk)</label>
+                  <Input type="number" value={vermogen} onChange={(e) => { setVermogen(e.target.value ? Number(e.target.value) : ""); clearRdw("vermogen"); }} placeholder="192" className={rdwBg("vermogen")} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Transmissie</label>
