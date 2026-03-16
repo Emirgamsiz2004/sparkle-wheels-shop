@@ -109,6 +109,13 @@ const AdminAdvertentiesPage = () => {
       if (data.motorinhoud) { setMotorinhoud(data.motorinhoud); filled.add("motorinhoud"); }
       if (data.apkTot) { setApkTot(data.apkTot); filled.add("apkTot"); }
       if (data.vermogen) { setVermogen(data.vermogen); filled.add("vermogen"); }
+      if (data.brandstof) { setBrandstof(data.brandstof); filled.add("brandstof"); }
+      if (data.carrosserie) { setCarrosserie(data.carrosserie); filled.add("carrosserie"); }
+      if (data.aantalDeuren) { setAantalDeuren(data.aantalDeuren); filled.add("aantalDeuren"); }
+      if (data.aantalZitplaatsen) { setAantalZitplaatsen(data.aantalZitplaatsen); filled.add("aantalZitplaatsen"); }
+      if (data.gewicht) { setGewicht(data.gewicht); filled.add("gewicht"); }
+      if (data.catalogusprijs) { setCatalogusprijs(data.catalogusprijs); filled.add("catalogusprijs"); }
+      if (data.aantalCilinders) { setAantalCilinders(data.aantalCilinders); filled.add("aantalCilinders"); }
       setRdwFields(filled);
     }
     setRdwLoading(false);
