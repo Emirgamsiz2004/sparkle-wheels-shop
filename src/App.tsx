@@ -35,6 +35,10 @@ import AdminBlogPage from "./pages/admin/AdminBlogPage";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import CookiePolicy from "./pages/CookiePolicy";
+import AlgemeneVoorwaarden from "./pages/AlgemeneVoorwaarden";
+import CookieBanner from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +88,9 @@ const App = () => (
               <Route path="/diensten/auto-detailing" element={<AutoDetailing />} />
               <Route path="/diensten/auto-zoeken" element={<AutoZoeken />} />
               <Route path="/diensten/auto-customizing" element={<AutoCustomizing />} />
+              <Route path="/privacybeleid" element={<PrivacyPolicy />} />
+              <Route path="/cookiebeleid" element={<CookiePolicy />} />
+              <Route path="/algemene-voorwaarden" element={<AlgemeneVoorwaarden />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboardPage />} />
@@ -105,6 +112,7 @@ const App = () => (
             </Routes>
           )}
           <WhatsAppButton />
+          <CookieBanner />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
