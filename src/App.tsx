@@ -91,6 +91,7 @@ const App = () => (
                 <Route path="moneybird" element={<AdminMoneybirdPage />} />
                 <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="social-media" element={<AdminSocialMediaPage />} />
+                <Route path="advertenties" element={<AdminAdvertentiesPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
               </Route>
               <Route path="*" element={<NotFound />} />
