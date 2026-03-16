@@ -16,6 +16,7 @@ const AdminVoertuigNieuwPage = () => {
   const [saving, setSaving] = useState(false);
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
+  const [isConsignatie, setIsConsignatie] = useState(false);
   const [form, setForm] = useState({
     merk: "", model: "", bouwjaar: new Date().getFullYear(), kleur: "",
     kenteken: "", kilometerstand: 0, brandstof: "benzine" as Vehicle["brandstof"],
