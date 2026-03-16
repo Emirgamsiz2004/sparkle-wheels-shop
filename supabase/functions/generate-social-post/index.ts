@@ -15,30 +15,74 @@ serve(async (req) => {
     const {
       merk, model, jaar, kilometerstand, prijs, transmissie,
       kleur, bijzonderheden, type_auto, toon, platform, motorinhoud,
+      apk_geldig_tot, aantal_eigenaren, schadevrij, nap, prijs_bespreekbaar,
     } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const kleurEmoji = (k: string): string => {
-      const map: Record<string, string> = {
-        rood: "🔴", blauw: "🔵", zwart: "⚫", wit: "⚪",
-        grijs: "🔘", zilver: "🔘", groen: "🟢", oranje: "🟠",
-        geel: "🟡", paars: "🟣", bruin: "🟤",
+    let prompt: string;
+    let aiModel = "google/gemini-3-flash-preview";
+
+    if (platform === "Marktplaats") {
+      const bespreekbaar = prijs_bespreekbaar ? "Ja" : "Nee";
+      const napTxt = nap ? "Ja" : "Nee";
+      const schadevrijTxt = schadevrij ? "Ja" : "Nee";
+
+      prompt = `Genereer een volledige Marktplaats advertentie voor een auto met de volgende gegevens:
+Merk: ${merk}, Model: ${model}, Jaar: ${jaar}, Kilometerstand: ${kilometerstand}, Motorinhoud: ${motorinhoud || "onbekend"}, Transmissie: ${transmissie}, Kleur: ${kleur}, Vraagprijs: €${prijs}, APK tot: ${apk_geldig_tot || "onbekend"}, Eigenaren: ${aantal_eigenaren || 1}, NAP: ${napTxt}, Schadevrij: ${schadevrijTxt}, Bijzonderheden: ${bijzonderheden || "geen"}, Prijs bespreekbaar: ${bespreekbaar}
+
+Geef de output EXACT in dit formaat terug, geen afwijkingen:
+
+TITEL: [Merk] [Model] [Motorinhoud] [pk indien bekend] | [Jaar] | [Kilometerstand]km | [Kleur]
+
+BESCHRIJVING:
+[2-3 zinnen over karakter, rijervaring en staat van de auto. Eerlijk en uitnodigend, jij/je vorm, geen overdreven superlatieven. Benoem het karakter van de auto.]
+
+SPECIFICATIES:
+- Bouwjaar: [jaar]
+- Kilometerstand: ± [km]
+- Motorinhoud: [motorinhoud]
+- Transmissie: [transmissie]
+- Kleur: [kleur]
+- Brandstof: [benzine/diesel/elektrisch]
+- Aantal eigenaren: [eigenaren]
+- APK geldig tot: [apk]
+- NAP: [ja/nee]
+- Schadevrij: [ja/nee]
+
+VRAAGPRIJS: € [prijs][indien bespreekbaar voeg toe: ' — prijs is bespreekbaar']
+
+CONTACT:
+📞 06 – 1269 3825
+🌐 www.platinautomotive.nl
+📍 Roelofarendsveen — proefrit altijd mogelijk!
+
+Regels:
+- Titel max 60 tekens, gebruik woorden die kopers echt intypen op Marktplaats
+- Beschrijving max 3 zinnen, geen opsomming
+- Schrijf in jij/je vorm
+- Geen emojis behalve in het contactblok`;
+    } else {
+      const kleurEmoji = (k: string): string => {
+        const map: Record<string, string> = {
+          rood: "🔴", blauw: "🔵", zwart: "⚫", wit: "⚪",
+          grijs: "🔘", zilver: "🔘", groen: "🟢", oranje: "🟠",
+          geel: "🟡", paars: "🟣", bruin: "🟤",
+        };
+        return map[k.toLowerCase().trim()] || "⚫";
       };
-      return map[k.toLowerCase().trim()] || "⚫";
-    };
 
-    const emoji = kleurEmoji(kleur);
-    const motorLabel = motorinhoud ? ` ${motorinhoud}` : "";
+      const emoji = kleurEmoji(kleur);
+      const motorLabel = motorinhoud ? ` ${motorinhoud}` : "";
 
-    const toonInstructie: Record<string, string> = {
-      "Professioneel & Nuchter": "Schrijf zakelijk, nuchter en to-the-point. Geen overdreven enthousiasme.",
-      "Enthousiast & Energiek": "Schrijf energiek en enthousiast. Maak de lezer enthousiast over de auto.",
-      "Luxe & Exclusief": "Schrijf alsof dit een premium aanbod is. Elegant, zelfverzekerd, exclusief gevoel.",
-    };
+      const toonInstructie: Record<string, string> = {
+        "Professioneel & Nuchter": "Schrijf zakelijk, nuchter en to-the-point. Geen overdreven enthousiasme.",
+        "Enthousiast & Energiek": "Schrijf energiek en enthousiast. Maak de lezer enthousiast over de auto.",
+        "Luxe & Exclusief": "Schrijf alsof dit een premium aanbod is. Elegant, zelfverzekerd, exclusief gevoel.",
+      };
 
-    const prompt = `Je bent een social media manager voor Platin Automotive, een autobedrijf in Roelofarendsveen. Schrijf een Instagram/Facebook post caption in het Nederlands voor de volgende auto:
+      prompt = `Je bent een social media manager voor Platin Automotive, een autobedrijf in Roelofarendsveen. Schrijf een Instagram/Facebook post caption in het Nederlands voor de volgende auto:
 
 Merk: ${merk}
 Model: ${model}
@@ -70,6 +114,7 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 📍 Roelofarendsveen
 
 Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we apart toe).`;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -78,9 +123,9 @@ Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we ap
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: aiModel,
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 500,
+        max_tokens: 800,
         temperature: 0.7,
       }),
     });
@@ -106,7 +151,14 @@ Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we ap
     const data = await response.json();
     const caption = data.choices?.[0]?.message?.content?.trim() ?? "";
 
-    // Generate hashtags
+    // For Marktplaats, return caption only (no hashtags needed)
+    if (platform === "Marktplaats") {
+      return new Response(JSON.stringify({ caption, hashtags: null }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Generate hashtags for Instagram/Facebook
     const merkLower = merk.toLowerCase().replace(/\s/g, "");
     const modelLower = model.toLowerCase().replace(/\s/g, "");
     const merkModel = `${merkLower}${modelLower}`;
