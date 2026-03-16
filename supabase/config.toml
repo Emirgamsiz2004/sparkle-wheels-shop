@@ -24,3 +24,9 @@ verify_jwt = false
 [functions.fetch-google-reviews]
 verify_jwt = false
 
+[functions.estimate-trade-in-value]
+verify_jwt = false
+
+[functions.generate-blog-post]
+verify_jwt = false
+

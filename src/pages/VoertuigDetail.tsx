@@ -217,24 +217,7 @@ const VoertuigDetail = () => {
               )}
 
               {/* Trade-in section */}
-              <div className="mt-12 border border-border p-6 bg-card">
-                <h2 className="text-lg font-display font-semibold text-foreground mb-2 tracking-tight">
-                  Wil je jouw auto inruilen?
-                </h2>
-                <p className="text-xs font-body text-muted-foreground mb-4">
-                  Voer je kenteken in en ontvang een vrijblijvend bod.
-                </p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="AB-123-C"
-                    className="flex-1 bg-background border border-border px-4 py-2.5 text-sm font-body text-foreground placeholder:text-muted-foreground/50 uppercase tracking-widest focus:outline-none focus:border-primary transition-colors"
-                  />
-                  <button className="bg-foreground text-background px-5 py-2.5 text-[10px] font-body font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all">
-                    Bereken
-                  </button>
-                </div>
-              </div>
+              <TradeInSection />
             </motion.div>
 
             {/* RIGHT — Sidebar (40%, sticky) */}
