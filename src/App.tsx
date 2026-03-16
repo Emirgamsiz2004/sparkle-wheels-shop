@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Index from "./pages/Index";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import Voorraad from "./pages/Voorraad";
 import Consignatie from "./pages/Consignatie";
 import Contact from "./pages/Contact";
@@ -70,6 +72,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/voorraad" element={<Voorraad />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/consignatie" element={<Consignatie />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/over-ons" element={<OverOns />} />
