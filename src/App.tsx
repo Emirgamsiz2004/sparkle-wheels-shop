@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Index from "./pages/Index";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import Voorraad from "./pages/Voorraad";
 import Consignatie from "./pages/Consignatie";
 import Contact from "./pages/Contact";
