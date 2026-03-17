@@ -20,16 +20,18 @@ const formatNumber = (n: number | undefined) =>
 
 const parseMarktplaatsCaption = (text: string) => {
   const lines = text.split("\n");
-  let titel = "", beschrijving = "", specificaties = "", vraagprijs = "", contact = "";
+  let titel = "", beschrijving = "", specificaties = "", vraagprijs = "", contact = "", opvaltekst = "";
   let section = "";
 
   for (const line of lines) {
     if (line.startsWith("TITEL:")) { titel = line.replace("TITEL:", "").trim(); section = "titel"; continue; }
+    if (line.startsWith("OPVALTEKST:")) { section = "opvaltekst"; opvaltekst = line.replace("OPVALTEKST:", "").trim(); continue; }
     if (line.startsWith("BESCHRIJVING:")) { section = "beschrijving"; beschrijving = line.replace("BESCHRIJVING:", "").trim(); continue; }
     if (line.startsWith("SPECIFICATIES:")) { section = "specificaties"; continue; }
     if (line.startsWith("VRAAGPRIJS:")) { vraagprijs = line.replace("VRAAGPRIJS:", "").trim(); section = "vraagprijs"; continue; }
     if (line.startsWith("CONTACT:")) { section = "contact"; contact = line.replace("CONTACT:", "").trim(); continue; }
 
+    if (section === "opvaltekst") opvaltekst += (opvaltekst ? "\n" : "") + line;
     if (section === "beschrijving") beschrijving += (beschrijving ? "\n" : "") + line;
     if (section === "specificaties") specificaties += (specificaties ? "\n" : "") + line;
     if (section === "contact") contact += (contact ? "\n" : "") + line;
@@ -45,7 +47,7 @@ const parseMarktplaatsCaption = (text: string) => {
     })
     .filter((s) => s.key && s.value);
 
-  return { titel, beschrijving: beschrijving.trim(), specs, vraagprijs, contact: contact.trim() };
+  return { titel, opvaltekst: opvaltekst.trim(), beschrijving: beschrijving.trim(), specs, vraagprijs, contact: contact.trim() };
 };
 
 const MARKTPLAATS_ORANGE = "#e05c00";
