@@ -79,6 +79,8 @@ const AdminAdvertentiesPage = () => {
   const [gewicht, setGewicht] = useState<number | "">("");
   const [catalogusprijs, setCatalogusprijs] = useState<number | "">("");
   const [aantalCilinders, setAantalCilinders] = useState<number | "">("");
+  const [chassisnummer, setChassisnummer] = useState("");
+  const [metallicLak, setMetallicLak] = useState<"ja" | "nee" | "onbekend">("onbekend");
   const [loading, setLoading] = useState(false);
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
