@@ -24,6 +24,8 @@ const AdminVoertuigNieuwPage = () => {
     kenteken: "", kilometerstand: 0, brandstof: "benzine" as Vehicle["brandstof"],
     status: "inkoop" as Vehicle["status"], inkoopDatum: new Date().toISOString().split("T")[0],
     inkoopprijs: 0, verkoopprijs: 0, opmerkingen: "",
+    chassisnummer: "", metallicLak: "onbekend" as "ja" | "nee" | "onbekend",
+    aantalEigenaren: "" as number | "",
   });
 
   const update = (key: string, value: any) => {
