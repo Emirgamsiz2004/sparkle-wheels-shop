@@ -116,6 +116,7 @@ const AdminAdvertentiesPage = () => {
       if (data.gewicht) { setGewicht(data.gewicht); filled.add("gewicht"); }
       if (data.catalogusprijs) { setCatalogusprijs(data.catalogusprijs); filled.add("catalogusprijs"); }
       if (data.aantalCilinders) { setAantalCilinders(data.aantalCilinders); filled.add("aantalCilinders"); }
+      if (data.aantalHouders) { setAantalEigenaren(data.aantalHouders); filled.add("aantalEigenaren"); }
       setRdwFields(filled);
     }
     setRdwLoading(false);
