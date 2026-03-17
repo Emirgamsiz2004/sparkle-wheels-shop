@@ -121,6 +121,7 @@ const AdminAdvertentiesPage = () => {
       if (data.catalogusprijs) { setCatalogusprijs(data.catalogusprijs); filled.add("catalogusprijs"); }
       if (data.aantalCilinders) { setAantalCilinders(data.aantalCilinders); filled.add("aantalCilinders"); }
       if (data.aantalHouders) { setAantalEigenaren(data.aantalHouders); filled.add("aantalEigenaren"); }
+      if (data.chassisnummer) { setChassisnummer(data.chassisnummer); filled.add("chassisnummer"); }
       setRdwFields(filled);
     }
     setRdwLoading(false);
