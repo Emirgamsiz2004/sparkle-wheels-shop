@@ -79,6 +79,8 @@ const AdminAdvertentiesPage = () => {
   const [gewicht, setGewicht] = useState<number | "">("");
   const [catalogusprijs, setCatalogusprijs] = useState<number | "">("");
   const [aantalCilinders, setAantalCilinders] = useState<number | "">("");
+  const [chassisnummer, setChassisnummer] = useState("");
+  const [metallicLak, setMetallicLak] = useState<"ja" | "nee" | "onbekend">("onbekend");
   const [loading, setLoading] = useState(false);
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
@@ -119,6 +121,7 @@ const AdminAdvertentiesPage = () => {
       if (data.catalogusprijs) { setCatalogusprijs(data.catalogusprijs); filled.add("catalogusprijs"); }
       if (data.aantalCilinders) { setAantalCilinders(data.aantalCilinders); filled.add("aantalCilinders"); }
       if (data.aantalHouders) { setAantalEigenaren(data.aantalHouders); filled.add("aantalEigenaren"); }
+      if (data.chassisnummer) { setChassisnummer(data.chassisnummer); filled.add("chassisnummer"); }
       setRdwFields(filled);
     }
     setRdwLoading(false);
@@ -375,101 +378,146 @@ const AdminAdvertentiesPage = () => {
           {/* Right — Preview */}
           <div className="space-y-4">
             {parsed ? (
-              <Card className="overflow-hidden">
-                {/* Marktplaats-style header bar */}
-                <div className="px-5 py-3 flex items-center gap-2" style={{ backgroundColor: MARKTPLAATS_ORANGE }}>
-                  <span className="text-white font-bold text-sm">Marktplaats</span>
-                  <span className="text-white/70 text-xs">Preview</span>
-                </div>
-
-                <div className="p-5 space-y-4 bg-white text-black">
-                  {/* Title */}
-                  <h2 className="text-lg font-bold leading-tight">{parsed.titel}</h2>
-
-                  {/* Price */}
-                  {parsed.vraagprijs && (
-                    <p className="text-xl font-bold" style={{ color: MARKTPLAATS_ORANGE }}>
-                      {parsed.vraagprijs}
+              <>
+                {/* TITEL */}
+                <Card className="overflow-hidden">
+                  <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: MARKTPLAATS_ORANGE }}>
+                    <span className="text-white font-bold text-xs uppercase tracking-wider">Titel (max 60 tekens)</span>
+                    <button onClick={() => copyToClipboard(parsed.titel, "Titel")} className="text-white/70 hover:text-white transition-colors">
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="p-4 bg-white text-black">
+                    <p className="text-base font-bold leading-tight">{parsed.titel}</p>
+                    <p className="text-[10px] mt-1.5" style={{ color: parsed.titel.length > 60 ? "#dc2626" : "#9ca3af" }}>
+                      {parsed.titel.length} / 60 tekens
                     </p>
-                  )}
+                  </div>
+                </Card>
 
-                  <Separator className="bg-gray-200" />
-
-                  {/* Opvaltekst */}
-                  {parsed.opvaltekst && (
-                    <div className="rounded-lg p-4" style={{ border: `2px solid ${MARKTPLAATS_ORANGE}`, backgroundColor: "#fff5ef" }}>
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="text-xs font-semibold uppercase" style={{ color: MARKTPLAATS_ORANGE }}>Opvaltekst</h4>
-                        <button
-                          onClick={() => copyToClipboard(parsed.opvaltekst, "Opvaltekst")}
-                          className="text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                {/* OPVALTEKST */}
+                {parsed.opvaltekst && (
+                  <Card className="overflow-hidden" style={{ border: `2px solid ${MARKTPLAATS_ORANGE}` }}>
+                    <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: MARKTPLAATS_ORANGE }}>
+                      <span className="text-white font-bold text-xs uppercase tracking-wider">Opvaltekst (50-208 tekens)</span>
+                      <button onClick={() => copyToClipboard(parsed.opvaltekst, "Opvaltekst")} className="text-white/70 hover:text-white transition-colors">
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <div className="p-4" style={{ backgroundColor: "#fff5ef" }}>
                       <p className="text-sm leading-relaxed text-black">{parsed.opvaltekst}</p>
-                      <p className="text-[10px] mt-1.5" style={{ color: parsed.opvaltekst.length > 208 ? "#dc2626" : "#9ca3af" }}>
+                      <p className="text-[10px] mt-1.5" style={{ color: parsed.opvaltekst.length > 208 ? "#dc2626" : parsed.opvaltekst.length < 50 ? "#f59e0b" : "#9ca3af" }}>
                         {parsed.opvaltekst.length} / 208 tekens
                       </p>
                     </div>
-                  )}
+                  </Card>
+                )}
 
-                  <Separator className="bg-gray-200" />
-                  {/* Description */}
-                  {parsed.beschrijving && (
-                    <div>
-                      <h4 className="text-xs font-semibold uppercase text-gray-500 mb-1">Beschrijving</h4>
+                {/* ADVERTENTIETEKST */}
+                <Card className="overflow-hidden">
+                  <div className="px-4 py-2.5 flex items-center justify-between bg-gray-800">
+                    <span className="text-white font-bold text-xs uppercase tracking-wider">Advertentietekst</span>
+                    <button onClick={() => {
+                      const adText = [
+                        parsed.beschrijving,
+                        parsed.specs.length ? "\n" + parsed.specs.map((s) => `- ${s.key}: ${s.value}`).join("\n") : "",
+                        parsed.vraagprijs ? `\nVraagprijs: ${parsed.vraagprijs}` : "",
+                        parsed.contact ? `\n${parsed.contact}` : "",
+                      ].filter(Boolean).join("\n");
+                      copyToClipboard(adText, "Advertentietekst");
+                    }} className="text-white/70 hover:text-white transition-colors">
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="p-4 bg-white text-black space-y-3">
+                    {parsed.beschrijving && (
                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{parsed.beschrijving}</p>
-                    </div>
-                  )}
-
-                  {/* Specs table */}
-                  {parsed.specs.length > 0 && (
-                    <div>
-                      <h4 className="text-xs font-semibold uppercase text-gray-500 mb-2">Kenmerken</h4>
+                    )}
+                    {parsed.specs.length > 0 && (
                       <div className="rounded border border-gray-200 overflow-hidden">
                         {parsed.specs.map((s, i) => (
-                          <div
-                            key={i}
-                            className={`flex justify-between px-3 py-2 text-sm ${i % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
-                          >
+                          <div key={i} className={`flex justify-between px-3 py-1.5 text-sm ${i % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
                             <span className="text-gray-600">{s.key}</span>
                             <span className="font-medium">{s.value}</span>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    )}
+                    {parsed.vraagprijs && (
+                      <p className="text-lg font-bold" style={{ color: MARKTPLAATS_ORANGE }}>{parsed.vraagprijs}</p>
+                    )}
+                    {parsed.contact && (
+                      <div className="rounded-lg bg-gray-50 p-3">
+                        <p className="text-sm whitespace-pre-wrap">{parsed.contact}</p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
 
-                  {/* Contact */}
-                  {parsed.contact && (
-                    <div className="rounded-lg bg-gray-50 p-4">
-                      <h4 className="text-xs font-semibold uppercase text-gray-500 mb-1">Contact</h4>
-                      <p className="text-sm whitespace-pre-wrap">{parsed.contact}</p>
-                    </div>
-                  )}
-                </div>
+                {/* VWE INVULHULP */}
+                <Card className="overflow-hidden" style={{ border: "2px solid #D98A3C" }}>
+                  <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: "#D98A3C" }}>
+                    <span className="text-white font-bold text-xs uppercase tracking-wider">VWE Invulhulp</span>
+                    <button onClick={() => {
+                      const vweText = [
+                        `Kenteken: ${kenteken || "—"}`,
+                        `Chassisnummer: ${chassisnummer || "handmatig invullen"}`,
+                        `Kleur: ${kleur || "—"}`,
+                        `Metallic: ${metallicLak === "ja" ? "Ja" : metallicLak === "nee" ? "Nee" : "Onbekend"}`,
+                        `Aantal eigenaren: ${aantalEigenaren || "—"}`,
+                        `APK tot: ${apkTot || "—"}`,
+                        `NAP: ${nap ? "Ja" : "Nee"}`,
+                        `Schadevrij: ${schadevrij ? "Ja" : "Nee"}`,
+                      ].join("\n");
+                      copyToClipboard(vweText, "VWE invulhulp");
+                    }} className="text-white/70 hover:text-white transition-colors">
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="p-0 bg-white text-black">
+                    {[
+                      { label: "Kenteken", value: kenteken || "—" },
+                      { label: "Chassisnummer", value: chassisnummer || "handmatig invullen" },
+                      { label: "Kleur", value: kleur || "—" },
+                      { label: "Metallic", value: metallicLak === "ja" ? "Ja" : metallicLak === "nee" ? "Nee" : "Onbekend" },
+                      { label: "Aantal eigenaren", value: String(aantalEigenaren || "—") },
+                      { label: "APK tot", value: apkTot || "—" },
+                      { label: "NAP", value: nap ? "Ja" : "Nee" },
+                      { label: "Schadevrij", value: schadevrij ? "Ja" : "Nee" },
+                    ].map((row, i) => (
+                      <div key={i} className={`flex items-center justify-between px-4 py-2 text-sm ${i % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                        <span className="text-gray-500">{row.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{row.value}</span>
+                          <button onClick={() => copyToClipboard(row.value, row.label)} className="text-gray-300 hover:text-gray-600 transition-colors">
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
 
-                {/* Copy buttons */}
-                <div className="p-4 border-t border-gray-200 bg-gray-50 flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(parsed.titel, "Titel")}
-                    className="gap-1.5 text-xs"
-                  >
-                    <Copy className="w-3.5 h-3.5" /> Kopieer titel
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => copyToClipboard(fullBody, "Advertentie")}
-                    className="gap-1.5 text-xs text-white"
-                    style={{ backgroundColor: MARKTPLAATS_ORANGE }}
-                  >
-                    <Copy className="w-3.5 h-3.5" /> Kopieer advertentie
-                  </Button>
-                </div>
-              </Card>
+                {/* Kopieer alles */}
+                <Button
+                  onClick={() => {
+                    const fullOutput = [
+                      `TITEL:\n${parsed.titel}`,
+                      parsed.opvaltekst ? `OPVALTEKST:\n${parsed.opvaltekst}` : "",
+                      `ADVERTENTIETEKST:\n${parsed.beschrijving}`,
+                      parsed.specs.length ? parsed.specs.map((s) => `- ${s.key}: ${s.value}`).join("\n") : "",
+                      parsed.vraagprijs ? `Vraagprijs: ${parsed.vraagprijs}` : "",
+                      parsed.contact ? parsed.contact : "",
+                      `\nVWE INVULHULP:\nKenteken: ${kenteken || "—"}\nChassisnummer: ${chassisnummer || "handmatig invullen"}\nKleur: ${kleur || "—"}\nMetallic: ${metallicLak === "ja" ? "Ja" : metallicLak === "nee" ? "Nee" : "Onbekend"}\nAantal eigenaren: ${aantalEigenaren || "—"}\nAPK tot: ${apkTot || "—"}\nNAP: ${nap ? "Ja" : "Nee"}\nSchadevrij: ${schadevrij ? "Ja" : "Nee"}`,
+                    ].filter(Boolean).join("\n\n");
+                    copyToClipboard(fullOutput, "Volledige output");
+                  }}
+                  className="w-full gap-2 text-white font-semibold"
+                  style={{ backgroundColor: MARKTPLAATS_ORANGE }}
+                >
+                  <Copy className="w-4 h-4" /> Kopieer alles
+                </Button>
+              </>
             ) : (
               <Card className="p-10 flex flex-col items-center justify-center text-center min-h-[300px]">
                 <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
