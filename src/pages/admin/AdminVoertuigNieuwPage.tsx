@@ -245,12 +245,12 @@ const AdminVoertuigNieuwPage = () => {
   );
 };
 
-const Field = ({ label, value, onChange, type = "text", required = false, highlight = false }: {
-  label: string; value: any; onChange: (v: string) => void; type?: string; required?: boolean; highlight?: boolean;
+const Field = ({ label, value, onChange, type = "text", required = false, highlight = false, placeholder }: {
+  label: string; value: any; onChange: (v: string) => void; type?: string; required?: boolean; highlight?: boolean; placeholder?: string;
 }) => (
   <div>
     <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", highlight && "bg-accent/40 border-primary/30")} />
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} placeholder={placeholder} className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", highlight && "bg-accent/40 border-primary/30")} />
   </div>
 );
 

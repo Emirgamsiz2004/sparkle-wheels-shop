@@ -73,6 +73,8 @@ export async function fetchRdwData(kenteken: string): Promise<RdwVehicleData | n
       catalogusprijs: v.catalogusprijs ? Number(v.catalogusprijs) : null,
       eersteToelating: formatRdwDate(v.datum_eerste_toelating || ""),
       aantalCilinders: v.aantal_cilinders ? Number(v.aantal_cilinders) : null,
+      aantalHouders: v.aantal_houders ? Number(v.aantal_houders) : null,
+      chassisnummer: v.voertuigidentificatienummer || null,
     };
 
     toast.success("Voertuiggegevens opgehaald via RDW ✓");

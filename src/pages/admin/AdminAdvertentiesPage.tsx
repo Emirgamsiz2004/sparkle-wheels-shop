@@ -328,7 +328,7 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Aantal eigenaren</label>
-                  <Input type="number" value={aantalEigenaren} onChange={(e) => setAantalEigenaren(Number(e.target.value) || 1)} min={1} />
+                  <Input type="number" value={aantalEigenaren} onChange={(e) => { setAantalEigenaren(Number(e.target.value) || 1); clearRdw("aantalEigenaren"); }} min={1} className={rdwBg("aantalEigenaren")} />
                 </div>
               </div>
 
