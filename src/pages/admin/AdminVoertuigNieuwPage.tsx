@@ -49,6 +49,8 @@ const AdminVoertuigNieuwPage = () => {
           updates.brandstof = bf; filled.add("brandstof");
         }
       }
+      if (data.aantalHouders) { updates.aantalEigenaren = data.aantalHouders; filled.add("aantalEigenaren"); }
+      if (data.chassisnummer) { updates.chassisnummer = data.chassisnummer; filled.add("chassisnummer"); }
       setForm((f) => ({ ...f, ...updates }));
       setRdwFields(filled);
     }
