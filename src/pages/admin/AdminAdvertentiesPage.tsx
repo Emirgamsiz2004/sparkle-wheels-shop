@@ -183,6 +183,7 @@ const AdminAdvertentiesPage = () => {
 
   const fullBody = parsed
     ? [
+        parsed.opvaltekst && `OPVALTEKST:\n${parsed.opvaltekst}`,
         parsed.beschrijving && `BESCHRIJVING:\n${parsed.beschrijving}`,
         parsed.specs.length && `SPECIFICATIES:\n${parsed.specs.map((s) => `- ${s.key}: ${s.value}`).join("\n")}`,
         parsed.vraagprijs && `VRAAGPRIJS: ${parsed.vraagprijs}`,
