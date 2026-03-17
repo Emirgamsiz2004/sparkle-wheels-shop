@@ -131,7 +131,7 @@ const AdminAdvertentiesPage = () => {
     setRdwFields((prev) => { const next = new Set(prev); next.delete(key); return next; });
   };
 
-  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800" : "";
+  const rdwBg = (key: string) => rdwFields.has(key) ? "bg-accent/40 border-primary/30 text-foreground" : "";
 
   const handleGenerate = async () => {
     if (!merk || !model) {
