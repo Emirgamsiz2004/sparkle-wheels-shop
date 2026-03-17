@@ -13,7 +13,7 @@ interface Props {
 }
 
 const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
-  const [form, setForm] = useState({ ...vehicle });
+  const [form, setForm] = useState({ ...vehicle, chassisnummer: (vehicle as any).chassisnummer || "", metallicLak: (vehicle as any).metallicLak || "onbekend", aantalEigenaren: (vehicle as any).aantalEigenaren || "" });
   const [saving, setSaving] = useState(false);
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
