@@ -107,6 +107,17 @@ const AdminVoertuigNieuwPage = () => {
             <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} highlight={rdwFields.has("bouwjaar")} />
             <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", capitalizeKleur(v))} highlight={rdwFields.has("kleur")} />
             <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
+            <Field label="Aantal eigenaren" type="number" value={form.aantalEigenaren} onChange={(v) => update("aantalEigenaren", v ? Number(v) : "")} highlight={rdwFields.has("aantalEigenaren")} />
+            <div className="col-span-2">
+              <Field label="Chassisnummer (VIN)" value={form.chassisnummer} onChange={(v) => update("chassisnummer", v.toUpperCase())} highlight={rdwFields.has("chassisnummer")} placeholder="Wordt automatisch opgehaald of handmatig invullen" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Metallic lak</label>
+              <select value={form.metallicLak} onChange={(e) => update("metallicLak", e.target.value)} className="w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all">
+                <option value="onbekend">Onbekend</option><option value="ja">Ja</option><option value="nee">Nee</option>
+              </select>
+              <p className="text-[9px] text-muted-foreground mt-1 italic">Niet automatisch beschikbaar — controleer het kentekenbewijs</p>
+            </div>
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>
               <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", rdwBg("brandstof"))}>
