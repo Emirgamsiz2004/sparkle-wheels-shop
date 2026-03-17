@@ -16,6 +16,8 @@ export interface RdwVehicleData {
   catalogusprijs: number | null;
   eersteToelating: string;
   aantalCilinders: number | null;
+  aantalHouders: number | null;
+  chassisnummer: string | null;
 }
 
 const capitalize = (s: string): string =>
