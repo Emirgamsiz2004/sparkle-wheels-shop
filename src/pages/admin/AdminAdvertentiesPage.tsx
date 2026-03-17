@@ -20,16 +20,18 @@ const formatNumber = (n: number | undefined) =>
 
 const parseMarktplaatsCaption = (text: string) => {
   const lines = text.split("\n");
-  let titel = "", beschrijving = "", specificaties = "", vraagprijs = "", contact = "";
+  let titel = "", beschrijving = "", specificaties = "", vraagprijs = "", contact = "", opvaltekst = "";
   let section = "";
 
   for (const line of lines) {
     if (line.startsWith("TITEL:")) { titel = line.replace("TITEL:", "").trim(); section = "titel"; continue; }
+    if (line.startsWith("OPVALTEKST:")) { section = "opvaltekst"; opvaltekst = line.replace("OPVALTEKST:", "").trim(); continue; }
     if (line.startsWith("BESCHRIJVING:")) { section = "beschrijving"; beschrijving = line.replace("BESCHRIJVING:", "").trim(); continue; }
     if (line.startsWith("SPECIFICATIES:")) { section = "specificaties"; continue; }
     if (line.startsWith("VRAAGPRIJS:")) { vraagprijs = line.replace("VRAAGPRIJS:", "").trim(); section = "vraagprijs"; continue; }
     if (line.startsWith("CONTACT:")) { section = "contact"; contact = line.replace("CONTACT:", "").trim(); continue; }
 
+    if (section === "opvaltekst") opvaltekst += (opvaltekst ? "\n" : "") + line;
     if (section === "beschrijving") beschrijving += (beschrijving ? "\n" : "") + line;
     if (section === "specificaties") specificaties += (specificaties ? "\n" : "") + line;
     if (section === "contact") contact += (contact ? "\n" : "") + line;
@@ -45,7 +47,7 @@ const parseMarktplaatsCaption = (text: string) => {
     })
     .filter((s) => s.key && s.value);
 
-  return { titel, beschrijving: beschrijving.trim(), specs, vraagprijs, contact: contact.trim() };
+  return { titel, opvaltekst: opvaltekst.trim(), beschrijving: beschrijving.trim(), specs, vraagprijs, contact: contact.trim() };
 };
 
 const MARKTPLAATS_ORANGE = "#e05c00";
@@ -181,6 +183,7 @@ const AdminAdvertentiesPage = () => {
 
   const fullBody = parsed
     ? [
+        parsed.opvaltekst && `OPVALTEKST:\n${parsed.opvaltekst}`,
         parsed.beschrijving && `BESCHRIJVING:\n${parsed.beschrijving}`,
         parsed.specs.length && `SPECIFICATIES:\n${parsed.specs.map((s) => `- ${s.key}: ${s.value}`).join("\n")}`,
         parsed.vraagprijs && `VRAAGPRIJS: ${parsed.vraagprijs}`,
@@ -392,6 +395,26 @@ const AdminAdvertentiesPage = () => {
 
                   <Separator className="bg-gray-200" />
 
+                  {/* Opvaltekst */}
+                  {parsed.opvaltekst && (
+                    <div className="rounded-lg p-4" style={{ border: `2px solid ${MARKTPLAATS_ORANGE}`, backgroundColor: "#fff5ef" }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="text-xs font-semibold uppercase" style={{ color: MARKTPLAATS_ORANGE }}>Opvaltekst</h4>
+                        <button
+                          onClick={() => copyToClipboard(parsed.opvaltekst, "Opvaltekst")}
+                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <p className="text-sm leading-relaxed text-black">{parsed.opvaltekst}</p>
+                      <p className="text-[10px] mt-1.5" style={{ color: parsed.opvaltekst.length > 208 ? "#dc2626" : "#9ca3af" }}>
+                        {parsed.opvaltekst.length} / 208 tekens
+                      </p>
+                    </div>
+                  )}
+
+                  <Separator className="bg-gray-200" />
                   {/* Description */}
                   {parsed.beschrijving && (
                     <div>
