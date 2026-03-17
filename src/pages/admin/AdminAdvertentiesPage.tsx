@@ -116,6 +116,7 @@ const AdminAdvertentiesPage = () => {
       if (data.gewicht) { setGewicht(data.gewicht); filled.add("gewicht"); }
       if (data.catalogusprijs) { setCatalogusprijs(data.catalogusprijs); filled.add("catalogusprijs"); }
       if (data.aantalCilinders) { setAantalCilinders(data.aantalCilinders); filled.add("aantalCilinders"); }
+      if (data.aantalHouders) { setAantalEigenaren(data.aantalHouders); filled.add("aantalEigenaren"); }
       setRdwFields(filled);
     }
     setRdwLoading(false);
@@ -327,7 +328,7 @@ const AdminAdvertentiesPage = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Aantal eigenaren</label>
-                  <Input type="number" value={aantalEigenaren} onChange={(e) => setAantalEigenaren(Number(e.target.value) || 1)} min={1} />
+                  <Input type="number" value={aantalEigenaren} onChange={(e) => { setAantalEigenaren(Number(e.target.value) || 1); clearRdw("aantalEigenaren"); }} min={1} className={rdwBg("aantalEigenaren")} />
                 </div>
               </div>
 
