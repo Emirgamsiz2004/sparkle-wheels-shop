@@ -415,6 +415,7 @@ const AdminAdvertentiesPage = () => {
                   )}
 
                   <Separator className="bg-gray-200" />
+                  {/* Description */}
                   {parsed.beschrijving && (
                     <div>
                       <h4 className="text-xs font-semibold uppercase text-gray-500 mb-1">Beschrijving</h4>

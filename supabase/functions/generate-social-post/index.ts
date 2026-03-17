@@ -38,7 +38,10 @@ Merk: ${merk}, Model: ${model}, Uitvoering: ${uitvoering || "onbekend"}, Jaar: $
 Geef output EXACT in dit formaat:
 
 TITEL:
-[Maximaal 60 tekens. Formule: Merk + Model + Uitvoering + Motorinhoud | Jaar | ±Kmkm | meest gezochte kenmerk. Jaar MOET in de titel staan. Voorbeeld: 'Volkswagen Polo GTI 1.8 TSI | 2017 | ±119.000km | Navi']
+[Maximaal 60 tekens. Formule: Merk + Model + Uitvoering + Motorinhoud | Jaar | Bijz. 1 - Bijz. 2. Jaar MOET in de titel staan. De bijzonderheden worden gescheiden door een streepje (-), NIET door een plusteken. Voorbeeld: 'Volkswagen Polo GTI 1.8 TSI | 2017 | Navi - Cruise']
+
+OPVALTEKST:
+[Schrijf een opvaltekst van 50-208 tekens. Benoem de 3-4 meest aantrekkelijke kenmerken van deze specifieke auto. Denk aan: staat, bijzondere opties, lage km, eerste eigenaar, apk, etc. Schrijf in actieve stijl zonder hoofdletters aan het begin van elk kenmerk. Voorbeeld stijl: 'Nette auto, eerste eigenaar, goed onderhouden. Inclusief navigatie, cruise control en parkeersensoren. Proefrit mogelijk in Roelofarendsveen!']
 
 BESCHRIJVING:
 [2-3 zinnen over karakter, rijervaring en staat. Eerlijk, uitnodigend, jij/je vorm. Benoem wat de auto bijzonder maakt als rijervaring, niet alleen technische specs.]
@@ -72,6 +75,8 @@ Ook te vinden als: [genereer hier 6-8 natuurlijke zoektermen die kopers echt int
 
 Strikte regels:
 - Titel max 60 tekens, jaar staat ALTIJD in de titel
+- Bijzonderheden in titel gescheiden door streepje (-), NIET door plusteken (+)
+- Opvaltekst is 50-208 tekens, benoemt concrete kenmerken
 - Beschrijving max 3 zinnen, geen opsomming
 - Zoektermen onderaan zijn lowercase, herkenbaar als echte zoekopdrachten
 - Schrijf in jij/je vorm
