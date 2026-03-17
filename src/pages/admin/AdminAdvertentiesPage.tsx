@@ -395,7 +395,26 @@ const AdminAdvertentiesPage = () => {
 
                   <Separator className="bg-gray-200" />
 
-                  {/* Description */}
+                  {/* Opvaltekst */}
+                  {parsed.opvaltekst && (
+                    <div className="rounded-lg p-4" style={{ border: `2px solid ${MARKTPLAATS_ORANGE}`, backgroundColor: "#fff5ef" }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="text-xs font-semibold uppercase" style={{ color: MARKTPLAATS_ORANGE }}>Opvaltekst</h4>
+                        <button
+                          onClick={() => copyToClipboard(parsed.opvaltekst, "Opvaltekst")}
+                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <p className="text-sm leading-relaxed text-black">{parsed.opvaltekst}</p>
+                      <p className="text-[10px] mt-1.5" style={{ color: parsed.opvaltekst.length > 208 ? "#dc2626" : "#9ca3af" }}>
+                        {parsed.opvaltekst.length} / 208 tekens
+                      </p>
+                    </div>
+                  )}
+
+                  <Separator className="bg-gray-200" />
                   {parsed.beschrijving && (
                     <div>
                       <h4 className="text-xs font-semibold uppercase text-gray-500 mb-1">Beschrijving</h4>
