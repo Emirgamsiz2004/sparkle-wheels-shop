@@ -50,7 +50,7 @@ const FacebookIcon = ({ className }: { className?: string }) => (
             {/* Social icons */}
             <div className="flex items-center gap-3">
               <a
-                href="https://www.instagram.com/platin_automotive"
+                href="https://www.instagram.com/platin_automotive/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
