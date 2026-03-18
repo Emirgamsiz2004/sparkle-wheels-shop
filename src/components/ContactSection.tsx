@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Clock, ArrowRight } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle } from "lucide-react";
 
 const contactInfo = [
   { icon: Phone, label: "Telefoon", value: "06 - 1269 3825", href: "tel:+31612693825" },
+  { icon: MessageCircle, label: "WhatsApp", value: "06 - 1269 3825", href: "https://wa.me/31612693825" },
   { icon: Mail, label: "E-mail", value: "info@platinautomotive.nl", href: "mailto:info@platinautomotive.nl" },
   { icon: MapPin, label: "Adres", value: "Cilinderweg 99, Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+Roelofarendsveen" },
   { icon: Clock, label: "Openingstijden", value: "Ma t/m Vr: 09:00 - 18:00\nZa & Zo: 10:00 - 17:00", href: "#" },
@@ -30,14 +31,26 @@ const ContactSection = () => {
             <p className="text-muted-foreground font-body font-light leading-relaxed mb-10 max-w-sm">
               Heeft u vragen of wilt u een afspraak maken? Wij helpen u graag verder.
             </p>
-            <a
-              href="tel:+31612693825"
-              className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-            >
-              <Phone className="w-3.5 h-3.5" />
-              Bel Direct
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="tel:+31612693825"
+                className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                Bel Direct
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </a>
+              <a
+                href="https://wa.me/31612693825"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-3 border border-border text-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                WhatsApp
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </div>
           </motion.div>
 
           <motion.div
