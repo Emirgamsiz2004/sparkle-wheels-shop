@@ -1,12 +1,8 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { Car, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { placeholderCars } from "@/data/cars";
-import CarCard from "@/components/CarCard";
 
 const InventorySection = () => {
-  const featured = placeholderCars.slice(0, 3);
-
   return (
     <section id="voorraad" className="py-16 md:py-28 lg:py-36 bg-card">
       <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
@@ -25,41 +21,38 @@ const InventorySection = () => {
               Onze auto's
             </h2>
           </div>
-          <Link
-            to="/voorraad"
-            className="hidden md:flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            Bekijk alles
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-px bg-border">
-          {featured.map((car, i) => (
-            <motion.div
-              key={car.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.15 }}
-            >
-              <CarCard car={car} />
-            </motion.div>
-          ))}
-        </div>
-
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-10 text-center md:hidden"
+          transition={{ duration: 0.7, delay: 0.15 }}
+          className="border border-border rounded-2xl bg-background p-10 md:p-16 lg:p-20 text-center"
         >
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-accent/50 flex items-center justify-center">
+              <Car className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+            </div>
+          </div>
+
+          <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-3">
+            Binnenkort beschikbaar
+          </h3>
+          <p className="text-muted-foreground font-body font-light max-w-md mx-auto mb-2">
+            We werken hard aan het samenstellen van onze voorraad. Binnenkort vind je hier ons actuele aanbod occasions.
+          </p>
+
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70 mb-8">
+            <Clock className="w-3.5 h-3.5" />
+            <span className="tracking-wide uppercase">Wordt bijgewerkt</span>
+          </div>
+
           <Link
-            to="/voorraad"
+            to="/contact"
             className="inline-flex items-center gap-2 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
           >
-            Bekijk Hele Voorraad
+            Neem Contact Op
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </motion.div>
