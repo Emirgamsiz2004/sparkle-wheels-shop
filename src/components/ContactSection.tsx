@@ -57,23 +57,34 @@ const ContactSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-border"
+            className="flex flex-col gap-px bg-border"
           >
-            {contactInfo.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="group bg-card hover:bg-primary p-6 md:p-8 transition-all duration-300"
-              >
-                <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary-foreground mb-6 transition-colors" />
-                <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-hover:text-primary-foreground/70 mb-2 transition-colors">
-                  {item.label}
-                </p>
-                <p className="text-sm font-body font-medium text-foreground group-hover:text-primary-foreground whitespace-pre-line transition-colors">
-                  {item.value}
-                </p>
-              </a>
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
+              {contactInfo.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target={item.href.startsWith("http") ? "_blank" : undefined}
+                  rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="group bg-card hover:bg-primary p-6 md:p-8 transition-all duration-300"
+                >
+                  <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary-foreground mb-6 transition-colors" />
+                  <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-hover:text-primary-foreground/70 mb-2 transition-colors">
+                    {item.label}
+                  </p>
+                  <p className="text-sm font-body font-medium text-foreground group-hover:text-primary-foreground whitespace-pre-line transition-colors">
+                    {item.value}
+                  </p>
+                </a>
+              ))}
+            </div>
+            <div className="bg-card flex items-center gap-3 px-6 md:px-8 py-4">
+              <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+              <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground">Openingstijden</p>
+              <span className="text-xs font-body text-foreground">Ma-Vr: 09:00 – 18:00</span>
+              <span className="text-border">·</span>
+              <span className="text-xs font-body text-foreground">Za & Zo: 10:00 – 17:00</span>
+            </div>
           </motion.div>
         </div>
       </div>
