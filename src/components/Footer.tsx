@@ -68,7 +68,16 @@ const FacebookIcon = ({ className }: { className?: string }) => (
                 <WhatsAppIcon className="w-3.5 h-3.5" />
               </a>
               <a
-                href="https://www.marktplaats.nl"
+                href="https://www.facebook.com/profile.php?id=61583040400722"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                aria-label="Facebook"
+              >
+                <FacebookIcon className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href="https://www.marktplaats.nl/u/platin-automotive/1474896/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all overflow-hidden"
