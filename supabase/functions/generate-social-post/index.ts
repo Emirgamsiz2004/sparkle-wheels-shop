@@ -100,7 +100,7 @@ Strikte regels:
         "Luxe & Exclusief": "Schrijf alsof dit een premium aanbod is. Elegant, zelfverzekerd, exclusief gevoel.",
       };
 
-      prompt = `Je bent een social media manager voor Platin Automotive, een autobedrijf in Roelofarendsveen. Schrijf een Instagram/Facebook post caption in het Nederlands voor de volgende auto:
+      prompt = `Je bent een social media manager voor Platin Automotive, een autobedrijf in Roelofarendsveen. Schrijf een korte, duidelijke Instagram/Facebook caption in het Nederlands voor de volgende auto:
 
 Merk: ${merk}
 Model: ${model}
@@ -117,39 +117,34 @@ Toon: ${toonInstructie[toon] || "Schrijf professioneel en to-the-point."}
 De caption MOET beginnen met EXACT deze eerste regel (kopieer letterlijk, verander NIETS):
 ${emoji} ${merk} ${model}${motorLabel} | ${jaar} | ${transmissie}
 
-Schrijf een beschrijving van 2-3 zinnen die past bij een social media post over deze auto. Regels:
+Schrijf daarna een korte beschrijving van 2-3 zinnen. Regels:
 
-- De eerste zin is een HAAK — een statement, vraag of observatie die iemand doet stoppen met scrollen. Geen saaie opsomming. Denk aan: een gevoel oproepen, FOMO creëren, de doelgroep aanspreken, of iets verrassends over de auto benoemen.
-- De tweede zin voegt iets toe over het karakter of de situatie van de auto — waarom is dit juist nu interessant? Lage km, bijzondere staat, zeldzame uitvoering, of een voordeel voor de koper.
-- Optionele derde zin: een subtiele call to action die uitnodigt zonder opdringerig te zijn.
+- Beschrijf de auto kort en eerlijk. Benoem alleen feiten die je weet uit de voertuiggegevens hierboven.
+- Verzin NIETS. Geen rijervaring, geen gevoel, geen aannames over staat of onderhoud tenzij het in de gegevens staat.
+- Houd het luchtig en leesbaar, maar overdrijf niet. Geen verkooppraatjes.
+- Gebruik NOOIT woorden als: 'betrouwbare', 'direct inzetbaar', 'prachtige', 'geweldige staat', 'pareltje', 'topper', 'instapklaar'. Gewoon feitelijk en to-the-point.
+- Eén subtiele uitnodiging mag (bijv. "Interesse? Stuur een DM"), maar niet opdringerig.
 
-Voorbeelden van goede eerste zinnen:
-- 'Bijna nieuw, zonder de nieuwprijs.' (voor lage km auto)
-- 'Voor wie niet wil wachten op de ideale auto.' (voor instapklaar voertuig)
-- 'Dit is wat 5.000 km op een nieuwe auto betekent.' (specifiek en concreet)
-- 'Weinig mensen rijden in iets als dit voor deze prijs.' (schaarste)
-- 'Soms komt de perfecte auto gewoon op het juiste moment voorbij.' (gevoel)
+Pas de schrijfstijl aan op het gekozen toonprofiel:
+- Professioneel & Nuchter: zakelijk, kort, geen franje
+- Enthousiast & Energiek: iets meer energie, maar blijf feitelijk
+- Luxe & Exclusief: rustig en zelfverzekerd, geen overdrijving
 
-Pas de toon aan op het gekozen toonprofiel:
-- Professioneel & Nuchter: droog, to the point, geen overdrijving
-- Enthousiast & Energiek: levendig, actief taalgebruik, lichte energie
-- Luxe & Exclusief: rustig, zelfverzekerd, wekt gevoel van kwaliteit
-
-Schrijf NOOIT: 'betrouwbare', 'direct inzetbaar', 'mooie auto', 'geweldige staat' of andere vage superlatieven zonder bewijs. Gebruik altijd concrete details uit de voertuiggegevens om claims te onderbouwen.
+Voeg daarna dit blok toe:
 
 📋 Specs:
-› Bouwjaar: [jaar]
-› Kilometerstand: ± [km] km
-› Transmissie: [transmissie]
-› Kleur: [kleur]
-[Alleen als er bijzonderheden zijn: › Extras: [bijzonderheden]]
+› Bouwjaar: ${jaar}
+› Kilometerstand: ± ${kilometerstand} km
+› Transmissie: ${transmissie}
+› Kleur: ${kleur}
+${bijzonderheden ? `› Extras: ${bijzonderheden}` : ""}
 
-💶 Vraagprijs: € [prijs],-
+💶 Vraagprijs: € ${prijs},-
 
 Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 📍 Roelofarendsveen
 
-Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags (die voegen we apart toe).`;
+Geef ALLEEN de caption tekst terug, geen uitleg, geen hashtags.`;
     }
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
