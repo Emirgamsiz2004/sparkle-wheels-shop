@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Clock, ArrowRight } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle } from "lucide-react";
 
 const contactInfo = [
   { icon: Phone, label: "Telefoon", value: "06 - 1269 3825", href: "tel:+31612693825" },
