@@ -1,55 +1,11 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Car, Clock, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import CarCard from "@/components/CarCard";
-import { placeholderCars } from "@/data/cars";
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 const Voorraad = () => {
-  const { data: dbVehicles } = useQuery({
-    queryKey: ["voorraad-vehicles"],
-    queryFn: async () => {
-      const { data: vehicles, error } = await supabase
-        .from("vehicles")
-        .select("*, vehicle_photos(file_path, is_hoofdfoto, volgorde)")
-        .in("status", ["in_voorraad", "in voorraad", "gepubliceerd", "te_koop"])
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return vehicles;
-    },
-  });
-
-  const getPhotoUrl = (filePath: string) => {
-    if (filePath.startsWith("http")) return filePath;
-    return `${SUPABASE_URL}/storage/v1/object/public/vehicle-photos/${filePath}`;
-  };
-
-  // Map Supabase vehicles to CarCard format
-  const supabaseCars = (dbVehicles ?? []).map((v) => {
-    const mainPhoto = v.vehicle_photos?.find((p: any) => p.is_hoofdfoto) ?? v.vehicle_photos?.[0];
-    return {
-      id: v.id,
-      title: `${v.merk} ${v.model}`,
-      price: v.verkoopprijs ?? 0,
-      year: v.bouwjaar ?? 0,
-      mileage: v.kilometerstand ?? 0,
-      fuel: v.brandstof ?? "",
-      transmission: "",
-      engine: v.brandstof ?? "",
-      nap: true,
-      image: mainPhoto ? getPhotoUrl(mainPhoto.file_path) : "/placeholder.svg",
-    };
-  });
-
-  // Use DB vehicles if available, otherwise show placeholders
-  const cars = supabaseCars.length > 0 ? supabaseCars : placeholderCars;
-
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -75,13 +31,38 @@ const Voorraad = () => {
             <p className="text-muted-foreground font-body font-light max-w-lg">Bekijk ons huidige aanbod. Alle auto's zijn gecontroleerd en rijklaar.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
-            {cars.map((car, i) => (
-              <motion.div key={car.id} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                <CarCard car={car} />
-              </motion.div>
-            ))}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="border border-border rounded-2xl bg-card p-10 md:p-16 lg:p-20 text-center"
+          >
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-accent/50 flex items-center justify-center">
+                <Car className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+              </div>
+            </div>
+
+            <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-3">
+              Binnenkort beschikbaar
+            </h3>
+            <p className="text-muted-foreground font-body font-light max-w-md mx-auto mb-2">
+              We werken hard aan het samenstellen van onze voorraad. Binnenkort vind je hier ons actuele aanbod occasions.
+            </p>
+
+            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70 mb-8">
+              <Clock className="w-3.5 h-3.5" />
+              <span className="tracking-wide uppercase">Wordt bijgewerkt</span>
+            </div>
+
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+            >
+              Neem Contact Op
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </motion.div>
         </div>
       </section>
 
