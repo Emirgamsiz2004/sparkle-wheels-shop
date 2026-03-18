@@ -115,17 +115,18 @@ export default function ReviewsSection() {
         </div>
 
         {/* Slider */}
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <div
-            className="flex transition-transform duration-500 ease-out gap-4"
+            className="flex transition-transform duration-500 ease-out"
             style={{
-              transform: `translateX(-${current * (100 / 3 + 1.066)}%)`, // account for gap
+              gap: "16px",
+              transform: `translateX(calc(-${current} * (280px + 16px)))`,
             }}
           >
             {reviews.map((review, index) => (
               <div
                 key={index}
-                className="min-w-[calc(100%-0px)] md:min-w-[calc(50%-8px)] lg:min-w-[calc(33.333%-10.666px)] shrink-0 border border-border bg-card p-6 flex flex-col justify-between transition-colors duration-300 hover:border-primary/30"
+                className="w-[280px] shrink-0 border border-border bg-card p-6 flex flex-col justify-between transition-colors duration-300 hover:border-primary/30"
               >
                 {/* Author row */}
                 <div className="flex items-center gap-3 mb-4">
@@ -141,16 +142,17 @@ export default function ReviewsSection() {
                     <p className="text-xs font-body font-medium text-foreground truncate">{review.author_name}</p>
                     <div className="flex items-center gap-1.5">
                       <div className="flex gap-0.5">{renderStars(review.rating)}</div>
-                      <span className="text-[10px] font-body text-muted-foreground">{review.relative_time_description}</span>
                     </div>
                   </div>
                   <GoogleIcon />
                 </div>
 
                 {/* Text */}
-                <p className="text-[13px] font-body text-muted-foreground leading-relaxed line-clamp-4 flex-1">
+                <p className="text-[13px] font-body text-muted-foreground leading-relaxed line-clamp-4 flex-1 mb-3">
                   {review.text || "Geen tekst toegevoegd."}
                 </p>
+
+                <span className="text-[10px] font-body text-muted-foreground/60">{review.relative_time_description}</span>
               </div>
             ))}
           </div>
