@@ -46,7 +46,7 @@ export default function ReviewsSection() {
   }, []);
 
   const reviews = data?.reviews ?? [];
-  const totalSlides = Math.max(1, reviews.length - 2); // 3 visible on desktop
+  const totalSlides = reviews.length;
 
   const prev = useCallback(() => setCurrent((c) => Math.max(0, c - 1)), []);
   const next = useCallback(() => setCurrent((c) => Math.min(totalSlides - 1, c + 1)), [totalSlides]);
