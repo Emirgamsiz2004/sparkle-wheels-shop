@@ -19,7 +19,7 @@ const FacebookIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-
+const Footer = () => {
   return (
     <footer className="bg-card border-t border-border">
       <div className="mx-auto px-5 md:px-[90px] max-w-[1920px] py-8 md:py-12">
