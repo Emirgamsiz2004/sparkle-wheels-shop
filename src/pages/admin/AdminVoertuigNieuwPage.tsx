@@ -4,7 +4,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Loader2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
-import { Vehicle } from "@/types/vehicle";
+import { Vehicle, VerkoopType, verkoopTypeLabels } from "@/types/vehicle";
 import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
