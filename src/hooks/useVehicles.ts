@@ -130,6 +130,11 @@ export function useVehicles() {
       koper_naam: updated.koperNaam || null,
       koper_email: updated.koperEmail || null,
       koper_telefoon: updated.koperTelefoon || null,
+      verkoop_type: updated.verkoopType || 'regulier',
+      consignatie_commissie_perc: updated.consignatieCommissiePerc || 10,
+      consignatie_eigenaar_naam: updated.consignatieEigenaarNaam || null,
+      consignatie_eigenaar_telefoon: updated.consignatieEigenaarTelefoon || null,
+      consignatie_eigenaar_email: updated.consignatieEigenaarEmail || null,
     } as any).eq('id', updated.id);
     if (error) { toast.error('Fout bij bijwerken voertuig'); return; }
     toast.success('Voertuig bijgewerkt');
