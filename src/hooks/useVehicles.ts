@@ -25,6 +25,11 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
   googleDriveFolderId: row.google_drive_folder_id || null,
   googleDriveFolderUrl: row.google_drive_folder_url || null,
   googleDriveSynced: row.google_drive_synced || false,
+  verkoopType: row.verkoop_type || 'regulier',
+  consignatieCommissiePerc: Number(row.consignatie_commissie_perc) || 10,
+  consignatieEigenaarNaam: row.consignatie_eigenaar_naam || undefined,
+  consignatieEigenaarTelefoon: row.consignatie_eigenaar_telefoon || undefined,
+  consignatieEigenaarEmail: row.consignatie_eigenaar_email || undefined,
   kosten: costs.map(c => ({
     id: c.id,
     description: c.description,
