@@ -25,6 +25,11 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
   googleDriveFolderId: row.google_drive_folder_id || null,
   googleDriveFolderUrl: row.google_drive_folder_url || null,
   googleDriveSynced: row.google_drive_synced || false,
+  verkoopType: row.verkoop_type || 'regulier',
+  consignatieCommissiePerc: Number(row.consignatie_commissie_perc) || 10,
+  consignatieEigenaarNaam: row.consignatie_eigenaar_naam || undefined,
+  consignatieEigenaarTelefoon: row.consignatie_eigenaar_telefoon || undefined,
+  consignatieEigenaarEmail: row.consignatie_eigenaar_email || undefined,
   kosten: costs.map(c => ({
     id: c.id,
     description: c.description,
@@ -96,6 +101,11 @@ export function useVehicles() {
       koper_naam: data.koperNaam || null,
       koper_email: data.koperEmail || null,
       koper_telefoon: data.koperTelefoon || null,
+      verkoop_type: data.verkoopType || 'regulier',
+      consignatie_commissie_perc: data.consignatieCommissiePerc || 10,
+      consignatie_eigenaar_naam: data.consignatieEigenaarNaam || null,
+      consignatie_eigenaar_telefoon: data.consignatieEigenaarTelefoon || null,
+      consignatie_eigenaar_email: data.consignatieEigenaarEmail || null,
     } as any);
     if (error) { toast.error('Fout bij toevoegen voertuig'); return; }
     toast.success('Voertuig toegevoegd');
@@ -120,6 +130,11 @@ export function useVehicles() {
       koper_naam: updated.koperNaam || null,
       koper_email: updated.koperEmail || null,
       koper_telefoon: updated.koperTelefoon || null,
+      verkoop_type: updated.verkoopType || 'regulier',
+      consignatie_commissie_perc: updated.consignatieCommissiePerc || 10,
+      consignatie_eigenaar_naam: updated.consignatieEigenaarNaam || null,
+      consignatie_eigenaar_telefoon: updated.consignatieEigenaarTelefoon || null,
+      consignatie_eigenaar_email: updated.consignatieEigenaarEmail || null,
     } as any).eq('id', updated.id);
     if (error) { toast.error('Fout bij bijwerken voertuig'); return; }
     toast.success('Voertuig bijgewerkt');

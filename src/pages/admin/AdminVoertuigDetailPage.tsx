@@ -4,7 +4,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Trash2, Loader2, ShoppingCart, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge } from "@/types/vehicle";
+import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge, verkoopTypeLabels } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
 import VehicleKostenTab from "@/components/admin/VehicleKostenTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
@@ -92,6 +92,9 @@ const AdminVoertuigDetailPage = () => {
         <div className="flex flex-wrap items-center gap-2">
           <span className={`inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border ${statusColors[vehicle.status]}`}>
             {statusLabels[vehicle.status]}
+          </span>
+          <span className="inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border bg-secondary text-secondary-foreground border-border">
+            {verkoopTypeLabels[vehicle.verkoopType] || 'Regulier'}
           </span>
           {vehicle.kenteken && (
             <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider bg-accent/50 px-2 py-0.5 rounded">{vehicle.kenteken}</span>

@@ -13,6 +13,14 @@ export interface CostItem {
   moneybirdSyncedAt?: string;
 }
 
+export type VerkoopType = 'regulier' | 'consignatie' | 'inruil';
+
+export const verkoopTypeLabels: Record<VerkoopType, string> = {
+  regulier: 'Reguliere verkoop',
+  consignatie: 'Consignatie',
+  inruil: 'Inruil',
+};
+
 export interface Vehicle {
   id: string;
   kenteken: string;
@@ -38,6 +46,11 @@ export interface Vehicle {
   googleDriveFolderId?: string | null;
   googleDriveFolderUrl?: string | null;
   googleDriveSynced?: boolean;
+  verkoopType: VerkoopType;
+  consignatieCommissiePerc?: number;
+  consignatieEigenaarNaam?: string;
+  consignatieEigenaarTelefoon?: string;
+  consignatieEigenaarEmail?: string;
 }
 
 export const calcKostprijs = (vehicle: Vehicle): number => {
