@@ -101,6 +101,11 @@ export function useVehicles() {
       koper_naam: data.koperNaam || null,
       koper_email: data.koperEmail || null,
       koper_telefoon: data.koperTelefoon || null,
+      verkoop_type: data.verkoopType || 'regulier',
+      consignatie_commissie_perc: data.consignatieCommissiePerc || 10,
+      consignatie_eigenaar_naam: data.consignatieEigenaarNaam || null,
+      consignatie_eigenaar_telefoon: data.consignatieEigenaarTelefoon || null,
+      consignatie_eigenaar_email: data.consignatieEigenaarEmail || null,
     } as any);
     if (error) { toast.error('Fout bij toevoegen voertuig'); return; }
     toast.success('Voertuig toegevoegd');
