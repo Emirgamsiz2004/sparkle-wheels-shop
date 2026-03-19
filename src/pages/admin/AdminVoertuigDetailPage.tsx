@@ -93,6 +93,9 @@ const AdminVoertuigDetailPage = () => {
           <span className={`inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border ${statusColors[vehicle.status]}`}>
             {statusLabels[vehicle.status]}
           </span>
+          <span className="inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border bg-secondary text-secondary-foreground border-border">
+            {verkoopTypeLabels[vehicle.verkoopType] || 'Regulier'}
+          </span>
           {vehicle.kenteken && (
             <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider bg-accent/50 px-2 py-0.5 rounded">{vehicle.kenteken}</span>
           )}
