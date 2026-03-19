@@ -19,7 +19,7 @@ import {
 const tabItems = [
   { key: "info", label: "Info", emoji: "📋" },
   { key: "kosten", label: "Kosten", emoji: "💸" },
-  { key: "documenten", label: "Docs", emoji: "📄" },
+  { key: "documenten", label: "Dossier", emoji: "📂" },
   { key: "fotos", label: "Foto's", emoji: "📸" },
   { key: "financieel", label: "Financieel", emoji: "💰" },
 ];
