@@ -4,7 +4,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Trash2, Loader2, ShoppingCart, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge } from "@/types/vehicle";
+import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge, verkoopTypeLabels } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
 import VehicleKostenTab from "@/components/admin/VehicleKostenTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
