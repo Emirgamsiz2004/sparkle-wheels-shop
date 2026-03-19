@@ -4,31 +4,30 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Trash2, Loader2, ShoppingCart, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { statusLabels, statusColors } from "@/types/vehicle";
+import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
 import VehicleKostenTab from "@/components/admin/VehicleKostenTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
 import VehicleFotosTab from "@/components/admin/VehicleFotosTab";
-import VehicleFinancieelTab from "@/components/admin/VehicleFinancieelTab";
 import VerkoopDialog from "@/components/admin/VerkoopDialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Info } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 const tabItems = [
-  { key: "info", label: "Info", emoji: "📋" },
+  { key: "overzicht", label: "Overzicht", emoji: "📋" },
   { key: "kosten", label: "Kosten", emoji: "💸" },
-  { key: "documenten", label: "Dossier", emoji: "📂" },
-  { key: "fotos", label: "Foto's", emoji: "📸" },
-  { key: "financieel", label: "Financieel", emoji: "💰" },
+  { key: "dossier", label: "Dossier", emoji: "📂" },
 ];
 
 const AdminVoertuigDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
-  const [activeTab, setActiveTab] = useState("info");
+  const [activeTab, setActiveTab] = useState("overzicht");
   const [verkoopOpen, setVerkoopOpen] = useState(false);
   const [blogGenerating, setBlogGenerating] = useState(false);
 
@@ -52,24 +51,14 @@ const AdminVoertuigDetailPage = () => {
     navigate("/admin/voertuigen");
   };
 
-  const handleVerkoopComplete = () => {
-    refetch();
-  };
+  const handleVerkoopComplete = () => { refetch(); };
 
   const handleGenerateBlog = async () => {
     setBlogGenerating(true);
     toast.info("Blogpost wordt aangemaakt...");
     try {
       const { error } = await supabase.functions.invoke("generate-blog-post", {
-        body: {
-          merk: vehicle.merk,
-          model: vehicle.model,
-          jaar: vehicle.bouwjaar,
-          km: vehicle.kilometerstand,
-          kleur: vehicle.kleur,
-          prijs: vehicle.verkoopprijs,
-          car_id: vehicle.id,
-        },
+        body: { merk: vehicle.merk, model: vehicle.model, jaar: vehicle.bouwjaar, km: vehicle.kilometerstand, kleur: vehicle.kleur, prijs: vehicle.verkoopprijs, car_id: vehicle.id },
       });
       if (error) throw error;
       toast.success("✓ Blogpost succesvol aangemaakt");
@@ -80,13 +69,19 @@ const AdminVoertuigDetailPage = () => {
     setBlogGenerating(false);
   };
 
+  // Financial calculations
+  const kostprijs = calcKostprijs(vehicle);
+  const brutoWinst = calcWinst(vehicle);
+  const nettoMarge = calcNettoMarge(vehicle);
+  const margePerc = calcMarge(vehicle);
+
   return (
     <div className="space-y-4 md:space-y-6">
       <button onClick={() => navigate("/admin/voertuigen")} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
         <ArrowLeft className="w-4 h-4" /> Terug
       </button>
 
-      {/* Header — stacked on mobile */}
+      {/* Header */}
       <div className="space-y-3">
         <div>
           <h1 className="text-lg md:text-2xl font-bold text-foreground leading-tight">
@@ -123,19 +118,12 @@ const AdminVoertuigDetailPage = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleGenerateBlog}
-            disabled={blogGenerating}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-accent text-foreground hover:bg-accent/80 rounded-lg transition-colors disabled:opacity-50"
-          >
+          <button onClick={handleGenerateBlog} disabled={blogGenerating} className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-accent text-foreground hover:bg-accent/80 rounded-lg transition-colors disabled:opacity-50">
             {blogGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
             Genereer blogpost
           </button>
           {vehicle.status === "te_koop" && (
-            <button
-              onClick={() => setVerkoopOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors"
-            >
+            <button onClick={() => setVerkoopOpen(true)} className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors">
               <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
             </button>
           )}
@@ -161,7 +149,7 @@ const AdminVoertuigDetailPage = () => {
         </div>
       </div>
 
-      {/* Tabs — scrollable on mobile */}
+      {/* Tabs */}
       <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
         <div className="flex gap-1 bg-card border border-border rounded-lg p-1 min-w-max">
           {tabItems.map((t) => (
@@ -183,11 +171,64 @@ const AdminVoertuigDetailPage = () => {
 
       {/* Tab Content */}
       <div>
-        {activeTab === "info" && <VehicleInfoTab vehicle={vehicle} onSave={updateVehicle} />}
-        {activeTab === "kosten" && <VehicleKostenTab vehicle={vehicle} onAddCost={addCost} onRemoveCost={removeCost} />}
-        {activeTab === "documenten" && <VehicleDocumentenTab vehicleId={vehicle.id} />}
-        {activeTab === "fotos" && <VehicleFotosTab vehicleId={vehicle.id} />}
-        {activeTab === "financieel" && <VehicleFinancieelTab vehicle={vehicle} />}
+        {activeTab === "overzicht" && (
+          <div className="space-y-6">
+            {/* Financial summary cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-card border border-border rounded-xl p-3.5">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Kostprijs</p>
+                <p className="text-lg font-bold text-foreground">{formatEuroDecimal(kostprijs)}</p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3.5">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Verkoopprijs</p>
+                <p className="text-lg font-bold text-foreground">{vehicle.verkoopprijs > 0 ? formatEuroDecimal(vehicle.verkoopprijs) : "—"}</p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3.5">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Nettomarge</p>
+                <p className={`text-lg font-bold ${nettoMarge >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  {vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"}
+                </p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3.5">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Marge %</p>
+                <p className={`text-lg font-bold ${nettoMarge >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  {vehicle.verkoopprijs > 0 ? `${margePerc.toFixed(1)}%` : "—"}
+                </p>
+              </div>
+            </div>
+
+            {/* Vehicle info form */}
+            <VehicleInfoTab vehicle={vehicle} onSave={updateVehicle} />
+
+            {/* BTW info */}
+            <div className="flex items-start gap-2 px-4 py-3 bg-secondary rounded-lg border border-border">
+              <Info className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                <strong className="text-foreground">BTW Margeregeling:</strong> als je inkoopt van particulieren, betaal je BTW alleen over de winst (marge × 21/121).
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "kosten" && (
+          <VehicleKostenTab vehicle={vehicle} onAddCost={addCost} onRemoveCost={removeCost} />
+        )}
+
+        {activeTab === "dossier" && (
+          <div className="space-y-8">
+            {/* Photos section */}
+            <div>
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-3">📸 Foto's</h3>
+              <VehicleFotosTab vehicleId={vehicle.id} />
+            </div>
+
+            {/* Documents section */}
+            <div>
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-3">📄 Documenten</h3>
+              <VehicleDocumentenTab vehicleId={vehicle.id} />
+            </div>
+          </div>
+        )}
       </div>
 
       <VerkoopDialog
