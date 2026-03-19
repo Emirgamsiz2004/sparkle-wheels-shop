@@ -836,6 +836,10 @@ export type Database = {
           betaalmethode: string | null
           bouwjaar: number | null
           brandstof: string | null
+          consignatie_commissie_perc: number | null
+          consignatie_eigenaar_email: string | null
+          consignatie_eigenaar_naam: string | null
+          consignatie_eigenaar_telefoon: string | null
           created_at: string
           google_drive_folder_id: string | null
           google_drive_folder_url: string | null
@@ -857,12 +861,17 @@ export type Database = {
           totale_kosten: number | null
           user_id: string | null
           verkoop_datum: string | null
+          verkoop_type: string | null
           verkoopprijs: number | null
         }
         Insert: {
           betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
+          consignatie_commissie_perc?: number | null
+          consignatie_eigenaar_email?: string | null
+          consignatie_eigenaar_naam?: string | null
+          consignatie_eigenaar_telefoon?: string | null
           created_at?: string
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
@@ -884,12 +893,17 @@ export type Database = {
           totale_kosten?: number | null
           user_id?: string | null
           verkoop_datum?: string | null
+          verkoop_type?: string | null
           verkoopprijs?: number | null
         }
         Update: {
           betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
+          consignatie_commissie_perc?: number | null
+          consignatie_eigenaar_email?: string | null
+          consignatie_eigenaar_naam?: string | null
+          consignatie_eigenaar_telefoon?: string | null
           created_at?: string
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
@@ -911,6 +925,7 @@ export type Database = {
           totale_kosten?: number | null
           user_id?: string | null
           verkoop_datum?: string | null
+          verkoop_type?: string | null
           verkoopprijs?: number | null
         }
         Relationships: []
