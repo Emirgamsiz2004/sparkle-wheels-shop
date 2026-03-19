@@ -60,7 +60,11 @@ const AdminVoertuigNieuwPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    await addVehicle({ ...form } as any);
+    await addVehicle({
+      ...form,
+      verkoopType: isConsignatie ? 'consignatie' : 'regulier',
+      consignatieCommissiePerc: isConsignatie ? consignatieMarge : undefined,
+    } as any);
     
     // Auto-generate blog post
     toast.info("Blogpost wordt aangemaakt...");
