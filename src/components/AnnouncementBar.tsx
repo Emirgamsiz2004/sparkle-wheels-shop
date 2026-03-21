@@ -50,7 +50,7 @@ const AnnouncementBar = () => {
 
   return (
     <div className="w-full bg-card border-b border-border relative z-[61]">
-      <div className="mx-auto flex items-center justify-between py-1.5 px-5 md:px-[90px] max-w-[1920px]">
+      <div className="mx-auto flex items-center justify-between py-2.5 px-5 md:px-[90px] max-w-[1920px]">
         {/* Left: status + contact */}
         <div className="flex items-center gap-4 md:gap-6">
           {/* Open/Closed indicator */}
