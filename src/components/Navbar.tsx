@@ -69,7 +69,7 @@ const Navbar = () => {
                 <div key={link.label} className="relative group/dropdown">
                   <button
                     onClick={() => handleNavClick(link.href, link.section)}
-                    className="flex items-center gap-1 text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
+                    className="flex items-center gap-1 text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-all duration-500"
                   >
                     {link.label}
                     <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover/dropdown:rotate-180" />
