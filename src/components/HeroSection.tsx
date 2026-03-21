@@ -46,13 +46,14 @@ const HeroSection = () => {
         >
           <a
             href="#voorraad"
-            className="bg-foreground/15 backdrop-blur-sm border border-foreground/20 hover:bg-primary/20 hover:border-primary/40 px-8 py-3.5 text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground transition-all duration-300"
+            className="group/cta relative bg-foreground text-background px-8 py-3.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.25em] uppercase overflow-hidden transition-all duration-500 hover:text-accent-foreground"
           >
-            Bekijk ons aanbod
+            <span className="absolute inset-0 bg-accent origin-left scale-x-0 group-hover/cta:scale-x-100 transition-transform duration-500 ease-out" />
+            <span className="relative z-10">Bekijk ons aanbod</span>
           </a>
           <Link
             to="/consignatie"
-            className="border-b border-foreground/30 hover:border-primary hover:text-primary pb-1 self-end text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground/60 transition-all duration-300"
+            className="relative border-b border-foreground/25 hover:border-accent pb-1 self-end text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground/50 hover:text-accent transition-all duration-500"
           >
             Consignatie verkoop
           </Link>

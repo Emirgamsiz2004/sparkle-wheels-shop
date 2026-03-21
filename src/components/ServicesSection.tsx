@@ -72,7 +72,7 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
           <span className="text-[10px] font-body font-medium text-muted-foreground tracking-wider">
             {service.num}
           </span>
-          <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all duration-300" />
+          <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-accent group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all duration-500" />
         </div>
         <h3 className="text-lg font-display font-semibold mb-3 text-foreground">
           {service.title}
