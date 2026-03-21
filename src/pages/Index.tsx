@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import InventorySection from "@/components/InventorySection";
