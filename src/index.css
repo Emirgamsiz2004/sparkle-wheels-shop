@@ -7,26 +7,26 @@
 @layer base {
   :root {
     /* Public website — industrial anthracite / brushed-metal palette */
-    --background: 220 8% 8%;
-    --foreground: 210 8% 78%;
+    --background: 220 10% 7%;
+    --foreground: 0 0% 88%;
 
-    --card: 220 7% 11%;
-    --card-foreground: 210 8% 80%;
+    --card: 220 8% 10%;
+    --card-foreground: 0 0% 85%;
 
-    --popover: 220 7% 11%;
-    --popover-foreground: 210 8% 80%;
+    --popover: 220 8% 10%;
+    --popover-foreground: 0 0% 85%;
 
-    --primary: 210 6% 72%;
-    --primary-foreground: 220 10% 6%;
+    --primary: 0 0% 92%;
+    --primary-foreground: 220 12% 6%;
 
-    --secondary: 220 6% 14%;
-    --secondary-foreground: 210 6% 62%;
+    --secondary: 220 6% 13%;
+    --secondary-foreground: 0 0% 60%;
 
-    --muted: 220 5% 16%;
-    --muted-foreground: 210 5% 45%;
+    --muted: 220 5% 15%;
+    --muted-foreground: 0 0% 42%;
 
-    --accent: 210 6% 72%;
-    --accent-foreground: 220 10% 6%;
+    --accent: 38 45% 52%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
@@ -35,20 +35,20 @@
     --whatsapp: 142 70% 49%;
     --whatsapp-foreground: 0 0% 100%;
 
-    --border: 220 6% 16%;
-    --input: 220 6% 16%;
-    --ring: 210 6% 50%;
+    --border: 220 6% 14%;
+    --input: 220 6% 14%;
+    --ring: 0 0% 40%;
 
     --radius: 0rem;
 
-    --sidebar-background: 220 8% 6%;
-    --sidebar-foreground: 210 8% 78%;
-    --sidebar-primary: 210 6% 72%;
-    --sidebar-primary-foreground: 220 10% 6%;
-    --sidebar-accent: 220 6% 14%;
-    --sidebar-accent-foreground: 210 8% 78%;
-    --sidebar-border: 220 6% 14%;
-    --sidebar-ring: 210 6% 50%;
+    --sidebar-background: 220 10% 5%;
+    --sidebar-foreground: 0 0% 88%;
+    --sidebar-primary: 0 0% 92%;
+    --sidebar-primary-foreground: 220 12% 6%;
+    --sidebar-accent: 220 6% 13%;
+    --sidebar-accent-foreground: 0 0% 88%;
+    --sidebar-border: 220 6% 12%;
+    --sidebar-ring: 0 0% 40%;
   }
 
   /* Admin panel — warm anthracite palette, monochrome */
