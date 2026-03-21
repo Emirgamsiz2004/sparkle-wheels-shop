@@ -92,7 +92,7 @@ const Navbar = () => {
                 <button
                   key={link.label}
                   onClick={() => handleNavClick(link.href, link.section)}
-                  className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-primary transition-colors duration-300"
+                  className="text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-all duration-500"
                 >
                   {link.label}
                 </button>
