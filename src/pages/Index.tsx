@@ -25,6 +25,7 @@ const Index = () => {
         <meta property="og:type" content="website" />
         <meta name="robots" content="index, follow" />
       </Helmet>
+      <AnnouncementBar />
       <Navbar />
       <HeroSection />
       <InventorySection />
