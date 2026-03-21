@@ -42,12 +42,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const ANNOUNCEMENT_HEIGHT = 45;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 50);
-      setNavTop(Math.max(0, ANNOUNCEMENT_HEIGHT - y));
-    };
+    const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
