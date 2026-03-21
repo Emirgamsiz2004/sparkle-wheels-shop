@@ -66,6 +66,7 @@ const Navbar = () => {
         style={{ top: navTop }}
       >
         <div className="mx-auto flex items-center justify-between py-6 px-5 md:px-[90px] max-w-[1920px]">
+          <Link to="/" className="flex items-center gap-3 relative z-[60]">
             <img src={logo} alt="Platin Automotive" className="h-8 md:h-9 w-auto" style={{ imageRendering: 'auto' }} />
           </Link>
 
