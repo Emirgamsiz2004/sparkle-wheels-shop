@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Outfit"', "sans-serif"],
+        display: ['"Rajdhani"', "sans-serif"],
         body: ['"DM Sans"', "sans-serif"],
       },
       colors: {
