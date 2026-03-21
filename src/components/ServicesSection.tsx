@@ -56,7 +56,7 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.6, delay }}
-    className="group bg-background"
+    className="group bg-background transition-colors duration-500 hover:bg-card"
   >
     <Link to={service.href} className="block">
       <div className="h-48 md:h-64 overflow-hidden relative">
