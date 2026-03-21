@@ -41,6 +41,7 @@ const getIsOpen = (): { isOpen: boolean; label: string } => {
 };
 
 const AnnouncementBar = () => {
+  const [status, setStatus] = useState(getIsOpen);
   const [barOffset, setBarOffset] = useState(0);
 
   useEffect(() => {
