@@ -42,10 +42,17 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
+    const BAR_HEIGHT = 41;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 50);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Navbar top = bar height minus how much the bar has slid up
+  const navTop = Math.max(0, 41 - Math.min(41, typeof window !== 'undefined' ? window.scrollY : 0));
 
   return (
     <>
