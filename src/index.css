@@ -114,18 +114,18 @@
   }
 
   ::selection {
-    background: hsl(210 6% 50%);
+    background: hsl(38 45% 52%);
     color: hsl(0 0% 98%);
   }
 }
 
 @layer utilities {
   .bg-gradient-dark {
-    background: linear-gradient(180deg, hsl(220 8% 8%) 0%, hsl(220 7% 12%) 100%);
+    background: linear-gradient(180deg, hsl(220 10% 7%) 0%, hsl(220 8% 11%) 100%);
   }
   
   .text-gradient {
-    background: linear-gradient(135deg, hsl(210 8% 82%) 0%, hsl(210 5% 45%) 100%);
+    background: linear-gradient(135deg, hsl(0 0% 90%) 0%, hsl(0 0% 42%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -134,8 +134,8 @@
   /* Brushed-metal texture overlay */
   .metal-texture {
     background-image: 
-      linear-gradient(135deg, transparent 40%, hsl(210 6% 20% / 0.15) 50%, transparent 60%),
-      repeating-linear-gradient(90deg, hsl(210 6% 50% / 0.03) 0px, transparent 1px, transparent 3px);
+      linear-gradient(135deg, transparent 40%, hsl(0 0% 50% / 0.06) 50%, transparent 60%),
+      repeating-linear-gradient(90deg, hsl(0 0% 50% / 0.02) 0px, transparent 1px, transparent 3px);
   }
 
   /* Admin panel utilities */
