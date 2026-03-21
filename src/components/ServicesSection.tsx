@@ -56,14 +56,14 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.6, delay }}
-    className="group bg-background"
+    className="group bg-background transition-colors duration-500 hover:bg-card"
   >
     <Link to={service.href} className="block">
       <div className="h-48 md:h-64 overflow-hidden relative">
         <img
           src={service.image}
           alt={service.alt}
-          className="w-full h-full object-cover transition-opacity duration-500"
+          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-500" />
       </div>
@@ -72,7 +72,7 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
           <span className="text-[10px] font-body font-medium text-muted-foreground tracking-wider">
             {service.num}
           </span>
-          <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all duration-300" />
+          <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-accent group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all duration-500" />
         </div>
         <h3 className="text-lg font-display font-semibold mb-3 text-foreground">
           {service.title}
