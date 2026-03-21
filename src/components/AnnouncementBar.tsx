@@ -41,15 +41,29 @@ const getIsOpen = (): { isOpen: boolean; label: string } => {
 };
 
 const AnnouncementBar = () => {
-  const [status, setStatus] = useState(getIsOpen);
+  const [barOffset, setBarOffset] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => setStatus(getIsOpen()), 60_000);
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const BAR_HEIGHT = 41;
+    const onScroll = () => {
+      const y = window.scrollY;
+      // Slide bar up as you scroll, max fully hidden
+      setBarOffset(Math.min(BAR_HEIGHT, y));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <div className="w-full bg-card border-b border-border relative z-[61]">
+    <div
+      className="fixed top-0 left-0 right-0 bg-card border-b border-border z-[61] transition-none"
+      style={{ transform: `translateY(-${barOffset}px)` }}
+    >
       <div className="mx-auto flex items-center justify-between py-2.5 px-5 md:px-[90px] max-w-[1920px]">
         {/* Left: status + contact */}
         <div className="flex items-center gap-4 md:gap-6">
