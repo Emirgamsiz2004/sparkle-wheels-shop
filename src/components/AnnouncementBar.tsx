@@ -120,7 +120,7 @@ const AnnouncementBar = () => {
             <img
               src={marktplaatsLogo}
               alt=""
-              className="w-4 h-4 invert sepia brightness-[0.6] opacity-50 hover:opacity-80 transition-opacity"
+              className="w-4 h-4 brightness-0 invert opacity-40 hover:opacity-70 transition-opacity"
             />
           </a>
         </div>
