@@ -26,7 +26,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dienstenOpen, setDienstenOpen] = useState(false);
-  const [navTop, setNavTop] = useState(33);
+  const [navTop, setNavTop] = useState(45);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -43,11 +43,10 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const ANNOUNCEMENT_HEIGHT = 33;
+    const ANNOUNCEMENT_HEIGHT = 45;
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 50);
-      // Smoothly reduce top from 33 to 0 as user scrolls
       setNavTop(Math.max(0, ANNOUNCEMENT_HEIGHT - y));
     };
     window.addEventListener("scroll", onScroll, { passive: true });
