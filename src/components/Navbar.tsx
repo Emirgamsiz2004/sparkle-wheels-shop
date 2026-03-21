@@ -53,10 +53,9 @@ const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
-        className={`fixed left-0 right-0 z-[60] transition-colors duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-[60] transition-colors duration-500 ${
           scrolled && !mobileOpen ? "bg-background/70 backdrop-blur-xl border-b border-border" : "bg-transparent"
         }`}
-        style={{ top: navTop }}
       >
         <div className="mx-auto flex items-center justify-between py-6 px-5 md:px-[90px] max-w-[1920px]">
           <Link to="/" className="flex items-center gap-3 relative z-[60]">
