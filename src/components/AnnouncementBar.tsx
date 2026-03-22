@@ -50,7 +50,7 @@ const AnnouncementBar = () => {
   }, []);
 
   useEffect(() => {
-    const BAR_HEIGHT = 41;
+    const BAR_HEIGHT = 33;
     const onScroll = () => {
       const y = window.scrollY;
       // Slide bar up as you scroll, max fully hidden
@@ -65,7 +65,7 @@ const AnnouncementBar = () => {
       className="fixed top-0 left-0 right-0 bg-card border-b border-border z-[61] transition-none"
       style={{ transform: `translateY(-${barOffset}px)` }}
     >
-      <div className="mx-auto flex items-center justify-between py-2.5 px-5 md:px-[90px] max-w-[1920px]">
+      <div className="mx-auto flex items-center justify-between py-1.5 px-5 md:px-[90px] max-w-[1920px]">
         {/* Left: status + contact */}
         <div className="flex items-center gap-4 md:gap-6">
           {/* Open/Closed indicator */}

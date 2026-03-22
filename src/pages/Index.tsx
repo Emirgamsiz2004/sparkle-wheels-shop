@@ -26,7 +26,7 @@ const Index = () => {
         <meta name="robots" content="index, follow" />
       </Helmet>
       <AnnouncementBar />
-      <div className="h-[41px]" /> {/* spacer for fixed announcement bar */}
+      <div className="h-[33px]" /> {/* spacer for fixed announcement bar */}
       <Navbar />
       <HeroSection />
       <InventorySection />
