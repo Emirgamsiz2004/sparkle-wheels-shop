@@ -30,12 +30,12 @@ const getIsOpen = (): { isOpen: boolean; label: string } => {
   // Ma-Vr: 09:00–18:00, Za-Zo: 10:00–17:00
   if (day >= 1 && day <= 5) {
     if (time >= 540 && time < 1080) return { isOpen: true, label: "Open tot 18:00" };
-    return { isOpen: false, label: "Gesloten · opens ma 09:00" };
+    return { isOpen: false, label: "Gesloten · opent ma 09:00" };
   }
   if (day === 6 || day === 0) {
     if (time >= 600 && time < 1020) return { isOpen: true, label: "Open tot 17:00" };
-    if (day === 6) return { isOpen: false, label: "Gesloten · opens zo 10:00" };
-    return { isOpen: false, label: "Gesloten · opens ma 09:00" };
+    if (day === 6) return { isOpen: false, label: "Gesloten · opent zo 10:00" };
+    return { isOpen: false, label: "Gesloten · opent ma 09:00" };
   }
   return { isOpen: false, label: "Gesloten" };
 };
