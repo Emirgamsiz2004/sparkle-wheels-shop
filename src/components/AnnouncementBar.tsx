@@ -83,7 +83,7 @@ const AnnouncementBar = () => {
                 className="hidden sm:inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground/50 hover:text-foreground transition-all duration-300"
               >
                 <span className="text-muted-foreground/30">|</span>
-                Op afspraak beschikbaar
+                Afspraak buiten openingstijden
               </a>
             )}
           </div>
