@@ -43,7 +43,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const BAR_HEIGHT = 41;
+    const BAR_HEIGHT = 33;
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 50);
