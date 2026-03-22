@@ -50,10 +50,9 @@ const AnnouncementBar = () => {
   }, []);
 
   useEffect(() => {
-    const BAR_HEIGHT = 33;
+    const BAR_HEIGHT = 40;
     const onScroll = () => {
       const y = window.scrollY;
-      // Slide bar up as you scroll, max fully hidden
       setBarOffset(Math.min(BAR_HEIGHT, y));
     };
     window.addEventListener("scroll", onScroll, { passive: true });
