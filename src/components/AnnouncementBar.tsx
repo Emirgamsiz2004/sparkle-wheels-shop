@@ -50,10 +50,9 @@ const AnnouncementBar = () => {
   }, []);
 
   useEffect(() => {
-    const BAR_HEIGHT = 33;
+    const BAR_HEIGHT = 40;
     const onScroll = () => {
       const y = window.scrollY;
-      // Slide bar up as you scroll, max fully hidden
       setBarOffset(Math.min(BAR_HEIGHT, y));
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -78,6 +77,17 @@ const AnnouncementBar = () => {
             <span className="text-[10px] md:text-[11px] font-body text-muted-foreground tracking-wide">
               {status.label}
             </span>
+            {!status.isOpen && (
+              <span className="hidden sm:inline text-[10px] md:text-[11px] font-body text-muted-foreground/60 tracking-wide">
+                ·&nbsp;
+                <a
+                  href="/contact"
+                  className="underline underline-offset-2 decoration-muted-foreground/30 hover:text-foreground hover:decoration-foreground/50 transition-all duration-300"
+                >
+                  Op afspraak mogelijk
+                </a>
+              </span>
+            )}
           </div>
 
           {/* Phone */}
