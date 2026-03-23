@@ -73,8 +73,12 @@ serve(async (req) => {
 
     if (countErr) throw countErr;
 
-    // Max 3 scheduled posts per week
-    if (recentPosts && recentPosts.length >= 3) {
+    // Check if force mode is enabled (for initial seeding)
+    const body = await req.json().catch(() => ({}));
+    const maxPosts = body?.force ? 999 : 3;
+
+    // Max posts per week (default 3, override with force)
+    if (recentPosts && recentPosts.length >= maxPosts) {
       return new Response(
         JSON.stringify({ skipped: true, reason: "Already 3 scheduled posts this week" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
