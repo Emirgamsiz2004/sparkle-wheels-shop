@@ -7,6 +7,8 @@ const AlgemeneVoorwaarden = () => (
     <Helmet>
       <title>Algemene Voorwaarden | Platin Automotive</title>
       <meta name="description" content="Lees de algemene voorwaarden van Platin Automotive voor de aan- en verkoop van voertuigen." />
+      <link rel="canonical" href="https://platinautomotive.nl/algemene-voorwaarden" />
+      <meta name="robots" content="index, follow" />
     </Helmet>
     <Navbar />
     <main className="min-h-screen bg-background pt-24 pb-16">

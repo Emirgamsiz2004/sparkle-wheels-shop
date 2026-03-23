@@ -7,6 +7,8 @@ const CookiePolicy = () => (
     <Helmet>
       <title>Cookiebeleid | Platin Automotive</title>
       <meta name="description" content="Lees het cookiebeleid van Platin Automotive. Wij gebruiken cookies om uw ervaring op onze website te verbeteren." />
+      <link rel="canonical" href="https://platinautomotive.nl/cookiebeleid" />
+      <meta name="robots" content="index, follow" />
     </Helmet>
     <Navbar />
     <main className="min-h-screen bg-background pt-24 pb-16">
