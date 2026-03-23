@@ -77,15 +77,13 @@ const AnnouncementBar = () => {
             <span className="text-[10px] md:text-[11px] font-body text-muted-foreground tracking-wide">
               {status.label}
             </span>
-            {!status.isOpen && (
-              <a
-                href="/contact"
-                className="hidden sm:inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground/50 hover:text-foreground transition-all duration-300"
-              >
-                <span className="text-muted-foreground/30">|</span>
-                Afspraak buiten openingstijden
-              </a>
-            )}
+            <a
+              href="/contact"
+              className="hidden sm:inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground/50 hover:text-foreground transition-all duration-300"
+            >
+              <span className="text-muted-foreground/30">|</span>
+              Afspraak buiten openingstijden
+            </a>
           </div>
 
           {/* Phone */}
