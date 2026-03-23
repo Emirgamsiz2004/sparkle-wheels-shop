@@ -30,3 +30,6 @@ verify_jwt = false
 [functions.generate-blog-post]
 verify_jwt = false
 
+[functions.scheduled-blog-post]
+verify_jwt = false
+
