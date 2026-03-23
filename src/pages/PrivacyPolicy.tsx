@@ -7,6 +7,8 @@ const PrivacyPolicy = () => (
     <Helmet>
       <title>Privacybeleid | Platin Automotive</title>
       <meta name="description" content="Lees het privacybeleid van Platin Automotive. Wij respecteren uw privacy en gaan zorgvuldig om met uw persoonsgegevens." />
+      <link rel="canonical" href="https://platinautomotive.nl/privacybeleid" />
+      <meta name="robots" content="index, follow" />
     </Helmet>
     <Navbar />
     <main className="min-h-screen bg-background pt-24 pb-16">
