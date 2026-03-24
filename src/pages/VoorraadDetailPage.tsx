@@ -7,7 +7,8 @@ import TradeInSection from "@/components/TradeInSection";
 import {
   ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
-  ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog,
+  ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog, FileCheck,
+  Users, Globe, Wrench, Weight, Cylinder,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -61,8 +62,27 @@ const VoorraadDetailPage = () => {
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null, icon: Zap },
         { label: "Aandrijving", value: vehicle.extra?.aandrijving || null, icon: Cog },
         { label: "Deuren", value: vehicle.extra?.deuren || null, icon: DoorOpen },
+        { label: "Zitplaatsen", value: vehicle.extra?.zitplaatsen || null, icon: Users },
+        { label: "Cilinders", value: vehicle.extra?.cilinders || null, icon: Cylinder },
+        { label: "Gewicht", value: vehicle.extra?.gewicht ? `${vehicle.extra.gewicht} kg` : null, icon: Weight },
+        { label: "Acceleratie", value: vehicle.extra?.acceleratie ? `${vehicle.extra.acceleratie} sec` : null, icon: Zap },
         { label: "Verbruik", value: vehicle.extra?.verbruik ? `${vehicle.extra.verbruik} l/100km` : null, icon: Droplets },
         { label: "Energielabel", value: vehicle.extra?.energielabel || null, icon: Leaf },
+      ].filter((s) => s.value)
+    : [];
+
+  // Sidebar key facts
+  const sidebarFacts = vehicle
+    ? [
+        { label: "Bouwjaar", value: vehicle.bouwjaar },
+        { label: "Kilometerstand", value: vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null },
+        { label: "Brandstof", value: vehicle.brandstof },
+        { label: "Transmissie", value: vehicle.transmissie?.replace(/,?\s*\d+\s*versnellingen?/i, "").trim() || null },
+        { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null },
+        { label: "Carrosserie", value: vehicle.carrosserie },
+        { label: "Kleur", value: vehicle.kleur },
+        { label: "NAP", value: vehicle.nap === "1" ? "NAP-check OK ✓" : vehicle.nap === "0" ? "Niet geregistreerd" : null },
+        { label: "APK", value: vehicle.extra?.apk || null },
       ].filter((s) => s.value)
     : [];
 
@@ -207,9 +227,9 @@ const VoorraadDetailPage = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="lg:w-[40%] lg:self-start"
+              className="lg:w-[40%]"
             >
-              <div className="lg:sticky lg:top-8 space-y-7">
+              <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:scrollbar-hide space-y-7">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground tracking-tight leading-tight">
                     {vehicle.merk} {vehicle.model}
@@ -259,10 +279,10 @@ const VoorraadDetailPage = () => {
                 </p>
 
                 <div className="border-t border-border pt-6 space-y-4">
-                  {specs.slice(0, 6).map((spec) => (
-                    <div key={spec.label} className="flex items-center justify-between">
-                      <span className="text-[12px] font-body text-muted-foreground">{spec.label}</span>
-                      <span className="text-[12px] font-body font-medium text-foreground capitalize">{spec.value}</span>
+                  {sidebarFacts.map((fact) => (
+                    <div key={fact.label} className="flex items-center justify-between">
+                      <span className="text-[12px] font-body text-muted-foreground">{fact.label}</span>
+                      <span className="text-[12px] font-body font-medium text-foreground capitalize">{fact.value}</span>
                     </div>
                   ))}
                 </div>

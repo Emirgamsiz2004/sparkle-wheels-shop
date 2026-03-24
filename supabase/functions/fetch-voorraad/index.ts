@@ -87,11 +87,20 @@ async function fetchDetail(detailPath: string) {
     }
   }
 
+  // Main data attributes from the detail page div
+  const dataAttr = (name: string): string => {
+    const m = html.match(new RegExp(`data-${name}="([^"]*)"`));
+    return m ? m[1] : "";
+  };
+
+  const nap = dataAttr("nap"); // "0" or "1"
+  const bovagGarantie = dataAttr("bovaggarantie");
+  const garantieMaanden = dataAttr("garantiemaanden");
+
   // Extract more specs from data-section attributes
   const extractSection = (name: string): string => {
     const m = html.match(new RegExp(`data-section="${name}"[^>]*>.*?data-item-value[^>]*>([^<]+)`, "s"));
     if (m) return m[1].trim();
-    // Try inner text patterns
     const m2 = html.match(new RegExp(`data-section="${name}"[^>]*>(.*?)(?=data-section=)`, "s"));
     if (m2) {
       const nums = m2[1].match(/>\s*(\d[\d.,]*)\s*</);
@@ -100,7 +109,6 @@ async function fetchDetail(detailPath: string) {
     return "";
   };
 
-  const vermogen_kw = extractSection("vermogen ");
   const topsnelheid = extractSection("topsnelheid");
   const verbruik = extractSection("verbruik ");
   const co2 = extractSection("co2uitstoot");
@@ -108,11 +116,20 @@ async function fetchDetail(detailPath: string) {
   const bekleding = extractSection("bekleding");
   const aandrijving = extractSection("aandrijving");
   const deuren = extractSection("aantal-deuren") || extractSection("deuren");
+  const cilinders = extractSection("cilinders");
+  const gewicht = extractSection("gewicht");
+  const tankinhoud = extractSection("tankinhoud");
+  const apk = extractSection("apk");
+  const zitplaatsen = extractSection("zitplaatsen");
+  const acceleratie = extractSection("acceleratie");
 
   return {
     fotos,
     beschrijving,
     opties,
+    nap,
+    bovag_garantie: bovagGarantie,
+    garantie_maanden: garantieMaanden,
     extra: {
       topsnelheid,
       verbruik,
@@ -121,6 +138,12 @@ async function fetchDetail(detailPath: string) {
       bekleding,
       aandrijving,
       deuren,
+      cilinders,
+      gewicht,
+      tankinhoud,
+      apk,
+      zitplaatsen,
+      acceleratie,
     },
   };
 }

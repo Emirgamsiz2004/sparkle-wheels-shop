@@ -156,4 +156,11 @@
     border: 1px solid hsl(0 65% 55% / 0.25);
   }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
