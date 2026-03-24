@@ -24,7 +24,7 @@ const navLinks = [
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [navTop, setNavTop] = useState(41);
+  
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dienstenOpen, setDienstenOpen] = useState(false);
   const location = useLocation();
