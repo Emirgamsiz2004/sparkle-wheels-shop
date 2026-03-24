@@ -42,27 +42,17 @@ const getIsOpen = (): { isOpen: boolean; label: string } => {
 
 const AnnouncementBar = () => {
   const [status, setStatus] = useState(getIsOpen);
-  const [barOffset, setBarOffset] = useState(0);
+  
 
   useEffect(() => {
     const interval = setInterval(() => setStatus(getIsOpen()), 60_000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const BAR_HEIGHT = 40;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setBarOffset(Math.min(BAR_HEIGHT, y));
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 bg-card border-b border-border z-[61] transition-none"
-      style={{ transform: `translateY(-${barOffset}px)` }}
+      className="relative top-0 left-0 right-0 bg-card border-b border-border z-[61]"
     >
       <div className="mx-auto flex items-center justify-between py-1.5 px-5 md:px-[90px] max-w-[1920px]">
         {/* Left: status + contact */}

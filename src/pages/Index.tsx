@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet-async";
-import AnnouncementBar from "@/components/AnnouncementBar";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import InventorySection from "@/components/InventorySection";
@@ -25,8 +24,6 @@ const Index = () => {
         <meta property="og:type" content="website" />
         <meta name="robots" content="index, follow" />
       </Helmet>
-      <AnnouncementBar />
-      <div className="h-[33px]" /> {/* spacer for fixed announcement bar */}
       <Navbar />
       <HeroSection />
       <InventorySection />
