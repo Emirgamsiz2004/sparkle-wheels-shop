@@ -56,7 +56,7 @@ const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
-        className={`absolute left-0 right-0 top-0 z-[60] transition-colors duration-500 ${
+        className={`absolute left-0 right-0 top-[40px] z-[60] transition-colors duration-500 ${
           scrolled && !mobileOpen ? "bg-background/70 backdrop-blur-xl border-b border-border" : "bg-transparent"
         }`}
       >

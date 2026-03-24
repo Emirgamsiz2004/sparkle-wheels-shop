@@ -209,7 +209,7 @@ const VoorraadDetailPage = () => {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="lg:w-[40%]"
             >
-              <div className="lg:sticky lg:top-28 space-y-7">
+              <div className="lg:sticky lg:top-8 space-y-7">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground tracking-tight leading-tight">
                     {vehicle.merk} {vehicle.model}

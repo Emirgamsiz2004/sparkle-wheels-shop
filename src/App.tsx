@@ -41,6 +41,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import AlgemeneVoorwaarden from "./pages/AlgemeneVoorwaarden";
 import CookieBanner from "./components/CookieBanner";
+import AnnouncementBar from "./components/AnnouncementBar";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <AnnouncementBar />
           {UNDER_CONSTRUCTION ? (
             <Routes>
               <Route path="/admin/login" element={<AdminLogin />} />
