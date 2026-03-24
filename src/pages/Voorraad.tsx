@@ -8,14 +8,23 @@ import Footer from "@/components/Footer";
 
 const Voorraad = () => {
   useEffect(() => {
-    // Load VWE voorraadlijst script
-    const script = document.createElement("script");
-    script.src = "//svl.autodealers.nl/jsVoorraadPlugin.ashx?did=91347";
-    script.async = true;
-    document.body.appendChild(script);
+    // jQuery is required by VWE voorraadlijst plugin
+    const jquery = document.createElement("script");
+    jquery.src = "https://code.jquery.com/jquery-3.3.1.min.js";
+    jquery.integrity = "sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=";
+    jquery.crossOrigin = "anonymous";
+    document.body.appendChild(jquery);
+
+    jquery.onload = () => {
+      // Load VWE voorraadlijst script after jQuery is ready
+      const vwe = document.createElement("script");
+      vwe.src = "//svl.autodealers.nl/jsVoorraadPlugin.ashx?did=91347";
+      document.body.appendChild(vwe);
+    };
 
     return () => {
-      document.body.removeChild(script);
+      // Cleanup scripts on unmount
+      document.querySelectorAll('script[src*="jquery"], script[src*="autodealers"]').forEach(s => s.remove());
     };
   }, []);
 
