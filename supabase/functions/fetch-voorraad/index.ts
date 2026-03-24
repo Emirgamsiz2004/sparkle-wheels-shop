@@ -6,7 +6,124 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const FEED_URL = "https://svl.autodealers.nl/occasions.aspx?did=91347&format=xml";
+const BASE = "https://svl.autodealers.nl";
+const LIST_URL = `${BASE}/occasions.aspx?did=91347&format=xml`;
+
+function attr(block: string, name: string): string {
+  const m = block.match(new RegExp(`data-${name}="([^"]*)"`));
+  return m ? m[1] : "";
+}
+
+async function fetchList() {
+  const res = await fetch(LIST_URL);
+  if (!res.ok) throw new Error(`Feed returned ${res.status}`);
+  const html = await res.text();
+
+  const blocks = html.split(/(?=<div[^>]+class="advertisement)/);
+  const vehicles: any[] = [];
+
+  for (const block of blocks) {
+    const merk = attr(block, "merk");
+    if (!merk) continue;
+
+    const photoMatch = block.match(/data-lazyloader-src="([^"]+)"/);
+    const photo = photoMatch ? photoMatch[1] : "";
+
+    const detailMatch = block.match(/href="(\/[^"]*details\.aspx[^"]*)"/);
+    const detailPath = detailMatch ? detailMatch[1] : "";
+
+    vehicles.push({
+      id: attr(block, "aid"),
+      merk,
+      model: attr(block, "model"),
+      type: attr(block, "type"),
+      bouwjaar: attr(block, "bouwjaar"),
+      brandstof: attr(block, "brandstof"),
+      transmissie: attr(block, "transmissie"),
+      kilometerstand: attr(block, "kilometerstand"),
+      carrosserie: attr(block, "carrosserie"),
+      kleur: attr(block, "kleur"),
+      prijs: parseInt(attr(block, "prijs") || "0", 10),
+      vermogen_pk: attr(block, "vermogen-pk"),
+      afbeelding: photo,
+      detailPath,
+      kenteken: attr(block, "kenteken"),
+    });
+  }
+
+  return vehicles;
+}
+
+async function fetchDetail(detailPath: string) {
+  const url = `${BASE}${detailPath}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Detail page returned ${res.status}`);
+  const html = await res.text();
+
+  // Photos - unique IDs from media-cdn
+  const allPhotos = html.match(/https:\/\/media-cdn\.vwe\.nl\/Images\/\d+/g) || [];
+  const uniqueIds = [...new Set(allPhotos)];
+  const fotos = uniqueIds.map((p) => `${p}?templateid=&overlay=&bgc=f5f5f5&w=1280`);
+
+  // Description
+  let beschrijving = "";
+  const descMatch = html.match(/opmerking-tekst[\s"'][^>]*>(.*?)<\/span>/s);
+  if (descMatch) {
+    beschrijving = descMatch[1]
+      .replace(/<br\s*\/?>/g, "\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/^\s*>\s*\n?/, "")
+      .trim();
+  }
+
+  // Options from ul inside opties section
+  const opties: string[] = [];
+  const optMatch = html.match(/data-section="opties".*?<ul[^>]*>(.*?)<\/ul>/s);
+  if (optMatch) {
+    const items = optMatch[1].match(/<li[^>]*>(.*?)<\/li>/gs) || [];
+    for (const li of items) {
+      const text = li.replace(/<[^>]+>/g, "").trim();
+      if (text) opties.push(text);
+    }
+  }
+
+  // Extract more specs from data-section attributes
+  const extractSection = (name: string): string => {
+    const m = html.match(new RegExp(`data-section="${name}"[^>]*>.*?data-item-value[^>]*>([^<]+)`, "s"));
+    if (m) return m[1].trim();
+    // Try inner text patterns
+    const m2 = html.match(new RegExp(`data-section="${name}"[^>]*>(.*?)(?=data-section=)`, "s"));
+    if (m2) {
+      const nums = m2[1].match(/>\s*(\d[\d.,]*)\s*</);
+      if (nums) return nums[1];
+    }
+    return "";
+  };
+
+  const vermogen_kw = extractSection("vermogen ");
+  const topsnelheid = extractSection("topsnelheid");
+  const verbruik = extractSection("verbruik ");
+  const co2 = extractSection("co2uitstoot");
+  const energielabel = extractSection("energielabel");
+  const bekleding = extractSection("bekleding");
+  const aandrijving = extractSection("aandrijving");
+  const deuren = extractSection("aantal-deuren") || extractSection("deuren");
+
+  return {
+    fotos,
+    beschrijving,
+    opties,
+    extra: {
+      topsnelheid,
+      verbruik,
+      co2,
+      energielabel,
+      bekleding,
+      aandrijving,
+      deuren,
+    },
+  };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -14,58 +131,30 @@ serve(async (req) => {
   }
 
   try {
-    const res = await fetch(FEED_URL);
-    if (!res.ok) throw new Error(`Feed returned ${res.status}`);
-    const html = await res.text();
+    const url = new URL(req.url);
+    const vehicleId = url.searchParams.get("id");
 
-    // Parse vehicle divs using regex on data-attributes
-    const vehicleRegex =
-      /<div[^>]+data-merk="([^"]*)"[^>]*data-model="([^"]*)"[^>]*data-prijs="([^"]*)"[^>]*data-aid="([^"]*)"[^>]*data-brandstof="([^"]*)"[^>]*data-kleur="([^"]*)"[^>]*data-transmissie="([^"]*)"[^>]*data-kilometerstand="([^"]*)"[^>]*data-kmmiles="[^"]*"[^>]*data-aantaldeuren="([^"]*)"[^>]*data-vermogen-kw="([^"]*)"[^>]*data-vermogen-pk="([^"]*)"[^>]*data-bouwjaar="([^"]*)"[^>]*data-type="([^"]*)"[^>]*>/g;
+    if (vehicleId) {
+      // Fetch list first to get the detail path for this vehicle
+      const vehicles = await fetchList();
+      const vehicle = vehicles.find((v: any) => v.id === vehicleId);
+      if (!vehicle || !vehicle.detailPath) {
+        return new Response(JSON.stringify({ error: "Voertuig niet gevonden" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-    // More flexible: extract each vehicle block and parse individually
-    const blocks = html.split(/(?=<div[^>]+class="advertisement)/);
-    const vehicles: any[] = [];
+      const detail = await fetchDetail(vehicle.detailPath);
 
-    for (const block of blocks) {
-      const attr = (name: string) => {
-        const m = block.match(new RegExp(`data-${name}="([^"]*)"`));
-        return m ? m[1] : "";
-      };
-
-      const merk = attr("merk");
-      if (!merk) continue;
-
-      // Extract photo from data-lazyloader-src
-      const photoMatch = block.match(/data-lazyloader-src="([^"]+)"/);
-      const photo = photoMatch ? photoMatch[1] : "";
-
-      // Extract detail link
-      const detailMatch = block.match(/href="(\/[^"]*details\.aspx[^"]*)"/);
-      const detailPath = detailMatch ? detailMatch[1] : "";
-      const detailUrl = detailPath ? `https://svl.autodealers.nl${detailPath}` : "";
-
-      // Extract carrosserie
-      const carrosserie = attr("carrosserie");
-
-      vehicles.push({
-        id: attr("aid"),
-        merk,
-        model: attr("model"),
-        type: attr("type"),
-        bouwjaar: attr("bouwjaar"),
-        brandstof: attr("brandstof"),
-        transmissie: attr("transmissie"),
-        kilometerstand: attr("kilometerstand"),
-        carrosserie,
-        kleur: attr("kleur"),
-        prijs: parseInt(attr("prijs") || "0", 10),
-        vermogen_pk: attr("vermogen-pk"),
-        afbeelding: photo,
-        url: detailUrl,
-        kenteken: attr("kenteken"),
-      });
+      return new Response(
+        JSON.stringify({ vehicle: { ...vehicle, ...detail } }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
+    // List all vehicles
+    const vehicles = await fetchList();
     return new Response(JSON.stringify({ vehicles, count: vehicles.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
