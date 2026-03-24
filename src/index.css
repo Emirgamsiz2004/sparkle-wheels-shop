@@ -8,22 +8,22 @@
   :root {
     /* Public website — pure black/anthracite, zilver accent */
     --background: 0 0% 5%;
-    --foreground: 0 0% 62%;
+    --foreground: 0 0% 75%;
 
     --card: 0 0% 8%;
-    --card-foreground: 0 0% 62%;
+    --card-foreground: 0 0% 75%;
 
     --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 62%;
+    --popover-foreground: 0 0% 75%;
 
     --primary: 0 0% 50%;
     --primary-foreground: 0 0% 5%;
 
     --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 48%;
+    --secondary-foreground: 0 0% 58%;
 
     --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 36%;
+    --muted-foreground: 0 0% 50%;
 
     --accent: 0 0% 78%;
     --accent-foreground: 0 0% 5%;
