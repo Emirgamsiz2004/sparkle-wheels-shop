@@ -62,8 +62,27 @@ const VoorraadDetailPage = () => {
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null, icon: Zap },
         { label: "Aandrijving", value: vehicle.extra?.aandrijving || null, icon: Cog },
         { label: "Deuren", value: vehicle.extra?.deuren || null, icon: DoorOpen },
+        { label: "Zitplaatsen", value: vehicle.extra?.zitplaatsen || null, icon: Users },
+        { label: "Cilinders", value: vehicle.extra?.cilinders || null, icon: Cylinder },
+        { label: "Gewicht", value: vehicle.extra?.gewicht ? `${vehicle.extra.gewicht} kg` : null, icon: Weight },
+        { label: "Acceleratie", value: vehicle.extra?.acceleratie ? `${vehicle.extra.acceleratie} sec` : null, icon: Zap },
         { label: "Verbruik", value: vehicle.extra?.verbruik ? `${vehicle.extra.verbruik} l/100km` : null, icon: Droplets },
         { label: "Energielabel", value: vehicle.extra?.energielabel || null, icon: Leaf },
+      ].filter((s) => s.value)
+    : [];
+
+  // Sidebar key facts
+  const sidebarFacts = vehicle
+    ? [
+        { label: "Bouwjaar", value: vehicle.bouwjaar },
+        { label: "Kilometerstand", value: vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null },
+        { label: "Brandstof", value: vehicle.brandstof },
+        { label: "Transmissie", value: vehicle.transmissie?.replace(/,?\s*\d+\s*versnellingen?/i, "").trim() || null },
+        { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null },
+        { label: "Carrosserie", value: vehicle.carrosserie },
+        { label: "Kleur", value: vehicle.kleur },
+        { label: "NAP", value: vehicle.nap === "1" ? "NAP-check OK ✓" : vehicle.nap === "0" ? "Niet geregistreerd" : null },
+        { label: "APK", value: vehicle.extra?.apk || null },
       ].filter((s) => s.value)
     : [];
 
