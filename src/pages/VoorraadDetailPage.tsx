@@ -7,7 +7,8 @@ import TradeInSection from "@/components/TradeInSection";
 import {
   ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
-  ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog,
+  ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog, FileCheck,
+  Users, Globe, Wrench, Weight, Cylinder,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
