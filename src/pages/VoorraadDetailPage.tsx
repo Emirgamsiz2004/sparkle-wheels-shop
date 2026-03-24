@@ -227,9 +227,9 @@ const VoorraadDetailPage = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="lg:w-[40%] lg:self-start"
+              className="lg:w-[40%]"
             >
-              <div className="lg:sticky lg:top-8 space-y-7">
+              <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:scrollbar-hide space-y-7">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground tracking-tight leading-tight">
                     {vehicle.merk} {vehicle.model}
@@ -279,10 +279,10 @@ const VoorraadDetailPage = () => {
                 </p>
 
                 <div className="border-t border-border pt-6 space-y-4">
-                  {specs.slice(0, 6).map((spec) => (
-                    <div key={spec.label} className="flex items-center justify-between">
-                      <span className="text-[12px] font-body text-muted-foreground">{spec.label}</span>
-                      <span className="text-[12px] font-body font-medium text-foreground capitalize">{spec.value}</span>
+                  {sidebarFacts.map((fact) => (
+                    <div key={fact.label} className="flex items-center justify-between">
+                      <span className="text-[12px] font-body text-muted-foreground">{fact.label}</span>
+                      <span className="text-[12px] font-body font-medium text-foreground capitalize">{fact.value}</span>
                     </div>
                   ))}
                 </div>
