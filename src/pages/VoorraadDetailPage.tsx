@@ -55,7 +55,7 @@ const VoorraadDetailPage = () => {
         { label: "Bouwjaar", value: vehicle.bouwjaar, icon: Calendar },
         { label: "Kilometerstand", value: vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null, icon: Gauge },
         { label: "Brandstof", value: vehicle.brandstof, icon: Fuel },
-        { label: "Transmissie", value: vehicle.transmissie?.replace(/,?\s*\d+\s*versnellingen?/i, "").trim() || null, icon: Settings2 },
+        { label: "Transmissie", value: vehicle.transmissie, icon: Settings2 },
         { label: "Carrosserie", value: vehicle.carrosserie, icon: Car },
         { label: "Kleur", value: vehicle.kleur, icon: Paintbrush },
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null, icon: Zap },
