@@ -22,6 +22,9 @@ export interface VoorraadVoertuigDetail extends VoorraadVoertuig {
   fotos: string[];
   beschrijving: string;
   opties: string[];
+  nap: string;
+  bovag_garantie: string;
+  garantie_maanden: string;
   extra: {
     topsnelheid: string;
     verbruik: string;
@@ -30,6 +33,12 @@ export interface VoorraadVoertuigDetail extends VoorraadVoertuig {
     bekleding: string;
     aandrijving: string;
     deuren: string;
+    cilinders: string;
+    gewicht: string;
+    tankinhoud: string;
+    apk: string;
+    zitplaatsen: string;
+    acceleratie: string;
   };
 }
 
