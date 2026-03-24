@@ -55,7 +55,7 @@ const VoorraadDetailPage = () => {
         { label: "Bouwjaar", value: vehicle.bouwjaar, icon: Calendar },
         { label: "Kilometerstand", value: vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null, icon: Gauge },
         { label: "Brandstof", value: vehicle.brandstof, icon: Fuel },
-        { label: "Transmissie", value: vehicle.transmissie, icon: Settings2 },
+        { label: "Transmissie", value: vehicle.transmissie?.replace(/,?\s*\d+\s*versnellingen?/i, "").trim() || null, icon: Settings2 },
         { label: "Carrosserie", value: vehicle.carrosserie, icon: Car },
         { label: "Kleur", value: vehicle.kleur, icon: Paintbrush },
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null, icon: Zap },
@@ -207,7 +207,7 @@ const VoorraadDetailPage = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="lg:w-[40%]"
+              className="lg:w-[40%] lg:self-start"
             >
               <div className="lg:sticky lg:top-8 space-y-7">
                 <div>
@@ -241,7 +241,7 @@ const VoorraadDetailPage = () => {
                     className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase transition-all duration-500 hover:bg-primary hover:border-primary hover:text-primary-foreground"
                   >
                     <Phone className="w-4 h-4" />
-                    Bel Direct — 06-12693825
+                    Bel Direct
                   </a>
                   <a
                     href={`https://wa.me/31612693825?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}

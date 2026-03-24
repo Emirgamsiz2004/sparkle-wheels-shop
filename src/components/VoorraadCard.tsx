@@ -62,7 +62,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
           <div className="flex flex-wrap gap-x-4 gap-y-1.5">
             <Spec icon={Calendar} label={voertuig.bouwjaar} />
             <Spec icon={Fuel} label={voertuig.brandstof} />
-            <Spec icon={Settings2} label={voertuig.transmissie} />
+            <Spec icon={Settings2} label={voertuig.transmissie?.replace(/,?\s*\d+\s*versnellingen?/i, "").trim() || ""} />
             <Spec icon={Gauge} label={voertuig.kilometerstand ? `${Number(voertuig.kilometerstand).toLocaleString("nl-NL")} km` : ""} />
             {voertuig.carrosserie && <Spec icon={Car} label={voertuig.carrosserie} />}
           </div>
