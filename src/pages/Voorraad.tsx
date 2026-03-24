@@ -247,10 +247,9 @@ const Voorraad = () => {
             <iframe
               id="autodealers_frame"
               title="Platin Automotive voorraadlijst"
-              src={VWE_IFRAME_SRC}
+              srcDoc={VWE_SRCDOC}
               className="w-full border-0 bg-background"
               style={{ height: `${frameHeight}px` }}
-              loading="lazy"
             />
           </motion.div>
         </div>
