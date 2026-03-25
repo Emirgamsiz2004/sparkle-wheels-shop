@@ -6,7 +6,11 @@ import heroSlide1 from "@/assets/hero-slide-1.jpg";
 import heroSlide2 from "@/assets/hero-slide-2.jpg";
 import heroSlide3 from "@/assets/hero-slide-3.jpg";
 
-const slides = [heroSlide1, heroSlide2, heroSlide3];
+const slides = [
+  { src: heroSlide1, mobilePosition: "60% center" },
+  { src: heroSlide2, mobilePosition: "65% center" },
+  { src: heroSlide3, mobilePosition: "center center" },
+];
 
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
@@ -28,15 +32,28 @@ const HeroSection = () => {
           animate={{ opacity: 1, scale: 1.03 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1.5, ease: "easeInOut" }}
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${slides[current]})` }}
-        />
+          className="absolute inset-0"
+        >
+          {/* Desktop: bg-center, Mobile: custom position via inline style on mobile img */}
+          <img
+            src={slides[current].src}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover md:object-center"
+            style={{ objectPosition: undefined }}
+          />
+          {/* Mobile-specific crop: use a separate element that only shows on mobile */}
+          <style>{`
+            @media (max-width: 767px) {
+              .hero-slide-img { object-position: ${slides[current].mobilePosition}; }
+            }
+          `}</style>
+        </motion.div>
       </AnimatePresence>
 
-      {/* Overlays */}
-      <div className="absolute inset-0 bg-background/60" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+      {/* Overlays — lighter on mobile for more image visibility */}
+      <div className="absolute inset-0 bg-background/40 md:bg-background/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/80 md:from-background/90 via-background/30 md:via-background/50 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30 md:to-background/40" />
 
       {/* Content — left aligned */}
       <div className="relative z-10 flex flex-col justify-center h-full px-6 md:px-[90px] max-w-[1920px] mx-auto">
