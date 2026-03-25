@@ -48,6 +48,7 @@ async function fetchList() {
       afbeelding: photo,
       detailPath,
       kenteken: attr(block, "kenteken"),
+      nap: attr(block, "nap"),
     });
   }
 

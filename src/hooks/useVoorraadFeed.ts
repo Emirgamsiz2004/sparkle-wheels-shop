@@ -16,6 +16,7 @@ export interface VoorraadVoertuig {
   vermogen_pk: string;
   afbeelding: string;
   kenteken: string;
+  nap: string;
 }
 
 export interface VoorraadVoertuigDetail extends VoorraadVoertuig {
