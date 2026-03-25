@@ -17,6 +17,11 @@ import Footer from "@/components/Footer";
 
 const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
 
+const buildMarktplaatsUrl = (merk: string, model: string) => {
+  const q = encodeURIComponent(`${merk} ${model}`);
+  return `https://www.marktplaats.nl/q/auto/${q}/#q:${q}|sellerName:Platin+Automotive`;
+};
+
 const slideVariants = {
   enter: (direction: number) => ({ x: direction > 0 ? 400 : -400, opacity: 0 }),
   center: { x: 0, opacity: 1 },
