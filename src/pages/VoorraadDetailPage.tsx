@@ -18,7 +18,8 @@ import Footer from "@/components/Footer";
 
 const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
 
-const buildMarktplaatsUrl = (vehicle: any) => {
+const buildMarktplaatsUrl = (vehicle: any, dbUrl?: string | null) => {
+  if (dbUrl) return dbUrl;
   if (vehicle.marktplaats_url) return vehicle.marktplaats_url;
   if (vehicle.kenteken) {
     const k = vehicle.kenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
