@@ -12,7 +12,7 @@ const slides = [
   { src: heroSlide1, mobilePosition: "center center", desktopPosition: "center center" },
   { src: heroSlide2, mobilePosition: "65% center", desktopPosition: "center center" },
   { src: heroSlide3, mobilePosition: "50% 40%", desktopPosition: "center center" },
-  { src: heroSlide4, mobilePosition: "center center", desktopPosition: "center center" },
+  { src: heroSlide4, mobilePosition: "center 40%", desktopPosition: "center center" },
 ];
 
 const HeroSection = () => {
