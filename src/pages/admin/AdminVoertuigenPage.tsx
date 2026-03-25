@@ -7,8 +7,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useIsMobile } from "@/hooks/use-mobile";
-import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
 const tabs: { label: string; value: string }[] = [
   { label: "Alle", value: "alle" },
