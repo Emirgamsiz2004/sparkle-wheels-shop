@@ -2,18 +2,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import heroSlide1 from "@/assets/hero-slide-1.jpg";
 import heroSlide2 from "@/assets/hero-slide-2.jpg";
 import heroSlide3 from "@/assets/hero-slide-3.jpg";
 
 const slides = [
-  { src: heroSlide1, mobilePosition: "60% center" },
-  { src: heroSlide2, mobilePosition: "65% center" },
-  { src: heroSlide3, mobilePosition: "center center" },
+  { src: heroSlide1, mobilePosition: "60% center", desktopPosition: "center center" },
+  { src: heroSlide2, mobilePosition: "65% center", desktopPosition: "center center" },
+  { src: heroSlide3, mobilePosition: "50% 40%", desktopPosition: "center center" },
 ];
 
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -34,19 +36,16 @@ const HeroSection = () => {
           transition={{ duration: 1.5, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          {/* Desktop: bg-center, Mobile: custom position via inline style on mobile img */}
           <img
             src={slides[current].src}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover md:object-center"
-            style={{ objectPosition: undefined }}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              objectPosition: isMobile
+                ? slides[current].mobilePosition
+                : slides[current].desktopPosition,
+            }}
           />
-          {/* Mobile-specific crop: use a separate element that only shows on mobile */}
-          <style>{`
-            @media (max-width: 767px) {
-              .hero-slide-img { object-position: ${slides[current].mobilePosition}; }
-            }
-          `}</style>
         </motion.div>
       </AnimatePresence>
 
