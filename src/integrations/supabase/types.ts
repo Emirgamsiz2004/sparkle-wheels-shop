@@ -841,6 +841,7 @@ export type Database = {
           consignatie_eigenaar_naam: string | null
           consignatie_eigenaar_telefoon: string | null
           created_at: string
+          feed_id: string | null
           google_drive_folder_id: string | null
           google_drive_folder_url: string | null
           google_drive_synced: boolean | null
@@ -854,6 +855,7 @@ export type Database = {
           koper_naam: string | null
           koper_telefoon: string | null
           kostprijs: number | null
+          marktplaats_url: string | null
           merk: string
           model: string
           opmerkingen: string | null
@@ -873,6 +875,7 @@ export type Database = {
           consignatie_eigenaar_naam?: string | null
           consignatie_eigenaar_telefoon?: string | null
           created_at?: string
+          feed_id?: string | null
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
@@ -886,6 +889,7 @@ export type Database = {
           koper_naam?: string | null
           koper_telefoon?: string | null
           kostprijs?: number | null
+          marktplaats_url?: string | null
           merk: string
           model: string
           opmerkingen?: string | null
@@ -905,6 +909,7 @@ export type Database = {
           consignatie_eigenaar_naam?: string | null
           consignatie_eigenaar_telefoon?: string | null
           created_at?: string
+          feed_id?: string | null
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
@@ -918,6 +923,7 @@ export type Database = {
           koper_naam?: string | null
           koper_telefoon?: string | null
           kostprijs?: number | null
+          marktplaats_url?: string | null
           merk?: string
           model?: string
           opmerkingen?: string | null

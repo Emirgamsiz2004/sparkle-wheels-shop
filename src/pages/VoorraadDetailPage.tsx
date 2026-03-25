@@ -19,6 +19,10 @@ const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR",
 
 const buildMarktplaatsUrl = (vehicle: any) => {
   if (vehicle.marktplaats_url) return vehicle.marktplaats_url;
+  if (vehicle.kenteken) {
+    const k = vehicle.kenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    return `https://www.marktplaats.nl/q/${encodeURIComponent(k)}/`;
+  }
   const q = encodeURIComponent(`${vehicle.merk} ${vehicle.model}`);
   return `https://www.marktplaats.nl/q/auto/${q}/#q:${q}|sellerName:Platin+Automotive`;
 };
