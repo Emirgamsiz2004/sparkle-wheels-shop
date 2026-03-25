@@ -5,16 +5,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useVoorraadDetail } from "@/hooks/useVoorraadFeed";
 import TradeInSection from "@/components/TradeInSection";
 import napLogo from "@/assets/nap-logo.png";
+import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
   ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
   ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog, FileCheck,
-  Users, Globe, Wrench, Weight, Cylinder,
+  Users, Globe, Wrench, Weight, Cylinder, ExternalLink,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
+
+const buildMarktplaatsUrl = (merk: string, model: string) => {
+  const q = encodeURIComponent(`${merk} ${model}`);
+  return `https://www.marktplaats.nl/q/auto/${q}/#q:${q}|sellerName:Platin+Automotive`;
+};
 
 const slideVariants = {
   enter: (direction: number) => ({ x: direction > 0 ? 400 : -400, opacity: 0 }),
@@ -223,6 +229,17 @@ const VoorraadDetailPage = () => {
                   </a>
                 </div>
 
+                <a
+                  href={buildMarktplaatsUrl(vehicle.merk, vehicle.model)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 text-[10px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
+                >
+                  <img src={marktplaatsLogo} alt="" className="h-4 brightness-0 invert opacity-50" />
+                  <span>Bekijk op Marktplaats</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+
                 <div className="border-t border-border pt-4 space-y-2.5">
                   {sidebarFacts.map((fact) => (
                     <div key={fact.label} className="flex items-center justify-between">
@@ -238,17 +255,17 @@ const VoorraadDetailPage = () => {
                 )}
               </div>
 
-              {/* Specs */}
+              {/* Kenmerken — Marktplaats-style grid */}
               <div className="mt-8 lg:mt-14">
-                <h2 className="text-lg lg:text-xl font-display font-semibold text-foreground mb-4 lg:mb-6 tracking-tight">Specificaties</h2>
-                <div className="border border-border divide-y divide-border">
-                  {specs.map((spec) => (
-                    <div key={spec.label} className="flex items-center justify-between px-4 lg:px-5 py-3 lg:py-4">
-                      <div className="flex items-center gap-2.5 lg:gap-3 text-muted-foreground">
-                        <spec.icon className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
-                        <span className="text-xs lg:text-sm font-body tracking-wide">{spec.label}</span>
+                <h2 className="text-lg lg:text-xl font-display font-semibold text-foreground mb-4 lg:mb-6 tracking-tight">Kenmerken</h2>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-0 border border-border">
+                  {specs.map((spec, i) => (
+                    <div key={spec.label} className={`flex items-center gap-2.5 px-4 py-3 border-b border-border ${i % 2 === 0 ? "border-r border-border" : ""}`}>
+                      <spec.icon className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-muted-foreground shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[10px] lg:text-[11px] font-body text-muted-foreground leading-tight">{spec.label}</p>
+                        <p className="text-xs lg:text-sm font-body font-medium text-foreground capitalize truncate">{spec.value}</p>
                       </div>
-                      <span className="text-xs lg:text-sm font-body font-medium text-foreground capitalize">{spec.value}</span>
                     </div>
                   ))}
                 </div>
@@ -335,6 +352,17 @@ const VoorraadDetailPage = () => {
                     Stuur WhatsApp
                   </a>
                 </div>
+
+                <a
+                  href={buildMarktplaatsUrl(vehicle.merk, vehicle.model)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2.5 w-full py-3 text-[11px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
+                >
+                  <img src={marktplaatsLogo} alt="" className="h-4 brightness-0 invert opacity-50" />
+                  <span>Bekijk op Marktplaats</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
 
                 <p className="text-[11px] font-body text-muted-foreground tracking-wide text-center">
                   Proefrit mogelijk? Neem contact op
