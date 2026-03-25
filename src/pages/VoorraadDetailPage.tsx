@@ -231,6 +231,11 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
+                {vehicle.nap === "1" && (
+                  <div className="flex items-center justify-center pt-2">
+                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-8 object-contain" />
+                  </div>
+                )}
               </div>
 
               {/* Specs */}
@@ -343,6 +348,11 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
+                {vehicle.nap === "1" && (
+                  <div className="flex items-center justify-center pt-3">
+                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-10 object-contain" />
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
