@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import verkoopImg from "@/assets/verkoop.jpg";
-import onderhoudImg from "@/assets/onderhoud.jpg";
-import detailingImg from "@/assets/detailing.jpg";
-import autoZoekenImg from "@/assets/auto-zoeken.jpg";
-import customizingImg from "@/assets/customizing.jpg";
+import verkoopImg from "@/assets/showroom.jpg";
+import onderhoudImg from "@/assets/garage-interior.jpg";
+import detailingImg from "@/assets/detailing-close.jpg";
+import autoZoekenImg from "@/assets/mercedes-badge.jpg";
+import customizingImg from "@/assets/mercedes-back.jpg";
 
 const services = [
   {

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import aboutImg from "@/assets/about.jpg";
+import aboutImg from "@/assets/plate-install.jpg";
 
 const stats = [
   { value: "100%", label: "Transparant" },
