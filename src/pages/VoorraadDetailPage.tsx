@@ -17,8 +17,9 @@ import Footer from "@/components/Footer";
 
 const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
 
-const buildMarktplaatsUrl = (merk: string, model: string) => {
-  const q = encodeURIComponent(`${merk} ${model}`);
+const buildMarktplaatsUrl = (vehicle: any) => {
+  if (vehicle.marktplaats_url) return vehicle.marktplaats_url;
+  const q = encodeURIComponent(`${vehicle.merk} ${vehicle.model}`);
   return `https://www.marktplaats.nl/q/auto/${q}/#q:${q}|sellerName:Platin+Automotive`;
 };
 
