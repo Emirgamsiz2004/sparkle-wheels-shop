@@ -17,8 +17,9 @@ import Footer from "@/components/Footer";
 
 const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
 
-const buildMarktplaatsUrl = (merk: string, model: string) => {
-  const q = encodeURIComponent(`${merk} ${model}`);
+const buildMarktplaatsUrl = (vehicle: any) => {
+  if (vehicle.marktplaats_url) return vehicle.marktplaats_url;
+  const q = encodeURIComponent(`${vehicle.merk} ${vehicle.model}`);
   return `https://www.marktplaats.nl/q/auto/${q}/#q:${q}|sellerName:Platin+Automotive`;
 };
 
@@ -199,9 +200,14 @@ const VoorraadDetailPage = () => {
                   </p>
                 </div>
 
-                <p className="text-3xl font-display font-bold text-foreground">
-                  {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
-                </p>
+                <div className="flex items-center gap-3">
+                  <p className="text-3xl font-display font-bold text-foreground">
+                    {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
+                  </p>
+                  {vehicle.nap === "1" && (
+                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-5 object-contain" />
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2 bg-card border border-border px-3 py-2 w-fit">
                   <ShieldCheck className="w-3.5 h-3.5 text-primary" />
@@ -230,7 +236,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
                 <a
-                  href={buildMarktplaatsUrl(vehicle.merk, vehicle.model)}
+                  href={buildMarktplaatsUrl(vehicle)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 text-[10px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
@@ -248,11 +254,6 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
-                {vehicle.nap === "1" && (
-                  <div className="flex items-center justify-center pt-2">
-                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-8 object-contain" />
-                  </div>
-                )}
               </div>
 
               {/* Kenmerken — Marktplaats-style grid */}
@@ -323,9 +324,14 @@ const VoorraadDetailPage = () => {
                   </p>
                 </div>
 
-                <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
-                  {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
-                </p>
+                <div className="flex items-center gap-4">
+                  <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
+                    {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
+                  </p>
+                  {vehicle.nap === "1" && (
+                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-6 object-contain" />
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2 bg-card border border-border px-4 py-2.5 w-fit">
                   <ShieldCheck className="w-4 h-4 text-primary" />
@@ -354,7 +360,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
                 <a
-                  href={buildMarktplaatsUrl(vehicle.merk, vehicle.model)}
+                  href={buildMarktplaatsUrl(vehicle)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2.5 w-full py-3 text-[11px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
@@ -376,11 +382,6 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
-                {vehicle.nap === "1" && (
-                  <div className="flex items-center justify-center pt-3">
-                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-10 object-contain" />
-                  </div>
-                )}
               </div>
             </motion.div>
           </div>

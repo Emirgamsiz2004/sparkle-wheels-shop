@@ -25,6 +25,7 @@ export interface VoorraadVoertuigDetail extends VoorraadVoertuig {
   nap: string;
   bovag_garantie: string;
   garantie_maanden: string;
+  marktplaats_url: string;
   extra: {
     topsnelheid: string;
     verbruik: string;

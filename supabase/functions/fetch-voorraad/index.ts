@@ -123,6 +123,13 @@ async function fetchDetail(detailPath: string) {
   const zitplaatsen = extractSection("zitplaatsen");
   const acceleratie = extractSection("acceleratie");
 
+  // Extract Marktplaats URL if present
+  let marktplaatsUrl = "";
+  const mpMatch = html.match(/href="(https?:\/\/(?:www\.)?marktplaats\.nl\/[^"]+)"/i);
+  if (mpMatch) {
+    marktplaatsUrl = mpMatch[1];
+  }
+
   return {
     fotos,
     beschrijving,
@@ -130,6 +137,7 @@ async function fetchDetail(detailPath: string) {
     nap,
     bovag_garantie: bovagGarantie,
     garantie_maanden: garantieMaanden,
+    marktplaats_url: marktplaatsUrl,
     extra: {
       topsnelheid,
       verbruik,
