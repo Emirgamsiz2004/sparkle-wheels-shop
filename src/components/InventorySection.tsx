@@ -80,11 +80,11 @@ const InventorySection = () => {
             transition={{ duration: 0.7, delay: 0.15 }}
           >
             <div className="overflow-hidden" ref={emblaRef}>
-              <div className="flex gap-6">
+              <div className="flex gap-5">
                 {voertuigen.map((v, i) => (
                   <div
                     key={v.id}
-                    className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)]"
+                    className="flex-[0_0_85%] min-w-0 sm:flex-[0_0_calc(50%-10px)] lg:flex-[0_0_calc(33.333%-14px)]"
                   >
                     <VoorraadCard voertuig={v} index={i} />
                   </div>

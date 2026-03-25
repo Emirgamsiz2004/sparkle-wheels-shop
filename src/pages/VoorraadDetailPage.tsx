@@ -193,19 +193,18 @@ const VoorraadDetailPage = () => {
                   {vehicle.type && (
                     <p className="text-[10px] text-muted-foreground tracking-wide uppercase mt-1">{vehicle.type}</p>
                   )}
-                  <p className="text-xs font-body text-muted-foreground mt-2 tracking-wide">
-                    {[vehicle.bouwjaar, vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null, vehicle.brandstof]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <p className="text-3xl font-display font-bold text-foreground">
-                    {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
-                  </p>
+                <p className="text-3xl font-display font-bold text-foreground">
+                  {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
+                </p>
+
+                <div className="flex items-center gap-2 text-sm font-body text-foreground">
+                  <span>{vehicle.bouwjaar}</span>
+                  <span className="text-muted-foreground">·</span>
+                  <span>{vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : ""}</span>
                   {vehicle.nap === "1" && (
-                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-5 object-contain" />
+                    <img src={napLogo} alt="NAP" className="h-4 object-contain ml-0.5" />
                   )}
                 </div>
 
@@ -317,11 +316,14 @@ const VoorraadDetailPage = () => {
                   {vehicle.type && (
                     <p className="text-[11px] text-muted-foreground tracking-wide uppercase mt-2">{vehicle.type}</p>
                   )}
-                  <p className="text-sm font-body text-muted-foreground mt-3 tracking-wide">
-                    {[vehicle.bouwjaar, vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null, vehicle.brandstof]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
+                  <div className="flex items-center gap-2 text-sm font-body text-muted-foreground mt-3 tracking-wide">
+                    <span>{vehicle.bouwjaar}</span>
+                    <span>·</span>
+                    <span>{vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : ""}</span>
+                    {vehicle.nap === "1" && (
+                      <img src={napLogo} alt="NAP" className="h-4 object-contain ml-0.5" />
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-4">
