@@ -51,6 +51,8 @@ export interface Vehicle {
   consignatieEigenaarNaam?: string;
   consignatieEigenaarTelefoon?: string;
   consignatieEigenaarEmail?: string;
+  marktplaatsUrl?: string;
+  feedId?: string;
 }
 
 export const calcKostprijs = (vehicle: Vehicle): number => {
