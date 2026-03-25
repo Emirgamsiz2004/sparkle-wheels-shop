@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVoorraadDetail } from "@/hooks/useVoorraadFeed";
 import TradeInSection from "@/components/TradeInSection";
+import napLogo from "@/assets/nap-logo.png";
 import {
   ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
@@ -81,7 +82,7 @@ const VoorraadDetailPage = () => {
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null },
         { label: "Carrosserie", value: vehicle.carrosserie },
         { label: "Kleur", value: vehicle.kleur },
-        { label: "NAP", value: vehicle.nap === "1" ? "NAP-check OK ✓" : vehicle.nap === "0" ? "Niet geregistreerd" : null },
+        { label: "APK", value: vehicle.extra?.apk || null },
         { label: "APK", value: vehicle.extra?.apk || null },
       ].filter((s) => s.value)
     : [];
@@ -230,6 +231,11 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
+                {vehicle.nap === "1" && (
+                  <div className="flex items-center justify-center pt-2">
+                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-8 object-contain" />
+                  </div>
+                )}
               </div>
 
               {/* Specs */}
@@ -342,6 +348,11 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
+                {vehicle.nap === "1" && (
+                  <div className="flex items-center justify-center pt-3">
+                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-10 object-contain" />
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
