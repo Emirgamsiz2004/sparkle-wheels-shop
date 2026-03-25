@@ -200,9 +200,13 @@ const VoorraadDetailPage = () => {
                   </p>
                 </div>
 
-                <p className="text-3xl font-display font-bold text-foreground">
-                  {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
-                </p>
+                <div className="flex items-center gap-3">
+                  <p className="text-3xl font-display font-bold text-foreground">
+                    {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
+                  </p>
+                  {vehicle.nap === "1" && (
+                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-5 object-contain" />
+                  )}
 
                 <div className="flex items-center gap-2 bg-card border border-border px-3 py-2 w-fit">
                   <ShieldCheck className="w-3.5 h-3.5 text-primary" />
@@ -231,7 +235,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
                 <a
-                  href={buildMarktplaatsUrl(vehicle.merk, vehicle.model)}
+                  href={buildMarktplaatsUrl(vehicle)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 text-[10px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
