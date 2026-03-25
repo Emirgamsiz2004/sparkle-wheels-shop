@@ -250,7 +250,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
                 <a
-                  href={buildMarktplaatsUrl(vehicle)}
+                  href={buildMarktplaatsUrl(vehicle, dbMarktplaatsUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 text-[10px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
@@ -371,7 +371,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
                 <a
-                  href={buildMarktplaatsUrl(vehicle)}
+                  href={buildMarktplaatsUrl(vehicle, dbMarktplaatsUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2.5 w-full py-3 text-[11px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
