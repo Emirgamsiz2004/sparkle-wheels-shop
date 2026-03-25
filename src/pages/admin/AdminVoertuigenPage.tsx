@@ -36,7 +36,6 @@ const AdminVoertuigenPage = () => {
     }
     setSyncing(false);
   };
-  const isMobile = useIsMobile();
 
   const filtered = vehicles.filter((v) => {
     if (filter !== "alle" && v.status !== filter) return false;
