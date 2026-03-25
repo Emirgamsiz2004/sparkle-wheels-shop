@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVoorraadDetail } from "@/hooks/useVoorraadFeed";
+import { supabase } from "@/integrations/supabase/client";
 import TradeInSection from "@/components/TradeInSection";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
@@ -17,8 +18,13 @@ import Footer from "@/components/Footer";
 
 const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
 
-const buildMarktplaatsUrl = (vehicle: any) => {
+const buildMarktplaatsUrl = (vehicle: any, dbUrl?: string | null) => {
+  if (dbUrl) return dbUrl;
   if (vehicle.marktplaats_url) return vehicle.marktplaats_url;
+  if (vehicle.kenteken) {
+    const k = vehicle.kenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    return `https://www.marktplaats.nl/q/${encodeURIComponent(k)}/`;
+  }
   const q = encodeURIComponent(`${vehicle.merk} ${vehicle.model}`);
   return `https://www.marktplaats.nl/q/auto/${q}/#q:${q}|sellerName:Platin+Automotive`;
 };
@@ -35,6 +41,22 @@ const VoorraadDetailPage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [slideDirection, setSlideDirection] = useState(0);
+  const [dbMarktplaatsUrl, setDbMarktplaatsUrl] = useState<string | null>(null);
+
+  // Look up marktplaats_url from DB by kenteken
+  useEffect(() => {
+    if (!vehicle?.kenteken) return;
+    const normalized = vehicle.kenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    supabase
+      .from("vehicles")
+      .select("marktplaats_url")
+      .ilike("kenteken", `%${normalized}%`)
+      .not("marktplaats_url", "is", null)
+      .limit(1)
+      .then(({ data }) => {
+        if (data?.[0]?.marktplaats_url) setDbMarktplaatsUrl(data[0].marktplaats_url);
+      });
+  }, [vehicle?.kenteken]);
 
   const photoUrls = vehicle?.fotos ?? [];
 
@@ -228,7 +250,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
                 <a
-                  href={buildMarktplaatsUrl(vehicle)}
+                  href={buildMarktplaatsUrl(vehicle, dbMarktplaatsUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 text-[10px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
@@ -349,7 +371,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
                 <a
-                  href={buildMarktplaatsUrl(vehicle)}
+                  href={buildMarktplaatsUrl(vehicle, dbMarktplaatsUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2.5 w-full py-3 text-[11px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"

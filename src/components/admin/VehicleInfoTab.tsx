@@ -202,6 +202,15 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
         </CardContent>
       </Card>
 
+      {/* Marktplaats URL */}
+      <Card>
+        <CardContent className="p-4 md:p-6 space-y-3">
+          <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Marktplaats URL</label>
+          <input type="url" value={form.marktplaatsUrl || ""} onChange={(e) => update("marktplaatsUrl", e.target.value || undefined)} placeholder="https://www.marktplaats.nl/v/auto-s/..." className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+          <p className="text-[10px] text-muted-foreground">Plak hier de directe link naar de Marktplaats-advertentie van dit voertuig.</p>
+        </CardContent>
+      </Card>
+
       {/* Opmerkingen */}
       <Card>
         <CardContent className="p-4 md:p-6 space-y-3">

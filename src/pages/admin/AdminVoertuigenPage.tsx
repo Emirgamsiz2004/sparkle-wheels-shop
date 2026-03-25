@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Eye, ChevronRight } from "lucide-react";
+import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, statusLabels, statusColors } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const tabs: { label: string; value: string }[] = [
   { label: "Alle", value: "alle" },
@@ -15,10 +17,25 @@ const tabs: { label: string; value: string }[] = [
 ];
 
 const AdminVoertuigenPage = () => {
-  const { vehicles, loading } = useVehicles();
+  const { vehicles, loading, refetch } = useVehicles();
   const [filter, setFilter] = useState("alle");
   const [search, setSearch] = useState("");
+  const [syncing, setSyncing] = useState(false);
   const isMobile = useIsMobile();
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-voorraad");
+      if (error) throw error;
+      toast.success(`✓ Sync klaar: ${data.created} nieuw, ${data.updated} bijgewerkt, ${data.skipped} overgeslagen`);
+      refetch();
+    } catch (err: any) {
+      console.error("Sync error:", err);
+      toast.error("Sync mislukt");
+    }
+    setSyncing(false);
+  };
 
   const filtered = vehicles.filter((v) => {
     if (filter !== "alle" && v.status !== filter) return false;
@@ -40,9 +57,19 @@ const AdminVoertuigenPage = () => {
           <h1 className="text-xl md:text-2xl font-bold text-foreground">Voertuigen</h1>
           <p className="text-xs md:text-sm text-muted-foreground mt-0.5">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
         </div>
-        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors shrink-0">
-          <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Nieuw</span> <span className="sm:hidden">Nieuw</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent text-foreground text-xs font-medium rounded-lg hover:bg-accent/80 transition-colors disabled:opacity-50 shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">Sync Feed</span>
+          </button>
+          <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors shrink-0">
+            <Plus className="w-3.5 h-3.5" /> Nieuw
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}

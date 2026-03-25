@@ -47,6 +47,8 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
   betaalmethode: row.betaalmethode || undefined,
   totaleKosten: Number(row.totale_kosten) || 0,
   kostprijsCalc: Number(row.kostprijs) || 0,
+  marktplaatsUrl: row.marktplaats_url || undefined,
+  feedId: row.feed_id || undefined,
 });
 
 export function useVehicles() {
@@ -135,6 +137,7 @@ export function useVehicles() {
       consignatie_eigenaar_naam: updated.consignatieEigenaarNaam || null,
       consignatie_eigenaar_telefoon: updated.consignatieEigenaarTelefoon || null,
       consignatie_eigenaar_email: updated.consignatieEigenaarEmail || null,
+      marktplaats_url: updated.marktplaatsUrl || null,
     } as any).eq('id', updated.id);
     if (error) { toast.error('Fout bij bijwerken voertuig'); return; }
     toast.success('Voertuig bijgewerkt');
