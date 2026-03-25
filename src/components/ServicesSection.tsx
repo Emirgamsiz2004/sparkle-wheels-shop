@@ -61,7 +61,7 @@ const services: Service[] = [
   },
 ];
 
-const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: number }) => (
+const ServiceCard = ({ service, delay }: { service: Service; delay: number }) => (
   <motion.div
     initial={{ opacity: 0, y: 40 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -76,6 +76,9 @@ const ServiceCard = ({ service, delay }: { service: typeof services[0]; delay: n
           alt={service.alt}
           className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
         />
+        {service.overlay && (
+          <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/30 to-background/10" />
+        )}
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-500" />
       </div>
       <div className="p-5 md:p-8">
