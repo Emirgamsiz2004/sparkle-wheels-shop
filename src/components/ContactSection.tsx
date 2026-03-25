@@ -78,14 +78,18 @@ const ContactSection = () => {
                 </a>
               ))}
             </div>
-            <div className="bg-card flex items-center gap-3 px-6 md:px-8 py-4">
-              <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
-              <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground">Openingstijden</p>
-              <span className="text-xs font-body text-foreground">Ma-Vr: 10:00 – 18:00</span>
-              <span className="text-border">·</span>
-              <span className="text-xs font-body text-foreground">Za: 10:00 – 17:00</span>
-              <span className="text-border">·</span>
-              <span className="text-xs font-body text-foreground">Zo: Gesloten</span>
+            <div className="bg-card px-6 md:px-8 py-4">
+              <div className="flex items-center gap-2 mb-2 md:mb-0">
+                <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground">Openingstijden</p>
+              </div>
+              <div className="flex items-center gap-2 md:gap-3 mt-1.5 text-xs font-body text-foreground">
+                <span>Ma–Vr: 10:00 – 18:00</span>
+                <span className="text-border">·</span>
+                <span>Za: 10:00 – 17:00</span>
+                <span className="text-border">·</span>
+                <span>Zo: Gesloten</span>
+              </div>
             </div>
           </motion.div>
         </div>
