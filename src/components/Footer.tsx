@@ -86,7 +86,7 @@ const Footer = () => {
                 <img
                   src={marktplaatsLogo}
                   alt=""
-                  className="w-5 h-5 invert sepia brightness-[0.6] opacity-50 group-hover:opacity-80 transition-opacity"
+                  className="w-5 h-5 brightness-0 invert opacity-50 group-hover:opacity-80 transition-opacity"
                 />
               </a>
             </div>

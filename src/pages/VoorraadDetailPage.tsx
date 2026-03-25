@@ -208,13 +208,6 @@ const VoorraadDetailPage = () => {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 bg-card border border-border px-3 py-2 w-fit">
-                  <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                  <span className="text-[9px] font-body font-semibold tracking-[0.15em] uppercase text-foreground">
-                    Gecontroleerd & Rijklaar
-                  </span>
-                </div>
-
                 <div className="space-y-2">
                   <a
                     href="tel:+31612693825"
@@ -335,12 +328,6 @@ const VoorraadDetailPage = () => {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 bg-card border border-border px-4 py-2.5 w-fit">
-                  <ShieldCheck className="w-4 h-4 text-primary" />
-                  <span className="text-[10px] font-body font-semibold tracking-[0.2em] uppercase text-foreground">
-                    Gecontroleerd & Rijklaar
-                  </span>
-                </div>
 
                 <div className="space-y-3">
                   <a
