@@ -7,7 +7,17 @@ import detailingImg from "@/assets/detailing-close.jpg";
 import autoZoekenImg from "@/assets/vw-gti-front.jpg";
 import customizingImg from "@/assets/detailing-work.jpg";
 
-const services = [
+interface Service {
+  num: string;
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+  href: string;
+  overlay?: boolean;
+}
+
+const services: Service[] = [
   {
     num: "01",
     title: "In- & Verkoop",
@@ -15,6 +25,7 @@ const services = [
     image: verkoopImg,
     alt: "Occasions kopen en verkopen Roelofarendsveen",
     href: "/diensten/in-en-verkoop",
+    overlay: true,
   },
   {
     num: "02",
