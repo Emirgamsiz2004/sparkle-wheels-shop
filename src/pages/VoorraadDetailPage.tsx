@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useVoorraadDetail } from "@/hooks/useVoorraadFeed";
 import { supabase } from "@/integrations/supabase/client";
 import TradeInSection from "@/components/TradeInSection";
+import RelatedVehicles from "@/components/RelatedVehicles";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
@@ -446,6 +447,7 @@ const VoorraadDetailPage = () => {
         )}
       </AnimatePresence>
 
+      {id && <RelatedVehicles currentId={id} />}
       <Footer />
     </div>
   );
