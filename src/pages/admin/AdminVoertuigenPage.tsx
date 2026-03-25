@@ -17,9 +17,25 @@ const tabs: { label: string; value: string }[] = [
 ];
 
 const AdminVoertuigenPage = () => {
-  const { vehicles, loading } = useVehicles();
+  const { vehicles, loading, refetch } = useVehicles();
   const [filter, setFilter] = useState("alle");
   const [search, setSearch] = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const isMobile = useIsMobile();
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-voorraad");
+      if (error) throw error;
+      toast.success(`✓ Sync klaar: ${data.created} nieuw, ${data.updated} bijgewerkt, ${data.skipped} overgeslagen`);
+      refetch();
+    } catch (err: any) {
+      console.error("Sync error:", err);
+      toast.error("Sync mislukt");
+    }
+    setSyncing(false);
+  };
   const isMobile = useIsMobile();
 
   const filtered = vehicles.filter((v) => {
