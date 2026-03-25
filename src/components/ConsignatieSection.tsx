@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import consignatieBg from "@/assets/mercedes-rear.jpg";
 
 const steps = [
   {
