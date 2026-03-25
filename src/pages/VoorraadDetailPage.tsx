@@ -82,7 +82,7 @@ const VoorraadDetailPage = () => {
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null },
         { label: "Carrosserie", value: vehicle.carrosserie },
         { label: "Kleur", value: vehicle.kleur },
-        { label: "NAP", value: vehicle.nap === "1" ? "NAP-check OK ✓" : vehicle.nap === "0" ? "Niet geregistreerd" : null },
+        { label: "APK", value: vehicle.extra?.apk || null },
         { label: "APK", value: vehicle.extra?.apk || null },
       ].filter((s) => s.value)
     : [];
