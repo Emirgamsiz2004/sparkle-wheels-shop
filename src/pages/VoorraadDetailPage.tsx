@@ -447,6 +447,7 @@ const VoorraadDetailPage = () => {
         )}
       </AnimatePresence>
 
+      {id && <RelatedVehicles currentId={id} />}
       <Footer />
     </div>
   );
