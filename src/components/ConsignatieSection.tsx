@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import consignatieBg from "@/assets/mercedes-rear.jpg";
 
 const steps = [
   {
@@ -23,11 +22,8 @@ const steps = [
 
 const ConsignatieSection = () => {
   return (
-    <section id="consignatie" className="relative py-16 md:py-28 lg:py-36 bg-background overflow-hidden">
-      <div className="absolute inset-0">
-        <img src={consignatieBg} alt="" className="w-full h-full object-cover opacity-[0.07]" />
-      </div>
-      <div className="relative mx-auto px-5 md:px-[90px] max-w-[1920px]">
+    <section id="consignatie" className="py-16 md:py-28 lg:py-36 bg-background">
+      <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
