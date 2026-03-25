@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Eye, ChevronRight } from "lucide-react";
+import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, statusLabels, statusColors } from "@/types/vehicle";
+import { useIsMobile } from "@/hooks/use-mobile";
+import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 
