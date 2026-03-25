@@ -92,12 +92,12 @@ const AnnouncementBar = () => {
               {status.label}
             </span>
             <a
-71:               href="/contact"
-72:               className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300"
-73:             >
-74:               <span className="text-muted-foreground/30">|</span>
+              href="/contact"
+              className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300"
+            >
+              <span className="text-muted-foreground/30">|</span>
               Buiten openingstijden <span className="font-medium text-foreground/70">open op afspraak</span>
-76:             </a>
+            </a>
           </div>
 
           {/* Phone */}
