@@ -137,6 +137,7 @@ export function useVehicles() {
       consignatie_eigenaar_naam: updated.consignatieEigenaarNaam || null,
       consignatie_eigenaar_telefoon: updated.consignatieEigenaarTelefoon || null,
       consignatie_eigenaar_email: updated.consignatieEigenaarEmail || null,
+      marktplaats_url: updated.marktplaatsUrl || null,
     } as any).eq('id', updated.id);
     if (error) { toast.error('Fout bij bijwerken voertuig'); return; }
     toast.success('Voertuig bijgewerkt');
