@@ -324,9 +324,14 @@ const VoorraadDetailPage = () => {
                   </p>
                 </div>
 
-                <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
-                  {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
-                </p>
+                <div className="flex items-center gap-4">
+                  <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
+                    {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
+                  </p>
+                  {vehicle.nap === "1" && (
+                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-6 object-contain" />
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2 bg-card border border-border px-4 py-2.5 w-fit">
                   <ShieldCheck className="w-4 h-4 text-primary" />
@@ -355,7 +360,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
                 <a
-                  href={buildMarktplaatsUrl(vehicle.merk, vehicle.model)}
+                  href={buildMarktplaatsUrl(vehicle)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2.5 w-full py-3 text-[11px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
@@ -377,11 +382,6 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
-                {vehicle.nap === "1" && (
-                  <div className="flex items-center justify-center pt-3">
-                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-10 object-contain" />
-                  </div>
-                )}
               </div>
             </motion.div>
           </div>
