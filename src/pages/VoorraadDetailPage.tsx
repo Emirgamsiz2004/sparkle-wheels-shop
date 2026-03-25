@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVoorraadDetail } from "@/hooks/useVoorraadFeed";
 import TradeInSection from "@/components/TradeInSection";
+import napLogo from "@/assets/nap-logo.png";
 import {
   ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
