@@ -40,6 +40,22 @@ const VoorraadDetailPage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [slideDirection, setSlideDirection] = useState(0);
+  const [dbMarktplaatsUrl, setDbMarktplaatsUrl] = useState<string | null>(null);
+
+  // Look up marktplaats_url from DB by kenteken
+  useEffect(() => {
+    if (!vehicle?.kenteken) return;
+    const normalized = vehicle.kenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    supabase
+      .from("vehicles")
+      .select("marktplaats_url")
+      .ilike("kenteken", `%${normalized}%`)
+      .not("marktplaats_url", "is", null)
+      .limit(1)
+      .then(({ data }) => {
+        if (data?.[0]?.marktplaats_url) setDbMarktplaatsUrl(data[0].marktplaats_url);
+      });
+  }, [vehicle?.kenteken]);
 
   const photoUrls = vehicle?.fotos ?? [];
 
