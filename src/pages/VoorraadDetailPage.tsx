@@ -209,6 +209,7 @@ const VoorraadDetailPage = () => {
                   )}
                 </div>
 
+                <div className="flex items-center gap-2 bg-card border border-border px-3 py-2 w-fit">
                   <ShieldCheck className="w-3.5 h-3.5 text-primary" />
                   <span className="text-[9px] font-body font-semibold tracking-[0.15em] uppercase text-foreground">
                     Gecontroleerd & Rijklaar
@@ -253,11 +254,6 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
-                {vehicle.nap === "1" && (
-                  <div className="flex items-center justify-center pt-2">
-                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-8 object-contain" />
-                  </div>
-                )}
               </div>
 
               {/* Kenmerken — Marktplaats-style grid */}
