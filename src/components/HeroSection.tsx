@@ -6,11 +6,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import heroSlide1 from "@/assets/hero-slide-1.jpg";
 import heroSlide2 from "@/assets/hero-slide-2.jpg";
 import heroSlide3 from "@/assets/hero-slide-3.jpg";
+import heroSlide4 from "@/assets/hero-slide-4.jpg";
 
 const slides = [
-  { src: heroSlide1, mobilePosition: "60% center", desktopPosition: "center center" },
+  { src: heroSlide1, mobilePosition: "center center", desktopPosition: "center center" },
   { src: heroSlide2, mobilePosition: "65% center", desktopPosition: "center center" },
   { src: heroSlide3, mobilePosition: "50% 40%", desktopPosition: "center center" },
+  { src: heroSlide4, mobilePosition: "center center", desktopPosition: "center center" },
 ];
 
 const HeroSection = () => {
