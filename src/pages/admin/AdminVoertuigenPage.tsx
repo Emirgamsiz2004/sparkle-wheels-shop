@@ -57,9 +57,19 @@ const AdminVoertuigenPage = () => {
           <h1 className="text-xl md:text-2xl font-bold text-foreground">Voertuigen</h1>
           <p className="text-xs md:text-sm text-muted-foreground mt-0.5">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
         </div>
-        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors shrink-0">
-          <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Nieuw</span> <span className="sm:hidden">Nieuw</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-accent text-foreground text-xs font-medium rounded-lg hover:bg-accent/80 transition-colors disabled:opacity-50 shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">Sync Feed</span>
+          </button>
+          <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors shrink-0">
+            <Plus className="w-3.5 h-3.5" /> Nieuw
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
