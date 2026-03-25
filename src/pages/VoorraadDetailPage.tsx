@@ -5,11 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useVoorraadDetail } from "@/hooks/useVoorraadFeed";
 import TradeInSection from "@/components/TradeInSection";
 import napLogo from "@/assets/nap-logo.png";
+import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
   ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
   ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog, FileCheck,
-  Users, Globe, Wrench, Weight, Cylinder,
+  Users, Globe, Wrench, Weight, Cylinder, ExternalLink,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
