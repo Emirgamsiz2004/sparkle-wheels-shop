@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import verkoopImg from "@/assets/voorraad-terrein.jpg";
-import onderhoudImg from "@/assets/garage-interior.jpg";
-import detailingImg from "@/assets/detailing-close.jpg";
-import autoZoekenImg from "@/assets/vw-gti-front.jpg";
-import customizingImg from "@/assets/detailing-work.jpg";
+import verkoopImg from "@/assets/service-verkoop.jpg";
+import onderhoudImg from "@/assets/service-onderhoud.jpg";
+import detailingImg from "@/assets/service-detailing.jpg";
+import autoZoekenImg from "@/assets/service-zoeken.jpg";
+import customizingImg from "@/assets/service-customizing.jpg";
 
 interface Service {
   num: string;
