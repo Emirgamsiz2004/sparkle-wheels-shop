@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, Fuel, Gauge, Car, Settings2 } from "lucide-react";
+import { Calendar, Fuel, Gauge, Car, Settings2, ShieldCheck } from "lucide-react";
 import type { VoorraadVoertuig } from "@/hooks/useVoorraadFeed";
 
 interface Props {
@@ -64,6 +64,12 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
             <Spec icon={Fuel} label={voertuig.brandstof} />
             <Spec icon={Settings2} label={voertuig.transmissie?.replace(/,?\s*\d+\s*versnellingen?/i, "").trim() || ""} />
             <Spec icon={Gauge} label={voertuig.kilometerstand ? `${Number(voertuig.kilometerstand).toLocaleString("nl-NL")} km` : ""} />
+            {voertuig.nap === "1" && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-primary font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                NAP
+              </span>
+            )}
             {voertuig.carrosserie && <Spec icon={Car} label={voertuig.carrosserie} />}
           </div>
 
