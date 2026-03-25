@@ -66,13 +66,13 @@ const ContactSection = () => {
                   href={item.href}
                   target={item.href.startsWith("http") ? "_blank" : undefined}
                   rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="group bg-card hover:bg-primary p-6 md:p-8 transition-all duration-300"
+                  className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
                 >
-                  <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary-foreground mb-6 transition-colors" />
-                  <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-hover:text-primary-foreground/70 mb-2 transition-colors">
+                  <item.icon className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
+                  <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
                     {item.label}
                   </p>
-                  <p className="text-sm font-body font-medium text-foreground group-hover:text-primary-foreground whitespace-pre-line transition-colors">
+                  <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground whitespace-pre-line transition-colors">
                     {item.value}
                   </p>
                 </a>

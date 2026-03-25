@@ -55,7 +55,7 @@ export default function ReviewsSection() {
     Array.from({ length: 5 }).map((_, i) => (
       <Star
         key={i}
-        className={`w-3 h-3 ${i < count ? "text-primary fill-primary" : "text-border"}`}
+        className={`w-3 h-3 ${i < count ? "text-yellow-400 fill-yellow-400" : "text-yellow-400/30 fill-yellow-400/30"}`}
       />
     ));
 
@@ -115,7 +115,23 @@ export default function ReviewsSection() {
         </div>
 
         {/* Slider */}
-        <div className="relative overflow-hidden">
+        <div
+          className="relative overflow-hidden touch-pan-y"
+          onTouchStart={(e) => {
+            const touch = e.touches[0];
+            (e.currentTarget as any)._touchStartX = touch.clientX;
+          }}
+          onTouchEnd={(e) => {
+            const startX = (e.currentTarget as any)._touchStartX;
+            if (startX === undefined) return;
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next();
+              else prev();
+            }
+          }}
+        >
           <div
             className="flex transition-transform duration-500 ease-out"
             style={{

@@ -20,22 +20,46 @@ const FacebookIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Opening hours schedule (Google Maps)
+const SCHEDULE: { open: number; close: number }[] = [
+  { open: -1, close: -1 },     // Zo: Gesloten
+  { open: 600, close: 1080 },  // Ma: 10:00–18:00
+  { open: 600, close: 1080 },  // Di: 10:00–18:00
+  { open: 600, close: 1080 },  // Wo: 10:00–18:00
+  { open: 600, close: 1080 },  // Do: 10:00–18:00
+  { open: 600, close: 1080 },  // Vr: 10:00–18:00
+  { open: 600, close: 1020 },  // Za: 10:00–17:00
+];
+
+const DAY_LABELS = ["zo", "ma", "di", "wo", "do", "vr", "za"];
+
+const fmtTime = (mins: number) => {
+  const h = String(Math.floor(mins / 60)).padStart(2, "0");
+  const m = String(mins % 60).padStart(2, "0");
+  return `${h}:${m}`;
+};
+
 const getIsOpen = (): { isOpen: boolean; label: string } => {
   const now = new Date();
-  const day = now.getDay(); // 0 = Sunday
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const time = hours * 60 + minutes;
+  const day = now.getDay();
+  const time = now.getHours() * 60 + now.getMinutes();
+  const today = SCHEDULE[day];
 
-  // Ma-Vr: 09:00–18:00, Za-Zo: 10:00–17:00
-  if (day >= 1 && day <= 5) {
-    if (time >= 540 && time < 1080) return { isOpen: true, label: "Open tot 18:00" };
-    return { isOpen: false, label: "Gesloten · opent ma 09:00" };
+  if (today.open >= 0 && time >= today.open && time < today.close) {
+    return { isOpen: true, label: `Open tot ${fmtTime(today.close)}` };
   }
-  if (day === 6 || day === 0) {
-    if (time >= 600 && time < 1020) return { isOpen: true, label: "Open tot 17:00" };
-    if (day === 6) return { isOpen: false, label: "Gesloten · opent zo 10:00" };
-    return { isOpen: false, label: "Gesloten · opent ma 09:00" };
+
+  // Find next opening
+  for (let offset = 0; offset < 7; offset++) {
+    const checkDay = (day + (offset === 0 ? 0 : offset)) % 7;
+    const s = SCHEDULE[checkDay];
+    if (s.open < 0) continue;
+    if (offset === 0 && time < s.open) {
+      return { isOpen: false, label: `Gesloten · opent ${DAY_LABELS[checkDay]} ${fmtTime(s.open)}` };
+    }
+    if (offset > 0) {
+      return { isOpen: false, label: `Gesloten · opent ${DAY_LABELS[checkDay]} ${fmtTime(s.open)}` };
+    }
   }
   return { isOpen: false, label: "Gesloten" };
 };

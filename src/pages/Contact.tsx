@@ -48,13 +48,13 @@ const contactDetails = [
 ];
 
 const openingHours = [
-  { day: "Maandag", time: "09:00 - 18:00" },
-  { day: "Dinsdag", time: "09:00 - 18:00" },
-  { day: "Woensdag", time: "09:00 - 18:00" },
-  { day: "Donderdag", time: "09:00 - 18:00" },
-  { day: "Vrijdag", time: "09:00 - 18:00" },
+  { day: "Maandag", time: "10:00 - 18:00" },
+  { day: "Dinsdag", time: "10:00 - 18:00" },
+  { day: "Woensdag", time: "10:00 - 18:00" },
+  { day: "Donderdag", time: "10:00 - 18:00" },
+  { day: "Vrijdag", time: "10:00 - 18:00" },
   { day: "Zaterdag", time: "10:00 - 17:00" },
-  { day: "Zondag", time: "10:00 - 17:00" },
+  { day: "Zondag", time: "Gesloten" },
 ];
 
 const ContactForm = () => {
