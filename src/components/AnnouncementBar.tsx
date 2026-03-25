@@ -96,7 +96,7 @@ const AnnouncementBar = () => {
               className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300"
             >
               <span className="text-muted-foreground/30">|</span>
-              <span className="hidden xs:inline">Buiten openingstijden</span> op afspraak
+              Buiten openingstijden <span className="font-medium text-foreground/70">open op afspraak</span>
             </a>
           </div>
 
