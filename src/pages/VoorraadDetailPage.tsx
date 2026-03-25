@@ -207,8 +207,8 @@ const VoorraadDetailPage = () => {
                   {vehicle.nap === "1" && (
                     <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-5 object-contain" />
                   )}
+                </div>
 
-                <div className="flex items-center gap-2 bg-card border border-border px-3 py-2 w-fit">
                   <ShieldCheck className="w-3.5 h-3.5 text-primary" />
                   <span className="text-[9px] font-body font-semibold tracking-[0.15em] uppercase text-foreground">
                     Gecontroleerd & Rijklaar
