@@ -16,7 +16,7 @@ export default {
       fontFamily: {
         display: ['"Orbitron"', "sans-serif"],
         body: ['"DM Sans"', "sans-serif"],
-        admin: ['"Poppins"', "sans-serif"],
+        admin: ['"Inter"', "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
