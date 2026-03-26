@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Trash2, Loader2, FileText, Info, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, FileText, Info, ClipboardCheck, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
