@@ -1,0 +1,1 @@
+CREATE POLICY "Authenticated users can delete test drives" ON public.test_drives FOR DELETE TO authenticated USING (true);

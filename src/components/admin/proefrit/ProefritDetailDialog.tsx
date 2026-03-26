@@ -7,14 +7,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
-  Download, Mail, StopCircle, FileText, X,
+  Download, Mail, StopCircle, FileText, X, Trash2,
 } from "lucide-react";
 import EindProefritDialog from "./EindProefritDialog";
+import { useTestDrives } from "@/hooks/useTestDrives";
 
 interface Props {
   testDrive: TestDrive;
   open: boolean;
   onClose: () => void;
+  onDeleted?: () => void;
 }
 
 interface PdfLog {
@@ -38,12 +40,14 @@ const statusDot: Record<string, string> = {
   onvolledig: "bg-red-400",
 };
 
-const ProefritDetailDialog = ({ testDrive: td, open, onClose }: Props) => {
+const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props) => {
   const { user } = useAuth();
+  const { deleteTestDrive } = useTestDrives();
   const [pdfLogs, setPdfLogs] = useState<PdfLog[]>([]);
   const [showEnd, setShowEnd] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [mailing, setMailing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [rijbewijsFotoUrl, setRijbewijsFotoUrl] = useState<string | null>(null);
   const [fotoFullscreen, setFotoFullscreen] = useState(false);
 
@@ -278,6 +282,21 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose }: Props) => {
                   Beëindigen
                 </button>
               )}
+
+              <button
+                onClick={async () => {
+                  if (!confirm("Weet je zeker dat je deze proefrit wilt verwijderen?")) return;
+                  setDeleting(true);
+                  const ok = await deleteTestDrive(td.id);
+                  setDeleting(false);
+                  if (ok) { onDeleted?.(); onClose(); }
+                }}
+                disabled={deleting}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-red-500/30 text-red-400 rounded-md hover:bg-red-500/10 transition-colors disabled:opacity-50 ml-auto"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                {deleting ? "Bezig..." : "Verwijderen"}
+              </button>
             </div>
 
             {/* Email status */}

@@ -96,7 +96,7 @@ const AdminDashboardPage = () => {
                       </td>
                       <td className="px-4 py-2.5 text-muted-foreground text-xs font-mono uppercase hidden sm:table-cell">{v.kenteken || "—"}</td>
                       <td className="px-4 py-2.5">
-                        <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border ${statusColors[v.status]}`}>
+                        <span className={`inline-flex whitespace-nowrap px-2 py-0.5 text-[11px] font-medium rounded border ${statusColors[v.status]}`}>
                           {statusLabels[v.status]}
                         </span>
                       </td>

@@ -110,5 +110,13 @@ export function useTestDrives() {
     fetchTestDrives();
   };
 
-  return { testDrives, loading, startTestDrive, endTestDrive, refetch: fetchTestDrives };
+  const deleteTestDrive = async (id: string) => {
+    const { error } = await supabase.from('test_drives').delete().eq('id', id);
+    if (error) { toast.error('Fout bij verwijderen proefrit'); return false; }
+    toast.success('Proefrit verwijderd');
+    fetchTestDrives();
+    return true;
+  };
+
+  return { testDrives, loading, startTestDrive, endTestDrive, deleteTestDrive, refetch: fetchTestDrives };
 }

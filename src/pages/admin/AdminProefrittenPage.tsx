@@ -142,6 +142,7 @@ const AdminProefrittenPage = () => {
           testDrive={selected}
           open={!!selected}
           onClose={() => setSelected(null)}
+          onDeleted={() => { setSelected(null); }}
         />
       )}
 
