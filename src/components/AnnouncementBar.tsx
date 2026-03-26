@@ -85,7 +85,7 @@ const AnnouncementBar = () => {
                 className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300 whitespace-nowrap"
               >
                 <span className="text-muted-foreground/30">|</span>
-                <span className="font-medium text-foreground/70">{status.openLabel}</span>
+                <span className="font-medium text-foreground/70 hover:text-foreground transition-all duration-300">{status.openLabel}</span>
               </a>
             )}
           </div>
