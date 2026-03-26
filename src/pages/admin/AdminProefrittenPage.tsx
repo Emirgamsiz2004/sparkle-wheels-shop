@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
-import { Loader2, Search, ChevronRight, CheckCircle2, Clock, AlertCircle, XCircle, Car } from "lucide-react";
+import { Loader2, Search, ChevronRight, CheckCircle2, Clock, AlertCircle, XCircle, Car, StopCircle } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ProefritDetailDialog from "@/components/admin/proefrit/ProefritDetailDialog";
+import EindProefritDialog from "@/components/admin/proefrit/EindProefritDialog";
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
   wacht_op_klant: { label: "Wacht op klant", icon: Clock, color: "text-amber-400 bg-amber-400/10 border-amber-400/20" },
