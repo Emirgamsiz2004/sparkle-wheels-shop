@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Phone, MapPin } from "lucide-react";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 
@@ -53,6 +54,7 @@ const getIsOpen = (): { isOpen: boolean; label: string; openLabel: string } => {
 };
 
 const AnnouncementBar = () => {
+  const location = useLocation();
   const [status, setStatus] = useState(getIsOpen);
   
 
@@ -61,6 +63,7 @@ const AnnouncementBar = () => {
     return () => clearInterval(interval);
   }, []);
 
+  if (location.pathname.startsWith("/admin")) return null;
 
   return (
     <div
