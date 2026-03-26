@@ -2,15 +2,13 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Trash2, Loader2, ShoppingCart, FileText } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge, verkoopTypeLabels } from "@/types/vehicle";
+import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
 import VehicleKostenTab from "@/components/admin/VehicleKostenTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
 import VehicleFotosTab from "@/components/admin/VehicleFotosTab";
-import VerkoopDialog from "@/components/admin/VerkoopDialog";
-import { Card, CardContent } from "@/components/ui/card";
 import { Info } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
@@ -28,7 +26,6 @@ const AdminVoertuigDetailPage = () => {
   const navigate = useNavigate();
   const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
   const [activeTab, setActiveTab] = useState("overzicht");
-  const [verkoopOpen, setVerkoopOpen] = useState(false);
   const [blogGenerating, setBlogGenerating] = useState(false);
 
   const vehicle = vehicles.find((v) => v.id === id);
@@ -51,8 +48,6 @@ const AdminVoertuigDetailPage = () => {
     navigate("/admin/voertuigen");
   };
 
-  const handleVerkoopComplete = () => { refetch(); };
-
   const handleGenerateBlog = async () => {
     setBlogGenerating(true);
     toast.info("Blogpost wordt aangemaakt...");
@@ -69,9 +64,7 @@ const AdminVoertuigDetailPage = () => {
     setBlogGenerating(false);
   };
 
-  // Financial calculations
   const kostprijs = calcKostprijs(vehicle);
-  const brutoWinst = calcWinst(vehicle);
   const nettoMarge = calcNettoMarge(vehicle);
   const margePerc = calcMarge(vehicle);
 
@@ -87,36 +80,14 @@ const AdminVoertuigDetailPage = () => {
           <h1 className="text-lg md:text-2xl font-bold text-foreground leading-tight">
             {vehicle.merk} {vehicle.model} {vehicle.bouwjaar}
           </h1>
-          <span className="text-sm text-muted-foreground">{vehicle.kleur || "Onbekend"}</span>
+          {vehicle.kenteken && (
+            <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">{vehicle.kenteken}</span>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className={`inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border ${statusColors[vehicle.status]}`}>
             {statusLabels[vehicle.status]}
           </span>
-          <span className="inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border bg-secondary text-secondary-foreground border-border">
-            {verkoopTypeLabels[vehicle.verkoopType] || 'Regulier'}
-          </span>
-          {vehicle.kenteken && (
-            <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider bg-accent/50 px-2 py-0.5 rounded">{vehicle.kenteken}</span>
-          )}
-        </div>
-
-        {/* Google Drive status */}
-        <div>
-          {vehicle.googleDriveFolderUrl ? (
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border" style={{ backgroundColor: "rgba(25, 103, 210, 0.1)", color: "#5b9bef", borderColor: "rgba(25, 103, 210, 0.2)" }}>
-                ✅ Google Drive
-              </span>
-              <a href={vehicle.googleDriveFolderUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-medium hover:opacity-80 transition-opacity" style={{ color: "#5b9bef" }}>
-                Open map →
-              </a>
-            </div>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border bg-accent/30 text-muted-foreground border-border">
-              📁 Drive: Niet gekoppeld
-            </span>
-          )}
         </div>
 
         {/* Actions */}
@@ -125,11 +96,6 @@ const AdminVoertuigDetailPage = () => {
             {blogGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
             Genereer blogpost
           </button>
-          {vehicle.status === "te_koop" && (
-            <button onClick={() => setVerkoopOpen(true)} className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors">
-              <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
-            </button>
-          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <button className="inline-flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
@@ -140,7 +106,7 @@ const AdminVoertuigDetailPage = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Voertuig verwijderen?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Dit verwijdert {vehicle.merk} {vehicle.model} en alle bijbehorende data. Dit kan niet ongedaan worden gemaakt.
+                  Dit verwijdert {vehicle.merk} {vehicle.model} en alle bijbehorende data.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -200,14 +166,12 @@ const AdminVoertuigDetailPage = () => {
               </div>
             </div>
 
-            {/* Vehicle info form */}
             <VehicleInfoTab vehicle={vehicle} onSave={updateVehicle} />
 
-            {/* BTW info */}
             <div className="flex items-start gap-2 px-4 py-3 bg-secondary rounded-lg border border-border">
               <Info className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
               <p className="text-xs text-muted-foreground">
-                <strong className="text-foreground">BTW Margeregeling:</strong> als je inkoopt van particulieren, betaal je BTW alleen over de winst (marge × 21/121).
+                <strong className="text-foreground">BTW Margeregeling:</strong> bij inkoop van particulieren betaal je BTW alleen over de winst (marge × 21/121).
               </p>
             </div>
           </div>
@@ -219,13 +183,10 @@ const AdminVoertuigDetailPage = () => {
 
         {activeTab === "dossier" && (
           <div className="space-y-8">
-            {/* Photos section */}
             <div>
               <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-3">📸 Foto's</h3>
               <VehicleFotosTab vehicleId={vehicle.id} />
             </div>
-
-            {/* Documents section */}
             <div>
               <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-3">📄 Documenten</h3>
               <VehicleDocumentenTab vehicleId={vehicle.id} />
@@ -233,13 +194,6 @@ const AdminVoertuigDetailPage = () => {
           </div>
         )}
       </div>
-
-      <VerkoopDialog
-        vehicle={vehicle}
-        open={verkoopOpen}
-        onOpenChange={setVerkoopOpen}
-        onComplete={handleVerkoopComplete}
-      />
     </div>
   );
 };
