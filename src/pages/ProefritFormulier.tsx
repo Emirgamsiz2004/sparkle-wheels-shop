@@ -279,7 +279,25 @@ const ProefritFormulier = () => {
             
             <div className="pt-2 border-t border-neutral-100">
               <p className="text-sm font-semibold text-neutral-900 mb-3">Rijbewijs</p>
-              <Field label="Rijbewijsnummer *" value={rijbewijsnummer} onChange={setRijbewijsnummer} />
+              
+              {/* Rijbewijsnummer met validatie */}
+              <div>
+                <label className="text-xs font-medium text-neutral-600 block mb-1">Rijbewijsnummer *</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={rijbewijsnummer}
+                  onChange={(e) => handleRijbewijsChange(e.target.value)}
+                  placeholder="0000000000"
+                  className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 ${
+                    rijbewijsError ? "border-red-400 focus:ring-red-200" : "border-neutral-200 focus:ring-neutral-900/10"
+                  }`}
+                />
+                {rijbewijsError && (
+                  <p className="text-xs text-red-600 mt-1">{rijbewijsError}</p>
+                )}
+              </div>
+
               <div className="mt-3">
                 <label className="text-xs font-medium text-neutral-600 block mb-1">Categorie</label>
                 <select
@@ -291,6 +309,43 @@ const ProefritFormulier = () => {
                   <option value="B+">B+</option>
                   <option value="BE">BE</option>
                 </select>
+              </div>
+
+              {/* Rijbewijs foto upload */}
+              <div className="mt-3">
+                <label className="text-xs font-medium text-neutral-600 block mb-1">Foto rijbewijs (voorkant) *</label>
+                <p className="text-[11px] text-neutral-400 mb-2">Zorg dat alle gegevens leesbaar zijn en er geen flits of schaduw op zit</p>
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleRijbewijsFoto}
+                  className="hidden"
+                />
+                
+                {!rijbewijsFotoPreview ? (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full border-2 border-dashed border-neutral-300 rounded-lg py-6 flex flex-col items-center gap-2 text-neutral-500 hover:border-neutral-400 hover:text-neutral-600 transition-colors"
+                  >
+                    <Upload className="w-5 h-5" />
+                    <span className="text-xs font-medium">Maak een foto of kies een bestand</span>
+                  </button>
+                ) : (
+                  <div className="relative rounded-lg overflow-hidden border border-neutral-200">
+                    <img src={rijbewijsFotoPreview} alt="Rijbewijs" className="w-full h-auto max-h-48 object-contain bg-neutral-50" />
+                    <button
+                      type="button"
+                      onClick={removeRijbewijsFoto}
+                      className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-1 shadow-sm hover:bg-white transition-colors"
+                    >
+                      <X className="w-4 h-4 text-neutral-600" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
