@@ -51,46 +51,46 @@
     --sidebar-ring: 0 0% 30%;
   }
 
-  /* Admin panel — neutral dark, Shopify-inspired */
+  /* Admin panel — deep dark, Cloud-inspired */
   .admin-theme {
-    --background: 220 6% 10%;
-    --foreground: 220 6% 88%;
+    --background: 220 4% 7%;
+    --foreground: 40 6% 80%;
 
-    --card: 220 6% 12%;
-    --card-foreground: 220 6% 88%;
+    --card: 220 4% 10%;
+    --card-foreground: 40 6% 80%;
 
-    --popover: 220 6% 12%;
-    --popover-foreground: 220 6% 88%;
+    --popover: 220 4% 10%;
+    --popover-foreground: 40 6% 80%;
 
-    --primary: 220 6% 88%;
-    --primary-foreground: 220 6% 10%;
+    --primary: 40 6% 80%;
+    --primary-foreground: 220 4% 7%;
 
-    --secondary: 220 5% 15%;
-    --secondary-foreground: 220 6% 70%;
+    --secondary: 220 4% 12%;
+    --secondary-foreground: 40 4% 60%;
 
-    --muted: 220 5% 18%;
-    --muted-foreground: 220 4% 50%;
+    --muted: 220 3% 14%;
+    --muted-foreground: 40 3% 45%;
 
-    --accent: 220 5% 16%;
-    --accent-foreground: 220 6% 88%;
+    --accent: 220 4% 13%;
+    --accent-foreground: 40 6% 80%;
 
-    --destructive: 0 60% 50%;
+    --destructive: 0 55% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 5% 16%;
-    --input: 220 5% 16%;
-    --ring: 220 5% 30%;
+    --border: 220 4% 14%;
+    --input: 220 4% 14%;
+    --ring: 220 4% 25%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 220 6% 8%;
-    --sidebar-foreground: 220 6% 70%;
-    --sidebar-primary: 220 6% 88%;
-    --sidebar-primary-foreground: 220 6% 8%;
-    --sidebar-accent: 220 5% 13%;
-    --sidebar-accent-foreground: 220 6% 88%;
-    --sidebar-border: 220 5% 13%;
-    --sidebar-ring: 220 5% 30%;
+    --sidebar-background: 220 4% 5.5%;
+    --sidebar-foreground: 40 4% 60%;
+    --sidebar-primary: 40 6% 80%;
+    --sidebar-primary-foreground: 220 4% 5.5%;
+    --sidebar-accent: 220 4% 10%;
+    --sidebar-accent-foreground: 40 6% 80%;
+    --sidebar-border: 220 4% 11%;
+    --sidebar-ring: 220 4% 25%;
 
     font-family: 'Inter', sans-serif;
   }
