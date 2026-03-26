@@ -91,7 +91,8 @@ serve(async (req) => {
       if (match) {
         matchedDbIds.add(match.id);
 
-        // Always sync feed data to DB (overwrite)
+        // Only sync FEED fields (VWE is leidend) — never touch manual fields
+        // (marktplaats_url, inkoopprijs, opmerkingen, koper*, consignatie*, kosten, docs)
         const updates: any = {};
         if (!match.feed_id && fv.feed_id) updates.feed_id = fv.feed_id;
         if (fv.merk && fv.merk !== match.merk) updates.merk = fv.merk;
@@ -101,9 +102,7 @@ serve(async (req) => {
         if (fv.kleur && fv.kleur !== match.kleur) updates.kleur = fv.kleur;
         if (fv.verkoopprijs && fv.verkoopprijs !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
         if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
-        // If it was not te_koop but is in feed, set to te_koop
-        if (match.status !== "te_koop" && match.status !== "verkocht") updates.status = "te_koop";
-        // If it was marked as sold but is back in feed, re-activate
+        // Re-activate if vehicle reappears in feed
         if (match.status === "verkocht") updates.status = "te_koop";
 
         if (Object.keys(updates).length > 0) {
