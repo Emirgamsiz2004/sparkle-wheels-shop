@@ -22,7 +22,7 @@ serve(async (req) => {
       throw new Error(`Google Places API error: ${data.status}`);
     }
 
-    const reviews = (data.result.reviews || []).filter((r: any) => r.rating >= 4).slice(0, 6);
+    const reviews = data.result.reviews || [];
 
     return new Response(
       JSON.stringify({ reviews, rating: data.result.rating, totalRatings: data.result.user_ratings_total }),
