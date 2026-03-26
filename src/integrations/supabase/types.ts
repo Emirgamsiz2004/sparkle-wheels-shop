@@ -663,6 +663,138 @@ export type Database = {
         }
         Relationships: []
       }
+      test_drive_customers: {
+        Row: {
+          achternaam: string
+          adres: string | null
+          created_at: string
+          email: string
+          geboortedatum: string | null
+          id: string
+          rijbewijs_foto_path: string | null
+          rijbewijscategorie: string | null
+          rijbewijsnummer: string | null
+          telefoon: string
+          voornaam: string
+        }
+        Insert: {
+          achternaam: string
+          adres?: string | null
+          created_at?: string
+          email: string
+          geboortedatum?: string | null
+          id?: string
+          rijbewijs_foto_path?: string | null
+          rijbewijscategorie?: string | null
+          rijbewijsnummer?: string | null
+          telefoon: string
+          voornaam: string
+        }
+        Update: {
+          achternaam?: string
+          adres?: string | null
+          created_at?: string
+          email?: string
+          geboortedatum?: string | null
+          id?: string
+          rijbewijs_foto_path?: string | null
+          rijbewijscategorie?: string | null
+          rijbewijsnummer?: string | null
+          telefoon?: string
+          voornaam?: string
+        }
+        Relationships: []
+      }
+      test_drives: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          eind_tijd: string | null
+          formulier_ingevuld_op: string | null
+          handtekening_data: string | null
+          id: string
+          ip_adres: string | null
+          km_na: number | null
+          km_voor: number
+          opmerkingen_na: string | null
+          opmerkingen_voor: string | null
+          pdf_definitief_path: string | null
+          pdf_path: string | null
+          schade_fotos: string[] | null
+          start_tijd: string
+          status: string
+          token: string
+          vehicle_id: string | null
+          voertuig_bouwjaar: number | null
+          voertuig_kenteken: string | null
+          voertuig_merk: string | null
+          voertuig_model: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          eind_tijd?: string | null
+          formulier_ingevuld_op?: string | null
+          handtekening_data?: string | null
+          id?: string
+          ip_adres?: string | null
+          km_na?: number | null
+          km_voor: number
+          opmerkingen_na?: string | null
+          opmerkingen_voor?: string | null
+          pdf_definitief_path?: string | null
+          pdf_path?: string | null
+          schade_fotos?: string[] | null
+          start_tijd?: string
+          status?: string
+          token: string
+          vehicle_id?: string | null
+          voertuig_bouwjaar?: number | null
+          voertuig_kenteken?: string | null
+          voertuig_merk?: string | null
+          voertuig_model?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          eind_tijd?: string | null
+          formulier_ingevuld_op?: string | null
+          handtekening_data?: string | null
+          id?: string
+          ip_adres?: string | null
+          km_na?: number | null
+          km_voor?: number
+          opmerkingen_na?: string | null
+          opmerkingen_voor?: string | null
+          pdf_definitief_path?: string | null
+          pdf_path?: string | null
+          schade_fotos?: string[] | null
+          start_tijd?: string
+          status?: string
+          token?: string
+          vehicle_id?: string | null
+          voertuig_bouwjaar?: number | null
+          voertuig_kenteken?: string | null
+          voertuig_merk?: string | null
+          voertuig_model?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_drives_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "test_drive_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_drives_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
