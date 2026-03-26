@@ -74,16 +74,15 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose }: Props) => {
         } as any);
       }
 
-      // Download the PDF
-      const pdfBytes = Uint8Array.from(atob(data.pdf), (c) => c.charCodeAt(0));
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `proefrit-${td.document_nummer || td.id.slice(0, 8)}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success("PDF gedownload");
+      // The edge function returns HTML as base64 - open in print window
+      const htmlContent = atob(data.pdf);
+      const printWindow = window.open("", "_blank");
+      if (printWindow) {
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        setTimeout(() => printWindow.print(), 500);
+      }
+      toast.success("PDF geopend voor afdrukken/downloaden");
 
       // Refresh logs
       const { data: logs } = await supabase
