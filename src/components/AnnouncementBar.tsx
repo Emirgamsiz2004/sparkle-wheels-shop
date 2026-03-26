@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Phone, MapPin } from "lucide-react";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 
