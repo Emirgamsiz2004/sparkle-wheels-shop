@@ -35,6 +35,8 @@ export interface TestDrive {
   formulier_ingevuld_op?: string;
   pdf_path?: string;
   pdf_definitief_path?: string;
+  document_nummer?: string;
+  email_verzonden_op?: string;
   schade_fotos: string[];
   voertuig_merk?: string;
   voertuig_model?: string;
