@@ -54,6 +54,7 @@ const getIsOpen = (): { isOpen: boolean; label: string; openLabel: string } => {
 };
 
 const AnnouncementBar = () => {
+  const location = useLocation();
   const [status, setStatus] = useState(getIsOpen);
   
 

@@ -4,13 +4,15 @@ import { Link, useLocation } from "react-router-dom";
 const CookieBanner = () => {
   const location = useLocation();
   const [visible, setVisible] = useState(false);
-
-  if (location.pathname.startsWith("/admin")) return null;
+  const isAdmin = location.pathname.startsWith("/admin");
 
   useEffect(() => {
+    if (isAdmin) return;
     const consent = localStorage.getItem("cookie_consent");
     if (!consent) setVisible(true);
-  }, []);
+  }, [isAdmin]);
+
+  if (isAdmin || !visible) return null;
 
   const accept = () => {
     localStorage.setItem("cookie_consent", "accepted");
@@ -21,8 +23,6 @@ const CookieBanner = () => {
     localStorage.setItem("cookie_consent", "declined");
     setVisible(false);
   };
-
-  if (!visible) return null;
 
   return (
     <div className="fixed bottom-0 inset-x-0 z-[60] p-4 md:p-6">
