@@ -82,7 +82,7 @@ const AnnouncementBar = () => {
             <span className="text-[10px] md:text-[11px] font-body text-muted-foreground tracking-wide whitespace-nowrap">
               {status.label}
             </span>
-            {status.isOpen && (
+            {status.openLabel && (
               <a
                 href="/contact"
                 className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300 whitespace-nowrap"
