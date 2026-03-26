@@ -63,7 +63,7 @@ serve(async (req) => {
     // Get existing vehicles from DB
     const { data: existing } = await supabase
       .from("vehicles")
-      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand");
+      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand, merk, model, bouwjaar, brandstof, kleur");
 
     const existingByFeedId = new Map(
       (existing || []).filter((v: any) => v.feed_id).map((v: any) => [v.feed_id, v])
@@ -82,7 +82,6 @@ serve(async (req) => {
     for (const fv of feedVehicles) {
       const normalizedKenteken = normalizeKenteken(fv.kenteken);
 
-      // Check if already exists by feed_id or kenteken
       const existingByFeed = existingByFeedId.get(fv.feed_id);
       const existingByKent = normalizedKenteken
         ? existingByKenteken.get(normalizedKenteken)
@@ -92,11 +91,18 @@ serve(async (req) => {
       if (match) {
         matchedDbIds.add(match.id);
 
-        // Update feed_id, verkoopprijs, kilometerstand, and ensure status is te_koop
+        // Always sync feed data to DB (overwrite)
         const updates: any = {};
         if (!match.feed_id && fv.feed_id) updates.feed_id = fv.feed_id;
+        if (fv.merk && fv.merk !== match.merk) updates.merk = fv.merk;
+        if (fv.model && fv.model !== match.model) updates.model = fv.model;
+        if (fv.bouwjaar && fv.bouwjaar !== match.bouwjaar) updates.bouwjaar = fv.bouwjaar;
+        if (fv.brandstof && fv.brandstof.toLowerCase() !== match.brandstof) updates.brandstof = fv.brandstof.toLowerCase();
+        if (fv.kleur && fv.kleur !== match.kleur) updates.kleur = fv.kleur;
         if (fv.verkoopprijs && fv.verkoopprijs !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
         if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
+        // If it was not te_koop but is in feed, set to te_koop
+        if (match.status !== "te_koop" && match.status !== "verkocht") updates.status = "te_koop";
         // If it was marked as sold but is back in feed, re-activate
         if (match.status === "verkocht") updates.status = "te_koop";
 
@@ -107,13 +113,12 @@ serve(async (req) => {
           skipped++;
         }
       } else {
-        // Create new vehicle
         const { error } = await supabase.from("vehicles").insert({
           feed_id: fv.feed_id,
           merk: fv.merk,
           model: fv.model,
           bouwjaar: fv.bouwjaar,
-          brandstof: fv.brandstof,
+          brandstof: fv.brandstof?.toLowerCase() || null,
           kilometerstand: fv.kilometerstand,
           kleur: fv.kleur,
           kenteken: fv.kenteken,
