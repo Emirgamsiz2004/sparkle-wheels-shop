@@ -50,7 +50,7 @@ const getIsOpen = (): { isOpen: boolean; label: string; openLabel: string } => {
     return { isOpen: true, label: `Open tot ${fmtTime(today.close)}`, openLabel: "Maak afspraak" };
   }
 
-  return { isOpen: false, label: "Open op afspraak", openLabel: "" };
+  return { isOpen: false, label: "Gesloten", openLabel: "Open op afspraak" };
 };
 
 const AnnouncementBar = () => {
