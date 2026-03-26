@@ -67,7 +67,7 @@ const AdminVoertuigenPage = () => {
             <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
             <span className="hidden sm:inline">Sync</span>
           </button>
-          <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-foreground text-background text-xs font-medium rounded-md hover:bg-foreground/90 transition-colors">
+          <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
             <Plus className="w-3.5 h-3.5" /> Nieuw
           </Link>
         </div>
@@ -82,7 +82,7 @@ const AdminVoertuigenPage = () => {
                 key={t.value}
                 onClick={() => setFilter(t.value)}
                 className={`px-2.5 py-1 text-xs font-medium rounded transition-colors whitespace-nowrap ${
-                  filter === t.value ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                  filter === t.value ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t.label}

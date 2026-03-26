@@ -52,7 +52,7 @@ const AdminDashboardPage = () => {
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-2">
-        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-xs font-medium rounded-md hover:bg-foreground/90 transition-colors">
+        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
           <Plus className="w-3.5 h-3.5" /> Nieuwe auto
         </Link>
         <Link to="/admin/financieel" className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">

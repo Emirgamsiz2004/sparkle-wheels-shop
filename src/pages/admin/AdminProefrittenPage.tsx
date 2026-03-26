@@ -62,7 +62,7 @@ const AdminProefrittenPage = () => {
                 key={t.value}
                 onClick={() => setFilter(t.value)}
                 className={`px-2.5 py-1 text-xs font-medium rounded transition-colors whitespace-nowrap ${
-                  filter === t.value ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                  filter === t.value ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t.label}
