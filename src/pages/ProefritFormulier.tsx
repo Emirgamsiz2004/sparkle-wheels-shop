@@ -137,10 +137,20 @@ const ProefritFormulier = () => {
   const isValid = voornaam && achternaam && email && telefoon && rijbewijsValid && rijbewijsFoto && akkoord && hasSigned;
 
   const handleSubmit = async () => {
-    if (!isValid || !testDrive || !sigPadRef.current) return;
+    if (!isValid || !testDrive || !sigPadRef.current || !rijbewijsFoto) return;
     setSubmitting(true);
 
     try {
+      // Upload rijbewijs foto
+      const fileExt = rijbewijsFoto.name.split(".").pop() || "jpg";
+      const filePath = `${testDrive.id}/rijbewijs.${fileExt}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("test-drive-files")
+        .upload(filePath, rijbewijsFoto, { upsert: true });
+      if (uploadErr) throw uploadErr;
+
+      const sanitizedRijbewijs = sanitizeRijbewijs(rijbewijsnummer);
+
       // Upsert customer
       const { data: existingCustomer } = await supabase
         .from("test_drive_customers")
@@ -155,7 +165,8 @@ const ProefritFormulier = () => {
         await supabase.from("test_drive_customers").update({
           voornaam, achternaam, telefoon, adres: adres || null,
           geboortedatum: geboortedatum || null,
-          rijbewijsnummer, rijbewijscategorie,
+          rijbewijsnummer: sanitizedRijbewijs, rijbewijscategorie,
+          rijbewijs_foto_path: filePath,
         } as any).eq("id", customerId);
       } else {
         const { data: newCust, error: custErr } = await supabase
@@ -163,7 +174,8 @@ const ProefritFormulier = () => {
             voornaam, achternaam, email, telefoon,
             adres: adres || null,
             geboortedatum: geboortedatum || null,
-            rijbewijsnummer, rijbewijscategorie,
+            rijbewijsnummer: sanitizedRijbewijs, rijbewijscategorie,
+            rijbewijs_foto_path: filePath,
           } as any).select().single();
         if (custErr) throw custErr;
         customerId = newCust.id;
@@ -179,7 +191,7 @@ const ProefritFormulier = () => {
         opmerkingen_voor: opmerkingen || null,
         formulier_ingevuld_op: new Date().toISOString(),
         status: "actief",
-        ip_adres: "collected-server-side", // placeholder, edge function would capture real IP
+        ip_adres: "collected-server-side",
       } as any).eq("id", testDrive.id);
 
       if (tdErr) throw tdErr;
