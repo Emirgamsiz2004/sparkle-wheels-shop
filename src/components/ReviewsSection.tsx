@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Star, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -29,7 +29,8 @@ const GoogleIcon = () => (
 export default function ReviewsSection() {
   const [data, setData] = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [current, setCurrent] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -47,26 +48,36 @@ export default function ReviewsSection() {
   }, []);
 
   const reviews = data?.reviews ?? [];
-  const totalSlides = reviews.length;
 
-  // Calculate max index so last card is fully visible
-  const [containerWidth, setContainerWidth] = useState(0);
-  const containerRef = useCallback((node: HTMLDivElement | null) => {
-    if (node) {
-      const measure = () => setContainerWidth(node.offsetWidth);
-      measure();
-      const ro = new ResizeObserver(measure);
-      ro.observe(node);
-      return () => ro.disconnect();
-    }
-  }, []);
-  const cardWidth = 280;
-  const gap = 16;
-  const visibleCards = Math.max(1, Math.floor((containerWidth + gap) / (cardWidth + gap)));
-  const maxIndex = Math.max(0, totalSlides - visibleCards);
+  // Auto-scroll animation
+  useEffect(() => {
+    if (reviews.length === 0 || !scrollRef.current) return;
 
-  const prev = useCallback(() => setCurrent((c) => Math.max(0, c - 1)), []);
-  const next = useCallback(() => setCurrent((c) => Math.min(maxIndex, c + 1)), [maxIndex]);
+    const el = scrollRef.current;
+    let animationId: number;
+    let position = 0;
+    const speed = 0.5; // pixels per frame
+
+    // The first set width (one copy of all cards)
+    const cardWidth = 280;
+    const gap = 16;
+    const setWidth = reviews.length * (cardWidth + gap);
+
+    const animate = () => {
+      if (!isPaused) {
+        position += speed;
+        // Reset when we've scrolled past the first set
+        if (position >= setWidth) {
+          position -= setWidth;
+        }
+        el.style.transform = `translateX(-${position}px)`;
+      }
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationId);
+  }, [reviews.length, isPaused]);
 
   const renderStars = (count: number) =>
     Array.from({ length: 5 }).map((_, i) => (
@@ -86,6 +97,9 @@ export default function ReviewsSection() {
 
   if (!data || reviews.length === 0) return null;
 
+  // Triple the reviews for seamless infinite loop
+  const loopedReviews = [...reviews, ...reviews, ...reviews];
+
   return (
     <section className="py-20 bg-background overflow-hidden">
       <div className="container mx-auto px-5 lg:px-16 max-w-[1920px]">
@@ -103,66 +117,31 @@ export default function ReviewsSection() {
             </h2>
           </div>
 
-          <div className="flex items-center gap-4">
-            {/* Rating badge */}
-            <div className="flex items-center gap-2">
-              <div className="flex gap-0.5">{renderStars(Math.round(data.rating))}</div>
-              <span className="text-sm font-display font-bold text-foreground">{data.rating?.toFixed(1)}</span>
-              <span className="text-[11px] font-body text-muted-foreground">({data.totalRatings})</span>
-            </div>
-
-            {/* Nav arrows */}
-            <div className="hidden md:flex items-center gap-1">
-              <button
-                onClick={prev}
-                disabled={current === 0}
-                className="w-8 h-8 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={next}
-                disabled={current >= maxIndex}
-                className="w-8 h-8 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-0.5">{renderStars(Math.round(data.rating))}</div>
+            <span className="text-sm font-display font-bold text-foreground">{data.rating?.toFixed(1)}</span>
+            <span className="text-[11px] font-body text-muted-foreground">({data.totalRatings})</span>
           </div>
         </div>
 
-        {/* Slider */}
+        {/* Infinite slider */}
         <div
-          ref={containerRef}
-          className="relative overflow-hidden touch-pan-y"
-          onTouchStart={(e) => {
-            const touch = e.touches[0];
-            (e.currentTarget as any)._touchStartX = touch.clientX;
-          }}
-          onTouchEnd={(e) => {
-            const startX = (e.currentTarget as any)._touchStartX;
-            if (startX === undefined) return;
-            const endX = e.changedTouches[0].clientX;
-            const diff = startX - endX;
-            if (Math.abs(diff) > 50) {
-              if (diff > 0) next();
-              else prev();
-            }
-          }}
+          className="overflow-hidden"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setTimeout(() => setIsPaused(false), 3000)}
         >
           <div
-            className="flex transition-transform duration-500 ease-out"
-            style={{
-              gap: "16px",
-              transform: `translateX(calc(-${current} * (280px + 16px)))`,
-            }}
+            ref={scrollRef}
+            className="flex will-change-transform"
+            style={{ gap: "16px" }}
           >
-            {reviews.map((review, index) => (
+            {loopedReviews.map((review, index) => (
               <div
                 key={index}
                 className="w-[280px] shrink-0 border border-border bg-card p-6 flex flex-col justify-between transition-colors duration-300 hover:border-primary/30"
               >
-                {/* Author row */}
                 <div className="flex items-center gap-3 mb-4">
                   <img
                     src={review.profile_photo_url}
@@ -174,35 +153,17 @@ export default function ReviewsSection() {
                   />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-body font-medium text-foreground truncate">{review.author_name}</p>
-                    <div className="flex items-center gap-1.5">
-                      <div className="flex gap-0.5">{renderStars(review.rating)}</div>
-                    </div>
+                    <div className="flex gap-0.5">{renderStars(review.rating)}</div>
                   </div>
                   <GoogleIcon />
                 </div>
-
-                {/* Text */}
                 <p className="text-[13px] font-body text-muted-foreground leading-relaxed line-clamp-4 flex-1 mb-3">
                   {review.text || "Geen tekst toegevoegd."}
                 </p>
-
                 <span className="text-[10px] font-body text-muted-foreground/60">{review.relative_time_description}</span>
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Mobile dots */}
-        <div className="flex md:hidden items-center justify-center gap-1.5 mt-6">
-          {reviews.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                i === current ? "bg-foreground w-4" : "bg-border"
-              }`}
-            />
-          ))}
         </div>
 
         {/* CTAs */}
