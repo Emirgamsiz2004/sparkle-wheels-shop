@@ -53,6 +53,17 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
       }
 
       await endTestDrive(testDrive.id, km, opmerkingen || undefined, uploadedPaths.length > 0 ? uploadedPaths : undefined);
+
+      // Auto-send email with PDF to customer
+      try {
+        await supabase.functions.invoke("generate-proefrit-pdf", {
+          body: { testDriveId: testDrive.id, sendEmail: true },
+        });
+        toast.success("Overeenkomst verzonden naar klant");
+      } catch (emailErr) {
+        console.error("Email send failed:", emailErr);
+      }
+
       onClose();
     } catch (err) {
       console.error(err);
