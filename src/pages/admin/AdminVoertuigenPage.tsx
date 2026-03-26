@@ -131,7 +131,9 @@ const AdminVoertuigenPage = () => {
                     {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
                   </div>
                   <div className="flex items-center gap-3 mt-1.5">
-                    <span className="text-xs text-muted-foreground">{formatEuro(v.inkoopprijs)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {isConsignatie(v) ? `${v.consignatieCommissiePerc || 10}% commissie` : formatEuro(v.inkoopprijs)}
+                    </span>
                     {v.verkoopprijs > 0 && (
                       <span className={`text-xs font-medium tabular-nums ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                         {formatEuro(winst)}
@@ -167,10 +169,13 @@ const AdminVoertuigenPage = () => {
                         </Link>
                       </td>
                       <td className="px-4 py-2.5 text-muted-foreground text-xs font-mono uppercase">{v.kenteken || "—"}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums">{formatEuro(v.inkoopprijs)}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums">
+                        {isConsignatie(v) ? <span className="text-muted-foreground text-xs">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
+                      </td>
                       <td className="px-4 py-2.5 text-right tabular-nums">{v.verkoopprijs > 0 ? formatEuro(v.verkoopprijs) : "—"}</td>
                       <td className={`px-4 py-2.5 text-right font-medium tabular-nums ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                         {v.verkoopprijs > 0 ? <>{formatEuro(winst)} <span className="text-xs font-normal opacity-60">({marge.toFixed(0)}%)</span></> : "—"}
+                      </td>
                       </td>
                       <td className="px-4 py-2.5 text-center">
                         <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border ${statusColors[v.status]}`}>{statusLabels[v.status]}</span>
