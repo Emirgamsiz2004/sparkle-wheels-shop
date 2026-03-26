@@ -48,8 +48,24 @@ export default function ReviewsSection() {
   const reviews = data?.reviews ?? [];
   const totalSlides = reviews.length;
 
+  // Calculate max index so last card is fully visible
+  const [containerWidth, setContainerWidth] = useState(0);
+  const containerRef = useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      const measure = () => setContainerWidth(node.offsetWidth);
+      measure();
+      const ro = new ResizeObserver(measure);
+      ro.observe(node);
+      return () => ro.disconnect();
+    }
+  }, []);
+  const cardWidth = 280;
+  const gap = 16;
+  const visibleCards = Math.max(1, Math.floor((containerWidth + gap) / (cardWidth + gap)));
+  const maxIndex = Math.max(0, totalSlides - visibleCards);
+
   const prev = useCallback(() => setCurrent((c) => Math.max(0, c - 1)), []);
-  const next = useCallback(() => setCurrent((c) => Math.min(totalSlides - 1, c + 1)), [totalSlides]);
+  const next = useCallback(() => setCurrent((c) => Math.min(maxIndex, c + 1)), [maxIndex]);
 
   const renderStars = (count: number) =>
     Array.from({ length: 5 }).map((_, i) => (
