@@ -33,3 +33,6 @@ verify_jwt = false
 [functions.scheduled-blog-post]
 verify_jwt = false
 
+[functions.process-email-queue]
+verify_jwt = true
+
