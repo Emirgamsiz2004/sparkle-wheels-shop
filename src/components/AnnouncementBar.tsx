@@ -39,17 +39,17 @@ const fmtTime = (mins: number) => {
   return `${h}:${m}`;
 };
 
-const getIsOpen = (): { isOpen: boolean; label: string } => {
+const getIsOpen = (): { isOpen: boolean; label: string; openLabel: string } => {
   const now = new Date();
   const day = now.getDay();
   const time = now.getHours() * 60 + now.getMinutes();
   const today = SCHEDULE[day];
 
   if (today.open >= 0 && time >= today.open && time < today.close) {
-    return { isOpen: true, label: "Maak afspraak" };
+    return { isOpen: true, label: `Open tot ${fmtTime(today.close)}`, openLabel: "Maak afspraak" };
   }
 
-  return { isOpen: false, label: "Open op afspraak" };
+  return { isOpen: false, label: "Open op afspraak", openLabel: "" };
 };
 
 const AnnouncementBar = () => {
@@ -66,40 +66,42 @@ const AnnouncementBar = () => {
     <div
       className="relative top-0 left-0 right-0 bg-card border-b border-border z-[61]"
     >
-      <div className="mx-auto flex items-center justify-between py-1.5 px-5 md:px-[90px] max-w-[1920px]">
+      <div className="mx-auto flex items-center justify-between py-1.5 px-4 md:px-[90px] max-w-[1920px]">
         {/* Left: status + contact */}
-        <div className="flex items-center gap-4 md:gap-6">
+        <div className="flex items-center gap-3 lg:gap-6">
           {/* Open/Closed indicator */}
           <div className="flex items-center gap-2">
             <span
-              className={`w-2 h-2 rounded-full ${
+              className={`w-2 h-2 rounded-full shrink-0 ${
                 status.isOpen ? "bg-green-500 shadow-[0_0_6px_hsl(142_70%_49%/0.5)]" : "bg-red-500"
               }`}
             />
-            <span className="text-[10px] md:text-[11px] font-body text-muted-foreground tracking-wide">
+            <span className="text-[10px] md:text-[11px] font-body text-muted-foreground tracking-wide whitespace-nowrap">
               {status.label}
             </span>
-            <a
-              href="/contact"
-              className="hidden sm:inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300"
-            >
-              <span className="text-muted-foreground/30">|</span>
-              {status.isOpen ? "Plan uw bezoek" : "Bel voor een afspraak"}
-            </a>
+            {status.isOpen && (
+              <a
+                href="/contact"
+                className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300 whitespace-nowrap"
+              >
+                <span className="text-muted-foreground/30">|</span>
+                <span className="font-medium text-foreground/70">{status.openLabel}</span>
+              </a>
+            )}
           </div>
 
           {/* Phone */}
           <a
             href="tel:+31612693825"
-            className="hidden sm:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-500"
+            className="hidden sm:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-500 whitespace-nowrap"
           >
-            <Phone className="w-3 h-3" />
+            <Phone className="w-3 h-3 shrink-0" />
             06-12693825
           </a>
 
           {/* Address */}
-          <span className="hidden md:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground">
-            <MapPin className="w-3 h-3" />
+          <span className="hidden lg:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground whitespace-nowrap">
+            <MapPin className="w-3 h-3 shrink-0" />
             Cilinderweg 99, Roelofarendsveen
           </span>
         </div>
