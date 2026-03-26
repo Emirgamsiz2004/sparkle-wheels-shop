@@ -642,6 +642,38 @@ export type Database = {
         }
         Relationships: []
       }
+      proefrit_pdf_logs: {
+        Row: {
+          actie: string
+          created_at: string
+          id: string
+          test_drive_id: string
+          user_id: string
+        }
+        Insert: {
+          actie?: string
+          created_at?: string
+          id?: string
+          test_drive_id: string
+          user_id: string
+        }
+        Update: {
+          actie?: string
+          created_at?: string
+          id?: string
+          test_drive_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proefrit_pdf_logs_test_drive_id_fkey"
+            columns: ["test_drive_id"]
+            isOneToOne: false
+            referencedRelation: "test_drives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -709,7 +741,9 @@ export type Database = {
         Row: {
           created_at: string
           customer_id: string | null
+          document_nummer: string | null
           eind_tijd: string | null
+          email_verzonden_op: string | null
           formulier_ingevuld_op: string | null
           handtekening_data: string | null
           id: string
@@ -733,7 +767,9 @@ export type Database = {
         Insert: {
           created_at?: string
           customer_id?: string | null
+          document_nummer?: string | null
           eind_tijd?: string | null
+          email_verzonden_op?: string | null
           formulier_ingevuld_op?: string | null
           handtekening_data?: string | null
           id?: string
@@ -757,7 +793,9 @@ export type Database = {
         Update: {
           created_at?: string
           customer_id?: string | null
+          document_nummer?: string | null
           eind_tijd?: string | null
+          email_verzonden_op?: string | null
           formulier_ingevuld_op?: string | null
           handtekening_data?: string | null
           id?: string
