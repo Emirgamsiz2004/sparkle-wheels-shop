@@ -46,7 +46,7 @@ const getIsOpen = (): { isOpen: boolean; label: string } => {
   const today = SCHEDULE[day];
 
   if (today.open >= 0 && time >= today.open && time < today.close) {
-    return { isOpen: true, label: `Open tot ${fmtTime(today.close)}` };
+    return { isOpen: true, label: "Maak afspraak" };
   }
 
   return { isOpen: false, label: "Open op afspraak" };
@@ -84,7 +84,7 @@ const AnnouncementBar = () => {
               className="hidden sm:inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300"
             >
               <span className="text-muted-foreground/30">|</span>
-              Buiten openingstijden <span className="font-medium text-foreground/70">open op afspraak</span>
+              {status.isOpen ? "Plan uw bezoek" : "Bel voor een afspraak"}
             </a>
           </div>
 
