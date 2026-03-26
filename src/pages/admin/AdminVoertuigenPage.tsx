@@ -176,7 +176,6 @@ const AdminVoertuigenPage = () => {
                       <td className={`px-4 py-2.5 text-right font-medium tabular-nums ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                         {v.verkoopprijs > 0 ? <>{formatEuro(winst)} <span className="text-xs font-normal opacity-60">({marge.toFixed(0)}%)</span></> : "—"}
                       </td>
-                      </td>
                       <td className="px-4 py-2.5 text-center">
                         <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border ${statusColors[v.status]}`}>{statusLabels[v.status]}</span>
                       </td>
