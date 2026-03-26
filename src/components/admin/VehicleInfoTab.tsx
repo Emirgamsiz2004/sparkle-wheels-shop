@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Vehicle } from "@/types/vehicle";
 import { Loader2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
@@ -51,71 +50,65 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
     setSaving(false);
   };
 
+  const inputCls = "w-full px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring";
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Voertuiggegevens */}
-      <Card>
-        <CardContent className="p-4 md:p-6 space-y-5">
-          <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest">Voertuiggegevens</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} onValidKenteken={handleRdwLookup} loading={rdwLoading} />
-            </div>
-            <Field label="Merk" value={form.merk} onChange={(v) => update("merk", capitalizeMerk(v))} highlight={rdwFields.has("merk")} />
-            <Field label="Model" value={form.model} onChange={(v) => update("model", capitalizeModel(v))} highlight={rdwFields.has("model")} />
-            <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} highlight={rdwFields.has("bouwjaar")} />
-            <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", capitalizeKleur(v))} highlight={rdwFields.has("kleur")} />
-            <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
-            <div>
-              <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Brandstof</label>
-              <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className={cn("w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring", rdwFields.has("brandstof") && "bg-accent/40 border-primary/30")}>
-                <option value="benzine">Benzine</option><option value="diesel">Diesel</option><option value="elektrisch">Elektrisch</option><option value="hybride">Hybride</option><option value="lpg">LPG</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Status</label>
-              <select value={form.status} onChange={(e) => update("status", e.target.value as Vehicle["status"])} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
-                <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="consignatie">Consignatie</option><option value="verkocht">Verkocht</option>
-              </select>
-            </div>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Voertuiggegevens</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="sm:col-span-2">
+            <KentekenInput value={form.kenteken} onChange={(v) => update("kenteken", v)} onValidKenteken={handleRdwLookup} loading={rdwLoading} />
           </div>
-        </CardContent>
-      </Card>
+          <Field label="Merk" value={form.merk} onChange={(v) => update("merk", capitalizeMerk(v))} highlight={rdwFields.has("merk")} inputCls={inputCls} />
+          <Field label="Model" value={form.model} onChange={(v) => update("model", capitalizeModel(v))} highlight={rdwFields.has("model")} inputCls={inputCls} />
+          <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} highlight={rdwFields.has("bouwjaar")} inputCls={inputCls} />
+          <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", capitalizeKleur(v))} highlight={rdwFields.has("kleur")} inputCls={inputCls} />
+          <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} inputCls={inputCls} />
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1">Brandstof</label>
+            <select value={form.brandstof} onChange={(e) => update("brandstof", e.target.value)} className={cn(inputCls, rdwFields.has("brandstof") && "border-ring/50 bg-accent/30")}>
+              <option value="benzine">Benzine</option><option value="diesel">Diesel</option><option value="elektrisch">Elektrisch</option><option value="hybride">Hybride</option><option value="lpg">LPG</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1">Status</label>
+            <select value={form.status} onChange={(e) => update("status", e.target.value as Vehicle["status"])} className={inputCls}>
+              <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="consignatie">Consignatie</option><option value="verkocht">Verkocht</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
       {/* Financieel */}
-      <Card>
-        <CardContent className="p-4 md:p-6 space-y-5">
-          <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest">Financieel</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Inkoopprijs (€)" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", Number(v))} />
-            <Field label="Verkoopprijs (€)" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} />
-            <Field label="Inkoopdatum" type="date" value={form.inkoopDatum} onChange={(v) => update("inkoopDatum", v)} />
-            <Field label="Verkoopdatum" type="date" value={form.verkoopDatum || ""} onChange={(v) => update("verkoopDatum", v || undefined)} />
-          </div>
-        </CardContent>
-      </Card>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Financieel</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Field label="Inkoopprijs" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", Number(v))} inputCls={inputCls} />
+          <Field label="Verkoopprijs" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} inputCls={inputCls} />
+          <Field label="Inkoopdatum" type="date" value={form.inkoopDatum} onChange={(v) => update("inkoopDatum", v)} inputCls={inputCls} />
+          <Field label="Verkoopdatum" type="date" value={form.verkoopDatum || ""} onChange={(v) => update("verkoopDatum", v || undefined)} inputCls={inputCls} />
+        </div>
+      </div>
 
       {/* Marktplaats URL */}
-      <Card>
-        <CardContent className="p-4 md:p-6 space-y-3">
-          <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Marktplaats URL</label>
-          <input type="url" value={form.marktplaatsUrl || ""} onChange={(e) => update("marktplaatsUrl", e.target.value || undefined)} placeholder="https://www.marktplaats.nl/v/auto-s/..." className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
-          <p className="text-[10px] text-muted-foreground">Deze link wordt getoond op de publieke voertuigpagina.</p>
-        </CardContent>
-      </Card>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <label className="block text-xs text-muted-foreground">Marktplaats URL</label>
+        <input type="url" value={form.marktplaatsUrl || ""} onChange={(e) => update("marktplaatsUrl", e.target.value || undefined)} placeholder="https://www.marktplaats.nl/v/auto-s/..." className={inputCls} />
+        <p className="text-[11px] text-muted-foreground">Wordt getoond op de publieke voertuigpagina.</p>
+      </div>
 
       {/* Opmerkingen */}
-      <Card>
-        <CardContent className="p-4 md:p-6 space-y-3">
-          <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Opmerkingen</label>
-          <textarea value={form.opmerkingen || ""} onChange={(e) => update("opmerkingen", e.target.value || undefined)} rows={3} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none" placeholder="Notities voor jezelf..." />
-        </CardContent>
-      </Card>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <label className="block text-xs text-muted-foreground">Opmerkingen</label>
+        <textarea value={form.opmerkingen || ""} onChange={(e) => update("opmerkingen", e.target.value || undefined)} rows={3} className={cn(inputCls, "resize-none")} placeholder="Notities voor jezelf..." />
+      </div>
 
       <button
         onClick={handleSave}
         disabled={saving}
-        className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-sm font-medium rounded-md hover:bg-foreground/90 transition-colors disabled:opacity-50"
       >
         {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
         Opslaan
@@ -124,12 +117,12 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
   );
 };
 
-const Field = ({ label, value, onChange, type = "text", highlight = false }: {
-  label: string; value: any; onChange: (v: string) => void; type?: string; highlight?: boolean;
+const Field = ({ label, value, onChange, type = "text", highlight = false, inputCls }: {
+  label: string; value: any; onChange: (v: string) => void; type?: string; highlight?: boolean; inputCls: string;
 }) => (
   <div>
-    <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cn("w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring", highlight && "bg-accent/40 border-primary/30")} />
+    <label className="block text-xs text-muted-foreground mb-1">{label}</label>
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cn(inputCls, highlight && "border-ring/50 bg-accent/30")} />
   </div>
 );
 

@@ -9,7 +9,7 @@ const AdminDashboardPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -22,30 +22,28 @@ const AdminDashboardPage = () => {
   const recent = vehicles.slice(0, 5);
 
   const kpis = [
-    { label: "Auto's in Voorraad", value: String(actief.length), icon: Car, color: "text-foreground" },
-    { label: "Totale Omzet", value: formatEuro(totaleOmzet), icon: TrendingUp, color: "text-emerald-400" },
-    { label: "Totale Kostprijs", value: formatEuro(totaleKostprijs), icon: Wallet, color: "text-amber-400" },
-    { label: "Totale Winst", value: formatEuro(totaleWinst), icon: CheckCircle, color: totaleWinst >= 0 ? "text-emerald-400" : "text-red-400" },
+    { label: "In voorraad", value: String(actief.length), icon: Car },
+    { label: "Totale omzet", value: formatEuro(totaleOmzet), icon: TrendingUp },
+    { label: "Totale kostprijs", value: formatEuro(totaleKostprijs), icon: Wallet },
+    { label: "Totale winst", value: formatEuro(totaleWinst), icon: CheckCircle, profit: totaleWinst >= 0 },
   ];
 
   return (
-    <div className="space-y-5 md:space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-xl md:text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-xs md:text-sm text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
+        <h1 className="text-lg font-medium text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="bg-card rounded-xl border border-border p-3.5 md:p-5 hover:border-primary/20 transition-colors duration-200">
-            <div className="flex items-center justify-between mb-2 md:mb-3">
-              <span className="text-[9px] md:text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{kpi.label}</span>
-              <div className="w-7 h-7 md:w-9 md:h-9 rounded-lg bg-accent/50 flex items-center justify-center">
-                <kpi.icon className={`w-3.5 md:w-4 h-3.5 md:h-4 ${kpi.color}`} />
-              </div>
+          <div key={kpi.label} className="bg-card rounded-lg border border-border p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground">{kpi.label}</span>
+              <kpi.icon className="w-4 h-4 text-muted-foreground/50" />
             </div>
-            <p className={`text-lg md:text-2xl font-bold ${kpi.color}`}>
+            <p className={`text-xl font-semibold tabular-nums ${'profit' in kpi ? (kpi.profit ? "text-emerald-500" : "text-red-500") : "text-foreground"}`}>
               {kpi.value}
             </p>
           </div>
@@ -53,48 +51,37 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex flex-wrap gap-2 md:gap-3">
-        <Link
-          to="/admin/voertuigen/nieuw"
-          className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" /> Nieuwe Auto
+      <div className="flex flex-wrap gap-2">
+        <Link to="/admin/voertuigen/nieuw" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-xs font-medium rounded-md hover:bg-foreground/90 transition-colors">
+          <Plus className="w-3.5 h-3.5" /> Nieuwe auto
         </Link>
-        <Link
-          to="/admin/financieel"
-          className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
-        >
+        <Link to="/admin/financieel" className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
           <Wallet className="w-3.5 h-3.5" /> Kosten
         </Link>
-        <Link
-          to="/admin/btw"
-          className="inline-flex items-center gap-1.5 px-3 md:px-3.5 py-2 bg-card text-foreground text-xs font-medium border border-border rounded-lg hover:bg-accent/50 transition-colors"
-        >
+        <Link to="/admin/btw" className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
           <Receipt className="w-3.5 h-3.5" /> BTW
         </Link>
       </div>
 
       {/* Recent Vehicles */}
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <div className="px-6 py-4 border-b border-border">
-          <h2 className="text-sm font-semibold text-foreground">Recent Toegevoegd</h2>
+      <div className="bg-card rounded-lg border border-border overflow-hidden">
+        <div className="px-4 py-3 border-b border-border">
+          <h2 className="text-sm font-medium text-foreground">Recent toegevoegd</h2>
         </div>
         {recent.length === 0 ? (
-          <div className="px-6 py-10 text-center text-sm text-muted-foreground">
-            Nog geen auto's toegevoegd.{" "}
-            <Link to="/admin/voertuigen/nieuw" className="text-primary hover:underline">
-              Voeg je eerste voertuig toe →
-            </Link>
+          <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+            Nog geen voertuigen.{" "}
+            <Link to="/admin/voertuigen/nieuw" className="text-foreground hover:underline">Voeg toe</Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left px-6 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Voertuig</th>
-                  <th className="text-left px-6 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Kenteken</th>
-                  <th className="text-left px-6 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Status</th>
-                  <th className="text-right px-6 py-3 text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Marge</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Voertuig</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground hidden sm:table-cell">Kenteken</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Status</th>
+                  <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground">Marge</th>
                 </tr>
               </thead>
               <tbody>
@@ -102,18 +89,18 @@ const AdminDashboardPage = () => {
                   const winst = calcWinst(v);
                   return (
                     <tr key={v.id} className="border-t border-border/50 hover:bg-accent/30 transition-colors">
-                      <td className="px-6 py-3 font-medium text-foreground">
-                        <Link to={`/admin/voertuigen/${v.id}`} className="hover:text-primary transition-colors">
+                      <td className="px-4 py-2.5">
+                        <Link to={`/admin/voertuigen/${v.id}`} className="text-foreground hover:underline">
                           {v.merk} {v.model} <span className="text-muted-foreground">({v.bouwjaar})</span>
                         </Link>
                       </td>
-                      <td className="px-6 py-3 text-muted-foreground uppercase tracking-wider text-xs">{v.kenteken || "—"}</td>
-                      <td className="px-6 py-3">
-                        <span className={`inline-flex px-2.5 py-1 text-[11px] font-medium rounded-md border ${statusColors[v.status]}`}>
+                      <td className="px-4 py-2.5 text-muted-foreground text-xs font-mono uppercase hidden sm:table-cell">{v.kenteken || "—"}</td>
+                      <td className="px-4 py-2.5">
+                        <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border ${statusColors[v.status]}`}>
                           {statusLabels[v.status]}
                         </span>
                       </td>
-                      <td className={`px-6 py-3 text-right font-medium ${winst >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      <td className={`px-4 py-2.5 text-right text-sm tabular-nums ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                         {v.verkoopprijs > 0 ? formatEuro(winst) : "—"}
                       </td>
                     </tr>
