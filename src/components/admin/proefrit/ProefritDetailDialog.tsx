@@ -7,14 +7,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
-  Download, Mail, StopCircle, FileText, X,
+  Download, Mail, StopCircle, FileText, X, Trash2,
 } from "lucide-react";
 import EindProefritDialog from "./EindProefritDialog";
+import { useTestDrives } from "@/hooks/useTestDrives";
 
 interface Props {
   testDrive: TestDrive;
   open: boolean;
   onClose: () => void;
+  onDeleted?: () => void;
 }
 
 interface PdfLog {
@@ -38,12 +40,14 @@ const statusDot: Record<string, string> = {
   onvolledig: "bg-red-400",
 };
 
-const ProefritDetailDialog = ({ testDrive: td, open, onClose }: Props) => {
+const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props) => {
   const { user } = useAuth();
+  const { deleteTestDrive } = useTestDrives();
   const [pdfLogs, setPdfLogs] = useState<PdfLog[]>([]);
   const [showEnd, setShowEnd] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [mailing, setMailing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [rijbewijsFotoUrl, setRijbewijsFotoUrl] = useState<string | null>(null);
   const [fotoFullscreen, setFotoFullscreen] = useState(false);
 
