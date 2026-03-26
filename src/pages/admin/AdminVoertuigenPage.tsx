@@ -13,6 +13,7 @@ const tabs: { label: string; value: string }[] = [
   { label: "Inkoop", value: "inkoop" },
   { label: "In behandeling", value: "in_behandeling" },
   { label: "Te koop", value: "te_koop" },
+  { label: "Consignatie", value: "consignatie" },
   { label: "Verkocht", value: "verkocht" },
 ];
 
