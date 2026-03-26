@@ -149,7 +149,7 @@ const AdminMoneybirdPage = () => {
                           <button
                             onClick={() => handleCreateInvoice(v)}
                             disabled={mbLoading || syncing === v.id || !v.koperNaam}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-xs font-medium hover:bg-foreground/90 disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-xs font-medium rounded-md hover:bg-accent disabled:opacity-50 transition-colors"
                           >
                             {syncing === v.id ? (
                               <Loader2 className="w-3 h-3 animate-spin" />
@@ -204,7 +204,7 @@ const AdminMoneybirdPage = () => {
                             <button
                               onClick={() => handleSyncCosts(v)}
                               disabled={mbLoading || syncing === v.id}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-xs font-medium hover:bg-foreground/90 disabled:opacity-50"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-xs font-medium rounded-md hover:bg-accent disabled:opacity-50 transition-colors"
                             >
                               {syncing === v.id ? (
                                 <Loader2 className="w-3 h-3 animate-spin" />

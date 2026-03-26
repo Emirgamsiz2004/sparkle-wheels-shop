@@ -108,7 +108,7 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-sm font-medium rounded-md hover:bg-foreground/90 transition-colors disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50"
       >
         {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
         Opslaan

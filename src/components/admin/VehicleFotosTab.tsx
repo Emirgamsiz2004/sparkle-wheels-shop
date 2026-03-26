@@ -81,13 +81,13 @@ const VehicleFotosTab = ({ vehicleId }: { vehicleId: string }) => {
                     {photo.google_drive_url ? "✅" : "⏳"}
                   </span>
                   {photo.is_hoofdfoto && (
-                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 bg-foreground text-background text-[10px] font-bold uppercase tracking-wider">
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 bg-accent border border-border text-foreground text-[10px] font-bold uppercase tracking-wider rounded">
                       <Star className="w-3 h-3" /> Hoofdfoto
                     </span>
                   )}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3 gap-2">
                     {!photo.is_hoofdfoto && (
-                      <button onClick={() => setHoofd(photo.id)} className="px-2 py-1 bg-foreground text-background text-xs font-medium hover:bg-foreground/90">
+                      <button onClick={() => setHoofd(photo.id)} className="px-2 py-1 bg-accent border border-border text-foreground text-xs font-medium rounded hover:bg-accent/80">
                         <Star className="w-3 h-3 inline mr-1" />Hoofdfoto
                       </button>
                     )}

@@ -142,7 +142,7 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
           <button
             onClick={handleEnd}
             disabled={loading || !kmNa}
-            className="w-full py-2 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors disabled:opacity-50"
+            className="w-full py-2 text-sm font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
           >
             {loading ? "Bezig..." : "Afsluiten en opslaan"}
           </button>
