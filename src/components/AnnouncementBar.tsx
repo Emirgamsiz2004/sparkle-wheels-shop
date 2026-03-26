@@ -63,6 +63,7 @@ const AnnouncementBar = () => {
     return () => clearInterval(interval);
   }, []);
 
+  if (location.pathname.startsWith("/admin")) return null;
 
   return (
     <div
