@@ -7,33 +7,40 @@ const corsHeaders = {
 
 const BEDRIJF = {
   naam: "Platin Automotive",
-  adres: "Cilinderweg 99, 2371 DZ Roelofarendsveen",
-  kvk: "94498083",
+  adres: "Cilinderweg 99 · 2371 DZ Roelofarendsveen",
+  kvk: "99146193",
   telefoon: "06-12693825",
   email: "info@platinautomotive.nl",
+  website: "platinautomotive.nl",
 };
 
-const OVEREENKOMST_TEKST = `De onderstaande bestuurder verklaart hierbij het voertuig zoals omschreven in goede en onbeschadigde staat te hebben ontvangen voor een proefrit. De bestuurder verklaart in het bezit te zijn van een geldig rijbewijs voor de betreffende voertuigcategorie en verklaart nuchter te zijn en fysiek in staat om het voertuig te besturen.
+const OVEREENKOMST_TEKST = `De onderstaande bestuurder verklaart het voertuig in goede en onbeschadigde staat te hebben ontvangen voor een proefrit. De bestuurder verklaart in het bezit te zijn van een geldig rijbewijs voor de betreffende voertuigcategorie, nuchter te zijn en fysiek in staat om het voertuig te besturen.
 
-De bestuurder is volledig aansprakelijk voor alle verkeersboetes, parkeerboetes en andere overtredingen begaan tijdens de proefrit. Bij schade aan het voertuig veroorzaakt door eigen schuld van de bestuurder is de bestuurder aansprakelijk voor het van toepassing zijnde eigen risico zoals vooraf medegedeeld door de garage.
-
-De bestuurder gaat ermee akkoord dat de garage de persoonsgegevens zoals vermeld in dit formulier mag bewaren voor administratieve en juridische doeleinden conform de AVG wetgeving. De gegevens worden niet gedeeld met derden.
-
-Deze overeenkomst is rechtsgeldig zonder fysieke handtekening op papier. De digitale handtekening in combinatie met het vastgelegde IP-adres, tijdstempel en de automatische bevestigingsmail naar het opgegeven e-mailadres vormen samen een juridisch bindend bewijs van ondertekening.`;
+De bestuurder is volledig aansprakelijk voor alle verkeersboetes en overtredingen begaan tijdens de proefrit. Bij schade door eigen schuld is de bestuurder aansprakelijk voor het van toepassing zijnde eigen risico. Persoonsgegevens worden bewaard conform de AVG en niet gedeeld met derden.`;
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
   return d.toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" });
 }
 
-function formatDateTime(dateStr: string): string {
+function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" }) +
-    " om " + d.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return d.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+}
+
+function formatShortDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}-${mm}-${yyyy}`;
+}
+
+function formatDateTime(dateStr: string): string {
+  return `${formatShortDate(dateStr)} ${formatTime(dateStr)}`;
 }
 
 async function generateDocumentNummer(supabase: any, testDriveId: string): Promise<string> {
-  // Check if already has a nummer
   const { data: td } = await supabase
     .from("test_drives")
     .select("document_nummer")
@@ -58,37 +65,8 @@ async function generateDocumentNummer(supabase: any, testDriveId: string): Promi
   return nummer;
 }
 
-// Simple PDF builder using basic PDF spec
-function buildPdfContent(sections: { type: string; text?: string; lines?: string[]; image?: string }[]): string {
-  // We'll use a text-based approach - generate HTML and note that we need jsPDF or similar
-  // For now, return structured HTML that the frontend can render to PDF
-  let html = `<!DOCTYPE html><html><head><meta charset="utf-8">
-<style>
-body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; color: #1a1a1a; margin: 0; padding: 40px; line-height: 1.5; }
-.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-.company-info { text-align: right; font-size: 10px; color: #555; }
-.company-name { font-size: 14px; font-weight: 600; color: #1a1a1a; }
-hr { border: none; border-top: 1px solid #ddd; margin: 15px 0; }
-h1 { text-align: center; font-size: 18px; font-weight: 600; margin: 20px 0 5px; }
-.doc-meta { text-align: right; font-size: 10px; color: #666; margin-bottom: 20px; }
-.section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #333; margin: 20px 0 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
-.row { display: flex; justify-content: space-between; padding: 3px 0; }
-.row-label { color: #666; }
-.row-value { font-weight: 500; text-align: right; }
-.agreement-text { font-size: 10px; color: #333; line-height: 1.6; text-align: justify; white-space: pre-wrap; background: #fafafa; padding: 12px; border-radius: 4px; }
-.signature-box { border: 1px solid #ddd; border-radius: 4px; padding: 10px; display: inline-block; background: #fff; }
-.signature-box img { max-height: 80px; }
-.signature-meta { font-size: 9px; color: #888; margin-top: 8px; }
-.footer { margin-top: 30px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 9px; color: #999; text-align: center; }
-.rijbewijs-foto { max-width: 120px; max-height: 80px; border-radius: 4px; border: 1px solid #ddd; }
-</style></head><body>`;
-
-  for (const s of sections) {
-    html += s.text || "";
-  }
-
-  html += `</body></html>`;
-  return html;
+function nl(n: number): string {
+  return n.toLocaleString("nl-NL");
 }
 
 Deno.serve(async (req) => {
@@ -103,7 +81,6 @@ Deno.serve(async (req) => {
 
     const { testDriveId, sendEmail } = await req.json();
 
-    // Fetch test drive with customer
     const { data: td, error: tdErr } = await supabase
       .from("test_drives")
       .select("*, test_drive_customers(*)")
@@ -120,7 +97,6 @@ Deno.serve(async (req) => {
     const customer = td.test_drive_customers;
     const docNummer = await generateDocumentNummer(supabase, testDriveId);
 
-    // Get rijbewijs foto URL if exists
     let rijbewijsFotoUrl = "";
     if (customer?.rijbewijs_foto_path) {
       const { data: urlData } = supabase.storage.from("test-drive-files").getPublicUrl(customer.rijbewijs_foto_path);
@@ -128,115 +104,170 @@ Deno.serve(async (req) => {
     }
 
     const geredenKm = td.km_na != null ? td.km_na - td.km_voor : null;
-    const now = new Date().toISOString();
+    const voertuigTitel = `${td.voertuig_merk || ''} ${td.voertuig_model || ''}`.trim();
+    const kentekenDisplay = td.voertuig_kenteken ? td.voertuig_kenteken.toUpperCase() : '—';
 
-    // Build HTML PDF content
+    // Build HTML matching the uploaded PDF template exactly
     const htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8">
 <style>
-@page { size: A4; margin: 25mm 20mm; }
-body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; color: #1a1a1a; margin: 0; padding: 0; line-height: 1.5; }
-.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-.logo-area { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
-.company-info { text-align: right; font-size: 9px; color: #555; line-height: 1.6; }
-hr { border: none; border-top: 1px solid #ccc; margin: 12px 0; }
-h1 { text-align: center; font-size: 16px; font-weight: 600; margin: 15px 0 5px; letter-spacing: 0.5px; }
-.doc-meta { text-align: right; font-size: 9px; color: #666; margin-bottom: 15px; }
-.section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #333; margin: 18px 0 6px; border-bottom: 1px solid #eee; padding-bottom: 3px; }
-table.info { width: 100%; border-collapse: collapse; font-size: 10px; }
-table.info td { padding: 2px 0; }
-table.info td:first-child { color: #666; width: 40%; }
-table.info td:last-child { font-weight: 500; }
-.agreement-text { font-size: 9px; color: #333; line-height: 1.7; text-align: justify; white-space: pre-wrap; background: #f8f8f8; padding: 10px; border-radius: 3px; margin-top: 6px; }
-.signature-box { border: 1px solid #ddd; border-radius: 3px; padding: 8px; display: inline-block; background: #fff; margin-top: 6px; }
-.signature-box img { max-height: 60px; }
-.sig-meta { font-size: 8px; color: #888; margin-top: 6px; line-height: 1.5; }
-.footer { margin-top: 25px; border-top: 1px solid #ccc; padding-top: 8px; font-size: 8px; color: #999; text-align: center; line-height: 1.5; }
-.two-col { display: flex; gap: 30px; }
-.two-col > div { flex: 1; }
-.rijbewijs-foto { max-width: 100px; max-height: 70px; border-radius: 3px; border: 1px solid #ddd; margin-top: 4px; }
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #1a1a1a; margin: 0; padding: 0; line-height: 1.4; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; min-height: 297mm; padding: 0; margin: 0 auto; position: relative; }
+
+/* Dark header */
+.header { background: #333; color: #fff; padding: 28px 35px 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+.header-left h1 { font-size: 28px; font-weight: 700; margin: 0 0 4px; letter-spacing: 0.5px; }
+.header-left .subtitle { font-size: 16px; font-weight: 300; font-style: italic; color: #ccc; margin: 0 0 12px; }
+.header-left .vehicle-line { font-size: 10px; color: #bbb; margin: 0 0 2px; }
+.header-left .date-line { font-size: 10px; color: #bbb; margin: 4px 0 0; }
+.header-right { text-align: right; }
+.header-right .logo-text { font-size: 26px; font-weight: 800; letter-spacing: 3px; color: #fff; }
+.header-right .logo-sub { font-size: 8px; letter-spacing: 4px; color: #999; text-transform: uppercase; margin-top: -2px; }
+
+/* Company bar */
+.company-bar { font-size: 8px; color: #666; padding: 8px 35px; border-bottom: 1px solid #ddd; }
+
+/* Content area */
+.content { padding: 0 35px 20px; }
+
+/* Section title */
+.section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #1a1a1a; margin: 22px 0 0; padding-left: 8px; border-left: 3px solid #333; }
+
+/* Data table */
+.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.data-table td { padding: 6px 10px; border: 1px solid #e0e0e0; vertical-align: top; }
+.data-table .label { font-size: 8px; color: #888; display: block; margin-bottom: 2px; }
+.data-table .value { font-size: 11px; font-weight: 500; color: #1a1a1a; display: block; min-height: 16px; }
+
+/* Agreement text */
+.agreement { font-size: 9px; color: #333; line-height: 1.7; text-align: justify; margin-top: 10px; }
+
+/* Signature section */
+.sig-grid { display: flex; gap: 30px; margin-top: 10px; }
+.sig-box { flex: 1; border: 1px solid #e0e0e0; border-radius: 2px; padding: 10px; min-height: 90px; position: relative; }
+.sig-box .sig-label { font-size: 8px; color: #888; margin-bottom: 4px; }
+.sig-box img { max-height: 60px; }
+.sig-line { border-top: 1px solid #999; margin-top: 10px; padding-top: 4px; font-size: 9px; color: #666; }
+
+/* Footer */
+.footer { position: absolute; bottom: 0; left: 0; right: 0; border-top: 1px solid #ccc; padding: 10px 35px; font-size: 8px; color: #999; text-align: center; }
+
+.rijbewijs-foto { max-width: 90px; max-height: 65px; border-radius: 2px; border: 1px solid #ddd; margin-top: 4px; }
+
+@media print {
+  body { margin: 0; }
+  .page { width: 100%; min-height: auto; }
+}
 </style></head><body>
+<div class="page">
 
+<!-- HEADER -->
 <div class="header">
-  <div class="logo-area">PLATIN AUTOMOTIVE</div>
-  <div class="company-info">
-    ${BEDRIJF.naam}<br>
-    ${BEDRIJF.adres}<br>
-    KVK: ${BEDRIJF.kvk}<br>
-    Tel: ${BEDRIJF.telefoon}<br>
-    ${BEDRIJF.email}
+  <div class="header-left">
+    <h1>Proefrit</h1>
+    <div class="subtitle">Overeenkomst</div>
+    <div class="vehicle-line">${voertuigTitel} · ${kentekenDisplay}${td.voertuig_bouwjaar ? ` · ${td.voertuig_bouwjaar}` : ''}</div>
+    <div class="vehicle-line">Documentnummer: ${docNummer}</div>
+    <div class="date-line">Datum: ${formatDate(td.created_at)}</div>
+  </div>
+  <div class="header-right">
+    <div class="logo-text">PLATIN</div>
+    <div class="logo-sub">AUTOMOTIVE</div>
   </div>
 </div>
 
-<hr>
-
-<h1>Proefrit Overeenkomst</h1>
-<div class="doc-meta">
-  Documentnummer: ${docNummer}<br>
-  Datum: ${formatDate(td.created_at)}
+<!-- COMPANY BAR -->
+<div class="company-bar">
+  ${BEDRIJF.adres} · ${BEDRIJF.telefoon} · ${BEDRIJF.email} · ${BEDRIJF.website} · KvK ${BEDRIJF.kvk}
 </div>
 
-<div class="section-title">1. Voertuiggegevens</div>
-<table class="info">
-  <tr><td>Merk / Model</td><td>${td.voertuig_merk} ${td.voertuig_model}</td></tr>
-  ${td.voertuig_bouwjaar ? `<tr><td>Bouwjaar</td><td>${td.voertuig_bouwjaar}</td></tr>` : ""}
-  ${td.voertuig_kenteken ? `<tr><td>Kenteken</td><td>${td.voertuig_kenteken.toUpperCase()}</td></tr>` : ""}
-  <tr><td>Kilometerstand bij start</td><td>${td.km_voor.toLocaleString("nl-NL")}</td></tr>
+<div class="content">
+
+<!-- 1. VOERTUIGGEGEVENS -->
+<div class="section-title">1. VOERTUIGGEGEVENS</div>
+<table class="data-table">
+  <tr>
+    <td style="width:33%"><span class="label">Merk</span><span class="value">${td.voertuig_merk || '—'}</span></td>
+    <td style="width:34%"><span class="label">Model</span><span class="value">${td.voertuig_model || '—'}</span></td>
+    <td style="width:33%"><span class="label">Bouwjaar</span><span class="value">${td.voertuig_bouwjaar || '—'}</span></td>
+  </tr>
+  <tr>
+    <td><span class="label">Kenteken</span><span class="value">${kentekenDisplay}</span></td>
+    <td><span class="label">Kilometerstand bij start</span><span class="value">${nl(td.km_voor)}</span></td>
+    <td><span class="label">Kilometerstand bij einde</span><span class="value">${td.km_na != null ? nl(td.km_na) : ''}</span></td>
+  </tr>
 </table>
 
-<div class="section-title">2. Klantgegevens</div>
-<div class="two-col">
-  <div>
-    <table class="info">
-      <tr><td>Naam</td><td>${customer ? `${customer.voornaam} ${customer.achternaam}` : "—"}</td></tr>
-      ${customer?.geboortedatum ? `<tr><td>Geboortedatum</td><td>${formatDate(customer.geboortedatum)}</td></tr>` : ""}
-      ${customer?.adres ? `<tr><td>Adres</td><td>${customer.adres}</td></tr>` : ""}
-      ${customer?.rijbewijsnummer ? `<tr><td>Rijbewijsnummer</td><td>${customer.rijbewijsnummer}</td></tr>` : ""}
-      <tr><td>Rijbewijscategorie</td><td>${customer?.rijbewijscategorie || "B"}</td></tr>
-      <tr><td>E-mail</td><td>${customer?.email || "—"}</td></tr>
-      <tr><td>Telefoon</td><td>${customer?.telefoon || "—"}</td></tr>
-    </table>
+<!-- 2. KLANTGEGEVENS -->
+<div class="section-title">2. KLANTGEGEVENS</div>
+<table class="data-table">
+  <tr>
+    <td style="width:33%"><span class="label">Voornaam</span><span class="value">${customer?.voornaam || ''}</span></td>
+    <td style="width:34%"><span class="label">Achternaam</span><span class="value">${customer?.achternaam || ''}</span></td>
+    <td style="width:33%"><span class="label">Geboortedatum</span><span class="value">${customer?.geboortedatum ? formatShortDate(customer.geboortedatum) : ''}</span></td>
+  </tr>
+  <tr>
+    <td><span class="label">Adres</span><span class="value">${customer?.adres || ''}</span></td>
+    <td><span class="label">Postcode & Plaats</span><span class="value"></span></td>
+    <td><span class="label">Telefoonnummer</span><span class="value">${customer?.telefoon || ''}</span></td>
+  </tr>
+  <tr>
+    <td><span class="label">E-mailadres</span><span class="value">${customer?.email || ''}</span></td>
+    <td><span class="label">Rijbewijsnummer</span><span class="value">${customer?.rijbewijsnummer || ''}</span></td>
+    <td><span class="label">Rijbewijscategorie</span><span class="value">${customer?.rijbewijscategorie || 'B'}</span></td>
+  </tr>
+</table>
+
+<!-- 3. PROEFRIT DETAILS -->
+<div class="section-title">3. PROEFRIT DETAILS</div>
+<table class="data-table">
+  <tr>
+    <td style="width:33%"><span class="label">Datum</span><span class="value">${formatShortDate(td.start_tijd)}</span></td>
+    <td style="width:34%"><span class="label">Starttijdstip</span><span class="value">${formatTime(td.start_tijd)}</span></td>
+    <td style="width:33%"><span class="label">Eindtijdstip</span><span class="value">${td.eind_tijd ? formatTime(td.eind_tijd) : ''}</span></td>
+  </tr>
+  <tr>
+    <td><span class="label">Totaal gereden (km)</span><span class="value">${geredenKm != null ? nl(geredenKm) : ''}</span></td>
+    <td colspan="2"><span class="label">Begeleidende medewerker</span><span class="value"></span></td>
+  </tr>
+</table>
+
+<!-- 4. OVEREENKOMST -->
+<div class="section-title">4. OVEREENKOMST</div>
+<div class="agreement">${OVEREENKOMST_TEKST.replace(/\n\n/g, '<br><br>')}</div>
+
+<!-- 5. ONDERTEKENING -->
+<div class="section-title">5. ONDERTEKENING</div>
+<div class="sig-grid">
+  <div class="sig-box">
+    <div class="sig-label">Handtekening klant</div>
+    ${td.handtekening_data ? `<img src="${td.handtekening_data}" alt="Handtekening">` : ''}
+    <div class="sig-line">Naam: ${customer ? `${customer.voornaam} ${customer.achternaam}` : '________________________________'}</div>
   </div>
-  ${rijbewijsFotoUrl ? `<div style="text-align:right;"><img src="${rijbewijsFotoUrl}" class="rijbewijs-foto" alt="Rijbewijs"></div>` : "<div></div>"}
+  <div class="sig-box">
+    <div class="sig-label">Datum & tijdstip</div>
+    <div style="margin-top:40px"></div>
+    <div class="sig-line">Datum / tijd: ${td.formulier_ingevuld_op ? formatDateTime(td.formulier_ingevuld_op) : '________________________'}</div>
+  </div>
 </div>
 
-<div class="section-title">3. Proefrit details</div>
-<table class="info">
-  <tr><td>Starttijdstip</td><td>${formatDateTime(td.start_tijd)}</td></tr>
-  ${td.eind_tijd ? `<tr><td>Eindtijdstip</td><td>${formatDateTime(td.eind_tijd)}</td></tr>` : ""}
-  <tr><td>Kilometerstand voor</td><td>${td.km_voor.toLocaleString("nl-NL")}</td></tr>
-  ${td.km_na != null ? `<tr><td>Kilometerstand na</td><td>${td.km_na.toLocaleString("nl-NL")}</td></tr>` : ""}
-  ${geredenKm != null ? `<tr><td>Totaal gereden</td><td>${geredenKm.toLocaleString("nl-NL")} km</td></tr>` : ""}
-</table>
+${td.ip_adres ? `<div style="font-size:7px;color:#aaa;margin-top:8px;">IP-adres bij ondertekening: ${td.ip_adres}</div>` : ''}
 
-<div class="section-title">4. Overeenkomst</div>
-<div class="agreement-text">${OVEREENKOMST_TEKST}</div>
+</div><!-- /content -->
 
-<div class="section-title">5. Ondertekening</div>
-${td.handtekening_data ? `
-<div class="signature-box">
-  <img src="${td.handtekening_data}" alt="Handtekening">
-</div>
-<div class="sig-meta">
-  ${customer ? `${customer.voornaam} ${customer.achternaam}` : ""}<br>
-  ${td.formulier_ingevuld_op ? `Ondertekend op: ${formatDateTime(td.formulier_ingevuld_op)}` : ""}<br>
-  ${td.ip_adres ? `IP-adres: ${td.ip_adres}` : ""}<br>
-  ${customer?.email ? `Automatische bevestiging verzonden naar ${customer.email}${td.email_verzonden_op ? ` op ${formatDateTime(td.email_verzonden_op)}` : ""}` : ""}
-</div>
-` : `<p style="color:#999;font-size:10px;">Nog niet ondertekend</p>`}
-
+<!-- FOOTER -->
 <div class="footer">
-  Dit document is automatisch gegenereerd en gearchiveerd door ${BEDRIJF.naam}.<br>
-  Documentnummer: ${docNummer}. Gegenereerd op: ${formatDateTime(now)}.
+  ${BEDRIJF.naam} · ${BEDRIJF.adres} · KvK ${BEDRIJF.kvk} · ${BEDRIJF.website} | Documentnummer: ${docNummer} · ${formatDate(td.created_at)}
 </div>
 
+</div><!-- /page -->
 </body></html>`;
 
-    // For now, we return the HTML as base64 - the frontend will handle printing/PDF
-    // In production, you'd use a headless browser or PDF library
     const encoder = new TextEncoder();
     const pdfBase64 = btoa(String.fromCharCode(...encoder.encode(htmlContent)));
 
-    // Store the HTML in storage for archiving
+    // Store in storage for archiving
     const storagePath = `${testDriveId}/overeenkomst-${docNummer}.html`;
     await supabase.storage
       .from("test-drive-files")
@@ -249,12 +280,40 @@ ${td.handtekening_data ? `
     const updateField = td.eind_tijd ? "pdf_definitief_path" : "pdf_path";
     await supabase.from("test_drives").update({ [updateField]: storagePath }).eq("id", testDriveId);
 
-    // If sendEmail, record the timestamp
+    // Send email if requested
     if (sendEmail && customer?.email) {
-      await supabase
-        .from("test_drives")
-        .update({ email_verzonden_op: new Date().toISOString() })
-        .eq("id", testDriveId);
+      // Generate a signed URL for the stored HTML
+      const { data: signedData } = await supabase.storage
+        .from("test-drive-files")
+        .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1 year
+
+      const pdfUrl = signedData?.signedUrl || "";
+
+      // Send transactional email via the queue
+      const { error: emailErr } = await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "proefrit-overeenkomst",
+          recipientEmail: customer.email,
+          idempotencyKey: `proefrit-${testDriveId}-${Date.now()}`,
+          templateData: {
+            klantNaam: `${customer.voornaam} ${customer.achternaam}`,
+            voertuig: voertuigTitel,
+            kenteken: kentekenDisplay,
+            datum: formatDate(td.created_at),
+            documentNummer: docNummer,
+            pdfUrl,
+          },
+        },
+      });
+
+      if (emailErr) {
+        console.error("Email send error:", emailErr);
+      } else {
+        await supabase
+          .from("test_drives")
+          .update({ email_verzonden_op: new Date().toISOString() })
+          .eq("id", testDriveId);
+      }
     }
 
     return new Response(JSON.stringify({ pdf: pdfBase64, html: true, docNummer }), {
