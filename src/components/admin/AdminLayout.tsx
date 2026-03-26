@@ -1,21 +1,50 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, Car, Wallet, Receipt, LogOut, BarChart3, Menu, X, BookOpen, Settings, ShoppingCart, Megaphone, Newspaper, FileText } from "lucide-react";
+import {
+  LayoutDashboard, Car, ShoppingCart, Wallet, BarChart3,
+  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X,
+} from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
 
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-  { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
-  { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
-  { label: "Financieel", icon: Wallet, path: "/admin/financieel" },
-  { label: "BTW Overzicht", icon: Receipt, path: "/admin/btw" },
-  { label: "Moneybird", icon: BookOpen, path: "/admin/moneybird" },
-  { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
-  { label: "Social Media", icon: Megaphone, path: "/admin/social-media" },
-  { label: "Advertenties", icon: Newspaper, path: "/admin/advertenties" },
-  { label: "Blog", icon: FileText, path: "/admin/blog" },
+interface NavItem {
+  label: string;
+  icon: typeof LayoutDashboard;
+  path: string;
+}
+
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: "",
+    items: [
+      { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+      { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
+      { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
+      { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
+    ],
+  },
+  {
+    label: "Financiën",
+    items: [
+      { label: "Overzicht", icon: Wallet, path: "/admin/financieel" },
+      { label: "BTW Aangifte", icon: Wallet, path: "/admin/btw" },
+      { label: "Moneybird", icon: Wallet, path: "/admin/moneybird" },
+    ],
+  },
+  {
+    label: "Marketing",
+    items: [
+      { label: "Social Media", icon: Megaphone, path: "/admin/social-media" },
+      { label: "Advertenties", icon: Newspaper, path: "/admin/advertenties" },
+      { label: "Blog", icon: FileText, path: "/admin/blog" },
+    ],
+  },
 ];
 
 const AdminLayout = () => {
@@ -51,19 +80,13 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] text-foreground flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-[240px] bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] text-foreground flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-5 flex items-center justify-between">
+        <div className="p-4 flex items-center justify-between">
           <Link to="/admin/dashboard" className="flex items-center gap-3">
-            <img
-              src={logo}
-              alt="Platin"
-              className="h-7 w-auto object-contain"
-              loading="eager"
-              decoding="sync"
-            />
+            <img src={logo} alt="Platin" className="h-6 w-auto object-contain" loading="eager" decoding="sync" />
             <span className="text-[9px] font-semibold tracking-[0.3em] uppercase text-muted-foreground">Admin</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground transition-colors">
@@ -71,44 +94,55 @@ const AdminLayout = () => {
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 ${
-                isActive(item.path)
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-              }`}
-            >
-              <item.icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive(item.path) ? 'text-primary' : ''}`} />
-              {item.label}
-            </Link>
+        <nav className="flex-1 px-2 py-2 space-y-4 overflow-y-auto">
+          {navGroups.map((group, gi) => (
+            <div key={gi}>
+              {group.label && (
+                <p className="px-3 mb-1.5 text-[9px] font-semibold tracking-[0.2em] uppercase text-muted-foreground/60">
+                  {group.label}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {group.items.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+                      isActive(item.path)
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
+                  >
+                    <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive(item.path) ? "text-primary" : ""}`} />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
 
-        <div className="p-3 border-t border-[hsl(var(--sidebar-border))] space-y-0.5">
+        <div className="p-2 border-t border-[hsl(var(--sidebar-border))] space-y-0.5">
           <Link
             to="/admin/instellingen"
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
               isActive("/admin/instellingen")
                 ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
             }`}
           >
-            <Settings className={`w-[18px] h-[18px] flex-shrink-0 ${isActive("/admin/instellingen") ? 'text-primary' : ''}`} />
+            <Settings className={`w-4 h-4 flex-shrink-0 ${isActive("/admin/instellingen") ? "text-primary" : ""}`} />
             Instellingen
           </Link>
-          <div className="pt-2 border-t border-[hsl(var(--sidebar-border))] mt-2">
-            <p className="text-[11px] text-muted-foreground truncate mb-1.5 px-3">{user.email}</p>
+          <div className="pt-1.5 border-t border-[hsl(var(--sidebar-border))] mt-1.5">
+            <p className="text-[10px] text-muted-foreground truncate mb-1 px-3">{user.email}</p>
             <button
               onClick={signOut}
-              className="flex items-center gap-3 px-3 py-2.5 text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-all duration-200 w-full"
+              className="flex items-center gap-2.5 px-3 py-2 text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-all duration-200 w-full"
             >
-              <LogOut className="w-[18px] h-[18px]" />
+              <LogOut className="w-4 h-4" />
               Uitloggen
             </button>
           </div>
@@ -117,18 +151,12 @@ const AdminLayout = () => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen min-w-0">
-        {/* Mobile header — sticky */}
+        {/* Mobile header */}
         <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-card border-b border-border">
           <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground hover:text-foreground transition-colors">
             <Menu className="w-5 h-5" />
           </button>
-          <img
-            src={logo}
-            alt="Platin"
-            className="h-6 w-auto object-contain"
-            loading="eager"
-            decoding="sync"
-          />
+          <img src={logo} alt="Platin" className="h-6 w-auto object-contain" loading="eager" decoding="sync" />
           <div className="w-5" />
         </header>
 
