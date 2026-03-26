@@ -1,4 +1,4 @@
-import { Vehicle, formatEuroDecimal, calcKostprijs, calcTotalKosten, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge, costCategories } from "@/types/vehicle";
+import { Vehicle, formatEuroDecimal, calcKostprijs, calcTotalKosten, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge, calcConsignatieCommissie, isConsignatie, costCategories } from "@/types/vehicle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Info } from "lucide-react";
 
@@ -19,6 +19,34 @@ const VehicleFinancieelTab = ({ vehicle }: Props) => {
     const cat = costCategories[k.category] || k.category;
     categoryBreakdown[cat] = (categoryBreakdown[cat] || 0) + k.amount;
   });
+
+  if (isConsignatie(vehicle)) {
+    const commissie = calcConsignatieCommissie(vehicle);
+    return (
+      <div className="space-y-6 max-w-xl">
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <Row label="Verkoopprijs" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(vehicle.verkoopprijs) : "—"} />
+            <Row label={`Commissie (${vehicle.consignatieCommissiePerc || 10}%)`} value={formatEuroDecimal(commissie)} />
+            <div className="border-t border-border pt-3">
+              <div className="flex items-center justify-between">
+                <span className="text-base font-bold text-foreground">Jouw marge</span>
+                <span className={`text-2xl font-bold ${commissie >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                  {formatEuroDecimal(commissie)}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <div className="flex items-start gap-2 px-4 py-3 bg-secondary rounded-sm border border-border">
+          <Info className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            <strong className="text-foreground">Consignatie:</strong> je verdient een commissie van {vehicle.consignatieCommissiePerc || 10}% over de verkoopprijs.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-xl">

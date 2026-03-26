@@ -55,7 +55,16 @@ export interface Vehicle {
   feedId?: string;
 }
 
+export const isConsignatie = (vehicle: Vehicle): boolean =>
+  vehicle.verkoopType === 'consignatie' || vehicle.status === 'consignatie';
+
+export const calcConsignatieCommissie = (vehicle: Vehicle): number => {
+  if (!isConsignatie(vehicle)) return 0;
+  return vehicle.verkoopprijs * ((vehicle.consignatieCommissiePerc || 10) / 100);
+};
+
 export const calcKostprijs = (vehicle: Vehicle): number => {
+  if (isConsignatie(vehicle)) return 0;
   const totalKosten = vehicle.kosten.reduce((sum, k) => sum + k.amount, 0);
   return vehicle.inkoopprijs + totalKosten;
 };
@@ -65,10 +74,15 @@ export const calcTotalKosten = (vehicle: Vehicle): number => {
 };
 
 export const calcWinst = (vehicle: Vehicle): number => {
+  if (isConsignatie(vehicle)) return calcConsignatieCommissie(vehicle);
   return vehicle.verkoopprijs - calcKostprijs(vehicle);
 };
 
 export const calcMarge = (vehicle: Vehicle): number => {
+  if (isConsignatie(vehicle)) {
+    if (vehicle.verkoopprijs === 0) return 0;
+    return (vehicle.consignatieCommissiePerc || 10);
+  }
   const kostprijs = calcKostprijs(vehicle);
   if (kostprijs === 0) return 0;
   return (calcWinst(vehicle) / kostprijs) * 100;
