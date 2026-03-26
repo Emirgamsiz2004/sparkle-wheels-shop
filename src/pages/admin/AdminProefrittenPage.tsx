@@ -119,7 +119,18 @@ const AdminProefrittenPage = () => {
                     {format(new Date(td.start_tijd), "d MMM yyyy, HH:mm", { locale: nl })}
                   </p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {td.status === "actief" && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setEnding(td); }}
+                      className="p-1.5 text-amber-400 hover:bg-amber-400/10 rounded-md transition-colors"
+                      title="Proefrit beëindigen"
+                    >
+                      <StopCircle className="w-4 h-4" />
+                    </button>
+                  )}
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+                </div>
               </button>
             );
           })}
@@ -131,6 +142,14 @@ const AdminProefrittenPage = () => {
           testDrive={selected}
           open={!!selected}
           onClose={() => setSelected(null)}
+        />
+      )}
+
+      {ending && (
+        <EindProefritDialog
+          testDrive={ending}
+          open={!!ending}
+          onClose={() => setEnding(null)}
         />
       )}
     </div>
