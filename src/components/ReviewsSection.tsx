@@ -80,11 +80,37 @@ export default function ReviewsSection() {
 
   const nudge = (dir: number) => {
     if (!scrollRef.current) return;
+    pause();
     const step = CARD_W + GAP;
-    posRef.current += dir * step;
-    if (posRef.current < 0) posRef.current += setWidth;
-    if (posRef.current >= setWidth) posRef.current -= setWidth;
-    scrollRef.current.style.transform = `translateX(-${posRef.current}px)`;
+    const target = posRef.current + dir * step;
+    const start = posRef.current;
+    const duration = 400;
+    let startTime: number | null = null;
+
+    const animateNudge = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      
+      let current = start + (target - start) * eased;
+      if (current < 0) current += setWidth;
+      if (current >= setWidth) current -= setWidth;
+      posRef.current = current;
+      
+      if (scrollRef.current) {
+        scrollRef.current.style.transform = `translateX(-${posRef.current}px)`;
+      }
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateNudge);
+      } else {
+        posRef.current = target < 0 ? target + setWidth : target >= setWidth ? target - setWidth : target;
+        resumeDelayed();
+      }
+    };
+    
+    requestAnimationFrame(animateNudge);
   };
 
   // Drag / swipe support
