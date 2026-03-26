@@ -80,7 +80,7 @@ const AdminVoertuigNieuwPage = () => {
         },
       });
       if (error) throw error;
-      toast.success("✓ Auto opgeslagen en blogpost automatisch aangemaakt");
+      toast.success("Auto opgeslagen en blogpost automatisch aangemaakt");
     } catch (err) {
       console.error("Blog generation error:", err);
       toast.warning("Auto opgeslagen, maar blogpost genereren is mislukt");

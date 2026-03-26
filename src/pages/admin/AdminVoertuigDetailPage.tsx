@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const tabItems = [
-  { key: "overzicht", label: "Overzicht", emoji: "📋" },
-  { key: "kosten", label: "Kosten", emoji: "💸" },
-  { key: "dossier", label: "Dossier", emoji: "📂" },
+  { key: "overzicht", label: "Overzicht" },
+  { key: "kosten", label: "Kosten" },
+  { key: "dossier", label: "Dossier" },
 ];
 
 const AdminVoertuigDetailPage = () => {
@@ -56,7 +56,7 @@ const AdminVoertuigDetailPage = () => {
         body: { merk: vehicle.merk, model: vehicle.model, jaar: vehicle.bouwjaar, km: vehicle.kilometerstand, kleur: vehicle.kleur, prijs: vehicle.verkoopprijs, car_id: vehicle.id },
       });
       if (error) throw error;
-      toast.success("✓ Blogpost succesvol aangemaakt");
+      toast.success("Blogpost succesvol aangemaakt");
     } catch (err) {
       console.error("Blog generation error:", err);
       toast.error("Blogpost genereren mislukt");
@@ -120,19 +120,18 @@ const AdminVoertuigDetailPage = () => {
 
       {/* Tabs */}
       <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
-        <div className="flex gap-1 bg-card border border-border rounded-lg p-1 min-w-max">
+        <div className="flex gap-1 bg-card border border-border rounded-xl p-1 min-w-max">
           {tabItems.map((t) => (
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
-              className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium rounded-md transition-all duration-200 whitespace-nowrap ${
+              className={`px-4 py-2 text-xs md:text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap ${
                 activeTab === t.key
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
             >
-              <span className="md:hidden">{t.emoji}</span>
-              <span className="hidden md:inline">{t.emoji} {t.label}</span>
+              {t.label}
             </button>
           ))}
         </div>
@@ -184,11 +183,11 @@ const AdminVoertuigDetailPage = () => {
         {activeTab === "dossier" && (
           <div className="space-y-8">
             <div>
-              <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-3">📸 Foto's</h3>
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-3">Foto's</h3>
               <VehicleFotosTab vehicleId={vehicle.id} />
             </div>
             <div>
-              <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-3">📄 Documenten</h3>
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-widest mb-3">Documenten</h3>
               <VehicleDocumentenTab vehicleId={vehicle.id} />
             </div>
           </div>

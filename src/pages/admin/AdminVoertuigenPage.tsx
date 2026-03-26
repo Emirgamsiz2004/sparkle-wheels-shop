@@ -29,7 +29,7 @@ const AdminVoertuigenPage = () => {
     try {
       const { data, error } = await supabase.functions.invoke("sync-voorraad");
       if (error) throw error;
-      toast.success(`✓ Sync klaar: ${data.created} nieuw, ${data.updated} bijgewerkt, ${data.skipped} ongewijzigd, ${data.removed || 0} verwijderd`);
+      toast.success(`Sync klaar: ${data.created} nieuw, ${data.updated} bijgewerkt, ${data.skipped} ongewijzigd, ${data.removed || 0} verwijderd`);
       refetch();
     } catch (err: any) {
       console.error("Sync error:", err);
