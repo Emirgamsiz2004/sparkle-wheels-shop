@@ -121,7 +121,7 @@ export default function ReviewsSection() {
               </button>
               <button
                 onClick={next}
-                disabled={current >= totalSlides - 1}
+                disabled={current >= maxIndex}
                 className="w-8 h-8 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -132,7 +132,7 @@ export default function ReviewsSection() {
 
         {/* Slider */}
         <div
-          className="relative overflow-hidden touch-pan-y"
+          ref={containerRef}
           onTouchStart={(e) => {
             const touch = e.touches[0];
             (e.currentTarget as any)._touchStartX = touch.clientX;
