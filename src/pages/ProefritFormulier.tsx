@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SignaturePad from "signature_pad";
-import { CheckCircle2, Loader2, Car, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Loader2, Car, AlertTriangle, Upload, X } from "lucide-react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 
 const OVEREENKOMST_TEKST = [
@@ -30,8 +30,13 @@ const ProefritFormulier = () => {
   const [rijbewijscategorie, setRijbewijscategorie] = useState("B");
   const [opmerkingen, setOpmerkingen] = useState("");
   const [akkoord, setAkkoord] = useState(false);
+  const [rijbewijsFoto, setRijbewijsFoto] = useState<File | null>(null);
+  const [rijbewijsFotoPreview, setRijbewijsFotoPreview] = useState<string | null>(null);
+  const [rijbewijsFotoUploading, setRijbewijsFotoUploading] = useState(false);
+  const [rijbewijsError, setRijbewijsError] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const sigPadRef = useRef<SignaturePad | null>(null);
   const [hasSigned, setHasSigned] = useState(false);
 
@@ -95,13 +100,57 @@ const ProefritFormulier = () => {
     setHasSigned(false);
   };
 
-  const isValid = voornaam && achternaam && email && telefoon && rijbewijsnummer && akkoord && hasSigned;
+  const sanitizeRijbewijs = (val: string) => val.replace(/[\s\-]/g, "");
+
+  const handleRijbewijsChange = (val: string) => {
+    // Strip non-digits
+    const clean = val.replace(/[^0-9\s\-]/g, "");
+    setRijbewijsnummer(clean);
+    const sanitized = sanitizeRijbewijs(clean);
+    if (sanitized.length > 0 && (sanitized.length !== 10 || !/^\d{10}$/.test(sanitized))) {
+      setRijbewijsError("Controleer je rijbewijsnummer — dit moet uit 10 cijfers bestaan");
+    } else {
+      setRijbewijsError(null);
+    }
+  };
+
+  const handleRijbewijsFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    setRijbewijsFoto(file);
+    setRijbewijsFotoPreview(URL.createObjectURL(file));
+  };
+
+  const removeRijbewijsFoto = () => {
+    setRijbewijsFoto(null);
+    if (rijbewijsFotoPreview) URL.revokeObjectURL(rijbewijsFotoPreview);
+    setRijbewijsFotoPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const rijbewijsValid = (() => {
+    const sanitized = sanitizeRijbewijs(rijbewijsnummer);
+    return /^\d{10}$/.test(sanitized);
+  })();
+
+  const isValid = voornaam && achternaam && email && telefoon && rijbewijsValid && rijbewijsFoto && akkoord && hasSigned;
 
   const handleSubmit = async () => {
-    if (!isValid || !testDrive || !sigPadRef.current) return;
+    if (!isValid || !testDrive || !sigPadRef.current || !rijbewijsFoto) return;
     setSubmitting(true);
 
     try {
+      // Upload rijbewijs foto
+      const fileExt = rijbewijsFoto.name.split(".").pop() || "jpg";
+      const filePath = `${testDrive.id}/rijbewijs.${fileExt}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("test-drive-files")
+        .upload(filePath, rijbewijsFoto, { upsert: true });
+      if (uploadErr) throw uploadErr;
+
+      const sanitizedRijbewijs = sanitizeRijbewijs(rijbewijsnummer);
+
       // Upsert customer
       const { data: existingCustomer } = await supabase
         .from("test_drive_customers")
@@ -116,7 +165,8 @@ const ProefritFormulier = () => {
         await supabase.from("test_drive_customers").update({
           voornaam, achternaam, telefoon, adres: adres || null,
           geboortedatum: geboortedatum || null,
-          rijbewijsnummer, rijbewijscategorie,
+          rijbewijsnummer: sanitizedRijbewijs, rijbewijscategorie,
+          rijbewijs_foto_path: filePath,
         } as any).eq("id", customerId);
       } else {
         const { data: newCust, error: custErr } = await supabase
@@ -124,7 +174,8 @@ const ProefritFormulier = () => {
             voornaam, achternaam, email, telefoon,
             adres: adres || null,
             geboortedatum: geboortedatum || null,
-            rijbewijsnummer, rijbewijscategorie,
+            rijbewijsnummer: sanitizedRijbewijs, rijbewijscategorie,
+            rijbewijs_foto_path: filePath,
           } as any).select().single();
         if (custErr) throw custErr;
         customerId = newCust.id;
@@ -140,7 +191,7 @@ const ProefritFormulier = () => {
         opmerkingen_voor: opmerkingen || null,
         formulier_ingevuld_op: new Date().toISOString(),
         status: "actief",
-        ip_adres: "collected-server-side", // placeholder, edge function would capture real IP
+        ip_adres: "collected-server-side",
       } as any).eq("id", testDrive.id);
 
       if (tdErr) throw tdErr;
@@ -228,7 +279,25 @@ const ProefritFormulier = () => {
             
             <div className="pt-2 border-t border-neutral-100">
               <p className="text-sm font-semibold text-neutral-900 mb-3">Rijbewijs</p>
-              <Field label="Rijbewijsnummer *" value={rijbewijsnummer} onChange={setRijbewijsnummer} />
+              
+              {/* Rijbewijsnummer met validatie */}
+              <div>
+                <label className="text-xs font-medium text-neutral-600 block mb-1">Rijbewijsnummer *</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={rijbewijsnummer}
+                  onChange={(e) => handleRijbewijsChange(e.target.value)}
+                  placeholder="0000000000"
+                  className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 ${
+                    rijbewijsError ? "border-red-400 focus:ring-red-200" : "border-neutral-200 focus:ring-neutral-900/10"
+                  }`}
+                />
+                {rijbewijsError && (
+                  <p className="text-xs text-red-600 mt-1">{rijbewijsError}</p>
+                )}
+              </div>
+
               <div className="mt-3">
                 <label className="text-xs font-medium text-neutral-600 block mb-1">Categorie</label>
                 <select
@@ -240,6 +309,43 @@ const ProefritFormulier = () => {
                   <option value="B+">B+</option>
                   <option value="BE">BE</option>
                 </select>
+              </div>
+
+              {/* Rijbewijs foto upload */}
+              <div className="mt-3">
+                <label className="text-xs font-medium text-neutral-600 block mb-1">Foto rijbewijs (voorkant) *</label>
+                <p className="text-[11px] text-neutral-400 mb-2">Zorg dat alle gegevens leesbaar zijn en er geen flits of schaduw op zit</p>
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleRijbewijsFoto}
+                  className="hidden"
+                />
+                
+                {!rijbewijsFotoPreview ? (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full border-2 border-dashed border-neutral-300 rounded-lg py-6 flex flex-col items-center gap-2 text-neutral-500 hover:border-neutral-400 hover:text-neutral-600 transition-colors"
+                  >
+                    <Upload className="w-5 h-5" />
+                    <span className="text-xs font-medium">Maak een foto of kies een bestand</span>
+                  </button>
+                ) : (
+                  <div className="relative rounded-lg overflow-hidden border border-neutral-200">
+                    <img src={rijbewijsFotoPreview} alt="Rijbewijs" className="w-full h-auto max-h-48 object-contain bg-neutral-50" />
+                    <button
+                      type="button"
+                      onClick={removeRijbewijsFoto}
+                      className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-1 shadow-sm hover:bg-white transition-colors"
+                    >
+                      <X className="w-4 h-4 text-neutral-600" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
