@@ -12,23 +12,15 @@ import {
   ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
   ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog, FileCheck,
-  Users, Globe, Wrench, Weight, Cylinder, ExternalLink,
+  Users, Globe, Wrench, Weight, Cylinder, ExternalLink, Hash, UserCheck, Receipt,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 0 });
 
-const buildMarktplaatsUrl = (vehicle: any, dbUrl?: string | null) => {
-  if (dbUrl) return dbUrl;
-  if (vehicle.marktplaats_url) return vehicle.marktplaats_url;
-  if (vehicle.kenteken) {
-    const k = vehicle.kenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-    return `https://www.marktplaats.nl/q/${encodeURIComponent(k)}/`;
-  }
-  const q = encodeURIComponent(`${vehicle.merk} ${vehicle.model}`);
-  return `https://www.marktplaats.nl/q/auto/${q}/#q:${q}|sellerName:Platin+Automotive`;
-};
+// No fallback search - only use DB link
+
 
 const slideVariants = {
   enter: (direction: number) => ({ x: direction > 0 ? 400 : -400, opacity: 0 }),
@@ -84,8 +76,12 @@ const VoorraadDetailPage = () => {
     ? `${vehicle.merk} ${vehicle.model}, bouwjaar ${vehicle.bouwjaar || ""}, ${Number(vehicle.kilometerstand || 0).toLocaleString("nl-NL")} km. Te koop bij Platin Automotive.`
     : "";
 
+  const displayKenteken = vehicle?.kenteken_detail || vehicle?.kenteken || "";
+  const formattedKenteken = displayKenteken ? displayKenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().replace(/(.{2,3})(?=.)/g, "$1-") : "";
+
   const specs = vehicle
     ? [
+        { label: "Kenteken", value: formattedKenteken || null, icon: Hash },
         { label: "Bouwjaar", value: vehicle.bouwjaar, icon: Calendar },
         { label: "Kilometerstand", value: vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null, icon: Gauge },
         { label: "Brandstof", value: vehicle.brandstof, icon: Fuel },
@@ -93,6 +89,8 @@ const VoorraadDetailPage = () => {
         { label: "Carrosserie", value: vehicle.carrosserie, icon: Car },
         { label: "Kleur", value: vehicle.kleur, icon: Paintbrush },
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null, icon: Zap },
+        { label: "Aantal eigenaren", value: vehicle.aantal_eigenaren || null, icon: UserCheck },
+        { label: "BTW/Marge", value: vehicle.btw_marge || null, icon: Receipt },
         { label: "Aandrijving", value: vehicle.extra?.aandrijving || null, icon: Cog },
         { label: "Deuren", value: vehicle.extra?.deuren || null, icon: DoorOpen },
         { label: "Zitplaatsen", value: vehicle.extra?.zitplaatsen || null, icon: Users },
@@ -101,12 +99,15 @@ const VoorraadDetailPage = () => {
         { label: "Acceleratie", value: vehicle.extra?.acceleratie ? `${vehicle.extra.acceleratie} sec` : null, icon: Zap },
         { label: "Verbruik", value: vehicle.extra?.verbruik ? `${vehicle.extra.verbruik} l/100km` : null, icon: Droplets },
         { label: "Energielabel", value: vehicle.extra?.energielabel || null, icon: Leaf },
+        { label: "Tankinhoud", value: vehicle.extra?.tankinhoud ? `${vehicle.extra.tankinhoud} liter` : null, icon: Droplets },
+        { label: "APK tot", value: vehicle.extra?.apk || null, icon: FileCheck },
       ].filter((s) => s.value)
     : [];
 
   // Sidebar key facts
   const sidebarFacts = vehicle
     ? [
+        { label: "Kenteken", value: formattedKenteken || null },
         { label: "Bouwjaar", value: vehicle.bouwjaar },
         { label: "Kilometerstand", value: vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null },
         { label: "Brandstof", value: vehicle.brandstof },
@@ -114,8 +115,9 @@ const VoorraadDetailPage = () => {
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null },
         { label: "Carrosserie", value: vehicle.carrosserie },
         { label: "Kleur", value: vehicle.kleur },
-        { label: "APK", value: vehicle.extra?.apk || null },
-        { label: "APK", value: vehicle.extra?.apk || null },
+        { label: "Aantal eigenaren", value: vehicle.aantal_eigenaren || null },
+        { label: "APK tot", value: vehicle.extra?.apk || null },
+        { label: "BTW/Marge", value: vehicle.btw_marge || null },
       ].filter((s) => s.value)
     : [];
 

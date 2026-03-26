@@ -98,6 +98,9 @@ async function fetchDetail(detailPath: string) {
   const bovagGarantie = dataAttr("bovaggarantie");
   const garantieMaanden = dataAttr("garantiemaanden");
 
+  // Extract kenteken from detail page
+  const kentekenDetail = dataAttr("kenteken");
+
   // Extract more specs from data-section attributes
   const extractSection = (name: string): string => {
     const m = html.match(new RegExp(`data-section="${name}"[^>]*>.*?data-item-value[^>]*>([^<]+)`, "s"));
@@ -109,6 +112,16 @@ async function fetchDetail(detailPath: string) {
     }
     return "";
   };
+
+  const aantalEigenaren = dataAttr("aantaleigenaren") || extractSection("aantal-eigenaren") || extractSection("eigenaren");
+  const btw_marge = dataAttr("btwmarge") || extractSection("btw-marge") || extractSection("btw");
+
+  // Try to extract aantal eigenaren from page text if not in data attributes
+  let eigenaren = aantalEigenaren;
+  if (!eigenaren) {
+    const eigMatch = html.match(/eigenar[^<]*?(\d+)/i);
+    if (eigMatch) eigenaren = eigMatch[1];
+  }
 
   const topsnelheid = extractSection("topsnelheid");
   const verbruik = extractSection("verbruik ");
@@ -139,6 +152,9 @@ async function fetchDetail(detailPath: string) {
     bovag_garantie: bovagGarantie,
     garantie_maanden: garantieMaanden,
     marktplaats_url: marktplaatsUrl,
+    aantal_eigenaren: eigenaren,
+    btw_marge: btw_marge,
+    kenteken_detail: kentekenDetail,
     extra: {
       topsnelheid,
       verbruik,
