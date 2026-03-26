@@ -252,16 +252,18 @@ const VoorraadDetailPage = () => {
                   </a>
                 </div>
 
-                <a
-                  href={buildMarktplaatsUrl(vehicle, dbMarktplaatsUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 text-[10px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
-                >
-                  <img src={marktplaatsLogo} alt="" className="h-4 brightness-0 invert opacity-50" />
-                  <span>Bekijk op Marktplaats</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                {dbMarktplaatsUrl && (
+                  <a
+                    href={dbMarktplaatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-2.5 text-[10px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
+                  >
+                    <img src={marktplaatsLogo} alt="" className="h-4 brightness-0 invert opacity-50" />
+                    <span>Bekijk op Marktplaats</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
 
                 <div className="border-t border-border pt-4 space-y-2.5">
                   {sidebarFacts.map((fact) => (
@@ -373,16 +375,18 @@ const VoorraadDetailPage = () => {
                   </a>
                 </div>
 
-                <a
-                  href={buildMarktplaatsUrl(vehicle, dbMarktplaatsUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2.5 w-full py-3 text-[11px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
-                >
-                  <img src={marktplaatsLogo} alt="" className="h-4 brightness-0 invert opacity-50" />
-                  <span>Bekijk op Marktplaats</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                {dbMarktplaatsUrl && (
+                  <a
+                    href={dbMarktplaatsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2.5 w-full py-3 text-[11px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
+                  >
+                    <img src={marktplaatsLogo} alt="" className="h-4 brightness-0 invert opacity-50" />
+                    <span>Bekijk op Marktplaats</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
 
                 <p className="text-[11px] font-body text-muted-foreground tracking-wide text-center">
                   Proefrit mogelijk? Neem contact op

@@ -5,6 +5,8 @@ import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
 import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
+import { Switch } from "@/components/ui/switch";
+import { formatEuroDecimal } from "@/types/vehicle";
 
 interface Props {
   vehicle: Vehicle;
@@ -17,9 +19,19 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
 
+  const isConsignatie = form.verkoopType === "consignatie";
+
   const update = (key: string, value: any) => {
     setForm((f) => ({ ...f, [key]: value }));
     setRdwFields((prev) => { const next = new Set(prev); next.delete(key); return next; });
+  };
+
+  const toggleConsignatie = (checked: boolean) => {
+    if (checked) {
+      setForm((f) => ({ ...f, verkoopType: "consignatie", status: "consignatie" }));
+    } else {
+      setForm((f) => ({ ...f, verkoopType: "regulier", status: f.status === "consignatie" ? "te_koop" : f.status }));
+    }
   };
 
   const handleRdwLookup = async (kenteken: string) => {
@@ -50,6 +62,10 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
     setSaving(false);
   };
 
+  // Consignatie marge berekening
+  const commissiePerc = form.consignatieCommissiePerc ?? 10;
+  const consignatieMarge = form.verkoopprijs > 0 ? form.verkoopprijs * (commissiePerc / 100) : 0;
+
   const inputCls = "w-full px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring";
 
   return (
@@ -72,25 +88,77 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
               <option value="benzine">Benzine</option><option value="diesel">Diesel</option><option value="elektrisch">Elektrisch</option><option value="hybride">Hybride</option><option value="lpg">LPG</option>
             </select>
           </div>
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1">Status</label>
-            <select value={form.status} onChange={(e) => update("status", e.target.value as Vehicle["status"])} className={inputCls}>
-              <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="consignatie">Consignatie</option><option value="verkocht">Verkocht</option>
-            </select>
-          </div>
+          {!isConsignatie && (
+            <div>
+              <label className="block text-xs text-muted-foreground mb-1">Status</label>
+              <select value={form.status} onChange={(e) => update("status", e.target.value as Vehicle["status"])} className={inputCls}>
+                <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="verkocht">Verkocht</option>
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Financieel */}
-      <div className="bg-card border border-border rounded-lg p-4 space-y-4">
-        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Financieel</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label="Inkoopprijs" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", Number(v))} inputCls={inputCls} />
-          <Field label="Verkoopprijs" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} inputCls={inputCls} />
-          <Field label="Inkoopdatum" type="date" value={form.inkoopDatum} onChange={(v) => update("inkoopDatum", v)} inputCls={inputCls} />
-          <Field label="Verkoopdatum" type="date" value={form.verkoopDatum || ""} onChange={(v) => update("verkoopDatum", v || undefined)} inputCls={inputCls} />
+      {/* Consignatie Toggle */}
+      <div className="bg-card border border-border rounded-lg p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Consignatie</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Dit voertuig wordt verkocht in consignatie</p>
+          </div>
+          <Switch checked={isConsignatie} onCheckedChange={toggleConsignatie} />
         </div>
+
+        {isConsignatie && (
+          <div className="mt-4 pt-4 border-t border-border space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Eigenaar naam" value={form.consignatieEigenaarNaam || ""} onChange={(v) => update("consignatieEigenaarNaam", v || undefined)} inputCls={inputCls} />
+              <Field label="Eigenaar telefoon" value={form.consignatieEigenaarTelefoon || ""} onChange={(v) => update("consignatieEigenaarTelefoon", v || undefined)} inputCls={inputCls} />
+              <Field label="Eigenaar e-mail" value={form.consignatieEigenaarEmail || ""} onChange={(v) => update("consignatieEigenaarEmail", v || undefined)} inputCls={inputCls} />
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">Commissie %</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  step={0.5}
+                  value={commissiePerc}
+                  onChange={(e) => update("consignatieCommissiePerc", Number(e.target.value))}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+
+            <Field label="Verkoopprijs" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} inputCls={inputCls} />
+
+            {form.verkoopprijs > 0 && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-secondary/50 border border-border rounded-md p-3">
+                  <p className="text-xs text-muted-foreground mb-1">Jouw commissie ({commissiePerc}%)</p>
+                  <p className="text-base font-semibold text-emerald-500 tabular-nums">{formatEuroDecimal(consignatieMarge)}</p>
+                </div>
+                <div className="bg-secondary/50 border border-border rounded-md p-3">
+                  <p className="text-xs text-muted-foreground mb-1">Uitbetaling eigenaar</p>
+                  <p className="text-base font-semibold tabular-nums">{formatEuroDecimal(form.verkoopprijs - consignatieMarge)}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Financieel — alleen bij niet-consignatie */}
+      {!isConsignatie && (
+        <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Financieel</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="Inkoopprijs" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", Number(v))} inputCls={inputCls} />
+            <Field label="Verkoopprijs" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} inputCls={inputCls} />
+            <Field label="Inkoopdatum" type="date" value={form.inkoopDatum} onChange={(v) => update("inkoopDatum", v)} inputCls={inputCls} />
+            <Field label="Verkoopdatum" type="date" value={form.verkoopDatum || ""} onChange={(v) => update("verkoopDatum", v || undefined)} inputCls={inputCls} />
+          </div>
+        </div>
+      )}
 
       {/* Marktplaats URL */}
       <div className="bg-card border border-border rounded-lg p-4 space-y-2">

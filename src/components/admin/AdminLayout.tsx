@@ -71,7 +71,7 @@ const AdminLayout = () => {
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[240px] bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex flex-col transition-transform duration-200 ease-out lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-14 px-4 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
           <Link to="/admin/dashboard" className="flex items-center gap-2.5">
-            <img src={logo} alt="Platin" className="h-4 w-auto object-contain" loading="eager" decoding="sync" />
+            <img src={logo} alt="Platin" className="h-7 w-auto object-contain" loading="eager" decoding="sync" />
             <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">Admin</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground p-1">
@@ -140,7 +140,7 @@ const AdminLayout = () => {
           <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground hover:text-foreground p-1">
             <Menu className="w-5 h-5" />
           </button>
-          <img src={logo} alt="Platin" className="h-4 w-auto object-contain" loading="eager" decoding="sync" />
+          <img src={logo} alt="Platin" className="h-6 w-auto object-contain" loading="eager" decoding="sync" />
           <div className="w-7" />
         </header>
 

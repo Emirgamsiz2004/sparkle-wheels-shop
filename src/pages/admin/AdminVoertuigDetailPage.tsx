@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Trash2, Loader2, FileText, Info, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, FileText, Info, ClipboardCheck, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
@@ -76,20 +76,18 @@ const AdminVoertuigDetailPage = () => {
       </button>
 
       {/* Header */}
-      <div className="space-y-2">
-        <div>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-lg font-medium text-foreground">
             {vehicle.merk} {vehicle.model} {vehicle.bouwjaar}
           </h1>
-          {vehicle.kenteken && (
-            <span className="text-xs font-mono text-muted-foreground uppercase">{vehicle.kenteken}</span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border ${statusColors[vehicle.status]}`}>
+          <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border whitespace-nowrap ${statusColors[vehicle.status]}`}>
             {statusLabels[vehicle.status]}
           </span>
         </div>
+        {vehicle.kenteken && (
+          <span className="text-xs font-mono text-muted-foreground uppercase">{vehicle.kenteken}</span>
+        )}
 
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={() => setProefritOpen(true)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
@@ -99,6 +97,16 @@ const AdminVoertuigDetailPage = () => {
             {blogGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
             Genereer blogpost
           </button>
+          {vehicle.marktplaatsUrl && (
+            <a
+              href={vehicle.marktplaatsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors"
+            >
+              <Link2 className="w-3.5 h-3.5" /> Marktplaats
+            </a>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <button className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-500/10 rounded-md transition-colors">
