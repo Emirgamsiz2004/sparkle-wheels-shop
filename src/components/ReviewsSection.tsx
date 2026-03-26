@@ -48,8 +48,24 @@ export default function ReviewsSection() {
   const reviews = data?.reviews ?? [];
   const totalSlides = reviews.length;
 
+  // Calculate max index so last card is fully visible
+  const [containerWidth, setContainerWidth] = useState(0);
+  const containerRef = useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      const measure = () => setContainerWidth(node.offsetWidth);
+      measure();
+      const ro = new ResizeObserver(measure);
+      ro.observe(node);
+      return () => ro.disconnect();
+    }
+  }, []);
+  const cardWidth = 280;
+  const gap = 16;
+  const visibleCards = Math.max(1, Math.floor((containerWidth + gap) / (cardWidth + gap)));
+  const maxIndex = Math.max(0, totalSlides - visibleCards);
+
   const prev = useCallback(() => setCurrent((c) => Math.max(0, c - 1)), []);
-  const next = useCallback(() => setCurrent((c) => Math.min(totalSlides - 1, c + 1)), [totalSlides]);
+  const next = useCallback(() => setCurrent((c) => Math.min(maxIndex, c + 1)), [maxIndex]);
 
   const renderStars = (count: number) =>
     Array.from({ length: 5 }).map((_, i) => (
@@ -105,7 +121,7 @@ export default function ReviewsSection() {
               </button>
               <button
                 onClick={next}
-                disabled={current >= totalSlides - 1}
+                disabled={current >= maxIndex}
                 className="w-8 h-8 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -116,6 +132,7 @@ export default function ReviewsSection() {
 
         {/* Slider */}
         <div
+          ref={containerRef}
           className="relative overflow-hidden touch-pan-y"
           onTouchStart={(e) => {
             const touch = e.touches[0];

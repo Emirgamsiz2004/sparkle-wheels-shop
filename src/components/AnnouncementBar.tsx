@@ -49,19 +49,7 @@ const getIsOpen = (): { isOpen: boolean; label: string } => {
     return { isOpen: true, label: `Open tot ${fmtTime(today.close)}` };
   }
 
-  // Find next opening
-  for (let offset = 0; offset < 7; offset++) {
-    const checkDay = (day + (offset === 0 ? 0 : offset)) % 7;
-    const s = SCHEDULE[checkDay];
-    if (s.open < 0) continue;
-    if (offset === 0 && time < s.open) {
-      return { isOpen: false, label: `Gesloten · opent ${DAY_LABELS[checkDay]} ${fmtTime(s.open)}` };
-    }
-    if (offset > 0) {
-      return { isOpen: false, label: `Gesloten · opent ${DAY_LABELS[checkDay]} ${fmtTime(s.open)}` };
-    }
-  }
-  return { isOpen: false, label: "Gesloten" };
+  return { isOpen: false, label: "Open op afspraak" };
 };
 
 const AnnouncementBar = () => {
@@ -93,7 +81,7 @@ const AnnouncementBar = () => {
             </span>
             <a
               href="/contact"
-              className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300"
+              className="hidden sm:inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-300"
             >
               <span className="text-muted-foreground/30">|</span>
               Buiten openingstijden <span className="font-medium text-foreground/70">open op afspraak</span>
