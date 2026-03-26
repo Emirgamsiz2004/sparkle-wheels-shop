@@ -15,6 +15,11 @@ function attr(block: string, name: string): string {
   return m ? m[1] : "";
 }
 
+function normalizeKenteken(k: string | null | undefined): string {
+  if (!k) return "";
+  return k.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
 async function fetchFeedVehicles() {
   const res = await fetch(LIST_URL);
   if (!res.ok) throw new Error(`Feed returned ${res.status}`);
@@ -26,9 +31,6 @@ async function fetchFeedVehicles() {
   for (const block of blocks) {
     const merk = attr(block, "merk");
     if (!merk) continue;
-
-    const photoMatch = block.match(/data-lazyloader-src="([^"]+)"/);
-    const photo = photoMatch ? photoMatch[1] : "";
 
     vehicles.push({
       feed_id: attr(block, "aid"),
@@ -61,23 +63,24 @@ serve(async (req) => {
     // Get existing vehicles from DB
     const { data: existing } = await supabase
       .from("vehicles")
-      .select("id, feed_id, kenteken");
+      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand");
 
     const existingByFeedId = new Map(
       (existing || []).filter((v: any) => v.feed_id).map((v: any) => [v.feed_id, v])
     );
     const existingByKenteken = new Map(
-      (existing || []).filter((v: any) => v.kenteken).map((v: any) => [v.kenteken.toUpperCase().replace(/[^A-Z0-9]/g, ""), v])
+      (existing || []).filter((v: any) => v.kenteken).map((v: any) => [normalizeKenteken(v.kenteken), v])
     );
+
+    // Track which DB vehicles are still in the feed
+    const matchedDbIds = new Set<string>();
 
     let created = 0;
     let updated = 0;
     let skipped = 0;
 
     for (const fv of feedVehicles) {
-      const normalizedKenteken = fv.kenteken
-        ? fv.kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "")
-        : null;
+      const normalizedKenteken = normalizeKenteken(fv.kenteken);
 
       // Check if already exists by feed_id or kenteken
       const existingByFeed = existingByFeedId.get(fv.feed_id);
@@ -87,9 +90,15 @@ serve(async (req) => {
       const match = existingByFeed || existingByKent;
 
       if (match) {
-        // Update feed_id if not set, and update verkoopprijs/km
+        matchedDbIds.add(match.id);
+
+        // Update feed_id, verkoopprijs, kilometerstand, and ensure status is te_koop
         const updates: any = {};
         if (!match.feed_id && fv.feed_id) updates.feed_id = fv.feed_id;
+        if (fv.verkoopprijs && fv.verkoopprijs !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
+        if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
+        // If it was marked as sold but is back in feed, re-activate
+        if (match.status === "verkocht") updates.status = "te_koop";
 
         if (Object.keys(updates).length > 0) {
           await supabase.from("vehicles").update(updates).eq("id", match.id);
@@ -120,6 +129,22 @@ serve(async (req) => {
       }
     }
 
+    // Mark vehicles that are in the feed (have feed_id) but no longer appear → verkocht
+    let removed = 0;
+    for (const dbVehicle of (existing || [])) {
+      if (
+        dbVehicle.feed_id &&
+        !matchedDbIds.has(dbVehicle.id) &&
+        dbVehicle.status === "te_koop"
+      ) {
+        await supabase
+          .from("vehicles")
+          .update({ status: "verkocht" })
+          .eq("id", dbVehicle.id);
+        removed++;
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -127,6 +152,7 @@ serve(async (req) => {
         created,
         updated,
         skipped,
+        removed,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
