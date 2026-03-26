@@ -12,7 +12,7 @@ import {
   ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
   ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog, FileCheck,
-  Users, Globe, Wrench, Weight, Cylinder, ExternalLink,
+  Users, Globe, Wrench, Weight, Cylinder, ExternalLink, Hash, UserCheck, Receipt,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
