@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Star, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -26,11 +26,16 @@ const GoogleIcon = () => (
   </svg>
 );
 
+const CARD_W = 280;
+const GAP = 16;
+
 export default function ReviewsSection() {
   const [data, setData] = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isPaused, setIsPaused] = useState(false);
+  const posRef = useRef(0);
+  const isPausedRef = useRef(false);
+  const [, forceUpdate] = useState(0);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -48,36 +53,63 @@ export default function ReviewsSection() {
   }, []);
 
   const reviews = data?.reviews ?? [];
+  const setWidth = reviews.length * (CARD_W + GAP);
 
-  // Auto-scroll animation
+  // Auto-scroll
   useEffect(() => {
     if (reviews.length === 0 || !scrollRef.current) return;
 
-    const el = scrollRef.current;
     let animationId: number;
-    let position = 0;
-    const speed = 0.5; // pixels per frame
-
-    // The first set width (one copy of all cards)
-    const cardWidth = 280;
-    const gap = 16;
-    const setWidth = reviews.length * (cardWidth + gap);
 
     const animate = () => {
-      if (!isPaused) {
-        position += speed;
-        // Reset when we've scrolled past the first set
-        if (position >= setWidth) {
-          position -= setWidth;
-        }
-        el.style.transform = `translateX(-${position}px)`;
+      if (!isPausedRef.current && scrollRef.current) {
+        posRef.current += 0.5;
+        if (posRef.current >= setWidth) posRef.current -= setWidth;
+        scrollRef.current.style.transform = `translateX(-${posRef.current}px)`;
       }
       animationId = requestAnimationFrame(animate);
     };
 
     animationId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationId);
-  }, [reviews.length, isPaused]);
+  }, [reviews.length, setWidth]);
+
+  const pause = () => { isPausedRef.current = true; };
+  const resume = () => { isPausedRef.current = false; };
+  const resumeDelayed = () => { setTimeout(() => { isPausedRef.current = false; }, 3000); };
+
+  const nudge = (dir: number) => {
+    if (!scrollRef.current) return;
+    const step = CARD_W + GAP;
+    posRef.current += dir * step;
+    if (posRef.current < 0) posRef.current += setWidth;
+    if (posRef.current >= setWidth) posRef.current -= setWidth;
+    scrollRef.current.style.transform = `translateX(-${posRef.current}px)`;
+  };
+
+  // Drag / swipe support
+  const dragStart = useRef<{ x: number; pos: number } | null>(null);
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    pause();
+    dragStart.current = { x: e.clientX, pos: posRef.current };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragStart.current || !scrollRef.current) return;
+    const dx = dragStart.current.x - e.clientX;
+    let newPos = dragStart.current.pos + dx;
+    if (newPos < 0) newPos += setWidth;
+    if (newPos >= setWidth) newPos -= setWidth;
+    posRef.current = newPos;
+    scrollRef.current.style.transform = `translateX(-${posRef.current}px)`;
+  };
+
+  const onPointerUp = () => {
+    dragStart.current = null;
+    resumeDelayed();
+  };
 
   const renderStars = (count: number) =>
     Array.from({ length: 5 }).map((_, i) => (
@@ -97,7 +129,6 @@ export default function ReviewsSection() {
 
   if (!data || reviews.length === 0) return null;
 
-  // Triple the reviews for seamless infinite loop
   const loopedReviews = [...reviews, ...reviews, ...reviews];
 
   return (
@@ -117,25 +148,46 @@ export default function ReviewsSection() {
             </h2>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex gap-0.5">{renderStars(Math.round(data.rating))}</div>
-            <span className="text-sm font-display font-bold text-foreground">{data.rating?.toFixed(1)}</span>
-            <span className="text-[11px] font-body text-muted-foreground">({data.totalRatings})</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-0.5">{renderStars(Math.round(data.rating))}</div>
+              <span className="text-sm font-display font-bold text-foreground">{data.rating?.toFixed(1)}</span>
+              <span className="text-[11px] font-body text-muted-foreground">({data.totalRatings})</span>
+            </div>
+
+            {/* Nav arrows */}
+            <div className="hidden md:flex items-center gap-1">
+              <button
+                onClick={() => nudge(-1)}
+                className="w-8 h-8 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors duration-200"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => nudge(1)}
+                className="w-8 h-8 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors duration-200"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Infinite slider */}
         <div
-          className="overflow-hidden"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => setTimeout(() => setIsPaused(false), 3000)}
+          className="overflow-hidden cursor-grab active:cursor-grabbing select-none"
+          onMouseEnter={pause}
+          onMouseLeave={resume}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          style={{ touchAction: "pan-y" }}
         >
           <div
             ref={scrollRef}
             className="flex will-change-transform"
-            style={{ gap: "16px" }}
+            style={{ gap: `${GAP}px` }}
           >
             {loopedReviews.map((review, index) => (
               <div
