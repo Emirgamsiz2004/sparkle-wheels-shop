@@ -46,7 +46,7 @@ const getIsOpen = (): { isOpen: boolean; label: string } => {
   const today = SCHEDULE[day];
 
   if (today.open >= 0 && time >= today.open && time < today.close) {
-    return { isOpen: true, label: `Open tot ${fmtTime(today.close)}` };
+    return { isOpen: true, label: "Maak afspraak" };
   }
 
   return { isOpen: false, label: "Open op afspraak" };
