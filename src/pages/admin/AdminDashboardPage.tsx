@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Car, TrendingUp, Wallet, CheckCircle, Plus, Receipt, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { formatEuro, calcKostprijs, calcWinst, statusLabels, statusColors } from "@/types/vehicle";
+import { formatEuro, calcKostprijs, calcWinst, calcConsignatieCommissie, isConsignatie, statusLabels, statusColors } from "@/types/vehicle";
+
+type WaardeFilter = "alle" | "eigen" | "consignatie";
 
 const AdminDashboardPage = () => {
   const { vehicles, loading } = useVehicles();
+  const [waardeFilter, setWaardeFilter] = useState<WaardeFilter>("alle");
 
   if (loading) {
     return (
@@ -16,15 +20,31 @@ const AdminDashboardPage = () => {
 
   const actief = vehicles.filter((v) => v.status !== "verkocht");
   const verkocht = vehicles.filter((v) => v.status === "verkocht");
+
+  // Totale verkoopwaarde berekeningen
+  const eigenActief = actief.filter((v) => !isConsignatie(v));
+  const consignatieActief = actief.filter((v) => isConsignatie(v));
+
+  const totaleVerkoopwaardeEigen = eigenActief.reduce((s, v) => s + v.verkoopprijs, 0);
+  const totaleVerkoopwaardeConsignatie = consignatieActief.reduce((s, v) => s + v.verkoopprijs, 0);
+  const totaleVerkoopwaardeAlle = totaleVerkoopwaardeEigen + totaleVerkoopwaardeConsignatie;
+
+  const verkoopwaardeLabel = waardeFilter === "consignatie" ? "Verkoopwaarde consignatie" : waardeFilter === "eigen" ? "Verkoopwaarde eigen" : "Totale verkoopwaarde";
+  const verkoopwaardeValue = waardeFilter === "consignatie" ? totaleVerkoopwaardeConsignatie : waardeFilter === "eigen" ? totaleVerkoopwaardeEigen : totaleVerkoopwaardeAlle;
+
+  // Winst berekeningen
   const totaleOmzet = verkocht.reduce((s, v) => s + v.verkoopprijs, 0);
-  const totaleKostprijs = verkocht.reduce((s, v) => s + calcKostprijs(v), 0);
-  const totaleWinst = totaleOmzet - totaleKostprijs;
+  const totaleKostprijs = verkocht.filter(v => !isConsignatie(v)).reduce((s, v) => s + calcKostprijs(v), 0);
+  const totaleCommissie = verkocht.filter(v => isConsignatie(v)).reduce((s, v) => s + calcConsignatieCommissie(v), 0);
+  const totaleWinstEigen = verkocht.filter(v => !isConsignatie(v)).reduce((s, v) => s + calcWinst(v), 0);
+  const totaleWinst = totaleWinstEigen + totaleCommissie;
+
   const recent = vehicles.slice(0, 5);
 
   const kpis = [
-    { label: "In voorraad", value: String(actief.length), icon: Car },
-    { label: "Totale omzet", value: formatEuro(totaleOmzet), icon: TrendingUp },
-    { label: "Totale kostprijs", value: formatEuro(totaleKostprijs), icon: Wallet },
+    { label: "In voorraad", value: `${eigenActief.length} eigen / ${consignatieActief.length} consig.`, icon: Car },
+    { label: verkoopwaardeLabel, value: formatEuro(verkoopwaardeValue), icon: TrendingUp },
+    { label: "Totale omzet (verkocht)", value: formatEuro(totaleOmzet), icon: Wallet },
     { label: "Totale winst", value: formatEuro(totaleWinst), icon: CheckCircle, profit: totaleWinst >= 0 },
   ];
 
@@ -37,7 +57,7 @@ const AdminDashboardPage = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {kpis.map((kpi) => (
+        {kpis.map((kpi, i) => (
           <div key={kpi.label} className="bg-card rounded-lg border border-border p-4">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs text-muted-foreground">{kpi.label}</span>
@@ -46,6 +66,24 @@ const AdminDashboardPage = () => {
             <p className={`text-xl font-semibold tabular-nums ${'profit' in kpi ? (kpi.profit ? "text-emerald-500" : "text-red-500") : "text-foreground"}`}>
               {kpi.value}
             </p>
+            {/* Filter toggle on verkoopwaarde card */}
+            {i === 1 && (
+              <div className="flex gap-1 mt-2">
+                {(["alle", "eigen", "consignatie"] as WaardeFilter[]).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setWaardeFilter(f)}
+                    className={`px-1.5 py-0.5 text-[10px] rounded border transition-colors ${
+                      waardeFilter === f
+                        ? "border-border bg-accent text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {f === "alle" ? "Alle" : f === "eigen" ? "Eigen" : "Consig."}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -101,7 +139,12 @@ const AdminDashboardPage = () => {
                         </span>
                       </td>
                       <td className={`px-4 py-2.5 text-right text-sm tabular-nums ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                        {v.verkoopprijs > 0 ? formatEuro(winst) : "—"}
+                        {v.verkoopprijs > 0 ? (
+                          <>
+                            {formatEuro(winst)}
+                            {isConsignatie(v) && <span className="text-[10px] text-muted-foreground ml-1">com.</span>}
+                          </>
+                        ) : "—"}
                       </td>
                     </tr>
                   );
