@@ -23,7 +23,7 @@ const tabs = [
 ];
 
 const AdminProefrittenPage = () => {
-  const { testDrives, loading } = useTestDrives();
+  const { testDrives, loading, refetch } = useTestDrives();
   const [filter, setFilter] = useState("alle");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<TestDrive | null>(null);
@@ -142,7 +142,7 @@ const AdminProefrittenPage = () => {
           testDrive={selected}
           open={!!selected}
           onClose={() => setSelected(null)}
-          onDeleted={() => { setSelected(null); }}
+          onDeleted={() => { setSelected(null); refetch(); }}
         />
       )}
 
@@ -150,7 +150,7 @@ const AdminProefrittenPage = () => {
         <EindProefritDialog
           testDrive={ending}
           open={!!ending}
-          onClose={() => setEnding(null)}
+          onClose={() => { setEnding(null); refetch(); }}
         />
       )}
     </div>
