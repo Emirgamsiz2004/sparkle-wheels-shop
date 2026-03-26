@@ -107,6 +107,7 @@ const VoorraadDetailPage = () => {
   // Sidebar key facts
   const sidebarFacts = vehicle
     ? [
+        { label: "Kenteken", value: formattedKenteken || null },
         { label: "Bouwjaar", value: vehicle.bouwjaar },
         { label: "Kilometerstand", value: vehicle.kilometerstand ? `${Number(vehicle.kilometerstand).toLocaleString("nl-NL")} km` : null },
         { label: "Brandstof", value: vehicle.brandstof },
@@ -114,8 +115,9 @@ const VoorraadDetailPage = () => {
         { label: "Vermogen", value: vehicle.vermogen_pk ? `${vehicle.vermogen_pk} pk` : null },
         { label: "Carrosserie", value: vehicle.carrosserie },
         { label: "Kleur", value: vehicle.kleur },
-        { label: "APK", value: vehicle.extra?.apk || null },
-        { label: "APK", value: vehicle.extra?.apk || null },
+        { label: "Aantal eigenaren", value: vehicle.aantal_eigenaren || null },
+        { label: "APK tot", value: vehicle.extra?.apk || null },
+        { label: "BTW/Marge", value: vehicle.btw_marge || null },
       ].filter((s) => s.value)
     : [];
 
