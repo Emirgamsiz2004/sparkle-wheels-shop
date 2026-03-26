@@ -27,6 +27,7 @@ const AdminProefrittenPage = () => {
   const [filter, setFilter] = useState("alle");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<TestDrive | null>(null);
+  const [ending, setEnding] = useState<TestDrive | null>(null);
   const isMobile = useIsMobile();
 
   const filtered = testDrives.filter((td) => {
