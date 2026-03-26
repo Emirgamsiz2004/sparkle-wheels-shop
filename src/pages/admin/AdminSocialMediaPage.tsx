@@ -324,10 +324,10 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                   {hashtags ? (
                     <>
                       {[
-                        { label: "🚗 Merk & Model", value: hashtags.merkModel },
-                        { label: "🏷️ Auto & Verkoop", value: hashtags.autoVerkopen },
-                        { label: "📍 Locatie", value: hashtags.locatie },
-                        { label: "✨ Extra", value: hashtags.extra },
+                        { label: "Merk & Model", value: hashtags.merkModel },
+                        { label: "Auto & Verkoop", value: hashtags.autoVerkopen },
+                        { label: "Locatie", value: hashtags.locatie },
+                        { label: "Extra", value: hashtags.extra },
                       ].map((block) => (
                         <div key={block.label} className="space-y-1">
                           <p className="text-xs font-medium text-muted-foreground">{block.label}</p>
