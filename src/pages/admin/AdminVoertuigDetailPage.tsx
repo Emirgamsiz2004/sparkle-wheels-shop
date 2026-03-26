@@ -195,6 +195,19 @@ const AdminVoertuigDetailPage = () => {
           </div>
         )}
       </div>
+
+      <StartProefritDialog
+        open={proefritOpen}
+        onClose={() => setProefritOpen(false)}
+        vehicle={{
+          id: vehicle.id,
+          merk: vehicle.merk,
+          model: vehicle.model,
+          kenteken: vehicle.kenteken,
+          bouwjaar: vehicle.bouwjaar,
+          kilometerstand: vehicle.kilometerstand,
+        }}
+      />
     </div>
   );
 };
