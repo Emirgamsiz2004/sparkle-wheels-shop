@@ -38,6 +38,7 @@ import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
 import ReviewsPage from "./pages/ReviewsPage";
 import NotFound from "./pages/NotFound";
+import Unsubscribe from "./pages/Unsubscribe";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -102,6 +103,7 @@ const App = () => (
               <Route path="/algemene-voorwaarden" element={<AlgemeneVoorwaarden />} />
               <Route path="/proefrit/:token" element={<ProefritFormulier />} />
               <Route path="/reviews" element={<ReviewsPage />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboardPage />} />
