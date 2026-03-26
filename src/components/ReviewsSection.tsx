@@ -133,6 +133,7 @@ export default function ReviewsSection() {
         {/* Slider */}
         <div
           ref={containerRef}
+          className="relative overflow-hidden touch-pan-y"
           onTouchStart={(e) => {
             const touch = e.touches[0];
             (e.currentTarget as any)._touchStartX = touch.clientX;
