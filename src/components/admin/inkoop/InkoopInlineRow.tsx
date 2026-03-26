@@ -123,7 +123,7 @@ export const InkoopInlineRow = ({ onAdd }: InkoopInlineRowProps) => {
             className={cn(
               "px-3 py-1 text-xs font-medium rounded-md transition-all duration-200",
               bronType === opt.value
-                ? "bg-foreground text-background shadow-sm"
+                ? "bg-accent text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >

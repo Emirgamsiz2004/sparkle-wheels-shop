@@ -176,7 +176,7 @@ const VehicleDocumentenTab = ({ vehicleId }: { vehicleId: string }) => {
                   ))}
                 </select>
               </div>
-              <button onClick={handleUpload} disabled={uploading || !form.file || !form.naam} className="w-full py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 disabled:opacity-50 flex items-center justify-center gap-2">
+              <button onClick={handleUpload} disabled={uploading || !form.file || !form.naam} className="w-full py-2.5 border border-border text-sm font-medium rounded-lg hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-2 transition-colors">
                 {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />} Uploaden
               </button>
             </div>

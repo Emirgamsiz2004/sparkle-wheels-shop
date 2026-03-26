@@ -261,7 +261,7 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose }: Props) => {
               <button
                 onClick={handleDownloadPdf}
                 disabled={downloading}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
               >
                 <Download className="w-3.5 h-3.5" />
                 {downloading ? "Bezig..." : "PDF downloaden"}

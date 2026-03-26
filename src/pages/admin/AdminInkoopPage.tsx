@@ -131,7 +131,7 @@ export default function AdminInkoopPage() {
               className={cn(
                 'text-xs px-3 py-1.5 rounded-lg border transition-all duration-200 font-medium',
                 filterStatus === s
-                  ? 'bg-foreground text-background border-foreground'
+                  ? 'bg-accent text-foreground border-border'
                   : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground/20'
               )}
             >

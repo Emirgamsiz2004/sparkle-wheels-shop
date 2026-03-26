@@ -130,7 +130,7 @@ const AdminVoertuigDetailPage = () => {
               onClick={() => setActiveTab(t.key)}
               className={`px-3 py-1.5 text-xs font-medium rounded transition-colors whitespace-nowrap ${
                 activeTab === t.key
-                  ? "bg-foreground text-background"
+                  ? "bg-accent text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
