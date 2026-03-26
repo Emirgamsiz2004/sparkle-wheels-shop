@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Trash2, Loader2, FileText, Info } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, FileText, Info, ClipboardCheck } from "lucide-react";
 import { toast } from "sonner";
 import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
@@ -26,6 +27,7 @@ const AdminVoertuigDetailPage = () => {
   const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
   const [activeTab, setActiveTab] = useState("overzicht");
   const [blogGenerating, setBlogGenerating] = useState(false);
+  const [proefritOpen, setProefritOpen] = useState(false);
 
   const vehicle = vehicles.find((v) => v.id === id);
 
@@ -89,7 +91,10 @@ const AdminVoertuigDetailPage = () => {
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={() => setProefritOpen(true)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+            <ClipboardCheck className="w-3.5 h-3.5" /> Proefrit starten
+          </button>
           <button onClick={handleGenerateBlog} disabled={blogGenerating} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50">
             {blogGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
             Genereer blogpost
@@ -190,6 +195,19 @@ const AdminVoertuigDetailPage = () => {
           </div>
         )}
       </div>
+
+      <StartProefritDialog
+        open={proefritOpen}
+        onClose={() => setProefritOpen(false)}
+        vehicle={{
+          id: vehicle.id,
+          merk: vehicle.merk,
+          model: vehicle.model,
+          kenteken: vehicle.kenteken,
+          bouwjaar: vehicle.bouwjaar,
+          kilometerstand: vehicle.kilometerstand,
+        }}
+      />
     </div>
   );
 };

@@ -34,6 +34,8 @@ import AdminInstellingenPage from "./pages/admin/AdminInstellingenPage";
 import AdminSocialMediaPage from "./pages/admin/AdminSocialMediaPage";
 import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
 import AdminBlogPage from "./pages/admin/AdminBlogPage";
+import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
+import ProefritFormulier from "./pages/ProefritFormulier";
 import NotFound from "./pages/NotFound";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
@@ -75,6 +77,7 @@ const App = () => (
                 <Route path="advertenties" element={<AdminAdvertentiesPage />} />
                 <Route path="blog" element={<AdminBlogPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
+                <Route path="proefriten" element={<AdminProefrittenPage />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
             </Routes>
@@ -96,6 +99,7 @@ const App = () => (
               <Route path="/privacybeleid" element={<PrivacyPolicy />} />
               <Route path="/cookiebeleid" element={<CookiePolicy />} />
               <Route path="/algemene-voorwaarden" element={<AlgemeneVoorwaarden />} />
+              <Route path="/proefrit/:token" element={<ProefritFormulier />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboardPage />} />
@@ -112,6 +116,7 @@ const App = () => (
                 <Route path="advertenties" element={<AdminAdvertentiesPage />} />
                 <Route path="blog" element={<AdminBlogPage />} />
                 <Route path="deals" element={<DealAnalyzer />} />
+                <Route path="proefriten" element={<AdminProefrittenPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
