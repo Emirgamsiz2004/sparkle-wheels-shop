@@ -55,20 +55,20 @@ const AdminProefrittenPage = () => {
       </div>
 
       <div className="space-y-3">
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-          <div className="flex gap-0.5 bg-secondary/50 border border-border rounded-md p-0.5 min-w-max">
-            {tabs.map((t) => (
-              <button
-                key={t.value}
-                onClick={() => setFilter(t.value)}
-                className={`px-2.5 py-1 text-xs font-medium rounded transition-colors whitespace-nowrap ${
-                  filter === t.value ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-1.5">
+          {tabs.map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setFilter(t.value)}
+              className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors ${
+                filter === t.value
+                  ? "border-border bg-accent text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
