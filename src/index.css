@@ -81,7 +81,7 @@
     --input: 220 5% 18%;
     --ring: 0 0% 60%;
 
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 220 6% 8%;
     --sidebar-foreground: 220 10% 92%;
@@ -91,6 +91,17 @@
     --sidebar-accent-foreground: 220 10% 92%;
     --sidebar-border: 220 5% 15%;
     --sidebar-ring: 0 0% 60%;
+
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .admin-theme h1,
+  .admin-theme h2,
+  .admin-theme h3,
+  .admin-theme h4,
+  .admin-theme h5,
+  .admin-theme h6 {
+    font-family: 'Poppins', sans-serif;
   }
 }
 

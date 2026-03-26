@@ -107,8 +107,8 @@ const AdminBlogPage = () => {
                 <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                   <span>{format(new Date(post.created_at), "d MMM yyyy", { locale: nl })}</span>
                   {post.vehicles && (
-                    <span className="bg-accent/50 px-2 py-0.5 rounded text-[11px]">
-                      🚗 {post.vehicles.merk} {post.vehicles.model} {post.vehicles.bouwjaar}
+                    <span className="bg-accent/50 px-2 py-0.5 rounded-md text-[11px]">
+                      {post.vehicles.merk} {post.vehicles.model} {post.vehicles.bouwjaar}
                     </span>
                   )}
                 </div>

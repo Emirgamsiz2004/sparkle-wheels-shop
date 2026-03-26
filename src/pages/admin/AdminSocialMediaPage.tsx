@@ -324,10 +324,10 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                   {hashtags ? (
                     <>
                       {[
-                        { label: "🚗 Merk & Model", value: hashtags.merkModel },
-                        { label: "🏷️ Auto & Verkoop", value: hashtags.autoVerkopen },
-                        { label: "📍 Locatie", value: hashtags.locatie },
-                        { label: "✨ Extra", value: hashtags.extra },
+                        { label: "Merk & Model", value: hashtags.merkModel },
+                        { label: "Auto & Verkoop", value: hashtags.autoVerkopen },
+                        { label: "Locatie", value: hashtags.locatie },
+                        { label: "Extra", value: hashtags.extra },
                       ].map((block) => (
                         <div key={block.label} className="space-y-1">
                           <p className="text-xs font-medium text-muted-foreground">{block.label}</p>
@@ -358,8 +358,8 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">PA</div>
                   <span className="text-xs font-semibold">platinautomotive</span>
                 </div>
-                <div className="bg-muted aspect-video rounded flex items-center justify-center text-muted-foreground text-xs">
-                  📷 Foto
+                <div className="bg-muted aspect-video rounded-lg flex items-center justify-center text-muted-foreground text-xs">
+                  Foto
                 </div>
                 <div className="text-xs leading-relaxed whitespace-pre-wrap">
                   <span className="font-semibold">{caption.split("\n")[0]}</span>
