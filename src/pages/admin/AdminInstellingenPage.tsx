@@ -112,7 +112,7 @@ const AdminInstellingenPage = () => {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-foreground text-background text-sm font-medium hover:bg-foreground/90 disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-6 py-2.5 border border-border text-sm font-medium rounded-md hover:bg-accent disabled:opacity-50 transition-colors"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             Opslaan
