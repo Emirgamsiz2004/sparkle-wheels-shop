@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
-import { Copy, Check, QrCode, Mail, ExternalLink } from "lucide-react";
+import { Copy, Check, QrCode, Mail, ExternalLink, Printer } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -121,6 +121,19 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
               >
                 <ExternalLink className="w-3.5 h-3.5" /> Openen
               </a>
+              <button
+                onClick={() => {
+                  const printWindow = window.open(proefritUrl, "_blank");
+                  if (printWindow) {
+                    printWindow.addEventListener("load", () => {
+                      setTimeout(() => printWindow.print(), 1000);
+                    });
+                  }
+                }}
+                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent/20 transition-colors text-foreground"
+              >
+                <Printer className="w-3.5 h-3.5" /> Printen
+              </button>
               <button
                 onClick={handleClose}
                 className="flex-1 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors"

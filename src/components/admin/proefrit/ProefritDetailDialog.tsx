@@ -282,6 +282,21 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
                   Beëindigen
                 </button>
               )}
+
+              <button
+                onClick={async () => {
+                  if (!confirm("Weet je zeker dat je deze proefrit wilt verwijderen?")) return;
+                  setDeleting(true);
+                  const ok = await deleteTestDrive(td.id);
+                  setDeleting(false);
+                  if (ok) { onDeleted?.(); onClose(); }
+                }}
+                disabled={deleting}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-red-500/30 text-red-400 rounded-md hover:bg-red-500/10 transition-colors disabled:opacity-50 ml-auto"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                {deleting ? "Bezig..." : "Verwijderen"}
+              </button>
             </div>
 
             {/* Email status */}
