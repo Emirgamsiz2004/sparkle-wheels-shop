@@ -97,15 +97,6 @@ async function fetchDetail(detailPath: string) {
   const nap = dataAttr("nap"); // "0" or "1"
   const bovagGarantie = dataAttr("bovaggarantie");
   const garantieMaanden = dataAttr("garantiemaanden");
-  const aantalEigenaren = dataAttr("aantaleigenaren") || extractSection("aantal-eigenaren") || extractSection("eigenaren");
-  const btw_marge = dataAttr("btwmarge") || extractSection("btw-marge") || extractSection("btw");
-
-  // Try to extract aantal eigenaren from page text if not in data attributes
-  let eigenaren = aantalEigenaren;
-  if (!eigenaren) {
-    const eigMatch = html.match(/eigenar[^<]*?(\d+)/i);
-    if (eigMatch) eigenaren = eigMatch[1];
-  }
 
   // Extract kenteken from detail page
   const kentekenDetail = dataAttr("kenteken");
@@ -121,6 +112,16 @@ async function fetchDetail(detailPath: string) {
     }
     return "";
   };
+
+  const aantalEigenaren = dataAttr("aantaleigenaren") || extractSection("aantal-eigenaren") || extractSection("eigenaren");
+  const btw_marge = dataAttr("btwmarge") || extractSection("btw-marge") || extractSection("btw");
+
+  // Try to extract aantal eigenaren from page text if not in data attributes
+  let eigenaren = aantalEigenaren;
+  if (!eigenaren) {
+    const eigMatch = html.match(/eigenar[^<]*?(\d+)/i);
+    if (eigMatch) eigenaren = eigMatch[1];
+  }
 
   const topsnelheid = extractSection("topsnelheid");
   const verbruik = extractSection("verbruik ");
