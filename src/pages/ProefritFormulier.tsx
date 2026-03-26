@@ -100,7 +100,41 @@ const ProefritFormulier = () => {
     setHasSigned(false);
   };
 
-  const isValid = voornaam && achternaam && email && telefoon && rijbewijsnummer && akkoord && hasSigned;
+  const sanitizeRijbewijs = (val: string) => val.replace(/[\s\-]/g, "");
+
+  const handleRijbewijsChange = (val: string) => {
+    // Strip non-digits
+    const clean = val.replace(/[^0-9\s\-]/g, "");
+    setRijbewijsnummer(clean);
+    const sanitized = sanitizeRijbewijs(clean);
+    if (sanitized.length > 0 && (sanitized.length !== 10 || !/^\d{10}$/.test(sanitized))) {
+      setRijbewijsError("Controleer je rijbewijsnummer — dit moet uit 10 cijfers bestaan");
+    } else {
+      setRijbewijsError(null);
+    }
+  };
+
+  const handleRijbewijsFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    setRijbewijsFoto(file);
+    setRijbewijsFotoPreview(URL.createObjectURL(file));
+  };
+
+  const removeRijbewijsFoto = () => {
+    setRijbewijsFoto(null);
+    if (rijbewijsFotoPreview) URL.revokeObjectURL(rijbewijsFotoPreview);
+    setRijbewijsFotoPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const rijbewijsValid = (() => {
+    const sanitized = sanitizeRijbewijs(rijbewijsnummer);
+    return /^\d{10}$/.test(sanitized);
+  })();
+
+  const isValid = voornaam && achternaam && email && telefoon && rijbewijsValid && rijbewijsFoto && akkoord && hasSigned;
 
   const handleSubmit = async () => {
     if (!isValid || !testDrive || !sigPadRef.current) return;
