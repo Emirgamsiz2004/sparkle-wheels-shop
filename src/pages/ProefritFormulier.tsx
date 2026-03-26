@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SignaturePad from "signature_pad";
-import { CheckCircle2, Loader2, Car, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Loader2, Car, AlertTriangle, Upload, X } from "lucide-react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 
 const OVEREENKOMST_TEKST = [
@@ -30,8 +30,13 @@ const ProefritFormulier = () => {
   const [rijbewijscategorie, setRijbewijscategorie] = useState("B");
   const [opmerkingen, setOpmerkingen] = useState("");
   const [akkoord, setAkkoord] = useState(false);
+  const [rijbewijsFoto, setRijbewijsFoto] = useState<File | null>(null);
+  const [rijbewijsFotoPreview, setRijbewijsFotoPreview] = useState<string | null>(null);
+  const [rijbewijsFotoUploading, setRijbewijsFotoUploading] = useState(false);
+  const [rijbewijsError, setRijbewijsError] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const sigPadRef = useRef<SignaturePad | null>(null);
   const [hasSigned, setHasSigned] = useState(false);
 
