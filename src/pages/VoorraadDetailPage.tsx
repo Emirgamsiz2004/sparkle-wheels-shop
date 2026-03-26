@@ -50,12 +50,14 @@ const VoorraadDetailPage = () => {
     const normalized = vehicle.kenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
     supabase
       .from("vehicles")
-      .select("marktplaats_url")
-      .ilike("kenteken", `%${normalized}%`)
+      .select("marktplaats_url, kenteken")
       .not("marktplaats_url", "is", null)
-      .limit(1)
       .then(({ data }) => {
-        if (data?.[0]?.marktplaats_url) setDbMarktplaatsUrl(data[0].marktplaats_url);
+        const match = data?.find((v) => {
+          const dbK = (v.kenteken || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+          return dbK === normalized;
+        });
+        if (match?.marktplaats_url) setDbMarktplaatsUrl(match.marktplaats_url);
       });
   }, [vehicle?.kenteken]);
 
