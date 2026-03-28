@@ -102,8 +102,9 @@ Deno.serve(async (req) => {
 
     let rijbewijsFotoUrl = "";
     if (customer?.rijbewijs_foto_path) {
-      const { data: urlData } = supabase.storage.from("test-drive-files").getPublicUrl(customer.rijbewijs_foto_path);
-      rijbewijsFotoUrl = urlData?.publicUrl || "";
+      const { data: signedData } = await supabase.storage.from("test-drive-files")
+        .createSignedUrl(customer.rijbewijs_foto_path, 60 * 60 * 24 * 365);
+      rijbewijsFotoUrl = signedData?.signedUrl || "";
     }
 
     const geredenKm = td.km_na != null ? td.km_na - td.km_voor : null;
