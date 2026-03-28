@@ -252,13 +252,12 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 1
     <div class="sig-label">Handtekening klant</div>
     ${td.handtekening_data ? `<img src="${td.handtekening_data}" alt="Handtekening">` : ''}
     <div class="sig-line">Naam: ${customer ? `${customer.voornaam} ${customer.achternaam}` : '________________________________'}</div>
-    <div class="sig-line" style="border-top:none;margin-top:2px;">Plaats: ${customer?.plaats || '________________________'}</div>
   </div>
   <div class="sig-box">
-    <div class="sig-label">Datum & tijdstip ondertekening</div>
+    <div class="sig-label">Plaats van ondertekening</div>
     <div style="margin-top:40px"></div>
     <div class="sig-line">Datum / tijd: ${td.formulier_ingevuld_op ? formatDateTime(td.formulier_ingevuld_op) : '________________________'}</div>
-    <div class="sig-line" style="border-top:none;margin-top:2px;">Postcode: ${customer?.postcode || '________________________'}</div>
+    <div class="sig-line" style="border-top:none;margin-top:2px;">Locatie: Cilinderweg 99, 2371 DZ Roelofarendsveen</div>
   </div>
 </div>
 
