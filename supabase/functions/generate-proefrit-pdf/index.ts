@@ -1,4 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import * as React from "npm:react@18.3.1";
+import { renderAsync } from "npm:@react-email/components@0.0.22";
+import { template as proefritTemplate } from "../_shared/transactional-email-templates/proefrit-overeenkomst.tsx";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -297,30 +300,94 @@ ${td.opmerkingen_na ? `<div style="font-size:8px;color:#666;margin-top:4px;"><st
 
       const pdfUrl = signedData?.signedUrl || "";
 
-      // Send transactional email via the queue
-      const { error: emailErr } = await supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "proefrit-overeenkomst",
-          recipientEmail: customer.email,
-          idempotencyKey: `proefrit-${testDriveId}-${Date.now()}`,
-          templateData: {
-            klantNaam: `${customer.voornaam} ${customer.achternaam}`,
-            voertuig: voertuigTitel,
-            kenteken: kentekenDisplay,
-            datum: formatDate(td.created_at),
-            documentNummer: docNummer,
-            pdfUrl,
-          },
-        },
-      });
+      const templateData = {
+        klantNaam: `${customer.voornaam} ${customer.achternaam}`,
+        voertuig: voertuigTitel,
+        kenteken: kentekenDisplay,
+        datum: formatDate(td.created_at),
+        documentNummer: docNummer,
+        pdfUrl,
+      };
 
-      if (emailErr) {
-        console.error("Email send error:", emailErr);
-      } else {
-        await supabase
-          .from("test_drives")
-          .update({ email_verzonden_op: new Date().toISOString() })
-          .eq("id", testDriveId);
+      try {
+        // Render the email template directly
+        const html = await renderAsync(
+          React.createElement(proefritTemplate.component, templateData)
+        );
+        const plainText = await renderAsync(
+          React.createElement(proefritTemplate.component, templateData),
+          { plainText: true }
+        );
+
+        const resolvedSubject = typeof proefritTemplate.subject === 'function'
+          ? proefritTemplate.subject(templateData)
+          : proefritTemplate.subject;
+
+        const messageId = crypto.randomUUID();
+
+        // Get or create unsubscribe token
+        const normalizedEmail = customer.email.toLowerCase();
+        let unsubscribeToken: string;
+        const { data: existingToken } = await supabase
+          .from('email_unsubscribe_tokens')
+          .select('token')
+          .eq('email', normalizedEmail)
+          .maybeSingle();
+
+        if (existingToken) {
+          unsubscribeToken = existingToken.token;
+        } else {
+          const bytes = new Uint8Array(32);
+          crypto.getRandomValues(bytes);
+          unsubscribeToken = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+          await supabase.from('email_unsubscribe_tokens').upsert(
+            { token: unsubscribeToken, email: normalizedEmail },
+            { onConflict: 'email', ignoreDuplicates: true }
+          );
+          // Re-read in case of race
+          const { data: storedToken } = await supabase
+            .from('email_unsubscribe_tokens').select('token').eq('email', normalizedEmail).maybeSingle();
+          if (storedToken) unsubscribeToken = storedToken.token;
+        }
+
+        // Log pending
+        await supabase.from('email_send_log').insert({
+          message_id: messageId,
+          template_name: 'proefrit-overeenkomst',
+          recipient_email: customer.email,
+          status: 'pending',
+        });
+
+        // Enqueue directly to the email queue
+        const { error: enqueueError } = await supabase.rpc('enqueue_email', {
+          queue_name: 'transactional_emails',
+          payload: {
+            message_id: messageId,
+            to: customer.email,
+            from: `Platin Automotive <noreply@notify.platinautomotive.nl>`,
+            sender_domain: 'notify.platinautomotive.nl',
+            subject: resolvedSubject,
+            html,
+            text: plainText,
+            purpose: 'transactional',
+            label: 'proefrit-overeenkomst',
+            idempotency_key: `proefrit-${testDriveId}-${Date.now()}`,
+            unsubscribe_token: unsubscribeToken,
+            queued_at: new Date().toISOString(),
+          },
+        });
+
+        if (enqueueError) {
+          console.error("Email enqueue error:", enqueueError);
+        } else {
+          console.log("Email enqueued for", customer.email);
+          await supabase
+            .from("test_drives")
+            .update({ email_verzonden_op: new Date().toISOString() })
+            .eq("id", testDriveId);
+        }
+      } catch (emailErr) {
+        console.error("Email render/enqueue error:", emailErr);
       }
     }
 
