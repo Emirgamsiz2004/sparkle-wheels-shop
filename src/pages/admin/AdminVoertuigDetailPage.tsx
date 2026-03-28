@@ -229,6 +229,12 @@ const AdminVoertuigDetailPage = () => {
         onClose={() => setConsignatieOpen(false)}
         vehicle={vehicle}
       />
+      <AanbetalingDialog
+        open={aanbetalingOpen}
+        onClose={() => setAanbetalingOpen(false)}
+        vehicle={vehicle}
+        onStatusChange={refetch}
+      />
     </div>
   );
 };
