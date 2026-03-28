@@ -94,6 +94,11 @@ const AdminVoertuigDetailPage = () => {
           <button onClick={() => setProefritOpen(true)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
             <ClipboardCheck className="w-3.5 h-3.5" /> Proefrit starten
           </button>
+          {(vehicle.verkoopType === "consignatie" || vehicle.status === "consignatie") && (
+            <button onClick={() => setConsignatieOpen(true)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+              <ScrollText className="w-3.5 h-3.5" /> Consignatieovereenkomst
+            </button>
+          )}
           <button onClick={handleGenerateBlog} disabled={blogGenerating} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50">
             {blogGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
             Genereer blogpost
