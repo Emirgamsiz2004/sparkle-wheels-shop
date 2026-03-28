@@ -10,9 +10,25 @@ const corsHeaders = {
 const BASE = "https://svl.autodealers.nl";
 const LIST_URL = `${BASE}/occasions.aspx?did=91347&format=xml`;
 
+type FeedStatus = "te_koop" | "verkocht" | "gereserveerd";
+
 function attr(block: string, name: string): string {
   const m = block.match(new RegExp(`data-${name}="([^"]*)"`));
   return m ? m[1] : "";
+}
+
+function extractFeedStatus(block: string): FeedStatus {
+  const lowerBlock = block.toLowerCase();
+
+  if (lowerBlock.includes("occ_verkocht.png") || lowerBlock.includes(">verkocht<")) {
+    return "verkocht";
+  }
+
+  if (lowerBlock.includes("occ_gereserveerd.png") || lowerBlock.includes(">gereserveerd<")) {
+    return "gereserveerd";
+  }
+
+  return "te_koop";
 }
 
 async function fetchList() {
@@ -50,6 +66,7 @@ async function fetchList() {
       detailPath,
       kenteken: attr(block, "kenteken"),
       nap: attr(block, "nap"),
+      feedStatus: extractFeedStatus(block),
     });
   }
 
@@ -228,7 +245,7 @@ serve(async (req) => {
         (v.kenteken ? statusByKenteken.get(v.kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "")) : null);
       return {
         ...v,
-        dbStatus: match?.status || "te_koop",
+        dbStatus: match?.status || v.feedStatus || "te_koop",
       };
     });
 
