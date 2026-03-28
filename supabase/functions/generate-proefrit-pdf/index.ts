@@ -293,12 +293,9 @@ ${td.opmerkingen_na ? `<div style="font-size:8px;color:#666;margin-top:4px;"><st
 
     // Send email if requested
     if (sendEmail && customer?.email) {
-      // Generate a signed URL for the stored HTML
-      const { data: signedData } = await supabase.storage
-        .from("test-drive-files")
-        .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1 year
-
-      const pdfUrl = signedData?.signedUrl || "";
+      // Build a viewer URL that renders the HTML properly
+      const siteUrl = Deno.env.get("SITE_URL") || "https://platinautomotive.nl";
+      const pdfUrl = `${siteUrl}/overeenkomst/${testDriveId}`;
 
       const templateData = {
         klantNaam: `${customer.voornaam} ${customer.achternaam}`,
