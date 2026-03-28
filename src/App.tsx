@@ -36,7 +36,7 @@ import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
 import AdminBlogPage from "./pages/admin/AdminBlogPage";
 import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
-import OvereenkomstViewer from "./pages/OvereenkomstViewer";
+
 import ReviewsPage from "./pages/ReviewsPage";
 import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
