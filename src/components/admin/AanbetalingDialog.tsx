@@ -62,6 +62,11 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
 
   const restbedrag = form.verkoopprijs - form.aanbetalingsbedrag;
 
+  const contantTooHigh = (form.betaalwijze === "contant" && form.verkoopprijs > 3000) ||
+    (form.betaalwijze === "combinatie" && form.contantBedrag > 3000);
+
+  const bankBedrag = form.betaalwijze === "combinatie" ? form.verkoopprijs - form.contantBedrag : 0;
+
   const isValid = () =>
     form.voornaam.trim() &&
     form.achternaam.trim() &&
@@ -72,7 +77,8 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
     form.email.trim() &&
     form.verkoopprijs > 0 &&
     form.aanbetalingsbedrag > 0 &&
-    form.uiterlijkeDatum;
+    form.uiterlijkeDatum &&
+    !contantTooHigh;
 
   const handleGenerate = async () => {
     if (!isValid()) {
