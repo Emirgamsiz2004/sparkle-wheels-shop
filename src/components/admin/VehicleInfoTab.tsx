@@ -119,7 +119,7 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
                 <label className="block text-xs text-muted-foreground mb-1">Commissie %</label>
                 <input
                   type="number"
-                  min={1}
+                  min={0}
                   max={50}
                   step={0.5}
                   value={commissiePerc}
