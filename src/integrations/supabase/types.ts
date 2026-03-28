@@ -814,6 +814,8 @@ export type Database = {
           email: string
           geboortedatum: string | null
           id: string
+          plaats: string | null
+          postcode: string | null
           rijbewijs_foto_path: string | null
           rijbewijscategorie: string | null
           rijbewijsnummer: string | null
@@ -827,6 +829,8 @@ export type Database = {
           email: string
           geboortedatum?: string | null
           id?: string
+          plaats?: string | null
+          postcode?: string | null
           rijbewijs_foto_path?: string | null
           rijbewijscategorie?: string | null
           rijbewijsnummer?: string | null
@@ -840,6 +844,8 @@ export type Database = {
           email?: string
           geboortedatum?: string | null
           id?: string
+          plaats?: string | null
+          postcode?: string | null
           rijbewijs_foto_path?: string | null
           rijbewijscategorie?: string | null
           rijbewijsnummer?: string | null
@@ -850,6 +856,7 @@ export type Database = {
       }
       test_drives: {
         Row: {
+          begeleidende_medewerker: string | null
           created_at: string
           customer_id: string | null
           document_nummer: string | null
@@ -876,6 +883,7 @@ export type Database = {
           voertuig_model: string | null
         }
         Insert: {
+          begeleidende_medewerker?: string | null
           created_at?: string
           customer_id?: string | null
           document_nummer?: string | null
@@ -902,6 +910,7 @@ export type Database = {
           voertuig_model?: string | null
         }
         Update: {
+          begeleidende_medewerker?: string | null
           created_at?: string
           customer_id?: string | null
           document_nummer?: string | null
