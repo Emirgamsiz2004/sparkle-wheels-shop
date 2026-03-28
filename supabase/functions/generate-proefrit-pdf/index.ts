@@ -209,13 +209,17 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 1
   </tr>
   <tr>
     <td><span class="label">Adres</span><span class="value">${customer?.adres || ''}</span></td>
-    <td><span class="label">Postcode & Plaats</span><span class="value"></span></td>
-    <td><span class="label">Telefoonnummer</span><span class="value">${customer?.telefoon || ''}</span></td>
+    <td><span class="label">Postcode</span><span class="value">${customer?.postcode || ''}</span></td>
+    <td><span class="label">Plaats</span><span class="value">${customer?.plaats || ''}</span></td>
   </tr>
   <tr>
+    <td><span class="label">Telefoonnummer</span><span class="value">${customer?.telefoon || ''}</span></td>
     <td><span class="label">E-mailadres</span><span class="value">${customer?.email || ''}</span></td>
-    <td><span class="label">Rijbewijsnummer</span><span class="value">${customer?.rijbewijsnummer || ''}</span></td>
     <td><span class="label">Rijbewijscategorie</span><span class="value">${customer?.rijbewijscategorie || 'B'}</span></td>
+  </tr>
+  <tr>
+    <td colspan="2"><span class="label">Rijbewijsnummer</span><span class="value">${customer?.rijbewijsnummer || ''}</span></td>
+    <td>${customer?.rijbewijs_foto_path ? `<span class="label">Rijbewijs foto</span><img src="${rijbewijsFotoUrl}" class="rijbewijs-foto" alt="Rijbewijs">` : ''}</td>
   </tr>
 </table>
 
@@ -229,7 +233,7 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 1
   </tr>
   <tr>
     <td><span class="label">Totaal gereden (km)</span><span class="value">${geredenKm != null ? nl(geredenKm) : ''}</span></td>
-    <td colspan="2"><span class="label">Begeleidende medewerker</span><span class="value"></span></td>
+    <td colspan="2"><span class="label">Begeleidende medewerker</span><span class="value">${td.begeleidende_medewerker || ''}</span></td>
   </tr>
 </table>
 
@@ -244,15 +248,19 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 1
     <div class="sig-label">Handtekening klant</div>
     ${td.handtekening_data ? `<img src="${td.handtekening_data}" alt="Handtekening">` : ''}
     <div class="sig-line">Naam: ${customer ? `${customer.voornaam} ${customer.achternaam}` : '________________________________'}</div>
+    <div class="sig-line" style="border-top:none;margin-top:2px;">Plaats: ${customer?.plaats || '________________________'}</div>
   </div>
   <div class="sig-box">
-    <div class="sig-label">Datum & tijdstip</div>
+    <div class="sig-label">Datum & tijdstip ondertekening</div>
     <div style="margin-top:40px"></div>
     <div class="sig-line">Datum / tijd: ${td.formulier_ingevuld_op ? formatDateTime(td.formulier_ingevuld_op) : '________________________'}</div>
+    <div class="sig-line" style="border-top:none;margin-top:2px;">Postcode: ${customer?.postcode || '________________________'}</div>
   </div>
 </div>
 
-${td.ip_adres ? `<div style="font-size:7px;color:#aaa;margin-top:8px;">IP-adres bij ondertekening: ${td.ip_adres}</div>` : ''}
+${td.ip_adres ? `<div style="font-size:7px;color:#aaa;margin-top:8px;">Digitaal ondertekend op ${td.formulier_ingevuld_op ? formatDateTime(td.formulier_ingevuld_op) : '—'} · IP-adres: ${td.ip_adres} · Document: ${docNummer}</div>` : ''}
+${td.opmerkingen_voor ? `<div style="font-size:8px;color:#666;margin-top:6px;"><strong>Opmerkingen klant:</strong> ${td.opmerkingen_voor}</div>` : ''}
+${td.opmerkingen_na ? `<div style="font-size:8px;color:#666;margin-top:4px;"><strong>Opmerkingen na rit:</strong> ${td.opmerkingen_na}</div>` : ''}
 
 </div><!-- /content -->
 
