@@ -15,6 +15,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
   const { startTestDrive } = useTestDrives();
   const [step, setStep] = useState<"form" | "result">("form");
   const [kmVoor, setKmVoor] = useState(vehicle.kilometerstand?.toString() || "");
+  const [medewerker, setMedewerker] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<TestDrive | null>(null);
   const [copied, setCopied] = useState(false);
@@ -32,7 +33,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
       model: vehicle.model,
       kenteken: vehicle.kenteken,
       bouwjaar: vehicle.bouwjaar,
-    });
+    }, medewerker || undefined);
     setLoading(false);
     if (td) {
       setResult(td);
@@ -74,6 +75,18 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                 value={kmVoor}
                 onChange={(e) => setKmVoor(e.target.value)}
                 placeholder="bijv. 45230"
+                className="w-full px-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+                Begeleidende medewerker
+              </label>
+              <input
+                type="text"
+                value={medewerker}
+                onChange={(e) => setMedewerker(e.target.value)}
+                placeholder="Naam medewerker"
                 className="w-full px-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
               />
             </div>
