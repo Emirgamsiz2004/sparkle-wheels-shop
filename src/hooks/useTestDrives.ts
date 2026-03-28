@@ -10,6 +10,8 @@ export interface TestDriveCustomer {
   email: string;
   telefoon: string;
   adres?: string;
+  postcode?: string;
+  plaats?: string;
   geboortedatum?: string;
   rijbewijsnummer?: string;
   rijbewijscategorie?: string;
@@ -76,7 +78,7 @@ export function useTestDrives() {
 
   useEffect(() => { fetchTestDrives(); }, [fetchTestDrives]);
 
-  const startTestDrive = async (vehicleId: string, kmVoor: number, voertuigInfo: { merk: string; model: string; kenteken?: string; bouwjaar?: number }) => {
+  const startTestDrive = async (vehicleId: string, kmVoor: number, voertuigInfo: { merk: string; model: string; kenteken?: string; bouwjaar?: number }, begeleidendeMedewerker?: string) => {
     const token = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
     
     const { data, error } = await supabase.from('test_drives').insert({
@@ -88,6 +90,7 @@ export function useTestDrives() {
       voertuig_model: voertuigInfo.model,
       voertuig_kenteken: voertuigInfo.kenteken || null,
       voertuig_bouwjaar: voertuigInfo.bouwjaar || null,
+      begeleidende_medewerker: begeleidendeMedewerker || null,
     } as any).select().single();
 
     if (error) { toast.error('Fout bij starten proefrit'); return null; }
