@@ -291,6 +291,18 @@ ${td.opmerkingen_na ? `<div style="font-size:8px;color:#666;margin-top:4px;"><st
     const updateField = td.eind_tijd ? "pdf_definitief_path" : "pdf_path";
     await supabase.from("test_drives").update({ [updateField]: storagePath }).eq("id", testDriveId);
 
+    // Save to document archive
+    const klantNaam = customer ? `${customer.voornaam} ${customer.achternaam}` : null;
+    await supabase.from("document_archive").insert({
+      document_type: "proefritformulier",
+      kenteken: td.voertuig_kenteken || null,
+      klant_naam: klantNaam,
+      vehicle_id: td.vehicle_id || null,
+      test_drive_id: testDriveId,
+      file_path: storagePath,
+      storage_bucket: "test-drive-files",
+    });
+
     // Send email if requested
     if (sendEmail && customer?.email) {
       // Build a viewer URL that renders the HTML properly

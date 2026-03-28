@@ -38,7 +38,7 @@ const formatDate = (d: string) => {
   return d;
 };
 
-export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCommissie }: PdfData) {
+function buildConsignatieDoc({ vehicle, form, effectiveCommissie }: PdfData) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pw = 210;
   const ml = 20;
@@ -67,7 +67,6 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   doc.setTextColor(30, 30, 30);
   addText("CONSIGNATIEOVEREENKOMST", pw / 2, y, { align: "center" });
   y += 4;
-
   doc.setDrawColor(30, 30, 30);
   doc.setLineWidth(0.5);
   doc.line(ml, y, pw - mr, y);
@@ -104,7 +103,6 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   addText("Hierna te noemen: \"Eigenaar\"", ml, y);
   y += 10;
 
-  // === Artikel 1 — Voertuig ===
   const addArtikel = (title: string) => {
     checkPage(12);
     setFont("bold", 10);
@@ -115,10 +113,10 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
     doc.setTextColor(60, 60, 60);
   };
 
+  // Artikel 1
   addArtikel("Artikel 1 — Voertuig");
   addText("Eigenaar geeft het volgende voertuig in consignatie aan Platin Automotive:", ml, y, { maxWidth: cw });
   y += 7;
-
   const voertuigRows = [
     ["Merk / Model", `${vehicle.merk} ${vehicle.model}`],
     ["Bouwjaar", String(vehicle.bouwjaar || "")],
@@ -128,7 +126,6 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
     ["Kleur", vehicle.kleur || ""],
     ["APK geldig tot", form.apkTot || "—"],
   ];
-
   voertuigRows.forEach(([label, val]) => {
     checkPage(5);
     setFont("normal", 9);
@@ -140,7 +137,7 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   });
   y += 5;
 
-  // === Artikel 2 — Verkoopprijs ===
+  // Artikel 2
   addArtikel("Artikel 2 — Verkoopprijs");
   const art2 = `De eigenaar stelt een vraagprijs vast van ${formatEur(form.vraagprijs)} en een minimumprijs van ${formatEur(form.minimumprijs)}. Platin Automotive zal het voertuig nooit verkopen onder de overeengekomen minimumprijs. Bij serieuze biedingen zal Platin Automotive altijd eerst overleg plegen met de eigenaar. De eigenaar beslist te allen tijde zelf over de uiteindelijke verkoop.`;
   const art2Lines = doc.splitTextToSize(art2, cw);
@@ -148,7 +145,7 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   doc.text(art2Lines, ml, y);
   y += art2Lines.length * 4 + 6;
 
-  // === Artikel 3 — Commissie ===
+  // Artikel 3
   addArtikel("Artikel 3 — Commissie");
   const art3 = `Bij verkoop van het voertuig ontvangt Platin Automotive een commissie van ${effectiveCommissie}% over de uiteindelijke verkoopprijs. De eigenaar ontvangt het resterende bedrag zo spoedig mogelijk na ontvangst van de betaling van de koper.`;
   const art3Lines = doc.splitTextToSize(art3, cw);
@@ -156,14 +153,13 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   doc.text(art3Lines, ml, y);
   y += art3Lines.length * 4 + 6;
 
-  // === Artikel 4 — Looptijd ===
+  // Artikel 4
   addArtikel("Artikel 4 — Looptijd en opzegging");
   const art4a = "Deze overeenkomst wordt aangegaan voor onbepaalde tijd. De eigenaar kan de overeenkomst te allen tijde opzeggen. Bij opzegging door de eigenaar worden de volgende gemaakte kosten in rekening gebracht:";
   const art4aLines = doc.splitTextToSize(art4a, cw);
   checkPage(art4aLines.length * 4 + 20);
   doc.text(art4aLines, ml, y);
   y += art4aLines.length * 4 + 4;
-
   const opzegRows = [
     ["Advertentiekosten", formatEur(form.advertentiekosten)],
     ["Poetskosten", formatEur(form.poetskosten)],
@@ -179,7 +175,7 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   doc.text(art4bLines, ml, y);
   y += art4bLines.length * 4 + 6;
 
-  // === Artikel 5 — Verantwoordelijkheid ===
+  // Artikel 5
   addArtikel("Artikel 5 — Verantwoordelijkheid en schade");
   const art5 = "Zolang het voertuig zich bevindt op het terrein van Platin Automotive, is Platin Automotive verantwoordelijk voor eventuele schade aan het voertuig. De staat van het voertuig bij binnenkomst wordt vastgelegd middels foto's en/of een schaderapport. APK-keuring en technische gebreken zijn te allen tijde de verantwoordelijkheid van de eigenaar.";
   const art5Lines = doc.splitTextToSize(art5, cw);
@@ -187,7 +183,7 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   doc.text(art5Lines, ml, y);
   y += art5Lines.length * 4 + 6;
 
-  // === Artikel 6 — Garantie ===
+  // Artikel 6
   addArtikel("Artikel 6 — Garantie");
   let art6 = "";
   if (form.garantie === "geen") {
@@ -202,17 +198,38 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   doc.text(art6Lines, ml, y);
   y += art6Lines.length * 4 + 6;
 
-  // === Artikel 7 — Ondertekening ===
-  addArtikel("Artikel 7 — Ondertekening");
+  // Artikel 7
+  addArtikel("Artikel 7 — Wijzigingen");
+  const art7 = "Wijzigingen op deze overeenkomst zijn alleen geldig indien schriftelijk overeengekomen en ondertekend door beide partijen.";
+  const art7Lines = doc.splitTextToSize(art7, cw);
+  checkPage(art7Lines.length * 4 + 4);
+  doc.text(art7Lines, ml, y);
+  y += art7Lines.length * 4 + 6;
+
+  // Artikel 8
+  addArtikel("Artikel 8 — Algemene voorwaarden");
+  const art8 = "Op deze overeenkomst zijn de algemene voorwaarden van Platin Automotive van toepassing. De algemene voorwaarden zijn overhandigd aan de eigenaar en hiervan is kennis genomen.";
+  const art8Lines = doc.splitTextToSize(art8, cw);
+  checkPage(art8Lines.length * 4 + 4);
+  doc.text(art8Lines, ml, y);
+  y += art8Lines.length * 4 + 6;
+
+  // Artikel 9
+  addArtikel("Artikel 9 — Toepasselijk recht");
+  const art9 = "Op deze overeenkomst is Nederlands recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechter in het arrondissement waar Platin Automotive is gevestigd.";
+  const art9Lines = doc.splitTextToSize(art9, cw);
+  checkPage(art9Lines.length * 4 + 4);
+  doc.text(art9Lines, ml, y);
+  y += art9Lines.length * 4 + 6;
+
+  // Artikel 10 — Ondertekening
+  addArtikel("Artikel 10 — Ondertekening");
   const datumStr = formatDate(form.datum);
   addText(`Aldus overeengekomen en in tweevoud opgemaakt te ${form.plaats} op ${datumStr}.`, ml, y, { maxWidth: cw });
   y += 14;
 
-  // Signature boxes
   checkPage(50);
   const colW = (cw - 10) / 2;
-
-  // Left - Platin
   setFont("bold", 9);
   doc.setTextColor(30, 30, 30);
   addText("Platin Automotive", ml, y);
@@ -220,8 +237,6 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   setFont("normal", 9);
   doc.setTextColor(80, 80, 80);
   addText("Naam: Emir Gamsiz", ml, y);
-  
-  // Right - Eigenaar
   setFont("bold", 9);
   doc.setTextColor(30, 30, 30);
   addText("Eigenaar", ml + colW + 10, y - 5);
@@ -229,18 +244,24 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   doc.setTextColor(80, 80, 80);
   addText(`Naam: ${form.voornaam} ${form.achternaam}`, ml + colW + 10, y);
   y += 6;
-
   addText("Handtekening:", ml, y);
   addText("Handtekening:", ml + colW + 10, y);
   y += 3;
-
-  // Signature lines
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.3);
   doc.line(ml, y + 20, ml + colW, y + 20);
   doc.line(ml + colW + 10, y + 20, ml + colW + 10 + colW, y + 20);
 
-  // Save
-  const fileName = `Consignatieovereenkomst_${vehicle.merk}_${vehicle.model}_${vehicle.kenteken || "onbekend"}.pdf`;
+  return doc;
+}
+
+export function generateConsignatieOvereenkomstPDF(data: PdfData) {
+  const doc = buildConsignatieDoc(data);
+  const fileName = `Consignatieovereenkomst_${data.vehicle.merk}_${data.vehicle.model}_${data.vehicle.kenteken || "onbekend"}.pdf`;
   doc.save(fileName);
+}
+
+export function generateConsignatieOvereenkomstBlob(data: PdfData): Blob {
+  const doc = buildConsignatieDoc(data);
+  return doc.output("blob");
 }
