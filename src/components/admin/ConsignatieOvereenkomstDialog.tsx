@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Loader2, X, AlertCircle, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { generateConsignatieOvereenkomstPDF } from "@/lib/consignatieOvereenkomstPdf";
+import { generateConsignatieOvereenkomstPDF, generateConsignatieOvereenkomstBlob } from "@/lib/consignatieOvereenkomstPdf";
 
 interface Props {
   open: boolean;
@@ -181,18 +181,43 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
         user_id: user?.id || null,
       } as any;
 
+      let agreementId = existingAgreement?.id;
       if (existingAgreement) {
         await supabase.from("consignatie_overeenkomsten").update(record).eq("id", existingAgreement.id);
       } else {
-        await supabase.from("consignatie_overeenkomsten").insert(record);
+        const { data: inserted } = await supabase.from("consignatie_overeenkomsten").insert(record).select("id").single();
+        agreementId = inserted?.id;
       }
 
-      // Generate PDF
-      generateConsignatieOvereenkomstPDF({
-        vehicle,
-        form,
-        effectiveCommissie,
+      // Generate PDF blob for storage
+      const pdfData = { vehicle, form, effectiveCommissie };
+      const pdfBlob = generateConsignatieOvereenkomstBlob(pdfData);
+
+      // Upload to storage
+      const storagePath = `consignatie/${vehicle.id}/${agreementId}.pdf`;
+      await supabase.storage.from("vehicle-documents").upload(storagePath, pdfBlob, {
+        contentType: "application/pdf",
+        upsert: true,
       });
+
+      // Update pdf_path on agreement
+      if (agreementId) {
+        await supabase.from("consignatie_overeenkomsten").update({ pdf_path: storagePath }).eq("id", agreementId);
+      }
+
+      // Save to document archive
+      await supabase.from("document_archive").insert({
+        document_type: "consignatieovereenkomst",
+        kenteken: vehicle.kenteken || null,
+        klant_naam: `${form.voornaam} ${form.achternaam}`,
+        vehicle_id: vehicle.id,
+        consignatie_overeenkomst_id: agreementId || null,
+        file_path: storagePath,
+        storage_bucket: "vehicle-documents",
+      } as any);
+
+      // Also download locally
+      generateConsignatieOvereenkomstPDF(pdfData);
 
       toast.success("Overeenkomst opgeslagen en PDF gedownload");
       onClose();
