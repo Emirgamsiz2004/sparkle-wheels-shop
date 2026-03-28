@@ -222,8 +222,16 @@ function buildConsignatieDoc({ vehicle, form, effectiveCommissie }: PdfData) {
   doc.text(art9Lines, ml, y);
   y += art9Lines.length * 4 + 6;
 
-  // Artikel 10 — Ondertekening
-  addArtikel("Artikel 10 — Ondertekening");
+  // Artikel 10 — Betaalwijze
+  addArtikel("Artikel 10 — Betaalwijze en wettelijk maximum contante betaling");
+  const art10 = "In het kader van de Wet ter voorkoming van witwassen en financieren van terrorisme (Wwft) is het wettelijk maximum voor contante betalingen bij de aankoop van een voertuig vastgesteld op € 3.000. Bedragen boven € 3.000 dienen te worden voldaan per bankoverschrijving op IBAN NL00BANK0000000000 ten name van Platin Automotive onder vermelding van het factuurnummer. Platin Automotive is wettelijk verplicht ongebruikelijke transacties te melden bij de autoriteiten.";
+  const art10Lines = doc.splitTextToSize(art10, cw);
+  checkPage(art10Lines.length * 4 + 4);
+  doc.text(art10Lines, ml, y);
+  y += art10Lines.length * 4 + 6;
+
+  // Artikel 11 — Ondertekening
+  addArtikel("Artikel 11 — Ondertekening");
   const datumStr = formatDate(form.datum);
   addText(`Aldus overeengekomen en in tweevoud opgemaakt te ${form.plaats} op ${datumStr}.`, ml, y, { maxWidth: cw });
   y += 14;
