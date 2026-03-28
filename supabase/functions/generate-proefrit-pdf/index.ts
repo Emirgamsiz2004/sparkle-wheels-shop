@@ -294,8 +294,7 @@ ${td.opmerkingen_na ? `<div style="font-size:8px;color:#666;margin-top:4px;"><st
     // Send email if requested
     if (sendEmail && customer?.email) {
       // Build a viewer URL that renders the HTML properly
-      const siteUrl = Deno.env.get("SITE_URL") || "https://platinautomotive.nl";
-      const pdfUrl = `${siteUrl}/overeenkomst/${testDriveId}`;
+      const pdfUrl = `${supabaseUrl}/functions/v1/view-overeenkomst?id=${testDriveId}`;
 
       const templateData = {
         klantNaam: `${customer.voornaam} ${customer.achternaam}`,
