@@ -24,6 +24,7 @@ const DOC_TYPES = [
   { value: "all", label: "Alle documenten" },
   { value: "proefritformulier", label: "Proefritformulier" },
   { value: "consignatieovereenkomst", label: "Consignatieovereenkomst" },
+  { value: "aanbetalingsovereenkomst", label: "Aanbetalingsovereenkomst" },
   { value: "koopovereenkomst", label: "Koopovereenkomst" },
   { value: "factuur", label: "Factuur" },
   { value: "schaderapport", label: "Schaderapport" },
