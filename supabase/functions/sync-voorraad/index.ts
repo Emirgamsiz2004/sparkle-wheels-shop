@@ -10,6 +10,8 @@ const corsHeaders = {
 const BASE = "https://svl.autodealers.nl";
 const LIST_URL = `${BASE}/occasions.aspx?did=91347&format=xml`;
 
+type FeedStatus = "te_koop" | "verkocht" | "gereserveerd";
+
 function attr(block: string, name: string): string {
   const m = block.match(new RegExp(`data-${name}="([^"]*)"`));
   return m ? m[1] : "";
@@ -18,6 +20,20 @@ function attr(block: string, name: string): string {
 function normalizeKenteken(k: string | null | undefined): string {
   if (!k) return "";
   return k.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+function extractFeedStatus(block: string): FeedStatus {
+  const lowerBlock = block.toLowerCase();
+
+  if (lowerBlock.includes("occ_verkocht.png") || lowerBlock.includes(">verkocht<")) {
+    return "verkocht";
+  }
+
+  if (lowerBlock.includes("occ_gereserveerd.png") || lowerBlock.includes(">gereserveerd<")) {
+    return "gereserveerd";
+  }
+
+  return "te_koop";
 }
 
 async function fetchFeedVehicles() {
@@ -42,6 +58,7 @@ async function fetchFeedVehicles() {
       kleur: attr(block, "kleur") || null,
       kenteken: attr(block, "kenteken") || null,
       verkoopprijs: parseInt(attr(block, "prijs") || "0", 10) || 0,
+      feed_status: extractFeedStatus(block),
     });
   }
 
@@ -102,9 +119,17 @@ serve(async (req) => {
         if (fv.kleur && fv.kleur !== match.kleur) updates.kleur = fv.kleur;
         if (fv.verkoopprijs && fv.verkoopprijs !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
         if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
-        // Do NOT override manually set statuses (verkocht, gereserveerd, consignatie, etc.)
-        // Only re-activate if status was automatically set to verkocht by a previous sync
-        // We never auto-reactivate — manual status changes are always leading
+        // VWE is leidend voor publiek zichtbare beschikbaarheid uit advertentiebeheer.
+        // Alleen verkocht/gereserveerd/te_koop worden hier automatisch bijgewerkt.
+        if (
+          fv.feed_status !== match.status &&
+          (fv.feed_status === "verkocht" ||
+            fv.feed_status === "gereserveerd" ||
+            match.status === "verkocht" ||
+            match.status === "gereserveerd")
+        ) {
+          updates.status = fv.feed_status;
+        }
 
         if (Object.keys(updates).length > 0) {
           await supabase.from("vehicles").update(updates).eq("id", match.id);
@@ -123,7 +148,7 @@ serve(async (req) => {
           kleur: fv.kleur,
           kenteken: fv.kenteken,
           verkoopprijs: fv.verkoopprijs,
-          status: "te_koop",
+          status: fv.feed_status,
         });
 
         if (error) {
