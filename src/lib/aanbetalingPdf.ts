@@ -24,6 +24,8 @@ interface AanbetalingPdfData {
     restbedrag: number;
     uiterlijkeDatum: string;
   };
+  betaalwijze?: "bank" | "contant" | "combinatie";
+  contantBedrag?: number;
   datum: string;
   plaats: string;
 }
