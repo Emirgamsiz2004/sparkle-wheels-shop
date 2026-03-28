@@ -25,6 +25,8 @@ const ProefritFormulier = () => {
   const [email, setEmail] = useState("");
   const [telefoon, setTelefoon] = useState("");
   const [adres, setAdres] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [plaats, setPlaats] = useState("");
   const [geboortedatum, setGeboortedatum] = useState("");
   const [rijbewijsnummer, setRijbewijsnummer] = useState("");
   const [rijbewijscategorie, setRijbewijscategorie] = useState("B");
@@ -134,7 +136,7 @@ const ProefritFormulier = () => {
     return /^\d{10}$/.test(sanitized);
   })();
 
-  const isValid = voornaam && achternaam && email && telefoon && rijbewijsValid && rijbewijsFoto && akkoord && hasSigned;
+  const isValid = voornaam && achternaam && email && telefoon && adres && postcode && plaats && geboortedatum && rijbewijsValid && rijbewijsFoto && akkoord && hasSigned;
 
   const handleSubmit = async () => {
     if (!isValid || !testDrive || !sigPadRef.current || !rijbewijsFoto) return;
@@ -164,6 +166,7 @@ const ProefritFormulier = () => {
         customerId = existingCustomer.id;
         await supabase.from("test_drive_customers").update({
           voornaam, achternaam, telefoon, adres: adres || null,
+          postcode: postcode || null, plaats: plaats || null,
           geboortedatum: geboortedatum || null,
           rijbewijsnummer: sanitizedRijbewijs, rijbewijscategorie,
           rijbewijs_foto_path: filePath,
@@ -173,6 +176,7 @@ const ProefritFormulier = () => {
           .from("test_drive_customers").insert({
             voornaam, achternaam, email, telefoon,
             adres: adres || null,
+            postcode: postcode || null, plaats: plaats || null,
             geboortedatum: geboortedatum || null,
             rijbewijsnummer: sanitizedRijbewijs, rijbewijscategorie,
             rijbewijs_foto_path: filePath,
@@ -184,6 +188,14 @@ const ProefritFormulier = () => {
       // Get signature data
       const signatureData = sigPadRef.current.toDataURL();
 
+      // Fetch client IP address
+      let clientIp = "";
+      try {
+        const ipRes = await fetch("https://api.ipify.org?format=json");
+        const ipData = await ipRes.json();
+        clientIp = ipData.ip || "";
+      } catch { clientIp = "onbekend"; }
+
       // Update test drive
       const { error: tdErr } = await supabase.from("test_drives").update({
         customer_id: customerId,
@@ -191,7 +203,7 @@ const ProefritFormulier = () => {
         opmerkingen_voor: opmerkingen || null,
         formulier_ingevuld_op: new Date().toISOString(),
         status: "actief",
-        ip_adres: "collected-server-side",
+        ip_adres: clientIp,
       } as any).eq("id", testDrive.id);
 
       if (tdErr) throw tdErr;
@@ -274,8 +286,12 @@ const ProefritFormulier = () => {
             </div>
             <Field label="E-mailadres *" value={email} onChange={setEmail} type="email" />
             <Field label="Telefoonnummer *" value={telefoon} onChange={setTelefoon} type="tel" />
-            <Field label="Adres" value={adres} onChange={setAdres} />
-            <Field label="Geboortedatum" value={geboortedatum} onChange={setGeboortedatum} type="date" />
+            <Field label="Adres *" value={adres} onChange={setAdres} />
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Postcode *" value={postcode} onChange={setPostcode} placeholder="1234 AB" />
+              <Field label="Plaats *" value={plaats} onChange={setPlaats} />
+            </div>
+            <Field label="Geboortedatum *" value={geboortedatum} onChange={setGeboortedatum} type="date" />
             
             <div className="pt-2 border-t border-neutral-100">
               <p className="text-sm font-semibold text-neutral-900 mb-3">Rijbewijs</p>
@@ -431,13 +447,14 @@ const ProefritFormulier = () => {
   );
 };
 
-const Field = ({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) => (
+const Field = ({ label, value, onChange, type = "text", placeholder }: { label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string }) => (
   <div>
     <label className="text-xs font-medium text-neutral-600 block mb-1">{label}</label>
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
       className="w-full px-3 py-2 text-sm border border-neutral-200 rounded-lg bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
     />
   </div>
