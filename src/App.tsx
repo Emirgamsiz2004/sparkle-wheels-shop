@@ -103,7 +103,7 @@ const App = () => (
               <Route path="/cookiebeleid" element={<CookiePolicy />} />
               <Route path="/algemene-voorwaarden" element={<AlgemeneVoorwaarden />} />
               <Route path="/proefrit/:token" element={<ProefritFormulier />} />
-              <Route path="/overeenkomst/:id" element={<OvereenkomstViewer />} />
+              
               <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/admin/login" element={<AdminLogin />} />
