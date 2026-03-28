@@ -101,6 +101,9 @@ const AdminVoertuigDetailPage = () => {
               <ScrollText className="w-3.5 h-3.5" /> Consignatieovereenkomst
             </button>
           )}
+          <button onClick={() => setAanbetalingOpen(true)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+            <Banknote className="w-3.5 h-3.5" /> Aanbetaling registreren
+          </button>
           <button onClick={handleGenerateBlog} disabled={blogGenerating} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50">
             {blogGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
             Genereer blogpost
