@@ -384,6 +384,116 @@ export type Database = {
         }
         Relationships: []
       }
+      consignatie_overeenkomsten: {
+        Row: {
+          aangepast_commissie_percentage: number | null
+          advertentiekosten: number | null
+          commissie_percentage: number
+          created_at: string
+          datum: string
+          eigenaar_achternaam: string
+          eigenaar_adres: string
+          eigenaar_email: string
+          eigenaar_iban: string
+          eigenaar_postcode: string
+          eigenaar_telefoon: string
+          eigenaar_voornaam: string
+          eigenaar_woonplaats: string
+          garantie: string
+          id: string
+          minimumprijs: number
+          overige_kosten: number | null
+          pdf_path: string | null
+          plaats: string
+          poetskosten: number | null
+          user_id: string | null
+          vehicle_id: string
+          voertuig_apk_tot: string | null
+          voertuig_bouwjaar: number | null
+          voertuig_kenteken: string | null
+          voertuig_kilometerstand: number | null
+          voertuig_kleur: string | null
+          voertuig_merk: string
+          voertuig_model: string
+          voertuig_vin: string | null
+          vraagprijs: number
+        }
+        Insert: {
+          aangepast_commissie_percentage?: number | null
+          advertentiekosten?: number | null
+          commissie_percentage?: number
+          created_at?: string
+          datum?: string
+          eigenaar_achternaam: string
+          eigenaar_adres: string
+          eigenaar_email: string
+          eigenaar_iban: string
+          eigenaar_postcode: string
+          eigenaar_telefoon: string
+          eigenaar_voornaam: string
+          eigenaar_woonplaats: string
+          garantie?: string
+          id?: string
+          minimumprijs?: number
+          overige_kosten?: number | null
+          pdf_path?: string | null
+          plaats?: string
+          poetskosten?: number | null
+          user_id?: string | null
+          vehicle_id: string
+          voertuig_apk_tot?: string | null
+          voertuig_bouwjaar?: number | null
+          voertuig_kenteken?: string | null
+          voertuig_kilometerstand?: number | null
+          voertuig_kleur?: string | null
+          voertuig_merk: string
+          voertuig_model: string
+          voertuig_vin?: string | null
+          vraagprijs?: number
+        }
+        Update: {
+          aangepast_commissie_percentage?: number | null
+          advertentiekosten?: number | null
+          commissie_percentage?: number
+          created_at?: string
+          datum?: string
+          eigenaar_achternaam?: string
+          eigenaar_adres?: string
+          eigenaar_email?: string
+          eigenaar_iban?: string
+          eigenaar_postcode?: string
+          eigenaar_telefoon?: string
+          eigenaar_voornaam?: string
+          eigenaar_woonplaats?: string
+          garantie?: string
+          id?: string
+          minimumprijs?: number
+          overige_kosten?: number | null
+          pdf_path?: string | null
+          plaats?: string
+          poetskosten?: number | null
+          user_id?: string | null
+          vehicle_id?: string
+          voertuig_apk_tot?: string | null
+          voertuig_bouwjaar?: number | null
+          voertuig_kenteken?: string | null
+          voertuig_kilometerstand?: number | null
+          voertuig_kleur?: string | null
+          voertuig_merk?: string
+          voertuig_model?: string
+          voertuig_vin?: string | null
+          vraagprijs?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consignatie_overeenkomsten_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deals: {
         Row: {
           aantal_eigenaren: string | null
