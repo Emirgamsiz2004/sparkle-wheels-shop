@@ -346,4 +346,15 @@ const Row = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
+const SchadeFoto = ({ path, index }: { path: string; index: number }) => {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.storage.from("test-drive-files")
+      .createSignedUrl(path, 3600)
+      .then(({ data }) => setUrl(data?.signedUrl || null));
+  }, [path]);
+  if (!url) return null;
+  return <img src={url} alt={`Schade ${index + 1}`} className="w-20 h-20 rounded-md border border-border object-cover" />;
+};
+
 export default ProefritDetailDialog;
