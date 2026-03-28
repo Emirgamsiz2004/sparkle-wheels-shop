@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
+import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -12,6 +13,8 @@ interface Props {
   vehicle: Vehicle;
   onStatusChange?: () => void;
 }
+
+type Betaalwijze = "bank" | "contant" | "combinatie";
 
 interface FormData {
   voornaam: string;
@@ -27,6 +30,8 @@ interface FormData {
   uiterlijkeDatum: string;
   datum: string;
   plaats: string;
+  betaalwijze: Betaalwijze;
+  contantBedrag: number;
 }
 
 const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) => {
@@ -47,6 +52,8 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
     uiterlijkeDatum: "",
     datum: new Date().toISOString().split("T")[0],
     plaats: "Roelofarendsveen",
+    betaalwijze: "bank",
+    contantBedrag: 0,
   });
 
   const update = (key: keyof FormData, value: any) => {
