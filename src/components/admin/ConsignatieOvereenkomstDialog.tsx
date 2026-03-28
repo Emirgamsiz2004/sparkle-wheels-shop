@@ -3,7 +3,7 @@ import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Loader2, X, AlertCircle, Download } from "lucide-react";
+import { Loader2, X, AlertCircle, Download, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateConsignatieOvereenkomstPDF, generateConsignatieOvereenkomstBlob } from "@/lib/consignatieOvereenkomstPdf";
 
@@ -14,6 +14,7 @@ interface Props {
 }
 
 type GarantieType = "geen" | "platin" | "autotrust";
+type Betaalwijze = "bank" | "contant" | "combinatie";
 
 interface FormData {
   voornaam: string;
@@ -36,6 +37,8 @@ interface FormData {
   overigeKosten: number;
   datum: string;
   plaats: string;
+  betaalwijze: Betaalwijze;
+  contantBedrag: number;
 }
 
 const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
