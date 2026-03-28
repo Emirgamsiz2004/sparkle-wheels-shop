@@ -61,8 +61,9 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
       .then(({ data }) => setPdfLogs((data as any[]) || []));
 
     if (td.customer?.rijbewijs_foto_path) {
-      const { data } = supabase.storage.from("test-drive-files").getPublicUrl(td.customer.rijbewijs_foto_path);
-      setRijbewijsFotoUrl(data?.publicUrl || null);
+      supabase.storage.from("test-drive-files")
+        .createSignedUrl(td.customer.rijbewijs_foto_path, 3600)
+        .then(({ data }) => setRijbewijsFotoUrl(data?.signedUrl || null));
     }
   }, [open, td.id, td.customer?.rijbewijs_foto_path]);
 
@@ -223,13 +224,9 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
               <section className="border-t border-border pt-5">
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-3">Schadefoto's</p>
                 <div className="flex gap-2 flex-wrap">
-                  {td.schade_fotos.map((foto, i) => {
-                    const { data } = supabase.storage.from("test-drive-files").getPublicUrl(foto);
-                    return (
-                      <img key={i} src={data?.publicUrl} alt={`Schade ${i + 1}`}
-                        className="w-20 h-20 rounded-md border border-border object-cover" />
-                    );
-                  })}
+                  {td.schade_fotos.map((foto, i) => (
+                    <SchadeFoto key={i} path={foto} index={i} />
+                  ))}
                 </div>
               </section>
             )}

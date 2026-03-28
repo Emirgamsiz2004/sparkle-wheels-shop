@@ -15,7 +15,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
   const { startTestDrive } = useTestDrives();
   const [step, setStep] = useState<"form" | "result">("form");
   const [kmVoor, setKmVoor] = useState(vehicle.kilometerstand?.toString() || "");
-  const [medewerker, setMedewerker] = useState("");
+  const [medewerker, setMedewerker] = useState("Emir Gamsiz");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<TestDrive | null>(null);
   const [copied, setCopied] = useState(false);
