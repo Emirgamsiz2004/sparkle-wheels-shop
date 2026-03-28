@@ -202,8 +202,32 @@ export function generateConsignatieOvereenkomstPDF({ vehicle, form, effectiveCom
   doc.text(art6Lines, ml, y);
   y += art6Lines.length * 4 + 6;
 
-  // === Artikel 7 — Ondertekening ===
-  addArtikel("Artikel 7 — Ondertekening");
+  // === Artikel 7 — Wijzigingen ===
+  addArtikel("Artikel 7 — Wijzigingen");
+  const art7 = "Wijzigingen op deze overeenkomst zijn alleen geldig indien schriftelijk overeengekomen en ondertekend door beide partijen.";
+  const art7Lines = doc.splitTextToSize(art7, cw);
+  checkPage(art7Lines.length * 4 + 4);
+  doc.text(art7Lines, ml, y);
+  y += art7Lines.length * 4 + 6;
+
+  // === Artikel 8 — Algemene voorwaarden ===
+  addArtikel("Artikel 8 — Algemene voorwaarden");
+  const art8 = "Op deze overeenkomst zijn de algemene voorwaarden van Platin Automotive van toepassing. De algemene voorwaarden zijn overhandigd aan de eigenaar en hiervan is kennis genomen.";
+  const art8Lines = doc.splitTextToSize(art8, cw);
+  checkPage(art8Lines.length * 4 + 4);
+  doc.text(art8Lines, ml, y);
+  y += art8Lines.length * 4 + 6;
+
+  // === Artikel 9 — Toepasselijk recht ===
+  addArtikel("Artikel 9 — Toepasselijk recht");
+  const art9 = "Op deze overeenkomst is Nederlands recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechter in het arrondissement waar Platin Automotive is gevestigd.";
+  const art9Lines = doc.splitTextToSize(art9, cw);
+  checkPage(art9Lines.length * 4 + 4);
+  doc.text(art9Lines, ml, y);
+  y += art9Lines.length * 4 + 6;
+
+  // === Artikel 10 — Ondertekening ===
+  addArtikel("Artikel 10 — Ondertekening");
   const datumStr = formatDate(form.datum);
   addText(`Aldus overeengekomen en in tweevoud opgemaakt te ${form.plaats} op ${datumStr}.`, ml, y, { maxWidth: cw });
   y += 14;
