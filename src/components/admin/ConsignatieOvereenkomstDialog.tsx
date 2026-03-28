@@ -132,6 +132,11 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
     setForm((f) => ({ ...f, [key]: value }));
   };
 
+  const contantTooHigh = (form.betaalwijze === "contant" && form.vraagprijs > 3000) ||
+    (form.betaalwijze === "combinatie" && form.contantBedrag > 3000);
+
+  const bankBedrag = form.betaalwijze === "combinatie" ? form.vraagprijs - form.contantBedrag : 0;
+
   const isValid = () => {
     return (
       form.voornaam.trim() &&
@@ -143,7 +148,8 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
       form.email.trim() &&
       form.iban.trim() &&
       form.vraagprijs > 0 &&
-      form.minimumprijs > 0
+      form.minimumprijs > 0 &&
+      !contantTooHigh
     );
   };
 
