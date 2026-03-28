@@ -102,8 +102,9 @@ serve(async (req) => {
         if (fv.kleur && fv.kleur !== match.kleur) updates.kleur = fv.kleur;
         if (fv.verkoopprijs && fv.verkoopprijs !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
         if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
-        // Re-activate if vehicle reappears in feed
-        if (match.status === "verkocht") updates.status = "te_koop";
+        // Do NOT override manually set statuses (verkocht, gereserveerd, consignatie, etc.)
+        // Only re-activate if status was automatically set to verkocht by a previous sync
+        // We never auto-reactivate — manual status changes are always leading
 
         if (Object.keys(updates).length > 0) {
           await supabase.from("vehicles").update(updates).eq("id", match.id);
@@ -133,7 +134,9 @@ serve(async (req) => {
       }
     }
 
-    // Mark vehicles that are in the feed (have feed_id) but no longer appear → verkocht
+    // Mark vehicles that disappeared from feed as verkocht
+    // ONLY if their current status is "te_koop" — never touch manually set statuses
+    // (gereserveerd, consignatie, in_behandeling, inkoop, etc.)
     let removed = 0;
     for (const dbVehicle of (existing || [])) {
       if (

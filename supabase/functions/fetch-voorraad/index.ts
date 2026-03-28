@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -201,9 +202,37 @@ serve(async (req) => {
       );
     }
 
-    // List all vehicles
+    // List all vehicles — merge DB statuses
     const vehicles = await fetchList();
-    return new Response(JSON.stringify({ vehicles, count: vehicles.length }), {
+
+    // Fetch DB statuses for all vehicles with a feed_id
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data: dbVehicles } = await supabase
+      .from("vehicles")
+      .select("feed_id, kenteken, status, marktplaats_url")
+      .in("status", ["verkocht", "gereserveerd"]);
+
+    const statusByFeedId = new Map<string, { status: string; marktplaats_url: string | null }>();
+    const statusByKenteken = new Map<string, { status: string; marktplaats_url: string | null }>();
+    for (const v of (dbVehicles || [])) {
+      if (v.feed_id) statusByFeedId.set(v.feed_id, { status: v.status, marktplaats_url: v.marktplaats_url });
+      if (v.kenteken) statusByKenteken.set(v.kenteken.toUpperCase().replace(/[^A-Z0-9]/g, ""), { status: v.status, marktplaats_url: v.marktplaats_url });
+    }
+
+    // Merge status into feed vehicles
+    const enriched = vehicles.map((v: any) => {
+      const match = statusByFeedId.get(v.id) ||
+        (v.kenteken ? statusByKenteken.get(v.kenteken.toUpperCase().replace(/[^A-Z0-9]/g, "")) : null);
+      return {
+        ...v,
+        dbStatus: match?.status || "te_koop",
+      };
+    });
+
+    return new Response(JSON.stringify({ vehicles: enriched, count: enriched.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {

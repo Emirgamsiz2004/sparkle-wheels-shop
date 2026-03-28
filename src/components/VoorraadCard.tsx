@@ -18,8 +18,15 @@ const Spec = ({ icon: Icon, label }: { icon: React.ElementType; label: string })
     </span>
   ) : null;
 
+const statusBadge: Record<string, { label: string; className: string } | null> = {
+  verkocht: { label: "Verkocht", className: "bg-red-600 text-white" },
+  gereserveerd: { label: "Gereserveerd", className: "bg-amber-500 text-white" },
+};
+
 const VoorraadCard = ({ voertuig, index }: Props) => {
   const title = [voertuig.merk, voertuig.model].filter(Boolean).join(" ");
+  const badge = voertuig.dbStatus ? statusBadge[voertuig.dbStatus] : null;
+  const isSold = voertuig.dbStatus === "verkocht";
 
   return (
     <motion.div
@@ -29,7 +36,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
     >
       <Link
         to={`/voorraad/${voertuig.id}`}
-        className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card hover:border-accent/40 transition-colors duration-300"
+        className={`group flex flex-col overflow-hidden rounded-lg border border-border bg-card hover:border-accent/40 transition-colors duration-300 ${isSold ? "opacity-75" : ""}`}
       >
         {/* Image */}
         <div className="relative aspect-[16/10] overflow-hidden bg-secondary">
@@ -38,12 +45,17 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
               src={voertuig.afbeelding}
               alt={title}
               loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${isSold ? "grayscale" : ""}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Car className="w-12 h-12 text-muted-foreground/30" />
             </div>
+          )}
+          {badge && (
+            <span className={`absolute top-3 left-3 px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded ${badge.className}`}>
+              {badge.label}
+            </span>
           )}
         </div>
 
@@ -73,11 +85,15 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
 
           <div className="mt-auto pt-3 flex items-end justify-between gap-3">
             <span className="font-display text-xl md:text-2xl font-bold text-accent tracking-tight">
-              {voertuig.prijs > 0 ? fmt.format(voertuig.prijs) : "Op aanvraag"}
+              {isSold ? (
+                <span className="text-muted-foreground line-through">{voertuig.prijs > 0 ? fmt.format(voertuig.prijs) : "—"}</span>
+              ) : (
+                voertuig.prijs > 0 ? fmt.format(voertuig.prijs) : "Op aanvraag"
+              )}
             </span>
 
             <span className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 border border-border text-[10px] tracking-[0.15em] uppercase font-body font-semibold text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors duration-300">
-              Meer info →
+              {isSold ? "Bekijk details →" : "Meer info →"}
             </span>
           </div>
         </div>
