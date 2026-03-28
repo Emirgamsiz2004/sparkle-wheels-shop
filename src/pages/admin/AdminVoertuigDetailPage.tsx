@@ -222,6 +222,11 @@ const AdminVoertuigDetailPage = () => {
           kilometerstand: vehicle.kilometerstand,
         }}
       />
+      <ConsignatieOvereenkomstDialog
+        open={consignatieOpen}
+        onClose={() => setConsignatieOpen(false)}
+        vehicle={vehicle}
+      />
     </div>
   );
 };
