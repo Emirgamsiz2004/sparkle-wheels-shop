@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      aanbetalingen: {
+        Row: {
+          aanbetalingsbedrag: number
+          created_at: string
+          datum: string
+          id: string
+          klant_achternaam: string
+          klant_adres: string
+          klant_email: string
+          klant_postcode: string
+          klant_telefoon: string
+          klant_voornaam: string
+          klant_woonplaats: string
+          pdf_path: string | null
+          plaats: string
+          restbedrag: number
+          uiterlijke_datum: string | null
+          user_id: string | null
+          vehicle_id: string
+          verkoopprijs: number
+          voertuig_bouwjaar: number | null
+          voertuig_kenteken: string | null
+          voertuig_kilometerstand: number | null
+          voertuig_merk: string
+          voertuig_model: string
+          voertuig_vin: string | null
+        }
+        Insert: {
+          aanbetalingsbedrag?: number
+          created_at?: string
+          datum?: string
+          id?: string
+          klant_achternaam: string
+          klant_adres: string
+          klant_email: string
+          klant_postcode: string
+          klant_telefoon: string
+          klant_voornaam: string
+          klant_woonplaats: string
+          pdf_path?: string | null
+          plaats?: string
+          restbedrag?: number
+          uiterlijke_datum?: string | null
+          user_id?: string | null
+          vehicle_id: string
+          verkoopprijs?: number
+          voertuig_bouwjaar?: number | null
+          voertuig_kenteken?: string | null
+          voertuig_kilometerstand?: number | null
+          voertuig_merk: string
+          voertuig_model: string
+          voertuig_vin?: string | null
+        }
+        Update: {
+          aanbetalingsbedrag?: number
+          created_at?: string
+          datum?: string
+          id?: string
+          klant_achternaam?: string
+          klant_adres?: string
+          klant_email?: string
+          klant_postcode?: string
+          klant_telefoon?: string
+          klant_voornaam?: string
+          klant_woonplaats?: string
+          pdf_path?: string | null
+          plaats?: string
+          restbedrag?: number
+          uiterlijke_datum?: string | null
+          user_id?: string | null
+          vehicle_id?: string
+          verkoopprijs?: number
+          voertuig_bouwjaar?: number | null
+          voertuig_kenteken?: string | null
+          voertuig_kilometerstand?: number | null
+          voertuig_merk?: string
+          voertuig_model?: string
+          voertuig_vin?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aanbetalingen_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           created_at: string

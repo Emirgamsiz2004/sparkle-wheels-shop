@@ -92,7 +92,7 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
             <div>
               <label className="block text-xs text-muted-foreground mb-1">Status</label>
               <select value={form.status} onChange={(e) => update("status", e.target.value as Vehicle["status"])} className={inputCls}>
-                <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="verkocht">Verkocht</option>
+                <option value="inkoop">Inkoop</option><option value="in_behandeling">In behandeling</option><option value="te_koop">Te koop</option><option value="gereserveerd">Gereserveerd</option><option value="verkocht">Verkocht</option>
               </select>
             </div>
           )}
