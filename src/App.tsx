@@ -36,6 +36,7 @@ import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
 import AdminBlogPage from "./pages/admin/AdminBlogPage";
 import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
+
 import ReviewsPage from "./pages/ReviewsPage";
 import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
@@ -102,6 +103,7 @@ const App = () => (
               <Route path="/cookiebeleid" element={<CookiePolicy />} />
               <Route path="/algemene-voorwaarden" element={<AlgemeneVoorwaarden />} />
               <Route path="/proefrit/:token" element={<ProefritFormulier />} />
+              
               <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/admin/login" element={<AdminLogin />} />
