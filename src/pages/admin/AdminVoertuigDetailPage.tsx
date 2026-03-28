@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog";
 import ConsignatieOvereenkomstDialog from "@/components/admin/ConsignatieOvereenkomstDialog";
+import AanbetalingDialog from "@/components/admin/AanbetalingDialog";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Trash2, Loader2, FileText, Info, ClipboardCheck, Link2, ScrollText } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, FileText, Info, ClipboardCheck, Link2, ScrollText, Banknote } from "lucide-react";
 import { toast } from "sonner";
 import { statusLabels, statusColors, formatEuroDecimal, calcKostprijs, calcWinst, calcNettoMarge, calcMarge } from "@/types/vehicle";
 import VehicleInfoTab from "@/components/admin/VehicleInfoTab";
@@ -30,6 +31,7 @@ const AdminVoertuigDetailPage = () => {
   const [blogGenerating, setBlogGenerating] = useState(false);
   const [proefritOpen, setProefritOpen] = useState(false);
   const [consignatieOpen, setConsignatieOpen] = useState(false);
+  const [aanbetalingOpen, setAanbetalingOpen] = useState(false);
   const vehicle = vehicles.find((v) => v.id === id);
 
   if (loading) {
