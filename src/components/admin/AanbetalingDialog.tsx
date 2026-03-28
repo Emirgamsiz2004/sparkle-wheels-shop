@@ -145,6 +145,8 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
           restbedrag,
           uiterlijkeDatum: form.uiterlijkeDatum,
         },
+        betaalwijze: form.betaalwijze,
+        contantBedrag: form.betaalwijze === "combinatie" ? form.contantBedrag : undefined,
         datum: form.datum,
         plaats: form.plaats,
       };
@@ -245,6 +247,43 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
                 <strong className="text-foreground font-medium">Annuleringsvoorwaarden:</strong> Bij annulering door koper vervalt de aanbetaling aan Platin Automotive als vergoeding voor gemaakte kosten en gederfde inkomsten.
               </p>
             </div>
+          </Section>
+
+          {/* Betaalwijze */}
+          <Section title="Betaalwijze">
+            <div>
+              <label className="block text-xs text-muted-foreground mb-1">Betaalwijze *</label>
+              <select value={form.betaalwijze} onChange={(e) => update("betaalwijze", e.target.value)} className={inputCls}>
+                <option value="bank">Volledig per bank</option>
+                <option value="contant">Volledig contant (max € 3.000)</option>
+                <option value="combinatie">Combinatie contant + bank</option>
+              </select>
+            </div>
+
+            {form.betaalwijze === "contant" && form.verkoopprijs > 3000 && (
+              <div className="mt-3 flex items-start gap-2 px-3 py-2.5 bg-destructive/10 rounded-md border border-destructive/30">
+                <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-destructive font-medium">
+                  ⚠️ Contante betaling is wettelijk beperkt tot € 3.000. Kies voor een combinatie van contant en bankoverschrijving.
+                </p>
+              </div>
+            )}
+
+            {form.betaalwijze === "combinatie" && (
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <div>
+                  <label className="block text-xs text-muted-foreground mb-1">Contant bedrag (€) — max € 3.000</label>
+                  <input type="number" value={form.contantBedrag} onChange={(e) => update("contantBedrag", Number(e.target.value))} className={inputCls} max={3000} />
+                  {form.contantBedrag > 3000 && (
+                    <p className="text-xs text-destructive mt-1 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Maximum € 3.000 contant toegestaan</p>
+                  )}
+                </div>
+                <div className="bg-secondary/50 border border-border rounded-md p-3">
+                  <p className="text-xs text-muted-foreground mb-1">Per bank</p>
+                  <p className="text-base font-semibold tabular-nums">{formatEuroDecimal(bankBedrag > 0 ? bankBedrag : 0)}</p>
+                </div>
+              </div>
+            )}
           </Section>
 
           {/* Datum / Plaats */}
