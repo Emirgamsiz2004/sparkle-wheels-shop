@@ -29,7 +29,7 @@ const AdminVoertuigDetailPage = () => {
   const [activeTab, setActiveTab] = useState("overzicht");
   const [blogGenerating, setBlogGenerating] = useState(false);
   const [proefritOpen, setProefritOpen] = useState(false);
-
+  const [consignatieOpen, setConsignatieOpen] = useState(false);
   const vehicle = vehicles.find((v) => v.id === id);
 
   if (loading) {
