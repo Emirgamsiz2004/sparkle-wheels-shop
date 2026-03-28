@@ -611,6 +611,70 @@ export type Database = {
         }
         Relationships: []
       }
+      document_archive: {
+        Row: {
+          consignatie_overeenkomst_id: string | null
+          created_at: string
+          document_type: string
+          file_path: string | null
+          id: string
+          kenteken: string | null
+          klant_naam: string | null
+          metadata: Json | null
+          storage_bucket: string | null
+          test_drive_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          consignatie_overeenkomst_id?: string | null
+          created_at?: string
+          document_type: string
+          file_path?: string | null
+          id?: string
+          kenteken?: string | null
+          klant_naam?: string | null
+          metadata?: Json | null
+          storage_bucket?: string | null
+          test_drive_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          consignatie_overeenkomst_id?: string | null
+          created_at?: string
+          document_type?: string
+          file_path?: string | null
+          id?: string
+          kenteken?: string | null
+          klant_naam?: string | null
+          metadata?: Json | null
+          storage_bucket?: string | null
+          test_drive_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_archive_consignatie_overeenkomst_id_fkey"
+            columns: ["consignatie_overeenkomst_id"]
+            isOneToOne: false
+            referencedRelation: "consignatie_overeenkomsten"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_archive_test_drive_id_fkey"
+            columns: ["test_drive_id"]
+            isOneToOne: false
+            referencedRelation: "test_drives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_archive_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_checklist_items: {
         Row: {
           document_id: string | null
