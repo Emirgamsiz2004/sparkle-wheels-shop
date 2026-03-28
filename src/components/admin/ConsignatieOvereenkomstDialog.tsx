@@ -121,6 +121,8 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
         overigeKosten: Number(a.overige_kosten) || 0,
         datum: a.datum || new Date().toISOString().split("T")[0],
         plaats: a.plaats || "Roelofarendsveen",
+        betaalwijze: "bank",
+        contantBedrag: 0,
       });
     }
     setLoadingExisting(false);
