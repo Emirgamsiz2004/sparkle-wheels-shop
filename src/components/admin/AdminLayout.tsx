@@ -25,9 +25,7 @@ const navGroups: NavGroup[] = [
   {
     label: "Financien",
     items: [
-      { label: "Overzicht", icon: Wallet, path: "/admin/financieel" },
-      { label: "BTW Aangifte", icon: Receipt, path: "/admin/btw" },
-      { label: "Moneybird", icon: Link2, path: "/admin/moneybird" },
+      { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
     ],
   },
   {

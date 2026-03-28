@@ -74,8 +74,8 @@ const App = () => (
                 <Route path="voertuigen/nieuw" element={<AdminVoertuigNieuwPage />} />
                 <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
                 <Route path="financieel" element={<AdminFinancieelPage />} />
-                <Route path="btw" element={<AdminBTWPage />} />
-                <Route path="moneybird" element={<AdminMoneybirdPage />} />
+                <Route path="btw" element={<AdminFinancieelPage />} />
+                <Route path="moneybird" element={<AdminFinancieelPage />} />
                 <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="social-media" element={<AdminSocialMediaPage />} />
                 <Route path="advertenties" element={<AdminAdvertentiesPage />} />
@@ -117,8 +117,8 @@ const App = () => (
                 <Route path="voertuigen/nieuw" element={<AdminVoertuigNieuwPage />} />
                 <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
                 <Route path="financieel" element={<AdminFinancieelPage />} />
-              <Route path="btw" element={<AdminBTWPage />} />
-                <Route path="moneybird" element={<AdminMoneybirdPage />} />
+              <Route path="btw" element={<AdminFinancieelPage />} />
+              <Route path="moneybird" element={<AdminFinancieelPage />} />
                 <Route path="instellingen" element={<AdminInstellingenPage />} />
                 <Route path="social-media" element={<AdminSocialMediaPage />} />
                 <Route path="advertenties" element={<AdminAdvertentiesPage />} />
