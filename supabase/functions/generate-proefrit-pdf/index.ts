@@ -325,6 +325,31 @@ ${td.opmerkingen_na ? `<div style="font-size:8px;color:#666;margin-top:4px;"><st
 
         const messageId = crypto.randomUUID();
 
+        // Get or create unsubscribe token
+        const normalizedEmail = customer.email.toLowerCase();
+        let unsubscribeToken: string;
+        const { data: existingToken } = await supabase
+          .from('email_unsubscribe_tokens')
+          .select('token')
+          .eq('email', normalizedEmail)
+          .maybeSingle();
+
+        if (existingToken) {
+          unsubscribeToken = existingToken.token;
+        } else {
+          const bytes = new Uint8Array(32);
+          crypto.getRandomValues(bytes);
+          unsubscribeToken = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+          await supabase.from('email_unsubscribe_tokens').upsert(
+            { token: unsubscribeToken, email: normalizedEmail },
+            { onConflict: 'email', ignoreDuplicates: true }
+          );
+          // Re-read in case of race
+          const { data: storedToken } = await supabase
+            .from('email_unsubscribe_tokens').select('token').eq('email', normalizedEmail).maybeSingle();
+          if (storedToken) unsubscribeToken = storedToken.token;
+        }
+
         // Log pending
         await supabase.from('email_send_log').insert({
           message_id: messageId,
@@ -347,6 +372,7 @@ ${td.opmerkingen_na ? `<div style="font-size:8px;color:#666;margin-top:4px;"><st
             purpose: 'transactional',
             label: 'proefrit-overeenkomst',
             idempotency_key: `proefrit-${testDriveId}-${Date.now()}`,
+            unsubscribe_token: unsubscribeToken,
             queued_at: new Date().toISOString(),
           },
         });
