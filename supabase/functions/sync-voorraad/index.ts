@@ -80,7 +80,7 @@ serve(async (req) => {
     // Get existing vehicles from DB
     const { data: existing } = await supabase
       .from("vehicles")
-      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand, merk, model, bouwjaar, brandstof, kleur");
+      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand, merk, model, bouwjaar, brandstof, kleur, verkoop_datum");
 
     const existingByFeedId = new Map(
       (existing || []).filter((v: any) => v.feed_id).map((v: any) => [v.feed_id, v])
