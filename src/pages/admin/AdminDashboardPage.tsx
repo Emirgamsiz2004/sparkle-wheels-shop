@@ -235,14 +235,31 @@ const AdminDashboardPage = () => {
       </ReportCard>
 
       {/* ═══════════════════════════════════════════
-          RAPPORT 4 — Populairste merken & modellen
+          RAPPORT 4 — Meest verkocht & meest winstgevend
       ═══════════════════════════════════════════ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ReportCard title="Meest verkochte merken" icon={Car}>
           <RankedList items={populariteit.merkVerkopen.map(m => ({ label: m.naam, value: `${m.aantal}x` }))} />
         </ReportCard>
-        <ReportCard title="Meest verkochte modellen" icon={Car}>
-          <RankedList items={populariteit.modelVerkopen.map(m => ({ label: m.naam, value: `${m.aantal}x` }))} />
+
+        <ReportCard title="Meest winstgevende verkopen" icon={TrendingUp}>
+          {margeAnalyse.top5.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-4">Geen data</p>
+          ) : (
+            <div className="space-y-3">
+              {margeAnalyse.top5.map((m, i) => (
+                <Link key={i} to={`/admin/voertuigen/${m.vehicle.id}`} className="flex items-center justify-between group">
+                  <div>
+                    <p className="text-[13px] text-foreground group-hover:underline">{m.vehicle.merk} {m.vehicle.model}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Inkoop {formatEuro(isConsignatie(m.vehicle) ? 0 : m.vehicle.inkoopprijs)} → Verkoop {formatEuro(m.vehicle.verkoopprijs)}
+                    </p>
+                  </div>
+                  <span className="text-emerald-500 font-semibold tabular-nums text-sm">+{formatEuro(m.winst)}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </ReportCard>
       </div>
 
