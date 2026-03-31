@@ -4,9 +4,8 @@ import { useTestDrives } from "@/hooks/useTestDrives";
 import { useDashboardData, getPeriodRange, calcTrend, PeriodKey } from "@/hooks/useDashboardData";
 import { formatEuro, isConsignatie } from "@/types/vehicle";
 import {
-  Loader2, TrendingUp, TrendingDown, Minus, Car, DollarSign, Tag,
-  Package, TestTube, Clock, Download, Calendar as CalendarIcon,
-  ArrowRight
+  Loader2, TrendingUp, TrendingDown, Minus, Car, DollarSign,
+  Package, TestTube, Clock, Download, Calendar as CalendarIcon
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, parseISO } from "date-fns";
