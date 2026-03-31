@@ -408,7 +408,7 @@ const AdminDashboardPage = () => {
                     {typeLabels[a.type] || a.type}
                   </span>
                   <span className="text-[13px] text-foreground flex-1">{a.label}</span>
-                  <span className="text-[11px] text-muted-foreground whitespace-nowrap">{a.tijd}</span>
+                  <span className="text-[11px] text-muted-foreground whitespace-nowrap">{a.time}</span>
                 </div>
               );
             })}
