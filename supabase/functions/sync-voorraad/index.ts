@@ -119,16 +119,18 @@ serve(async (req) => {
         if (fv.kleur && fv.kleur !== match.kleur) updates.kleur = fv.kleur;
         if (fv.verkoopprijs && fv.verkoopprijs !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
         if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
-        // VWE is leidend voor publiek zichtbare beschikbaarheid uit advertentiebeheer.
-        // Alleen verkocht/gereserveerd/te_koop worden hier automatisch bijgewerkt.
-        if (
-          fv.feed_status !== match.status &&
-          (fv.feed_status === "verkocht" ||
-            fv.feed_status === "gereserveerd" ||
-            match.status === "verkocht" ||
-            match.status === "gereserveerd")
-        ) {
-          updates.status = fv.feed_status;
+        // VWE feed is leidend: alleen als de FEED zegt verkocht/gereserveerd nemen we dat over.
+        // Als de feed "te_koop" zegt maar de DB heeft een handmatige status (verkocht, gereserveerd, 
+        // consignatie, in_behandeling, inkoop), laten we die met rust.
+        if (fv.feed_status !== match.status) {
+          if (fv.feed_status === "verkocht" || fv.feed_status === "gereserveerd") {
+            // Feed zegt verkocht/gereserveerd → altijd overnemen
+            updates.status = fv.feed_status;
+            if (fv.feed_status === "verkocht" && !match.verkoop_datum) {
+              updates.verkoop_datum = new Date().toISOString().split("T")[0];
+            }
+          }
+          // Als feed "te_koop" zegt maar DB heeft een andere status → NIET overschrijven
         }
 
         if (Object.keys(updates).length > 0) {
