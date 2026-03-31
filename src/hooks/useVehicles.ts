@@ -81,25 +81,6 @@ export function useVehicles() {
     setLoading(false);
   }, [user]);
 
-  // Auto-sync with VWE feed on first load (max once per 5 minutes)
-  useEffect(() => {
-    if (!user) return;
-    const SYNC_KEY = 'last_voorraad_sync';
-    const lastSync = localStorage.getItem(SYNC_KEY);
-    const now = Date.now();
-    const fiveMin = 5 * 60 * 1000;
-
-    if (!lastSync || now - parseInt(lastSync) > fiveMin) {
-      localStorage.setItem(SYNC_KEY, String(now));
-      supabase.functions.invoke('sync-voorraad').then(({ data, error }) => {
-        if (!error && data?.created > 0) {
-          // Refetch if new vehicles were added
-          fetchVehicles();
-        }
-      }).catch(() => {});
-    }
-  }, [user, fetchVehicles]);
-
   useEffect(() => { fetchVehicles(); }, [fetchVehicles]);
 
   const addVehicle = async (data: Omit<Vehicle, 'id' | 'kosten'>) => {
