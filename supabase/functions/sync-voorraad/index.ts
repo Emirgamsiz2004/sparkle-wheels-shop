@@ -149,6 +149,7 @@ serve(async (req) => {
           kenteken: fv.kenteken,
           verkoopprijs: fv.verkoopprijs,
           status: fv.feed_status,
+          inkoop_datum: new Date().toISOString().split("T")[0],
         });
 
         if (error) {
