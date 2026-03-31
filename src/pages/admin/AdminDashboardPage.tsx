@@ -4,9 +4,8 @@ import { useTestDrives } from "@/hooks/useTestDrives";
 import { useDashboardData, getPeriodRange, calcTrend, PeriodKey } from "@/hooks/useDashboardData";
 import { formatEuro, isConsignatie } from "@/types/vehicle";
 import {
-  Loader2, TrendingUp, TrendingDown, Minus, Car, DollarSign, Tag,
-  Package, TestTube, Clock, Download, Calendar as CalendarIcon,
-  ArrowRight
+  Loader2, TrendingUp, TrendingDown, Minus, Car, DollarSign,
+  Package, TestTube, Clock, Download, Calendar as CalendarIcon
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, parseISO } from "date-fns";
@@ -235,66 +234,14 @@ const AdminDashboardPage = () => {
       </ReportCard>
 
       {/* ═══════════════════════════════════════════
-          RAPPORT 4 — Populairste merken & modellen
+          RAPPORT 4 — Meest verkocht & meest winstgevend
       ═══════════════════════════════════════════ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ReportCard title="Meest verkochte merken" icon={Car}>
           <RankedList items={populariteit.merkVerkopen.map(m => ({ label: m.naam, value: `${m.aantal}x` }))} />
         </ReportCard>
-        <ReportCard title="Meest verkochte modellen" icon={Car}>
-          <RankedList items={populariteit.modelVerkopen.map(m => ({ label: m.naam, value: `${m.aantal}x` }))} />
-        </ReportCard>
-      </div>
 
-      {/* ═══════════════════════════════════════════
-          RAPPORT 5 — Brandstof & Transmissie
-      ═══════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ReportCard title="Verkopen per brandstof" icon={Tag}>
-          <RankedList items={populariteit.brandstofVerkopen.map(m => ({ label: m.naam, value: `${m.aantal}x` }))} />
-        </ReportCard>
-        <ReportCard title="Verkopen per transmissie" icon={Tag}>
-          <RankedList items={populariteit.transmissieVerkopen.map(m => ({ label: m.naam, value: `${m.aantal}x` }))} />
-        </ReportCard>
-      </div>
-
-      {/* ═══════════════════════════════════════════
-          RAPPORT 6 — Marge per merk
-      ═══════════════════════════════════════════ */}
-      <ReportCard title="Marge per merk" icon={DollarSign}>
-        {margeAnalyse.margePerMerk.length === 0 ? (
-          <p className="text-xs text-muted-foreground text-center py-4">Geen verkopen in deze periode</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
-              <thead>
-                <tr className="border-b border-border text-[11px] text-muted-foreground">
-                  <th className="text-left py-2 pr-3 font-medium">Merk</th>
-                  <th className="text-right py-2 pr-3 font-medium">Gem. marge</th>
-                  <th className="text-right py-2 font-medium">Percentage</th>
-                </tr>
-              </thead>
-              <tbody>
-                {margeAnalyse.margePerMerk.map(m => (
-                  <tr key={m.merk} className="border-t border-border/40">
-                    <td className="py-2 pr-3 text-foreground">{m.merk}</td>
-                    <td className={`py-2 pr-3 text-right tabular-nums font-medium ${m.marge >= 0 ? "text-emerald-500" : "text-red-400"}`}>
-                      {formatEuro(m.marge)}
-                    </td>
-                    <td className="py-2 text-right tabular-nums text-muted-foreground">{m.margePerc.toFixed(0)}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </ReportCard>
-
-      {/* ═══════════════════════════════════════════
-          RAPPORT 7 — Top & bottom verkopen
-      ═══════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ReportCard title="Meest winstgevend" icon={TrendingUp}>
+        <ReportCard title="Meest winstgevende verkopen" icon={TrendingUp}>
           {margeAnalyse.top5.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-4">Geen data</p>
           ) : (
@@ -313,29 +260,8 @@ const AdminDashboardPage = () => {
             </div>
           )}
         </ReportCard>
-
-        <ReportCard title="Minst winstgevend" icon={TrendingDown}>
-          {margeAnalyse.bottom5.length === 0 ? (
-            <p className="text-xs text-muted-foreground text-center py-4">Geen data</p>
-          ) : (
-            <div className="space-y-3">
-              {margeAnalyse.bottom5.map((m, i) => (
-                <Link key={i} to={`/admin/voertuigen/${m.vehicle.id}`} className="flex items-center justify-between group">
-                  <div>
-                    <p className="text-[13px] text-foreground group-hover:underline">{m.vehicle.merk} {m.vehicle.model}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      Inkoop {formatEuro(isConsignatie(m.vehicle) ? 0 : m.vehicle.inkoopprijs)} → Verkoop {formatEuro(m.vehicle.verkoopprijs)}
-                    </p>
-                  </div>
-                  <span className={`font-semibold tabular-nums text-sm ${m.winst >= 0 ? "text-emerald-500" : "text-red-400"}`}>
-                    {m.winst >= 0 ? "+" : ""}{formatEuro(m.winst)}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </ReportCard>
       </div>
+
 
       {/* ═══════════════════════════════════════════
           RAPPORT 8 — Financieel overzicht
