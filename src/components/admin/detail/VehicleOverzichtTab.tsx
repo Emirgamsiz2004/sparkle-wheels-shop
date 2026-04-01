@@ -146,12 +146,33 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           )}
         </div>
 
-        {/* Right - Financial summary (read-only) */}
+        {/* Right - Financial summary with editable kostprijs */}
         <div className="bg-card border border-border rounded-lg p-4 space-y-3">
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Financieel overzicht</h3>
           <div className="grid grid-cols-2 gap-y-2 text-sm">
             <ReadField label="Inkoopprijs" value={formatEuroDecimal(vehicle.inkoopprijs)} />
             <ReadField label="Totale kosten" value={formatEuroDecimal(totalKosten)} />
+            <div className="col-span-2 pt-1">
+              <label className="block text-xs text-muted-foreground mb-1">Kostprijs (€)</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  value={kostprijsEdit}
+                  onChange={(e) => setKostprijsEdit(e.target.value)}
+                  className={cn(inputCls, "max-w-[180px]")}
+                  placeholder={String(autoKostprijs)}
+                />
+                {Number(kostprijsEdit) !== (vehicle.kostprijsCalc || autoKostprijs) && (
+                  <button
+                    onClick={handleSaveKostprijs}
+                    className="px-3 py-2 text-xs font-medium bg-accent text-foreground rounded-xl hover:bg-accent/80 transition-colors"
+                  >
+                    Opslaan
+                  </button>
+                )}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1">Berekend: € {autoKostprijs.toLocaleString("nl-NL")} · Pas aan als de werkelijke kostprijs afwijkt</p>
+            </div>
             <ReadField label="Verkoopprijs" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(vehicle.verkoopprijs) : "—"} />
             <ReadField label="Nettomarge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} valueColor={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
           </div>
