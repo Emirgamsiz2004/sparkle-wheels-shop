@@ -33,7 +33,7 @@ export interface Vehicle {
   inkoopprijs: number;
   verkoopprijs: number;
   kosten: CostItem[];
-  status: 'inkoop' | 'in_behandeling' | 'te_koop' | 'verkocht' | 'consignatie' | 'gereserveerd';
+  status: 'inkoop' | 'in_behandeling' | 'te_koop' | 'verkocht' | 'consignatie' | 'gereserveerd' | 'reparatie_onderhoud';
   inkoopDatum: string;
   verkoopDatum?: string;
   opmerkingen?: string;
@@ -123,6 +123,7 @@ export const statusLabels: Record<Vehicle['status'], string> = {
   verkocht: 'Verkocht',
   consignatie: 'Consignatie',
   gereserveerd: 'Gereserveerd',
+  reparatie_onderhoud: 'Reparatie/Onderhoud',
 };
 
 export const statusColors: Record<Vehicle['status'], string> = {
@@ -132,6 +133,7 @@ export const statusColors: Record<Vehicle['status'], string> = {
   verkocht: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
   consignatie: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
   gereserveerd: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+  reparatie_onderhoud: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
 };
 
 export const brandstofLabels: Record<Vehicle['brandstof'], string> = {
