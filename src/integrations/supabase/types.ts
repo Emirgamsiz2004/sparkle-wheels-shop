@@ -1234,6 +1234,41 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_activity_log: {
+        Row: {
+          actie_type: string
+          beschrijving: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          vehicle_id: string
+        }
+        Insert: {
+          actie_type: string
+          beschrijving: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          vehicle_id: string
+        }
+        Update: {
+          actie_type?: string
+          beschrijving?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_activity_log_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_costs: {
         Row: {
           amount: number
@@ -1377,6 +1412,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "vehicle_photos_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_tasks: {
+        Row: {
+          created_at: string
+          deadline: string | null
+          id: string
+          omschrijving: string
+          prioriteit: string
+          vehicle_id: string
+          voltooid: boolean
+          voltooid_op: string | null
+        }
+        Insert: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          omschrijving: string
+          prioriteit?: string
+          vehicle_id: string
+          voltooid?: boolean
+          voltooid_op?: string | null
+        }
+        Update: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          omschrijving?: string
+          prioriteit?: string
+          vehicle_id?: string
+          voltooid?: boolean
+          voltooid_op?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_tasks_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
