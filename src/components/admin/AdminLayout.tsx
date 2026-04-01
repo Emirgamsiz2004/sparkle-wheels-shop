@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet, BarChart3,
-  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users,
+  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
@@ -19,6 +20,7 @@ const navGroups: NavGroup[] = [
       { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
       { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
       { label: "Klanten", icon: Users, path: "/admin/klanten" },
+      { label: "Leads", icon: Target, path: "/admin/leads" },
       { label: "Archief", icon: Archive, path: "/admin/archief" },
       { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
     ],
@@ -44,6 +46,24 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [overdueLeads, setOverdueLeads] = useState(0);
+
+  // Fetch overdue leads count
+  useEffect(() => {
+    if (!user) return;
+    const fetchOverdue = async () => {
+      const today = new Date().toISOString().split("T")[0];
+      const { count } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true })
+        .not("status", "in", '("gewonnen","verloren")')
+        .lt("volgende_actie_datum", today);
+      setOverdueLeads(count || 0);
+    };
+    fetchOverdue();
+    const interval = setInterval(fetchOverdue, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
@@ -100,7 +120,12 @@ const AdminLayout = () => {
                     }`}
                   >
                     <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
-                    {item.label}
+                    <span className="flex-1">{item.label}</span>
+                    {item.path === "/admin/leads" && overdueLeads > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                        {overdueLeads}
+                      </span>
+                    )}
                   </Link>
                 ))}
               </div>

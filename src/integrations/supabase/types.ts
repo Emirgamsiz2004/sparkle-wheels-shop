@@ -1016,6 +1016,101 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_history: {
+        Row: {
+          beschrijving: string
+          created_at: string
+          id: string
+          lead_id: string
+          nieuwe_status: string | null
+          oude_status: string | null
+        }
+        Insert: {
+          beschrijving: string
+          created_at?: string
+          id?: string
+          lead_id: string
+          nieuwe_status?: string | null
+          oude_status?: string | null
+        }
+        Update: {
+          beschrijving?: string
+          created_at?: string
+          id?: string
+          lead_id?: string
+          nieuwe_status?: string | null
+          oude_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_history_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          bron: string
+          created_at: string
+          customer_id: string
+          id: string
+          laatste_activiteit: string | null
+          notities_log: Json
+          status: string
+          updated_at: string
+          vehicle_id: string | null
+          verloren_reden: string | null
+          volgende_actie: string | null
+          volgende_actie_datum: string | null
+        }
+        Insert: {
+          bron?: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          laatste_activiteit?: string | null
+          notities_log?: Json
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          verloren_reden?: string | null
+          volgende_actie?: string | null
+          volgende_actie_datum?: string | null
+        }
+        Update: {
+          bron?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          laatste_activiteit?: string | null
+          notities_log?: Json
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          verloren_reden?: string | null
+          volgende_actie?: string | null
+          volgende_actie_datum?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       make_events: {
         Row: {
           created_at: string

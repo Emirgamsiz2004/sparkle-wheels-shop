@@ -38,6 +38,8 @@ import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
 import AdminArchiefPage from "./pages/admin/AdminArchiefPage";
 import AdminKlantenPage from "./pages/admin/AdminKlantenPage";
 import AdminKlantDetailPage from "./pages/admin/AdminKlantDetailPage";
+import AdminLeadsPage from "./pages/admin/AdminLeadsPage";
+import AdminLeadDetailPage from "./pages/admin/AdminLeadDetailPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
 
 import ReviewsPage from "./pages/ReviewsPage";
@@ -87,6 +89,8 @@ const App = () => (
                 <Route path="archief" element={<AdminArchiefPage />} />
                 <Route path="klanten" element={<AdminKlantenPage />} />
                 <Route path="klanten/:id" element={<AdminKlantDetailPage />} />
+                <Route path="leads" element={<AdminLeadsPage />} />
+                <Route path="leads/:id" element={<AdminLeadDetailPage />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
             </Routes>
@@ -132,6 +136,8 @@ const App = () => (
                 <Route path="archief" element={<AdminArchiefPage />} />
                 <Route path="klanten" element={<AdminKlantenPage />} />
                 <Route path="klanten/:id" element={<AdminKlantDetailPage />} />
+                <Route path="leads" element={<AdminLeadsPage />} />
+                <Route path="leads/:id" element={<AdminLeadDetailPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
