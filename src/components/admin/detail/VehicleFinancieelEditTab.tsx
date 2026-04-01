@@ -136,8 +136,8 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
           </div>
         )}
 
-        <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50">
-          {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Opslaan
+        <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:bg-foreground/90 disabled:opacity-40 transition-all active:scale-[0.98]">
+          {saving && <Loader2 className="w-4 h-4 animate-spin" />} Opslaan
         </button>
       </div>
 
