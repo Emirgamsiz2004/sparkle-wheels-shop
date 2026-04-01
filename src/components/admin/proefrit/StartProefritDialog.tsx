@@ -119,7 +119,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
               />
               <button
                 onClick={handleCopy}
-                className="shrink-0 p-1.5 border border-border rounded-md hover:bg-accent/20 transition-colors"
+                className="shrink-0 p-2 border border-border rounded-xl hover:bg-accent/20 transition-all"
               >
                 {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
               </button>
