@@ -1362,6 +1362,66 @@ export type Database = {
           },
         ]
       }
+      time_entries: {
+        Row: {
+          category: string
+          created_at: string
+          customer_id: string | null
+          description: string
+          duration_minutes: number | null
+          end_note: string | null
+          end_time: string | null
+          hourly_rate: number | null
+          id: string
+          start_time: string
+          user_id: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          customer_id?: string | null
+          description: string
+          duration_minutes?: number | null
+          end_note?: string | null
+          end_time?: string | null
+          hourly_rate?: number | null
+          id?: string
+          start_time?: string
+          user_id: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          customer_id?: string | null
+          description?: string
+          duration_minutes?: number | null
+          end_note?: string | null
+          end_time?: string | null
+          hourly_rate?: number | null
+          id?: string
+          start_time?: string
+          user_id?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_entries_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
