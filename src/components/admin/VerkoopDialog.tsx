@@ -139,7 +139,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg rounded-2xl p-6">
         <DialogHeader>
           <DialogTitle>
             {step === 1 && "Verkoopgegevens"}
@@ -158,29 +158,29 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
           <div className="space-y-4 mt-2">
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Verkoopprijs (€) *</label>
-              <input type="number" step="0.01" value={form.verkoopprijs} onChange={(e) => setForm(f => ({ ...f, verkoopprijs: Number(e.target.value) }))} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+              <input type="number" step="0.01" value={form.verkoopprijs} onChange={(e) => setForm(f => ({ ...f, verkoopprijs: Number(e.target.value) }))} className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all" />
             </div>
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Verkoopdatum *</label>
-              <input type="date" value={form.verkoopDatum} onChange={(e) => setForm(f => ({ ...f, verkoopDatum: e.target.value }))} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+              <input type="date" value={form.verkoopDatum} onChange={(e) => setForm(f => ({ ...f, verkoopDatum: e.target.value }))} className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all" />
             </div>
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Koper naam *</label>
-              <input value={form.koperNaam} onChange={(e) => setForm(f => ({ ...f, koperNaam: e.target.value }))} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+              <input value={form.koperNaam} onChange={(e) => setForm(f => ({ ...f, koperNaam: e.target.value }))} className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Koper e-mail</label>
-                <input value={form.koperEmail} onChange={(e) => setForm(f => ({ ...f, koperEmail: e.target.value }))} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+                <input value={form.koperEmail} onChange={(e) => setForm(f => ({ ...f, koperEmail: e.target.value }))} className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all" />
               </div>
               <div>
                 <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Koper telefoon</label>
-                <input value={form.koperTelefoon} onChange={(e) => setForm(f => ({ ...f, koperTelefoon: e.target.value }))} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+                <input value={form.koperTelefoon} onChange={(e) => setForm(f => ({ ...f, koperTelefoon: e.target.value }))} className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all" />
               </div>
             </div>
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Betaalmethode</label>
-              <select value={form.betaalmethode} onChange={(e) => setForm(f => ({ ...f, betaalmethode: e.target.value }))} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+              <select value={form.betaalmethode} onChange={(e) => setForm(f => ({ ...f, betaalmethode: e.target.value }))} className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all">
                 <option value="contant">Contant</option>
                 <option value="overboeking">Overboeking</option>
                 <option value="ideal">iDEAL</option>
@@ -190,9 +190,9 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             <button
               onClick={() => setStep(2)}
               disabled={!form.verkoopprijs || !form.verkoopDatum || !form.koperNaam}
-              className="w-full py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+              className="w-full py-3 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:bg-primary/90 disabled:opacity-50 active:scale-[0.98] transition-all"
             >
-              Volgende →
+              Volgende
             </button>
           </div>
         )}
@@ -203,7 +203,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             <p className="text-sm text-muted-foreground">{completedCount} van de {checklist.length} documenten aanwezig</p>
             <div className="space-y-2">
               {checklist.map((item) => (
-                <div key={item.naam} className="flex items-center justify-between px-4 py-3 bg-secondary/50 rounded-lg border border-border">
+                <div key={item.naam} className="flex items-center justify-between px-4 py-3 bg-secondary/50 rounded-xl border border-border">
                   <div className="flex items-center gap-3">
                     {item.voltooid ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-500" />
@@ -213,7 +213,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
                     <span className="text-sm text-foreground">{item.naam}</span>
                   </div>
                   {!item.voltooid && (
-                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-md cursor-pointer transition-colors">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-xl cursor-pointer transition-all">
                       <Upload className="w-3.5 h-3.5" />
                       {uploading === item.naam ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Uploaden"}
                       <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => {
@@ -227,7 +227,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             </div>
 
             {completedCount < checklist.length && (
-              <div className="flex items-start gap-2 px-4 py-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+              <div className="flex items-start gap-2 px-4 py-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
                 <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-amber-400">
                   Let op: je dossier is nog niet volledig. Je kunt de verkoop afronden, maar zorg dat je de documenten zo snel mogelijk uploadt.
@@ -236,11 +236,11 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             )}
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(1)} className="flex-1 py-2.5 bg-secondary text-secondary-foreground text-sm font-medium rounded-lg hover:bg-secondary/80 transition-colors">
-                ← Terug
+              <button onClick={() => setStep(1)} className="flex-1 py-3 bg-secondary text-secondary-foreground text-sm font-medium rounded-xl hover:bg-secondary/80 active:scale-[0.98] transition-all">
+                Terug
               </button>
-              <button onClick={() => setStep(3)} className="flex-1 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors">
-                Volgende →
+              <button onClick={() => setStep(3)} className="flex-1 py-3 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all">
+                Volgende
               </button>
             </div>
           </div>
@@ -268,19 +268,19 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
               </CardContent>
             </Card>
 
-            <label className="flex items-center gap-3 cursor-pointer px-4 py-3 bg-secondary/50 rounded-lg border border-border">
+            <label className="flex items-center gap-3 cursor-pointer px-4 py-3 bg-secondary/50 rounded-xl border border-border">
               <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} className="w-4 h-4 rounded border-border text-primary focus:ring-primary" />
               <span className="text-sm text-foreground">Ik bevestig dat de betaling is ontvangen</span>
             </label>
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(2)} className="flex-1 py-2.5 bg-secondary text-secondary-foreground text-sm font-medium rounded-lg hover:bg-secondary/80 transition-colors">
-                ← Terug
+              <button onClick={() => setStep(2)} className="flex-1 py-3 bg-secondary text-secondary-foreground text-sm font-medium rounded-xl hover:bg-secondary/80 active:scale-[0.98] transition-all">
+                Terug
               </button>
               <button
                 onClick={handleFinalize}
                 disabled={!confirmed || saving}
-                className="flex-1 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 py-3 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 Verkoop Afronden

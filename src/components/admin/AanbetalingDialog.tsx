@@ -193,17 +193,17 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
 
   if (!open) return null;
 
-  const inputCls = "w-full px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring";
+  const inputCls = "w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all";
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto p-4">
-      <div className="bg-background border border-border rounded-lg w-full max-w-2xl my-8">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+      <div className="bg-background border border-border rounded-2xl w-full max-w-2xl my-8">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
           <h2 className="text-base font-medium">Aanbetaling registreren</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
         </div>
 
-        <div className="px-5 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
+        <div className="px-6 py-5 space-y-6 max-h-[70vh] overflow-y-auto">
           {/* Voertuiggegevens */}
           <Section title="Voertuiggegevens">
             <div className="grid grid-cols-2 gap-3">
@@ -235,14 +235,14 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
               <Field label="Aanbetalingsbedrag (€) *" value={form.aanbetalingsbedrag} onChange={(v) => update("aanbetalingsbedrag", Number(v))} cls={inputCls} type="number" />
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3">
-              <div className="bg-secondary/50 border border-border rounded-md p-3">
+              <div className="bg-secondary/50 border border-border rounded-xl p-3">
                 <p className="text-xs text-muted-foreground mb-1">Restbedrag</p>
                 <p className="text-base font-semibold tabular-nums">{formatEuroDecimal(restbedrag)}</p>
               </div>
               <Field label="Uiterlijke datum restbetaling *" value={form.uiterlijkeDatum} onChange={(v) => update("uiterlijkeDatum", v)} cls={inputCls} type="date" />
             </div>
 
-            <div className="mt-3 px-3 py-2.5 bg-secondary/50 rounded-md border border-border">
+            <div className="mt-3 px-4 py-3 bg-secondary/50 rounded-xl border border-border">
               <p className="text-xs text-muted-foreground">
                 <strong className="text-foreground font-medium">Annuleringsvoorwaarden:</strong> Bij annulering door koper vervalt de aanbetaling aan Platin Automotive als vergoeding voor gemaakte kosten en gederfde inkomsten.
               </p>
@@ -261,7 +261,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
             </div>
 
             {form.betaalwijze === "contant" && form.verkoopprijs > 3000 && (
-              <div className="mt-3 flex items-start gap-2 px-3 py-2.5 bg-destructive/10 rounded-md border border-destructive/30">
+              <div className="mt-3 flex items-start gap-2 px-4 py-3 bg-destructive/10 rounded-xl border border-destructive/30">
                 <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-destructive font-medium">
                   ⚠️ Contante betaling is wettelijk beperkt tot € 3.000. Kies voor een combinatie van contant en bankoverschrijving.
@@ -278,7 +278,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
                     <p className="text-xs text-destructive mt-1 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Maximum € 3.000 contant toegestaan</p>
                   )}
                 </div>
-                <div className="bg-secondary/50 border border-border rounded-md p-3">
+                <div className="bg-secondary/50 border border-border rounded-xl p-3">
                   <p className="text-xs text-muted-foreground mb-1">Per bank</p>
                   <p className="text-base font-semibold tabular-nums">{formatEuroDecimal(bankBedrag > 0 ? bankBedrag : 0)}</p>
                 </div>
@@ -295,12 +295,12 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
           </Section>
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border">
-          <button onClick={onClose} className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">Annuleren</button>
+        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-border">
+          <button onClick={onClose} className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl transition-all">Annuleren</button>
           <button
             onClick={handleGenerate}
             disabled={saving || !isValid()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.97] transition-all disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
             Genereer overeenkomst
@@ -320,8 +320,8 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 
 const ReadOnly = ({ label, value }: { label: string; value: string }) => (
   <div>
-    <label className="block text-xs text-muted-foreground mb-1">{label}</label>
-    <p className="px-2.5 py-1.5 text-sm bg-secondary/50 border border-border rounded-md text-foreground">{value || "—"}</p>
+    <label className="block text-xs text-muted-foreground mb-1.5">{label}</label>
+    <p className="px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground">{value || "—"}</p>
   </div>
 );
 
@@ -329,7 +329,7 @@ const Field = ({ label, value, onChange, cls, type = "text" }: {
   label: string; value: any; onChange: (v: string) => void; cls: string; type?: string;
 }) => (
   <div>
-    <label className="block text-xs text-muted-foreground mb-1">{label}</label>
+    <label className="block text-xs text-muted-foreground mb-1.5">{label}</label>
     <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cls} />
   </div>
 );
