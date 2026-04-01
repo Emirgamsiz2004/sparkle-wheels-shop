@@ -82,21 +82,26 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
           {!isConsig && (
             <>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Inkoopprijs</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Inkoopprijs (€)</label>
                 <input type="number" value={form.inkoopprijs} onChange={(e) => setForm(f => ({ ...f, inkoopprijs: Number(e.target.value) }))} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Inkoopdatum</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Inkoopdatum</label>
                 <input type="date" value={form.inkoopDatum} onChange={(e) => setForm(f => ({ ...f, inkoopDatum: e.target.value }))} className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Kostprijs (€)</label>
+                <input type="number" value={form.kostprijsOverride || autoKostprijs} onChange={(e) => setForm(f => ({ ...f, kostprijsOverride: e.target.value }))} className={inputCls} placeholder={String(autoKostprijs)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Berekend: € {autoKostprijs.toLocaleString("nl-NL")} · Pas aan als de werkelijke kostprijs afwijkt</p>
               </div>
             </>
           )}
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">Verkoopprijs</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Verkoopprijs (€)</label>
             <input type="number" value={form.verkoopprijs} onChange={(e) => setForm(f => ({ ...f, verkoopprijs: Number(e.target.value) }))} className={inputCls} />
           </div>
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">Verkoopdatum</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Verkoopdatum</label>
             <input type="date" value={form.verkoopDatum} onChange={(e) => setForm(f => ({ ...f, verkoopDatum: e.target.value }))} className={inputCls} />
           </div>
         </div>
