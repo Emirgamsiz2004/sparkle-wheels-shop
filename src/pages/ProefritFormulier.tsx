@@ -185,6 +185,34 @@ const ProefritFormulier = () => {
         customerId = newCust.id;
       }
 
+      // Auto-create/update customer in CRM customers table
+      try {
+        const { data: existingCrm } = await supabase
+          .from("customers")
+          .select("id")
+          .eq("email", email)
+          .maybeSingle();
+
+        if (existingCrm) {
+          await supabase.from("customers").update({
+            voornaam, achternaam, telefoon,
+            adres: adres || null, postcode: postcode || null, plaats: plaats || null,
+            geboortedatum: geboortedatum || null,
+            laatste_contact: new Date().toISOString(),
+          } as any).eq("id", existingCrm.id);
+        } else {
+          await supabase.from("customers").insert({
+            voornaam, achternaam, email, telefoon,
+            adres: adres || null, postcode: postcode || null, plaats: plaats || null,
+            geboortedatum: geboortedatum || null,
+            status: "prospect",
+            laatste_contact: new Date().toISOString(),
+          } as any);
+        }
+      } catch (crmErr) {
+        console.error("CRM customer sync error:", crmErr);
+      }
+
       // Get signature data
       const signatureData = sigPadRef.current.toDataURL();
 
