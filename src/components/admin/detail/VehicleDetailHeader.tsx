@@ -48,21 +48,21 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
 
       {/* Action bar */}
       <div className="flex items-center gap-2 flex-wrap">
-        <button onClick={onOpenProefrit} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+        <button onClick={onOpenProefrit} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
           <ClipboardCheck className="w-3.5 h-3.5" /> Proefrit starten
         </button>
 
         {/* Status dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+            <button className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
               Status wijzigen <ChevronDown className="w-3 h-3" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
+          <DropdownMenuContent align="start" className="rounded-xl p-1">
             {allStatuses.map((s) => (
-              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={vehicle.status === s ? "bg-accent" : ""}>
-                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border mr-2 ${statusColors[s]}`}>
+              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={`rounded-lg ${vehicle.status === s ? "bg-accent" : ""}`}>
+                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded-lg border mr-2 ${statusColors[s]}`}>
                   {statusLabels[s]}
                 </span>
               </DropdownMenuItem>
@@ -70,26 +70,26 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <button onClick={onOpenKosten} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+        <button onClick={onOpenKosten} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
           <Plus className="w-3.5 h-3.5" /> Kosten toevoegen
         </button>
 
-        <button onClick={onOpenTaak} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+        <button onClick={onOpenTaak} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
           <Plus className="w-3.5 h-3.5" /> Taak toevoegen
         </button>
 
         {/* Meer dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+            <button className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
               <MoreHorizontal className="w-3.5 h-3.5" /> Meer
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={onOpenAanbetaling}>
+          <DropdownMenuContent align="start" className="rounded-xl p-1">
+            <DropdownMenuItem onClick={onOpenAanbetaling} className="rounded-lg">
               <Banknote className="w-3.5 h-3.5 mr-2" /> Aanbetaling registreren
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setDeleteOpen(true)} className="text-red-500 focus:text-red-500">
+            <DropdownMenuItem onClick={() => setDeleteOpen(true)} className="text-red-500 focus:text-red-500 rounded-lg">
               <Trash2 className="w-3.5 h-3.5 mr-2" /> Verwijderen
             </DropdownMenuItem>
           </DropdownMenuContent>
