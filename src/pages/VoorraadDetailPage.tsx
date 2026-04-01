@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVoorraadDetail } from "@/hooks/useVoorraadFeed";
 import { supabase } from "@/integrations/supabase/client";
+import { formatKenteken } from "@/lib/kenteken";
 import TradeInSection from "@/components/TradeInSection";
 import RelatedVehicles from "@/components/RelatedVehicles";
 import napLogo from "@/assets/nap-logo.png";
@@ -77,7 +78,7 @@ const VoorraadDetailPage = () => {
     : "";
 
   const displayKenteken = vehicle?.kenteken_detail || vehicle?.kenteken || "";
-  const formattedKenteken = displayKenteken ? displayKenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().replace(/(.{2,3})(?=.)/g, "$1-") : "";
+  const formattedKenteken = displayKenteken ? formatKenteken(displayKenteken) : "";
 
   const specs = vehicle
     ? [
@@ -352,9 +353,6 @@ const VoorraadDetailPage = () => {
                   <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
                     {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
                   </p>
-                  {vehicle.nap === "1" && (
-                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-6 object-contain" />
-                  )}
                 </div>
 
 
