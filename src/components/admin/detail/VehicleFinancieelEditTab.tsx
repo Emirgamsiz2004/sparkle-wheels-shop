@@ -19,6 +19,7 @@ interface Props {
 }
 
 const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, onLogActivity }: Props) => {
+  const autoKostprijs = vehicle.inkoopprijs + vehicle.kosten.reduce((s, k) => s + k.amount, 0);
   const [form, setForm] = useState({
     inkoopprijs: vehicle.inkoopprijs,
     verkoopprijs: vehicle.verkoopprijs,
@@ -29,6 +30,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",
+    kostprijsOverride: vehicle.kostprijsCalc && vehicle.kostprijsCalc !== autoKostprijs ? String(vehicle.kostprijsCalc) : "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -40,6 +42,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
 
   const handleSave = async () => {
     setSaving(true);
+    const kostprijsVal = form.kostprijsOverride ? Number(form.kostprijsOverride) : autoKostprijs;
     await onSave({
       ...vehicle,
       inkoopprijs: form.inkoopprijs,
@@ -52,6 +55,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
       consignatieEigenaarNaam: form.consignatieEigenaarNaam || undefined,
       consignatieEigenaarTelefoon: form.consignatieEigenaarTelefoon || undefined,
       consignatieEigenaarEmail: form.consignatieEigenaarEmail || undefined,
+      kostprijsCalc: kostprijsVal,
     });
     onLogActivity("financieel_bewerkt", "Financiële gegevens bijgewerkt");
     setSaving(false);
@@ -64,7 +68,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
     window.open(data.signedUrl, "_blank");
   };
 
-  const inputCls = "w-full px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring";
+  const inputCls = "w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all";
 
   const totalKosten = vehicle.kosten.reduce((s, k) => s + k.amount, 0);
   const kostprijs = calcKostprijs(vehicle);
@@ -80,21 +84,26 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
           {!isConsig && (
             <>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Inkoopprijs</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Inkoopprijs (€)</label>
                 <input type="number" value={form.inkoopprijs} onChange={(e) => setForm(f => ({ ...f, inkoopprijs: Number(e.target.value) }))} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Inkoopdatum</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Inkoopdatum</label>
                 <input type="date" value={form.inkoopDatum} onChange={(e) => setForm(f => ({ ...f, inkoopDatum: e.target.value }))} className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Kostprijs (€)</label>
+                <input type="number" value={form.kostprijsOverride || autoKostprijs} onChange={(e) => setForm(f => ({ ...f, kostprijsOverride: e.target.value }))} className={inputCls} placeholder={String(autoKostprijs)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Berekend: € {autoKostprijs.toLocaleString("nl-NL")} · Pas aan als de werkelijke kostprijs afwijkt</p>
               </div>
             </>
           )}
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">Verkoopprijs</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Verkoopprijs (€)</label>
             <input type="number" value={form.verkoopprijs} onChange={(e) => setForm(f => ({ ...f, verkoopprijs: Number(e.target.value) }))} className={inputCls} />
           </div>
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">Verkoopdatum</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Verkoopdatum</label>
             <input type="date" value={form.verkoopDatum} onChange={(e) => setForm(f => ({ ...f, verkoopDatum: e.target.value }))} className={inputCls} />
           </div>
         </div>
@@ -111,26 +120,26 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
         {isConsig && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Eigenaar naam</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Eigenaar naam</label>
               <input value={form.consignatieEigenaarNaam} onChange={(e) => setForm(f => ({ ...f, consignatieEigenaarNaam: e.target.value }))} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Commissie %</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Commissie %</label>
               <input type="number" min={0} max={50} step={0.5} value={form.consignatieCommissiePerc} onChange={(e) => setForm(f => ({ ...f, consignatieCommissiePerc: Number(e.target.value) }))} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Eigenaar telefoon</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Eigenaar telefoon</label>
               <input value={form.consignatieEigenaarTelefoon} onChange={(e) => setForm(f => ({ ...f, consignatieEigenaarTelefoon: e.target.value }))} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Eigenaar e-mail</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Eigenaar e-mail</label>
               <input value={form.consignatieEigenaarEmail} onChange={(e) => setForm(f => ({ ...f, consignatieEigenaarEmail: e.target.value }))} className={inputCls} />
             </div>
           </div>
         )}
 
-        <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50">
-          {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Opslaan
+        <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:bg-foreground/90 disabled:opacity-40 transition-all active:scale-[0.98]">
+          {saving && <Loader2 className="w-4 h-4 animate-spin" />} Opslaan
         </button>
       </div>
 
