@@ -46,6 +46,24 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [overdueLeads, setOverdueLeads] = useState(0);
+
+  // Fetch overdue leads count
+  useEffect(() => {
+    if (!user) return;
+    const fetchOverdue = async () => {
+      const today = new Date().toISOString().split("T")[0];
+      const { count } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true })
+        .not("status", "in", '("gewonnen","verloren")')
+        .lt("volgende_actie_datum", today);
+      setOverdueLeads(count || 0);
+    };
+    fetchOverdue();
+    const interval = setInterval(fetchOverdue, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
