@@ -92,7 +92,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenProefrit={() => setProefritOpen(true)}
         onOpenAanbetaling={() => setAanbetalingOpen(true)}
         onOpenKosten={() => setKostenOpen(true)}
-        onOpenTaak={() => setTaakDialogOpen(true)}
+        onOpenTaak={handleOpenTaak}
         onDelete={handleDelete}
       />
 
