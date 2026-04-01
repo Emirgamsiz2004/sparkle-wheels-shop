@@ -295,12 +295,12 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
           </Section>
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border">
-          <button onClick={onClose} className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">Annuleren</button>
+        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-border">
+          <button onClick={onClose} className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl transition-all">Annuleren</button>
           <button
             onClick={handleGenerate}
             disabled={saving || !isValid()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.97] transition-all disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
             Genereer overeenkomst
