@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Vehicle, statusLabels, statusColors } from "@/types/vehicle";
-import { ArrowLeft, ClipboardCheck, ChevronDown, Plus, FileText, MoreHorizontal, Banknote, Trash2 } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, ChevronDown, Plus, FileText, MoreHorizontal, Banknote, Trash2, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
