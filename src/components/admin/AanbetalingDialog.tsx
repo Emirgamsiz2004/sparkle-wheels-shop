@@ -203,7 +203,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
         </div>
 
-        <div className="px-5 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
+        <div className="px-6 py-5 space-y-6 max-h-[70vh] overflow-y-auto">
           {/* Voertuiggegevens */}
           <Section title="Voertuiggegevens">
             <div className="grid grid-cols-2 gap-3">
