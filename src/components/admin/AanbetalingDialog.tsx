@@ -235,7 +235,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
               <Field label="Aanbetalingsbedrag (€) *" value={form.aanbetalingsbedrag} onChange={(v) => update("aanbetalingsbedrag", Number(v))} cls={inputCls} type="number" />
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3">
-              <div className="bg-secondary/50 border border-border rounded-md p-3">
+              <div className="bg-secondary/50 border border-border rounded-xl p-3">
                 <p className="text-xs text-muted-foreground mb-1">Restbedrag</p>
                 <p className="text-base font-semibold tabular-nums">{formatEuroDecimal(restbedrag)}</p>
               </div>
