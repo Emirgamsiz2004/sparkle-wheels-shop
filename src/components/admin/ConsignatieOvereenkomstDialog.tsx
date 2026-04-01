@@ -356,10 +356,10 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
               </div>
 
               {form.betaalwijze === "contant" && form.vraagprijs > 3000 && (
-                <div className="mt-3 flex items-start gap-2 px-3 py-2.5 bg-destructive/10 rounded-md border border-destructive/30">
+                <div className="mt-3 flex items-start gap-2 px-4 py-3 bg-destructive/10 rounded-xl border border-destructive/30">
                   <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
                   <p className="text-xs text-destructive font-medium">
-                    ⚠️ Contante betaling is wettelijk beperkt tot € 3.000. Kies voor een combinatie van contant en bankoverschrijving.
+                    Contante betaling is wettelijk beperkt tot € 3.000. Kies voor een combinatie van contant en bankoverschrijving.
                   </p>
                 </div>
               )}
