@@ -352,9 +352,6 @@ const VoorraadDetailPage = () => {
                   <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
                     {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
                   </p>
-                  {vehicle.nap === "1" && (
-                    <img src={napLogo} alt="NAP Nationale Auto Pas goedgekeurd" className="h-6 object-contain" />
-                  )}
                 </div>
 
 
