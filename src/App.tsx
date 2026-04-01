@@ -41,6 +41,7 @@ import AdminKlantDetailPage from "./pages/admin/AdminKlantDetailPage";
 import AdminLeadsPage from "./pages/admin/AdminLeadsPage";
 import AdminLeadDetailPage from "./pages/admin/AdminLeadDetailPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
+import AdminUrenPage from "./pages/admin/AdminUrenPage";
 
 import ReviewsPage from "./pages/ReviewsPage";
 import NotFound from "./pages/NotFound";
