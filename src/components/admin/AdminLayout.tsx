@@ -22,6 +22,7 @@ const navGroups: NavGroup[] = [
       { label: "Klanten", icon: Users, path: "/admin/klanten" },
       { label: "Leads", icon: Target, path: "/admin/leads" },
       { label: "Archief", icon: Archive, path: "/admin/archief" },
+      { label: "Uren", icon: Clock, path: "/admin/uren" },
       { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
     ],
   },
