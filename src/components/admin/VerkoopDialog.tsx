@@ -236,11 +236,11 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             )}
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(1)} className="flex-1 py-2.5 bg-secondary text-secondary-foreground text-sm font-medium rounded-lg hover:bg-secondary/80 transition-colors">
-                ← Terug
+              <button onClick={() => setStep(1)} className="flex-1 py-3 bg-secondary text-secondary-foreground text-sm font-medium rounded-xl hover:bg-secondary/80 active:scale-[0.98] transition-all">
+                Terug
               </button>
-              <button onClick={() => setStep(3)} className="flex-1 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors">
-                Volgende →
+              <button onClick={() => setStep(3)} className="flex-1 py-3 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all">
+                Volgende
               </button>
             </div>
           </div>
