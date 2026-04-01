@@ -268,7 +268,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
               </CardContent>
             </Card>
 
-            <label className="flex items-center gap-3 cursor-pointer px-4 py-3 bg-secondary/50 rounded-lg border border-border">
+            <label className="flex items-center gap-3 cursor-pointer px-4 py-3 bg-secondary/50 rounded-xl border border-border">
               <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} className="w-4 h-4 rounded border-border text-primary focus:ring-primary" />
               <span className="text-sm text-foreground">Ik bevestig dat de betaling is ontvangen</span>
             </label>
