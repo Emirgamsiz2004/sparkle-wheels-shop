@@ -218,11 +218,66 @@ const KpiCard = ({ label, value, color }: { label: string; value: string; color?
 );
 
 const ReadField = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
-  <>
-    <span className="text-muted-foreground">{label}</span>
-    <span className={`text-foreground ${valueColor || ""}`}>{value}</span>
-  </>
+  <div className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0">
+    <span className="text-xs text-muted-foreground">{label}</span>
+    <span className={`text-sm font-medium tabular-nums ${valueColor || "text-foreground"}`}>{value}</span>
+  </div>
 );
+
+const EditableEuroField = ({ label, value, onSave, hint }: { label: string; value: number; onSave: (val: number) => Promise<void>; hint?: string }) => {
+  const [editing, setEditing] = useState(false);
+  const [editVal, setEditVal] = useState(String(value));
+
+  const handleSave = async () => {
+    const val = Number(editVal);
+    if (!isNaN(val)) {
+      await onSave(val);
+      toast.success(`${label} opgeslagen`);
+    }
+    setEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSave();
+    if (e.key === "Escape") { setEditVal(String(value)); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center justify-between py-1.5 border-b border-border/50">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">€</span>
+          <input
+            autoFocus
+            type="text"
+            inputMode="decimal"
+            value={editVal}
+            onChange={(e) => setEditVal(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSave}
+            className="w-24 px-2 py-1 text-sm text-right bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring tabular-nums"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-between py-1.5 border-b border-border/50 group">
+      <div>
+        <span className="text-xs text-muted-foreground">{label}</span>
+        {hint && <p className="text-[10px] text-muted-foreground/60">{hint}</p>}
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="text-sm font-medium tabular-nums text-foreground">{formatEuroDecimal(value)}</span>
+        <button onClick={() => { setEditVal(String(value)); setEditing(true); }} className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-foreground transition-opacity">
+          <Pencil className="w-3 h-3" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const EditField = ({ label, value, onChange, type = "text", highlight = false, inputCls }: {
   label: string; value: any; onChange: (v: string) => void; type?: string; highlight?: boolean; inputCls: string;
