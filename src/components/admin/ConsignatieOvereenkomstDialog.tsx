@@ -323,11 +323,11 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
 
               {form.vraagprijs > 0 && (
                 <div className="grid grid-cols-2 gap-3 mt-3">
-                  <div className="bg-secondary/50 border border-border rounded-md p-3">
+                  <div className="bg-secondary/50 border border-border rounded-xl p-3">
                     <p className="text-xs text-muted-foreground mb-1">Commissie ({effectiveCommissie}%)</p>
                     <p className="text-base font-semibold text-emerald-500 tabular-nums">{formatEuroDecimal(form.vraagprijs * (effectiveCommissie / 100))}</p>
                   </div>
-                  <div className="bg-secondary/50 border border-border rounded-md p-3">
+                  <div className="bg-secondary/50 border border-border rounded-xl p-3">
                     <p className="text-xs text-muted-foreground mb-1">Uitbetaling eigenaar</p>
                     <p className="text-base font-semibold tabular-nums">{formatEuroDecimal(form.vraagprijs - form.vraagprijs * (effectiveCommissie / 100))}</p>
                   </div>
