@@ -33,7 +33,7 @@ export interface Vehicle {
   inkoopprijs: number;
   verkoopprijs: number;
   kosten: CostItem[];
-  status: 'inkoop' | 'in_behandeling' | 'te_koop' | 'verkocht' | 'consignatie' | 'gereserveerd';
+  status: 'inkoop' | 'in_behandeling' | 'te_koop' | 'verkocht' | 'consignatie' | 'gereserveerd' | 'reparatie_onderhoud';
   inkoopDatum: string;
   verkoopDatum?: string;
   opmerkingen?: string;
