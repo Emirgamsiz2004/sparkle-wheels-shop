@@ -197,10 +197,10 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto p-4">
-      <div className="bg-background border border-border rounded-lg w-full max-w-2xl my-8">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+      <div className="bg-background border border-border rounded-2xl w-full max-w-2xl my-8">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
           <h2 className="text-base font-medium">Aanbetaling registreren</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
         </div>
 
         <div className="px-5 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
