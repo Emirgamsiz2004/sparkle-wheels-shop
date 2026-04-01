@@ -274,13 +274,13 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             </label>
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(2)} className="flex-1 py-2.5 bg-secondary text-secondary-foreground text-sm font-medium rounded-lg hover:bg-secondary/80 transition-colors">
-                ← Terug
+              <button onClick={() => setStep(2)} className="flex-1 py-3 bg-secondary text-secondary-foreground text-sm font-medium rounded-xl hover:bg-secondary/80 active:scale-[0.98] transition-all">
+                Terug
               </button>
               <button
                 onClick={handleFinalize}
                 disabled={!confirmed || saving}
-                className="flex-1 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 py-3 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 Verkoop Afronden

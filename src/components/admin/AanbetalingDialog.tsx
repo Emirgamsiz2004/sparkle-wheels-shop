@@ -320,8 +320,8 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 
 const ReadOnly = ({ label, value }: { label: string; value: string }) => (
   <div>
-    <label className="block text-xs text-muted-foreground mb-1">{label}</label>
-    <p className="px-2.5 py-1.5 text-sm bg-secondary/50 border border-border rounded-md text-foreground">{value || "—"}</p>
+    <label className="block text-xs text-muted-foreground mb-1.5">{label}</label>
+    <p className="px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground">{value || "—"}</p>
   </div>
 );
 
@@ -329,7 +329,7 @@ const Field = ({ label, value, onChange, cls, type = "text" }: {
   label: string; value: any; onChange: (v: string) => void; cls: string; type?: string;
 }) => (
   <div>
-    <label className="block text-xs text-muted-foreground mb-1">{label}</label>
+    <label className="block text-xs text-muted-foreground mb-1.5">{label}</label>
     <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cls} />
   </div>
 );

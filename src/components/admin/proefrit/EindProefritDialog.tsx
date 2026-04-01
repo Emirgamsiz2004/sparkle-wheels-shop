@@ -74,20 +74,20 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md rounded-2xl p-6">
         <DialogHeader>
           <DialogTitle className="text-base font-medium">
             Proefrit beëindigen — {testDrive.voertuig_merk} {testDrive.voertuig_model}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="text-xs text-muted-foreground">
             KM voor rit: <span className="text-foreground font-medium">{testDrive.km_voor.toLocaleString("nl-NL")}</span>
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+            <label className="text-xs font-medium text-muted-foreground block mb-2">
               Kilometerstand na de rit *
             </label>
             <input
@@ -95,12 +95,12 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
               value={kmNa}
               onChange={(e) => setKmNa(e.target.value)}
               placeholder="bijv. 45280"
-              className="w-full px-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+              className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+            <label className="text-xs font-medium text-muted-foreground block mb-2">
               Opmerkingen over de staat van de auto
             </label>
             <textarea
@@ -108,13 +108,13 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
               onChange={(e) => setOpmerkingen(e.target.value)}
               placeholder="Eventuele opmerkingen over de staat van de auto na terugkomst..."
               rows={3}
-              className="w-full px-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground resize-none"
+              className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground resize-none transition-all"
             />
           </div>
 
           {/* Schadefoto's */}
           <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+            <label className="text-xs font-medium text-muted-foreground block mb-2">
               Schadefoto's (optioneel)
             </label>
             <input
@@ -126,10 +126,10 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
               className="hidden"
             />
             {fotoPreviews.length > 0 && (
-              <div className="flex gap-2 flex-wrap mb-2">
+              <div className="flex gap-2 flex-wrap mb-3">
                 {fotoPreviews.map((url, i) => (
                   <div key={i} className="relative w-16 h-16">
-                    <img src={url} alt={`Schade ${i + 1}`} className="w-full h-full object-cover rounded-md border border-border" />
+                    <img src={url} alt={`Schade ${i + 1}`} className="w-full h-full object-cover rounded-xl border border-border" />
                     <button
                       onClick={() => removeFoto(i)}
                       className="absolute -top-1.5 -right-1.5 bg-card border border-border rounded-full p-0.5"
@@ -143,7 +143,7 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent/20 transition-colors text-muted-foreground"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.97] transition-all text-muted-foreground"
             >
               <Upload className="w-3.5 h-3.5" />
               Foto's toevoegen
@@ -153,7 +153,7 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
           <button
             onClick={handleEnd}
             disabled={loading || !kmNa}
-            className="w-full py-2 text-sm font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
+            className="w-full py-3 text-sm font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.98] transition-all disabled:opacity-50"
           >
             {loading ? "Bezig..." : "Afsluiten en opslaan"}
           </button>
