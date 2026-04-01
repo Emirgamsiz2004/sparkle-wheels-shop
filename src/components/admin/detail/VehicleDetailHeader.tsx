@@ -25,7 +25,7 @@ const allStatuses: Vehicle["status"][] = [
   "inkoop", "in_behandeling", "te_koop", "consignatie", "gereserveerd", "verkocht", "reparatie_onderhoud",
 ];
 
-const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onDelete }: Props) => {
+const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onOpenVerkoop, onDelete }: Props) => {
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
