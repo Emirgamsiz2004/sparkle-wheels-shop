@@ -190,9 +190,9 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             <button
               onClick={() => setStep(2)}
               disabled={!form.verkoopprijs || !form.verkoopDatum || !form.koperNaam}
-              className="w-full py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+              className="w-full py-3 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:bg-primary/90 disabled:opacity-50 active:scale-[0.98] transition-all"
             >
-              Volgende →
+              Volgende
             </button>
           </div>
         )}
