@@ -120,7 +120,12 @@ const AdminLayout = () => {
                     }`}
                   >
                     <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
-                    {item.label}
+                    <span className="flex-1">{item.label}</span>
+                    {item.path === "/admin/leads" && overdueLeads > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                        {overdueLeads}
+                      </span>
+                    )}
                   </Link>
                 ))}
               </div>
