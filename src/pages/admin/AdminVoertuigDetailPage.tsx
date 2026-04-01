@@ -31,7 +31,11 @@ const AdminVoertuigDetailPage = () => {
   const [consignatieOpen, setConsignatieOpen] = useState(false);
   const [aanbetalingOpen, setAanbetalingOpen] = useState(false);
   const [kostenOpen, setKostenOpen] = useState(false);
-  const [taakDialogOpen, setTaakDialogOpen] = useState(false);
+
+  // When "Taak toevoegen" is clicked, switch to taken tab
+  const handleOpenTaak = useCallback(() => {
+    setActiveTab("taken");
+  }, []);
 
   const vehicle = vehicles.find((v) => v.id === id);
 
