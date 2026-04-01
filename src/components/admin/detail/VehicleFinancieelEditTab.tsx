@@ -118,19 +118,19 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
         {isConsig && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Eigenaar naam</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Eigenaar naam</label>
               <input value={form.consignatieEigenaarNaam} onChange={(e) => setForm(f => ({ ...f, consignatieEigenaarNaam: e.target.value }))} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Commissie %</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Commissie %</label>
               <input type="number" min={0} max={50} step={0.5} value={form.consignatieCommissiePerc} onChange={(e) => setForm(f => ({ ...f, consignatieCommissiePerc: Number(e.target.value) }))} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Eigenaar telefoon</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Eigenaar telefoon</label>
               <input value={form.consignatieEigenaarTelefoon} onChange={(e) => setForm(f => ({ ...f, consignatieEigenaarTelefoon: e.target.value }))} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Eigenaar e-mail</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Eigenaar e-mail</label>
               <input value={form.consignatieEigenaarEmail} onChange={(e) => setForm(f => ({ ...f, consignatieEigenaarEmail: e.target.value }))} className={inputCls} />
             </div>
           </div>
