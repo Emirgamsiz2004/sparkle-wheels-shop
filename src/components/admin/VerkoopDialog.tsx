@@ -203,7 +203,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             <p className="text-sm text-muted-foreground">{completedCount} van de {checklist.length} documenten aanwezig</p>
             <div className="space-y-2">
               {checklist.map((item) => (
-                <div key={item.naam} className="flex items-center justify-between px-4 py-3 bg-secondary/50 rounded-lg border border-border">
+                <div key={item.naam} className="flex items-center justify-between px-4 py-3 bg-secondary/50 rounded-xl border border-border">
                   <div className="flex items-center gap-3">
                     {item.voltooid ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-500" />
