@@ -143,6 +143,7 @@ const AdminVoertuigDetailPage = () => {
       <ConsignatieOvereenkomstDialog open={consignatieOpen} onClose={() => setConsignatieOpen(false)} vehicle={vehicle} />
       <AanbetalingDialog open={aanbetalingOpen} onClose={() => setAanbetalingOpen(false)} vehicle={vehicle} onStatusChange={refetch} />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
+      <VerkoopDialog open={verkoopOpen} onOpenChange={setVerkoopOpen} vehicle={vehicle} onComplete={refetch} />
     </div>
   );
 };

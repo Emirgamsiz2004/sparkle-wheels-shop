@@ -71,6 +71,10 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <button onClick={onOpenVerkoop} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-green-600/40 text-green-500 rounded-xl hover:bg-green-500/10 hover:border-green-500/60 transition-all active:scale-[0.97]">
+          <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
+        </button>
+
         <button onClick={onOpenKosten} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
           <Plus className="w-3.5 h-3.5" /> Kosten toevoegen
         </button>
