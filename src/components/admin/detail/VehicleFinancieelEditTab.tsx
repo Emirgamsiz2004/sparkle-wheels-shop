@@ -19,6 +19,7 @@ interface Props {
 }
 
 const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, onLogActivity }: Props) => {
+  const autoKostprijs = vehicle.inkoopprijs + vehicle.kosten.reduce((s, k) => s + k.amount, 0);
   const [form, setForm] = useState({
     inkoopprijs: vehicle.inkoopprijs,
     verkoopprijs: vehicle.verkoopprijs,
@@ -29,6 +30,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",
+    kostprijsOverride: vehicle.kostprijsCalc && vehicle.kostprijsCalc !== autoKostprijs ? String(vehicle.kostprijsCalc) : "",
   });
   const [saving, setSaving] = useState(false);
 
