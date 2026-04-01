@@ -48,23 +48,13 @@ export const useTimeEntries = () => {
 
   const fetchEntries = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("time_entries")
-      .select("*, vehicles(id, merk, model, kenteken), customers(id, voornaam, achternaam), profiles!time_entries_user_id_fkey(display_name, user_id)")
+      .select("*, vehicles(id, merk, model, kenteken), customers(id, voornaam, achternaam)")
       .order("start_time", { ascending: false })
       .limit(500);
 
-    if (error) {
-      // Fallback without profiles join if FK doesn't exist
-      const { data: d2 } = await supabase
-        .from("time_entries")
-        .select("*, vehicles(id, merk, model, kenteken), customers(id, voornaam, achternaam)")
-        .order("start_time", { ascending: false })
-        .limit(500);
-      setEntries((d2 || []) as TimeEntry[]);
-    } else {
-      setEntries((data || []) as TimeEntry[]);
-    }
+    setEntries((data || []) as unknown as TimeEntry[]);
 
     // Check for active timer
     if (user) {
