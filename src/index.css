@@ -105,9 +105,18 @@ input[type="number"] {
     font-family: 'Inter', sans-serif;
   }
 
-  /* Admin dialog & input overrides */
-  .admin-theme [role="dialog"] {
+  /* Admin dialog, input & font overrides */
+  .admin-theme [role="dialog"],
+  .admin-theme [data-radix-popper-content-wrapper] [role="listbox"],
+  .admin-theme [data-radix-popper-content-wrapper] [role="menu"] {
     border-radius: 1rem !important;
+    font-family: 'Inter', sans-serif !important;
+  }
+
+  .admin-theme select,
+  .admin-theme input,
+  .admin-theme textarea {
+    font-family: 'Inter', sans-serif !important;
   }
 
   .admin-theme h1,
