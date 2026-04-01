@@ -27,14 +27,6 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   const nettoMarge = calcNettoMarge(vehicle);
   const margePerc = calcMarge(vehicle);
   const totalKosten = calcTotalKosten(vehicle);
-  const [kostprijsEdit, setKostprijsEdit] = useState(String(vehicle.kostprijsCalc || autoKostprijs));
-
-  const handleSaveKostprijs = async () => {
-    const val = Number(kostprijsEdit);
-    await onSave({ ...vehicle, kostprijsCalc: val });
-    onLogActivity("kostprijs_gewijzigd", `Kostprijs aangepast naar € ${val.toLocaleString("nl-NL")}`);
-    toast.success("Kostprijs opgeslagen");
-  };
 
   // Auto-save notes
   const saveNotes = useCallback(async (val: string) => {
@@ -155,36 +147,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           )}
         </div>
 
-        {/* Right - Financial summary with editable kostprijs */}
-        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Financieel overzicht</h3>
-          <div className="grid grid-cols-2 gap-y-2 text-sm">
-            <ReadField label="Inkoopprijs" value={formatEuroDecimal(vehicle.inkoopprijs)} />
-            <ReadField label="Totale kosten" value={formatEuroDecimal(totalKosten)} />
-            <div className="col-span-2 pt-1">
-              <label className="block text-xs text-muted-foreground mb-1">Kostprijs (€)</label>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="number"
-                  value={kostprijsEdit}
-                  onChange={(e) => setKostprijsEdit(e.target.value)}
-                  className={cn(inputCls, "max-w-[180px]")}
-                  placeholder={String(autoKostprijs)}
-                />
-                {Number(kostprijsEdit) !== (vehicle.kostprijsCalc || autoKostprijs) && (
-                  <button
-                    onClick={handleSaveKostprijs}
-                    className="px-3 py-2 text-xs font-medium bg-accent text-foreground rounded-xl hover:bg-accent/80 transition-colors"
-                  >
-                    Opslaan
-                  </button>
-                )}
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-1">Berekend: € {autoKostprijs.toLocaleString("nl-NL")} · Pas aan als de werkelijke kostprijs afwijkt</p>
-            </div>
-            <ReadField label="Verkoopprijs" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(vehicle.verkoopprijs) : "—"} />
-            <ReadField label="Nettomarge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} valueColor={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
-          </div>
+        {/* Right - Financial summary - all inline editable */}
+        <div className="bg-card border border-border rounded-lg p-4 space-y-1">
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Financieel overzicht</h3>
+          <EditableEuroField label="Inkoopprijs" value={vehicle.inkoopprijs} onSave={async (val) => { await onSave({ ...vehicle, inkoopprijs: val }); onLogActivity("inkoopprijs_gewijzigd", `Inkoopprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} />
+          <ReadField label="Totale kosten" value={formatEuroDecimal(totalKosten)} />
+          <EditableEuroField label="Kostprijs" value={vehicle.kostprijsCalc || autoKostprijs} onSave={async (val) => { await onSave({ ...vehicle, kostprijsCalc: val }); onLogActivity("kostprijs_gewijzigd", `Kostprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} hint={`Berekend: € ${autoKostprijs.toLocaleString("nl-NL")}`} />
+          <EditableEuroField label="Verkoopprijs" value={vehicle.verkoopprijs} onSave={async (val) => { await onSave({ ...vehicle, verkoopprijs: val }); onLogActivity("verkoopprijs_gewijzigd", `Verkoopprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} />
+          <ReadField label="Nettomarge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} valueColor={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
         </div>
       </div>
 
@@ -248,11 +218,66 @@ const KpiCard = ({ label, value, color }: { label: string; value: string; color?
 );
 
 const ReadField = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
-  <>
-    <span className="text-muted-foreground">{label}</span>
-    <span className={`text-foreground ${valueColor || ""}`}>{value}</span>
-  </>
+  <div className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0">
+    <span className="text-xs text-muted-foreground">{label}</span>
+    <span className={`text-sm font-medium tabular-nums ${valueColor || "text-foreground"}`}>{value}</span>
+  </div>
 );
+
+const EditableEuroField = ({ label, value, onSave, hint }: { label: string; value: number; onSave: (val: number) => Promise<void>; hint?: string }) => {
+  const [editing, setEditing] = useState(false);
+  const [editVal, setEditVal] = useState(String(value));
+
+  const handleSave = async () => {
+    const val = Number(editVal);
+    if (!isNaN(val)) {
+      await onSave(val);
+      toast.success(`${label} opgeslagen`);
+    }
+    setEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSave();
+    if (e.key === "Escape") { setEditVal(String(value)); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center justify-between py-1.5 border-b border-border/50">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">€</span>
+          <input
+            autoFocus
+            type="text"
+            inputMode="decimal"
+            value={editVal}
+            onChange={(e) => setEditVal(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSave}
+            className="w-24 px-2 py-1 text-sm text-right bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring tabular-nums"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-between py-1.5 border-b border-border/50 group">
+      <div>
+        <span className="text-xs text-muted-foreground">{label}</span>
+        {hint && <p className="text-[10px] text-muted-foreground/60">{hint}</p>}
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="text-sm font-medium tabular-nums text-foreground">{formatEuroDecimal(value)}</span>
+        <button onClick={() => { setEditVal(String(value)); setEditing(true); }} className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-foreground transition-opacity">
+          <Pencil className="w-3 h-3" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const EditField = ({ label, value, onChange, type = "text", highlight = false, inputCls }: {
   label: string; value: any; onChange: (v: string) => void; type?: string; highlight?: boolean; inputCls: string;
