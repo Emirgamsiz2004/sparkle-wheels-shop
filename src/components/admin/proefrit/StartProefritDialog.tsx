@@ -57,7 +57,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md rounded-2xl p-6">
         <DialogHeader>
           <DialogTitle className="text-base font-medium">
             Proefrit starten — {vehicle.merk} {vehicle.model}
@@ -65,9 +65,9 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
         </DialogHeader>
 
         {step === "form" ? (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+              <label className="text-xs font-medium text-muted-foreground block mb-2">
                 Kilometerstand voor de rit
               </label>
               <input
@@ -75,11 +75,11 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                 value={kmVoor}
                 onChange={(e) => setKmVoor(e.target.value)}
                 placeholder="bijv. 45230"
-                className="w-full px-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+                className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+              <label className="text-xs font-medium text-muted-foreground block mb-2">
                 Begeleidende medewerker
               </label>
               <input
@@ -87,13 +87,13 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                 value={medewerker}
                 onChange={(e) => setMedewerker(e.target.value)}
                 placeholder="Naam medewerker"
-                className="w-full px-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+                className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
               />
             </div>
             <button
               onClick={handleStart}
               disabled={loading || !kmVoor}
-              className="w-full py-2 text-sm font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
+              className="w-full py-3 text-sm font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {loading ? "Bezig..." : "Proefrit starten"}
             </button>
