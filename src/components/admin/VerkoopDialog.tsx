@@ -139,7 +139,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg rounded-2xl p-6">
         <DialogHeader>
           <DialogTitle>
             {step === 1 && "Verkoopgegevens"}
