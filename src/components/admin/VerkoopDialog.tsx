@@ -213,7 +213,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
                     <span className="text-sm text-foreground">{item.naam}</span>
                   </div>
                   {!item.voltooid && (
-                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-md cursor-pointer transition-colors">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-xl cursor-pointer transition-all">
                       <Upload className="w-3.5 h-3.5" />
                       {uploading === item.naam ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Uploaden"}
                       <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => {
