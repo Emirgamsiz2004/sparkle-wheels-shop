@@ -14,6 +14,7 @@ import VehicleFinancieelEditTab from "@/components/admin/detail/VehicleFinanciee
 import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
+import VerkoopDialog from "@/components/admin/VerkoopDialog";
 
 const tabItems = [
   { key: "overzicht", label: "Overzicht" },
