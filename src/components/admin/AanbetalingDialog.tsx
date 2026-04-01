@@ -242,7 +242,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
               <Field label="Uiterlijke datum restbetaling *" value={form.uiterlijkeDatum} onChange={(v) => update("uiterlijkeDatum", v)} cls={inputCls} type="date" />
             </div>
 
-            <div className="mt-3 px-3 py-2.5 bg-secondary/50 rounded-md border border-border">
+            <div className="mt-3 px-4 py-3 bg-secondary/50 rounded-xl border border-border">
               <p className="text-xs text-muted-foreground">
                 <strong className="text-foreground font-medium">Annuleringsvoorwaarden:</strong> Bij annulering door koper vervalt de aanbetaling aan Platin Automotive als vergoeding voor gemaakte kosten en gederfde inkomsten.
               </p>
