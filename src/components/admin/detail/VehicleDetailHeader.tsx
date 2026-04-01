@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Vehicle, statusLabels, statusColors } from "@/types/vehicle";
-import { ArrowLeft, ClipboardCheck, ChevronDown, Plus, FileText, MoreHorizontal, Banknote, Trash2 } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, ChevronDown, Plus, FileText, MoreHorizontal, Banknote, Trash2, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -17,6 +17,7 @@ interface Props {
   onOpenAanbetaling: () => void;
   onOpenKosten: () => void;
   onOpenTaak: () => void;
+  onOpenVerkoop: () => void;
   onDelete: () => void;
 }
 
@@ -24,7 +25,7 @@ const allStatuses: Vehicle["status"][] = [
   "inkoop", "in_behandeling", "te_koop", "consignatie", "gereserveerd", "verkocht", "reparatie_onderhoud",
 ];
 
-const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onDelete }: Props) => {
+const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onOpenVerkoop, onDelete }: Props) => {
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -69,6 +70,10 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <button onClick={onOpenVerkoop} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-green-600/40 text-green-500 rounded-xl hover:bg-green-500/10 hover:border-green-500/60 transition-all active:scale-[0.97]">
+          <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
+        </button>
 
         <button onClick={onOpenKosten} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
           <Plus className="w-3.5 h-3.5" /> Kosten toevoegen

@@ -14,6 +14,7 @@ import VehicleFinancieelEditTab from "@/components/admin/detail/VehicleFinanciee
 import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
+import VerkoopDialog from "@/components/admin/VerkoopDialog";
 
 const tabItems = [
   { key: "overzicht", label: "Overzicht" },
@@ -31,6 +32,7 @@ const AdminVoertuigDetailPage = () => {
   const [consignatieOpen, setConsignatieOpen] = useState(false);
   const [aanbetalingOpen, setAanbetalingOpen] = useState(false);
   const [kostenOpen, setKostenOpen] = useState(false);
+  const [verkoopOpen, setVerkoopOpen] = useState(false);
 
   // When "Taak toevoegen" is clicked, switch to taken tab
   const handleOpenTaak = useCallback(() => {
@@ -93,6 +95,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenAanbetaling={() => setAanbetalingOpen(true)}
         onOpenKosten={() => setKostenOpen(true)}
         onOpenTaak={handleOpenTaak}
+        onOpenVerkoop={() => setVerkoopOpen(true)}
         onDelete={handleDelete}
       />
 
@@ -140,6 +143,7 @@ const AdminVoertuigDetailPage = () => {
       <ConsignatieOvereenkomstDialog open={consignatieOpen} onClose={() => setConsignatieOpen(false)} vehicle={vehicle} />
       <AanbetalingDialog open={aanbetalingOpen} onClose={() => setAanbetalingOpen(false)} vehicle={vehicle} onStatusChange={refetch} />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
+      <VerkoopDialog open={verkoopOpen} onOpenChange={setVerkoopOpen} vehicle={vehicle} onComplete={refetch} />
     </div>
   );
 };
