@@ -193,7 +193,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
 
   if (!open) return null;
 
-  const inputCls = "w-full px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring";
+  const inputCls = "w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all";
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto p-4">
