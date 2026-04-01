@@ -190,16 +190,18 @@ const VehicleTakenTab = ({ vehicleId }: { vehicleId: string }) => {
 
       {/* Add task dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-[calc(100vw-2rem)]">
-          <DialogHeader><DialogTitle>Taak toevoegen</DialogTitle></DialogHeader>
-          <div className="space-y-4 mt-2">
+        <DialogContent className="max-w-md rounded-2xl border-border bg-card p-0 overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle className="text-base font-semibold tracking-tight">Taak toevoegen</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 px-6 pb-6">
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Omschrijving</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Omschrijving</label>
               <input value={form.omschrijving} onChange={(e) => setForm(f => ({ ...f, omschrijving: e.target.value }))} className={inputCls} placeholder="Wat moet er gedaan worden?" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Prioriteit</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Prioriteit</label>
                 <select value={form.prioriteit} onChange={(e) => setForm(f => ({ ...f, prioriteit: e.target.value }))} className={inputCls}>
                   <option value="laag">Laag</option>
                   <option value="normaal">Normaal</option>
@@ -207,11 +209,11 @@ const VehicleTakenTab = ({ vehicleId }: { vehicleId: string }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Deadline (optioneel)</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Deadline (optioneel)</label>
                 <input type="date" value={form.deadline} onChange={(e) => setForm(f => ({ ...f, deadline: e.target.value }))} className={inputCls} />
               </div>
             </div>
-            <button onClick={handleAddTask} disabled={saving || !form.omschrijving} className="w-full py-2 border border-border text-sm font-medium rounded-md hover:bg-accent disabled:opacity-50 flex items-center justify-center gap-2 transition-colors">
+            <button onClick={handleAddTask} disabled={saving || !form.omschrijving} className="w-full py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:bg-foreground/90 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
               {saving && <Loader2 className="w-4 h-4 animate-spin" />} Toevoegen
             </button>
           </div>
