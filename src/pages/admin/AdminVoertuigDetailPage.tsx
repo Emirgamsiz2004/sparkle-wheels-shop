@@ -136,16 +136,6 @@ const AdminVoertuigDetailPage = () => {
       <ConsignatieOvereenkomstDialog open={consignatieOpen} onClose={() => setConsignatieOpen(false)} vehicle={vehicle} />
       <AanbetalingDialog open={aanbetalingOpen} onClose={() => setAanbetalingOpen(false)} vehicle={vehicle} onStatusChange={refetch} />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
-      
-      {/* Taak dialog - triggered from header, opened in TakenTab */}
-      {taakDialogOpen && (
-        (() => {
-          // Switch to taken tab and close this trigger
-          setActiveTab("taken");
-          setTaakDialogOpen(false);
-          return null;
-        })()
-      )}
     </div>
   );
 };
