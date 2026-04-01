@@ -101,7 +101,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
         ) : (
           <div className="space-y-5">
             <div className="flex justify-center">
-              <div className="bg-white p-3 rounded-lg">
+              <div className="bg-white p-4 rounded-xl">
                 <QRCodeSVG value={proefritUrl} size={180} />
               </div>
             </div>
