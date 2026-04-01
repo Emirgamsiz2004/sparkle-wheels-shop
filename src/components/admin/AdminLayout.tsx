@@ -19,6 +19,7 @@ const navGroups: NavGroup[] = [
       { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
       { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
       { label: "Klanten", icon: Users, path: "/admin/klanten" },
+      { label: "Leads", icon: Target, path: "/admin/leads" },
       { label: "Archief", icon: Archive, path: "/admin/archief" },
       { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
     ],
