@@ -227,7 +227,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             </div>
 
             {completedCount < checklist.length && (
-              <div className="flex items-start gap-2 px-4 py-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+              <div className="flex items-start gap-2 px-4 py-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
                 <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-amber-400">
                   Let op: je dossier is nog niet volledig. Je kunt de verkoop afronden, maar zorg dat je de documenten zo snel mogelijk uploadt.
