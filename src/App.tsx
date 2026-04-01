@@ -36,6 +36,8 @@ import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
 import AdminBlogPage from "./pages/admin/AdminBlogPage";
 import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
 import AdminArchiefPage from "./pages/admin/AdminArchiefPage";
+import AdminKlantenPage from "./pages/admin/AdminKlantenPage";
+import AdminKlantDetailPage from "./pages/admin/AdminKlantDetailPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
 
 import ReviewsPage from "./pages/ReviewsPage";
@@ -83,6 +85,8 @@ const App = () => (
                 <Route path="deals" element={<DealAnalyzer />} />
                 <Route path="proefriten" element={<AdminProefrittenPage />} />
                 <Route path="archief" element={<AdminArchiefPage />} />
+                <Route path="klanten" element={<AdminKlantenPage />} />
+                <Route path="klanten/:id" element={<AdminKlantDetailPage />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
             </Routes>
@@ -126,6 +130,8 @@ const App = () => (
                 <Route path="deals" element={<DealAnalyzer />} />
                 <Route path="proefriten" element={<AdminProefrittenPage />} />
                 <Route path="archief" element={<AdminArchiefPage />} />
+                <Route path="klanten" element={<AdminKlantenPage />} />
+                <Route path="klanten/:id" element={<AdminKlantDetailPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

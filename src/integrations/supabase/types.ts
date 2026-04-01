@@ -583,6 +583,57 @@ export type Database = {
           },
         ]
       }
+      customers: {
+        Row: {
+          achternaam: string
+          adres: string | null
+          created_at: string
+          email: string
+          geboortedatum: string | null
+          id: string
+          laatste_contact: string | null
+          notities: string | null
+          plaats: string | null
+          postcode: string | null
+          status: string
+          telefoon: string
+          updated_at: string
+          voornaam: string
+        }
+        Insert: {
+          achternaam: string
+          adres?: string | null
+          created_at?: string
+          email: string
+          geboortedatum?: string | null
+          id?: string
+          laatste_contact?: string | null
+          notities?: string | null
+          plaats?: string | null
+          postcode?: string | null
+          status?: string
+          telefoon?: string
+          updated_at?: string
+          voornaam: string
+        }
+        Update: {
+          achternaam?: string
+          adres?: string | null
+          created_at?: string
+          email?: string
+          geboortedatum?: string | null
+          id?: string
+          laatste_contact?: string | null
+          notities?: string | null
+          plaats?: string | null
+          postcode?: string | null
+          status?: string
+          telefoon?: string
+          updated_at?: string
+          voornaam?: string
+        }
+        Relationships: []
+      }
       deals: {
         Row: {
           aantal_eigenaren: string | null
@@ -1470,6 +1521,7 @@ export type Database = {
           consignatie_eigenaar_naam: string | null
           consignatie_eigenaar_telefoon: string | null
           created_at: string
+          customer_id: string | null
           feed_id: string | null
           google_drive_folder_id: string | null
           google_drive_folder_url: string | null
@@ -1504,6 +1556,7 @@ export type Database = {
           consignatie_eigenaar_naam?: string | null
           consignatie_eigenaar_telefoon?: string | null
           created_at?: string
+          customer_id?: string | null
           feed_id?: string | null
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
@@ -1538,6 +1591,7 @@ export type Database = {
           consignatie_eigenaar_naam?: string | null
           consignatie_eigenaar_telefoon?: string | null
           created_at?: string
+          customer_id?: string | null
           feed_id?: string | null
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
@@ -1563,7 +1617,15 @@ export type Database = {
           verkoop_type?: string | null
           verkoopprijs?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

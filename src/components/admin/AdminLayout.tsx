@@ -3,7 +3,7 @@ import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet, BarChart3,
-  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive,
+  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
@@ -18,6 +18,7 @@ const navGroups: NavGroup[] = [
       { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
       { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
       { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
+      { label: "Klanten", icon: Users, path: "/admin/klanten" },
       { label: "Archief", icon: Archive, path: "/admin/archief" },
       { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
     ],
