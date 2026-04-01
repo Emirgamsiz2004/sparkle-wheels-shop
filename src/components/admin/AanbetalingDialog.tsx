@@ -278,7 +278,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
                     <p className="text-xs text-destructive mt-1 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Maximum € 3.000 contant toegestaan</p>
                   )}
                 </div>
-                <div className="bg-secondary/50 border border-border rounded-md p-3">
+                <div className="bg-secondary/50 border border-border rounded-xl p-3">
                   <p className="text-xs text-muted-foreground mb-1">Per bank</p>
                   <p className="text-base font-semibold tabular-nums">{formatEuroDecimal(bankBedrag > 0 ? bankBedrag : 0)}</p>
                 </div>
