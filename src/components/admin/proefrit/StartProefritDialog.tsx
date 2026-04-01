@@ -130,7 +130,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                 href={proefritUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent/20 transition-colors text-foreground"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.97] transition-all text-foreground"
               >
                 <ExternalLink className="w-3.5 h-3.5" /> Openen
               </a>
@@ -143,13 +143,13 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                     });
                   }
                 }}
-                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent/20 transition-colors text-foreground"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.97] transition-all text-foreground"
               >
                 <Printer className="w-3.5 h-3.5" /> Printen
               </button>
               <button
                 onClick={handleClose}
-                className="flex-1 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors"
+                className="flex-1 py-2.5 text-xs font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.97] transition-all"
               >
                 Sluiten
               </button>

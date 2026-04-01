@@ -105,6 +105,11 @@ input[type="number"] {
     font-family: 'Inter', sans-serif;
   }
 
+  /* Admin dialog & input overrides */
+  .admin-theme [role="dialog"] {
+    border-radius: 1rem !important;
+  }
+
   .admin-theme h1,
   .admin-theme h2,
   .admin-theme h3,
