@@ -77,7 +77,7 @@ const VoorraadDetailPage = () => {
     : "";
 
   const displayKenteken = vehicle?.kenteken_detail || vehicle?.kenteken || "";
-  const formattedKenteken = displayKenteken ? displayKenteken.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().replace(/(.{2,3})(?=.)/g, "$1-") : "";
+  const formattedKenteken = displayKenteken ? formatKenteken(displayKenteken) : "";
 
   const specs = vehicle
     ? [
