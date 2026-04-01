@@ -180,7 +180,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
             </div>
             <div>
               <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Betaalmethode</label>
-              <select value={form.betaalmethode} onChange={(e) => setForm(f => ({ ...f, betaalmethode: e.target.value }))} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+              <select value={form.betaalmethode} onChange={(e) => setForm(f => ({ ...f, betaalmethode: e.target.value }))} className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all">
                 <option value="contant">Contant</option>
                 <option value="overboeking">Overboeking</option>
                 <option value="ideal">iDEAL</option>
