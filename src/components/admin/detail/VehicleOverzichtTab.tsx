@@ -22,10 +22,19 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
 
+  const autoKostprijs = vehicle.inkoopprijs + vehicle.kosten.reduce((s, k) => s + k.amount, 0);
   const kostprijs = calcKostprijs(vehicle);
   const nettoMarge = calcNettoMarge(vehicle);
   const margePerc = calcMarge(vehicle);
   const totalKosten = calcTotalKosten(vehicle);
+  const [kostprijsEdit, setKostprijsEdit] = useState(String(vehicle.kostprijsCalc || autoKostprijs));
+
+  const handleSaveKostprijs = async () => {
+    const val = Number(kostprijsEdit);
+    await onSave({ ...vehicle, kostprijsCalc: val });
+    onLogActivity("kostprijs_gewijzigd", `Kostprijs aangepast naar € ${val.toLocaleString("nl-NL")}`);
+    toast.success("Kostprijs opgeslagen");
+  };
 
   // Auto-save notes
   const saveNotes = useCallback(async (val: string) => {
