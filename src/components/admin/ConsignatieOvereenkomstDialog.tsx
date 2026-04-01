@@ -257,9 +257,9 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
         {loadingExisting ? (
           <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
         ) : (
-          <div className="px-5 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
+          <div className="px-6 py-5 space-y-6 max-h-[70vh] overflow-y-auto">
             {existingAgreement && (
-              <div className="flex items-start gap-2 px-3 py-2.5 bg-accent/50 rounded-md border border-border">
+              <div className="flex items-start gap-2 px-4 py-3 bg-accent/50 rounded-xl border border-border">
                 <AlertCircle className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-muted-foreground">Er bestaat al een overeenkomst voor dit voertuig. Wijzigingen worden overschreven.</p>
               </div>
