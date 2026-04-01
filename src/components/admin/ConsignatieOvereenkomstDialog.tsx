@@ -309,7 +309,7 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
               </div>
 
               {form.garantie === "autotrust" && (
-                <div className="mt-3 flex items-start gap-2 px-3 py-2.5 bg-amber-500/10 rounded-md border border-amber-500/20">
+                <div className="mt-3 flex items-start gap-2 px-4 py-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
                   <AlertCircle className="w-3.5 h-3.5 text-amber-400 mt-0.5 flex-shrink-0" />
                   <p className="text-xs text-amber-400">Kosten AutoTrust zijn voor rekening van eigenaar</p>
                 </div>
