@@ -42,6 +42,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
 
   const handleSave = async () => {
     setSaving(true);
+    const kostprijsVal = form.kostprijsOverride ? Number(form.kostprijsOverride) : autoKostprijs;
     await onSave({
       ...vehicle,
       inkoopprijs: form.inkoopprijs,
@@ -54,6 +55,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
       consignatieEigenaarNaam: form.consignatieEigenaarNaam || undefined,
       consignatieEigenaarTelefoon: form.consignatieEigenaarTelefoon || undefined,
       consignatieEigenaarEmail: form.consignatieEigenaarEmail || undefined,
+      kostprijsCalc: kostprijsVal,
     });
     onLogActivity("financieel_bewerkt", "Financiële gegevens bijgewerkt");
     setSaving(false);
