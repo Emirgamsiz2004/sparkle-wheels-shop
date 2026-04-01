@@ -115,7 +115,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                 type="text"
                 readOnly
                 value={proefritUrl}
-                className="flex-1 px-3 py-1.5 text-xs bg-secondary border border-border rounded-md text-muted-foreground font-mono truncate"
+                className="flex-1 px-3 py-2 text-xs bg-secondary/50 border border-border rounded-xl text-muted-foreground font-mono truncate"
               />
               <button
                 onClick={handleCopy}
