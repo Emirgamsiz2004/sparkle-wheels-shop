@@ -175,7 +175,7 @@ const VerkoopDialog = ({ vehicle, open, onOpenChange, onComplete }: Props) => {
               </div>
               <div>
                 <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Koper telefoon</label>
-                <input value={form.koperTelefoon} onChange={(e) => setForm(f => ({ ...f, koperTelefoon: e.target.value }))} className="w-full px-3 py-2 text-sm bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+                <input value={form.koperTelefoon} onChange={(e) => setForm(f => ({ ...f, koperTelefoon: e.target.value }))} className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all" />
               </div>
             </div>
             <div>
