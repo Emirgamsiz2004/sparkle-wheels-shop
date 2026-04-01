@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVoorraadDetail } from "@/hooks/useVoorraadFeed";
 import { supabase } from "@/integrations/supabase/client";
+import { formatKenteken } from "@/lib/kenteken";
 import TradeInSection from "@/components/TradeInSection";
 import RelatedVehicles from "@/components/RelatedVehicles";
 import napLogo from "@/assets/nap-logo.png";
