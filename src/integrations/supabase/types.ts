@@ -127,6 +127,69 @@ export type Database = {
         }
         Relationships: []
       }
+      appointments: {
+        Row: {
+          betalingsstatus: string | null
+          created_at: string
+          customer_id: string | null
+          datum_tijd: string
+          id: string
+          medewerker: string | null
+          notities: string | null
+          onderwerp: string | null
+          status: string
+          type: string
+          updated_at: string
+          vehicle_id: string | null
+          voertuig_klaargemaakt: boolean
+        }
+        Insert: {
+          betalingsstatus?: string | null
+          created_at?: string
+          customer_id?: string | null
+          datum_tijd: string
+          id?: string
+          medewerker?: string | null
+          notities?: string | null
+          onderwerp?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+          vehicle_id?: string | null
+          voertuig_klaargemaakt?: boolean
+        }
+        Update: {
+          betalingsstatus?: string | null
+          created_at?: string
+          customer_id?: string | null
+          datum_tijd?: string
+          id?: string
+          medewerker?: string | null
+          notities?: string | null
+          onderwerp?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          voertuig_klaargemaakt?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       automation_results: {
         Row: {
           afbeelding_url: string | null

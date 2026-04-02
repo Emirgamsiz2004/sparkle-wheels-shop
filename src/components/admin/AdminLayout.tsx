@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet, BarChart3,
-  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target, Clock,
+  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target, Clock, CalendarDays,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
@@ -16,6 +16,7 @@ const navGroups: NavGroup[] = [
     label: "",
     items: [
       { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+      { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
       { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
       { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
       { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
@@ -63,6 +64,26 @@ const AdminLayout = () => {
     };
     fetchOverdue();
     const interval = setInterval(fetchOverdue, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Fetch upcoming appointment badge (within 30 min)
+  const [upcomingAppts, setUpcomingAppts] = useState(0);
+  useEffect(() => {
+    if (!user) return;
+    const fetchUpcoming = async () => {
+      const now = new Date();
+      const soon = new Date(now.getTime() + 30 * 60 * 1000);
+      const { count } = await supabase
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "gepland")
+        .gte("datum_tijd", now.toISOString())
+        .lte("datum_tijd", soon.toISOString());
+      setUpcomingAppts(count || 0);
+    };
+    fetchUpcoming();
+    const interval = setInterval(fetchUpcoming, 60000);
     return () => clearInterval(interval);
   }, [user]);
 
@@ -125,6 +146,11 @@ const AdminLayout = () => {
                     {item.path === "/admin/leads" && overdueLeads > 0 && (
                       <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
                         {overdueLeads}
+                      </span>
+                    )}
+                    {item.path === "/admin/planning" && upcomingAppts > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground">
+                        {upcomingAppts}
                       </span>
                     )}
                   </Link>
