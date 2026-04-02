@@ -95,7 +95,7 @@ const Footer = () => {
         {/* Bottom bar */}
         <div className="mt-10 pt-6 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[10px] text-muted-foreground/50 font-body tracking-wider">
-            © {new Date().getFullYear()} Platin Automotive. Alle rechten voorbehouden.
+            © {new Date().getFullYear()} Platin Automotive · KVK 99146193
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
