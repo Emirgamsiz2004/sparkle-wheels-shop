@@ -68,9 +68,14 @@ const OverOns = () => {
               <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
                 Ons Verhaal
               </p>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground tracking-tight mb-8 leading-tight">
-                Platin Automotive is wat er gebeurt als je een levenslange passie eindelijk serieus neemt.
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground tracking-tight mb-6 leading-tight">
+                Van passie
+                <br />
+                naar bedrijf.
               </h2>
+              <p className="text-muted-foreground font-body font-light leading-relaxed text-lg mb-6">
+                Platin Automotive is wat er gebeurt als je een levenslange passie eindelijk serieus neemt.
+              </p>
               <div className="space-y-5">
                 <p className="text-muted-foreground font-body font-light leading-relaxed">
                   De liefde voor auto's zit er bij ons al jaren in. Altijd zelf in mooie auto's gereden, altijd dat gevoel gehad dat een auto meer is dan vervoer — het is een uitstraling, een gevoel, iets waar je trots op staat.
