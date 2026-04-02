@@ -98,6 +98,7 @@ const App = () => (
                 <Route path="leads" element={<AdminLeadsPage />} />
                 <Route path="leads/:id" element={<AdminLeadDetailPage />} />
                 <Route path="uren" element={<AdminUrenPage />} />
+                <Route path="planning" element={<AdminPlanningPage />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
             </Routes>
@@ -150,6 +151,7 @@ const App = () => (
                 <Route path="leads" element={<AdminLeadsPage />} />
                 <Route path="leads/:id" element={<AdminLeadDetailPage />} />
                 <Route path="uren" element={<AdminUrenPage />} />
+                <Route path="planning" element={<AdminPlanningPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
