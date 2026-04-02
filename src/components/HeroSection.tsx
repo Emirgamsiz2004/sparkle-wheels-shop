@@ -1,30 +1,52 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import heroSlide1 from "@/assets/hero-slide-1.webp";
-import heroSlide2 from "@/assets/hero-slide-2.webp";
-import heroSlide3 from "@/assets/hero-slide-3.webp";
-import heroSlide4 from "@/assets/hero-slide-4.webp";
 
-const slides = [
-  { src: heroSlide1, mobilePosition: "center center", desktopPosition: "center center" },
-  { src: heroSlide2, mobilePosition: "65% center", desktopPosition: "center center" },
-  { src: heroSlide3, mobilePosition: "50% 40%", desktopPosition: "center center" },
-  { src: heroSlide4, mobilePosition: "center 40%", desktopPosition: "center center" },
+const lazySlideImports = [
+  () => import("@/assets/hero-slide-2.webp"),
+  () => import("@/assets/hero-slide-3.webp"),
+  () => import("@/assets/hero-slide-4.webp"),
+];
+
+const slidePositions = [
+  { mobilePosition: "center center", desktopPosition: "center center" },
+  { mobilePosition: "65% center", desktopPosition: "center center" },
+  { mobilePosition: "50% 40%", desktopPosition: "center center" },
+  { mobilePosition: "center 40%", desktopPosition: "center center" },
 ];
 
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
   const isMobile = useIsMobile();
+  const [slideSrcs, setSlideSrcs] = useState<string[]>([heroSlide1]);
+  const loaded = useRef(false);
+
+  // Load remaining slides after page is idle
+  useEffect(() => {
+    if (loaded.current) return;
+    loaded.current = true;
+    const load = () => {
+      Promise.all(lazySlideImports.map(fn => fn())).then(modules => {
+        setSlideSrcs([heroSlide1, ...modules.map(m => m.default)]);
+      });
+    };
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(load);
+    } else {
+      setTimeout(load, 200);
+    }
+  }, []);
 
   useEffect(() => {
+    if (slideSrcs.length < 4) return;
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length);
+      setCurrent((prev) => (prev + 1) % 4);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slideSrcs.length]);
 
   return (
     <section id="home" className="relative h-[100svh] w-full overflow-hidden">
@@ -39,18 +61,18 @@ const HeroSection = () => {
           className="absolute inset-0"
         >
           <img
-            src={slides[current].src}
+            src={slideSrcs[current] || slideSrcs[0]}
             alt="Platin Automotive showroom"
             className="absolute inset-0 w-full h-full object-cover"
-            width={1920}
-            height={1080}
+            width={1200}
+            height={800}
             loading="eager"
             fetchPriority={current === 0 ? "high" : "auto"}
             decoding={current === 0 ? "sync" : "async"}
             style={{
               objectPosition: isMobile
-                ? slides[current].mobilePosition
-                : slides[current].desktopPosition,
+                ? slidePositions[current].mobilePosition
+                : slidePositions[current].desktopPosition,
             }}
           />
         </motion.div>
