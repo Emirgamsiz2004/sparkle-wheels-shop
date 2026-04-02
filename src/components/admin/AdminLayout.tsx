@@ -16,6 +16,7 @@ const navGroups: NavGroup[] = [
     label: "",
     items: [
       { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+      { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
       { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
       { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
       { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
