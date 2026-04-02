@@ -67,6 +67,26 @@ const AdminLayout = () => {
     return () => clearInterval(interval);
   }, [user]);
 
+  // Fetch upcoming appointment badge (within 30 min)
+  const [upcomingAppts, setUpcomingAppts] = useState(0);
+  useEffect(() => {
+    if (!user) return;
+    const fetchUpcoming = async () => {
+      const now = new Date();
+      const soon = new Date(now.getTime() + 30 * 60 * 1000);
+      const { count } = await supabase
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "gepland")
+        .gte("datum_tijd", now.toISOString())
+        .lte("datum_tijd", soon.toISOString());
+      setUpcomingAppts(count || 0);
+    };
+    fetchUpcoming();
+    const interval = setInterval(fetchUpcoming, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
+
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
   }, [user, loading, navigate]);
