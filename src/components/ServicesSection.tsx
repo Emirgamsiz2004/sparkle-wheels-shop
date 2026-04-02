@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import verkoopImg from "@/assets/service-verkoop.jpg";
-import onderhoudImg from "@/assets/service-onderhoud.jpg";
-import detailingImg from "@/assets/service-detailing.jpg";
-import autoZoekenImg from "@/assets/service-zoeken.jpg";
-import customizingImg from "@/assets/service-customizing.jpg";
+import verkoopImg from "@/assets/service-verkoop.webp";
+import onderhoudImg from "@/assets/service-onderhoud.webp";
+import detailingImg from "@/assets/service-detailing.webp";
+import autoZoekenImg from "@/assets/service-zoeken.webp";
+import customizingImg from "@/assets/service-customizing.webp";
 
 interface Service {
   num: string;
@@ -75,6 +75,9 @@ const ServiceCard = ({ service, delay }: { service: Service; delay: number }) =>
           src={service.image}
           alt={service.alt}
           className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+          width={600}
+          height={400}
+          loading="lazy"
         />
         {service.overlay && (
           <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/30 to-background/10" />

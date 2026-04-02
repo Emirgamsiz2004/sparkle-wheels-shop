@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import aboutImg from "@/assets/plate-install.jpg";
+import aboutImg from "@/assets/plate-install.webp";
 
 const stats = [
   { value: "100%", label: "Transparant" },
@@ -64,6 +64,9 @@ const AboutSection = () => {
                 src={aboutImg}
                 alt="Platin Automotive werkplaats Roelofarendsveen"
                 className="w-full h-full object-cover"
+                width={800}
+                height={532}
+                loading="lazy"
               />
             </div>
             <div className="hidden lg:block absolute -bottom-4 -right-4 w-full h-full border border-foreground/8 -z-10" />
