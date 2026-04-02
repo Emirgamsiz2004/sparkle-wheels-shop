@@ -203,7 +203,7 @@ const AutoZoeken = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="tel:+31612693825" className="group inline-flex items-center justify-center gap-3 border border-border px-6 py-3.5 hover:border-foreground/30 transition-all duration-300">
                 <Phone className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                <span className="text-xs font-body font-medium text-foreground">06 - 1269 3825</span>
+                <span className="text-xs font-body font-medium text-foreground">06-12693825</span>
               </a>
               <a href="https://wa.me/31612693825?text=Hallo%2C%20ik%20ben%20op%20zoek%20naar%20een%20auto." target="_blank" rel="noopener noreferrer" className="group inline-flex items-center justify-center gap-3 border border-border px-6 py-3.5 hover:border-foreground/30 transition-all duration-300">
                 <MessageCircle className="w-4 h-4 text-green-500" />

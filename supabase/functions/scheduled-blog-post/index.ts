@@ -98,7 +98,7 @@ serve(async (req) => {
     const fullPrompt = `${selected.prompt}
 
 De blogpost is voor Platin Automotive, een autohandel gevestigd in Roelofarendsveen.
-Website: platinautomotive.nl | Telefoon: 06-1269 3825
+Website: platinautomotive.nl | Telefoon: 06-12693825
 
 Geef output EXACT in dit JSON formaat:
 {

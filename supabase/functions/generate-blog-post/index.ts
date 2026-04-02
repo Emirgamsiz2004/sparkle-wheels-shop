@@ -38,7 +38,7 @@ Geef output EXACT in dit JSON formaat:
   "focus_keyword": "[meest gezochte zoekterm voor deze auto]",
   "excerpt": "[2 zinnen die uitnodigen om de post te lezen]",
   "slug": "[url-vriendelijke-slug-met-streepjes-geen-spaties]",
-  "content": "[volledige blogpost in HTML met deze structuur: <h1>titel</h1> <p>inleiding: 2-3 zinnen die de lezer aanspreken</p> <h2>Over de [Merk Model]</h2> <p>karakter en rijervaring van dit type auto, 3-4 zinnen</p> <h2>Dit exemplaar</h2> <p>specifieke details over deze auto: km, staat, bijzonderheden, 3-4 zinnen</p> <h2>Specificaties</h2> <ul><li>Bouwjaar: ...</li><li>Kilometerstand: ...</li><li>Motorinhoud: ...</li><li>Transmissie: ...</li><li>Kleur: ...</li><li>Vraagprijs: €...</li></ul> <h2>Interesse?</h2> <p>Kom langs in Roelofarendsveen voor een proefrit. Bel ons op 06-1269 3825 of stuur een bericht via WhatsApp. Bekijk ook ons volledige aanbod op platinautomotive.nl</p>]"
+  "content": "[volledige blogpost in HTML met deze structuur: <h1>titel</h1> <p>inleiding: 2-3 zinnen die de lezer aanspreken</p> <h2>Over de [Merk Model]</h2> <p>karakter en rijervaring van dit type auto, 3-4 zinnen</p> <h2>Dit exemplaar</h2> <p>specifieke details over deze auto: km, staat, bijzonderheden, 3-4 zinnen</p> <h2>Specificaties</h2> <ul><li>Bouwjaar: ...</li><li>Kilometerstand: ...</li><li>Motorinhoud: ...</li><li>Transmissie: ...</li><li>Kleur: ...</li><li>Vraagprijs: €...</li></ul> <h2>Interesse?</h2> <p>Kom langs in Roelofarendsveen voor een proefrit. Bel ons op 06-12693825 of stuur een bericht via WhatsApp. Bekijk ook ons volledige aanbod op platinautomotive.nl</p>]"
 }
 
 Regels:

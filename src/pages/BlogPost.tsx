@@ -228,7 +228,7 @@ const BlogPost = () => {
               href="tel:+31612693825"
               className="flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase hover:bg-primary hover:text-primary-foreground transition-all"
             >
-              <Phone className="w-3.5 h-3.5" /> 06-1269 3825
+              <Phone className="w-3.5 h-3.5" /> 06-12693825
             </a>
             <a
               href="https://wa.me/31612693825"
