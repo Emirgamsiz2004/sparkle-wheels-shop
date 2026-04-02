@@ -148,6 +148,11 @@ const AdminLayout = () => {
                         {overdueLeads}
                       </span>
                     )}
+                    {item.path === "/admin/planning" && upcomingAppts > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground">
+                        {upcomingAppts}
+                      </span>
+                    )}
                   </Link>
                 ))}
               </div>
