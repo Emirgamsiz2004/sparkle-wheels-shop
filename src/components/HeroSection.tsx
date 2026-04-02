@@ -42,6 +42,10 @@ const HeroSection = () => {
             src={slides[current].src}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
+            width={1920}
+            height={1080}
+            fetchPriority={current === 0 ? "high" : "auto"}
+            decoding={current === 0 ? "sync" : "async"}
             style={{
               objectPosition: isMobile
                 ? slides[current].mobilePosition
