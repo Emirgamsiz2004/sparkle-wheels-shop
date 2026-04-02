@@ -19,7 +19,7 @@ const contactDetails = [
   {
     icon: Phone,
     label: "Telefoon",
-    value: "06 - 1269 3825",
+    value: "06-12693825",
     href: "tel:+31612693825",
     description: "Bel ons direct voor vragen of een afspraak",
   },
