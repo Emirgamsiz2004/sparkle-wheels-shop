@@ -45,7 +45,7 @@ const AdminPlanningPage = () => {
   );
 
   const activeVehicles = useMemo(() =>
-    vehicles.filter((v) => v.status !== "verkocht" && v.status !== "gearchiveerd"),
+    vehicles.filter((v) => v.status !== "verkocht"),
     [vehicles]
   );
 
