@@ -257,7 +257,7 @@ const Contact = () => {
               className="bg-card"
             >
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2446.8!2d4.6278!3d52.1972!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5c6f4b4b4b4b4%3A0x1234567890abcdef!2sCilinderweg+99%2C+2371+DZ+Roelofarendsveen!5e0!3m2!1snl!2snl!4v1700000000000"
+                src="https://maps.google.com/maps?q=Cilinderweg+99,+2371+DZ+Roelofarendsveen&t=&z=15&ie=UTF8&iwloc=&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0, minHeight: "400px", filter: "grayscale(1) invert(0.92) contrast(0.9)" }}
