@@ -3,10 +3,10 @@ import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import heroSlide1 from "@/assets/hero-slide-1.jpg";
-import heroSlide2 from "@/assets/hero-slide-2.jpg";
-import heroSlide3 from "@/assets/hero-slide-3.jpg";
-import heroSlide4 from "@/assets/hero-slide-4.jpg";
+import heroSlide1 from "@/assets/hero-slide-1.webp";
+import heroSlide2 from "@/assets/hero-slide-2.webp";
+import heroSlide3 from "@/assets/hero-slide-3.webp";
+import heroSlide4 from "@/assets/hero-slide-4.webp";
 
 const slides = [
   { src: heroSlide1, mobilePosition: "center center", desktopPosition: "center center" },
@@ -40,10 +40,11 @@ const HeroSection = () => {
         >
           <img
             src={slides[current].src}
-            alt=""
+            alt="Platin Automotive showroom"
             className="absolute inset-0 w-full h-full object-cover"
             width={1920}
             height={1080}
+            loading="eager"
             fetchPriority={current === 0 ? "high" : "auto"}
             decoding={current === 0 ? "sync" : "async"}
             style={{
