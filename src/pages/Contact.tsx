@@ -257,10 +257,10 @@ const Contact = () => {
               className="bg-card"
             >
               <iframe
-                src="https://maps.google.com/maps?q=Cilinderweg+99,+2371+DZ+Roelofarendsveen&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2445.073771743922!2d4.61870297731756!3d52.20570685945053!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5c59e4e115023%3A0x38b8df52b07f3d!2sPlatin%20Automotive!5e0!3m2!1snl!2snl!4v1775136871731!5m2!1snl!2snl"
                 width="100%"
                 height="100%"
-                style={{ border: 0, minHeight: "400px", filter: "grayscale(1) invert(0.92) contrast(0.9)" }}
+                style={{ border: 0, minHeight: "400px" }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
