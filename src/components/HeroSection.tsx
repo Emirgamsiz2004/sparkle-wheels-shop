@@ -128,7 +128,7 @@ const HeroSection = () => {
 
         {/* Slide indicators */}
         <div className="flex gap-2 mt-10">
-          {slides.map((_, i) => (
+          {slidePositions.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
