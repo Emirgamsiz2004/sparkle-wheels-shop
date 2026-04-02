@@ -19,14 +19,14 @@ const contactDetails = [
   {
     icon: Phone,
     label: "Telefoon",
-    value: "06 - 1269 3825",
+    value: "06-12693825",
     href: "tel:+31612693825",
     description: "Bel ons direct voor vragen of een afspraak",
   },
   {
     icon: MessageCircle,
     label: "WhatsApp",
-    value: "06 - 1269 3825",
+    value: "06-12693825",
     href: "https://wa.me/31612693825?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20auto.",
     description: "Stuur ons een berichtje via WhatsApp",
     highlight: true,

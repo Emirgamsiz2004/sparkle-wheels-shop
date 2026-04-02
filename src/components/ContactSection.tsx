@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle } from "lucide-react";
 
 const contactInfo = [
-  { icon: Phone, label: "Telefoon", value: "06 - 1269 3825", href: "tel:+31612693825" },
+  { icon: Phone, label: "Telefoon", value: "06-12693825", href: "tel:+31612693825" },
   { icon: MessageCircle, label: "WhatsApp", value: "Stuur een bericht", href: "https://wa.me/31612693825" },
   { icon: Mail, label: "E-mail", value: "info@platinautomotive.nl", href: "mailto:info@platinautomotive.nl" },
   { icon: MapPin, label: "Adres", value: "Cilinderweg 99, Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+Roelofarendsveen" },

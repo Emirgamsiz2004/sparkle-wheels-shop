@@ -203,7 +203,7 @@ const AutoCustomizing = () => {
                   <Phone className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                   <div>
                     <p className="text-sm font-display font-semibold text-foreground">Bel ons</p>
-                    <p className="text-xs font-body text-muted-foreground">06 - 1269 3825</p>
+                    <p className="text-xs font-body text-muted-foreground">06-12693825</p>
                   </div>
                 </a>
                 <a
