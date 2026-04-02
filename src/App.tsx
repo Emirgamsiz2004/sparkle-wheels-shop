@@ -42,6 +42,10 @@ import AdminLeadsPage from "./pages/admin/AdminLeadsPage";
 import AdminLeadDetailPage from "./pages/admin/AdminLeadDetailPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
 import AdminUrenPage from "./pages/admin/AdminUrenPage";
+import OccasionsAlphen from "./pages/OccasionsAlphen";
+import OccasionsLeiden from "./pages/OccasionsLeiden";
+import OccasionsZoetermeer from "./pages/OccasionsZoetermeer";
+import OccasionsDenHaag from "./pages/OccasionsDenHaag";
 
 import ReviewsPage from "./pages/ReviewsPage";
 import NotFound from "./pages/NotFound";
@@ -116,6 +120,10 @@ const App = () => (
               <Route path="/algemene-voorwaarden" element={<AlgemeneVoorwaarden />} />
               <Route path="/proefrit/:token" element={<ProefritFormulier />} />
               
+              <Route path="/occasions-alphen-aan-den-rijn" element={<OccasionsAlphen />} />
+              <Route path="/occasions-leiden" element={<OccasionsLeiden />} />
+              <Route path="/occasions-zoetermeer" element={<OccasionsZoetermeer />} />
+              <Route path="/occasions-den-haag" element={<OccasionsDenHaag />} />
               <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/admin/login" element={<AdminLogin />} />

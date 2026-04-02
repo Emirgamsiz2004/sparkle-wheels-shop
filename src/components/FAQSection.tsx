@@ -32,6 +32,11 @@ const faqs = [
     answer:
       "U bent altijd welkom tijdens onze openingstijden, zonder afspraak. Wilt u een specifieke auto bezichtigen? Dan stellen wij het op prijs als u van tevoren even laat weten dat u komt en voor welke auto — zo zorgen wij dat het voertuig aanwezig, schoongemaakt en klaar staat voor bezichtiging. Buiten openingstijden zijn wij beschikbaar op afspraak.",
   },
+  {
+    question: "Kunnen jullie een auto bezorgen?",
+    answer:
+      "Ja, bezorging is mogelijk. Wij brengen de auto naar uw gewenste locatie, zoals uw thuis- of werkadres. Hier zijn bezorgkosten aan verbonden. Neem contact op voor meer informatie en een prijsopgave.",
+  },
 ];
 
 const FAQSection = () => {

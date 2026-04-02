@@ -101,6 +101,15 @@ const Footer = () => {
               <Link to="/cookiebeleid" className="text-[9px] tracking-wider uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors">Cookies</Link>
               <Link to="/algemene-voorwaarden" className="text-[9px] tracking-wider uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors">Voorwaarden</Link>
             </div>
+            <div className="mt-3">
+              <p className="text-[9px] tracking-wider uppercase text-muted-foreground/50 mb-1.5">Wij bedienen ook</p>
+              <div className="flex items-center gap-3">
+                <Link to="/occasions-alphen-aan-den-rijn" className="text-[9px] tracking-wider text-muted-foreground/50 hover:text-muted-foreground transition-colors">Alphen aan den Rijn</Link>
+                <Link to="/occasions-leiden" className="text-[9px] tracking-wider text-muted-foreground/50 hover:text-muted-foreground transition-colors">Leiden</Link>
+                <Link to="/occasions-zoetermeer" className="text-[9px] tracking-wider text-muted-foreground/50 hover:text-muted-foreground transition-colors">Zoetermeer</Link>
+                <Link to="/occasions-den-haag" className="text-[9px] tracking-wider text-muted-foreground/50 hover:text-muted-foreground transition-colors">Den Haag</Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
