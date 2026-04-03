@@ -1,10 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Outlet, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  LayoutDashboard, Car, ShoppingCart, Wallet, BarChart3,
-  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target, Clock, CalendarDays,
+  LayoutDashboard, Car, ShoppingCart, Wallet,
+  Settings, LogOut, Menu, X, ClipboardCheck, Users, Clock, CalendarDays,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
