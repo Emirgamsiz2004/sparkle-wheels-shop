@@ -86,7 +86,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubm
               <button
                 key={opt.value}
                 onClick={() => { setType(opt.value); setStep("form"); }}
-                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:scale-[1.02] ${opt.color}`}
+                className={`flex flex-col items-center gap-2 p-5 rounded-[3px] border transition-all hover:scale-[1.01] hover:brightness-125 ${opt.color}`}
               >
                 <opt.icon className="w-6 h-6" />
                 <span className="text-sm font-medium">{opt.label}</span>
