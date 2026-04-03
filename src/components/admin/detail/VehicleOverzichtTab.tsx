@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Vehicle, formatEuroDecimal, calcKostprijs, calcNettoMarge, calcMarge, calcTotalKosten, brandstofLabels } from "@/types/vehicle";
 import { Pencil, Check, X, Link2 } from "lucide-react";
 import KentekenInput from "@/components/admin/KentekenInput";
