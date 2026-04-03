@@ -92,8 +92,10 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
               </div>
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1.5">Kostprijs (€)</label>
-                <input type="number" value={form.kostprijsOverride || autoKostprijs} onChange={(e) => setForm(f => ({ ...f, kostprijsOverride: e.target.value }))} className={inputCls} placeholder={String(autoKostprijs)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Berekend: € {autoKostprijs.toLocaleString("nl-NL")} · Pas aan als de werkelijke kostprijs afwijkt</p>
+                <div className="px-3 py-2.5 text-sm bg-secondary/30 border border-border rounded-xl text-foreground tabular-nums">
+                  {formatEuroDecimal(autoKostprijs)}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">Automatisch berekend: inkoopprijs + kosten</p>
               </div>
             </>
           )}
