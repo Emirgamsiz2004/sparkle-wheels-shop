@@ -235,4 +235,19 @@ const AdminVoertuigenPage = () => {
   );
 };
 
+const ApkBadge = ({ apkVervaldatum }: { apkVervaldatum?: string }) => {
+  const status = getApkStatus(apkVervaldatum);
+  if (status.level === 'green' || status.level === 'none') return null;
+  const isRed = status.level === 'red';
+  return (
+    <span className={`inline-flex px-1.5 py-0.5 text-[9px] font-medium rounded border ${
+      isRed
+        ? "bg-red-500/15 text-red-400 border-red-500/30"
+        : "bg-amber-500/15 text-amber-400 border-amber-500/30"
+    }`}>
+      APK {status.label}
+    </span>
+  );
+};
+
 export default AdminVoertuigenPage;
