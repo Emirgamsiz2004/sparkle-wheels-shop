@@ -106,38 +106,11 @@ input[type="number"] {
   }
 
   /* Admin — consistent 3px radius on ALL interactive elements */
-  .admin-theme [role="dialog"],
-  .admin-theme [data-radix-popper-content-wrapper] [role="listbox"],
-  .admin-theme [data-radix-popper-content-wrapper] [role="menu"] {
+  .admin-theme *,
+  body:has(.admin-theme) [data-radix-portal] *,
+  body:has(.admin-theme) [vaul-drawer] * {
     border-radius: 3px !important;
-    font-family: 'DM Sans', sans-serif !important;
-  }
-
-  .admin-theme button,
-  .admin-theme [role="button"],
-  .admin-theme a[class*="btn"],
-  .admin-theme select,
-  .admin-theme input,
-  .admin-theme textarea,
-  .admin-theme [data-slot="badge"],
-  .admin-theme .badge,
-  .admin-theme [role="tab"],
-  .admin-theme [role="tablist"],
-  .admin-theme table,
-  .admin-theme th,
-  .admin-theme td,
-  .admin-theme [role="tooltip"],
-  .admin-theme [data-radix-popper-content-wrapper] *,
-  .admin-theme [role="alertdialog"],
-  .admin-theme .card,
-  .admin-theme [class*="rounded"] {
-    border-radius: 3px !important;
-  }
-
-  .admin-theme select,
-  .admin-theme input,
-  .admin-theme textarea {
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'DM Sans', sans-serif;
   }
 
   .admin-theme h1,
@@ -145,8 +118,16 @@ input[type="number"] {
   .admin-theme h3,
   .admin-theme h4,
   .admin-theme h5,
-  .admin-theme h6 {
-    font-family: 'Poppins', sans-serif;
+  .admin-theme h6,
+  body:has(.admin-theme) [data-radix-portal] h1,
+  body:has(.admin-theme) [data-radix-portal] h2,
+  body:has(.admin-theme) [data-radix-portal] h3,
+  body:has(.admin-theme) [data-radix-portal] h4,
+  body:has(.admin-theme) [data-radix-portal] h5,
+  body:has(.admin-theme) [data-radix-portal] h6,
+  body:has(.admin-theme) [data-radix-portal] [class*="DialogTitle"],
+  body:has(.admin-theme) [data-radix-portal] [class*="AlertDialogTitle"] {
+    font-family: 'Poppins', sans-serif !important;
     font-weight: 600;
   }
 }
