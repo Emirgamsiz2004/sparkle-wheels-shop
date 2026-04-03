@@ -26,6 +26,7 @@ const AdminVoertuigNieuwPage = () => {
     inkoopprijs: 0, verkoopprijs: 0, opmerkingen: "",
     chassisnummer: "", metallicLak: "onbekend" as "ja" | "nee" | "onbekend",
     aantalEigenaren: "" as number | "",
+    apkVervaldatum: "",
   });
 
   const update = (key: string, value: any) => {
