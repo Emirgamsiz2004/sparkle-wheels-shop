@@ -158,7 +158,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
             <tbody>
               <EditableEuroRow label="Inkoopprijs" value={vehicle.inkoopprijs} onSave={async (val) => { await onSave({ ...vehicle, inkoopprijs: val }); onLogActivity("inkoopprijs_gewijzigd", `Inkoopprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} />
               <InfoRow label="Totale kosten" value={formatEuroDecimal(totalKosten)} />
-              <EditableEuroRow label="Kostprijs" value={vehicle.kostprijsCalc || autoKostprijs} onSave={async (val) => { await onSave({ ...vehicle, kostprijsCalc: val }); onLogActivity("kostprijs_gewijzigd", `Kostprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} hint={`Berekend: € ${autoKostprijs.toLocaleString("nl-NL")}`} />
+              <InfoRow label="Kostprijs" value={formatEuroDecimal(kostprijs)} />
               <EditableEuroRow label="Verkoopprijs" value={vehicle.verkoopprijs} onSave={async (val) => { await onSave({ ...vehicle, verkoopprijs: val }); onLogActivity("verkoopprijs_gewijzigd", `Verkoopprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} />
               <InfoRow label="Nettomarge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} valueColor={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} isLast />
             </tbody>
