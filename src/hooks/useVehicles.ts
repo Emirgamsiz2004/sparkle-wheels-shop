@@ -109,6 +109,7 @@ export function useVehicles() {
       consignatie_eigenaar_naam: data.consignatieEigenaarNaam || null,
       consignatie_eigenaar_telefoon: data.consignatieEigenaarTelefoon || null,
       consignatie_eigenaar_email: data.consignatieEigenaarEmail || null,
+      apk_vervaldatum: data.apkVervaldatum || null,
     } as any);
     if (error) { toast.error('Fout bij toevoegen voertuig'); return; }
     toast.success('Voertuig toegevoegd');
