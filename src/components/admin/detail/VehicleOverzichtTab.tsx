@@ -72,6 +72,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           updates.brandstof = bf; filled.add("brandstof");
         }
       }
+      if (data.apkTot) { updates.apkVervaldatum = data.apkTot; filled.add("apkVervaldatum"); }
       setForm((f) => ({ ...f, ...updates }));
       setRdwFields(filled);
     }
