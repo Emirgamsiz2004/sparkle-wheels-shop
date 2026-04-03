@@ -82,6 +82,30 @@ export function useVehicles() {
     setLoading(false);
   }, [user]);
 
+  // Batch-fetch APK for vehicles missing it
+  useEffect(() => {
+    const fetchMissingApk = async () => {
+      const missing = vehicles.filter(v => v.kenteken && !v.apkVervaldatum && v.status !== 'verkocht');
+      if (missing.length === 0) return;
+
+      for (const v of missing) {
+        try {
+          const clean = v.kenteken.replace(/[-\s]/g, '').toUpperCase();
+          const res = await fetch(`https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=${clean}`);
+          const data = await res.json();
+          if (data?.[0]?.vervaldatum_apk) {
+            const raw = data[0].vervaldatum_apk;
+            const apk = `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+            await supabase.from('vehicles').update({ apk_vervaldatum: apk } as any).eq('id', v.id);
+          }
+        } catch { /* skip */ }
+      }
+      // Refetch to update UI
+      if (missing.length > 0) fetchVehicles();
+    };
+    if (!loading && vehicles.length > 0) fetchMissingApk();
+  }, [loading, vehicles.length]); // Only run when vehicles first load
+
   useEffect(() => { fetchVehicles(); }, [fetchVehicles]);
 
   const addVehicle = async (data: Omit<Vehicle, 'id' | 'kosten'>) => {
