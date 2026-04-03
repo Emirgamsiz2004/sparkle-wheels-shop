@@ -22,7 +22,7 @@ const PartnerTrack = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
     {repeatedPartners.map((partner, index) => (
       <div
         key={`${partner.name}-${ariaHidden ? "clone" : "main"}-${index}`}
-        className="group flex h-[42px] w-[132px] shrink-0 items-center justify-center rounded-xl border border-border/60 bg-background/80 px-4 backdrop-blur-sm transition-all duration-500 hover:border-foreground/15 hover:bg-background md:h-[52px] md:w-[176px] md:px-5 lg:h-[58px] lg:w-[196px]"
+        className="group flex h-[42px] w-[132px] shrink-0 items-center justify-center px-4 transition-all duration-500 md:h-[52px] md:w-[176px] md:px-5 lg:h-[58px] lg:w-[196px]"
       >
         <img
           src={partner.logo}

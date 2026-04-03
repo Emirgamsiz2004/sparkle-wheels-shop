@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
   Accordion,
   AccordionContent,
@@ -6,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const faqs = [
+const faqs: { question: string; answer: string; link?: string; linkText?: string }[] = [
   {
     question: "Kopen jullie ook auto's in?",
     answer:
@@ -16,6 +17,8 @@ const faqs = [
     question: "Bieden jullie garantie aan?",
     answer:
       "Ja. Wij werken samen met AutoTrust, een dochteronderneming van BOVAG. Via deze samenwerking kunnen wij officiële AutoTrust garantiepakketten aanbieden op voertuigen die daarvoor in aanmerking komen. Zo rijdt u met zekerheid weg.",
+    link: "/garantie",
+    linkText: "Bekijk onze garantiepakketten →",
   },
   {
     question: "Doen jullie ook onderhoud en reparaties?",
@@ -77,6 +80,14 @@ const FAQSection = () => {
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground font-body font-light leading-relaxed">
                   {faq.answer}
+                  {faq.link && (
+                    <Link
+                      to={faq.link}
+                      className="mt-3 inline-block text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+                    >
+                      {faq.linkText}
+                    </Link>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}
