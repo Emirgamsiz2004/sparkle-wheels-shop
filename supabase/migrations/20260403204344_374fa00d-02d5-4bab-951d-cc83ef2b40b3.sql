@@ -1,0 +1,1 @@
+ALTER TABLE public.vehicles ADD COLUMN apk_vervaldatum date DEFAULT NULL;

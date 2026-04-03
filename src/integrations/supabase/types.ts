@@ -1731,6 +1731,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          apk_vervaldatum: string | null
           betaalmethode: string | null
           bouwjaar: number | null
           brandstof: string | null
@@ -1766,6 +1767,7 @@ export type Database = {
           verkoopprijs: number | null
         }
         Insert: {
+          apk_vervaldatum?: string | null
           betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
@@ -1801,6 +1803,7 @@ export type Database = {
           verkoopprijs?: number | null
         }
         Update: {
+          apk_vervaldatum?: string | null
           betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
