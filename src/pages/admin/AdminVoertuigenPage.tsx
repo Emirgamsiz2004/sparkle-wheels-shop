@@ -20,10 +20,28 @@ const tabs = [
 
 const AdminVoertuigenPage = () => {
   const { vehicles, loading, refetch } = useVehicles();
-  const [filter, setFilter] = useState("alle");
+  const [filter, setFilter] = useState("voorraad");
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
   const isMobile = useIsMobile();
+
+  // APK warning: vehicles expiring within 4 weeks or already expired (only non-sold)
+  const apkWarningVehicles = useMemo(() => {
+    return vehicles.filter((v) => {
+      if (v.status === "verkocht") return false;
+      const status = getApkStatus(v.apkVervaldatum);
+      if (status.level === 'red') return true;
+      if (status.level === 'orange') {
+        // Check if within 4 weeks
+        if (!v.apkVervaldatum) return false;
+        const today = new Date(); today.setHours(0,0,0,0);
+        const apk = new Date(v.apkVervaldatum);
+        const diffDays = Math.ceil((apk.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        return diffDays <= 28;
+      }
+      return false;
+    });
+  }, [vehicles]);
 
   const handleSync = async () => {
     setSyncing(true);
@@ -40,7 +58,8 @@ const AdminVoertuigenPage = () => {
   };
 
   const filtered = vehicles.filter((v) => {
-    if (filter !== "alle" && v.status !== filter) return false;
+    if (filter === "voorraad" && v.status === "verkocht") return false;
+    if (filter !== "voorraad" && v.status !== filter) return false;
     if (search) {
       const q = search.toLowerCase();
       return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || v.kenteken?.toLowerCase().includes(q);
