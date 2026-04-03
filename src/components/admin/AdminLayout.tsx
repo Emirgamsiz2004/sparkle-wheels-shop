@@ -16,29 +16,18 @@ const navGroups: NavGroup[] = [
     label: "",
     items: [
       { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-      { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
       { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
       { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
       { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
       { label: "Klanten", icon: Users, path: "/admin/klanten" },
-      { label: "Leads", icon: Target, path: "/admin/leads" },
-      { label: "Archief", icon: Archive, path: "/admin/archief" },
-      { label: "Uren", icon: Clock, path: "/admin/uren" },
-      { label: "Deal Analyzer", icon: BarChart3, path: "/admin/deals" },
+      { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
     ],
   },
   {
-    label: "Financien",
+    label: "Financiën",
     items: [
       { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
-    ],
-  },
-  {
-    label: "Marketing",
-    items: [
-      { label: "Social Media", icon: Megaphone, path: "/admin/social-media" },
-      { label: "Advertenties", icon: Newspaper, path: "/admin/advertenties" },
-      { label: "Blog", icon: FileText, path: "/admin/blog" },
+      { label: "Uren", icon: Clock, path: "/admin/uren" },
     ],
   },
 ];
