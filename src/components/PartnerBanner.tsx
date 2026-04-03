@@ -17,7 +17,7 @@ const repeatedPartners = [...partners, ...partners];
 const PartnerTrack = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
   <div
     aria-hidden={ariaHidden}
-    className="flex shrink-0 items-center gap-6 pr-6 md:gap-10 md:pr-10 lg:gap-12 lg:pr-12"
+    className="flex shrink-0 items-center gap-4 pr-4 md:gap-10 md:pr-10 lg:gap-12 lg:pr-12"
   >
     {repeatedPartners.map((partner, index) => (
       <div
