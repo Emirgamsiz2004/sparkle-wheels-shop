@@ -28,19 +28,19 @@ const PartnerBanner = () => {
         <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-muted/30 to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-muted/30 to-transparent z-10 pointer-events-none" />
         
-        <div className="flex animate-scroll-left items-center gap-12 md:gap-20 lg:gap-28 w-max px-4">
+        <div className="flex animate-scroll-left items-center gap-8 md:gap-14 lg:gap-20 w-max">
           {allPartners.map((partner, i) => (
             <div
               key={`${partner.name}-${i}`}
-              className="flex items-center justify-center w-[100px] md:w-[140px] lg:w-[160px] h-[32px] md:h-[40px] shrink-0"
+              className="flex items-center justify-center w-[120px] md:w-[160px] lg:w-[180px] h-[36px] md:h-[44px] shrink-0"
             >
               <img
                 src={partner.logo}
                 alt={`${partner.name} logo`}
                 className="max-h-full max-w-full object-contain"
                 loading="lazy"
-                width={160}
-                height={40}
+                width={180}
+                height={44}
               />
             </div>
           ))}
