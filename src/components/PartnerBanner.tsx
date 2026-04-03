@@ -1,7 +1,7 @@
 import logoAutotrust from "@/assets/logo-autotrust.png";
-import logoAutotrack from "@/assets/logo-autotrack.svg";
-import logoMarktplaats from "@/assets/logo-marktplaats.svg";
-import logoAutoscout24 from "@/assets/logo-autoscout24.svg";
+import logoAutotrack from "@/assets/logo-autotrack.png";
+import logoMarktplaats from "@/assets/logo-marktplaats.png";
+import logoAutoscout24 from "@/assets/logo-autoscout24.png";
 import logoFinanciallease from "@/assets/logo-financiallease.png";
 
 const partners = [
