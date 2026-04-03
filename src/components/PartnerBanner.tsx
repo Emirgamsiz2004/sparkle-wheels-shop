@@ -1,5 +1,5 @@
 import logoAutotrust from "@/assets/logo-autotrust.png";
-import logoAutotrack from "@/assets/logo-autotrack.png";
+import logoAutotrack from "@/assets/logo-autotrack.svg";
 
 const partners = [
   { name: "AutoTrust", logo: logoAutotrust },
