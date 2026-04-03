@@ -17,24 +17,30 @@ const allPartners = [...partners, ...partners];
 
 const PartnerBanner = () => {
   return (
-    <section className="py-8 md:py-10 bg-muted/30 border-y border-border/40 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 mb-5">
-        <p className="text-center text-xs md:text-sm font-medium uppercase tracking-widest text-muted-foreground">
+    <section className="py-8 md:py-12 bg-muted/30 border-y border-border/40 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 mb-6 md:mb-8">
+        <p className="text-center text-[10px] md:text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
           Onze partners
         </p>
       </div>
-      <div className="relative">
-        <div className="flex animate-scroll-left items-center gap-10 md:gap-20 w-max">
+      <div className="relative mx-auto max-w-6xl">
+        {/* Fade edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-muted/30 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-muted/30 to-transparent z-10 pointer-events-none" />
+        
+        <div className="flex animate-scroll-left items-center gap-12 md:gap-20 lg:gap-28 w-max px-4">
           {allPartners.map((partner, i) => (
             <div
               key={`${partner.name}-${i}`}
-              className="flex items-center justify-center h-8 md:h-10 min-w-[100px] md:min-w-[140px] grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300"
+              className="flex items-center justify-center w-[100px] md:w-[140px] lg:w-[160px] h-[32px] md:h-[40px] shrink-0"
             >
               <img
                 src={partner.logo}
                 alt={`${partner.name} logo`}
-                className="h-full w-auto object-contain max-w-[120px] md:max-w-[160px]"
+                className="max-h-full max-w-full object-contain"
                 loading="lazy"
+                width={160}
+                height={40}
               />
             </div>
           ))}
