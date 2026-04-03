@@ -41,7 +41,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
 
   const handleSave = async () => {
     setSaving(true);
-    const kostprijsVal = form.kostprijsOverride ? Number(form.kostprijsOverride) : autoKostprijs;
+    const kostprijsVal = form.inkoopprijs + vehicle.kosten.reduce((s, k) => s + k.amount, 0);
     await onSave({
       ...vehicle,
       inkoopprijs: form.inkoopprijs,
