@@ -45,6 +45,7 @@ const Footer = () => {
               { label: "Consignatie", href: "/consignatie" },
               { label: "Garantie", href: "/garantie" },
               { label: "Over Ons", href: "/over-ons" },
+              { label: "Blog", href: "/blog" },
               { label: "Contact", href: "/contact" },
             ].map((item) => (
               <Link

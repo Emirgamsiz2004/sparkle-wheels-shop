@@ -10,7 +10,6 @@ const services = [
   { label: "Detailing", href: "/diensten/auto-detailing" },
   { label: "Customizing", href: "/diensten/auto-customizing" },
   { label: "Auto op Aanvraag", href: "/diensten/auto-zoeken" },
-  { label: "Garantie", href: "/garantie" },
 ];
 
 const navLinks = [
@@ -18,8 +17,8 @@ const navLinks = [
   { label: "Voorraad", href: "/voorraad" },
   { label: "Consignatie", href: "/consignatie" },
   { label: "Diensten", href: "/#diensten", section: "diensten", hasDropdown: true },
+  { label: "Garantie", href: "/garantie" },
   { label: "Over Ons", href: "/over-ons" },
-  { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
 
