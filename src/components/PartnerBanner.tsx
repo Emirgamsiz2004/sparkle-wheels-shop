@@ -17,12 +17,12 @@ const repeatedPartners = [...partners, ...partners];
 const PartnerTrack = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
   <div
     aria-hidden={ariaHidden}
-    className="flex shrink-0 items-center gap-6 pr-6 md:gap-10 md:pr-10 lg:gap-12 lg:pr-12"
+    className="flex shrink-0 items-center gap-4 pr-4 md:gap-10 md:pr-10 lg:gap-12 lg:pr-12"
   >
     {repeatedPartners.map((partner, index) => (
       <div
         key={`${partner.name}-${ariaHidden ? "clone" : "main"}-${index}`}
-        className="group flex h-[42px] w-[132px] shrink-0 items-center justify-center px-4 transition-all duration-500 md:h-[52px] md:w-[176px] md:px-5 lg:h-[58px] lg:w-[196px]"
+        className="group flex h-[48px] w-[148px] shrink-0 items-center justify-center px-4 transition-all duration-500 md:h-[52px] md:w-[176px] md:px-5 lg:h-[58px] lg:w-[196px]"
       >
         <img
           src={partner.logo}
