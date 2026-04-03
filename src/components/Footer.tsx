@@ -43,6 +43,7 @@ const Footer = () => {
               { label: "Home", href: "/" },
               { label: "Voorraad", href: "/voorraad" },
               { label: "Consignatie", href: "/consignatie" },
+              { label: "Garantie", href: "/garantie" },
               { label: "Over Ons", href: "/over-ons" },
               { label: "Contact", href: "/contact" },
             ].map((item) => (

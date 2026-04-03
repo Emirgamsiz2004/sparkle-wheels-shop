@@ -28,9 +28,9 @@ const Index = () => {
       </Helmet>
       <Navbar />
       <HeroSection />
-      <PartnerBanner />
       <InventorySection />
       <ConsignatieSection />
+      <PartnerBanner />
       <ServicesSection />
       <AboutSection />
       <ReviewsSection />
