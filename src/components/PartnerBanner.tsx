@@ -27,7 +27,7 @@ const PartnerTrack = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
         <img
           src={partner.logo}
           alt={`${partner.name} logo`}
-          className="max-h-full max-w-full object-contain brightness-0 saturate-0 opacity-70 transition-all duration-500 group-hover:brightness-100 group-hover:saturate-100 group-hover:opacity-100"
+          className="max-h-full max-w-full object-contain brightness-0 invert opacity-60 transition-all duration-500 group-hover:brightness-100 group-hover:invert-0 group-hover:saturate-100 group-hover:opacity-100"
           loading="lazy"
           width={196}
           height={58}
