@@ -1,19 +1,20 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw } from "lucide-react";
+import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw, AlertTriangle } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
+import { getApkStatus } from "@/components/admin/detail/VehicleOverzichtTab";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const tabs = [
-  { label: "Alle", value: "alle" },
-  { label: "Inkoop", value: "inkoop" },
-  { label: "In behandeling", value: "in_behandeling" },
+  { label: "Voorraad", value: "voorraad" },
   { label: "Te koop", value: "te_koop" },
   { label: "Consignatie", value: "consignatie" },
+  { label: "In behandeling", value: "in_behandeling" },
+  { label: "Inkoop", value: "inkoop" },
   { label: "Verkocht", value: "verkocht" },
 ];
 
