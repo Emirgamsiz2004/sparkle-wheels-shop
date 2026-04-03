@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Vehicle, statusLabels, statusColors } from "@/types/vehicle";
-import { ArrowLeft, ClipboardCheck, ChevronDown, Plus, FileText, MoreHorizontal, Banknote, Trash2, ShoppingCart } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, ChevronDown, Plus, MoreHorizontal, Banknote, Trash2, ShoppingCart, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
@@ -25,9 +25,18 @@ const allStatuses: Vehicle["status"][] = [
   "inkoop", "in_behandeling", "te_koop", "consignatie", "gereserveerd", "verkocht", "reparatie_onderhoud",
 ];
 
+const btnCls = "inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-md hover:bg-accent hover:border-accent transition-all active:scale-[0.97] text-foreground";
+
 const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onOpenVerkoop, onDelete }: Props) => {
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const handleGenerateDoc = (type: string) => {
+    if (type === "proefrit") {
+      onOpenProefrit();
+    }
+    // Vrijwaring can be added later as a PDF generator
+  };
 
   return (
     <div className="space-y-3">
@@ -49,21 +58,21 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
 
       {/* Action bar */}
       <div className="flex items-center gap-2 flex-wrap">
-        <button onClick={onOpenProefrit} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
+        <button onClick={onOpenProefrit} className={btnCls}>
           <ClipboardCheck className="w-3.5 h-3.5" /> Proefrit starten
         </button>
 
         {/* Status dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
+            <button className={btnCls}>
               Status wijzigen <ChevronDown className="w-3 h-3" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="rounded-xl p-1">
+          <DropdownMenuContent align="start" className="p-1">
             {allStatuses.map((s) => (
-              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={`rounded-lg ${vehicle.status === s ? "bg-accent" : ""}`}>
-                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded-lg border mr-2 ${statusColors[s]}`}>
+              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={vehicle.status === s ? "bg-accent" : ""}>
+                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border mr-2 ${statusColors[s]}`}>
                   {statusLabels[s]}
                 </span>
               </DropdownMenuItem>
@@ -71,30 +80,43 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <button onClick={onOpenVerkoop} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-green-600/40 text-green-500 rounded-xl hover:bg-green-500/10 hover:border-green-500/60 transition-all active:scale-[0.97]">
+        <button onClick={onOpenVerkoop} className={btnCls}>
           <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
         </button>
 
-        <button onClick={onOpenKosten} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
+        <button onClick={onOpenKosten} className={btnCls}>
           <Plus className="w-3.5 h-3.5" /> Kosten toevoegen
         </button>
 
-        <button onClick={onOpenTaak} className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
+        <button onClick={onOpenTaak} className={btnCls}>
           <Plus className="w-3.5 h-3.5" /> Taak toevoegen
         </button>
 
         {/* Meer dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-xl hover:bg-accent hover:border-accent transition-all active:scale-[0.97]">
+            <button className={btnCls}>
               <MoreHorizontal className="w-3.5 h-3.5" /> Meer
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="rounded-xl p-1">
-            <DropdownMenuItem onClick={onOpenAanbetaling} className="rounded-lg">
+          <DropdownMenuContent align="start" className="p-1">
+            <DropdownMenuItem onClick={onOpenAanbetaling}>
               <Banknote className="w-3.5 h-3.5 mr-2" /> Aanbetaling registreren
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setDeleteOpen(true)} className="text-red-500 focus:text-red-500 rounded-lg">
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <FileText className="w-3.5 h-3.5 mr-2" /> Document genereren
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className="p-1">
+                <DropdownMenuItem onClick={() => handleGenerateDoc("proefrit")}>
+                  Proefrit overeenkomst
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleGenerateDoc("vrijwaring")}>
+                  Vrijwaring
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuItem onClick={() => setDeleteOpen(true)} className="text-red-500 focus:text-red-500">
               <Trash2 className="w-3.5 h-3.5 mr-2" /> Verwijderen
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -102,7 +124,7 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
       </div>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="bg-card border-border rounded-lg max-w-[calc(100vw-2rem)]">
+        <AlertDialogContent className="bg-card border-border max-w-[calc(100vw-2rem)]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base font-medium">Voertuig verwijderen?</AlertDialogTitle>
             <AlertDialogDescription className="text-sm">
@@ -110,8 +132,8 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-md text-sm">Annuleren</AlertDialogCancel>
-            <AlertDialogAction onClick={onDelete} className="bg-red-600 hover:bg-red-700 rounded-md text-sm">Verwijderen</AlertDialogAction>
+            <AlertDialogCancel className="text-sm">Annuleren</AlertDialogCancel>
+            <AlertDialogAction onClick={onDelete} className="bg-red-600 hover:bg-red-700 text-sm">Verwijderen</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
