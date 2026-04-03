@@ -199,7 +199,12 @@ const AdminVoertuigenPage = () => {
                           {v.merk} {v.model} <span className="text-muted-foreground">({v.bouwjaar})</span>
                         </Link>
                       </td>
-                      <td className="px-4 py-2.5 text-muted-foreground text-xs font-mono uppercase">{v.kenteken || "—"}</td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-xs font-mono uppercase">{v.kenteken || "—"}</span>
+                          <ApkBadge apkVervaldatum={v.apkVervaldatum} />
+                        </div>
+                      </td>
                       <td className="px-4 py-2.5 text-right tabular-nums">
                         {isConsignatie(v) ? <span className="text-muted-foreground text-xs">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
                       </td>
