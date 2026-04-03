@@ -47,6 +47,7 @@ import OccasionsAlphen from "./pages/OccasionsAlphen";
 import OccasionsLeiden from "./pages/OccasionsLeiden";
 import OccasionsZoetermeer from "./pages/OccasionsZoetermeer";
 import OccasionsDenHaag from "./pages/OccasionsDenHaag";
+import Garantie from "./pages/Garantie";
 
 import ReviewsPage from "./pages/ReviewsPage";
 import NotFound from "./pages/NotFound";
