@@ -22,7 +22,6 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   const [rdwLoading, setRdwLoading] = useState(false);
   const [rdwFields, setRdwFields] = useState<Set<string>>(new Set());
 
-  const totalKosten = calcTotalKosten(vehicle);
   const kostprijs = calcKostprijs(vehicle);
   const nettoMarge = calcNettoMarge(vehicle);
   const margePerc = calcMarge(vehicle);
