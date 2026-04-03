@@ -91,7 +91,7 @@ input[type="number"] {
     --input: 220 4% 14%;
     --ring: 220 4% 25%;
 
-    --radius: 0.5rem;
+    --radius: 3px;
 
     --sidebar-background: 220 4% 5.5%;
     --sidebar-foreground: 40 4% 60%;
@@ -109,7 +109,7 @@ input[type="number"] {
   .admin-theme [role="dialog"],
   .admin-theme [data-radix-popper-content-wrapper] [role="listbox"],
   .admin-theme [data-radix-popper-content-wrapper] [role="menu"] {
-    border-radius: 1rem !important;
+    border-radius: 3px !important;
     font-family: 'Inter', sans-serif !important;
   }
 
