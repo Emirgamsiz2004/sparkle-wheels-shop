@@ -17,6 +17,7 @@ export default {
         display: ['"Orbitron"', "sans-serif"],
         body: ['"DM Sans"', "sans-serif"],
         admin: ['"Inter"', "sans-serif"],
+        heading: ['"Poppins"', "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

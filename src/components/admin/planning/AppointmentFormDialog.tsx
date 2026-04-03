@@ -17,10 +17,10 @@ interface Props {
 }
 
 const typeOptions: { value: AppointmentType; label: string; icon: typeof Eye; color: string }[] = [
-  { value: "bezichtiging", label: "Bezichtiging", icon: Eye, color: "border-blue-500 bg-blue-500/10 text-blue-400" },
-  { value: "proefrit", label: "Proefrit", icon: Car, color: "border-emerald-500 bg-emerald-500/10 text-emerald-400" },
-  { value: "terugbelafspraak", label: "Terugbelafspraak", icon: Phone, color: "border-orange-500 bg-orange-500/10 text-orange-400" },
-  { value: "aflevering", label: "Aflevering", icon: PackageCheck, color: "border-purple-500 bg-purple-500/10 text-purple-400" },
+  { value: "bezichtiging", label: "Bezichtiging", icon: Eye, color: "border-blue-400/40 bg-blue-500/5 text-blue-300/80" },
+  { value: "proefrit", label: "Proefrit", icon: Car, color: "border-emerald-400/40 bg-emerald-500/5 text-emerald-300/80" },
+  { value: "terugbelafspraak", label: "Terugbelafspraak", icon: Phone, color: "border-amber-400/40 bg-amber-500/5 text-amber-300/80" },
+  { value: "aflevering", label: "Aflevering", icon: PackageCheck, color: "border-violet-400/40 bg-violet-500/5 text-violet-300/80" },
 ];
 
 const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubmit }: Props) => {
@@ -86,10 +86,10 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubm
               <button
                 key={opt.value}
                 onClick={() => { setType(opt.value); setStep("form"); }}
-                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:scale-[1.02] ${opt.color}`}
+                className={`flex flex-col items-center gap-2 p-5 rounded-[3px] border transition-all hover:scale-[1.01] hover:brightness-125 ${opt.color}`}
               >
-                <opt.icon className="w-6 h-6" />
-                <span className="text-sm font-medium">{opt.label}</span>
+                <opt.icon className="w-5 h-5 opacity-80" />
+                <span className="text-sm font-body tracking-wide">{opt.label}</span>
               </button>
             ))}
           </div>
