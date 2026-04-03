@@ -110,13 +110,13 @@ input[type="number"] {
   .admin-theme [data-radix-popper-content-wrapper] [role="listbox"],
   .admin-theme [data-radix-popper-content-wrapper] [role="menu"] {
     border-radius: 3px !important;
-    font-family: 'Inter', sans-serif !important;
+    font-family: 'DM Sans', sans-serif !important;
   }
 
   .admin-theme select,
   .admin-theme input,
   .admin-theme textarea {
-    font-family: 'Inter', sans-serif !important;
+    font-family: 'DM Sans', sans-serif !important;
   }
 
   .admin-theme h1,
@@ -125,8 +125,8 @@ input[type="number"] {
   .admin-theme h4,
   .admin-theme h5,
   .admin-theme h6 {
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
   }
 }
 
