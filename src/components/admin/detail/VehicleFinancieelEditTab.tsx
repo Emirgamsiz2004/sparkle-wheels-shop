@@ -30,7 +30,6 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",
-    kostprijsOverride: vehicle.kostprijsCalc && vehicle.kostprijsCalc !== autoKostprijs ? String(vehicle.kostprijsCalc) : "",
   });
   const [saving, setSaving] = useState(false);
 
