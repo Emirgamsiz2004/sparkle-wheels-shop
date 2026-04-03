@@ -49,6 +49,7 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
   kostprijsCalc: Number(row.kostprijs) || 0,
   marktplaatsUrl: row.marktplaats_url || undefined,
   feedId: row.feed_id || undefined,
+  apkVervaldatum: row.apk_vervaldatum || undefined,
 });
 
 export function useVehicles() {
