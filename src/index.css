@@ -102,7 +102,7 @@ input[type="number"] {
     --sidebar-border: 220 4% 11%;
     --sidebar-ring: 220 4% 25%;
 
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
   }
 
   /* Admin dialog, input & font overrides */
