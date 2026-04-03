@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const faqs = [
+const faqs: { question: string; answer: string; link?: string; linkText?: string }[] = [
   {
     question: "Kopen jullie ook auto's in?",
     answer:
