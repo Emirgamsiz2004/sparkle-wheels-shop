@@ -159,7 +159,7 @@ const AdminVoertuigenPage = () => {
                       {statusLabels[v.status]}
                     </span>
                     {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
-                  </div>
+                    <ApkBadge apkVervaldatum={v.apkVervaldatum} />
                   <div className="flex items-center gap-3 mt-1.5">
                     <span className="text-xs text-muted-foreground">
                       {isConsignatie(v) ? `${v.consignatieCommissiePerc || 10}% commissie` : formatEuro(v.inkoopprijs)}
