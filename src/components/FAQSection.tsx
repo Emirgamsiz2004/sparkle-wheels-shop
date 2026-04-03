@@ -17,6 +17,8 @@ const faqs = [
     question: "Bieden jullie garantie aan?",
     answer:
       "Ja. Wij werken samen met AutoTrust, een dochteronderneming van BOVAG. Via deze samenwerking kunnen wij officiële AutoTrust garantiepakketten aanbieden op voertuigen die daarvoor in aanmerking komen. Zo rijdt u met zekerheid weg.",
+    link: "/garantie",
+    linkText: "Bekijk onze garantiepakketten →",
   },
   {
     question: "Doen jullie ook onderhoud en reparaties?",
