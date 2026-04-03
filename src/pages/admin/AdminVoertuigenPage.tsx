@@ -73,6 +73,16 @@ const AdminVoertuigenPage = () => {
 
   return (
     <div className="space-y-4">
+      {/* APK Warning bar */}
+      {apkWarningVehicles.length > 0 && (
+        <button
+          onClick={() => { setFilter("voorraad"); setSearch(""); }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium bg-amber-500/10 border border-amber-500/25 rounded-md text-amber-400 hover:bg-amber-500/15 transition-colors"
+        >
+          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+          <span>{apkWarningVehicles.length} voertuig{apkWarningVehicles.length !== 1 ? "en" : ""} met APK die binnenkort verloopt of al verlopen is</span>
+        </button>
+      )}
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-medium text-foreground">Voertuigen</h1>
