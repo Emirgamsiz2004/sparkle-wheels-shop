@@ -12,38 +12,47 @@ const partners = [
   { name: "FinancialLease.nl", logo: logoFinanciallease },
 ];
 
-// Duplicate for seamless infinite scroll
-const allPartners = [...partners, ...partners];
+const repeatedPartners = [...partners, ...partners];
+
+const PartnerTrack = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
+  <div
+    aria-hidden={ariaHidden}
+    className="flex shrink-0 items-center gap-6 pr-6 md:gap-10 md:pr-10 lg:gap-12 lg:pr-12"
+  >
+    {repeatedPartners.map((partner, index) => (
+      <div
+        key={`${partner.name}-${ariaHidden ? "clone" : "main"}-${index}`}
+        className="group flex h-[42px] w-[132px] shrink-0 items-center justify-center rounded-xl border border-border/60 bg-background/80 px-4 backdrop-blur-sm transition-all duration-500 hover:border-foreground/15 hover:bg-background md:h-[52px] md:w-[176px] md:px-5 lg:h-[58px] lg:w-[196px]"
+      >
+        <img
+          src={partner.logo}
+          alt={`${partner.name} logo`}
+          className="max-h-full max-w-full object-contain brightness-0 saturate-0 opacity-70 transition-all duration-500 group-hover:brightness-100 group-hover:saturate-100 group-hover:opacity-100"
+          loading="lazy"
+          width={196}
+          height={58}
+        />
+      </div>
+    ))}
+  </div>
+);
 
 const PartnerBanner = () => {
   return (
-    <section className="py-8 md:py-12 bg-muted/30 border-y border-border/40 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 mb-6 md:mb-8">
-        <p className="text-center text-[10px] md:text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
+    <section className="overflow-hidden border-y border-border/40 bg-muted/30 py-8 md:py-12">
+      <div className="mx-auto mb-6 max-w-7xl px-4 md:mb-8">
+        <p className="text-center text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground md:text-xs">
           Onze partners
         </p>
       </div>
-      <div className="relative mx-auto max-w-6xl">
-        {/* Fade edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-muted/30 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-muted/30 to-transparent z-10 pointer-events-none" />
-        
-        <div className="flex animate-scroll-left items-center gap-8 md:gap-14 lg:gap-20 w-max">
-          {allPartners.map((partner, i) => (
-            <div
-              key={`${partner.name}-${i}`}
-              className="flex items-center justify-center w-[120px] md:w-[160px] lg:w-[180px] h-[36px] md:h-[44px] shrink-0"
-            >
-              <img
-                src={partner.logo}
-                alt={`${partner.name} logo`}
-                className="max-h-full max-w-full object-contain"
-                loading="lazy"
-                width={180}
-                height={44}
-              />
-            </div>
-          ))}
+
+      <div className="relative mx-auto max-w-6xl overflow-hidden">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-muted/30 via-muted/30 to-transparent md:w-24" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-muted/30 via-muted/30 to-transparent md:w-24" />
+
+        <div className="flex w-max items-center will-change-transform animate-[scroll-left_60s_linear_infinite] motion-reduce:animate-none">
+          <PartnerTrack />
+          <PartnerTrack ariaHidden />
         </div>
       </div>
     </section>
