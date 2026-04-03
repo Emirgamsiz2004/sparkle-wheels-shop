@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Vehicle, formatEuroDecimal, calcKostprijs, calcNettoMarge, calcMarge, calcTotalKosten, brandstofLabels } from "@/types/vehicle";
 import { Pencil, Check, X, Link2 } from "lucide-react";
 import KentekenInput from "@/components/admin/KentekenInput";
@@ -72,6 +72,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           updates.brandstof = bf; filled.add("brandstof");
         }
       }
+      if (data.apkTot) { updates.apkVervaldatum = data.apkTot; filled.add("apkVervaldatum"); }
       setForm((f) => ({ ...f, ...updates }));
       setRdwFields(filled);
     }
@@ -143,7 +144,8 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
                 <InfoRow label="Bouwjaar" value={String(vehicle.bouwjaar)} />
                 <InfoRow label="Kleur" value={vehicle.kleur || "—"} />
                 <InfoRow label="Brandstof" value={brandstofLabels[vehicle.brandstof] || vehicle.brandstof} />
-                <InfoRow label="KM-stand" value={vehicle.kilometerstand?.toLocaleString("nl-NL") || "—"} isLast />
+                <InfoRow label="KM-stand" value={vehicle.kilometerstand?.toLocaleString("nl-NL") || "—"} />
+                <ApkRow apkVervaldatum={vehicle.apkVervaldatum} isLast />
               </tbody>
             </table>
           )}
@@ -304,5 +306,31 @@ const EditField = ({ label, value, onChange, type = "text", highlight = false, i
     <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cn(inputCls, highlight && "border-ring/50 bg-accent/30")} />
   </div>
 );
+
+export const getApkStatus = (apkVervaldatum?: string): { label: string; color: string; level: 'green' | 'orange' | 'red' | 'none' } => {
+  if (!apkVervaldatum) return { label: "Onbekend", color: "text-muted-foreground", level: 'none' };
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const apk = new Date(apkVervaldatum);
+  const diffMs = apk.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+
+  if (diffDays < 0) return { label: `Verlopen (${formatted})`, color: "text-red-500", level: 'red' };
+  if (diffDays <= 30) return { label: formatted, color: "text-red-500", level: 'red' };
+  if (diffDays <= 90) return { label: formatted, color: "text-amber-500", level: 'orange' };
+  return { label: formatted, color: "text-emerald-500", level: 'green' };
+};
+
+const ApkRow = ({ apkVervaldatum, isLast }: { apkVervaldatum?: string; isLast?: boolean }) => {
+  const status = getApkStatus(apkVervaldatum);
+  return (
+    <tr className={!isLast ? "border-b border-border/50" : ""}>
+      <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap align-middle">APK tot</td>
+      <td className={`py-2.5 text-sm font-medium tabular-nums text-right align-middle ${status.color}`}>{status.label}</td>
+    </tr>
+  );
+};
 
 export default VehicleOverzichtTab;

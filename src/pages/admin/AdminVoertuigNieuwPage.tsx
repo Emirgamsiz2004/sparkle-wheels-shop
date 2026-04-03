@@ -26,6 +26,7 @@ const AdminVoertuigNieuwPage = () => {
     inkoopprijs: 0, verkoopprijs: 0, opmerkingen: "",
     chassisnummer: "", metallicLak: "onbekend" as "ja" | "nee" | "onbekend",
     aantalEigenaren: "" as number | "",
+    apkVervaldatum: "",
   });
 
   const update = (key: string, value: any) => {
@@ -51,6 +52,7 @@ const AdminVoertuigNieuwPage = () => {
       }
       if (data.aantalHouders) { updates.aantalEigenaren = data.aantalHouders; filled.add("aantalEigenaren"); }
       if (data.chassisnummer) { updates.chassisnummer = data.chassisnummer; filled.add("chassisnummer"); }
+      if (data.apkTot) { updates.apkVervaldatum = data.apkTot; filled.add("apkVervaldatum"); }
       setForm((f) => ({ ...f, ...updates }));
       setRdwFields(filled);
     }

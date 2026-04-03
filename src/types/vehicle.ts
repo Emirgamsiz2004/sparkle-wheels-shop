@@ -53,6 +53,7 @@ export interface Vehicle {
   consignatieEigenaarEmail?: string;
   marktplaatsUrl?: string;
   feedId?: string;
+  apkVervaldatum?: string;
 }
 
 export const isConsignatie = (vehicle: Vehicle): boolean =>

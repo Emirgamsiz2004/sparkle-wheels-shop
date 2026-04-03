@@ -1,28 +1,47 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw } from "lucide-react";
+import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw, AlertTriangle } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
+import { getApkStatus } from "@/components/admin/detail/VehicleOverzichtTab";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const tabs = [
-  { label: "Alle", value: "alle" },
-  { label: "Inkoop", value: "inkoop" },
-  { label: "In behandeling", value: "in_behandeling" },
+  { label: "Voorraad", value: "voorraad" },
   { label: "Te koop", value: "te_koop" },
   { label: "Consignatie", value: "consignatie" },
+  { label: "In behandeling", value: "in_behandeling" },
+  { label: "Inkoop", value: "inkoop" },
   { label: "Verkocht", value: "verkocht" },
 ];
 
 const AdminVoertuigenPage = () => {
   const { vehicles, loading, refetch } = useVehicles();
-  const [filter, setFilter] = useState("alle");
+  const [filter, setFilter] = useState("voorraad");
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
   const isMobile = useIsMobile();
+
+  // APK warning: vehicles expiring within 4 weeks or already expired (only non-sold)
+  const apkWarningVehicles = useMemo(() => {
+    return vehicles.filter((v) => {
+      if (v.status === "verkocht") return false;
+      const status = getApkStatus(v.apkVervaldatum);
+      if (status.level === 'red') return true;
+      if (status.level === 'orange') {
+        // Check if within 4 weeks
+        if (!v.apkVervaldatum) return false;
+        const today = new Date(); today.setHours(0,0,0,0);
+        const apk = new Date(v.apkVervaldatum);
+        const diffDays = Math.ceil((apk.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        return diffDays <= 28;
+      }
+      return false;
+    });
+  }, [vehicles]);
 
   const handleSync = async () => {
     setSyncing(true);
@@ -39,7 +58,8 @@ const AdminVoertuigenPage = () => {
   };
 
   const filtered = vehicles.filter((v) => {
-    if (filter !== "alle" && v.status !== filter) return false;
+    if (filter === "voorraad" && v.status === "verkocht") return false;
+    if (filter !== "voorraad" && v.status !== filter) return false;
     if (search) {
       const q = search.toLowerCase();
       return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || v.kenteken?.toLowerCase().includes(q);
@@ -53,6 +73,16 @@ const AdminVoertuigenPage = () => {
 
   return (
     <div className="space-y-4">
+      {/* APK Warning bar */}
+      {apkWarningVehicles.length > 0 && (
+        <button
+          onClick={() => { setFilter("voorraad"); setSearch(""); }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium bg-amber-500/10 border border-amber-500/25 rounded-md text-amber-400 hover:bg-amber-500/15 transition-colors"
+        >
+          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+          <span>{apkWarningVehicles.length} voertuig{apkWarningVehicles.length !== 1 ? "en" : ""} met APK die binnenkort verloopt of al verlopen is</span>
+        </button>
+      )}
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-medium text-foreground">Voertuigen</h1>
@@ -129,6 +159,7 @@ const AdminVoertuigenPage = () => {
                       {statusLabels[v.status]}
                     </span>
                     {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
+                    <ApkBadge apkVervaldatum={v.apkVervaldatum} />
                   </div>
                   <div className="flex items-center gap-3 mt-1.5">
                     <span className="text-xs text-muted-foreground">
@@ -168,7 +199,12 @@ const AdminVoertuigenPage = () => {
                           {v.merk} {v.model} <span className="text-muted-foreground">({v.bouwjaar})</span>
                         </Link>
                       </td>
-                      <td className="px-4 py-2.5 text-muted-foreground text-xs font-mono uppercase">{v.kenteken || "—"}</td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-xs font-mono uppercase">{v.kenteken || "—"}</span>
+                          <ApkBadge apkVervaldatum={v.apkVervaldatum} />
+                        </div>
+                      </td>
                       <td className="px-4 py-2.5 text-right tabular-nums">
                         {isConsignatie(v) ? <span className="text-muted-foreground text-xs">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
                       </td>
@@ -196,6 +232,21 @@ const AdminVoertuigenPage = () => {
         </div>
       )}
     </div>
+  );
+};
+
+const ApkBadge = ({ apkVervaldatum }: { apkVervaldatum?: string }) => {
+  const status = getApkStatus(apkVervaldatum);
+  if (status.level === 'green' || status.level === 'none') return null;
+  const isRed = status.level === 'red';
+  return (
+    <span className={`inline-flex px-1.5 py-0.5 text-[9px] font-medium rounded border ${
+      isRed
+        ? "bg-red-500/15 text-red-400 border-red-500/30"
+        : "bg-amber-500/15 text-amber-400 border-amber-500/30"
+    }`}>
+      APK {status.label}
+    </span>
   );
 };
 
