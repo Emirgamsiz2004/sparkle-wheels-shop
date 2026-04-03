@@ -307,4 +307,30 @@ const EditField = ({ label, value, onChange, type = "text", highlight = false, i
   </div>
 );
 
+export const getApkStatus = (apkVervaldatum?: string): { label: string; color: string; level: 'green' | 'orange' | 'red' | 'none' } => {
+  if (!apkVervaldatum) return { label: "Onbekend", color: "text-muted-foreground", level: 'none' };
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const apk = new Date(apkVervaldatum);
+  const diffMs = apk.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+
+  if (diffDays < 0) return { label: `Verlopen (${formatted})`, color: "text-red-500", level: 'red' };
+  if (diffDays <= 30) return { label: formatted, color: "text-red-500", level: 'red' };
+  if (diffDays <= 90) return { label: formatted, color: "text-amber-500", level: 'orange' };
+  return { label: formatted, color: "text-emerald-500", level: 'green' };
+};
+
+const ApkRow = ({ apkVervaldatum, isLast }: { apkVervaldatum?: string; isLast?: boolean }) => {
+  const status = getApkStatus(apkVervaldatum);
+  return (
+    <tr className={!isLast ? "border-b border-border/50" : ""}>
+      <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap align-middle">APK tot</td>
+      <td className={`py-2.5 text-sm font-medium tabular-nums text-right align-middle ${status.color}`}>{status.label}</td>
+    </tr>
+  );
+};
+
 export default VehicleOverzichtTab;
