@@ -39,7 +39,7 @@ const PartnerTrack = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
 
 const PartnerBanner = () => {
   return (
-    <section className="overflow-hidden border-y border-border/40 bg-muted/30 py-8 md:py-12">
+    <section className="overflow-hidden border-y border-border/40 py-8 md:py-12" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
       <div className="mx-auto mb-6 max-w-7xl px-4 md:mb-8">
         <p className="text-center text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground md:text-xs">
           Onze partners
@@ -47,8 +47,8 @@ const PartnerBanner = () => {
       </div>
 
       <div className="relative mx-auto max-w-6xl overflow-hidden">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-muted/30 via-muted/30 to-transparent md:w-24" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-muted/30 via-muted/30 to-transparent md:w-24" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 md:w-36" style={{ background: 'linear-gradient(to right, hsl(var(--muted) / 0.3), transparent)' }} />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 md:w-36" style={{ background: 'linear-gradient(to left, hsl(var(--muted) / 0.3), transparent)' }} />
 
         <div className="flex w-max items-center will-change-transform animate-[scroll-left_60s_linear_infinite] motion-reduce:animate-none">
           <PartnerTrack />
