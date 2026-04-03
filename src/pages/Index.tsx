@@ -10,6 +10,7 @@ import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import LatestBlogSection from "@/components/LatestBlogSection";
 import FAQSection from "@/components/FAQSection";
+import PartnerBanner from "@/components/PartnerBanner";
 
 const Index = () => {
   return (
@@ -27,6 +28,7 @@ const Index = () => {
       </Helmet>
       <Navbar />
       <HeroSection />
+      <PartnerBanner />
       <InventorySection />
       <ConsignatieSection />
       <ServicesSection />

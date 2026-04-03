@@ -47,6 +47,7 @@ import OccasionsAlphen from "./pages/OccasionsAlphen";
 import OccasionsLeiden from "./pages/OccasionsLeiden";
 import OccasionsZoetermeer from "./pages/OccasionsZoetermeer";
 import OccasionsDenHaag from "./pages/OccasionsDenHaag";
+import Garantie from "./pages/Garantie";
 
 import ReviewsPage from "./pages/ReviewsPage";
 import NotFound from "./pages/NotFound";
@@ -126,6 +127,7 @@ const App = () => (
               <Route path="/occasions-leiden" element={<OccasionsLeiden />} />
               <Route path="/occasions-zoetermeer" element={<OccasionsZoetermeer />} />
               <Route path="/occasions-den-haag" element={<OccasionsDenHaag />} />
+              <Route path="/garantie" element={<Garantie />} />
               <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/admin/login" element={<AdminLogin />} />
