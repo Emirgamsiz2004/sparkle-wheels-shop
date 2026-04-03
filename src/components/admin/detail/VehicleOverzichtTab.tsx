@@ -144,7 +144,8 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
                 <InfoRow label="Bouwjaar" value={String(vehicle.bouwjaar)} />
                 <InfoRow label="Kleur" value={vehicle.kleur || "—"} />
                 <InfoRow label="Brandstof" value={brandstofLabels[vehicle.brandstof] || vehicle.brandstof} />
-                <InfoRow label="KM-stand" value={vehicle.kilometerstand?.toLocaleString("nl-NL") || "—"} isLast />
+                <InfoRow label="KM-stand" value={vehicle.kilometerstand?.toLocaleString("nl-NL") || "—"} />
+                <ApkRow apkVervaldatum={vehicle.apkVervaldatum} isLast />
               </tbody>
             </table>
           )}
