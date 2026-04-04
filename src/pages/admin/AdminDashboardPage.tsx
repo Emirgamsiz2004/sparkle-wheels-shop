@@ -127,42 +127,46 @@ const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-[1200px]">
+    <div className="space-y-5 max-w-[1200px]">
       {/* ─── Header + period selector ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          {(Object.keys(periodLabels) as PeriodKey[]).filter(k => k !== 'custom').map(k => (
-            <button key={k} onClick={() => setPeriod(k)}
-              className={`px-2.5 py-1 text-[11px] font-medium rounded border transition-colors ${
-                period === k ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}>
-              {periodLabels[k]}
-            </button>
-          ))}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className={`flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded border transition-colors ${
-                period === 'custom' ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}>
-                <CalendarIcon className="w-3 h-3" />
-                {period === 'custom' && customFrom && customTo ? `${format(customFrom, 'dd/MM')} - ${format(customTo, 'dd/MM')}` : "Custom"}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar mode="range" selected={{ from: customFrom, to: customTo }}
-                onSelect={(r: any) => { setCustomFrom(r?.from); setCustomTo(r?.to); if (r?.from && r?.to) setPeriod('custom'); }}
-                numberOfMonths={2} className="p-3 pointer-events-auto" />
-            </PopoverContent>
-          </Popover>
-          <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer ml-2">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
+          </div>
+          <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer">
             <input type="checkbox" checked={compare} onChange={e => setCompare(e.target.checked)}
               className="rounded border-border bg-card w-3.5 h-3.5" />
             Vergelijk
           </label>
+        </div>
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+          <div className="flex items-center gap-1.5 min-w-max">
+            {(Object.keys(periodLabels) as PeriodKey[]).filter(k => k !== 'custom').map(k => (
+              <button key={k} onClick={() => setPeriod(k)}
+                className={`px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
+                  period === k ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}>
+                {periodLabels[k]}
+              </button>
+            ))}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
+                  period === 'custom' ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}>
+                  <CalendarIcon className="w-3 h-3" />
+                  {period === 'custom' && customFrom && customTo ? `${format(customFrom, 'dd/MM')} - ${format(customTo, 'dd/MM')}` : "Custom"}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar mode="range" selected={{ from: customFrom, to: customTo }}
+                  onSelect={(r: any) => { setCustomFrom(r?.from); setCustomTo(r?.to); if (r?.from && r?.to) setPeriod('custom'); }}
+                  numberOfMonths={1} className="p-3 pointer-events-auto" />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
 
