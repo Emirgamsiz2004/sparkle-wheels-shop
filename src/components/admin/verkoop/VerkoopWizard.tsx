@@ -61,6 +61,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
     betaalwijze: "overboeking" as string,
     contantBedrag: 0,
     overboekingBedrag: 0,
+    financieringBedrag: 0,
+    eigenBijdrage: 0,
     aanbetalingActief: !!existingDeposit,
     aanbetalingsbedrag: existingDeposit || 0,
     aanbetalingDatum: "",
@@ -212,6 +214,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
         betaalwijze: details.betaalwijze,
         contantBedrag: details.contantBedrag,
         overboekingBedrag: details.overboekingBedrag,
+        financieringBedrag: details.financieringBedrag,
+        eigenBijdrage: details.eigenBijdrage,
         aanbetalingActief: details.aanbetalingActief,
         aanbetalingsbedrag: details.aanbetalingsbedrag,
         restbedrag,
@@ -529,7 +533,28 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                         )}
                       </AnimatePresence>
 
-                      {/* Wwft */}
+                      <AnimatePresence>
+                        {details.betaalwijze === "financiering" && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className={labelCls}>Financieringsbedrag (€)</label>
+                                <input type="number" step="0.01" value={details.financieringBedrag} onChange={e => setDetails(d => ({ ...d, financieringBedrag: Number(e.target.value) }))} className={inputCls} />
+                              </div>
+                              <div>
+                                <label className={labelCls}>Eigen bijdrage (€)</label>
+                                <input type="number" step="0.01" value={details.eigenBijdrage} onChange={e => setDetails(d => ({ ...d, eigenBijdrage: Number(e.target.value) }))} className={inputCls} />
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                       <AnimatePresence>
                         {wwftNodig && (
                           <motion.div
