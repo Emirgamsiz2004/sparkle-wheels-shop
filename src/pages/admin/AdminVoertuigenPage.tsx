@@ -105,7 +105,7 @@ const AdminVoertuigenPage = () => {
       </div>
 
       {/* Filters */}
-      <div className="space-y-3">
+      <div className="space-y-3 overflow-hidden">
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
           <SlidingTabs
             tabs={tabs}

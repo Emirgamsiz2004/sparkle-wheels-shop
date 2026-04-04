@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
-import { Loader2, Search, ChevronRight, CheckCircle2, Clock, AlertCircle, XCircle, Car, StopCircle } from "lucide-react";
+import { Loader2, Search, ChevronRight, CheckCircle2, Clock, XCircle, Car, StopCircle } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
-import { useIsMobile } from "@/hooks/use-mobile";
 import ProefritDetailDialog from "@/components/admin/proefrit/ProefritDetailDialog";
 import EindProefritDialog from "@/components/admin/proefrit/EindProefritDialog";
+import SlidingTabs from "@/components/admin/SlidingTabs";
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
   wacht_op_klant: { label: "Wacht op klant", icon: Clock, color: "text-amber-400 bg-amber-400/10 border-amber-400/20" },
@@ -28,7 +28,6 @@ const AdminProefrittenPage = () => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<TestDrive | null>(null);
   const [ending, setEnding] = useState<TestDrive | null>(null);
-  const isMobile = useIsMobile();
 
   const filtered = testDrives.filter((td) => {
     if (filter !== "alle" && td.status !== filter) return false;
@@ -48,27 +47,15 @@ const AdminProefrittenPage = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-lg font-medium text-foreground">Proefriten</h1>
           <p className="text-sm text-muted-foreground">{testDrives.length} proefrit{testDrives.length !== 1 ? "ten" : ""}</p>
         </div>
       </div>
 
       <div className="space-y-3">
-        <div className="flex flex-wrap gap-1.5">
-          {tabs.map((t) => (
-            <button
-              key={t.value}
-              onClick={() => setFilter(t.value)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors ${
-                filter === t.value
-                  ? "border-border bg-accent text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+          <SlidingTabs tabs={tabs} value={filter} onChange={setFilter} className="min-w-max" />
         </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -77,13 +64,13 @@ const AdminProefrittenPage = () => {
             placeholder="Zoek op klant, voertuig, kenteken..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:max-w-xs pl-8 pr-3 py-1.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+            className="w-full sm:max-w-xs pl-8 pr-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
           />
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-card rounded-lg border border-border px-4 py-12 text-center text-sm text-muted-foreground">
+        <div className="bg-card rounded-md border border-border px-4 py-12 text-center text-sm text-muted-foreground">
           Geen proefriten gevonden.
         </div>
       ) : (
@@ -95,7 +82,7 @@ const AdminProefrittenPage = () => {
               <button
                 key={td.id}
                 onClick={() => setSelected(td)}
-                className="w-full flex items-center justify-between gap-3 bg-card border border-border rounded-lg p-3 hover:bg-accent/20 transition-colors text-left"
+                className="w-full flex items-center justify-between gap-3 bg-card border border-border rounded-md p-3 hover:bg-accent/20 active:bg-accent/30 transition-colors text-left"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
@@ -111,7 +98,7 @@ const AdminProefrittenPage = () => {
                       <Icon className="w-3 h-3" />
                       {sc.label}
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground truncate">
                       {td.customer ? `${td.customer.voornaam} ${td.customer.achternaam}` : "Klant nog niet ingevuld"}
                     </span>
                   </div>
@@ -123,7 +110,7 @@ const AdminProefrittenPage = () => {
                   {td.status === "actief" && (
                     <button
                       onClick={(e) => { e.stopPropagation(); setEnding(td); }}
-                      className="p-1.5 text-amber-400 hover:bg-amber-400/10 rounded-md transition-colors"
+                      className="inline-flex items-center justify-center w-9 h-9 text-amber-400 hover:bg-amber-400/10 rounded-md transition-colors"
                       title="Proefrit beëindigen"
                     >
                       <StopCircle className="w-4 h-4" />

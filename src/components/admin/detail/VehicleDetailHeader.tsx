@@ -61,7 +61,7 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
         {/* Quick-add (+) dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="inline-flex items-center justify-center w-8 h-8 text-xs font-medium border border-border rounded-md hover:bg-accent hover:border-accent transition-all active:scale-[0.97] text-foreground">
+            <button className="inline-flex items-center justify-center w-9 h-9 text-xs font-medium border border-border rounded-md hover:bg-accent hover:border-accent transition-colors active:scale-[0.97] text-foreground min-h-[36px]">
               <Plus className="w-4 h-4" />
             </button>
           </DropdownMenuTrigger>
