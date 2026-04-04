@@ -159,7 +159,11 @@ export function buildKoopovereenkomstDoc(data: KoopovereenkomstData) {
   } else if (data.financieel.betaalwijze === "overboeking") {
     betaalTekst += " De betaling geschiedt per bankoverschrijving op IBAN NL00BANK0000000000 t.n.v. Platin Automotive.";
   } else if (data.financieel.betaalwijze === "financiering") {
-    betaalTekst += " De betaling geschiedt via financiering.";
+    if (data.financieel.financieringBedrag && data.financieel.eigenBijdrage) {
+      betaalTekst += ` De betaling geschiedt als volgt: ${formatEur(data.financieel.financieringBedrag)} via financiering en ${formatEur(data.financieel.eigenBijdrage)} als eigen bijdrage.`;
+    } else {
+      betaalTekst += " De betaling geschiedt via financiering.";
+    }
   } else if (data.financieel.betaalwijze === "combinatie") {
     betaalTekst += ` De betaling geschiedt als volgt: ${formatEur(data.financieel.contantBedrag || 0)} contant en ${formatEur(data.financieel.overboekingBedrag || 0)} per bankoverschrijving.`;
   }
