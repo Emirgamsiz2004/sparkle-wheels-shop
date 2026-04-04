@@ -8,6 +8,9 @@ export interface KoopovereenkomstData {
     kenteken: string;
     kilometerstand: number;
     vin?: string;
+    kleur?: string;
+    brandstof?: string;
+    uitvoering?: string;
   };
   klant: {
     voornaam: string;
@@ -39,6 +42,8 @@ export interface KoopovereenkomstData {
   wwftBevestigd: boolean;
   datum: string;
   plaats: string;
+  afleverDatum?: string;
+  opmerkingen?: string;
 }
 
 const formatEur = (n: number) =>
@@ -51,219 +56,306 @@ const formatDate = (d: string) => {
   return d;
 };
 
+// Brand colors
+const DARK = { r: 26, g: 26, b: 30 };        // #1a1a1e
+const MID_GRAY = { r: 100, g: 100, b: 100 };
+const LIGHT_GRAY = { r: 160, g: 160, b: 160 };
+const LINE_COLOR = { r: 200, g: 200, b: 200 };
+const BG_LIGHT = { r: 248, g: 248, b: 248 };
+
 export function buildKoopovereenkomstDoc(data: KoopovereenkomstData) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pw = 210;
-  const ml = 20;
-  const mr = 20;
+  const ml = 18;
+  const mr = 18;
   const cw = pw - ml - mr;
   let y = 0;
 
+  const setColor = (c: { r: number; g: number; b: number }) => doc.setTextColor(c.r, c.g, c.b);
   const setFont = (style: "normal" | "bold" | "italic", size: number) => {
     doc.setFont("helvetica", style);
     doc.setFontSize(size);
   };
 
   const checkPage = (needed: number) => {
-    if (y + needed > 275) { doc.addPage(); y = 20; }
+    if (y + needed > 278) { doc.addPage(); y = 18; }
   };
 
-  // Header bar - anthracite
-  doc.setFillColor(35, 35, 40);
-  doc.rect(0, 0, pw, 32, "F");
-  setFont("bold", 16);
+  const drawLine = () => {
+    doc.setDrawColor(LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b);
+    doc.setLineWidth(0.3);
+    doc.line(ml, y, pw - mr, y);
+  };
+
+  const sectionTitle = (title: string) => {
+    checkPage(14);
+    setFont("bold", 11);
+    setColor(DARK);
+    doc.text(title, ml, y);
+    y += 7;
+  };
+
+  const fieldRow = (label1: string, val1: string, label2?: string, val2?: string) => {
+    checkPage(6);
+    const col2X = ml + cw / 2 + 5;
+
+    setFont("bold", 8.5);
+    setColor(DARK);
+    doc.text(label1, ml, y);
+    setFont("normal", 8.5);
+    setColor(MID_GRAY);
+    doc.text(val1 || "—", ml + 38, y);
+
+    if (label2) {
+      setFont("bold", 8.5);
+      setColor(DARK);
+      doc.text(label2, col2X, y);
+      setFont("normal", 8.5);
+      setColor(MID_GRAY);
+      doc.text(val2 || "—", col2X + 38, y);
+    }
+    y += 5.5;
+  };
+
+  // ── HEADER ──
+  doc.setFillColor(DARK.r, DARK.g, DARK.b);
+  doc.rect(0, 0, pw, 28, "F");
+
+  setFont("bold", 18);
   doc.setTextColor(255, 255, 255);
-  doc.text("PLATIN AUTOMOTIVE", ml, 14);
-  setFont("normal", 8);
+  doc.text("PLATIN", ml, 13);
+  setFont("normal", 18);
+  doc.text("AUTOMOTIVE", ml + doc.getTextWidth("PLATIN") + 2, 13);
+
+  setFont("normal", 7.5);
   doc.setTextColor(180, 180, 180);
-  doc.text("Cilinderweg 99, 2371 DZ Roelofarendsveen  |  KvK: 99146193", ml, 22);
-  doc.text("info@platinautomotive.nl  |  platinautomotive.nl", ml, 27);
+  doc.text("Cilinderweg 99 | 2371 DZ Roelofarendsveen | 06-12693825", ml, 20);
+  doc.text("info@platinautomotive.nl | platinautomotive.nl", ml, 24);
 
-  y = 42;
+  // IBAN line
+  y = 32;
+  setFont("bold", 8);
+  setColor(DARK);
+  doc.text("IBAN: NL54 INGB 0117 0493 36", ml, y);
+  y += 4;
 
-  // Title
-  setFont("bold", 14);
-  doc.setTextColor(35, 35, 40);
-  doc.text("KOOPOVEREENKOMST", pw / 2, y, { align: "center" });
-  y += 3;
-  doc.setDrawColor(35, 35, 40);
-  doc.setLineWidth(0.5);
-  doc.line(ml, y, pw - mr, y);
-  y += 10;
-
-  // Verkoper
-  setFont("bold", 10);
-  doc.setTextColor(35, 35, 40);
-  doc.text("Verkoper", ml, y);
-  y += 5;
-  setFont("normal", 9);
-  doc.setTextColor(80, 80, 80);
-  doc.text("Platin Automotive", ml, y); y += 4;
-  doc.text("Cilinderweg 99, 2371 DZ Roelofarendsveen", ml, y); y += 4;
-  doc.text("KvK: 99146193", ml, y); y += 4;
-  doc.text('Hierna te noemen: "Verkoper"', ml, y);
+  drawLine();
   y += 8;
 
-  // Koper
-  setFont("bold", 10);
-  doc.setTextColor(35, 35, 40);
-  doc.text("Koper", ml, y);
-  y += 5;
-  setFont("normal", 9);
-  doc.setTextColor(80, 80, 80);
-  doc.text(`${data.klant.voornaam} ${data.klant.achternaam}`, ml, y); y += 4;
-  doc.text(`${data.klant.adres}, ${data.klant.postcode} ${data.klant.woonplaats}`, ml, y); y += 4;
-  doc.text(`Tel: ${data.klant.telefoon}${data.klant.email ? ` | ${data.klant.email}` : ""}`, ml, y); y += 4;
-  if (data.klant.geboortedatum) {
-    doc.text(`Geboortedatum: ${formatDate(data.klant.geboortedatum)}`, ml, y); y += 4;
-  }
-  doc.text('Hierna te noemen: "Koper"', ml, y);
+  // ── TITLE ──
+  setFont("bold", 14);
+  setColor(DARK);
+  doc.text("KOOPOVEREENKOMST", ml, y);
   y += 10;
 
-  const addArtikel = (title: string) => {
-    checkPage(14);
-    setFont("bold", 10);
-    doc.setTextColor(35, 35, 40);
-    doc.text(title, ml, y);
-    y += 6;
-    setFont("normal", 9);
-    doc.setTextColor(60, 60, 60);
+  // ── GEGEVENS KOPER ──
+  sectionTitle("Gegevens koper");
+  fieldRow("Naam:", `${data.klant.voornaam} ${data.klant.achternaam}`, "Telefoon:", data.klant.telefoon);
+  fieldRow("Adres:", data.klant.adres, "Email:", data.klant.email || "");
+  fieldRow("Postcode / woonplaats:", `${data.klant.postcode} ${data.klant.woonplaats}`, "Geboortedatum:", data.klant.geboortedatum ? formatDate(data.klant.geboortedatum) : "");
+  y += 2;
+  drawLine();
+  y += 8;
+
+  // ── VOERTUIGGEGEVENS ──
+  sectionTitle("Voertuiggegevens");
+  fieldRow("Merk:", data.voertuig.merk, "Kleur:", data.voertuig.kleur || "—");
+  fieldRow("Model:", data.voertuig.model, "Km-stand:", `${(data.voertuig.kilometerstand || 0).toLocaleString("nl-NL")} km`);
+  if (data.voertuig.uitvoering) {
+    fieldRow("Uitvoering:", data.voertuig.uitvoering, "Bouwjaar:", String(data.voertuig.bouwjaar || ""));
+  } else {
+    fieldRow("Bouwjaar:", String(data.voertuig.bouwjaar || ""), "Brandstof:", data.voertuig.brandstof || "—");
+  }
+  fieldRow("Kenteken:", data.voertuig.kenteken || "—");
+  fieldRow("Chassisnr:", data.voertuig.vin || "—");
+  y += 2;
+  drawLine();
+  y += 8;
+
+  // ── BETALINGSWIJZE ──
+  sectionTitle("Betalingswijze");
+
+  const tableStartY = y;
+  const tableW = cw;
+  const col1W = tableW * 0.65;
+  const col2W = tableW * 0.35;
+  const rowH = 7;
+
+  const drawTableRow = (label: string, value: string, isBold = false, hasBg = false) => {
+    checkPage(rowH + 2);
+    if (hasBg) {
+      doc.setFillColor(BG_LIGHT.r, BG_LIGHT.g, BG_LIGHT.b);
+      doc.rect(ml, y - 0.5, tableW, rowH, "F");
+    }
+    doc.setDrawColor(LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b);
+    doc.setLineWidth(0.2);
+    doc.line(ml, y + rowH - 0.5, ml + tableW, y + rowH - 0.5);
+
+    setFont(isBold ? "bold" : "normal", 8.5);
+    setColor(DARK);
+    doc.text(label, ml + 3, y + 4.5);
+    doc.text(value, ml + col1W + col2W - 3, y + 4.5, { align: "right" });
+    y += rowH;
   };
 
-  // Artikel 1 — Voertuig
-  addArtikel("Artikel 1 — Voertuig");
-  doc.text("Verkoper verkoopt en koper koopt het volgende voertuig:", ml, y); y += 7;
-  const rows = [
-    ["Merk / Model", `${data.voertuig.merk} ${data.voertuig.model}`],
-    ["Bouwjaar", String(data.voertuig.bouwjaar || "")],
-    ["Kenteken", data.voertuig.kenteken || ""],
-    ["Kilometerstand", `${(data.voertuig.kilometerstand || 0).toLocaleString("nl-NL")} km`],
-    ["Chassisnummer", data.voertuig.vin || "—"],
-  ];
-  rows.forEach(([label, val]) => {
-    checkPage(5);
-    setFont("normal", 9);
-    doc.setTextColor(100, 100, 100);
-    doc.text(label + ":", ml + 4, y);
-    doc.setTextColor(35, 35, 40);
-    doc.text(val, ml + 55, y);
-    y += 5;
-  });
-  y += 5;
+  // Betaling rijen
+  const betaalwijzeLabel = {
+    contant: "Contant",
+    overboeking: "Per bank *",
+    financiering: "Financiering",
+    combinatie: "Combinatie",
+  }[data.financieel.betaalwijze] || data.financieel.betaalwijze;
 
-  // Artikel 2 — Koopprijs
-  addArtikel("Artikel 2 — Koopprijs en betaling");
-  let betaalTekst = `De overeengekomen koopprijs bedraagt ${formatEur(data.financieel.verkoopprijs)}.`;
-  if (data.financieel.betaalwijze === "contant") {
-    betaalTekst += " De betaling geschiedt volledig contant bij aflevering.";
-  } else if (data.financieel.betaalwijze === "overboeking") {
-    betaalTekst += " De betaling geschiedt per bankoverschrijving op IBAN NL00BANK0000000000 t.n.v. Platin Automotive.";
-  } else if (data.financieel.betaalwijze === "financiering") {
-    if (data.financieel.financieringBedrag && data.financieel.eigenBijdrage) {
-      betaalTekst += ` De betaling geschiedt als volgt: ${formatEur(data.financieel.financieringBedrag)} via financiering en ${formatEur(data.financieel.eigenBijdrage)} als eigen bijdrage.`;
-    } else {
-      betaalTekst += " De betaling geschiedt via financiering.";
+  if (data.financieel.betaalwijze === "combinatie") {
+    if (data.financieel.contantBedrag) {
+      drawTableRow("Contant:", formatEur(data.financieel.contantBedrag));
     }
-  } else if (data.financieel.betaalwijze === "combinatie") {
-    betaalTekst += ` De betaling geschiedt als volgt: ${formatEur(data.financieel.contantBedrag || 0)} contant en ${formatEur(data.financieel.overboekingBedrag || 0)} per bankoverschrijving.`;
-  }
-  if (data.financieel.aanbetalingActief && data.financieel.aanbetalingsbedrag) {
-    betaalTekst += ` Er is een aanbetaling gedaan van ${formatEur(data.financieel.aanbetalingsbedrag)}. Het restbedrag van ${formatEur(data.financieel.restbedrag || 0)} dient te worden voldaan voor aflevering.`;
-  }
-  const art2Lines = doc.splitTextToSize(betaalTekst, cw);
-  checkPage(art2Lines.length * 4 + 4);
-  doc.text(art2Lines, ml, y);
-  y += art2Lines.length * 4 + 6;
-
-  // Artikel 3 — Garantie
-  addArtikel("Artikel 3 — Garantie");
-  let garantieTekst = "";
-  if (data.garantie.type === "geen") {
-    garantieTekst = "Het voertuig wordt verkocht zonder garantie. Koper verklaart het voertuig te hebben geïnspecteerd en accepteert het voertuig in de huidige staat.";
-  } else if (data.garantie.type === "autotrust") {
-    garantieTekst = `Op het voertuig is een AutoTrust garantie van toepassing voor een periode van ${data.garantie.maanden || 3} maanden na aflevering. De garantievoorwaarden zijn vastgelegd in een separaat garantiecertificaat.`;
+    if (data.financieel.overboekingBedrag) {
+      drawTableRow("Per bank *:", formatEur(data.financieel.overboekingBedrag));
+    }
+  } else if (data.financieel.betaalwijze === "financiering") {
+    if (data.financieel.financieringBedrag) {
+      drawTableRow("Financiering:", formatEur(data.financieel.financieringBedrag));
+    }
+    if (data.financieel.eigenBijdrage) {
+      drawTableRow("Eigen bijdrage:", formatEur(data.financieel.eigenBijdrage));
+    }
+    if (!data.financieel.financieringBedrag && !data.financieel.eigenBijdrage) {
+      drawTableRow(`${betaalwijzeLabel}:`, formatEur(data.financieel.verkoopprijs));
+    }
   } else {
-    garantieTekst = `Op het voertuig is een garantie van Platin Automotive van toepassing voor een periode van ${data.garantie.maanden || 3} maanden na aflevering.`;
+    drawTableRow(`${betaalwijzeLabel}:`, formatEur(data.financieel.verkoopprijs));
   }
-  if (data.garantie.kosten && data.garantie.kosten > 0) {
-    const betalerLabel = data.garantie.betaler === "klant" ? "De kosten zijn voor rekening van koper" : data.garantie.betaler === "gedeeld" ? "De kosten worden gedeeld tussen verkoper en koper" : "De kosten zijn voor rekening van verkoper";
-    garantieTekst += ` De kosten voor de garantie bedragen ${formatEur(data.garantie.kosten)}. ${betalerLabel}.`;
+
+  drawTableRow("Totaal:", formatEur(data.financieel.verkoopprijs), true, true);
+  y += 2;
+
+  // Footnote for bank
+  if (data.financieel.betaalwijze === "overboeking" || data.financieel.betaalwijze === "combinatie") {
+    setFont("italic", 7);
+    setColor(LIGHT_GRAY);
+    const note = "* Bij betaling per bank dient het bedrag op de dag van aflevering op onze bankrekening onder vermelding van het kenteken, te zijn bijgeschreven.";
+    const noteLines = doc.splitTextToSize(note, cw);
+    doc.text(noteLines, ml, y + 3);
+    y += noteLines.length * 3.5 + 2;
   }
-  const art3Lines = doc.splitTextToSize(garantieTekst, cw);
-  checkPage(art3Lines.length * 4 + 4);
-  doc.text(art3Lines, ml, y);
-  y += art3Lines.length * 4 + 6;
 
-  // Artikel 4 — Levering
-  addArtikel("Artikel 4 — Levering en risico-overgang");
-  const art4 = "Het risico van het voertuig gaat over op koper op het moment van aflevering. Koper is verplicht het voertuig op het afgesproken tijdstip af te halen. Bij niet-afhaling binnen 7 dagen na de afgesproken datum is verkoper gerechtigd opslagkosten in rekening te brengen.";
-  const art4Lines = doc.splitTextToSize(art4, cw);
-  checkPage(art4Lines.length * 4 + 4);
-  doc.text(art4Lines, ml, y);
-  y += art4Lines.length * 4 + 6;
+  y += 4;
+  drawLine();
+  y += 8;
 
-  // Artikel 5 — Algemene voorwaarden
-  addArtikel("Artikel 5 — Algemene voorwaarden");
-  const art5 = "Op deze overeenkomst zijn de algemene voorwaarden van Platin Automotive van toepassing. Een exemplaar van de algemene voorwaarden is aan de koper overhandigd.";
-  const art5Lines = doc.splitTextToSize(art5, cw);
-  checkPage(art5Lines.length * 4 + 4);
-  doc.text(art5Lines, ml, y);
-  y += art5Lines.length * 4 + 6;
+  // ── OVERZICHT ──
+  sectionTitle("Overzicht");
 
-  // Artikel 6 — Toepasselijk recht
-  addArtikel("Artikel 6 — Toepasselijk recht");
-  const art6 = "Op deze overeenkomst is Nederlands recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechter in het arrondissement waar Platin Automotive is gevestigd.";
-  const art6Lines = doc.splitTextToSize(art6, cw);
-  checkPage(art6Lines.length * 4 + 4);
-  doc.text(art6Lines, ml, y);
-  y += art6Lines.length * 4 + 6;
+  const margeText = data.financieel.betaalwijze !== "financiering" ? " (marge)" : "";
+  drawTableRow("Voertuig:", `${formatEur(data.financieel.verkoopprijs)}${margeText}`);
 
-  // Wwft artikel if applicable
+  // Garantiekosten apart als klant betaalt
+  if (data.garantie.kosten && data.garantie.kosten > 0 && data.garantie.betaler !== "dealer") {
+    const garantieLabel = data.garantie.betaler === "gedeeld"
+      ? `Garantie (${data.garantie.type === "autotrust" ? "AutoTrust" : "eigen"}, gedeeld):`
+      : `Garantie (${data.garantie.type === "autotrust" ? "AutoTrust" : "eigen"}):`;
+    drawTableRow(garantieLabel, formatEur(data.garantie.kosten));
+  }
+
+  const subtotaal = data.financieel.verkoopprijs + (
+    data.garantie.kosten && data.garantie.betaler !== "dealer" ? data.garantie.kosten : 0
+  );
+  drawTableRow("Subtotaal:", formatEur(subtotaal));
+  drawTableRow("Totaal te voldoen:", formatEur(subtotaal), true, true);
+
+  if (data.financieel.aanbetalingActief && data.financieel.aanbetalingsbedrag) {
+    drawTableRow("Aanbetaling:", `€ -${Math.abs(data.financieel.aanbetalingsbedrag).toLocaleString("nl-NL", { minimumFractionDigits: 2 })}`);
+    const nog = subtotaal - (data.financieel.aanbetalingsbedrag || 0);
+    drawTableRow("Nog te voldoen:", formatEur(nog), true, true);
+  }
+
+  y += 4;
+
+  // ── OPMERKING (garantie) ──
+  checkPage(16);
+  let opmerking = "";
+  if (data.garantie.type === "geen") {
+    opmerking = "Het voertuig wordt verkocht zonder garantie, in de staat zoals bezichtigd en geaccepteerd door koper.";
+  } else if (data.garantie.type === "autotrust") {
+    opmerking = `Op het voertuig is een AutoTrust garantie van toepassing voor een periode van ${data.garantie.maanden || 3} maanden na aflevering. De garantievoorwaarden zijn vastgelegd in een separaat garantiecertificaat.`;
+  } else {
+    opmerking = `Op het voertuig is een garantie van Platin Automotive van toepassing voor een periode van ${data.garantie.maanden || 3} maanden na aflevering.`;
+  }
+
+  if (data.opmerkingen) {
+    opmerking += ` ${data.opmerkingen}`;
+  }
+
+  setFont("bold", 8.5);
+  setColor(DARK);
+  doc.text("Opmerking:", ml, y);
+  setFont("normal", 8.5);
+  setColor(MID_GRAY);
+  const opmLines = doc.splitTextToSize(opmerking, cw - 24);
+  doc.text(opmLines, ml + 24, y);
+  y += Math.max(opmLines.length * 4, 5) + 4;
+
+  // ── VERWACHTE DATUM LEVERING ──
+  if (data.afleverDatum) {
+    y += 2;
+    sectionTitle("Verwachte datum levering:");
+    setFont("normal", 9);
+    setColor(MID_GRAY);
+    doc.text(formatDate(data.afleverDatum), ml, y);
+    y += 8;
+  }
+
+  // ── Wwft ──
   if (data.wwftBevestigd || (data.financieel.contantBedrag && data.financieel.contantBedrag > 3000)) {
-    addArtikel("Artikel 7 — Wwft en contante betaling");
-    const art7 = "In het kader van de Wet ter voorkoming van witwassen en financieren van terrorisme (Wwft) is het wettelijk maximum voor contante betalingen bij de aankoop van een voertuig vastgesteld op € 3.000. Bedragen boven € 3.000 dienen te worden voldaan per bankoverschrijving. Platin Automotive is wettelijk verplicht ongebruikelijke transacties te melden bij de autoriteiten. Koper verklaart kennis te hebben genomen van deze verplichting.";
-    const art7Lines = doc.splitTextToSize(art7, cw);
-    checkPage(art7Lines.length * 4 + 4);
-    doc.text(art7Lines, ml, y);
-    y += art7Lines.length * 4 + 6;
+    checkPage(20);
+    setFont("italic", 7.5);
+    setColor(MID_GRAY);
+    const wwft = "In het kader van de Wwft is het wettelijk maximum voor contante betalingen bij aankoop van een voertuig € 3.000. Bedragen boven € 3.000 dienen per bankoverschrijving te worden voldaan.";
+    const wwftLines = doc.splitTextToSize(wwft, cw);
+    doc.text(wwftLines, ml, y);
+    y += wwftLines.length * 3.5 + 6;
   }
 
-  // Ondertekening
-  const artNr = data.wwftBevestigd ? "Artikel 8" : "Artikel 7";
-  addArtikel(`${artNr} — Ondertekening`);
-  doc.text(`Aldus overeengekomen en in tweevoud opgemaakt te ${data.plaats} op ${formatDate(data.datum)}.`, ml, y, { maxWidth: cw });
+  // ── ONDERTEKENING ──
+  checkPage(50);
+  y += 4;
+  drawLine();
+  y += 10;
+
+  const colW = (cw - 16) / 2;
+
+  // Datum lijn
+  setFont("normal", 9);
+  setColor(MID_GRAY);
+  doc.text("Datum: ...............................", ml, y);
+  y += 12;
+
+  // Verkoper
+  setFont("bold", 9);
+  setColor(DARK);
+  doc.text("Verkoper:", ml, y);
+  doc.text("Koper:", ml + colW + 16, y);
+  y += 8;
+
+  setFont("normal", 8.5);
+  setColor(MID_GRAY);
+  doc.text("...............................", ml, y);
+  doc.text("...............................", ml + colW + 16, y);
   y += 14;
 
-  checkPage(55);
-  const colW = (cw - 10) / 2;
+  // Algemene voorwaarden
+  setFont("italic", 7);
+  setColor(LIGHT_GRAY);
+  doc.text("Op deze overeenkomst zijn de algemene voorwaarden van Platin Automotive van toepassing.", ml, y);
 
-  // Left - Verkoper
-  setFont("bold", 9);
-  doc.setTextColor(35, 35, 40);
-  doc.text("Verkoper", ml, y);
-  y += 5;
-  setFont("normal", 9);
-  doc.setTextColor(80, 80, 80);
-  doc.text("Naam: Platin Automotive", ml, y);
-  doc.text(`Datum: ${formatDate(data.datum)}`, ml, y + 5);
-
-  // Right - Koper
-  setFont("bold", 9);
-  doc.setTextColor(35, 35, 40);
-  doc.text("Koper", ml + colW + 10, y - 5);
-  setFont("normal", 9);
-  doc.setTextColor(80, 80, 80);
-  doc.text(`Naam: ${data.klant.voornaam} ${data.klant.achternaam}`, ml + colW + 10, y);
-  doc.text(`Datum: ${formatDate(data.datum)}`, ml + colW + 10, y + 5);
-
-  y += 12;
-  doc.text("Handtekening:", ml, y);
-  doc.text("Handtekening:", ml + colW + 10, y);
-  y += 3;
-  doc.setDrawColor(180, 180, 180);
-  doc.setLineWidth(0.3);
-  doc.line(ml, y + 20, ml + colW, y + 20);
-  doc.line(ml + colW + 10, y + 20, ml + colW + 10 + colW, y + 20);
+  // Footer lijn
+  doc.setDrawColor(DARK.r, DARK.g, DARK.b);
+  doc.setLineWidth(0.5);
+  doc.line(0, 290, pw, 290);
+  setFont("normal", 6.5);
+  doc.setTextColor(LIGHT_GRAY.r, LIGHT_GRAY.g, LIGHT_GRAY.b);
+  doc.text("Platin Automotive · Cilinderweg 99 · 2371 DZ Roelofarendsveen · KvK 99146193", pw / 2, 294, { align: "center" });
 
   return doc;
 }
