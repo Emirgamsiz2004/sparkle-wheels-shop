@@ -31,7 +31,7 @@ const AdminVoertuigDetailPage = () => {
   const navigate = useNavigate();
   const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
   const { customers } = useCustomers();
-  const { createAppointment } = useAppointments();
+  const { addAppointment } = useAppointments();
   const [activeTab, setActiveTab] = useState("overzicht");
   const [proefritOpen, setProefritOpen] = useState(false);
   const [consignatieOpen, setConsignatieOpen] = useState(false);
