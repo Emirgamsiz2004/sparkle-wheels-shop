@@ -44,6 +44,7 @@ const AdminUrenPage = () => {
   const [quickDesc, setQuickDesc] = useState("");
   const [quickCategory, setQuickCategory] = useState("overig");
   const [quickStarting, setQuickStarting] = useState(false);
+  const [stopTimerDialogOpen, setStopTimerDialogOpen] = useState(false);
 
   // History filters
   const [historySearch, setHistorySearch] = useState("");
