@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import StopTimerDialog from "@/components/admin/StopTimerDialog";
-import StopTimerDialog from "@/components/admin/StopTimerDialog";
 
 interface VehicleTask {
   id: string;
