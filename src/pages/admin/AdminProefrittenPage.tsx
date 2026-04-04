@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
-import { Loader2, Search, ChevronRight, CheckCircle2, Clock, XCircle, Car, StopCircle } from "lucide-react";
-import { format } from "date-fns";
+import { useAppointments, typeColors, typeLabels } from "@/hooks/useAppointments";
+import { Loader2, Search, ChevronRight, CheckCircle2, Clock, XCircle, Car, StopCircle, Plus, Play, CalendarDays } from "lucide-react";
+import { format, isSameDay, isFuture } from "date-fns";
 import { nl } from "date-fns/locale";
+import { Badge } from "@/components/ui/badge";
 import ProefritDetailDialog from "@/components/admin/proefrit/ProefritDetailDialog";
 import EindProefritDialog from "@/components/admin/proefrit/EindProefritDialog";
+import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDialog";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
@@ -24,10 +27,20 @@ const tabs = [
 
 const AdminProefrittenPage = () => {
   const { testDrives, loading, refetch } = useTestDrives();
+  const { appointments } = useAppointments();
   const [filter, setFilter] = useState("alle");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<TestDrive | null>(null);
   const [ending, setEnding] = useState<TestDrive | null>(null);
+  const [newOpen, setNewOpen] = useState(false);
+  const [startFromAppointment, setStartFromAppointment] = useState<{ id: string; merk: string; model: string; kenteken?: string; bouwjaar?: number; kilometerstand?: number } | null>(null);
+
+  // Upcoming proefrit appointments (scheduled, future or today)
+  const scheduledProefritten = useMemo(() => {
+    return appointments
+      .filter((a) => a.type === "proefrit" && a.status === "gepland" && (isFuture(new Date(a.datum_tijd)) || isSameDay(new Date(a.datum_tijd), new Date())))
+      .sort((a, b) => new Date(a.datum_tijd).getTime() - new Date(b.datum_tijd).getTime());
+  }, [appointments]);
 
   const filtered = testDrives.filter((td) => {
     if (filter !== "alle" && td.status !== filter) return false;
@@ -51,7 +64,59 @@ const AdminProefrittenPage = () => {
           <h1 className="text-lg font-medium text-foreground">Proefriten</h1>
           <p className="text-sm text-muted-foreground">{testDrives.length} proefrit{testDrives.length !== 1 ? "ten" : ""}</p>
         </div>
+        <button
+          onClick={() => setNewOpen(true)}
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97] shrink-0"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Proefrit</span>
+        </button>
       </div>
+
+      {/* Scheduled proefrit appointments */}
+      {scheduledProefritten.length > 0 && (
+        <div className="bg-card border border-border rounded-md p-3">
+          <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
+            <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
+            Ingeplande proefriten
+          </h3>
+          <div className="space-y-1.5">
+            {scheduledProefritten.map((a) => (
+              <div key={a.id} className="flex items-center justify-between gap-2 bg-muted/30 border border-border rounded-md px-3 py-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-foreground">
+                      {format(new Date(a.datum_tijd), "EEE d MMM · HH:mm", { locale: nl })}
+                    </span>
+                    <Badge className={`${typeColors.proefrit} border text-[10px]`}>Proefrit</Badge>
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {a.customer && <span className="text-xs text-muted-foreground truncate">{a.customer.voornaam} {a.customer.achternaam}</span>}
+                    {a.vehicle && <span className="text-xs text-muted-foreground truncate">· {a.vehicle.merk} {a.vehicle.model}</span>}
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    if (a.vehicle) {
+                      setStartFromAppointment({
+                        id: a.vehicle.id,
+                        merk: a.vehicle.merk,
+                        model: a.vehicle.model,
+                        kenteken: a.vehicle.kenteken || undefined,
+                      });
+                    } else {
+                      setNewOpen(true);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-md hover:bg-emerald-500/25 transition-colors active:scale-[0.97] shrink-0"
+                >
+                  <Play className="w-3 h-3" /> Starten
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3">
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
@@ -122,6 +187,21 @@ const AdminProefrittenPage = () => {
             );
           })}
         </div>
+      )}
+
+      {/* New test drive dialog */}
+      <NieuweProefritDialog
+        open={newOpen}
+        onClose={() => { setNewOpen(false); refetch(); }}
+      />
+
+      {/* Start from scheduled appointment */}
+      {startFromAppointment && (
+        <NieuweProefritDialog
+          open={!!startFromAppointment}
+          onClose={() => { setStartFromAppointment(null); refetch(); }}
+          preselectedVehicle={startFromAppointment}
+        />
       )}
 
       {selected && (
