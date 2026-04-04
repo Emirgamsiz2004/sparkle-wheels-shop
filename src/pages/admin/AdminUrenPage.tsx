@@ -4,11 +4,11 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { useCustomers } from "@/hooks/useCustomers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-import { Loader2, Play, Pause, CheckCircle, Download, Clock, Search, Plus, Timer, Square } from "lucide-react";
+import { Loader2, Play, Pause, CheckCircle, Download, Search, Timer, Square } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import StopTimerDialog from "@/components/admin/StopTimerDialog";
 import StopTimerDialog from "@/components/admin/StopTimerDialog";
 
 interface VehicleTask {
