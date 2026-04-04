@@ -57,7 +57,7 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
       )}
 
       {/* Action bar */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap -mx-0.5">
         {/* Quick-add (+) dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
