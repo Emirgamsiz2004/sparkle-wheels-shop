@@ -24,9 +24,9 @@ const typeOptions: { value: AppointmentType; label: string; icon: typeof Eye; co
   { value: "aflevering", label: "Aflevering", icon: PackageCheck, color: "border-violet-400/40 bg-violet-500/5 text-violet-300/80" },
 ];
 
-const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubmit }: Props) => {
-  const [step, setStep] = useState<"type" | "form">("type");
-  const [type, setType] = useState<AppointmentType | null>(null);
+const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubmit, defaultType }: Props) => {
+  const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
+  const [type, setType] = useState<AppointmentType | null>(defaultType as AppointmentType || null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     datum: "",
