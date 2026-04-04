@@ -189,6 +189,7 @@ input[type="number"] {
     font-family: 'Poppins', sans-serif !important;
     font-weight: 600;
   }
+}
 
 @keyframes admin-fade-in {
   from {
