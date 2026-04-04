@@ -102,7 +102,7 @@ export default function GlobalSearch() {
     try {
       // Parallel queries
       const [vehiclesRes, customersRes, testDrivesRes, appointmentsRes, inkoopRes] = await Promise.all([
-        supabase.from("vehicles").select("id, merk, model, bouwjaar, kenteken, status, verkoopprijs, kostprijs, inkoopprijs, totale_kosten").limit(20),
+        supabase.from("vehicles").select("id, merk, model, bouwjaar, kenteken, kleur, status, verkoopprijs, kostprijs, inkoopprijs, totale_kosten").limit(20),
         supabase.from("customers").select("id, voornaam, achternaam, telefoon, email").limit(20),
         supabase.from("test_drives").select("id, voertuig_merk, voertuig_model, voertuig_kenteken, status, start_tijd, customer_id, test_drive_customers(voornaam, achternaam)").limit(20),
         supabase.from("appointments").select("id, type, datum_tijd, status, onderwerp, vehicle_id, vehicles(merk, model, kenteken)").limit(20),

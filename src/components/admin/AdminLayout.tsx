@@ -180,13 +180,16 @@ const AdminLayout = () => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen min-w-0">
-        <header className="sticky top-0 z-30 flex items-center justify-between h-12 px-4 bg-background border-b border-border">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground p-1">
+        <header className="sticky top-0 z-30 flex items-center justify-between h-12 px-4 bg-background border-b border-border gap-3">
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground p-1 flex-shrink-0">
             <Menu className="w-5 h-5" />
           </button>
-          <img src={logo} alt="Platin" className="h-6 w-auto object-contain lg:hidden" loading="eager" decoding="sync" />
-          <div className="hidden lg:block" />
-          <div className="flex items-center gap-2">
+          <img src={logo} alt="Platin" className="h-6 w-auto object-contain lg:hidden flex-shrink-0" loading="eager" decoding="sync" />
+          <div className="hidden lg:block flex-shrink-0" />
+          <div className="flex-1 flex justify-center">
+            <GlobalSearch />
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
             <NotificationBell />
           </div>
         </header>
