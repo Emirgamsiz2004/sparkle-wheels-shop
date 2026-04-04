@@ -214,6 +214,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
         betaalwijze: details.betaalwijze,
         contantBedrag: details.contantBedrag,
         overboekingBedrag: details.overboekingBedrag,
+        financieringBedrag: details.financieringBedrag,
+        eigenBijdrage: details.eigenBijdrage,
         aanbetalingActief: details.aanbetalingActief,
         aanbetalingsbedrag: details.aanbetalingsbedrag,
         restbedrag,
