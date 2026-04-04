@@ -107,6 +107,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenTaak={handleOpenTaak}
         onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
         onOpenVerkoop={() => setVerkoopOpen(true)}
+        onOpenReservering={() => setReserveringOpen(true)}
         onDelete={handleDelete}
       />
 
