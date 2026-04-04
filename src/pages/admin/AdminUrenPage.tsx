@@ -440,6 +440,22 @@ const AdminUrenPage = () => {
           </AnimatePresence>
         </DialogContent>
       </Dialog>
+
+      {activeTimer && (
+        <StopTimerDialog
+          open={stopTimerDialogOpen}
+          onClose={() => setStopTimerDialogOpen(false)}
+          timerId={activeTimer.id}
+          timerDescription={activeTimer.description}
+          timerVehicleId={activeTimer.vehicle_id}
+          timerStartTime={activeTimer.start_time}
+          timerCategory={activeTimer.category}
+          onStopped={() => {
+            setStopTimerDialogOpen(false);
+            fetchEntries();
+          }}
+        />
+      )}
     </div>
   );
 };
