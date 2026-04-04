@@ -61,6 +61,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
     betaalwijze: "overboeking" as string,
     contantBedrag: 0,
     overboekingBedrag: 0,
+    financieringBedrag: 0,
+    eigenBijdrage: 0,
     aanbetalingActief: !!existingDeposit,
     aanbetalingsbedrag: existingDeposit || 0,
     aanbetalingDatum: "",
