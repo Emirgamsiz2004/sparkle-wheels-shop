@@ -237,14 +237,24 @@ const AdminVoertuigenPage = () => {
 
 const ApkBadge = ({ apkVervaldatum }: { apkVervaldatum?: string }) => {
   const status = getApkStatus(apkVervaldatum);
-  if (status.level === 'green' || status.level === 'none') return null;
+  if (status.level === 'green' || status.level === 'none') {
+    if (status.level === 'none') return <span className="text-[10px] text-muted-foreground/50">—</span>;
+    const apk = new Date(apkVervaldatum!);
+    const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+    return <span className="text-[10px] text-muted-foreground">Tot {formatted}</span>;
+  }
   const isRed = status.level === 'red';
+  const apk = new Date(apkVervaldatum!);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const isExpired = apk.getTime() < today.getTime();
+  const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
   return (
-    <span className={`inline-flex items-center gap-1.5 text-[10px] font-medium whitespace-nowrap ${
-      isRed ? "text-red-400" : "text-amber-400"
+    <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap border ${
+      isRed
+        ? "bg-red-500/10 text-red-400 border-red-500/25"
+        : "bg-amber-500/10 text-amber-400 border-amber-500/25"
     }`}>
-      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isRed ? "bg-red-400" : "bg-amber-400"}`} />
-      APK {status.label}
+      {isExpired ? `Verlopen ${formatted}` : `Verloopt ${formatted}`}
     </span>
   );
 };
