@@ -396,18 +396,28 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                     <div className="space-y-4">
                       <h3 className="text-sm font-semibold font-['Poppins'] text-foreground">Klantgegevens</h3>
 
-                      {duplicateFound && (
-                        <div className="p-3 bg-amber-500/10 border border-amber-500/25 rounded-[3px] space-y-2">
-                          <p className="text-xs text-amber-400 flex items-center gap-2">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            Dit lijkt op een bestaande klant: {duplicateFound.voornaam} {duplicateFound.achternaam}
-                          </p>
-                          <div className="flex gap-2">
-                            <button onClick={useDuplicate} className="text-xs px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-[3px] hover:bg-amber-500/30 transition-colors">Ja, gebruik bestaande</button>
-                            <button onClick={() => { setDuplicateFound(null); setStep(2); }} className="text-xs px-3 py-1.5 bg-secondary text-secondary-foreground rounded-[3px] hover:bg-secondary/80 transition-colors">Nee, maak nieuwe aan</button>
-                          </div>
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {duplicateFound && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="p-3 bg-amber-500/10 border border-amber-500/25 rounded-[3px] space-y-2">
+                              <p className="text-xs text-amber-400 flex items-center gap-2">
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                Dit lijkt op een bestaande klant: {duplicateFound.voornaam} {duplicateFound.achternaam}
+                              </p>
+                              <div className="flex gap-2">
+                                <button onClick={useDuplicate} className="text-xs px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-[3px] hover:bg-amber-500/30 transition-colors">Ja, gebruik bestaande</button>
+                                <button onClick={() => { setDuplicateFound(null); setStep(2); }} className="text-xs px-3 py-1.5 bg-secondary text-secondary-foreground rounded-[3px] hover:bg-secondary/80 transition-colors">Nee, maak nieuwe aan</button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {showExistingSelect ? (
                         <div className="space-y-2">
