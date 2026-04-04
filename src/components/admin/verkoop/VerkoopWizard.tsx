@@ -298,6 +298,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
         restbedrag,
         garantie_type: details.garantieType,
         garantie_maanden: details.garantieMaanden,
+        garantie_kosten: details.garantieKosten,
+        garantie_betaler: details.garantieBetaler,
         wwft_bevestigd: details.wwftBevestigd,
         overeenkomst_ondertekend: overeenkomstOndertekend,
         moneybird_factuur_id: moneybirdFactuurId || null,
