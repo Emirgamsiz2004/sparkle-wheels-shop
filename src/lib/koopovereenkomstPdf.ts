@@ -307,6 +307,8 @@ export function buildKoopovereenkomstDoc(data: KoopovereenkomstData) {
     drawTableRow("Nog te voldoen:", formatEur(nog), true);
   }
   y += 4;
+  drawSeparator();
+  y += 8;
 
   // ── OPMERKING ──
   checkPage(16);
