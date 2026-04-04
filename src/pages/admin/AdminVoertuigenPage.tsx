@@ -9,8 +9,6 @@ import { getApkStatus } from "@/components/admin/detail/VehicleOverzichtTab";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SlidingTabs from "@/components/admin/SlidingTabs";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 const tabs = [
   { label: "Voorraad", value: "voorraad" },
