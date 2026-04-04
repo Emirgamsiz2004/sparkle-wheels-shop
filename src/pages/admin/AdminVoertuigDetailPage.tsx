@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import SlidingTabs from "@/components/admin/SlidingTabs";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,21 +110,12 @@ const AdminVoertuigDetailPage = () => {
 
       {/* Tabs */}
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <div className="flex gap-0.5 bg-secondary/50 border border-border rounded-md p-0.5 min-w-max">
-          {tabItems.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setActiveTab(t.key)}
-              className={`px-3 py-1.5 text-xs font-medium rounded transition-colors whitespace-nowrap ${
-                activeTab === t.key
-                  ? "bg-accent text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        <SlidingTabs
+          tabs={tabItems.map(t => ({ label: t.label, value: t.key }))}
+          value={activeTab}
+          onChange={setActiveTab}
+          className="min-w-max"
+        />
       </div>
 
       {/* Tab content */}

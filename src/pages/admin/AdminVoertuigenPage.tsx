@@ -8,6 +8,7 @@ import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { getApkStatus } from "@/components/admin/detail/VehicleOverzichtTab";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import SlidingTabs from "@/components/admin/SlidingTabs";
 
 const tabs = [
   { label: "Voorraad", value: "voorraad" },
@@ -105,21 +106,12 @@ const AdminVoertuigenPage = () => {
 
       {/* Filters */}
       <div className="space-y-3">
-        <div className="flex flex-wrap gap-1.5">
-          {tabs.map((t) => (
-            <button
-              key={t.value}
-              onClick={() => setFilter(t.value)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors ${
-                filter === t.value
-                  ? "border-border bg-accent text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        <SlidingTabs
+          tabs={tabs}
+          value={filter}
+          onChange={setFilter}
+          className="w-fit"
+        />
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
