@@ -49,11 +49,11 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle }: Props) => {
 
   const filteredVehicles = useMemo(() => {
     if (!search.trim()) return voorraadVehicles;
-    const q = search.toLowerCase();
+    const q = search.toLowerCase().replace(/[-\s]/g, "");
     return voorraadVehicles.filter(
       (v) =>
         `${v.merk} ${v.model}`.toLowerCase().includes(q) ||
-        (v.kenteken || "").toLowerCase().includes(q)
+        (v.kenteken || "").toLowerCase().replace(/[-\s]/g, "").includes(q)
     );
   }, [voorraadVehicles, search]);
 
