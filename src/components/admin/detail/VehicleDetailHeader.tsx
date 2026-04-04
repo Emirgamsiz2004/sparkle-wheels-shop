@@ -87,9 +87,26 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
         </button>
 
         {onOpenAfspraak && (
-          <button onClick={onOpenAfspraak} className={btnCls}>
-            <CalendarPlus className="w-3.5 h-3.5" /> Afspraak
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={btnCls}>
+                <CalendarPlus className="w-3.5 h-3.5" /> Afspraak <ChevronDown className="w-3 h-3" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
+              {[
+                { label: "Bezichtiging", type: "bezichtiging" },
+                { label: "Proefrit", type: "proefrit" },
+                { label: "Aflevering", type: "aflevering" },
+                { label: "Onderhoud/Reparatie", type: "onderhoud" },
+                { label: "Overig", type: "overig" },
+              ].map((opt) => (
+                <DropdownMenuItem key={opt.type} onClick={() => onOpenAfspraak(opt.type)}>
+                  {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {/* Status dropdown */}
