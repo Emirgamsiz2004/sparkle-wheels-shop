@@ -637,26 +637,36 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                                   <label className={labelCls}>Garantiekosten (€)</label>
                                   <input type="number" step="0.01" value={details.garantieKosten} onChange={e => setDetails(d => ({ ...d, garantieKosten: Number(e.target.value) }))} className={inputCls + " w-32"} />
                                 </div>
-                                {details.garantieKosten > 0 && (
-                                  <div>
-                                    <label className={labelCls}>Wie betaalt?</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                      {[
-                                        { key: "dealer", label: "Dealer" },
-                                        { key: "klant", label: "Klant" },
-                                        { key: "gedeeld", label: "Gedeeld" },
-                                      ].map(opt => (
-                                        <button
-                                          key={opt.key}
-                                          onClick={() => setDetails(d => ({ ...d, garantieBetaler: opt.key }))}
-                                          className={`px-3 py-2 text-xs font-medium border rounded-[3px] transition-all ${details.garantieBetaler === opt.key ? "border-foreground bg-foreground/10 text-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}
-                                        >
-                                          {opt.label}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
+                                <AnimatePresence>
+                                  {details.garantieKosten > 0 && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div>
+                                        <label className={labelCls}>Wie betaalt?</label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                          {[
+                                            { key: "dealer", label: "Dealer" },
+                                            { key: "klant", label: "Klant" },
+                                            { key: "gedeeld", label: "Gedeeld" },
+                                          ].map(opt => (
+                                            <button
+                                              key={opt.key}
+                                              onClick={() => setDetails(d => ({ ...d, garantieBetaler: opt.key }))}
+                                              className={`px-3 py-2 text-xs font-medium border rounded-[3px] transition-all ${details.garantieBetaler === opt.key ? "border-foreground bg-foreground/10 text-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}
+                                            >
+                                              {opt.label}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
                             </motion.div>
                           )}
