@@ -18,7 +18,8 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   customers: { id: string; voornaam: string; achternaam: string }[];
-  vehicles: { id: string; merk: string; model: string; kenteken: string | null }[];
+  vehicles: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
+  allVehicles?: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
   onSubmit: (data: any) => Promise<void>;
   defaultType?: string;
 }
@@ -36,7 +37,7 @@ const timeSlots = Array.from({ length: 20 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${m}`;
 });
 
-const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubmit, defaultType }: Props) => {
+const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType }: Props) => {
   const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
   const [type, setType] = useState<AppointmentType | null>(defaultType as AppointmentType || null);
   const [saving, setSaving] = useState(false);
@@ -71,14 +72,15 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubm
     onOpenChange(v);
   };
 
+  const vehicleList = type === "aflevering" && allVehicles ? allVehicles : vehicles;
   const filteredVehicles = useMemo(() => {
-    if (!vehicleSearch) return vehicles;
+    if (!vehicleSearch) return vehicleList;
     const q = vehicleSearch.toLowerCase().replace(/[-\s]/g, "");
-    return vehicles.filter(v =>
+    return vehicleList.filter(v =>
       `${v.merk} ${v.model}`.toLowerCase().includes(q) ||
       (v.kenteken || "").toLowerCase().replace(/[-\s]/g, "").includes(q)
     );
-  }, [vehicles, vehicleSearch]);
+  }, [vehicleList, vehicleSearch]);
 
   const handleSubmit = async () => {
     if (!type || !selectedDate || !form.tijd) return;
@@ -218,7 +220,11 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubm
                     </div>
                     {filteredVehicles.map((v) => (
                       <SelectItem key={v.id} value={v.id} className="rounded-[3px]">
-                        {v.merk} {v.model} {v.kenteken ? `(${v.kenteken})` : ""}
+                        <span className="flex items-center gap-2">
+                          {v.merk} {v.model} {v.kenteken ? `(${v.kenteken})` : ""}
+                          {v.status === "verkocht" && <span className="text-[9px] px-1.5 py-0.5 bg-muted rounded-[2px] text-muted-foreground">Verkocht</span>}
+                          {v.status === "gereserveerd" && <span className="text-[9px] px-1.5 py-0.5 bg-amber-500/15 rounded-[2px] text-amber-400">Gereserveerd</span>}
+                        </span>
                       </SelectItem>
                     ))}
                     {filteredVehicles.length === 0 && (
