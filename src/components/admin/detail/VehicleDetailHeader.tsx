@@ -26,7 +26,7 @@ const allStatuses: Vehicle["status"][] = [
   "inkoop", "in_behandeling", "te_koop", "consignatie", "gereserveerd", "verkocht", "reparatie_onderhoud",
 ];
 
-const btnCls = "inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-border rounded-md hover:bg-accent hover:border-accent transition-all active:scale-[0.97] text-foreground";
+const btnCls = "inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium border border-border rounded-md hover:bg-accent hover:border-accent transition-colors active:scale-[0.97] text-foreground min-h-[36px]";
 
 const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onOpenVerkoop, onOpenAfspraak, onDelete }: Props) => {
   const navigate = useNavigate();
