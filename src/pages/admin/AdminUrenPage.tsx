@@ -169,6 +169,17 @@ const AdminUrenPage = () => {
     setConfirmSwitch(null);
   };
 
+  // Quick timer start
+  const handleQuickStart = async () => {
+    if (!quickDesc.trim()) { toast.error("Vul een omschrijving in"); return; }
+    setQuickStarting(true);
+    await startTimer({ description: quickDesc.trim(), category: quickCategory });
+    setQuickStarting(false);
+    setQuickTimerOpen(false);
+    setQuickDesc("");
+    setQuickCategory("overig");
+  };
+
   // CSV export
   const exportCSV = () => {
     const rows = [["Datum", "Voertuig", "Omschrijving", "Duur (min)"]];
@@ -188,35 +199,6 @@ const AdminUrenPage = () => {
   };
 
   const isLoading = entriesLoading || tasksLoading;
-
-  if (isLoading) {
-    return <div className="flex justify-center py-20"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
-  }
-
-  return (
-    <div className="space-y-5">
-      <h1 className="text-lg font-medium text-foreground">Uren & Taken</h1>
-
-      {/* Active timer bar */}
-      {activeTimer && (
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-md p-3 flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            <div>
-              <p className="text-sm font-medium text-foreground">{activeTimer.description}</p>
-              <p className="text-xs text-muted-foreground">
-                {activeTimer.vehicles ? `${activeTimer.vehicles.merk} ${activeTimer.vehicles.model}` : ""}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xl font-mono font-bold text-emerald-400 tabular-nums">{formatElapsed(elapsed)}</span>
-            <button onClick={handlePauseTask} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
-              <Pause className="w-3.5 h-3.5" /> Pauzeer
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Top: Taken + Vandaag */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
