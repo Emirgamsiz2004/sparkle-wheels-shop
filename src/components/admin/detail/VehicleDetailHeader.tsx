@@ -116,12 +116,13 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
               Status <ChevronDown className="w-3 h-3" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="p-1">
+          <DropdownMenuContent align="start" className="p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
             {allStatuses.map((s) => (
-              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={vehicle.status === s ? "bg-accent" : ""}>
-                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border mr-2 ${statusColors[s]}`}>
+              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={`flex items-center gap-2 ${vehicle.status === s ? "bg-accent/50" : ""}`}>
+                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border ${statusColors[s]}`}>
                   {statusLabels[s]}
                 </span>
+                {vehicle.status === s && <span className="text-[10px] text-muted-foreground ml-auto">✓</span>}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
