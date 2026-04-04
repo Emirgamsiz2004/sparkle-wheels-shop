@@ -15,7 +15,8 @@ import VehicleFinancieelEditTab from "@/components/admin/detail/VehicleFinanciee
 import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
-import VerkoopDialog from "@/components/admin/VerkoopDialog";
+import VerkoopWizard from "@/components/admin/verkoop/VerkoopWizard";
+import ReserveringWizard from "@/components/admin/verkoop/ReserveringWizard";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useAppointments } from "@/hooks/useAppointments";
