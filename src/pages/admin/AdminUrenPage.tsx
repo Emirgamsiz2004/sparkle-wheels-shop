@@ -5,9 +5,10 @@ import { useCustomers } from "@/hooks/useCustomers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Play, Pause, CheckCircle, Download, Clock, Search } from "lucide-react";
+import { Loader2, Play, Pause, CheckCircle, Download, Clock, Search, Plus, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface VehicleTask {
   id: string;
