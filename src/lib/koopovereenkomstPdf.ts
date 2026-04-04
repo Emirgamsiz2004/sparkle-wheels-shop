@@ -31,6 +31,8 @@ export interface KoopovereenkomstData {
   garantie: {
     type: string;
     maanden?: number;
+    kosten?: number;
+    betaler?: string;
   };
   wwftBevestigd: boolean;
   datum: string;
