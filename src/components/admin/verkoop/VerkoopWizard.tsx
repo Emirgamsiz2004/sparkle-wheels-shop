@@ -720,6 +720,9 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                         <div className="flex justify-between"><span className="text-muted-foreground">Verkoopprijs</span><span className="text-foreground font-medium">{formatEuroDecimal(details.verkoopprijs)}</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Betaalwijze</span><span className="text-foreground capitalize">{details.betaalwijze}</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Garantie</span><span className="text-foreground">{details.garantieType === "geen" ? "Geen" : `${details.garantieType === "autotrust" ? "AutoTrust" : "Eigen"} — ${details.garantieMaanden} mnd`}</span></div>
+                        {details.garantieKosten > 0 && (
+                          <div className="flex justify-between"><span className="text-muted-foreground">Garantiekosten</span><span className="text-foreground">{formatEuroDecimal(details.garantieKosten)} ({details.garantieBetaler === "klant" ? "klant" : details.garantieBetaler === "gedeeld" ? "gedeeld" : "dealer"})</span></div>
+                        )}
                         <div className="border-t border-border pt-2 flex justify-between">
                           <span className="text-muted-foreground">Overeenkomst</span>
                           <span className="text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> Ondertekend</span>
