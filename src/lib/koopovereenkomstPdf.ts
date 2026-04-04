@@ -279,7 +279,9 @@ export function buildKoopovereenkomstDoc(data: KoopovereenkomstData) {
     y += noteLines.length * 3 + 4;
   }
 
-  y += 6;
+  y += 4;
+  drawSeparator();
+  y += 8;
 
   // ── OVERZICHT ──
   checkPage(40);
