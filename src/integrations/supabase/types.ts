@@ -1201,6 +1201,107 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_enabled: boolean
+          id: string
+          in_app_enabled: boolean
+          notification_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          in_app_enabled?: boolean
+          notification_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          in_app_enabled?: boolean
+          notification_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          appointment_id: string | null
+          created_at: string
+          customer_id: string | null
+          id: string
+          link: string | null
+          metadata: Json | null
+          read: boolean
+          task_id: string | null
+          title: string
+          type: string
+          user_id: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          link?: string | null
+          metadata?: Json | null
+          read?: boolean
+          task_id?: string | null
+          title: string
+          type: string
+          user_id: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          link?: string | null
+          metadata?: Json | null
+          read?: boolean
+          task_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       proefrit_pdf_logs: {
         Row: {
           actie: string
