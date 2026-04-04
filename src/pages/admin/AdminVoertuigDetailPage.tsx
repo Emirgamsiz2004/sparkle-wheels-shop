@@ -39,6 +39,7 @@ const AdminVoertuigDetailPage = () => {
   const [kostenOpen, setKostenOpen] = useState(false);
   const [verkoopOpen, setVerkoopOpen] = useState(false);
   const [afspraakOpen, setAfspraakOpen] = useState(false);
+  const [afspraakType, setAfspraakType] = useState<string | undefined>();
 
   // When "Taak toevoegen" is clicked, switch to taken tab
   const handleOpenTaak = useCallback(() => {
@@ -101,7 +102,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenAanbetaling={() => setAanbetalingOpen(true)}
         onOpenKosten={() => setKostenOpen(true)}
         onOpenTaak={handleOpenTaak}
-        onOpenAfspraak={() => setAfspraakOpen(true)}
+        onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
         onOpenVerkoop={() => setVerkoopOpen(true)}
         onDelete={handleDelete}
       />
@@ -153,9 +154,10 @@ const AdminVoertuigDetailPage = () => {
       <VerkoopDialog open={verkoopOpen} onOpenChange={setVerkoopOpen} vehicle={vehicle} onComplete={refetch} />
       <AppointmentFormDialog
         open={afspraakOpen}
-        onOpenChange={setAfspraakOpen}
+        onOpenChange={(v) => { setAfspraakOpen(v); if (!v) setAfspraakType(undefined); }}
         customers={customers.map(c => ({ id: c.id, voornaam: c.voornaam, achternaam: c.achternaam }))}
         vehicles={[{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, kenteken: vehicle.kenteken }]}
+        defaultType={afspraakType}
         onSubmit={async (data) => {
           await addAppointment({ ...data, vehicle_id: vehicle.id });
           toast.success("Afspraak ingepland");

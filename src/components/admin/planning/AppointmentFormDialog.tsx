@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ interface Props {
   customers: { id: string; voornaam: string; achternaam: string }[];
   vehicles: { id: string; merk: string; model: string; kenteken: string | null }[];
   onSubmit: (data: any) => Promise<void>;
+  defaultType?: string;
 }
 
 const typeOptions: { value: AppointmentType; label: string; icon: typeof Eye; color: string }[] = [
@@ -23,9 +24,9 @@ const typeOptions: { value: AppointmentType; label: string; icon: typeof Eye; co
   { value: "aflevering", label: "Aflevering", icon: PackageCheck, color: "border-violet-400/40 bg-violet-500/5 text-violet-300/80" },
 ];
 
-const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubmit }: Props) => {
-  const [step, setStep] = useState<"type" | "form">("type");
-  const [type, setType] = useState<AppointmentType | null>(null);
+const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubmit, defaultType }: Props) => {
+  const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
+  const [type, setType] = useState<AppointmentType | null>(defaultType as AppointmentType || null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     datum: "",
@@ -37,6 +38,13 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubm
     onderwerp: "",
     betalingsstatus: "openstaand" as "volledig_betaald" | "openstaand",
   });
+
+  useEffect(() => {
+    if (open && defaultType) {
+      setType(defaultType as AppointmentType);
+      setStep("form");
+    }
+  }, [open, defaultType]);
 
   const reset = () => {
     setStep("type");

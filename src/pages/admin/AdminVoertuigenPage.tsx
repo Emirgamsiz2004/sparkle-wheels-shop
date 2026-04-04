@@ -200,8 +200,8 @@ const AdminVoertuigenPage = () => {
                         </Link>
                       </td>
                       <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground text-xs font-mono uppercase">{v.kenteken || "—"}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-muted-foreground text-xs font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
                           <ApkBadge apkVervaldatum={v.apkVervaldatum} />
                         </div>
                       </td>
@@ -240,10 +240,10 @@ const ApkBadge = ({ apkVervaldatum }: { apkVervaldatum?: string }) => {
   if (status.level === 'green' || status.level === 'none') return null;
   const isRed = status.level === 'red';
   return (
-    <span className={`inline-flex items-center gap-0.5 text-[10px] font-medium ${
+    <span className={`inline-flex items-center gap-1.5 text-[10px] font-medium whitespace-nowrap ${
       isRed ? "text-red-400" : "text-amber-400"
     }`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${isRed ? "bg-red-400" : "bg-amber-400"}`} />
+      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isRed ? "bg-red-400" : "bg-amber-400"}`} />
       APK {status.label}
     </span>
   );

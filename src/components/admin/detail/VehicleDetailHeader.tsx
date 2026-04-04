@@ -18,7 +18,7 @@ interface Props {
   onOpenKosten: () => void;
   onOpenTaak: () => void;
   onOpenVerkoop: () => void;
-  onOpenAfspraak?: () => void;
+  onOpenAfspraak?: (type?: string) => void;
   onDelete: () => void;
 }
 
@@ -87,9 +87,26 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
         </button>
 
         {onOpenAfspraak && (
-          <button onClick={onOpenAfspraak} className={btnCls}>
-            <CalendarPlus className="w-3.5 h-3.5" /> Afspraak
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={btnCls}>
+                <CalendarPlus className="w-3.5 h-3.5" /> Afspraak <ChevronDown className="w-3 h-3" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
+              {[
+                { label: "Bezichtiging", type: "bezichtiging" },
+                { label: "Proefrit", type: "proefrit" },
+                { label: "Aflevering", type: "aflevering" },
+                { label: "Onderhoud/Reparatie", type: "onderhoud" },
+                { label: "Overig", type: "overig" },
+              ].map((opt) => (
+                <DropdownMenuItem key={opt.type} onClick={() => onOpenAfspraak(opt.type)}>
+                  {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {/* Status dropdown */}
@@ -99,12 +116,13 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
               Status <ChevronDown className="w-3 h-3" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="p-1">
+          <DropdownMenuContent align="start" className="p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
             {allStatuses.map((s) => (
-              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={vehicle.status === s ? "bg-accent" : ""}>
-                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border mr-2 ${statusColors[s]}`}>
+              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={`flex items-center gap-2 ${vehicle.status === s ? "bg-accent/50" : ""}`}>
+                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border ${statusColors[s]}`}>
                   {statusLabels[s]}
                 </span>
+                {vehicle.status === s && <span className="text-[10px] text-muted-foreground ml-auto">✓</span>}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
