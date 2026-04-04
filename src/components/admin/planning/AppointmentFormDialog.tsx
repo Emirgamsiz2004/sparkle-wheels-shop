@@ -220,7 +220,11 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                     </div>
                     {filteredVehicles.map((v) => (
                       <SelectItem key={v.id} value={v.id} className="rounded-[3px]">
-                        {v.merk} {v.model} {v.kenteken ? `(${v.kenteken})` : ""}
+                        <span className="flex items-center gap-2">
+                          {v.merk} {v.model} {v.kenteken ? `(${v.kenteken})` : ""}
+                          {v.status === "verkocht" && <span className="text-[9px] px-1.5 py-0.5 bg-muted rounded-[2px] text-muted-foreground">Verkocht</span>}
+                          {v.status === "gereserveerd" && <span className="text-[9px] px-1.5 py-0.5 bg-amber-500/15 rounded-[2px] text-amber-400">Gereserveerd</span>}
+                        </span>
                       </SelectItem>
                     ))}
                     {filteredVehicles.length === 0 && (
