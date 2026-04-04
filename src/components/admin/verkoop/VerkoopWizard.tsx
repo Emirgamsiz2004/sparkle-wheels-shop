@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Loader2, Check, AlertTriangle, Printer, ChevronLeft, ChevronRight, User, CreditCard, FileText, Receipt, CheckCircle2 } from "lucide-react";
+import { Loader2, Check, AlertTriangle, Printer, ChevronLeft, ChevronRight, User, CreditCard, FileText, Receipt, CheckCircle2, Download, Mail, ExternalLink } from "lucide-react";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { printKoopovereenkomst, type KoopovereenkomstData } from "@/lib/koopovereenkomstPdf";
