@@ -151,6 +151,16 @@ const AdminVoertuigDetailPage = () => {
       <AanbetalingDialog open={aanbetalingOpen} onClose={() => setAanbetalingOpen(false)} vehicle={vehicle} onStatusChange={refetch} />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
       <VerkoopDialog open={verkoopOpen} onOpenChange={setVerkoopOpen} vehicle={vehicle} onComplete={refetch} />
+      <AppointmentFormDialog
+        open={afspraakOpen}
+        onOpenChange={setAfspraakOpen}
+        customers={customers.map(c => ({ id: c.id, voornaam: c.voornaam, achternaam: c.achternaam }))}
+        vehicles={[{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, kenteken: vehicle.kenteken }]}
+        onSubmit={async (data) => {
+          await addAppointment({ ...data, vehicle_id: vehicle.id });
+          toast.success("Afspraak ingepland");
+        }}
+      />
     </div>
   );
 };
