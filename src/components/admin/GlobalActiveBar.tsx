@@ -159,9 +159,9 @@ const GlobalActiveBar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-b border-blue-500/20"
+            className="overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-2 bg-blue-500/8">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-blue-500/8 border border-blue-500/25 rounded-[3px]">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse shrink-0" />
                 <Car className="w-3.5 h-3.5 text-blue-400 shrink-0" />
