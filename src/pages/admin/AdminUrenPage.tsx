@@ -247,7 +247,7 @@ const AdminUrenPage = () => {
           )}
           {!activeTimer && (
             <button
-              onClick={() => setQuickTimerOpen(true)}
+              onClick={handleQuickStart}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors"
             >
               <Timer className="w-3.5 h-3.5" /> Timer starten
