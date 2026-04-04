@@ -432,7 +432,7 @@ const AdminDashboardPage = () => {
       {/* ═══ BLOK 8 — Proefriten ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
         <h2 className="text-[13px] font-semibold text-foreground mb-4">Proefriten</h2>
-        <div className="grid grid-cols-3 gap-4 mb-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
           {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[72px] rounded-lg" />) : (
             <>
               <div className="bg-accent/20 rounded-lg p-3 text-center">
