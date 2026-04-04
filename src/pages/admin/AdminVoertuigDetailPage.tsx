@@ -39,6 +39,7 @@ const AdminVoertuigDetailPage = () => {
   const [kostenOpen, setKostenOpen] = useState(false);
   const [verkoopOpen, setVerkoopOpen] = useState(false);
   const [afspraakOpen, setAfspraakOpen] = useState(false);
+  const [afspraakType, setAfspraakType] = useState<string | undefined>();
 
   // When "Taak toevoegen" is clicked, switch to taken tab
   const handleOpenTaak = useCallback(() => {
