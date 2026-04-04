@@ -15,6 +15,9 @@ import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
 import VerkoopDialog from "@/components/admin/VerkoopDialog";
+import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
+import { useCustomers } from "@/hooks/useCustomers";
+import { useAppointments } from "@/hooks/useAppointments";
 
 const tabItems = [
   { key: "overzicht", label: "Overzicht" },
@@ -27,12 +30,15 @@ const AdminVoertuigDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
+  const { customers } = useCustomers();
+  const { addAppointment } = useAppointments();
   const [activeTab, setActiveTab] = useState("overzicht");
   const [proefritOpen, setProefritOpen] = useState(false);
   const [consignatieOpen, setConsignatieOpen] = useState(false);
   const [aanbetalingOpen, setAanbetalingOpen] = useState(false);
   const [kostenOpen, setKostenOpen] = useState(false);
   const [verkoopOpen, setVerkoopOpen] = useState(false);
+  const [afspraakOpen, setAfspraakOpen] = useState(false);
 
   // When "Taak toevoegen" is clicked, switch to taken tab
   const handleOpenTaak = useCallback(() => {
@@ -95,6 +101,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenAanbetaling={() => setAanbetalingOpen(true)}
         onOpenKosten={() => setKostenOpen(true)}
         onOpenTaak={handleOpenTaak}
+        onOpenAfspraak={() => setAfspraakOpen(true)}
         onOpenVerkoop={() => setVerkoopOpen(true)}
         onDelete={handleDelete}
       />
@@ -144,6 +151,16 @@ const AdminVoertuigDetailPage = () => {
       <AanbetalingDialog open={aanbetalingOpen} onClose={() => setAanbetalingOpen(false)} vehicle={vehicle} onStatusChange={refetch} />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
       <VerkoopDialog open={verkoopOpen} onOpenChange={setVerkoopOpen} vehicle={vehicle} onComplete={refetch} />
+      <AppointmentFormDialog
+        open={afspraakOpen}
+        onOpenChange={setAfspraakOpen}
+        customers={customers.map(c => ({ id: c.id, voornaam: c.voornaam, achternaam: c.achternaam }))}
+        vehicles={[{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, kenteken: vehicle.kenteken }]}
+        onSubmit={async (data) => {
+          await addAppointment({ ...data, vehicle_id: vehicle.id });
+          toast.success("Afspraak ingepland");
+        }}
+      />
     </div>
   );
 };
