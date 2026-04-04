@@ -31,6 +31,8 @@ export interface KoopovereenkomstData {
   garantie: {
     type: string;
     maanden?: number;
+    kosten?: number;
+    betaler?: string;
   };
   wwftBevestigd: boolean;
   datum: string;
@@ -176,6 +178,10 @@ export function buildKoopovereenkomstDoc(data: KoopovereenkomstData) {
     garantieTekst = `Op het voertuig is een AutoTrust garantie van toepassing voor een periode van ${data.garantie.maanden || 3} maanden na aflevering. De garantievoorwaarden zijn vastgelegd in een separaat garantiecertificaat.`;
   } else {
     garantieTekst = `Op het voertuig is een garantie van Platin Automotive van toepassing voor een periode van ${data.garantie.maanden || 3} maanden na aflevering.`;
+  }
+  if (data.garantie.kosten && data.garantie.kosten > 0) {
+    const betalerLabel = data.garantie.betaler === "klant" ? "De kosten zijn voor rekening van koper" : data.garantie.betaler === "gedeeld" ? "De kosten worden gedeeld tussen verkoper en koper" : "De kosten zijn voor rekening van verkoper";
+    garantieTekst += ` De kosten voor de garantie bedragen ${formatEur(data.garantie.kosten)}. ${betalerLabel}.`;
   }
   const art3Lines = doc.splitTextToSize(garantieTekst, cw);
   checkPage(art3Lines.length * 4 + 4);

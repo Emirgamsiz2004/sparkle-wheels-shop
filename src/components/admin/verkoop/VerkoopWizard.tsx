@@ -67,6 +67,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
     afleverdatum: "",
     garantieType: "geen" as string,
     garantieMaanden: 3,
+    garantieKosten: 0,
+    garantieBetaler: "geen" as string,
     wwftBevestigd: false,
   });
 
@@ -217,6 +219,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
       garantie: {
         type: details.garantieType,
         maanden: details.garantieMaanden,
+        kosten: details.garantieKosten,
+        betaler: details.garantieBetaler,
       },
       wwftBevestigd: details.wwftBevestigd,
       datum: new Date().toISOString().split("T")[0],
@@ -294,6 +298,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
         restbedrag,
         garantie_type: details.garantieType,
         garantie_maanden: details.garantieMaanden,
+        garantie_kosten: details.garantieKosten,
+        garantie_betaler: details.garantieBetaler,
         wwft_bevestigd: details.wwftBevestigd,
         overeenkomst_ondertekend: overeenkomstOndertekend,
         moneybird_factuur_id: moneybirdFactuurId || null,
@@ -508,24 +514,45 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                       )}
 
                       {/* Aanbetaling */}
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={details.aanbetalingActief} onChange={e => setDetails(d => ({ ...d, aanbetalingActief: e.target.checked }))} className="w-3.5 h-3.5 rounded-sm border-border" />
-                          <span className="text-xs text-foreground">Aanbetaling</span>
-                        </label>
-                        {details.aanbetalingActief && (
-                          <div className="grid grid-cols-2 gap-3 pl-5">
-                            <div>
-                              <label className={labelCls}>Aanbetalingsbedrag (€)</label>
-                              <input type="number" step="0.01" value={details.aanbetalingsbedrag} onChange={e => setDetails(d => ({ ...d, aanbetalingsbedrag: Number(e.target.value) }))} className={inputCls} />
-                            </div>
-                            <div>
-                              <label className={labelCls}>Aanbetalingsdatum</label>
-                              <input type="date" value={details.aanbetalingDatum} onChange={e => setDetails(d => ({ ...d, aanbetalingDatum: e.target.value }))} className={inputCls} />
-                            </div>
-                            <p className="col-span-2 text-xs text-muted-foreground">Restbedrag: {formatEuroDecimal(restbedrag)}</p>
-                          </div>
-                        )}
+                      <div className="space-y-3">
+                        <label className={labelCls}>Aanbetaling</label>
+                        <div className="inline-flex bg-secondary/50 border border-border rounded-[3px] p-0.5">
+                          <button
+                            onClick={() => setDetails(d => ({ ...d, aanbetalingActief: false }))}
+                            className={`px-4 py-1.5 text-xs font-medium rounded-[2px] transition-all ${!details.aanbetalingActief ? "bg-foreground text-background shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                          >
+                            Nee
+                          </button>
+                          <button
+                            onClick={() => setDetails(d => ({ ...d, aanbetalingActief: true }))}
+                            className={`px-4 py-1.5 text-xs font-medium rounded-[2px] transition-all ${details.aanbetalingActief ? "bg-foreground text-background shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                          >
+                            Ja
+                          </button>
+                        </div>
+                        <AnimatePresence>
+                          {details.aanbetalingActief && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: "easeInOut" }}
+                              className="overflow-hidden"
+                            >
+                              <div className="grid grid-cols-2 gap-3 pt-1">
+                                <div>
+                                  <label className={labelCls}>Aanbetalingsbedrag (€)</label>
+                                  <input type="number" step="0.01" value={details.aanbetalingsbedrag} onChange={e => setDetails(d => ({ ...d, aanbetalingsbedrag: Number(e.target.value) }))} className={inputCls} />
+                                </div>
+                                <div>
+                                  <label className={labelCls}>Aanbetalingsdatum</label>
+                                  <input type="date" value={details.aanbetalingDatum} onChange={e => setDetails(d => ({ ...d, aanbetalingDatum: e.target.value }))} className={inputCls} />
+                                </div>
+                                <p className="col-span-2 text-xs text-muted-foreground">Restbedrag: {formatEuroDecimal(restbedrag)}</p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       {/* Afleverdatum */}
@@ -552,12 +579,48 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                             </button>
                           ))}
                         </div>
-                        {(details.garantieType === "autotrust" || details.garantieType === "eigen") && (
-                          <div className="mt-2">
-                            <label className={labelCls}>Garantieduur (maanden)</label>
-                            <input type="number" value={details.garantieMaanden} onChange={e => setDetails(d => ({ ...d, garantieMaanden: Number(e.target.value) }))} className={inputCls + " w-24"} />
-                          </div>
-                        )}
+                        <AnimatePresence>
+                          {(details.garantieType === "autotrust" || details.garantieType === "eigen") && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: "easeInOut" }}
+                              className="overflow-hidden"
+                            >
+                              <div className="mt-3 space-y-3">
+                                <div>
+                                  <label className={labelCls}>Garantieduur (maanden)</label>
+                                  <input type="number" value={details.garantieMaanden} onChange={e => setDetails(d => ({ ...d, garantieMaanden: Number(e.target.value) }))} className={inputCls + " w-24"} />
+                                </div>
+                                <div>
+                                  <label className={labelCls}>Garantiekosten (€)</label>
+                                  <input type="number" step="0.01" value={details.garantieKosten} onChange={e => setDetails(d => ({ ...d, garantieKosten: Number(e.target.value) }))} className={inputCls + " w-32"} />
+                                </div>
+                                {details.garantieKosten > 0 && (
+                                  <div>
+                                    <label className={labelCls}>Wie betaalt?</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                      {[
+                                        { key: "dealer", label: "Dealer" },
+                                        { key: "klant", label: "Klant" },
+                                        { key: "gedeeld", label: "Gedeeld" },
+                                      ].map(opt => (
+                                        <button
+                                          key={opt.key}
+                                          onClick={() => setDetails(d => ({ ...d, garantieBetaler: opt.key }))}
+                                          className={`px-3 py-2 text-xs font-medium border rounded-[3px] transition-all ${details.garantieBetaler === opt.key ? "border-foreground bg-foreground/10 text-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}
+                                        >
+                                          {opt.label}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       <div className="flex justify-between pt-2">
@@ -580,7 +643,12 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                         <div className="flex justify-between"><span className="text-muted-foreground">Verkoopprijs</span><span className="text-foreground font-medium">{formatEuroDecimal(details.verkoopprijs)}</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Betaalwijze</span><span className="text-foreground capitalize">{details.betaalwijze}</span></div>
                         {details.garantieType !== "geen" && (
-                          <div className="flex justify-between"><span className="text-muted-foreground">Garantie</span><span className="text-foreground">{details.garantieType === "autotrust" ? "AutoTrust" : "Eigen"} — {details.garantieMaanden} mnd</span></div>
+                          <>
+                            <div className="flex justify-between"><span className="text-muted-foreground">Garantie</span><span className="text-foreground">{details.garantieType === "autotrust" ? "AutoTrust" : "Eigen"} — {details.garantieMaanden} mnd</span></div>
+                            {details.garantieKosten > 0 && (
+                              <div className="flex justify-between"><span className="text-muted-foreground">Garantiekosten</span><span className="text-foreground">{formatEuroDecimal(details.garantieKosten)} ({details.garantieBetaler === "klant" ? "klant" : details.garantieBetaler === "gedeeld" ? "gedeeld" : "dealer"})</span></div>
+                            )}
+                          </>
                         )}
                       </div>
 
@@ -652,6 +720,9 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                         <div className="flex justify-between"><span className="text-muted-foreground">Verkoopprijs</span><span className="text-foreground font-medium">{formatEuroDecimal(details.verkoopprijs)}</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Betaalwijze</span><span className="text-foreground capitalize">{details.betaalwijze}</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Garantie</span><span className="text-foreground">{details.garantieType === "geen" ? "Geen" : `${details.garantieType === "autotrust" ? "AutoTrust" : "Eigen"} — ${details.garantieMaanden} mnd`}</span></div>
+                        {details.garantieKosten > 0 && (
+                          <div className="flex justify-between"><span className="text-muted-foreground">Garantiekosten</span><span className="text-foreground">{formatEuroDecimal(details.garantieKosten)} ({details.garantieBetaler === "klant" ? "klant" : details.garantieBetaler === "gedeeld" ? "gedeeld" : "dealer"})</span></div>
+                        )}
                         <div className="border-t border-border pt-2 flex justify-between">
                           <span className="text-muted-foreground">Overeenkomst</span>
                           <span className="text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> Ondertekend</span>

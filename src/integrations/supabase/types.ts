@@ -1799,6 +1799,8 @@ export type Database = {
           contant_bedrag: number | null
           created_at: string
           customer_id: string | null
+          garantie_betaler: string | null
+          garantie_kosten: number | null
           garantie_maanden: number | null
           garantie_type: string
           id: string
@@ -1824,6 +1826,8 @@ export type Database = {
           contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
+          garantie_betaler?: string | null
+          garantie_kosten?: number | null
           garantie_maanden?: number | null
           garantie_type?: string
           id?: string
@@ -1849,6 +1853,8 @@ export type Database = {
           contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
+          garantie_betaler?: string | null
+          garantie_kosten?: number | null
           garantie_maanden?: number | null
           garantie_type?: string
           id?: string
