@@ -124,22 +124,15 @@ export default function AdminInkoopPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Zoek op merk, model..." className="pl-9 h-9 bg-card border-border text-sm" />
         </div>
-        <div className="flex gap-1.5 flex-wrap">
-          {(['alle', 'nieuw', 'interessant', 'bod_gedaan', 'afgewezen', 'ingekocht'] as const).map(s => (
-            <button
-              key={s}
-              onClick={() => setFilterStatus(s)}
-              className={cn(
-                'text-xs px-3 py-1.5 rounded-lg border transition-all duration-200 font-medium',
-                filterStatus === s
-                  ? 'bg-accent text-foreground border-border'
-                  : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground/20'
-              )}
-            >
-              {s === 'alle' ? 'Alle' : interesseLabels[s]}
-            </button>
-          ))}
-        </div>
+        <SlidingTabs
+          tabs={(['alle', 'nieuw', 'interessant', 'bod_gedaan', 'afgewezen', 'ingekocht'] as const).map(s => ({
+            label: s === 'alle' ? 'Alle' : interesseLabels[s],
+            value: s,
+          }))}
+          value={filterStatus}
+          onChange={(v) => setFilterStatus(v as any)}
+          className="w-fit"
+        />
       </div>
 
       {/* Mobile: Card view */}

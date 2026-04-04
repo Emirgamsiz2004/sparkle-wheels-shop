@@ -113,7 +113,13 @@ export const InkoopInlineRow = ({ onAdd }: InkoopInlineRowProps) => {
   const selectClass = "h-8 text-sm bg-secondary/50 border-border/50";
 
   return (
-    <div className="border border-foreground/10 bg-secondary/20 rounded-xl px-3 md:px-4 py-3 animate-fade-in space-y-2.5" onKeyDown={handleKeyDown}>
+    <div
+      className="border border-foreground/10 bg-secondary/20 rounded-xl px-3 md:px-4 py-3 space-y-2.5 overflow-hidden"
+      style={{
+        animation: 'admin-expand 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
+      }}
+      onKeyDown={handleKeyDown}
+    >
       {/* Bron pill toggle */}
       <div className="flex items-center gap-1 bg-secondary/30 rounded-lg p-0.5 w-fit">
         {bronOptions.map((opt) => (
