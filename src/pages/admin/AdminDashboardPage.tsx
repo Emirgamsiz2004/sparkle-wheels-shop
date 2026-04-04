@@ -171,10 +171,10 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* ═══ BLOK 1 — Omzet grafiek ═══ */}
-      <div className="bg-card border border-border rounded-lg p-5">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-card border border-border rounded-md p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h2 className="text-[13px] font-semibold text-foreground">Omzet</h2>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
             {loading ? (
               <><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-16" /></>
             ) : (
@@ -195,15 +195,15 @@ const AdminDashboardPage = () => {
             )}
           </div>
         </div>
-        {loading ? <Skeleton className="h-[200px] w-full" /> : chartData.length === 0 ? (
+        {loading ? <Skeleton className="h-[180px] w-full" /> : chartData.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-16">Geen verkopen in deze periode</p>
         ) : (
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={180}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-              <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-              <RechartsTooltip formatter={euroFormatter} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
+              <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+              <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} width={40} />
+              <RechartsTooltip formatter={euroFormatter} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 3, fontSize: 12 }} />
               <Line type="monotone" dataKey="omzet" stroke="#10b981" strokeWidth={2} dot={false} name="Omzet" />
             </LineChart>
           </ResponsiveContainer>
