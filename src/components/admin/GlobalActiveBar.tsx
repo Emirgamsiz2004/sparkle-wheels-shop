@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import { X, Square, Clock, Car } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import StopTimerDialog from "./StopTimerDialog";
+import EindProefritDialog from "./proefrit/EindProefritDialog";
+import { TestDrive } from "@/hooks/useTestDrives";
 
 interface ActiveTimer {
   id: string;
@@ -22,18 +23,19 @@ interface ActiveTestDrive {
   voertuig_kenteken: string | null;
   km_voor: number;
   start_tijd: string;
+  customer_id?: string | null;
   customer?: { voornaam: string; achternaam: string } | null;
 }
 
 const GlobalActiveBar = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [timer, setTimer] = useState<ActiveTimer | null>(null);
   const [testDrive, setTestDrive] = useState<ActiveTestDrive | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [dismissedTimer, setDismissedTimer] = useState(false);
   const [dismissedTestDrive, setDismissedTestDrive] = useState(false);
   const [stopDialogOpen, setStopDialogOpen] = useState(false);
+  const [eindProefritOpen, setEindProefritOpen] = useState(false);
 
   const fetchActive = useCallback(async () => {
     if (!user) return;
@@ -48,14 +50,13 @@ const GlobalActiveBar = () => {
       .maybeSingle();
 
     const newTimer = timerData as ActiveTimer | null;
-    // If timer changed (new one started), un-dismiss
     if (newTimer?.id !== timer?.id) setDismissedTimer(false);
     setTimer(newTimer);
 
     // Active test drive
     const { data: tdData } = await supabase
       .from("test_drives")
-      .select("id, voertuig_merk, voertuig_model, voertuig_kenteken, km_voor, start_tijd, test_drive_customers(voornaam, achternaam)")
+      .select("id, voertuig_merk, voertuig_model, voertuig_kenteken, km_voor, start_tijd, customer_id, test_drive_customers(voornaam, achternaam)")
       .in("status", ["actief", "wacht_op_klant"])
       .limit(1)
       .maybeSingle();
@@ -175,7 +176,7 @@ const GlobalActiveBar = () => {
               </div>
               <div className="flex items-center gap-2 shrink-0 ml-3">
                 <button
-                  onClick={() => navigate("/admin/proefriten")}
+                  onClick={() => setEindProefritOpen(true)}
                   className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium bg-blue-500/15 text-blue-400 border border-blue-500/30 rounded-md hover:bg-blue-500/25 transition-colors"
                 >
                   <Square className="w-3 h-3" /> Beëindigen
@@ -204,6 +205,28 @@ const GlobalActiveBar = () => {
           timerStartTime={timer.start_time}
           timerCategory={timer.category}
           onStopped={handleTimerStopped}
+        />
+      )}
+
+      {testDrive && (
+        <EindProefritDialog
+          testDrive={{
+            id: testDrive.id,
+            voertuig_merk: testDrive.voertuig_merk || "",
+            voertuig_model: testDrive.voertuig_model || "",
+            voertuig_kenteken: testDrive.voertuig_kenteken || undefined,
+            km_voor: testDrive.km_voor,
+            start_tijd: testDrive.start_tijd,
+            status: "actief" as const,
+            token: "",
+            created_at: "",
+            schade_fotos: [],
+          } as any}
+          open={eindProefritOpen}
+          onClose={() => {
+            setEindProefritOpen(false);
+            fetchActive();
+          }}
         />
       )}
     </>

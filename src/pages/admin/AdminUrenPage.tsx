@@ -5,10 +5,11 @@ import { useCustomers } from "@/hooks/useCustomers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Play, Pause, CheckCircle, Download, Clock, Search, Plus, Timer } from "lucide-react";
+import { Loader2, Play, Pause, CheckCircle, Download, Clock, Search, Plus, Timer, Square } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
+import StopTimerDialog from "@/components/admin/StopTimerDialog";
 
 interface VehicleTask {
   id: string;
@@ -30,7 +31,7 @@ const prioriteitColors: Record<string, string> = {
 
 const AdminUrenPage = () => {
   const { user } = useAuth();
-  const { entries, activeTimer, loading: entriesLoading, startTimer, stopTimer } = useTimeEntries();
+  const { entries, activeTimer, loading: entriesLoading, startTimer, stopTimer, fetchEntries } = useTimeEntries();
   const { vehicles } = useVehicles();
   const { customers } = useCustomers();
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ const AdminUrenPage = () => {
   const [quickDesc, setQuickDesc] = useState("");
   const [quickCategory, setQuickCategory] = useState("overig");
   const [quickStarting, setQuickStarting] = useState(false);
+  const [stopTimerDialogOpen, setStopTimerDialogOpen] = useState(false);
 
   // History filters
   const [historySearch, setHistorySearch] = useState("");
@@ -208,14 +210,24 @@ const AdminUrenPage = () => {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-medium text-foreground">Uren & Taken</h1>
-        {!activeTimer && (
-          <button
-            onClick={() => setQuickTimerOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors"
-          >
-            <Timer className="w-3.5 h-3.5" /> Timer starten
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {activeTimer && (
+            <button
+              onClick={() => setStopTimerDialogOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-red-500/15 text-red-400 border border-red-500/30 rounded-md hover:bg-red-500/25 transition-colors"
+            >
+              <Square className="w-3.5 h-3.5" /> Timer stoppen ({formatElapsed(elapsed)})
+            </button>
+          )}
+          {!activeTimer && (
+            <button
+              onClick={() => setQuickTimerOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors"
+            >
+              <Timer className="w-3.5 h-3.5" /> Timer starten
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Top: Taken + Vandaag */}
@@ -428,6 +440,22 @@ const AdminUrenPage = () => {
           </AnimatePresence>
         </DialogContent>
       </Dialog>
+
+      {activeTimer && (
+        <StopTimerDialog
+          open={stopTimerDialogOpen}
+          onClose={() => setStopTimerDialogOpen(false)}
+          timerId={activeTimer.id}
+          timerDescription={activeTimer.description}
+          timerVehicleId={activeTimer.vehicle_id}
+          timerStartTime={activeTimer.start_time}
+          timerCategory={activeTimer.category}
+          onStopped={() => {
+            setStopTimerDialogOpen(false);
+            fetchEntries();
+          }}
+        />
+      )}
     </div>
   );
 };
