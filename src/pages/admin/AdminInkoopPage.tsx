@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SlidingTabs from '@/components/admin/SlidingTabs';
 import {
   InkoopCandidate,
   formatEuro,
