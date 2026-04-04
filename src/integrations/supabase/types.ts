@@ -1789,6 +1789,99 @@ export type Database = {
           },
         ]
       }
+      vehicle_sales: {
+        Row: {
+          aanbetaling_actief: boolean
+          aanbetaling_datum: string | null
+          aanbetalingsbedrag: number | null
+          afleverdatum: string | null
+          betaalwijze: string
+          contant_bedrag: number | null
+          created_at: string
+          customer_id: string | null
+          garantie_maanden: number | null
+          garantie_type: string
+          id: string
+          moneybird_factuur_id: string | null
+          overboeking_bedrag: number | null
+          overeenkomst_ondertekend: boolean
+          restbedrag: number | null
+          status: string
+          updated_at: string
+          vehicle_id: string
+          verkoop_datum: string | null
+          verkoopprijs: number
+          wizard_data: Json | null
+          wizard_stap: number
+          wwft_bevestigd: boolean
+        }
+        Insert: {
+          aanbetaling_actief?: boolean
+          aanbetaling_datum?: string | null
+          aanbetalingsbedrag?: number | null
+          afleverdatum?: string | null
+          betaalwijze?: string
+          contant_bedrag?: number | null
+          created_at?: string
+          customer_id?: string | null
+          garantie_maanden?: number | null
+          garantie_type?: string
+          id?: string
+          moneybird_factuur_id?: string | null
+          overboeking_bedrag?: number | null
+          overeenkomst_ondertekend?: boolean
+          restbedrag?: number | null
+          status?: string
+          updated_at?: string
+          vehicle_id: string
+          verkoop_datum?: string | null
+          verkoopprijs?: number
+          wizard_data?: Json | null
+          wizard_stap?: number
+          wwft_bevestigd?: boolean
+        }
+        Update: {
+          aanbetaling_actief?: boolean
+          aanbetaling_datum?: string | null
+          aanbetalingsbedrag?: number | null
+          afleverdatum?: string | null
+          betaalwijze?: string
+          contant_bedrag?: number | null
+          created_at?: string
+          customer_id?: string | null
+          garantie_maanden?: number | null
+          garantie_type?: string
+          id?: string
+          moneybird_factuur_id?: string | null
+          overboeking_bedrag?: number | null
+          overeenkomst_ondertekend?: boolean
+          restbedrag?: number | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string
+          verkoop_datum?: string | null
+          verkoopprijs?: number
+          wizard_data?: Json | null
+          wizard_stap?: number
+          wwft_bevestigd?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_sales_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_sales_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_tasks: {
         Row: {
           created_at: string
