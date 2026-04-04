@@ -31,7 +31,7 @@ const prioriteitColors: Record<string, string> = {
 
 const AdminUrenPage = () => {
   const { user } = useAuth();
-  const { entries, activeTimer, loading: entriesLoading, startTimer, stopTimer } = useTimeEntries();
+  const { entries, activeTimer, loading: entriesLoading, startTimer, stopTimer, fetchEntries } = useTimeEntries();
   const { vehicles } = useVehicles();
   const { customers } = useCustomers();
   const navigate = useNavigate();
