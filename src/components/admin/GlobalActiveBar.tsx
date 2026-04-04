@@ -192,6 +192,7 @@ const GlobalActiveBar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       {timer && (
         <StopTimerDialog
