@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
+import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; }
 interface NavGroup { label: string; items: NavItem[]; }
@@ -188,6 +189,8 @@ const AdminLayout = () => {
             <NotificationBell />
           </div>
         </header>
+
+        <GlobalActiveBar />
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden">
           <Outlet />
