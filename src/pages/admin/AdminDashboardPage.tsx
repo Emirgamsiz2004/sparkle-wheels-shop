@@ -44,7 +44,7 @@ function KpiCard({ label, value, compare, current, previous }: {
   label: string; value: string; compare?: boolean; current?: number; previous?: number;
 }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
+    <div className="bg-card border border-border rounded-md p-3 sm:p-4">
       <p className="text-[11px] text-muted-foreground mb-1">{label}</p>
       <p className="text-xl font-semibold tabular-nums text-foreground">{value}</p>
       {compare && current !== undefined && previous !== undefined && (
@@ -127,50 +127,54 @@ const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-[1200px]">
+    <div className="space-y-5 max-w-[1200px]">
       {/* ─── Header + period selector ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          {(Object.keys(periodLabels) as PeriodKey[]).filter(k => k !== 'custom').map(k => (
-            <button key={k} onClick={() => setPeriod(k)}
-              className={`px-2.5 py-1 text-[11px] font-medium rounded border transition-colors ${
-                period === k ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}>
-              {periodLabels[k]}
-            </button>
-          ))}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className={`flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded border transition-colors ${
-                period === 'custom' ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}>
-                <CalendarIcon className="w-3 h-3" />
-                {period === 'custom' && customFrom && customTo ? `${format(customFrom, 'dd/MM')} - ${format(customTo, 'dd/MM')}` : "Custom"}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar mode="range" selected={{ from: customFrom, to: customTo }}
-                onSelect={(r: any) => { setCustomFrom(r?.from); setCustomTo(r?.to); if (r?.from && r?.to) setPeriod('custom'); }}
-                numberOfMonths={2} className="p-3 pointer-events-auto" />
-            </PopoverContent>
-          </Popover>
-          <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer ml-2">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
+          </div>
+          <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer">
             <input type="checkbox" checked={compare} onChange={e => setCompare(e.target.checked)}
               className="rounded border-border bg-card w-3.5 h-3.5" />
             Vergelijk
           </label>
         </div>
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+          <div className="flex items-center gap-1.5 min-w-max">
+            {(Object.keys(periodLabels) as PeriodKey[]).filter(k => k !== 'custom').map(k => (
+              <button key={k} onClick={() => setPeriod(k)}
+                className={`px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
+                  period === k ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}>
+                {periodLabels[k]}
+              </button>
+            ))}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
+                  period === 'custom' ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}>
+                  <CalendarIcon className="w-3 h-3" />
+                  {period === 'custom' && customFrom && customTo ? `${format(customFrom, 'dd/MM')} - ${format(customTo, 'dd/MM')}` : "Custom"}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar mode="range" selected={{ from: customFrom, to: customTo }}
+                  onSelect={(r: any) => { setCustomFrom(r?.from); setCustomTo(r?.to); if (r?.from && r?.to) setPeriod('custom'); }}
+                  numberOfMonths={1} className="p-3 pointer-events-auto" />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
       </div>
 
       {/* ═══ BLOK 1 — Omzet grafiek ═══ */}
-      <div className="bg-card border border-border rounded-lg p-5">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-card border border-border rounded-md p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h2 className="text-[13px] font-semibold text-foreground">Omzet</h2>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
             {loading ? (
               <><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-16" /></>
             ) : (
@@ -191,15 +195,15 @@ const AdminDashboardPage = () => {
             )}
           </div>
         </div>
-        {loading ? <Skeleton className="h-[200px] w-full" /> : chartData.length === 0 ? (
+        {loading ? <Skeleton className="h-[180px] w-full" /> : chartData.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-16">Geen verkopen in deze periode</p>
         ) : (
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={180}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-              <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-              <RechartsTooltip formatter={euroFormatter} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
+              <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+              <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} width={40} />
+              <RechartsTooltip formatter={euroFormatter} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 3, fontSize: 12 }} />
               <Line type="monotone" dataKey="omzet" stroke="#10b981" strokeWidth={2} dot={false} name="Omzet" />
             </LineChart>
           </ResponsiveContainer>
@@ -318,12 +322,12 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* ═══ BLOK 5 — Drie voorraad getallen ═══ */}
-      <div className="grid grid-cols-3 gap-4">
-        {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[88px] rounded-lg" />) : (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[88px] rounded-md" />) : (
           <>
             <KpiCard label="Voertuigen in voorraad" value={String(kpis.voorraad)} />
             <KpiCard label="Langste stager" value={`${langsteStager} dagen`} />
-            <KpiCard label="Totale inkoopwaarde voorraad" value={formatEuro(totaleInkoopVoorraad)} />
+            <KpiCard label="Totale inkoopwaarde" value={formatEuro(totaleInkoopVoorraad)} />
           </>
         )}
       </div>
@@ -428,7 +432,7 @@ const AdminDashboardPage = () => {
       {/* ═══ BLOK 8 — Proefriten ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
         <h2 className="text-[13px] font-semibold text-foreground mb-4">Proefriten</h2>
-        <div className="grid grid-cols-3 gap-4 mb-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
           {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[72px] rounded-lg" />) : (
             <>
               <div className="bg-accent/20 rounded-lg p-3 text-center">

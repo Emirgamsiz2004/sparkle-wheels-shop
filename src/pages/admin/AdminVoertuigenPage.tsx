@@ -105,13 +105,15 @@ const AdminVoertuigenPage = () => {
       </div>
 
       {/* Filters */}
-      <div className="space-y-3">
-        <SlidingTabs
-          tabs={tabs}
-          value={filter}
-          onChange={setFilter}
-          className="w-fit"
-        />
+      <div className="space-y-3 overflow-hidden">
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+          <SlidingTabs
+            tabs={tabs}
+            value={filter}
+            onChange={setFilter}
+            className="min-w-max"
+          />
+        </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -119,7 +121,7 @@ const AdminVoertuigenPage = () => {
             placeholder="Zoek op merk, model, kenteken..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:max-w-xs pl-8 pr-3 py-1.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+            className="w-full sm:max-w-xs pl-8 pr-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
           />
         </div>
       </div>

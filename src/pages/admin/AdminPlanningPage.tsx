@@ -7,8 +7,10 @@ import { nl } from "date-fns/locale";
 import { useAppointments, Appointment, AppointmentType, typeLabels, typeColors, typeDotColors } from "@/hooks/useAppointments";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useVehicles } from "@/hooks/useVehicles";
+import { useIsMobile } from "@/hooks/use-mobile";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import AppointmentDetailDialog from "@/components/admin/planning/AppointmentDetailDialog";
+import SlidingTabs from "@/components/admin/SlidingTabs";
 
 type ViewMode = "agenda" | "lijst";
 type PeriodFilter = "vandaag" | "morgen" | "deze_week" | "deze_maand" | "alles";
@@ -21,10 +23,29 @@ const periodLabels: Record<PeriodFilter, string> = {
   alles: "Alles",
 };
 
+const viewTabs = [
+  { label: "Agenda", value: "agenda" },
+  { label: "Lijst", value: "lijst" },
+];
+
+const periodTabs = (Object.keys(periodLabels) as PeriodFilter[]).map((p) => ({
+  label: periodLabels[p],
+  value: p,
+}));
+
+const typeTabs = [
+  { label: "Alles", value: "alles" },
+  ...(Object.keys(typeLabels) as AppointmentType[]).map((t) => ({
+    label: typeLabels[t],
+    value: t,
+  })),
+];
+
 const AdminPlanningPage = () => {
   const { appointments, loading, addAppointment, updateAppointment, deleteAppointment } = useAppointments();
   const { customers } = useCustomers();
   const { vehicles } = useVehicles();
+  const isMobile = useIsMobile();
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [formOpen, setFormOpen] = useState(false);
   const [detailAppointment, setDetailAppointment] = useState<Appointment | null>(null);
@@ -89,52 +110,94 @@ const AdminPlanningPage = () => {
 
   const activeVehicles = useMemo(() => vehicles.filter((v) => v.status !== "verkocht"), [vehicles]);
 
+  // On mobile, show day list for agenda instead of 7-col grid
+  const todayAppointments = useMemo(() => {
+    const today = new Date();
+    return appointments
+      .filter((a) => a.status !== "geannuleerd" && isSameDay(new Date(a.datum_tijd), today))
+      .sort((a, b) => new Date(a.datum_tijd).getTime() - new Date(b.datum_tijd).getTime());
+  }, [appointments]);
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Planning</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Agenda & afspraken</p>
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="text-lg font-medium text-foreground">Planning</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Agenda & afspraken</p>
         </div>
-        <div className="flex items-center gap-2">
-          {/* View toggle */}
-          <div className="flex bg-secondary/50 border border-border rounded-md p-0.5">
-            <button onClick={() => setView("agenda")} className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-colors ${view === "agenda" ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              <CalendarDays className="w-3.5 h-3.5" /> Agenda
-            </button>
-            <button onClick={() => setView("lijst")} className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-colors ${view === "lijst" ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              <List className="w-3.5 h-3.5" /> Lijst
-            </button>
-          </div>
-          <Button onClick={() => setFormOpen(true)} size="sm">
-            <Plus className="w-4 h-4 mr-1.5" />Afspraak plannen
-          </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <SlidingTabs tabs={viewTabs} value={view} onChange={(v) => setView(v as ViewMode)} />
+          <button
+            onClick={() => setFormOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97]"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Afspraak</span>
+          </button>
         </div>
       </div>
 
       {view === "agenda" ? (
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-5">
-          {/* Calendar + Prep */}
-          <div className="space-y-5">
-            {/* Week navigation */}
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setWeekStart(subWeeks(weekStart, 1))}>
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))}>
-                Vandaag
-              </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setWeekStart(addWeeks(weekStart, 1))}>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-              <span className="text-sm font-medium ml-2">
-                {format(weekStart, "d MMM", { locale: nl })} — {format(addDays(weekStart, 6), "d MMM yyyy", { locale: nl })}
-              </span>
-            </div>
+        <>
+          {/* Week navigation */}
+          <div className="flex items-center gap-2">
+            <button onClick={() => setWeekStart(subWeeks(weekStart, 1))} className="inline-flex items-center justify-center w-8 h-8 border border-border rounded-md hover:bg-accent transition-colors">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button onClick={() => setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))} className="px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+              Vandaag
+            </button>
+            <button onClick={() => setWeekStart(addWeeks(weekStart, 1))} className="inline-flex items-center justify-center w-8 h-8 border border-border rounded-md hover:bg-accent transition-colors">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <span className="text-sm font-medium ml-1 truncate">
+              {format(weekStart, "d MMM", { locale: nl })} — {format(addDays(weekStart, 6), "d MMM yyyy", { locale: nl })}
+            </span>
+          </div>
 
-            {/* Week calendar */}
-            <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden border border-border">
+          {isMobile ? (
+            /* Mobile: vertical day list */
+            <div className="space-y-3">
+              {weekDays.map((day) => {
+                const key = format(day, "yyyy-MM-dd");
+                const dayAppts = appointmentsByDay.get(key) || [];
+                const today = isToday(day);
+                return (
+                  <div key={key} className={`bg-card border rounded-md overflow-hidden ${today ? "border-accent" : "border-border"}`}>
+                    <div className={`px-3 py-2 flex items-center justify-between ${today ? "bg-accent/20" : "bg-muted/20"}`}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-foreground">{format(day, "EEEE", { locale: nl })}</span>
+                        <span className="text-xs text-muted-foreground">{format(day, "d MMM", { locale: nl })}</span>
+                      </div>
+                      {dayAppts.length > 0 && (
+                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5">{dayAppts.length}</Badge>
+                      )}
+                    </div>
+                    {dayAppts.length === 0 ? (
+                      <p className="px-3 py-3 text-xs text-muted-foreground/50">Geen afspraken</p>
+                    ) : (
+                      <div className="p-1.5 space-y-1">
+                        {dayAppts.map((a) => (
+                          <button key={a.id} onClick={() => setDetailAppointment(a)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm leading-tight border transition-colors active:opacity-70 ${typeColors[a.type]}`}>
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-medium">{format(new Date(a.datum_tijd), "HH:mm")}</span>
+                              <Badge className={`${typeColors[a.type]} border text-[10px]`}>{typeLabels[a.type]}</Badge>
+                            </div>
+                            {a.customer && <p className="text-sm mt-0.5 truncate">{a.customer.voornaam} {a.customer.achternaam}</p>}
+                            {a.vehicle && <p className="text-xs opacity-70 truncate">{a.vehicle.merk} {a.vehicle.model}</p>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* Desktop: 7-column grid */
+            <div className="grid grid-cols-7 gap-px bg-border rounded-md overflow-hidden border border-border">
               {weekDays.map((day) => {
                 const key = format(day, "yyyy-MM-dd");
                 const dayAppts = appointmentsByDay.get(key) || [];
@@ -162,39 +225,41 @@ const AdminPlanningPage = () => {
                 );
               })}
             </div>
+          )}
 
-            {/* Today's prep */}
-            {todayPrep.length > 0 && (
-              <div className="bg-card border border-border rounded-lg p-4">
-                <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <Car className="w-4 h-4 text-muted-foreground" />
-                  Voertuigen klaarmaken vandaag
-                </h3>
-                <div className="space-y-2">
-                  {todayPrep.map((a) => (
-                    <div key={a.id} className="flex items-center justify-between bg-muted/50 rounded-md px-3 py-2">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${typeDotColors[a.type]}`} />
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            {a.vehicle?.merk} {a.vehicle?.model} {a.vehicle?.kenteken ? `(${a.vehicle.kenteken})` : ""}
-                          </p>
-                          <p className="text-xs text-muted-foreground">{format(new Date(a.datum_tijd), "HH:mm")} — {typeLabels[a.type]}</p>
-                        </div>
+          {/* Today's prep */}
+          {todayPrep.length > 0 && (
+            <div className="bg-card border border-border rounded-md p-3 sm:p-4">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Car className="w-4 h-4 text-muted-foreground" />
+                Voertuigen klaarmaken vandaag
+              </h3>
+              <div className="space-y-2">
+                {todayPrep.map((a) => (
+                  <div key={a.id} className="flex items-center justify-between bg-muted/50 rounded-md px-3 py-2.5">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${typeDotColors[a.type]}`} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {a.vehicle?.merk} {a.vehicle?.model} {a.vehicle?.kenteken ? `(${a.vehicle.kenteken})` : ""}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{format(new Date(a.datum_tijd), "HH:mm")} — {typeLabels[a.type]}</p>
                       </div>
-                      <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
-                        onClick={() => updateAppointment(a.id, { voertuig_klaargemaakt: true })}>
-                        <Check className="w-4 h-4" />
-                      </Button>
                     </div>
-                  ))}
-                </div>
+                    <button
+                      onClick={() => updateAppointment(a.id, { voertuig_klaargemaakt: true })}
+                      className="inline-flex items-center justify-center w-9 h-9 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-md transition-colors shrink-0"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Upcoming sidebar */}
-          <div className="bg-card border border-border rounded-lg p-4 h-fit">
+          {/* Upcoming sidebar — on mobile below, on desktop to the right */}
+          <div className="bg-card border border-border rounded-md p-3 sm:p-4">
             <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
               Aankomende afspraken
@@ -205,8 +270,8 @@ const AdminPlanningPage = () => {
               <div className="space-y-1.5">
                 {upcoming.map((a) => (
                   <button key={a.id} onClick={() => setDetailAppointment(a)}
-                    className="w-full text-left bg-muted/30 hover:bg-muted/60 border border-border rounded-md px-3 py-2.5 transition-colors">
-                    <div className="flex items-center gap-2 mb-1.5">
+                    className="w-full text-left bg-muted/30 hover:bg-muted/60 border border-border rounded-md px-3 py-2.5 transition-colors active:bg-muted/80">
+                    <div className="flex items-center gap-2 mb-1">
                       <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${typeDotColors[a.type]}`} />
                       <span className="text-[11px] text-muted-foreground">{format(new Date(a.datum_tijd), "EEE d MMM · HH:mm", { locale: nl })}</span>
                     </div>
@@ -218,53 +283,57 @@ const AdminPlanningPage = () => {
               </div>
             )}
           </div>
-        </div>
+        </>
       ) : (
         /* ── List View ── */
-        <div className="space-y-4">
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Period tabs */}
-            <div className="flex bg-secondary/50 border border-border rounded-md p-0.5">
-              {(Object.keys(periodLabels) as PeriodFilter[]).map((p) => (
-                <button key={p} onClick={() => setPeriodFilter(p)}
-                  className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${periodFilter === p ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-                  {periodLabels[p]}
-                </button>
-              ))}
+        <div className="space-y-3">
+          {/* Filters — scrollable on mobile */}
+          <div className="space-y-2">
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+              <SlidingTabs tabs={periodTabs} value={periodFilter} onChange={(v) => setPeriodFilter(v as PeriodFilter)} className="min-w-max" />
             </div>
-
-            {/* Type filter */}
-            <div className="flex bg-secondary/50 border border-border rounded-md p-0.5">
-              <button onClick={() => setTypeFilter("alles")} className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${typeFilter === "alles" ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-                Alles
-              </button>
-              {(Object.keys(typeLabels) as AppointmentType[]).map((t) => (
-                <button key={t} onClick={() => setTypeFilter(t)}
-                  className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${typeFilter === t ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-                  {typeLabels[t]}
-                </button>
-              ))}
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+              <SlidingTabs tabs={typeTabs} value={typeFilter} onChange={(v) => setTypeFilter(v as AppointmentType | "alles")} className="min-w-max" />
             </div>
-
-            {/* Search */}
-            <div className="relative flex-1 min-w-[160px] max-w-xs">
+            <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Zoek klant of voertuig..."
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-secondary/50 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50" />
+                className="w-full pl-8 pr-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50" />
             </div>
           </div>
 
-          {/* Results count */}
           <p className="text-xs text-muted-foreground">{filteredAppointments.length} afspra{filteredAppointments.length === 1 ? "ak" : "ken"}</p>
 
-          {/* Table */}
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            {filteredAppointments.length === 0 ? (
-              <div className="py-12 text-center text-sm text-muted-foreground">
-                Geen afspraken gevonden voor deze filters
-              </div>
-            ) : (
+          {/* Mobile: card list. Desktop: table */}
+          {filteredAppointments.length === 0 ? (
+            <div className="bg-card border border-border rounded-md py-12 text-center text-sm text-muted-foreground">
+              Geen afspraken gevonden voor deze filters
+            </div>
+          ) : isMobile ? (
+            <div className="space-y-1.5">
+              {filteredAppointments.map((a) => {
+                const isPast = new Date(a.datum_tijd) < new Date() && a.status === "gepland";
+                return (
+                  <button key={a.id} onClick={() => setDetailAppointment(a)}
+                    className={`w-full text-left bg-card border border-border rounded-md p-3 active:bg-accent/30 transition-colors ${isPast ? "opacity-60" : ""}`}>
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="text-xs font-medium text-foreground">{format(new Date(a.datum_tijd), "EEE d MMM · HH:mm", { locale: nl })}</span>
+                      <Badge variant={a.status === "voltooid" ? "default" : a.status === "geannuleerd" ? "destructive" : "secondary"} className="text-[10px]">
+                        {a.status === "gepland" ? "Gepland" : a.status === "voltooid" ? "Voltooid" : "Geannuleerd"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className={`${typeColors[a.type]} border text-[10px]`}>{typeLabels[a.type]}</Badge>
+                      {a.customer && <span className="text-sm truncate">{a.customer.voornaam} {a.customer.achternaam}</span>}
+                    </div>
+                    {a.vehicle && <p className="text-xs text-muted-foreground truncate">{a.vehicle.merk} {a.vehicle.model} {a.vehicle.kenteken ? `· ${a.vehicle.kenteken}` : ""}</p>}
+                    {a.notities && <p className="text-xs text-muted-foreground/60 truncate mt-1">{a.notities}</p>}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-card border border-border rounded-md overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -319,8 +388,8 @@ const AdminPlanningPage = () => {
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
