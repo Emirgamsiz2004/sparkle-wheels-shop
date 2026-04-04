@@ -200,8 +200,8 @@ const AdminVoertuigenPage = () => {
                         </Link>
                       </td>
                       <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground text-xs font-mono uppercase">{v.kenteken || "—"}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-muted-foreground text-xs font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
                           <ApkBadge apkVervaldatum={v.apkVervaldatum} />
                         </div>
                       </td>
