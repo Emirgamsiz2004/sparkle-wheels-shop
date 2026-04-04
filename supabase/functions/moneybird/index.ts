@@ -201,15 +201,18 @@ Deno.serve(async (req) => {
         if (searchResults.length > 0) {
           contact = searchResults[0];
         } else {
+          const isValidEmail = buyer_email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyer_email);
+          const contactPayload: Record<string, unknown> = {
+            company_name: buyer_name,
+            phone: buyer_phone || undefined,
+          };
+          if (isValidEmail) {
+            contactPayload.send_invoices_to_email = buyer_email;
+            contactPayload.send_estimates_to_email = buyer_email;
+          }
           contact = await mbFetch("contacts.json", {
             method: "POST",
-            body: JSON.stringify({
-              contact: {
-                company_name: buyer_name,
-                email: buyer_email || undefined,
-                phone: buyer_phone || undefined,
-              },
-            }),
+            body: JSON.stringify({ contact: contactPayload }),
           });
         }
 
