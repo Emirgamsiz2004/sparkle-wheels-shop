@@ -24,6 +24,8 @@ export interface KoopovereenkomstData {
     betaalwijze: string;
     contantBedrag?: number;
     overboekingBedrag?: number;
+    financieringBedrag?: number;
+    eigenBijdrage?: number;
     aanbetalingActief: boolean;
     aanbetalingsbedrag?: number;
     restbedrag?: number;
