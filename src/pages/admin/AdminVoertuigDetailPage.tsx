@@ -146,7 +146,19 @@ const AdminVoertuigDetailPage = () => {
       <ConsignatieOvereenkomstDialog open={consignatieOpen} onClose={() => setConsignatieOpen(false)} vehicle={vehicle} />
       <AanbetalingDialog open={aanbetalingOpen} onClose={() => setAanbetalingOpen(false)} vehicle={vehicle} onStatusChange={refetch} />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
-      <VerkoopWizard open={verkoopOpen} onOpenChange={setVerkoopOpen} vehicle={vehicle} onComplete={refetch} />
+      <VerkoopWizard
+        open={verkoopOpen}
+        onOpenChange={setVerkoopOpen}
+        vehicle={vehicle}
+        onComplete={refetch}
+        initialStep={vehicle.status === "gereserveerd" ? 2 : undefined}
+        existingCustomer={vehicle.status === "gereserveerd" && vehicle.koperNaam ? {
+          voornaam: vehicle.koperNaam?.split(" ")[0] || "",
+          achternaam: vehicle.koperNaam?.split(" ").slice(1).join(" ") || "",
+          telefoon: vehicle.koperTelefoon || "",
+          email: vehicle.koperEmail || "",
+        } : undefined}
+      />
       <ReserveringWizard open={reserveringOpen} onOpenChange={setReserveringOpen} vehicle={vehicle} onComplete={refetch} />
       <AppointmentFormDialog
         open={afspraakOpen}
