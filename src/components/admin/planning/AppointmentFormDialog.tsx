@@ -18,7 +18,8 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   customers: { id: string; voornaam: string; achternaam: string }[];
-  vehicles: { id: string; merk: string; model: string; kenteken: string | null }[];
+  vehicles: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
+  allVehicles?: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
   onSubmit: (data: any) => Promise<void>;
   defaultType?: string;
 }
