@@ -94,6 +94,11 @@ export function useMoneybird() {
   const getTaxRates = useCallback(() => invoke('get_tax_rates'), [invoke]);
   const getLedgerAccounts = useCallback(() => invoke('get_ledger_accounts'), [invoke]);
 
+  const downloadInvoicePdf = useCallback(
+    (invoiceId: string) => invoke('download_invoice_pdf', { invoice_id: invoiceId }),
+    [invoke]
+  );
+
   return {
     loading,
     invoke,
@@ -102,6 +107,7 @@ export function useMoneybird() {
     syncVehicleCosts,
     getSalesInvoices,
     sendInvoice,
+    downloadInvoicePdf,
     getTaxRates,
     getLedgerAccounts,
   };
