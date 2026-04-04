@@ -36,6 +36,7 @@ const GlobalActiveBar = () => {
   const [dismissedTimer, setDismissedTimer] = useState(false);
   const [dismissedTestDrive, setDismissedTestDrive] = useState(false);
   const [stopDialogOpen, setStopDialogOpen] = useState(false);
+  const [eindProefritOpen, setEindProefritOpen] = useState(false);
 
   const fetchActive = useCallback(async () => {
     if (!user) return;
@@ -50,14 +51,13 @@ const GlobalActiveBar = () => {
       .maybeSingle();
 
     const newTimer = timerData as ActiveTimer | null;
-    // If timer changed (new one started), un-dismiss
     if (newTimer?.id !== timer?.id) setDismissedTimer(false);
     setTimer(newTimer);
 
     // Active test drive
     const { data: tdData } = await supabase
       .from("test_drives")
-      .select("id, voertuig_merk, voertuig_model, voertuig_kenteken, km_voor, start_tijd, test_drive_customers(voornaam, achternaam)")
+      .select("id, voertuig_merk, voertuig_model, voertuig_kenteken, km_voor, start_tijd, customer_id, test_drive_customers(voornaam, achternaam)")
       .in("status", ["actief", "wacht_op_klant"])
       .limit(1)
       .maybeSingle();
