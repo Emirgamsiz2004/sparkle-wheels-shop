@@ -112,6 +112,7 @@ const GlobalActiveBar = () => {
 
   return (
     <>
+      <div className="px-4 pt-3 space-y-2">
       <AnimatePresence>
         {showTimer && (
           <motion.div
@@ -119,9 +120,9 @@ const GlobalActiveBar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-b border-emerald-500/20"
+            className="overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-2 bg-emerald-500/8">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-emerald-500/8 border border-emerald-500/25 rounded-[3px]">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shrink-0" />
                 <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -158,9 +159,9 @@ const GlobalActiveBar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-b border-blue-500/20"
+            className="overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-2 bg-blue-500/8">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-blue-500/8 border border-blue-500/25 rounded-[3px]">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse shrink-0" />
                 <Car className="w-3.5 h-3.5 text-blue-400 shrink-0" />
@@ -191,6 +192,7 @@ const GlobalActiveBar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       {timer && (
         <StopTimerDialog
