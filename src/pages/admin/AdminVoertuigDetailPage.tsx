@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import SlidingTabs from "@/components/admin/SlidingTabs";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
