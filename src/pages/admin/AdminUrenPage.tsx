@@ -210,14 +210,24 @@ const AdminUrenPage = () => {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-medium text-foreground">Uren & Taken</h1>
-        {!activeTimer && (
-          <button
-            onClick={() => setQuickTimerOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors"
-          >
-            <Timer className="w-3.5 h-3.5" /> Timer starten
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {activeTimer && (
+            <button
+              onClick={() => setStopTimerDialogOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-red-500/15 text-red-400 border border-red-500/30 rounded-md hover:bg-red-500/25 transition-colors"
+            >
+              <Square className="w-3.5 h-3.5" /> Timer stoppen ({formatElapsed(elapsed)})
+            </button>
+          )}
+          {!activeTimer && (
+            <button
+              onClick={() => setQuickTimerOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors"
+            >
+              <Timer className="w-3.5 h-3.5" /> Timer starten
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Top: Taken + Vandaag */}
