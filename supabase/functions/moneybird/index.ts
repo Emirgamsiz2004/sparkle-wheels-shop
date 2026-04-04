@@ -269,6 +269,29 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── Factuur versturen ───
+      case "send_sales_invoice": {
+        const { invoice_id, delivery_method } = params;
+        result = await mbFetch(`sales_invoices/${invoice_id}/send_invoice.json`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            sales_invoice_sending: {
+              delivery_method: delivery_method || "Email",
+            },
+          }),
+        });
+        break;
+      }
+
+      // ─── Factuur PDF downloaden ───
+      case "download_invoice_pdf": {
+        const { invoice_id: pdfInvoiceId } = params;
+        const invoice = await mbFetch(`sales_invoices/${pdfInvoiceId}.json`);
+        // Return the Moneybird PDF URL
+        result = { pdf_url: invoice.url, invoice };
+        break;
+      }
+
       default:
         return new Response(
           JSON.stringify({ error: `Onbekende actie: ${action}` }),
