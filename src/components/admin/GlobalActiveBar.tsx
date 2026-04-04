@@ -29,7 +29,6 @@ interface ActiveTestDrive {
 
 const GlobalActiveBar = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [timer, setTimer] = useState<ActiveTimer | null>(null);
   const [testDrive, setTestDrive] = useState<ActiveTestDrive | null>(null);
   const [elapsed, setElapsed] = useState(0);
