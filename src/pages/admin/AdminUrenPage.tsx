@@ -40,11 +40,12 @@ const AdminUrenPage = () => {
   const [tasksLoading, setTasksLoading] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const [confirmSwitch, setConfirmSwitch] = useState<VehicleTask | null>(null);
-  const [quickTimerOpen, setQuickTimerOpen] = useState(false);
-  const [quickDesc, setQuickDesc] = useState("");
-  const [quickCategory, setQuickCategory] = useState("overig");
-  const [quickStarting, setQuickStarting] = useState(false);
   const [stopTimerDialogOpen, setStopTimerDialogOpen] = useState(false);
+  const [editEntry, setEditEntry] = useState<TimeEntry | null>(null);
+  const [editDesc, setEditDesc] = useState("");
+  const [editCategory, setEditCategory] = useState("overig");
+  const [editNote, setEditNote] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   // History filters
   const [historySearch, setHistorySearch] = useState("");
