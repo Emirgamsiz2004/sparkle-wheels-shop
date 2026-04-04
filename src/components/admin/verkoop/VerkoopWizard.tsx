@@ -219,6 +219,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
       garantie: {
         type: details.garantieType,
         maanden: details.garantieMaanden,
+        kosten: details.garantieKosten,
+        betaler: details.garantieBetaler,
       },
       wwftBevestigd: details.wwftBevestigd,
       datum: new Date().toISOString().split("T")[0],
