@@ -4,11 +4,10 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { useCustomers } from "@/hooks/useCustomers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-import { Loader2, Play, Pause, CheckCircle, Download, Clock, Search, Plus, Timer, Square } from "lucide-react";
+import { Loader2, Play, Pause, CheckCircle, Download, Search, Timer, Square } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import StopTimerDialog from "@/components/admin/StopTimerDialog";
 
 interface VehicleTask {
@@ -34,17 +33,18 @@ const AdminUrenPage = () => {
   const { entries, activeTimer, loading: entriesLoading, startTimer, stopTimer, fetchEntries } = useTimeEntries();
   const { vehicles } = useVehicles();
   const { customers } = useCustomers();
-  const navigate = useNavigate();
+  
 
   const [tasks, setTasks] = useState<VehicleTask[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const [confirmSwitch, setConfirmSwitch] = useState<VehicleTask | null>(null);
-  const [quickTimerOpen, setQuickTimerOpen] = useState(false);
-  const [quickDesc, setQuickDesc] = useState("");
-  const [quickCategory, setQuickCategory] = useState("overig");
-  const [quickStarting, setQuickStarting] = useState(false);
   const [stopTimerDialogOpen, setStopTimerDialogOpen] = useState(false);
+  const [editEntry, setEditEntry] = useState<TimeEntry | null>(null);
+  const [editDesc, setEditDesc] = useState("");
+  const [editCategory, setEditCategory] = useState("overig");
+  const [editNote, setEditNote] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   // History filters
   const [historySearch, setHistorySearch] = useState("");
@@ -171,15 +171,40 @@ const AdminUrenPage = () => {
     setConfirmSwitch(null);
   };
 
-  // Quick timer start
+  // Quick timer start — no description needed, just start
   const handleQuickStart = async () => {
-    if (!quickDesc.trim()) { toast.error("Vul een omschrijving in"); return; }
-    setQuickStarting(true);
-    await startTimer({ description: quickDesc.trim(), category: quickCategory });
-    setQuickStarting(false);
-    setQuickTimerOpen(false);
-    setQuickDesc("");
-    setQuickCategory("overig");
+    await startTimer({ description: "Timer", category: "overig" });
+  };
+
+  // Edit entry
+  const openEditEntry = (entry: TimeEntry) => {
+    setEditEntry(entry);
+    setEditDesc(entry.description);
+    setEditCategory(entry.category);
+    setEditNote(entry.end_note || "");
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editEntry || !editDesc.trim()) return;
+    setEditSaving(true);
+    await supabase.from("time_entries").update({
+      description: editDesc.trim(),
+      category: editCategory,
+      end_note: editNote.trim() || null,
+    } as any).eq("id", editEntry.id);
+    toast.success("Bijgewerkt");
+    setEditSaving(false);
+    setEditEntry(null);
+    fetchEntries();
+  };
+
+  const handleDeleteEntry = async () => {
+    if (!editEntry) return;
+    if (!confirm("Weet je zeker dat je deze registratie wilt verwijderen?")) return;
+    await supabase.from("time_entries").delete().eq("id", editEntry.id);
+    toast.success("Verwijderd");
+    setEditEntry(null);
+    fetchEntries();
   };
 
   // CSV export
@@ -221,7 +246,7 @@ const AdminUrenPage = () => {
           )}
           {!activeTimer && (
             <button
-              onClick={() => setQuickTimerOpen(true)}
+              onClick={handleQuickStart}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors"
             >
               <Timer className="w-3.5 h-3.5" /> Timer starten
@@ -292,7 +317,7 @@ const AdminUrenPage = () => {
           ) : (
             <div className="space-y-1">
               {todayEntries.map(e => (
-                <div key={e.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+                <div key={e.id} onClick={() => e.end_time && openEditEntry(e)} className={`flex items-center justify-between py-2 border-b border-border/50 last:border-0 ${e.end_time ? "cursor-pointer hover:bg-accent/20" : ""} transition-colors rounded-md px-2 -mx-2`}>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-foreground truncate">{e.description}</p>
                     <p className="text-xs text-muted-foreground truncate">
@@ -348,16 +373,12 @@ const AdminUrenPage = () => {
               {historyEntries.length === 0 ? (
                 <tr><td colSpan={4} className="px-3 py-8 text-center text-muted-foreground text-sm">Geen uren gevonden</td></tr>
               ) : historyEntries.map(e => (
-                <tr key={e.id} className="border-b border-border/50 hover:bg-accent/20 transition-colors">
+                <tr key={e.id} onClick={() => openEditEntry(e)} className="border-b border-border/50 hover:bg-accent/20 transition-colors cursor-pointer">
                   <td className="px-3 py-2 text-muted-foreground whitespace-nowrap text-xs">
                     {new Date(e.start_time).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
                   </td>
                   <td className="px-3 py-2 text-xs">
-                    {e.vehicles ? (
-                      <button onClick={() => navigate(`/admin/voertuigen/${e.vehicle_id}`)} className="text-foreground hover:underline">
-                        {e.vehicles.merk} {e.vehicles.model}
-                      </button>
-                    ) : "—"}
+                    {e.vehicles ? `${e.vehicles.merk} ${e.vehicles.model}` : "—"}
                   </td>
                   <td className="px-3 py-2 text-foreground max-w-[200px] truncate text-xs">{e.description}</td>
                   <td className="px-3 py-2 text-right font-medium tabular-nums text-xs">{formatDuration(e.duration_minutes)}</td>
@@ -388,27 +409,35 @@ const AdminUrenPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Quick timer start dialog */}
-      <Dialog open={quickTimerOpen} onOpenChange={setQuickTimerOpen}>
+      {/* Edit entry dialog */}
+      <Dialog open={!!editEntry} onOpenChange={() => setEditEntry(null)}>
         <DialogContent className="sm:max-w-[420px]">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium">Timer starten</DialogTitle>
+            <DialogTitle className="text-base font-medium">Urenregistratie bewerken</DialogTitle>
           </DialogHeader>
-          <AnimatePresence mode="wait">
+          {editEntry && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
               className="space-y-4"
             >
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{new Date(editEntry.start_time).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })}</span>
+                <span className="font-medium tabular-nums">{formatDuration(editEntry.duration_minutes)}</span>
+              </div>
+              {editEntry.vehicles && (
+                <div className="text-xs text-muted-foreground">
+                  Voertuig: {editEntry.vehicles.merk} {editEntry.vehicles.model}
+                  {editEntry.vehicles.kenteken && ` · ${editEntry.vehicles.kenteken.toUpperCase()}`}
+                </div>
+              )}
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1.5">Waar ga je aan werken? *</label>
+                <label className="text-xs font-medium text-muted-foreground block mb-1.5">Omschrijving *</label>
                 <input
-                  value={quickDesc}
-                  onChange={(e) => setQuickDesc(e.target.value)}
-                  placeholder="bijv. Auto wassen, Admin werk..."
+                  value={editDesc}
+                  onChange={(e) => setEditDesc(e.target.value)}
                   className="w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring/30 text-foreground placeholder:text-muted-foreground transition-all"
-                  autoFocus
                 />
               </div>
               <div>
@@ -417,9 +446,9 @@ const AdminUrenPage = () => {
                   {Object.entries(categoryLabels).map(([val, label]) => (
                     <button
                       key={val}
-                      onClick={() => setQuickCategory(val)}
+                      onClick={() => setEditCategory(val)}
                       className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-                        quickCategory === val
+                        editCategory === val
                           ? "bg-foreground text-background border-foreground"
                           : "bg-secondary/50 text-muted-foreground border-border hover:bg-accent"
                       }`}
@@ -429,15 +458,33 @@ const AdminUrenPage = () => {
                   ))}
                 </div>
               </div>
-              <button
-                onClick={handleQuickStart}
-                disabled={quickStarting || !quickDesc.trim()}
-                className="w-full py-2.5 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors disabled:opacity-50"
-              >
-                {quickStarting ? "Bezig..." : "Start timer"}
-              </button>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground block mb-1.5">Notitie (optioneel)</label>
+                <textarea
+                  value={editNote}
+                  onChange={(e) => setEditNote(e.target.value)}
+                  placeholder="Extra opmerkingen..."
+                  rows={2}
+                  className="w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring/30 text-foreground placeholder:text-muted-foreground resize-none transition-all"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDeleteEntry}
+                  className="px-3 py-2.5 text-xs font-medium text-red-400 border border-red-500/30 rounded-md hover:bg-red-500/10 transition-colors"
+                >
+                  Verwijderen
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={editSaving || !editDesc.trim()}
+                  className="flex-1 py-2.5 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                >
+                  {editSaving ? "Bezig..." : "Opslaan"}
+                </button>
+              </div>
             </motion.div>
-          </AnimatePresence>
+          )}
         </DialogContent>
       </Dialog>
 

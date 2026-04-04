@@ -128,7 +128,7 @@ const GlobalActiveBar = () => {
                 <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shrink-0" />
                 <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <p className="text-xs text-foreground truncate">
-                  <span className="font-medium">{timer!.description}</span>
+                  <span className="font-medium">{timer!.description === "Timer" ? "Timer loopt..." : timer!.description}</span>
                   {timer!.vehicles && (
                     <span className="text-muted-foreground ml-1.5">· {timer!.vehicles.merk} {timer!.vehicles.model}</span>
                   )}
