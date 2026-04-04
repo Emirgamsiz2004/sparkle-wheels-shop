@@ -410,27 +410,35 @@ const AdminUrenPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Quick timer start dialog */}
-      <Dialog open={quickTimerOpen} onOpenChange={setQuickTimerOpen}>
+      {/* Edit entry dialog */}
+      <Dialog open={!!editEntry} onOpenChange={() => setEditEntry(null)}>
         <DialogContent className="sm:max-w-[420px]">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium">Timer starten</DialogTitle>
+            <DialogTitle className="text-base font-medium">Urenregistratie bewerken</DialogTitle>
           </DialogHeader>
-          <AnimatePresence mode="wait">
+          {editEntry && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
               className="space-y-4"
             >
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{new Date(editEntry.start_time).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })}</span>
+                <span className="font-medium tabular-nums">{formatDuration(editEntry.duration_minutes)}</span>
+              </div>
+              {editEntry.vehicles && (
+                <div className="text-xs text-muted-foreground">
+                  Voertuig: {editEntry.vehicles.merk} {editEntry.vehicles.model}
+                  {editEntry.vehicles.kenteken && ` · ${editEntry.vehicles.kenteken.toUpperCase()}`}
+                </div>
+              )}
               <div>
-                <label className="text-xs font-medium text-muted-foreground block mb-1.5">Waar ga je aan werken? *</label>
+                <label className="text-xs font-medium text-muted-foreground block mb-1.5">Omschrijving *</label>
                 <input
-                  value={quickDesc}
-                  onChange={(e) => setQuickDesc(e.target.value)}
-                  placeholder="bijv. Auto wassen, Admin werk..."
+                  value={editDesc}
+                  onChange={(e) => setEditDesc(e.target.value)}
                   className="w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring/30 text-foreground placeholder:text-muted-foreground transition-all"
-                  autoFocus
                 />
               </div>
               <div>
@@ -439,9 +447,9 @@ const AdminUrenPage = () => {
                   {Object.entries(categoryLabels).map(([val, label]) => (
                     <button
                       key={val}
-                      onClick={() => setQuickCategory(val)}
+                      onClick={() => setEditCategory(val)}
                       className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-                        quickCategory === val
+                        editCategory === val
                           ? "bg-foreground text-background border-foreground"
                           : "bg-secondary/50 text-muted-foreground border-border hover:bg-accent"
                       }`}
@@ -451,15 +459,33 @@ const AdminUrenPage = () => {
                   ))}
                 </div>
               </div>
-              <button
-                onClick={handleQuickStart}
-                disabled={quickStarting || !quickDesc.trim()}
-                className="w-full py-2.5 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors disabled:opacity-50"
-              >
-                {quickStarting ? "Bezig..." : "Start timer"}
-              </button>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground block mb-1.5">Notitie (optioneel)</label>
+                <textarea
+                  value={editNote}
+                  onChange={(e) => setEditNote(e.target.value)}
+                  placeholder="Extra opmerkingen..."
+                  rows={2}
+                  className="w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring/30 text-foreground placeholder:text-muted-foreground resize-none transition-all"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDeleteEntry}
+                  className="px-3 py-2.5 text-xs font-medium text-red-400 border border-red-500/30 rounded-md hover:bg-red-500/10 transition-colors"
+                >
+                  Verwijderen
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={editSaving || !editDesc.trim()}
+                  className="flex-1 py-2.5 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                >
+                  {editSaving ? "Bezig..." : "Opslaan"}
+                </button>
+              </div>
             </motion.div>
-          </AnimatePresence>
+          )}
         </DialogContent>
       </Dialog>
 
