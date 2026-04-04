@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import { X, Square, Clock, Car } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import StopTimerDialog from "./StopTimerDialog";
+import EindProefritDialog from "./proefrit/EindProefritDialog";
+import { TestDrive } from "@/hooks/useTestDrives";
 
 interface ActiveTimer {
   id: string;
@@ -22,6 +23,7 @@ interface ActiveTestDrive {
   voertuig_kenteken: string | null;
   km_voor: number;
   start_tijd: string;
+  customer_id?: string | null;
   customer?: { voornaam: string; achternaam: string } | null;
 }
 
