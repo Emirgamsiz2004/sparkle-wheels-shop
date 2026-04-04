@@ -18,7 +18,7 @@ interface Props {
   onOpenKosten: () => void;
   onOpenTaak: () => void;
   onOpenVerkoop: () => void;
-  onOpenAfspraak?: () => void;
+  onOpenAfspraak?: (type?: string) => void;
   onDelete: () => void;
 }
 
