@@ -102,7 +102,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenAanbetaling={() => setAanbetalingOpen(true)}
         onOpenKosten={() => setKostenOpen(true)}
         onOpenTaak={handleOpenTaak}
-        onOpenAfspraak={() => setAfspraakOpen(true)}
+        onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
         onOpenVerkoop={() => setVerkoopOpen(true)}
         onDelete={handleDelete}
       />
