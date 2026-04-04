@@ -322,12 +322,12 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* ═══ BLOK 5 — Drie voorraad getallen ═══ */}
-      <div className="grid grid-cols-3 gap-4">
-        {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[88px] rounded-lg" />) : (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[88px] rounded-md" />) : (
           <>
             <KpiCard label="Voertuigen in voorraad" value={String(kpis.voorraad)} />
             <KpiCard label="Langste stager" value={`${langsteStager} dagen`} />
-            <KpiCard label="Totale inkoopwaarde voorraad" value={formatEuro(totaleInkoopVoorraad)} />
+            <KpiCard label="Totale inkoopwaarde" value={formatEuro(totaleInkoopVoorraad)} />
           </>
         )}
       </div>
