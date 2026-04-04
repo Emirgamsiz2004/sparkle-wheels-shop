@@ -18,6 +18,7 @@ interface Props {
   onOpenKosten: () => void;
   onOpenTaak: () => void;
   onOpenVerkoop: () => void;
+  onOpenReservering?: () => void;
   onOpenAfspraak?: (type?: string) => void;
   onDelete: () => void;
 }
@@ -28,7 +29,7 @@ const allStatuses: Vehicle["status"][] = [
 
 const btnCls = "inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium border border-border rounded-md hover:bg-accent hover:border-accent transition-colors active:scale-[0.97] text-foreground min-h-[36px]";
 
-const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onOpenVerkoop, onOpenAfspraak, onDelete }: Props) => {
+const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onOpenVerkoop, onOpenReservering, onOpenAfspraak, onDelete }: Props) => {
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -82,9 +83,15 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           <ClipboardCheck className="w-3.5 h-3.5" /> Proefrit
         </button>
 
-        <button onClick={onOpenVerkoop} className={btnCls}>
-          <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
-        </button>
+        {vehicle.status === "gereserveerd" ? (
+          <button onClick={onOpenVerkoop} className={btnCls + " !border-emerald-500/30 !text-emerald-400"}>
+            <ShoppingCart className="w-3.5 h-3.5" /> Verkoop afronden
+          </button>
+        ) : (
+          <button onClick={onOpenVerkoop} className={btnCls}>
+            <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
+          </button>
+        )}
 
         {onOpenAfspraak && (
           <DropdownMenu>
@@ -136,6 +143,11 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="p-1">
+            {onOpenReservering && (
+              <DropdownMenuItem onClick={onOpenReservering}>
+                <Banknote className="w-3.5 h-3.5 mr-2" /> Reserveren
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <FileText className="w-3.5 h-3.5 mr-2" /> Document genereren

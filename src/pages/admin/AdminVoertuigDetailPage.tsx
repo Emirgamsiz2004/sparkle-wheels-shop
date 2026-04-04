@@ -15,7 +15,8 @@ import VehicleFinancieelEditTab from "@/components/admin/detail/VehicleFinanciee
 import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
-import VerkoopDialog from "@/components/admin/VerkoopDialog";
+import VerkoopWizard from "@/components/admin/verkoop/VerkoopWizard";
+import ReserveringWizard from "@/components/admin/verkoop/ReserveringWizard";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useAppointments } from "@/hooks/useAppointments";
@@ -39,6 +40,7 @@ const AdminVoertuigDetailPage = () => {
   const [aanbetalingOpen, setAanbetalingOpen] = useState(false);
   const [kostenOpen, setKostenOpen] = useState(false);
   const [verkoopOpen, setVerkoopOpen] = useState(false);
+  const [reserveringOpen, setReserveringOpen] = useState(false);
   const [afspraakOpen, setAfspraakOpen] = useState(false);
   const [afspraakType, setAfspraakType] = useState<string | undefined>();
 
@@ -105,6 +107,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenTaak={handleOpenTaak}
         onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
         onOpenVerkoop={() => setVerkoopOpen(true)}
+        onOpenReservering={() => setReserveringOpen(true)}
         onDelete={handleDelete}
       />
 
@@ -143,7 +146,20 @@ const AdminVoertuigDetailPage = () => {
       <ConsignatieOvereenkomstDialog open={consignatieOpen} onClose={() => setConsignatieOpen(false)} vehicle={vehicle} />
       <AanbetalingDialog open={aanbetalingOpen} onClose={() => setAanbetalingOpen(false)} vehicle={vehicle} onStatusChange={refetch} />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
-      <VerkoopDialog open={verkoopOpen} onOpenChange={setVerkoopOpen} vehicle={vehicle} onComplete={refetch} />
+      <VerkoopWizard
+        open={verkoopOpen}
+        onOpenChange={setVerkoopOpen}
+        vehicle={vehicle}
+        onComplete={refetch}
+        initialStep={vehicle.status === "gereserveerd" ? 2 : undefined}
+        existingCustomer={vehicle.status === "gereserveerd" && vehicle.koperNaam ? {
+          voornaam: vehicle.koperNaam?.split(" ")[0] || "",
+          achternaam: vehicle.koperNaam?.split(" ").slice(1).join(" ") || "",
+          telefoon: vehicle.koperTelefoon || "",
+          email: vehicle.koperEmail || "",
+        } : undefined}
+      />
+      <ReserveringWizard open={reserveringOpen} onOpenChange={setReserveringOpen} vehicle={vehicle} onComplete={refetch} />
       <AppointmentFormDialog
         open={afspraakOpen}
         onOpenChange={(v) => { setAfspraakOpen(v); if (!v) setAfspraakType(undefined); }}
