@@ -510,24 +510,45 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                       )}
 
                       {/* Aanbetaling */}
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={details.aanbetalingActief} onChange={e => setDetails(d => ({ ...d, aanbetalingActief: e.target.checked }))} className="w-3.5 h-3.5 rounded-sm border-border" />
-                          <span className="text-xs text-foreground">Aanbetaling</span>
-                        </label>
-                        {details.aanbetalingActief && (
-                          <div className="grid grid-cols-2 gap-3 pl-5">
-                            <div>
-                              <label className={labelCls}>Aanbetalingsbedrag (€)</label>
-                              <input type="number" step="0.01" value={details.aanbetalingsbedrag} onChange={e => setDetails(d => ({ ...d, aanbetalingsbedrag: Number(e.target.value) }))} className={inputCls} />
-                            </div>
-                            <div>
-                              <label className={labelCls}>Aanbetalingsdatum</label>
-                              <input type="date" value={details.aanbetalingDatum} onChange={e => setDetails(d => ({ ...d, aanbetalingDatum: e.target.value }))} className={inputCls} />
-                            </div>
-                            <p className="col-span-2 text-xs text-muted-foreground">Restbedrag: {formatEuroDecimal(restbedrag)}</p>
-                          </div>
-                        )}
+                      <div className="space-y-3">
+                        <label className={labelCls}>Aanbetaling</label>
+                        <div className="inline-flex bg-secondary/50 border border-border rounded-[3px] p-0.5">
+                          <button
+                            onClick={() => setDetails(d => ({ ...d, aanbetalingActief: false }))}
+                            className={`px-4 py-1.5 text-xs font-medium rounded-[2px] transition-all ${!details.aanbetalingActief ? "bg-foreground text-background shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                          >
+                            Nee
+                          </button>
+                          <button
+                            onClick={() => setDetails(d => ({ ...d, aanbetalingActief: true }))}
+                            className={`px-4 py-1.5 text-xs font-medium rounded-[2px] transition-all ${details.aanbetalingActief ? "bg-foreground text-background shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                          >
+                            Ja
+                          </button>
+                        </div>
+                        <AnimatePresence>
+                          {details.aanbetalingActief && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: "easeInOut" }}
+                              className="overflow-hidden"
+                            >
+                              <div className="grid grid-cols-2 gap-3 pt-1">
+                                <div>
+                                  <label className={labelCls}>Aanbetalingsbedrag (€)</label>
+                                  <input type="number" step="0.01" value={details.aanbetalingsbedrag} onChange={e => setDetails(d => ({ ...d, aanbetalingsbedrag: Number(e.target.value) }))} className={inputCls} />
+                                </div>
+                                <div>
+                                  <label className={labelCls}>Aanbetalingsdatum</label>
+                                  <input type="date" value={details.aanbetalingDatum} onChange={e => setDetails(d => ({ ...d, aanbetalingDatum: e.target.value }))} className={inputCls} />
+                                </div>
+                                <p className="col-span-2 text-xs text-muted-foreground">Restbedrag: {formatEuroDecimal(restbedrag)}</p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       {/* Afleverdatum */}
