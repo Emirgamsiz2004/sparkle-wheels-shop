@@ -67,6 +67,8 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
     afleverdatum: "",
     garantieType: "geen" as string,
     garantieMaanden: 3,
+    garantieKosten: 0,
+    garantieBetaler: "geen" as string,
     wwftBevestigd: false,
   });
 
