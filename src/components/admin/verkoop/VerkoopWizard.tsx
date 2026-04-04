@@ -643,7 +643,12 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                         <div className="flex justify-between"><span className="text-muted-foreground">Verkoopprijs</span><span className="text-foreground font-medium">{formatEuroDecimal(details.verkoopprijs)}</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Betaalwijze</span><span className="text-foreground capitalize">{details.betaalwijze}</span></div>
                         {details.garantieType !== "geen" && (
-                          <div className="flex justify-between"><span className="text-muted-foreground">Garantie</span><span className="text-foreground">{details.garantieType === "autotrust" ? "AutoTrust" : "Eigen"} — {details.garantieMaanden} mnd</span></div>
+                          <>
+                            <div className="flex justify-between"><span className="text-muted-foreground">Garantie</span><span className="text-foreground">{details.garantieType === "autotrust" ? "AutoTrust" : "Eigen"} — {details.garantieMaanden} mnd</span></div>
+                            {details.garantieKosten > 0 && (
+                              <div className="flex justify-between"><span className="text-muted-foreground">Garantiekosten</span><span className="text-foreground">{formatEuroDecimal(details.garantieKosten)} ({details.garantieBetaler === "klant" ? "klant" : details.garantieBetaler === "gedeeld" ? "gedeeld" : "dealer"})</span></div>
+                            )}
+                          </>
                         )}
                       </div>
 
