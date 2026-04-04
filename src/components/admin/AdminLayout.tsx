@@ -9,6 +9,7 @@ import {
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
+import GlobalSearch from "@/components/admin/GlobalSearch";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; }
 interface NavGroup { label: string; items: NavItem[]; }
