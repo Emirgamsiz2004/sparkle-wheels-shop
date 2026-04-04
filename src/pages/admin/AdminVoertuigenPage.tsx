@@ -106,12 +106,14 @@ const AdminVoertuigenPage = () => {
 
       {/* Filters */}
       <div className="space-y-3">
-        <SlidingTabs
-          tabs={tabs}
-          value={filter}
-          onChange={setFilter}
-          className="w-fit"
-        />
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+          <SlidingTabs
+            tabs={tabs}
+            value={filter}
+            onChange={setFilter}
+            className="min-w-max"
+          />
+        </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
