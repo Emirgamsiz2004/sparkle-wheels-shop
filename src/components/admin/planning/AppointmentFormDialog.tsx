@@ -72,14 +72,15 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     onOpenChange(v);
   };
 
+  const vehicleList = type === "aflevering" && allVehicles ? allVehicles : vehicles;
   const filteredVehicles = useMemo(() => {
-    if (!vehicleSearch) return vehicles;
+    if (!vehicleSearch) return vehicleList;
     const q = vehicleSearch.toLowerCase().replace(/[-\s]/g, "");
-    return vehicles.filter(v =>
+    return vehicleList.filter(v =>
       `${v.merk} ${v.model}`.toLowerCase().includes(q) ||
       (v.kenteken || "").toLowerCase().replace(/[-\s]/g, "").includes(q)
     );
-  }, [vehicles, vehicleSearch]);
+  }, [vehicleList, vehicleSearch]);
 
   const handleSubmit = async () => {
     if (!type || !selectedDate || !form.tijd) return;
