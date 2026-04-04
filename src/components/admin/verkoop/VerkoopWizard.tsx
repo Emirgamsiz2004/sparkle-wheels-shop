@@ -36,7 +36,7 @@ const btnSecondary = "px-5 py-2.5 bg-secondary text-secondary-foreground text-sm
 
 const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, existingCustomer, existingDeposit }: Props) => {
   const { customers } = useCustomers();
-  const { createVehicleInvoice, loading: mbLoading } = useMoneybird();
+  const { createVehicleInvoice, downloadInvoicePdf, sendInvoice, loading: mbLoading } = useMoneybird();
 
   const [step, setStep] = useState(initialStep || 1);
   const [saving, setSaving] = useState(false);
