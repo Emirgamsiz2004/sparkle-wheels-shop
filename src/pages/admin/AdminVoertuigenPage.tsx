@@ -183,8 +183,8 @@ const AdminVoertuigenPage = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  {["Voertuig", "Kenteken", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive", ""].map((h, i) => (
-                    <th key={h || i} className={`${i >= 2 && i <= 4 ? "text-right" : i >= 5 ? "text-center" : "text-left"} px-4 py-2.5 text-xs font-medium text-muted-foreground`}>{h}</th>
+                  {["Voertuig", "Kenteken", "APK", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive", ""].map((h, i) => (
+                    <th key={h || i} className={`${i >= 3 && i <= 5 ? "text-right" : i >= 6 ? "text-center" : "text-left"} px-4 py-2.5 text-xs font-medium text-muted-foreground`}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -200,10 +200,10 @@ const AdminVoertuigenPage = () => {
                         </Link>
                       </td>
                       <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-3">
-                          <span className="text-muted-foreground text-xs font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
-                          <ApkBadge apkVervaldatum={v.apkVervaldatum} />
-                        </div>
+                        <span className="text-muted-foreground text-xs font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <ApkBadge apkVervaldatum={v.apkVervaldatum} />
                       </td>
                       <td className="px-4 py-2.5 text-right tabular-nums">
                         {isConsignatie(v) ? <span className="text-muted-foreground text-xs">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
@@ -237,14 +237,24 @@ const AdminVoertuigenPage = () => {
 
 const ApkBadge = ({ apkVervaldatum }: { apkVervaldatum?: string }) => {
   const status = getApkStatus(apkVervaldatum);
-  if (status.level === 'green' || status.level === 'none') return null;
+  if (status.level === 'green' || status.level === 'none') {
+    if (status.level === 'none') return <span className="text-[10px] text-muted-foreground/50">—</span>;
+    const apk = new Date(apkVervaldatum!);
+    const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+    return <span className="text-[10px] text-muted-foreground">Tot {formatted}</span>;
+  }
   const isRed = status.level === 'red';
+  const apk = new Date(apkVervaldatum!);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const isExpired = apk.getTime() < today.getTime();
+  const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
   return (
-    <span className={`inline-flex items-center gap-1.5 text-[10px] font-medium whitespace-nowrap ${
-      isRed ? "text-red-400" : "text-amber-400"
+    <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap border ${
+      isRed
+        ? "bg-red-500/10 text-red-400 border-red-500/25"
+        : "bg-amber-500/10 text-amber-400 border-amber-500/25"
     }`}>
-      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isRed ? "bg-red-400" : "bg-amber-400"}`} />
-      APK {status.label}
+      {isExpired ? `Verlopen ${formatted}` : `Verloopt ${formatted}`}
     </span>
   );
 };
