@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
+import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; }
 interface NavGroup { label: string; items: NavItem[]; }
