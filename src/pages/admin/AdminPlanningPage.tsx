@@ -109,6 +109,7 @@ const AdminPlanningPage = () => {
   }, [appointments, periodFilter, typeFilter, searchQuery]);
 
   const activeVehicles = useMemo(() => vehicles.filter((v) => v.status !== "verkocht"), [vehicles]);
+  const allSelectableVehicles = useMemo(() => vehicles.filter((v) => ["te_koop", "in_behandeling", "consignatie", "gereserveerd", "verkocht", "reparatie_onderhoud"].includes(v.status)), [vehicles]);
 
   // On mobile, show day list for agenda instead of 7-col grid
   const todayAppointments = useMemo(() => {
