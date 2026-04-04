@@ -520,18 +520,28 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                       </AnimatePresence>
 
                       {/* Wwft */}
-                      {wwftNodig && (
-                        <div className="p-3 bg-red-500/10 border border-red-500/25 rounded-[3px] space-y-2">
-                          <p className="text-xs text-red-400 flex items-center gap-2">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            Contante betaling boven €3.000 — Wwft identificatieplicht van toepassing.
-                          </p>
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" checked={details.wwftBevestigd} onChange={e => setDetails(d => ({ ...d, wwftBevestigd: e.target.checked }))} className="w-3.5 h-3.5 rounded-sm border-border" />
-                            <span className="text-xs text-foreground">Ik bevestig dat de Wwft-identificatieplicht is nageleefd</span>
-                          </label>
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {wwftNodig && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="p-3 bg-red-500/10 border border-red-500/25 rounded-[3px] space-y-2">
+                              <p className="text-xs text-red-400 flex items-center gap-2">
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                Contante betaling boven €3.000 — Wwft identificatieplicht van toepassing.
+                              </p>
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked={details.wwftBevestigd} onChange={e => setDetails(d => ({ ...d, wwftBevestigd: e.target.checked }))} className="w-3.5 h-3.5 rounded-sm border-border" />
+                                <span className="text-xs text-foreground">Ik bevestig dat de Wwft-identificatieplicht is nageleefd</span>
+                              </label>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Aanbetaling */}
                       <div className="space-y-3">
