@@ -200,6 +200,20 @@ input[type="number"] {
     transform: translateY(0);
   }
 }
+
+@keyframes admin-expand {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: scaleY(0.95);
+    transform-origin: top;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: scaleY(1);
+    transform-origin: top;
+  }
 }
 
 @layer base {
