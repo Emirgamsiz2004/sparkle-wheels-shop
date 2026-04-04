@@ -113,6 +113,65 @@ input[type="number"] {
     font-family: 'DM Sans', sans-serif;
   }
 
+  /* Admin — smooth transitions everywhere */
+  .admin-theme button,
+  .admin-theme a,
+  .admin-theme input,
+  .admin-theme select,
+  .admin-theme textarea,
+  .admin-theme [role="tab"],
+  .admin-theme [role="tabpanel"],
+  .admin-theme [class*="badge"],
+  .admin-theme span[class*="px-"],
+  .admin-theme tr,
+  .admin-theme td {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Smooth content appear for admin sections */
+  .admin-theme .space-y-1\.5 > *,
+  .admin-theme .space-y-2 > *,
+  .admin-theme .space-y-3 > *,
+  .admin-theme .space-y-4 > *,
+  .admin-theme table tbody tr {
+    animation: admin-fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .admin-theme .space-y-1\.5 > *:nth-child(1),
+  .admin-theme .space-y-2 > *:nth-child(1),
+  .admin-theme .space-y-3 > *:nth-child(1),
+  .admin-theme .space-y-4 > *:nth-child(1),
+  .admin-theme table tbody tr:nth-child(1) { animation-delay: 0ms; }
+  .admin-theme .space-y-1\.5 > *:nth-child(2),
+  .admin-theme .space-y-2 > *:nth-child(2),
+  .admin-theme .space-y-3 > *:nth-child(2),
+  .admin-theme .space-y-4 > *:nth-child(2),
+  .admin-theme table tbody tr:nth-child(2) { animation-delay: 30ms; }
+  .admin-theme .space-y-1\.5 > *:nth-child(3),
+  .admin-theme .space-y-2 > *:nth-child(3),
+  .admin-theme .space-y-3 > *:nth-child(3),
+  .admin-theme .space-y-4 > *:nth-child(3),
+  .admin-theme table tbody tr:nth-child(3) { animation-delay: 60ms; }
+  .admin-theme .space-y-1\.5 > *:nth-child(n+4),
+  .admin-theme .space-y-2 > *:nth-child(n+4),
+  .admin-theme .space-y-3 > *:nth-child(n+4),
+  .admin-theme .space-y-4 > *:nth-child(n+4),
+  .admin-theme table tbody tr:nth-child(n+4) { animation-delay: 80ms; }
+
+  /* Smoother dialog animations */
+  body:has(.admin-theme) [data-radix-portal] [data-state="open"][role="dialog"],
+  body:has(.admin-theme) [data-radix-portal] [data-state="open"][class*="DialogContent"],
+  body:has(.admin-theme) [data-radix-portal] [data-state="open"][class*="AlertDialogContent"] {
+    animation-duration: 0.3s !important;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Smoother dropdown animations */
+  body:has(.admin-theme) [data-radix-portal] [data-radix-menu-content] {
+    animation-duration: 0.2s !important;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
   .admin-theme h1,
   .admin-theme h2,
   .admin-theme h3,
@@ -130,6 +189,17 @@ input[type="number"] {
     font-family: 'Poppins', sans-serif !important;
     font-weight: 600;
   }
+
+@keyframes admin-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 }
 
 @layer base {
