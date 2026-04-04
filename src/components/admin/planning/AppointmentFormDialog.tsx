@@ -14,6 +14,7 @@ interface Props {
   customers: { id: string; voornaam: string; achternaam: string }[];
   vehicles: { id: string; merk: string; model: string; kenteken: string | null }[];
   onSubmit: (data: any) => Promise<void>;
+  defaultType?: string;
 }
 
 const typeOptions: { value: AppointmentType; label: string; icon: typeof Eye; color: string }[] = [
