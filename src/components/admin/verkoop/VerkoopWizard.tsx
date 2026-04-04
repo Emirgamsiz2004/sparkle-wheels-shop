@@ -396,18 +396,28 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                     <div className="space-y-4">
                       <h3 className="text-sm font-semibold font-['Poppins'] text-foreground">Klantgegevens</h3>
 
-                      {duplicateFound && (
-                        <div className="p-3 bg-amber-500/10 border border-amber-500/25 rounded-[3px] space-y-2">
-                          <p className="text-xs text-amber-400 flex items-center gap-2">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            Dit lijkt op een bestaande klant: {duplicateFound.voornaam} {duplicateFound.achternaam}
-                          </p>
-                          <div className="flex gap-2">
-                            <button onClick={useDuplicate} className="text-xs px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-[3px] hover:bg-amber-500/30 transition-colors">Ja, gebruik bestaande</button>
-                            <button onClick={() => { setDuplicateFound(null); setStep(2); }} className="text-xs px-3 py-1.5 bg-secondary text-secondary-foreground rounded-[3px] hover:bg-secondary/80 transition-colors">Nee, maak nieuwe aan</button>
-                          </div>
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {duplicateFound && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="p-3 bg-amber-500/10 border border-amber-500/25 rounded-[3px] space-y-2">
+                              <p className="text-xs text-amber-400 flex items-center gap-2">
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                Dit lijkt op een bestaande klant: {duplicateFound.voornaam} {duplicateFound.achternaam}
+                              </p>
+                              <div className="flex gap-2">
+                                <button onClick={useDuplicate} className="text-xs px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-[3px] hover:bg-amber-500/30 transition-colors">Ja, gebruik bestaande</button>
+                                <button onClick={() => { setDuplicateFound(null); setStep(2); }} className="text-xs px-3 py-1.5 bg-secondary text-secondary-foreground rounded-[3px] hover:bg-secondary/80 transition-colors">Nee, maak nieuwe aan</button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {showExistingSelect ? (
                         <div className="space-y-2">
@@ -483,35 +493,65 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                         </div>
                       </div>
 
-                      {details.betaalwijze === "combinatie" && (
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className={labelCls}>Bedrag contant (€)</label>
-                            <input type="number" step="0.01" value={details.contantBedrag} onChange={e => setDetails(d => ({ ...d, contantBedrag: Number(e.target.value) }))} className={inputCls} />
-                          </div>
-                          <div>
-                            <label className={labelCls}>Bedrag overboeking (€)</label>
-                            <input type="number" step="0.01" value={details.overboekingBedrag} onChange={e => setDetails(d => ({ ...d, overboekingBedrag: Number(e.target.value) }))} className={inputCls} />
-                          </div>
-                          {!combinatieKlopt && (
-                            <p className="col-span-2 text-xs text-red-400">Bedragen tellen niet op tot de verkoopprijs ({formatEuroDecimal(details.verkoopprijs)}). Verschil: {formatEuroDecimal(details.verkoopprijs - combinatieTotaal)}</p>
-                          )}
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {details.betaalwijze === "combinatie" && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className={labelCls}>Bedrag contant (€)</label>
+                                <input type="number" step="0.01" value={details.contantBedrag} onChange={e => setDetails(d => ({ ...d, contantBedrag: Number(e.target.value) }))} className={inputCls} />
+                              </div>
+                              <div>
+                                <label className={labelCls}>Bedrag overboeking (€)</label>
+                                <input type="number" step="0.01" value={details.overboekingBedrag} onChange={e => setDetails(d => ({ ...d, overboekingBedrag: Number(e.target.value) }))} className={inputCls} />
+                              </div>
+                              <AnimatePresence>
+                                {!combinatieKlopt && (
+                                  <motion.p
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="col-span-2 text-xs text-red-400 overflow-hidden"
+                                  >
+                                    Bedragen tellen niet op tot de verkoopprijs ({formatEuroDecimal(details.verkoopprijs)}). Verschil: {formatEuroDecimal(details.verkoopprijs - combinatieTotaal)}
+                                  </motion.p>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Wwft */}
-                      {wwftNodig && (
-                        <div className="p-3 bg-red-500/10 border border-red-500/25 rounded-[3px] space-y-2">
-                          <p className="text-xs text-red-400 flex items-center gap-2">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            Contante betaling boven €3.000 — Wwft identificatieplicht van toepassing.
-                          </p>
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" checked={details.wwftBevestigd} onChange={e => setDetails(d => ({ ...d, wwftBevestigd: e.target.checked }))} className="w-3.5 h-3.5 rounded-sm border-border" />
-                            <span className="text-xs text-foreground">Ik bevestig dat de Wwft-identificatieplicht is nageleefd</span>
-                          </label>
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {wwftNodig && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="p-3 bg-red-500/10 border border-red-500/25 rounded-[3px] space-y-2">
+                              <p className="text-xs text-red-400 flex items-center gap-2">
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                Contante betaling boven €3.000 — Wwft identificatieplicht van toepassing.
+                              </p>
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked={details.wwftBevestigd} onChange={e => setDetails(d => ({ ...d, wwftBevestigd: e.target.checked }))} className="w-3.5 h-3.5 rounded-sm border-border" />
+                                <span className="text-xs text-foreground">Ik bevestig dat de Wwft-identificatieplicht is nageleefd</span>
+                              </label>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Aanbetaling */}
                       <div className="space-y-3">
@@ -597,26 +637,36 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                                   <label className={labelCls}>Garantiekosten (€)</label>
                                   <input type="number" step="0.01" value={details.garantieKosten} onChange={e => setDetails(d => ({ ...d, garantieKosten: Number(e.target.value) }))} className={inputCls + " w-32"} />
                                 </div>
-                                {details.garantieKosten > 0 && (
-                                  <div>
-                                    <label className={labelCls}>Wie betaalt?</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                      {[
-                                        { key: "dealer", label: "Dealer" },
-                                        { key: "klant", label: "Klant" },
-                                        { key: "gedeeld", label: "Gedeeld" },
-                                      ].map(opt => (
-                                        <button
-                                          key={opt.key}
-                                          onClick={() => setDetails(d => ({ ...d, garantieBetaler: opt.key }))}
-                                          className={`px-3 py-2 text-xs font-medium border rounded-[3px] transition-all ${details.garantieBetaler === opt.key ? "border-foreground bg-foreground/10 text-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}
-                                        >
-                                          {opt.label}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
+                                <AnimatePresence>
+                                  {details.garantieKosten > 0 && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div>
+                                        <label className={labelCls}>Wie betaalt?</label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                          {[
+                                            { key: "dealer", label: "Dealer" },
+                                            { key: "klant", label: "Klant" },
+                                            { key: "gedeeld", label: "Gedeeld" },
+                                          ].map(opt => (
+                                            <button
+                                              key={opt.key}
+                                              onClick={() => setDetails(d => ({ ...d, garantieBetaler: opt.key }))}
+                                              className={`px-3 py-2 text-xs font-medium border rounded-[3px] transition-all ${details.garantieBetaler === opt.key ? "border-foreground bg-foreground/10 text-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}
+                                            >
+                                              {opt.label}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
                             </motion.div>
                           )}
