@@ -1,15 +1,24 @@
-import type { FC } from 'npm:react@18.3.1'
+/// <reference types="npm:@types/react@18.3.1" />
+import * as React from 'npm:react@18.3.1'
 
 export interface TemplateEntry {
-  component: FC<any>
-  subject: string | ((data: any) => string)
+  component: React.ComponentType<any>
+  subject: string | ((data: Record<string, any>) => string)
+  to?: string
   displayName?: string
   previewData?: Record<string, any>
-  to?: string
 }
 
-export const TEMPLATES: Record<string, TemplateEntry> = {}
-
-// Import and register templates
 import { template as proefritOvereenkomst } from './proefrit-overeenkomst.tsx'
-TEMPLATES['proefrit-overeenkomst'] = proefritOvereenkomst
+import { template as apkOverview } from './apk-overview.tsx'
+import { template as vehicleLongStock } from './vehicle-long-stock.tsx'
+import { template as proefritFormCompleted } from './proefrit-form-completed.tsx'
+import { template as tasksOverdueOverview } from './tasks-overdue-overview.tsx'
+
+export const TEMPLATES: Record<string, TemplateEntry> = {
+  'proefrit-overeenkomst': proefritOvereenkomst,
+  'apk-overview': apkOverview,
+  'vehicle-long-stock': vehicleLongStock,
+  'proefrit-form-completed': proefritFormCompleted,
+  'tasks-overdue-overview': tasksOverdueOverview,
+}
