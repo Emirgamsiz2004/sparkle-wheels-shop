@@ -176,7 +176,7 @@ const GlobalActiveBar = () => {
               </div>
               <div className="flex items-center gap-2 shrink-0 ml-3">
                 <button
-                  onClick={() => navigate("/admin/proefriten")}
+                  onClick={() => setEindProefritOpen(true)}
                   className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium bg-blue-500/15 text-blue-400 border border-blue-500/30 rounded-md hover:bg-blue-500/25 transition-colors"
                 >
                   <Square className="w-3 h-3" /> Beëindigen
