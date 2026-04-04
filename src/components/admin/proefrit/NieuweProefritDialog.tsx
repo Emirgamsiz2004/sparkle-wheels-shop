@@ -44,7 +44,7 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle }: Props) => {
   const proefritUrl = result ? `${window.location.origin}/proefrit/${result.token}` : "";
 
   const voorraadVehicles = useMemo(() => {
-    return vehicles.filter((v) => v.status !== "verkocht" && v.status !== "gearchiveerd");
+    return vehicles.filter((v) => v.status !== "verkocht");
   }, [vehicles]);
 
   const filteredVehicles = useMemo(() => {
