@@ -483,21 +483,41 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                         </div>
                       </div>
 
-                      {details.betaalwijze === "combinatie" && (
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className={labelCls}>Bedrag contant (€)</label>
-                            <input type="number" step="0.01" value={details.contantBedrag} onChange={e => setDetails(d => ({ ...d, contantBedrag: Number(e.target.value) }))} className={inputCls} />
-                          </div>
-                          <div>
-                            <label className={labelCls}>Bedrag overboeking (€)</label>
-                            <input type="number" step="0.01" value={details.overboekingBedrag} onChange={e => setDetails(d => ({ ...d, overboekingBedrag: Number(e.target.value) }))} className={inputCls} />
-                          </div>
-                          {!combinatieKlopt && (
-                            <p className="col-span-2 text-xs text-red-400">Bedragen tellen niet op tot de verkoopprijs ({formatEuroDecimal(details.verkoopprijs)}). Verschil: {formatEuroDecimal(details.verkoopprijs - combinatieTotaal)}</p>
-                          )}
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {details.betaalwijze === "combinatie" && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className={labelCls}>Bedrag contant (€)</label>
+                                <input type="number" step="0.01" value={details.contantBedrag} onChange={e => setDetails(d => ({ ...d, contantBedrag: Number(e.target.value) }))} className={inputCls} />
+                              </div>
+                              <div>
+                                <label className={labelCls}>Bedrag overboeking (€)</label>
+                                <input type="number" step="0.01" value={details.overboekingBedrag} onChange={e => setDetails(d => ({ ...d, overboekingBedrag: Number(e.target.value) }))} className={inputCls} />
+                              </div>
+                              <AnimatePresence>
+                                {!combinatieKlopt && (
+                                  <motion.p
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="col-span-2 text-xs text-red-400 overflow-hidden"
+                                  >
+                                    Bedragen tellen niet op tot de verkoopprijs ({formatEuroDecimal(details.verkoopprijs)}). Verschil: {formatEuroDecimal(details.verkoopprijs - combinatieTotaal)}
+                                  </motion.p>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Wwft */}
                       {wwftNodig && (
