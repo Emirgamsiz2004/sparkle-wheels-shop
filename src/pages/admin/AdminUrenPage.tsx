@@ -172,15 +172,40 @@ const AdminUrenPage = () => {
     setConfirmSwitch(null);
   };
 
-  // Quick timer start
+  // Quick timer start — no description needed, just start
   const handleQuickStart = async () => {
-    if (!quickDesc.trim()) { toast.error("Vul een omschrijving in"); return; }
-    setQuickStarting(true);
-    await startTimer({ description: quickDesc.trim(), category: quickCategory });
-    setQuickStarting(false);
-    setQuickTimerOpen(false);
-    setQuickDesc("");
-    setQuickCategory("overig");
+    await startTimer({ description: "Timer", category: "overig" });
+  };
+
+  // Edit entry
+  const openEditEntry = (entry: TimeEntry) => {
+    setEditEntry(entry);
+    setEditDesc(entry.description);
+    setEditCategory(entry.category);
+    setEditNote(entry.end_note || "");
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editEntry || !editDesc.trim()) return;
+    setEditSaving(true);
+    await supabase.from("time_entries").update({
+      description: editDesc.trim(),
+      category: editCategory,
+      end_note: editNote.trim() || null,
+    } as any).eq("id", editEntry.id);
+    toast.success("Bijgewerkt");
+    setEditSaving(false);
+    setEditEntry(null);
+    fetchEntries();
+  };
+
+  const handleDeleteEntry = async () => {
+    if (!editEntry) return;
+    if (!confirm("Weet je zeker dat je deze registratie wilt verwijderen?")) return;
+    await supabase.from("time_entries").delete().eq("id", editEntry.id);
+    toast.success("Verwijderd");
+    setEditEntry(null);
+    fetchEntries();
   };
 
   // CSV export
