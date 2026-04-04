@@ -39,6 +39,13 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, onSubm
     betalingsstatus: "openstaand" as "volledig_betaald" | "openstaand",
   });
 
+  useEffect(() => {
+    if (open && defaultType) {
+      setType(defaultType as AppointmentType);
+      setStep("form");
+    }
+  }, [open, defaultType]);
+
   const reset = () => {
     setStep("type");
     setType(null);
