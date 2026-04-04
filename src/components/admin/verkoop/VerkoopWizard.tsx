@@ -756,9 +756,48 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
                       </div>
 
                       {factuurAangemaakt ? (
-                        <div className="p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-[3px] flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                          <span className="text-xs text-emerald-400">Factuur aangemaakt in Moneybird</span>
+                        <div className="space-y-3">
+                          <div className="p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-[3px] flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <span className="text-xs text-emerald-400">Factuur aangemaakt in Moneybird (concept)</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const result = await downloadInvoicePdf(moneybirdFactuurId);
+                                  if (result?.pdf_url) {
+                                    window.open(result.pdf_url, "_blank");
+                                  } else {
+                                    toast.error("Geen PDF URL gevonden");
+                                  }
+                                } catch {
+                                  toast.error("Fout bij ophalen PDF");
+                                }
+                              }}
+                              disabled={mbLoading || !moneybirdFactuurId || moneybirdFactuurId === "created"}
+                              className={`${btnSecondary} flex-1 justify-center`}
+                            >
+                              <Download className="w-3.5 h-3.5" /> PDF bekijken
+                            </button>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await sendInvoice(moneybirdFactuurId, "Email");
+                                  toast.success("Factuur verstuurd naar klant");
+                                } catch {
+                                  toast.error("Fout bij versturen factuur");
+                                }
+                              }}
+                              disabled={mbLoading || !moneybirdFactuurId || moneybirdFactuurId === "created" || !klant.email}
+                              className={`${btnSecondary} flex-1 justify-center`}
+                            >
+                              <Mail className="w-3.5 h-3.5" /> Mailen naar klant
+                            </button>
+                          </div>
+                          {!klant.email && (
+                            <p className="text-[10px] text-muted-foreground">Geen e-mailadres bekend — mailen niet mogelijk</p>
+                          )}
                         </div>
                       ) : (
                         <div className="space-y-2">
