@@ -7,6 +7,7 @@ import {
   Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target, Clock, CalendarDays,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
+import NotificationBell from "@/components/admin/NotificationBell";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; }
 interface NavGroup { label: string; items: NavItem[]; }
@@ -133,7 +134,7 @@ const AdminLayout = () => {
                     <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
                     <span className="flex-1">{item.label}</span>
                     {item.path === "/admin/leads" && overdueLeads > 0 && (
-                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground">
                         {overdueLeads}
                       </span>
                     )}
@@ -177,12 +178,15 @@ const AdminLayout = () => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen min-w-0">
-        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between h-12 px-4 bg-background border-b border-border">
-          <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground hover:text-foreground p-1">
+        <header className="sticky top-0 z-30 flex items-center justify-between h-12 px-4 bg-background border-b border-border">
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground p-1">
             <Menu className="w-5 h-5" />
           </button>
-          <img src={logo} alt="Platin" className="h-6 w-auto object-contain" loading="eager" decoding="sync" />
-          <div className="w-7" />
+          <img src={logo} alt="Platin" className="h-6 w-auto object-contain lg:hidden" loading="eager" decoding="sync" />
+          <div className="hidden lg:block" />
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+          </div>
         </header>
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden">
