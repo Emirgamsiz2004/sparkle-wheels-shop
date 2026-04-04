@@ -137,6 +137,11 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="p-1">
+            {onOpenReservering && (
+              <DropdownMenuItem onClick={onOpenReservering}>
+                <Banknote className="w-3.5 h-3.5 mr-2" /> Reserveren
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <FileText className="w-3.5 h-3.5 mr-2" /> Document genereren
