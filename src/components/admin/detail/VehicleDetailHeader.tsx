@@ -83,9 +83,15 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           <ClipboardCheck className="w-3.5 h-3.5" /> Proefrit
         </button>
 
-        <button onClick={onOpenVerkoop} className={btnCls}>
-          <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
-        </button>
+        {vehicle.status === "gereserveerd" ? (
+          <button onClick={onOpenVerkoop} className={btnCls + " !border-emerald-500/30 !text-emerald-400"}>
+            <ShoppingCart className="w-3.5 h-3.5" /> Verkoop afronden
+          </button>
+        ) : (
+          <button onClick={onOpenVerkoop} className={btnCls}>
+            <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
+          </button>
+        )}
 
         {onOpenAfspraak && (
           <DropdownMenu>
