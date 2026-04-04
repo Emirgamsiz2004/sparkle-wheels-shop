@@ -374,16 +374,12 @@ const AdminUrenPage = () => {
               {historyEntries.length === 0 ? (
                 <tr><td colSpan={4} className="px-3 py-8 text-center text-muted-foreground text-sm">Geen uren gevonden</td></tr>
               ) : historyEntries.map(e => (
-                <tr key={e.id} className="border-b border-border/50 hover:bg-accent/20 transition-colors">
+                <tr key={e.id} onClick={() => openEditEntry(e)} className="border-b border-border/50 hover:bg-accent/20 transition-colors cursor-pointer">
                   <td className="px-3 py-2 text-muted-foreground whitespace-nowrap text-xs">
                     {new Date(e.start_time).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
                   </td>
                   <td className="px-3 py-2 text-xs">
-                    {e.vehicles ? (
-                      <button onClick={() => navigate(`/admin/voertuigen/${e.vehicle_id}`)} className="text-foreground hover:underline">
-                        {e.vehicles.merk} {e.vehicles.model}
-                      </button>
-                    ) : "—"}
+                    {e.vehicles ? `${e.vehicles.merk} ${e.vehicles.model}` : "—"}
                   </td>
                   <td className="px-3 py-2 text-foreground max-w-[200px] truncate text-xs">{e.description}</td>
                   <td className="px-3 py-2 text-right font-medium tabular-nums text-xs">{formatDuration(e.duration_minutes)}</td>
