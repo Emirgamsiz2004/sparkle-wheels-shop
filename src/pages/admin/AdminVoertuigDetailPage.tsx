@@ -40,6 +40,7 @@ const AdminVoertuigDetailPage = () => {
   const [aanbetalingOpen, setAanbetalingOpen] = useState(false);
   const [kostenOpen, setKostenOpen] = useState(false);
   const [verkoopOpen, setVerkoopOpen] = useState(false);
+  const [reserveringOpen, setReserveringOpen] = useState(false);
   const [afspraakOpen, setAfspraakOpen] = useState(false);
   const [afspraakType, setAfspraakType] = useState<string | undefined>();
 
