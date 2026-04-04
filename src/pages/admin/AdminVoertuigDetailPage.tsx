@@ -30,12 +30,15 @@ const AdminVoertuigDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { vehicles, loading, deleteVehicle, updateVehicle, addCost, removeCost, refetch } = useVehicles();
+  const { customers } = useCustomers();
+  const { createAppointment } = useAppointments();
   const [activeTab, setActiveTab] = useState("overzicht");
   const [proefritOpen, setProefritOpen] = useState(false);
   const [consignatieOpen, setConsignatieOpen] = useState(false);
   const [aanbetalingOpen, setAanbetalingOpen] = useState(false);
   const [kostenOpen, setKostenOpen] = useState(false);
   const [verkoopOpen, setVerkoopOpen] = useState(false);
+  const [afspraakOpen, setAfspraakOpen] = useState(false);
 
   // When "Taak toevoegen" is clicked, switch to taken tab
   const handleOpenTaak = useCallback(() => {
