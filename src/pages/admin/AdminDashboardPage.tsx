@@ -44,7 +44,7 @@ function KpiCard({ label, value, compare, current, previous }: {
   label: string; value: string; compare?: boolean; current?: number; previous?: number;
 }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
+    <div className="bg-card border border-border rounded-md p-3 sm:p-4">
       <p className="text-[11px] text-muted-foreground mb-1">{label}</p>
       <p className="text-xl font-semibold tabular-nums text-foreground">{value}</p>
       {compare && current !== undefined && previous !== undefined && (
