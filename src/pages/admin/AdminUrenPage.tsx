@@ -317,7 +317,7 @@ const AdminUrenPage = () => {
           ) : (
             <div className="space-y-1">
               {todayEntries.map(e => (
-                <div key={e.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+                <div key={e.id} onClick={() => e.end_time && openEditEntry(e)} className={`flex items-center justify-between py-2 border-b border-border/50 last:border-0 ${e.end_time ? "cursor-pointer hover:bg-accent/20" : ""} transition-colors rounded-md px-2 -mx-2`}>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-foreground truncate">{e.description}</p>
                     <p className="text-xs text-muted-foreground truncate">
