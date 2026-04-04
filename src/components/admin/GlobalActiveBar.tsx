@@ -207,6 +207,28 @@ const GlobalActiveBar = () => {
           onStopped={handleTimerStopped}
         />
       )}
+
+      {testDrive && (
+        <EindProefritDialog
+          testDrive={{
+            id: testDrive.id,
+            voertuig_merk: testDrive.voertuig_merk || "",
+            voertuig_model: testDrive.voertuig_model || "",
+            voertuig_kenteken: testDrive.voertuig_kenteken || undefined,
+            km_voor: testDrive.km_voor,
+            start_tijd: testDrive.start_tijd,
+            status: "actief" as const,
+            token: "",
+            created_at: "",
+            schade_fotos: [],
+          } as any}
+          open={eindProefritOpen}
+          onClose={() => {
+            setEindProefritOpen(false);
+            fetchActive();
+          }}
+        />
+      )}
     </>
   );
 };
