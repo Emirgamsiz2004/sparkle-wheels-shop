@@ -15,6 +15,7 @@ import VehicleFinancieelEditTab from "@/components/admin/detail/VehicleFinanciee
 import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
+import VerkoopCompletenessBar from "@/components/admin/detail/VerkoopCompletenessBar";
 import VerkoopWizard from "@/components/admin/verkoop/VerkoopWizard";
 import ReserveringWizard from "@/components/admin/verkoop/ReserveringWizard";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
@@ -110,6 +111,8 @@ const AdminVoertuigDetailPage = () => {
         onOpenReservering={() => setReserveringOpen(true)}
         onDelete={handleDelete}
       />
+
+      <VerkoopCompletenessBar vehicleId={vehicle.id} vehicleStatus={vehicle.status} koperNaam={vehicle.koperNaam} />
 
       {/* Tabs */}
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
