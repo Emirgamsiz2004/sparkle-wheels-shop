@@ -118,6 +118,10 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           </DropdownMenu>
         )}
 
+        <button onClick={() => setSocialOpen(true)} className={btnCls}>
+          <Sparkles className="w-3.5 h-3.5" /> Genereer Post
+        </button>
+
         {/* Status dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -184,6 +188,12 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <SocialPostDialog
+        open={socialOpen}
+        onOpenChange={setSocialOpen}
+        vehicle={{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, bouwjaar: vehicle.bouwjaar, kilometerstand: vehicle.kilometerstand, verkoopprijs: vehicle.verkoopprijs, kleur: vehicle.kleur }}
+      />
     </div>
   );
 };
