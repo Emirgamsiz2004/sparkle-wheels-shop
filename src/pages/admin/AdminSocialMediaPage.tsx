@@ -1,16 +1,10 @@
 import { useState, useEffect } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Copy, Sparkles, Loader2, Instagram, Facebook, Trash2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Hashtags {
   merkModel: string;
@@ -32,24 +26,21 @@ const formatNumber = (n: number | undefined) =>
 
 const AdminSocialMediaPage = () => {
   const { vehicles } = useVehicles();
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState("");
-  const [merk, setMerk] = useState("");
-  const [model, setModel] = useState("");
-  const [jaar, setJaar] = useState<number | "">("");
-  const [km, setKm] = useState<number | "">("");
-  const [prijs, setPrijs] = useState<number | "">("");
-  const [transmissie, setTransmissie] = useState("Handgeschakeld");
-  const [kleur, setKleur] = useState("");
   const [bijzonderheden, setBijzonderheden] = useState("");
-  const [motorinhoud, setMotorinhoud] = useState("");
-  const [typeAuto, setTypeAuto] = useState("Hatchback");
   const [toon, setToon] = useState("Professioneel & Nuchter");
   const [platform, setPlatform] = useState("Beide");
   const [loading, setLoading] = useState(false);
+
+  // Result
   const [caption, setCaption] = useState("");
   const [hashtags, setHashtags] = useState<Hashtags | null>(null);
-  const [activeTab, setActiveTab] = useState("caption");
+  const [showResult, setShowResult] = useState(false);
+
+  // History
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [expandedHistory, setExpandedHistory] = useState<number | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("social-post-history");
@@ -61,31 +52,29 @@ const AdminSocialMediaPage = () => {
     localStorage.setItem("social-post-history", JSON.stringify(items));
   };
 
-  const handleVehicleSelect = (id: string) => {
-    setSelectedVehicle(id);
-    const v = vehicles.find((v) => v.id === id);
-    if (!v) return;
-    setMerk(v.merk);
-    setModel(v.model);
-    setJaar(v.bouwjaar || "");
-    setKm(v.kilometerstand || "");
-    setPrijs(v.verkoopprijs || "");
-    setKleur(v.kleur || "");
-    setTransmissie("Handgeschakeld");
-  };
+  const vehicle = vehicles.find((v) => v.id === selectedVehicle);
 
   const generateFallback = () => {
+    if (!vehicle) return { caption: "", hashtags: { merkModel: "", autoVerkopen: "", locatie: "", extra: "" } };
+    const merk = vehicle.merk;
+    const model = vehicle.model;
+    const jaar = vehicle.bouwjaar || "";
+    const km = vehicle.kilometerstand || 0;
+    const prijs = vehicle.verkoopprijs || 0;
+    const kleur = vehicle.kleur || "";
+    const transmissie = "Handgeschakeld";
+
     const c = `🚗 ${merk} ${model} | ${jaar} | ${transmissie}
 
 Een mooie ${merk} ${model} in ${kleur || "nette staat"}.
 
 📋 Specs:
 › Bouwjaar: ${jaar}
-› Kilometerstand: ± ${formatNumber(km as number)} km
+› Kilometerstand: ± ${formatNumber(km)} km
 › Transmissie: ${transmissie}
 › Kleur: ${kleur}${bijzonderheden ? `\n› Extras: ${bijzonderheden}` : ""}
 
-💶 Vraagprijs: € ${formatNumber(prijs as number)},-
+💶 Vraagprijs: € ${formatNumber(prijs)},-
 
 Interesse of vragen? Stuur een DM of app ons via WhatsApp.
 📍 Roelofarendsveen`;
@@ -96,55 +85,65 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
       merkModel: `#${merkLower} #${modelLower} #${merkLower}${modelLower}`,
       autoVerkopen: "#autotekoop #autoverkoop #occasion #occasions #tweedehandsauto #gebruikteauto #tweedehandsautotekoop #dutchcars",
       locatie: "#roelofarendsveen #kaagenbraassem #groenehart #zuidholland #amsterdam #rotterdam #denhaag #nederland",
-      extra: `#carsofinstagram #cars #carphotography #autobedrijf #platinautomotive ${transmissie === "Automaat" ? "#automaat" : "#handgeschakeld"} #occasion`,
+      extra: `#carsofinstagram #cars #carphotography #autobedrijf #platinautomotive #occasion`,
     };
     return { caption: c, hashtags: h };
   };
 
   const handleGenerate = async () => {
-    if (!merk || !model) {
-      toast.error("Vul minimaal merk en model in");
+    if (!vehicle) {
+      toast.error("Selecteer eerst een voertuig");
       return;
     }
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-social-post", {
         body: {
-          merk, model, jaar, kilometerstand: formatNumber(km as number),
-          prijs: formatNumber(prijs as number), transmissie, kleur,
-          bijzonderheden, type_auto: typeAuto, toon, platform, motorinhoud,
+          merk: vehicle.merk,
+          model: vehicle.model,
+          jaar: vehicle.bouwjaar,
+          kilometerstand: formatNumber(vehicle.kilometerstand),
+          prijs: formatNumber(vehicle.verkoopprijs),
+          transmissie: "Handgeschakeld",
+          kleur: vehicle.kleur || "",
+          bijzonderheden,
+          type_auto: "Hatchback",
+          toon,
+          platform,
+          motorinhoud: "",
         },
       });
 
       if (error || data?.error) {
-        console.warn("AI generation failed, using fallback:", error || data?.error);
         const fb = generateFallback();
         setCaption(fb.caption);
         setHashtags(fb.hashtags);
-        toast.info("Template-gebaseerde post gegenereerd (AI niet beschikbaar)");
+        toast.info("Template-gebaseerde post gegenereerd");
       } else {
         setCaption(data.caption);
         setHashtags(data.hashtags);
         toast.success("Post gegenereerd!");
       }
-      setActiveTab("caption");
 
       // Save to history
       const item: HistoryItem = {
         datum: new Date().toLocaleString("nl-NL"),
-        voertuig: `${merk} ${model}`,
+        voertuig: `${vehicle.merk} ${vehicle.model}`,
         platform,
         caption: data?.caption || generateFallback().caption,
         hashtags: data?.hashtags || generateFallback().hashtags,
       };
-      saveHistory([item, ...history].slice(0, 10));
-    } catch (e) {
-      console.warn("Fallback used:", e);
+      saveHistory([item, ...history].slice(0, 20));
+
+      setShowResult(true);
+      setDialogOpen(false);
+    } catch {
       const fb = generateFallback();
       setCaption(fb.caption);
       setHashtags(fb.hashtags);
+      setShowResult(true);
+      setDialogOpen(false);
       toast.info("Template-gebaseerde post gegenereerd");
-      setActiveTab("caption");
     } finally {
       setLoading(false);
     }
@@ -159,268 +158,235 @@ Interesse of vragen? Stuur een DM of app ons via WhatsApp.
     toast.success(`${label} gekopieerd!`);
   };
 
+  const inputCls = "w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all";
+  const labelCls = "block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5";
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Social Media</h1>
-        <p className="text-muted-foreground text-sm mt-1">Genereer posts voor Instagram en Facebook</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-medium text-foreground">Social Media</h1>
+          <p className="text-sm text-muted-foreground">Genereer posts voor Instagram en Facebook</p>
+        </div>
+        <button
+          onClick={() => { setDialogOpen(true); setShowResult(false); setBijzonderheden(""); setSelectedVehicle(""); }}
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium bg-foreground text-background rounded-xl hover:bg-foreground/90 transition-colors active:scale-[0.97]"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          Genereer Post
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left column — Form */}
-        <div className="space-y-6">
-          <Card className="p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Voertuig selecteren</h3>
-            <Select value={selectedVehicle} onValueChange={handleVehicleSelect}>
-              <SelectTrigger><SelectValue placeholder="Selecteer een auto uit je voorraad" /></SelectTrigger>
-              <SelectContent>
-                {vehicles.map((v) => (
-                  <SelectItem key={v.id} value={v.id}>
-                    {v.merk} {v.model} {v.bouwjaar ? `(${v.bouwjaar})` : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <div className="relative">
-              <Separator />
-              <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">
-                of vul handmatig in
-              </span>
+      {/* Result Card */}
+      <AnimatePresence>
+        {showResult && caption && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="bg-card border border-border rounded-xl p-5 space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-foreground">Gegenereerde Post</h3>
+              <button onClick={() => setShowResult(false)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">Sluiten</button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Merk</label>
-                <Input value={merk} onChange={(e) => setMerk(e.target.value)} placeholder="Volkswagen" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Model</label>
-                <Input value={model} onChange={(e) => setModel(e.target.value)} placeholder="Polo GTI" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Motorinhoud</label>
-                <Input value={motorinhoud} onChange={(e) => setMotorinhoud(e.target.value)} placeholder="1.8 TSI" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Jaar</label>
-                <Input type="number" value={jaar} onChange={(e) => setJaar(e.target.value ? Number(e.target.value) : "")} placeholder="2019" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Kilometerstand</label>
-                <Input type="number" value={km} onChange={(e) => setKm(e.target.value ? Number(e.target.value) : "")} placeholder="119000" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Vraagprijs (€)</label>
-                <Input type="number" value={prijs} onChange={(e) => setPrijs(e.target.value ? Number(e.target.value) : "")} placeholder="13250" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Kleur</label>
-                <Input value={kleur} onChange={(e) => setKleur(e.target.value)} placeholder="Wit" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Transmissie</label>
-                <Select value={transmissie} onValueChange={setTransmissie}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Automaat">Automaat</SelectItem>
-                    <SelectItem value="Handgeschakeld">Handgeschakeld</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Type auto</label>
-                <Select value={typeAuto} onValueChange={setTypeAuto}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {["Hatchback", "Sedan", "SUV / Crossover", "Stationwagon", "Cabrio", "Sportauto", "Youngtimer"].map((t) => (
-                      <SelectItem key={t} value={t}>{t}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground">Bijzonderheden</label>
-              <Textarea
-                value={bijzonderheden}
-                onChange={(e) => setBijzonderheden(e.target.value)}
-                placeholder="Panoramadak, trekhaak, nieuw APK... of laat leeg"
-                rows={2}
+            {/* Caption */}
+            <div className="space-y-2">
+              <label className={labelCls}>Caption</label>
+              <textarea
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                rows={10}
+                className={inputCls + " resize-none font-mono text-xs leading-relaxed"}
               />
-            </div>
-          </Card>
-
-          <Card className="p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Instellingen</h3>
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground">Toon</label>
-              <Select value={toon} onValueChange={setToon}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Professioneel & Nuchter">Professioneel & Nuchter</SelectItem>
-                  <SelectItem value="Enthousiast & Energiek">Enthousiast & Energiek</SelectItem>
-                  <SelectItem value="Luxe & Exclusief">Luxe & Exclusief</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground">Platform</label>
-              <ToggleGroup type="single" value={platform} onValueChange={(v) => v && setPlatform(v)} className="justify-start">
-                <ToggleGroupItem value="Instagram" className="gap-1.5 text-xs">
-                  <Instagram className="w-3.5 h-3.5" /> Instagram
-                </ToggleGroupItem>
-                <ToggleGroupItem value="Facebook" className="gap-1.5 text-xs">
-                  <Facebook className="w-3.5 h-3.5" /> Facebook
-                </ToggleGroupItem>
-                <ToggleGroupItem value="Beide" className="text-xs">Beide</ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-
-            <Button onClick={handleGenerate} disabled={loading} className="w-full">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-              Genereer Post
-            </Button>
-          </Card>
-        </div>
-
-        {/* Right column — Output */}
-        <div className="space-y-6">
-          <Card className="p-5">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full">
-                  <TabsTrigger value="caption" className="flex-1">Caption</TabsTrigger>
-                  <TabsTrigger value="hashtags" className="flex-1">Hashtags</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="caption" className="space-y-3 mt-4">
-                  <Textarea
-                    value={caption}
-                    onChange={(e) => setCaption(e.target.value)}
-                    rows={12}
-                    placeholder="Hier verschijnt je gegenereerde caption..."
-                    className="text-sm"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(caption, "Caption")}
-                    disabled={!caption}
-                    className="gap-1.5"
-                  >
-                    <Copy className="w-3.5 h-3.5" /> Kopieer Caption
-                  </Button>
-                  <p className="text-[11px] text-muted-foreground">
-                    Tip: plaats de hashtags als eerste reactie op Instagram
-                  </p>
-                </TabsContent>
-
-                <TabsContent value="hashtags" className="space-y-4 mt-4">
-                  {hashtags ? (
-                    <>
-                      {[
-                        { label: "Merk & Model", value: hashtags.merkModel },
-                        { label: "Auto & Verkoop", value: hashtags.autoVerkopen },
-                        { label: "Locatie", value: hashtags.locatie },
-                        { label: "Extra", value: hashtags.extra },
-                      ].map((block) => (
-                        <div key={block.label} className="space-y-1">
-                          <p className="text-xs font-medium text-muted-foreground">{block.label}</p>
-                          <p className="text-sm break-all">{block.value}</p>
-                        </div>
-                      ))}
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(allHashtags, "Hashtags")} className="gap-1.5">
-                          <Copy className="w-3.5 h-3.5" /> Kopieer Alle Hashtags
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(`${caption}\n\n${allHashtags}`, "Caption + Hashtags")} className="gap-1.5">
-                          <Copy className="w-3.5 h-3.5" /> Kopieer Alles
-                        </Button>
-                      </div>
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Genereer eerst een post om hashtags te zien.</p>
-                  )}
-                </TabsContent>
-            </Tabs>
-          </Card>
-
-          {caption && (
-            <Card className="p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Instagram Preview</h3>
-              <div className="rounded-lg border border-border bg-background p-4 space-y-2 max-w-sm">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">PA</div>
-                  <span className="text-xs font-semibold">platinautomotive</span>
-                </div>
-                <div className="bg-muted aspect-video rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-                  Foto
-                </div>
-                <div className="text-xs leading-relaxed whitespace-pre-wrap">
-                  <span className="font-semibold">{caption.split("\n")[0]}</span>
-                  {caption.split("\n").length > 1 && (
-                    <span className="text-muted-foreground">{"\n" + caption.split("\n").slice(1).join("\n")}</span>
-                  )}
-                </div>
+              <div className="flex flex-wrap gap-2">
+                <button onClick={() => copyToClipboard(caption, "Caption")} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-xl hover:bg-accent/20 transition-colors">
+                  <Copy className="w-3 h-3" /> Kopieer Caption
+                </button>
                 {hashtags && (
-                  <p className="text-[10px] text-muted-foreground break-all">{allHashtags}</p>
+                  <>
+                    <button onClick={() => copyToClipboard(allHashtags, "Hashtags")} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-xl hover:bg-accent/20 transition-colors">
+                      <Copy className="w-3 h-3" /> Kopieer Hashtags
+                    </button>
+                    <button onClick={() => copyToClipboard(`${caption}\n\n${allHashtags}`, "Alles")} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-xl hover:bg-accent/20 transition-colors">
+                      <Copy className="w-3 h-3" /> Kopieer Alles
+                    </button>
+                  </>
                 )}
               </div>
-            </Card>
-          )}
-        </div>
-      </div>
+            </div>
 
-      {/* Post History */}
+            {/* Hashtags */}
+            {hashtags && (
+              <div className="space-y-2">
+                <label className={labelCls}>Hashtags</label>
+                <div className="text-xs text-muted-foreground break-all leading-relaxed bg-secondary/30 rounded-xl p-3 border border-border">
+                  {allHashtags}
+                </div>
+              </div>
+            )}
+
+            <p className="text-[10px] text-muted-foreground">Tip: plaats de hashtags als eerste reactie op Instagram</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* History */}
       {history.length > 0 && (
-        <Card className="p-5 space-y-3">
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Recente Posts</h3>
-            <Button variant="ghost" size="sm" onClick={() => saveHistory([])} className="text-xs text-muted-foreground gap-1">
-              <Trash2 className="w-3 h-3" /> Wis geschiedenis
-            </Button>
+            <h3 className="text-sm font-medium text-foreground">Recente Posts</h3>
+            <button onClick={() => saveHistory([])} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+              <Trash2 className="w-3 h-3" /> Wis
+            </button>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                  <th className="pb-2 pr-4">Datum</th>
-                  <th className="pb-2 pr-4">Voertuig</th>
-                  <th className="pb-2 pr-4">Platform</th>
-                  <th className="pb-2">Actie</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((h, i) => (
-                  <tr key={i} className="border-b border-border/50">
-                    <td className="py-2 pr-4 text-xs text-muted-foreground">{h.datum}</td>
-                    <td className="py-2 pr-4 text-xs">{h.voertuig}</td>
-                    <td className="py-2 pr-4 text-xs">{h.platform}</td>
-                    <td className="py-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs gap-1 h-7"
-                        onClick={() => {
-                          const allH = `${h.hashtags.merkModel}\n${h.hashtags.autoVerkopen}\n${h.hashtags.locatie}\n${h.hashtags.extra}`;
-                          copyToClipboard(`${h.caption}\n\n${allH}`, "Post");
-                        }}
-                      >
-                        <Copy className="w-3 h-3" /> Kopieer
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-1.5">
+            {history.map((item, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  if (expandedHistory === i) {
+                    setExpandedHistory(null);
+                  } else {
+                    setExpandedHistory(i);
+                    setCaption(item.caption);
+                    setHashtags(item.hashtags);
+                  }
+                }}
+                className="w-full text-left bg-card border border-border rounded-xl p-3 hover:bg-accent/10 transition-colors"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground truncate">{item.voertuig}</p>
+                    <p className="text-xs text-muted-foreground">{item.datum} · {item.platform}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); copyToClipboard(item.caption, "Caption"); }}
+                      className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/20 transition-colors"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <AnimatePresence>
+                  {expandedHistory === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-3 pt-3 border-t border-border">
+                        <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">{item.caption}</p>
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const all = `${item.hashtags.merkModel}\n${item.hashtags.autoVerkopen}\n${item.hashtags.locatie}\n${item.hashtags.extra}`;
+                              copyToClipboard(`${item.caption}\n\n${all}`, "Alles");
+                            }}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium border border-border rounded-lg hover:bg-accent/20 transition-colors text-muted-foreground"
+                          >
+                            <Copy className="w-2.5 h-2.5" /> Alles kopiëren
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+            ))}
           </div>
-        </Card>
+        </div>
       )}
+
+      {/* Generate Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-base font-medium">Social Media Post Genereren</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            {/* Vehicle select */}
+            <div>
+              <label className={labelCls}>Voertuig *</label>
+              <select
+                value={selectedVehicle}
+                onChange={(e) => setSelectedVehicle(e.target.value)}
+                className={inputCls}
+              >
+                <option value="">Selecteer een auto</option>
+                {vehicles.filter(v => v.status !== "verkocht").map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.merk} {v.model} {v.bouwjaar ? `(${v.bouwjaar})` : ""} {v.kenteken ? `· ${v.kenteken}` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Bijzonderheden */}
+            <div>
+              <label className={labelCls}>Bijzonderheden</label>
+              <textarea
+                value={bijzonderheden}
+                onChange={(e) => setBijzonderheden(e.target.value)}
+                placeholder="Panoramadak, trekhaak, nieuw APK, net grote beurt gehad..."
+                rows={3}
+                className={inputCls + " resize-none"}
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">Optioneel — deze worden meegenomen in de post</p>
+            </div>
+
+            {/* Tone */}
+            <div>
+              <label className={labelCls}>Toon</label>
+              <select value={toon} onChange={(e) => setToon(e.target.value)} className={inputCls}>
+                <option value="Professioneel & Nuchter">Professioneel & Nuchter</option>
+                <option value="Enthousiast & Energiek">Enthousiast & Energiek</option>
+                <option value="Luxe & Exclusief">Luxe & Exclusief</option>
+              </select>
+            </div>
+
+            {/* Platform */}
+            <div>
+              <label className={labelCls}>Platform</label>
+              <div className="flex gap-2">
+                {[
+                  { value: "Instagram", icon: Instagram, label: "Instagram" },
+                  { value: "Facebook", icon: Facebook, label: "Facebook" },
+                  { value: "Beide", label: "Beide" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setPlatform(opt.value)}
+                    className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-xl border transition-colors ${
+                      platform === opt.value
+                        ? "bg-foreground text-background border-foreground"
+                        : "bg-secondary/50 text-muted-foreground border-border hover:border-foreground/30"
+                    }`}
+                  >
+                    {opt.icon && <opt.icon className="w-3.5 h-3.5" />}
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={handleGenerate}
+              disabled={loading || !selectedVehicle}
+              className="w-full py-3 bg-foreground text-background text-sm font-medium rounded-xl hover:bg-foreground/90 disabled:opacity-40 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {loading ? "Genereren..." : "Genereer Post"}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
