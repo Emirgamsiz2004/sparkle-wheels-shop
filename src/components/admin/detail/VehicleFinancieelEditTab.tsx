@@ -21,12 +21,12 @@ interface Props {
 const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, onLogActivity }: Props) => {
   const autoKostprijs = vehicle.inkoopprijs + vehicle.kosten.reduce((s, k) => s + k.amount, 0);
   const [form, setForm] = useState({
-    inkoopprijs: vehicle.inkoopprijs,
-    verkoopprijs: vehicle.verkoopprijs,
+    inkoopprijs: vehicle.inkoopprijs ? String(vehicle.inkoopprijs) : "",
+    verkoopprijs: vehicle.verkoopprijs ? String(vehicle.verkoopprijs) : "",
     inkoopDatum: vehicle.inkoopDatum,
     verkoopDatum: vehicle.verkoopDatum || "",
     verkoopType: vehicle.verkoopType,
-    consignatieCommissiePerc: vehicle.consignatieCommissiePerc ?? 10,
+    consignatieCommissiePerc: vehicle.consignatieCommissiePerc ? String(vehicle.consignatieCommissiePerc) : "10",
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",

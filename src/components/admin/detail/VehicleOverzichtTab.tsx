@@ -299,12 +299,23 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
 
 const EditField = ({ label, value, onChange, type = "text", highlight = false, inputCls }: {
   label: string; value: any; onChange: (v: string) => void; type?: string; highlight?: boolean; inputCls: string;
-}) => (
-  <div>
-    <label className="block text-xs text-muted-foreground mb-1">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cn(inputCls, highlight && "border-ring/50 bg-accent/30")} />
-  </div>
-);
+}) => {
+  const isNumber = type === "number";
+  const displayVal = isNumber ? (value === 0 || value === "0" ? "" : value) : value;
+  return (
+    <div>
+      <label className="block text-xs text-muted-foreground mb-1">{label}</label>
+      <input
+        type={isNumber ? "text" : type}
+        inputMode={isNumber ? "numeric" : undefined}
+        value={displayVal}
+        onChange={(e) => onChange(isNumber ? e.target.value.replace(/[^0-9]/g, "") : e.target.value)}
+        placeholder={isNumber ? "0" : undefined}
+        className={cn(inputCls, highlight && "border-ring/50 bg-accent/30")}
+      />
+    </div>
+  );
+};
 
 export const getApkStatus = (apkVervaldatum?: string): { label: string; color: string; level: 'green' | 'orange' | 'red' | 'none' } => {
   if (!apkVervaldatum) return { label: "Onbekend", color: "text-muted-foreground", level: 'none' };
