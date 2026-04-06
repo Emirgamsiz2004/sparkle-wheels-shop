@@ -133,7 +133,15 @@ const AdminVoertuigDetailPage = () => {
           <VehicleFinancieelEditTab vehicle={vehicle} onSave={updateVehicle} onAddCost={handleAddCostWithLog} onRemoveCost={removeCost} onLogActivity={logActivity} />
         )}
         {activeTab === "dossier" && (
-          <VehicleDossierTab vehicleId={vehicle.id} />
+          <VehicleDossierTab
+            vehicleId={vehicle.id}
+            vehicleStatus={vehicle.status}
+            koperNaam={vehicle.koperNaam}
+            koperEmail={vehicle.koperEmail}
+            koperTelefoon={vehicle.koperTelefoon}
+            verkoopDatum={vehicle.verkoopDatum}
+            verkoopprijs={vehicle.verkoopprijs}
+          />
         )}
         {activeTab === "taken" && (
           <VehicleTakenTab vehicleId={vehicle.id} />
