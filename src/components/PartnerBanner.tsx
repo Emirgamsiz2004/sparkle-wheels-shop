@@ -46,9 +46,9 @@ const PartnerBanner = () => {
         </p>
       </div>
 
-      <div className="relative mx-auto max-w-6xl overflow-hidden">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-40 bg-gradient-to-r from-background to-transparent md:block" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-40 bg-gradient-to-l from-background to-transparent md:block" />
+      <div className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-muted/30 to-transparent md:w-40" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-muted/30 to-transparent md:w-40" />
 
         <div className="flex w-max items-center will-change-transform animate-[scroll-left_60s_linear_infinite] motion-reduce:animate-none">
           <PartnerTrack />
