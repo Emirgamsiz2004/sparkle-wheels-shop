@@ -21,9 +21,9 @@ const AdminVoertuigNieuwPage = () => {
   const [garantieVerantwoordelijkheid, setGarantieVerantwoordelijkheid] = useState<"platin" | "verkoper">("platin");
   const [form, setForm] = useState({
     merk: "", model: "", bouwjaar: new Date().getFullYear(), kleur: "",
-    kenteken: "", kilometerstand: 0, brandstof: "benzine" as Vehicle["brandstof"],
+    kenteken: "", kilometerstand: "" as number | "", brandstof: "benzine" as Vehicle["brandstof"],
     status: "inkoop" as Vehicle["status"], inkoopDatum: new Date().toISOString().split("T")[0],
-    inkoopprijs: 0, verkoopprijs: 0, opmerkingen: "",
+    inkoopprijs: "" as number | "", verkoopprijs: "" as number | "", opmerkingen: "",
     chassisnummer: "", metallicLak: "onbekend" as "ja" | "nee" | "onbekend",
     aantalEigenaren: "" as number | "",
     apkVervaldatum: "",
@@ -64,6 +64,9 @@ const AdminVoertuigNieuwPage = () => {
     setSaving(true);
     await addVehicle({
       ...form,
+      kilometerstand: Number(form.kilometerstand) || 0,
+      inkoopprijs: Number(form.inkoopprijs) || 0,
+      verkoopprijs: Number(form.verkoopprijs) || 0,
       verkoopType: isConsignatie ? 'consignatie' : 'regulier',
       consignatieCommissiePerc: isConsignatie ? consignatieMarge : undefined,
     } as any);
@@ -112,7 +115,7 @@ const AdminVoertuigNieuwPage = () => {
             <Field label="Model" value={form.model} onChange={(v) => update("model", capitalizeModel(v))} required highlight={rdwFields.has("model")} />
             <Field label="Bouwjaar" type="number" value={form.bouwjaar} onChange={(v) => update("bouwjaar", Number(v))} highlight={rdwFields.has("bouwjaar")} />
             <Field label="Kleur" value={form.kleur} onChange={(v) => update("kleur", capitalizeKleur(v))} highlight={rdwFields.has("kleur")} />
-            <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", Number(v))} />
+            <Field label="KM-stand" type="number" value={form.kilometerstand} onChange={(v) => update("kilometerstand", v === "" ? "" : Number(v))} />
             <Field label="Aantal eigenaren" type="number" value={form.aantalEigenaren} onChange={(v) => update("aantalEigenaren", v ? Number(v) : "")} highlight={rdwFields.has("aantalEigenaren")} />
             <div className="col-span-2">
               <Field label="Chassisnummer (VIN)" value={form.chassisnummer} onChange={(v) => update("chassisnummer", v.toUpperCase())} highlight={rdwFields.has("chassisnummer")} placeholder="Wordt automatisch opgehaald of handmatig invullen" />
@@ -224,9 +227,9 @@ const AdminVoertuigNieuwPage = () => {
 
             <Field label="Inkoopdatum" type="date" value={form.inkoopDatum} onChange={(v) => update("inkoopDatum", v)} />
             {!isConsignatie && (
-              <Field label="Inkoopprijs (€)" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", Number(v))} />
+              <Field label="Inkoopprijs (€)" type="number" value={form.inkoopprijs} onChange={(v) => update("inkoopprijs", v === "" ? "" : Number(v))} />
             )}
-            <Field label="Verwachte verkoopprijs (€)" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", Number(v))} />
+            <Field label="Verwachte verkoopprijs (€)" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", v === "" ? "" : Number(v))} />
 
             {/* Price suggestion box */}
             <PriceSuggestion merk={form.merk} model={form.model} bouwjaar={form.bouwjaar} kilometerstand={form.kilometerstand} kenteken={form.kenteken} />
@@ -253,12 +256,24 @@ const AdminVoertuigNieuwPage = () => {
 
 const Field = ({ label, value, onChange, type = "text", required = false, highlight = false, placeholder }: {
   label: string; value: any; onChange: (v: string) => void; type?: string; required?: boolean; highlight?: boolean; placeholder?: string;
-}) => (
-  <div>
-    <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} placeholder={placeholder} className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", highlight && "bg-accent/40 border-primary/30")} />
-  </div>
-);
+}) => {
+  const isNumber = type === "number";
+  const displayVal = isNumber && (value === 0 || value === "0") ? "" : value;
+  return (
+    <div>
+      <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">{label}</label>
+      <input
+        type={isNumber ? "text" : type}
+        inputMode={isNumber ? "numeric" : undefined}
+        value={displayVal}
+        onChange={(e) => onChange(isNumber ? e.target.value.replace(/[^0-9]/g, "") : e.target.value)}
+        required={required}
+        placeholder={isNumber ? "0" : placeholder}
+        className={cn("w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all", highlight && "bg-accent/40 border-primary/30")}
+      />
+    </div>
+  );
+};
 
 const PriceSuggestion = ({ merk, model, bouwjaar, kilometerstand, kenteken }: {
   merk: string; model: string; bouwjaar: number; kilometerstand: number; kenteken: string;
