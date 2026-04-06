@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, Loader2, Eye } from "lucide-react";
+import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus } from "lucide-react";
 import VehicleFotosTab from "@/components/admin/VehicleFotosTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ArchiveDoc {
   id: string;
@@ -33,25 +34,62 @@ interface Aanbetaling {
   pdf_path: string | null;
 }
 
-const VehicleDossierTab = ({ vehicleId }: { vehicleId: string }) => {
+// Required documents when vehicle is sold
+const VERKOOP_DOCUMENTEN = [
+  { type: "Koopovereenkomst", label: "Koopovereenkomst" },
+  { type: "Factuur", label: "Factuur" },
+  { type: "Kentekenbewijs", label: "Kentekenbewijs (overschrijving)" },
+  { type: "Vrijwaringsbewijs", label: "Vrijwaringsbewijs" },
+  { type: "Betalingsbewijs", label: "Betalingsbewijs" },
+  { type: "Afleverbon", label: "Afleverbon" },
+];
+
+// Required data fields when vehicle is sold
+const VERKOOP_GEGEVENS = [
+  { key: "koperNaam", label: "Koper naam" },
+  { key: "koperEmail", label: "Koper e-mail" },
+  { key: "koperTelefoon", label: "Koper telefoon" },
+  { key: "verkoopDatum", label: "Verkoopdatum" },
+  { key: "verkoopprijs", label: "Verkoopprijs" },
+];
+
+interface VehicleDossierTabProps {
+  vehicleId: string;
+  vehicleStatus?: string;
+  koperNaam?: string | null;
+  koperEmail?: string | null;
+  koperTelefoon?: string | null;
+  verkoopDatum?: string | null;
+  verkoopprijs?: number | null;
+}
+
+const VehicleDossierTab = ({ vehicleId, vehicleStatus, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs }: VehicleDossierTabProps) => {
   const [archiveDocs, setArchiveDocs] = useState<ArchiveDoc[]>([]);
   const [testDrives, setTestDrives] = useState<TestDrive[]>([]);
   const [aanbetalingen, setAanbetalingen] = useState<Aanbetaling[]>([]);
+  const [verkoopDocs, setVerkoopDocs] = useState<{ type: string; naam: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadType, setUploadType] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const fetch = async () => {
-      const [archRes, tdRes, abRes] = await Promise.all([
+    const fetchAll = async () => {
+      const [archRes, tdRes, abRes, docRes] = await Promise.all([
         supabase.from("document_archive").select("*").eq("vehicle_id", vehicleId).order("created_at", { ascending: false }),
         supabase.from("test_drives").select("*").eq("vehicle_id", vehicleId).order("start_tijd", { ascending: false }),
         supabase.from("aanbetalingen").select("*").eq("vehicle_id", vehicleId).order("datum", { ascending: false }),
+        supabase.from("vehicle_documents").select("type, naam").eq("vehicle_id", vehicleId),
       ]);
       setArchiveDocs((archRes.data as ArchiveDoc[]) || []);
       setTestDrives((tdRes.data as TestDrive[]) || []);
       setAanbetalingen((abRes.data as Aanbetaling[]) || []);
+      setVerkoopDocs((docRes.data as any[]) || []);
       setLoading(false);
     };
-    fetch();
+    fetchAll();
   }, [vehicleId]);
 
   const handleDownload = async (filePath: string | null, bucket: string | null) => {
@@ -59,6 +97,30 @@ const VehicleDossierTab = ({ vehicleId }: { vehicleId: string }) => {
     const { data, error } = await supabase.storage.from(bucket).createSignedUrl(filePath, 300);
     if (error || !data?.signedUrl) { toast.error("Download mislukt"); return; }
     window.open(data.signedUrl, "_blank");
+  };
+
+  const handleFileUpload = async (file: File) => {
+    if (!file || !uploadType) return;
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${vehicleId}/${Date.now()}.${ext}`;
+    const { error: storageError } = await supabase.storage.from("vehicle-documents").upload(path, file);
+    if (storageError) { toast.error("Upload mislukt"); setUploading(false); return; }
+    const { error } = await supabase.from("vehicle_documents").insert({
+      vehicle_id: vehicleId,
+      naam: uploadType,
+      type: uploadType,
+      file_path: path,
+      file_size: file.size,
+      mime_type: file.type,
+    } as any);
+    if (error) { toast.error("Opslaan mislukt"); } else {
+      toast.success(`${uploadType} geüpload!`);
+      setVerkoopDocs(prev => [...prev, { type: uploadType, naam: uploadType }]);
+    }
+    setUploading(false);
+    setUploadOpen(false);
+    setUploadType("");
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
@@ -77,8 +139,150 @@ const VehicleDossierTab = ({ vehicleId }: { vehicleId: string }) => {
     geannuleerd: "bg-red-500/15 text-red-400",
   };
 
+  const isVerkocht = vehicleStatus === "verkocht";
+
+  // Check which verkoop documents are present
+  const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
+
+  // Check which data fields are filled
+  const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
+  const hasData = (key: string) => {
+    const val = vehicleData[key];
+    if (val === null || val === undefined || val === "") return false;
+    if (typeof val === "number" && val === 0) return false;
+    return true;
+  };
+
+  const docsComplete = VERKOOP_DOCUMENTEN.filter(d => hasDocument(d.type)).length;
+  const dataComplete = VERKOOP_GEGEVENS.filter(d => hasData(d.key)).length;
+  const totalComplete = docsComplete + dataComplete;
+  const totalRequired = VERKOOP_DOCUMENTEN.length + VERKOOP_GEGEVENS.length;
+
   return (
     <div className="space-y-6">
+      {/* Verkoop dossier checklist */}
+      {isVerkocht && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Verkoopdossier</h3>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+              totalComplete === totalRequired 
+                ? "bg-emerald-500/15 text-emerald-400" 
+                : "bg-amber-500/15 text-amber-400"
+            }`}>
+              {totalComplete}/{totalRequired} compleet
+            </span>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg divide-y divide-border">
+            {/* Data fields */}
+            <div className="px-4 py-2.5">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">Gegevens</p>
+              <div className="space-y-1.5">
+                {VERKOOP_GEGEVENS.map(field => {
+                  const filled = hasData(field.key);
+                  return (
+                    <div key={field.key} className="flex items-center gap-2.5">
+                      {filled ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      ) : (
+                        <Circle className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                      )}
+                      <span className={`text-sm ${filled ? "text-foreground" : "text-muted-foreground"}`}>{field.label}</span>
+                      {filled && (
+                        <span className="text-xs text-muted-foreground ml-auto truncate max-w-[140px]">
+                          {field.key === "verkoopprijs" ? `€ ${Number(vehicleData[field.key]).toLocaleString("nl-NL")}` : String(vehicleData[field.key])}
+                        </span>
+                      )}
+                      {!filled && <span className="text-[10px] text-amber-400 ml-auto">Ontbreekt</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Document upload slots */}
+            <div className="px-4 py-2.5">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">Documenten</p>
+              <div className="space-y-1.5">
+                {VERKOOP_DOCUMENTEN.map(doc => {
+                  const present = hasDocument(doc.type);
+                  return (
+                    <div key={doc.type} className="flex items-center gap-2.5">
+                      {present ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      ) : (
+                        <Circle className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                      )}
+                      <span className={`text-sm flex-1 ${present ? "text-foreground" : "text-muted-foreground"}`}>{doc.label}</span>
+                      {present ? (
+                        <span className="text-[10px] text-emerald-400">Aanwezig</span>
+                      ) : (
+                        <button
+                          onClick={() => { setUploadType(doc.type); setUploadOpen(true); }}
+                          className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+                        >
+                          <Upload className="w-3 h-3" /> Uploaden
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upload dialog with scan option */}
+      <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+        <DialogContent className="max-w-[calc(100vw-2rem)]">
+          <DialogHeader><DialogTitle>{uploadType} uploaden</DialogTitle></DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="flex flex-col items-center gap-2 p-6 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+              >
+                <Upload className="w-6 h-6 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">Bestand kiezen</span>
+                <span className="text-[10px] text-muted-foreground">PDF, JPG, PNG</span>
+              </button>
+              <button
+                onClick={() => cameraInputRef.current?.click()}
+                disabled={uploading}
+                className="flex flex-col items-center gap-2 p-6 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+              >
+                <Camera className="w-6 h-6 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">Scannen</span>
+                <span className="text-[10px] text-muted-foreground">Camera openen</span>
+              </button>
+            </div>
+            {uploading && (
+              <div className="flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" /> Uploaden...
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png,.docx"
+              className="hidden"
+              onChange={(e) => { if (e.target.files?.[0]) handleFileUpload(e.target.files[0]); }}
+            />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => { if (e.target.files?.[0]) handleFileUpload(e.target.files[0]); }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Gegenereerde documenten */}
       {archiveDocs.length > 0 && (
         <div>
