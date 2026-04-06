@@ -126,9 +126,32 @@ serve(async (req) => {
         if (fv.feed_status !== match.status) {
           if (fv.feed_status === "verkocht" || fv.feed_status === "gereserveerd") {
             // Feed zegt verkocht/gereserveerd → altijd overnemen
+            const wasNotVerkocht = match.status !== "verkocht";
             updates.status = fv.feed_status;
             if (fv.feed_status === "verkocht" && !match.verkoop_datum) {
               updates.verkoop_datum = new Date().toISOString().split("T")[0];
+            }
+            // Auto-create verkoop checklist tasks when auto-set to verkocht
+            if (fv.feed_status === "verkocht" && wasNotVerkocht) {
+              const verkoopTaken = [
+                "Kopersgegevens invullen",
+                "Koopovereenkomst genereren en uploaden",
+                "Factuur aanmaken",
+                "Vrijwaringsbewijs uploaden",
+                "Betaling controleren",
+              ];
+              for (const taak of verkoopTaken) {
+                await supabase.from("vehicle_tasks").insert({
+                  vehicle_id: match.id,
+                  omschrijving: taak,
+                  prioriteit: "hoog",
+                });
+              }
+              await supabase.from("vehicle_activity_log").insert({
+                vehicle_id: match.id,
+                actie_type: "status_gewijzigd",
+                beschrijving: "Automatisch op verkocht gezet via feed — verkooptaken aangemaakt",
+              });
             }
           }
           // Als feed "te_koop" zegt maar DB heeft een andere status → NIET overschrijven
@@ -175,8 +198,30 @@ serve(async (req) => {
       ) {
         await supabase
           .from("vehicles")
-          .update({ status: "verkocht" })
+          .update({ status: "verkocht", verkoop_datum: new Date().toISOString().split("T")[0] })
           .eq("id", dbVehicle.id);
+
+        // Create verkoop checklist tasks
+        const verkoopTaken = [
+          "Kopersgegevens invullen",
+          "Koopovereenkomst genereren en uploaden",
+          "Factuur aanmaken",
+          "Vrijwaringsbewijs uploaden",
+          "Betaling controleren",
+        ];
+        for (const taak of verkoopTaken) {
+          await supabase.from("vehicle_tasks").insert({
+            vehicle_id: dbVehicle.id,
+            omschrijving: taak,
+            prioriteit: "hoog",
+          });
+        }
+        await supabase.from("vehicle_activity_log").insert({
+          vehicle_id: dbVehicle.id,
+          actie_type: "status_gewijzigd",
+          beschrijving: "Automatisch op verkocht gezet (uit feed verdwenen) — verkooptaken aangemaakt",
+        });
+
         removed++;
       }
     }
