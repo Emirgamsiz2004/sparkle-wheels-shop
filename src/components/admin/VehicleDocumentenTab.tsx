@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   Plus, Download, Trash2, FileText, Loader2, ExternalLink,
-  CheckCircle2, Circle, Upload, Filter, FolderOpen
+  CheckCircle2, Circle, Upload, Filter, FolderOpen, Camera
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
