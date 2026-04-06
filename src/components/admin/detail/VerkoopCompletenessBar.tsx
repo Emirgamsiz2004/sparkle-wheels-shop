@@ -6,18 +6,32 @@ interface Props {
   vehicleId: string;
   vehicleStatus: string;
   koperNaam?: string | null;
+  koperEmail?: string | null;
+  koperTelefoon?: string | null;
+  verkoopDatum?: string | null;
+  verkoopprijs?: number | null;
+  onGoToDossier?: () => void;
 }
 
-const VERKOOP_TAKEN = [
-  "Kopersgegevens invullen",
-  "Koopovereenkomst genereren en uploaden",
-  "Factuur aanmaken",
-  "Vrijwaringsbewijs uploaden",
-  "Betaling controleren",
+const REQUIRED_DOCS = [
+  "Koopovereenkomst",
+  "Factuur",
+  "Kentekenbewijs",
+  "Vrijwaringsbewijs",
+  "Betalingsbewijs",
+  "Afleverbon",
 ];
 
-const VerkoopCompletenessBar = ({ vehicleId, vehicleStatus, koperNaam }: Props) => {
-  const [tasks, setTasks] = useState<{ omschrijving: string; voltooid: boolean }[]>([]);
+const REQUIRED_DATA = [
+  { key: "koperNaam", label: "Koper naam" },
+  { key: "koperEmail", label: "Koper e-mail" },
+  { key: "koperTelefoon", label: "Koper telefoon" },
+  { key: "verkoopDatum", label: "Verkoopdatum" },
+  { key: "verkoopprijs", label: "Verkoopprijs" },
+];
+
+const VerkoopCompletenessBar = ({ vehicleId, vehicleStatus, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs, onGoToDossier }: Props) => {
+  const [uploadedTypes, setUploadedTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,11 +39,11 @@ const VerkoopCompletenessBar = ({ vehicleId, vehicleStatus, koperNaam }: Props) 
 
     const fetch = async () => {
       const { data } = await supabase
-        .from("vehicle_tasks")
-        .select("omschrijving, voltooid")
+        .from("vehicle_documents")
+        .select("type")
         .eq("vehicle_id", vehicleId)
-        .in("omschrijving", VERKOOP_TAKEN);
-      setTasks((data as any[]) || []);
+        .in("type", REQUIRED_DOCS);
+      setUploadedTypes((data as any[])?.map(d => d.type) || []);
       setLoading(false);
     };
     fetch();
@@ -37,20 +51,34 @@ const VerkoopCompletenessBar = ({ vehicleId, vehicleStatus, koperNaam }: Props) 
 
   if (vehicleStatus !== "verkocht" || loading) return null;
 
-  // If no verkoop tasks exist yet, don't show bar
-  if (tasks.length === 0) return null;
+  const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
+  const hasData = (key: string) => {
+    const val = vehicleData[key];
+    if (val === null || val === undefined || val === "") return false;
+    if (typeof val === "number" && val === 0) return false;
+    return true;
+  };
 
-  const done = tasks.filter(t => t.voltooid).length;
-  const total = tasks.length;
+  const docsPresent = REQUIRED_DOCS.filter(t => uploadedTypes.includes(t)).length;
+  const dataPresent = REQUIRED_DATA.filter(d => hasData(d.key)).length;
+  const done = docsPresent + dataPresent;
+  const total = REQUIRED_DOCS.length + REQUIRED_DATA.length;
   const allDone = done === total;
   const pct = Math.round((done / total) * 100);
 
+  // Missing items for tooltip
+  const missingDocs = REQUIRED_DOCS.filter(t => !uploadedTypes.includes(t));
+  const missingData = REQUIRED_DATA.filter(d => !hasData(d.key));
+
   return (
-    <div className={`flex items-center gap-3 px-3.5 py-2.5 rounded-md border text-xs ${
-      allDone
-        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-        : "bg-amber-500/10 border-amber-500/30 text-amber-400"
-    }`}>
+    <button
+      onClick={onGoToDossier}
+      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-md border text-xs text-left transition-colors ${
+        allDone
+          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/15"
+          : "bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/15"
+      }`}
+    >
       {allDone ? (
         <CheckCircle2 className="w-4 h-4 shrink-0" />
       ) : (
@@ -58,10 +86,13 @@ const VerkoopCompletenessBar = ({ vehicleId, vehicleStatus, koperNaam }: Props) 
       )}
       <div className="flex-1 min-w-0">
         <span className="font-medium">
-          {allDone ? "Verkoopgegevens compleet" : `Verkoopgegevens onvolledig — ${done}/${total} taken afgerond`}
+          {allDone ? "Verkoopdossier compleet" : `Verkoopdossier onvolledig — ${done}/${total} afgerond`}
         </span>
-        {!koperNaam && !allDone && (
-          <span className="ml-2 text-muted-foreground">• Kopersgegevens ontbreken</span>
+        {!allDone && (missingDocs.length > 0 || missingData.length > 0) && (
+          <span className="ml-2 text-muted-foreground">
+            {missingData.length > 0 && `• ${missingData.length} gegeven(s) `}
+            {missingDocs.length > 0 && `• ${missingDocs.length} document(en)`}
+          </span>
         )}
       </div>
       {!allDone && (
@@ -69,7 +100,7 @@ const VerkoopCompletenessBar = ({ vehicleId, vehicleStatus, koperNaam }: Props) 
           <div className="h-full bg-amber-400 rounded-full transition-all" style={{ width: `${pct}%` }} />
         </div>
       )}
-    </div>
+    </button>
   );
 };
 

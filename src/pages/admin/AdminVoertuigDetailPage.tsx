@@ -112,7 +112,16 @@ const AdminVoertuigDetailPage = () => {
         onDelete={handleDelete}
       />
 
-      <VerkoopCompletenessBar vehicleId={vehicle.id} vehicleStatus={vehicle.status} koperNaam={vehicle.koperNaam} />
+      <VerkoopCompletenessBar
+        vehicleId={vehicle.id}
+        vehicleStatus={vehicle.status}
+        koperNaam={vehicle.koperNaam}
+        koperEmail={vehicle.koperEmail}
+        koperTelefoon={vehicle.koperTelefoon}
+        verkoopDatum={vehicle.verkoopDatum}
+        verkoopprijs={vehicle.verkoopprijs}
+        onGoToDossier={() => setActiveTab("dossier")}
+      />
 
       {/* Tabs */}
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
