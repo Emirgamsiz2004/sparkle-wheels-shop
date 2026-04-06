@@ -185,9 +185,9 @@ const AdminVoertuigNieuwPage = () => {
                       <span className="text-[9px] text-muted-foreground">15%</span>
                     </div>
                   </div>
-                  {form.verkoopprijs > 0 && (
+                  {Number(form.verkoopprijs) > 0 && (
                     <p className="text-xs text-muted-foreground mt-2">
-                      Commissie bij verkoop: <span className="text-foreground font-medium">€ {Math.round(form.verkoopprijs * consignatieMarge / 100).toLocaleString("nl-NL")}</span>
+                      Commissie bij verkoop: <span className="text-foreground font-medium">€ {Math.round(Number(form.verkoopprijs) * consignatieMarge / 100).toLocaleString("nl-NL")}</span>
                     </p>
                   )}
                 </div>
@@ -232,7 +232,7 @@ const AdminVoertuigNieuwPage = () => {
             <Field label="Verwachte verkoopprijs (€)" type="number" value={form.verkoopprijs} onChange={(v) => update("verkoopprijs", v === "" ? "" : Number(v))} />
 
             {/* Price suggestion box */}
-            <PriceSuggestion merk={form.merk} model={form.model} bouwjaar={form.bouwjaar} kilometerstand={form.kilometerstand} kenteken={form.kenteken} />
+            <PriceSuggestion merk={form.merk} model={form.model} bouwjaar={form.bouwjaar} kilometerstand={Number(form.kilometerstand) || 0} kenteken={form.kenteken} />
           </div>
 
           <div>
