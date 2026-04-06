@@ -1,0 +1,1 @@
+ALTER TABLE public.appointments ADD COLUMN eind_datum_tijd timestamp with time zone DEFAULT NULL;

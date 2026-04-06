@@ -42,6 +42,8 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
   const [saving, setSaving] = useState(false);
   const [editDate, setEditDate] = useState<Date | undefined>(undefined);
   const [editTime, setEditTime] = useState("10:00");
+  const [editEindTime, setEditEindTime] = useState("");
+  const [editTijdvenster, setEditTijdvenster] = useState(false);
   const [editStatus, setEditStatus] = useState<AppointmentStatus>("gepland");
   const [editNotities, setEditNotities] = useState("");
   const [editOnderwerp, setEditOnderwerp] = useState("");
@@ -56,6 +58,14 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
     const d = new Date(appointment.datum_tijd);
     setEditDate(d);
     setEditTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`);
+    if (appointment.eind_datum_tijd) {
+      const ed = new Date(appointment.eind_datum_tijd);
+      setEditEindTime(`${String(ed.getHours()).padStart(2, "0")}:${String(ed.getMinutes()).padStart(2, "0")}`);
+      setEditTijdvenster(true);
+    } else {
+      setEditEindTime("");
+      setEditTijdvenster(false);
+    }
     setEditStatus(appointment.status);
     setEditNotities(appointment.notities || "");
     setEditOnderwerp(appointment.onderwerp || "");
@@ -71,10 +81,11 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
     try {
       const dateStr = format(editDate, "yyyy-MM-dd");
       // Find closest time slot or use exact
-      const closestTime = timeSlots.includes(editTime) ? editTime : editTime;
-      const datum_tijd = new Date(`${dateStr}T${closestTime}`).toISOString();
+      const datum_tijd = new Date(`${dateStr}T${editTime}`).toISOString();
+      const eind_datum_tijd = editTijdvenster && editEindTime ? new Date(`${dateStr}T${editEindTime}`).toISOString() : null;
       await onUpdate(appointment.id, {
         datum_tijd,
+        eind_datum_tijd,
         status: editStatus,
         notities: editNotities || null,
         onderwerp: editOnderwerp || null,
@@ -121,7 +132,10 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
               <div className="space-y-3 pt-1">
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span>{format(dt, "EEEE d MMMM yyyy 'om' HH:mm", { locale: nl })}</span>
+                  <span>
+                    {format(dt, "EEEE d MMMM yyyy 'om' HH:mm", { locale: nl })}
+                    {appointment.eind_datum_tijd && ` – ${format(new Date(appointment.eind_datum_tijd), "HH:mm", { locale: nl })}`}
+                  </span>
                 </div>
 
                 {appointment.customer && (
@@ -247,7 +261,7 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
                   </Popover>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">Tijdstip</Label>
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">{editTijdvenster ? "Van" : "Tijdstip"}</Label>
                   <Select value={editTime} onValueChange={setEditTime}>
                     <SelectTrigger className="rounded-[3px] h-10">
                       <Clock className="mr-2 h-4 w-4 opacity-60" />
@@ -261,6 +275,41 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
                   </Select>
                 </div>
               </div>
+
+              {/* Tijdvenster toggle */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEditTijdvenster(!editTijdvenster)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+                >
+                  {editTijdvenster ? "Exact tijdstip" : "Tijdsvenster (van-tot)"}
+                </button>
+              </div>
+
+              <AnimatePresence>
+                {editTijdvenster && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Label className="text-xs text-muted-foreground mb-1.5 block">Tot</Label>
+                    <Select value={editEindTime || timeSlots.find(t => t > editTime) || "17:00"} onValueChange={setEditEindTime}>
+                      <SelectTrigger className="rounded-[3px] h-10">
+                        <Clock className="mr-2 h-4 w-4 opacity-60" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-[3px] max-h-[240px]">
+                        {timeSlots.filter(t => t > editTime).map((t) => (
+                          <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Onderwerp (terugbelafspraak) */}
               <AnimatePresence>

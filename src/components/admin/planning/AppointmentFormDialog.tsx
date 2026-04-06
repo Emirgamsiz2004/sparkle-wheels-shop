@@ -43,8 +43,10 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [vehicleSearch, setVehicleSearch] = useState("");
+  const [tijdvenster, setTijdvenster] = useState(false);
   const [form, setForm] = useState({
     tijd: "10:00",
+    eind_tijd: "11:00",
     klant_naam: "",
     vehicle_id: "",
     notities: "",
@@ -64,7 +66,8 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     setType(null);
     setSelectedDate(undefined);
     setVehicleSearch("");
-    setForm({ tijd: "10:00", klant_naam: "", vehicle_id: "", notities: "", onderwerp: "", betalingsstatus: "openstaand" });
+    setTijdvenster(false);
+    setForm({ tijd: "10:00", eind_tijd: "11:00", klant_naam: "", vehicle_id: "", notities: "", onderwerp: "", betalingsstatus: "openstaand" });
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -89,9 +92,11 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     try {
       const dateStr = format(selectedDate, "yyyy-MM-dd");
       const datum_tijd = new Date(`${dateStr}T${form.tijd}`).toISOString();
+      const eind_datum_tijd = tijdvenster ? new Date(`${dateStr}T${form.eind_tijd}`).toISOString() : null;
       await onSubmit({
         type,
         datum_tijd,
+        eind_datum_tijd,
         customer_id: null,
         vehicle_id: form.vehicle_id || null,
         medewerker: null,
@@ -176,7 +181,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                   </Popover>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">Tijdstip *</Label>
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">{tijdvenster ? "Van *" : "Tijdstip *"}</Label>
                   <Select value={form.tijd} onValueChange={(v) => setForm({ ...form, tijd: v })}>
                     <SelectTrigger className="rounded-[3px] h-10">
                       <Clock className="mr-2 h-4 w-4 opacity-60" />
@@ -190,6 +195,41 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                   </Select>
                 </div>
               </div>
+
+              {/* Tijdvenster toggle + eind tijd */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setTijdvenster(!tijdvenster)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+                >
+                  {tijdvenster ? "Exact tijdstip" : "Tijdsvenster (van-tot)"}
+                </button>
+              </div>
+
+              <AnimatePresence>
+                {tijdvenster && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Label className="text-xs text-muted-foreground mb-1.5 block">Tot *</Label>
+                    <Select value={form.eind_tijd} onValueChange={(v) => setForm({ ...form, eind_tijd: v })}>
+                      <SelectTrigger className="rounded-[3px] h-10">
+                        <Clock className="mr-2 h-4 w-4 opacity-60" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-[3px] max-h-[240px]">
+                        {timeSlots.filter(t => t > form.tijd).map((t) => (
+                          <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Klant naam (optioneel) */}
               <div>

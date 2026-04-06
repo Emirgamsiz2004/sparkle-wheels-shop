@@ -9,6 +9,7 @@ export interface Appointment {
   id: string;
   type: AppointmentType;
   datum_tijd: string;
+  eind_datum_tijd: string | null;
   customer_id: string | null;
   vehicle_id: string | null;
   medewerker: string | null;

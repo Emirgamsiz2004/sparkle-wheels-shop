@@ -133,6 +133,7 @@ export type Database = {
           created_at: string
           customer_id: string | null
           datum_tijd: string
+          eind_datum_tijd: string | null
           id: string
           medewerker: string | null
           notities: string | null
@@ -148,6 +149,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           datum_tijd: string
+          eind_datum_tijd?: string | null
           id?: string
           medewerker?: string | null
           notities?: string | null
@@ -163,6 +165,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           datum_tijd?: string
+          eind_datum_tijd?: string | null
           id?: string
           medewerker?: string | null
           notities?: string | null
