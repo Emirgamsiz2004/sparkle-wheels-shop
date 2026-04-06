@@ -108,17 +108,18 @@ serve(async (req) => {
       if (match) {
         matchedDbIds.add(match.id);
 
-        // Only sync FEED fields (VWE is leidend) — never touch manual fields
-        // (marktplaats_url, inkoopprijs, opmerkingen, koper*, consignatie*, kosten, docs)
+        // Bestaande voertuigen: handmatige admin-wijzigingen zijn leidend.
+        // Vul alleen ontbrekende feeddata aan, maar overschrijf geen bestaande waarden.
         const updates: any = {};
         if (!match.feed_id && fv.feed_id) updates.feed_id = fv.feed_id;
-        if (fv.merk && fv.merk !== match.merk) updates.merk = fv.merk;
-        if (fv.model && fv.model !== match.model) updates.model = fv.model;
-        if (fv.bouwjaar && fv.bouwjaar !== match.bouwjaar) updates.bouwjaar = fv.bouwjaar;
-        if (fv.brandstof && fv.brandstof.toLowerCase() !== match.brandstof) updates.brandstof = fv.brandstof.toLowerCase();
-        if (fv.kleur && fv.kleur !== match.kleur) updates.kleur = fv.kleur;
-        if (fv.verkoopprijs && fv.verkoopprijs !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
-        if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
+        if (!match.kenteken && fv.kenteken) updates.kenteken = fv.kenteken;
+        if (!match.merk && fv.merk) updates.merk = fv.merk;
+        if (!match.model && fv.model) updates.model = fv.model;
+        if (!match.bouwjaar && fv.bouwjaar) updates.bouwjaar = fv.bouwjaar;
+        if (!match.brandstof && fv.brandstof) updates.brandstof = fv.brandstof.toLowerCase();
+        if (!match.kleur && fv.kleur) updates.kleur = fv.kleur;
+        if ((!match.verkoopprijs || Number(match.verkoopprijs) === 0) && fv.verkoopprijs) updates.verkoopprijs = fv.verkoopprijs;
+        if ((!match.kilometerstand || match.kilometerstand === 0) && fv.kilometerstand) updates.kilometerstand = fv.kilometerstand;
         // VWE feed is leidend: alleen als de FEED zegt verkocht/gereserveerd nemen we dat over.
         // Als de feed "te_koop" zegt maar de DB heeft een handmatige status (verkocht, gereserveerd, 
         // consignatie, in_behandeling, inkoop), laten we die met rust.
