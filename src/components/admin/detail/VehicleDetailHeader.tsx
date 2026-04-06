@@ -9,6 +9,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SocialPostDialog from "@/components/admin/SocialPostDialog";
 
 interface Props {
   vehicle: Vehicle;
@@ -32,6 +33,7 @@ const btnCls = "inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium
 const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onOpenVerkoop, onOpenReservering, onOpenAfspraak, onDelete }: Props) => {
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [socialOpen, setSocialOpen] = useState(false);
 
   const handleGenerateDoc = (type: string) => {
     if (type === "proefrit") {
