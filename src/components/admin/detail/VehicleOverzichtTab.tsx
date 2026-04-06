@@ -240,10 +240,10 @@ const InfoRow = ({ label, value, valueColor, isLast }: { label: string; value: s
 
 const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value: number; onSave: (val: number) => Promise<void>; hint?: string }) => {
   const [editing, setEditing] = useState(false);
-  const [editVal, setEditVal] = useState(String(value));
+  const [editVal, setEditVal] = useState(value ? String(value) : "");
 
   const handleSave = async () => {
-    const val = Number(editVal);
+    const val = editVal === "" ? 0 : Number(editVal);
     if (!isNaN(val)) {
       await onSave(val);
       toast.success(`${label} opgeslagen`);
@@ -253,7 +253,7 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSave();
-    if (e.key === "Escape") { setEditVal(String(value)); setEditing(false); }
+    if (e.key === "Escape") { setEditVal(value ? String(value) : ""); setEditing(false); }
   };
 
   if (editing) {
@@ -288,7 +288,7 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
       <td className="py-2.5 text-right align-middle">
         <div className="inline-flex items-center gap-1.5">
           <span className="text-sm font-medium tabular-nums text-foreground">{formatEuroDecimal(value)}</span>
-          <button onClick={() => { setEditVal(String(value)); setEditing(true); }} className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-foreground transition-opacity">
+          <button onClick={() => { setEditVal(value ? String(value) : ""); setEditing(true); }} className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-foreground transition-opacity">
             <Pencil className="w-3 h-3" />
           </button>
         </div>
@@ -299,12 +299,23 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
 
 const EditField = ({ label, value, onChange, type = "text", highlight = false, inputCls }: {
   label: string; value: any; onChange: (v: string) => void; type?: string; highlight?: boolean; inputCls: string;
-}) => (
-  <div>
-    <label className="block text-xs text-muted-foreground mb-1">{label}</label>
-    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={cn(inputCls, highlight && "border-ring/50 bg-accent/30")} />
-  </div>
-);
+}) => {
+  const isNumber = type === "number";
+  const displayVal = isNumber ? (value === 0 || value === "0" ? "" : value) : value;
+  return (
+    <div>
+      <label className="block text-xs text-muted-foreground mb-1">{label}</label>
+      <input
+        type={isNumber ? "text" : type}
+        inputMode={isNumber ? "numeric" : undefined}
+        value={displayVal}
+        onChange={(e) => onChange(isNumber ? e.target.value.replace(/[^0-9]/g, "") : e.target.value)}
+        placeholder={isNumber ? "0" : undefined}
+        className={cn(inputCls, highlight && "border-ring/50 bg-accent/30")}
+      />
+    </div>
+  );
+};
 
 export const getApkStatus = (apkVervaldatum?: string): { label: string; color: string; level: 'green' | 'orange' | 'red' | 'none' } => {
   if (!apkVervaldatum) return { label: "Onbekend", color: "text-muted-foreground", level: 'none' };

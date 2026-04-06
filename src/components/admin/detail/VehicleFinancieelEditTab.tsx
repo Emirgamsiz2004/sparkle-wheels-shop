@@ -21,12 +21,12 @@ interface Props {
 const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, onLogActivity }: Props) => {
   const autoKostprijs = vehicle.inkoopprijs + vehicle.kosten.reduce((s, k) => s + k.amount, 0);
   const [form, setForm] = useState({
-    inkoopprijs: vehicle.inkoopprijs,
-    verkoopprijs: vehicle.verkoopprijs,
+    inkoopprijs: vehicle.inkoopprijs ? String(vehicle.inkoopprijs) : "",
+    verkoopprijs: vehicle.verkoopprijs ? String(vehicle.verkoopprijs) : "",
     inkoopDatum: vehicle.inkoopDatum,
     verkoopDatum: vehicle.verkoopDatum || "",
     verkoopType: vehicle.verkoopType,
-    consignatieCommissiePerc: vehicle.consignatieCommissiePerc ?? 10,
+    consignatieCommissiePerc: vehicle.consignatieCommissiePerc ? String(vehicle.consignatieCommissiePerc) : "10",
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",
@@ -41,16 +41,19 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
 
   const handleSave = async () => {
     setSaving(true);
-    const kostprijsVal = form.inkoopprijs + vehicle.kosten.reduce((s, k) => s + k.amount, 0);
+    const inkoopVal = Number(form.inkoopprijs) || 0;
+    const verkoopVal = Number(form.verkoopprijs) || 0;
+    const commissieVal = Number(form.consignatieCommissiePerc) || 10;
+    const kostprijsVal = inkoopVal + vehicle.kosten.reduce((s, k) => s + k.amount, 0);
     await onSave({
       ...vehicle,
-      inkoopprijs: form.inkoopprijs,
-      verkoopprijs: form.verkoopprijs,
+      inkoopprijs: inkoopVal,
+      verkoopprijs: verkoopVal,
       inkoopDatum: form.inkoopDatum,
       verkoopDatum: form.verkoopDatum || undefined,
       verkoopType: form.verkoopType,
       status: isConsig ? "consignatie" : vehicle.status === "consignatie" ? "te_koop" : vehicle.status,
-      consignatieCommissiePerc: form.consignatieCommissiePerc,
+      consignatieCommissiePerc: commissieVal,
       consignatieEigenaarNaam: form.consignatieEigenaarNaam || undefined,
       consignatieEigenaarTelefoon: form.consignatieEigenaarTelefoon || undefined,
       consignatieEigenaarEmail: form.consignatieEigenaarEmail || undefined,
@@ -84,7 +87,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
             <>
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1.5">Inkoopprijs (€)</label>
-                <input type="number" value={form.inkoopprijs} onChange={(e) => setForm(f => ({ ...f, inkoopprijs: Number(e.target.value) }))} className={inputCls} />
+                <input type="text" inputMode="numeric" value={form.inkoopprijs} onChange={(e) => setForm(f => ({ ...f, inkoopprijs: e.target.value.replace(/[^0-9]/g, "") }))} placeholder="0" className={inputCls} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1.5">Inkoopdatum</label>
@@ -101,7 +104,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
           )}
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Verkoopprijs (€)</label>
-            <input type="number" value={form.verkoopprijs} onChange={(e) => setForm(f => ({ ...f, verkoopprijs: Number(e.target.value) }))} className={inputCls} />
+            <input type="text" inputMode="numeric" value={form.verkoopprijs} onChange={(e) => setForm(f => ({ ...f, verkoopprijs: e.target.value.replace(/[^0-9]/g, "") }))} placeholder="0" className={inputCls} />
           </div>
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Verkoopdatum</label>
@@ -126,7 +129,7 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1.5">Commissie %</label>
-              <input type="number" min={0} max={50} step={0.5} value={form.consignatieCommissiePerc} onChange={(e) => setForm(f => ({ ...f, consignatieCommissiePerc: Number(e.target.value) }))} className={inputCls} />
+              <input type="text" inputMode="decimal" value={form.consignatieCommissiePerc} onChange={(e) => setForm(f => ({ ...f, consignatieCommissiePerc: e.target.value.replace(/[^0-9.]/g, "") }))} placeholder="10" className={inputCls} />
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1.5">Eigenaar telefoon</label>
