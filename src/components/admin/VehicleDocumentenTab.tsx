@@ -159,7 +159,18 @@ const VehicleDocumentenTab = ({ vehicleId }: { vehicleId: string }) => {
             <div className="space-y-4 mt-2">
               <div>
                 <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Bestand</label>
-                <input type="file" accept=".pdf,.docx,.jpg,.jpeg,.png,.xlsx,.xls" onChange={(e) => setForm(f => ({ ...f, file: e.target.files?.[0] || null }))} className="w-full text-sm text-foreground" />
+                <div className="flex gap-2">
+                  <label className="flex-1 flex items-center gap-2 px-3 py-2 text-sm bg-card border border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+                    <Upload className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="text-foreground truncate">{form.file ? form.file.name : "Bestand kiezen"}</span>
+                    <input type="file" accept=".pdf,.docx,.jpg,.jpeg,.png,.xlsx,.xls" onChange={(e) => setForm(f => ({ ...f, file: e.target.files?.[0] || null }))} className="hidden" />
+                  </label>
+                  <label className="flex items-center gap-1.5 px-3 py-2 text-sm bg-card border border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors shrink-0">
+                    <Camera className="w-4 h-4 text-muted-foreground" />
+                    <span className="hidden sm:inline text-foreground">Scan</span>
+                    <input type="file" accept="image/*" capture="environment" onChange={(e) => setForm(f => ({ ...f, file: e.target.files?.[0] || null }))} className="hidden" />
+                  </label>
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">PDF, DOCX, JPG, PNG, Excel — max 20MB</p>
               </div>
               <div>
