@@ -81,10 +81,11 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
     try {
       const dateStr = format(editDate, "yyyy-MM-dd");
       // Find closest time slot or use exact
-      const closestTime = timeSlots.includes(editTime) ? editTime : editTime;
-      const datum_tijd = new Date(`${dateStr}T${closestTime}`).toISOString();
+      const datum_tijd = new Date(`${dateStr}T${editTime}`).toISOString();
+      const eind_datum_tijd = editTijdvenster && editEindTime ? new Date(`${dateStr}T${editEindTime}`).toISOString() : null;
       await onUpdate(appointment.id, {
         datum_tijd,
+        eind_datum_tijd,
         status: editStatus,
         notities: editNotities || null,
         onderwerp: editOnderwerp || null,
