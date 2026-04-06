@@ -42,6 +42,8 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
   const [saving, setSaving] = useState(false);
   const [editDate, setEditDate] = useState<Date | undefined>(undefined);
   const [editTime, setEditTime] = useState("10:00");
+  const [editEindTime, setEditEindTime] = useState("");
+  const [editTijdvenster, setEditTijdvenster] = useState(false);
   const [editStatus, setEditStatus] = useState<AppointmentStatus>("gepland");
   const [editNotities, setEditNotities] = useState("");
   const [editOnderwerp, setEditOnderwerp] = useState("");
@@ -56,6 +58,14 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
     const d = new Date(appointment.datum_tijd);
     setEditDate(d);
     setEditTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`);
+    if (appointment.eind_datum_tijd) {
+      const ed = new Date(appointment.eind_datum_tijd);
+      setEditEindTime(`${String(ed.getHours()).padStart(2, "0")}:${String(ed.getMinutes()).padStart(2, "0")}`);
+      setEditTijdvenster(true);
+    } else {
+      setEditEindTime("");
+      setEditTijdvenster(false);
+    }
     setEditStatus(appointment.status);
     setEditNotities(appointment.notities || "");
     setEditOnderwerp(appointment.onderwerp || "");
