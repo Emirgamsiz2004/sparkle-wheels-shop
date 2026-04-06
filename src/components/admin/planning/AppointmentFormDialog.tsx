@@ -43,8 +43,10 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [vehicleSearch, setVehicleSearch] = useState("");
+  const [tijdvenster, setTijdvenster] = useState(false);
   const [form, setForm] = useState({
     tijd: "10:00",
+    eind_tijd: "11:00",
     klant_naam: "",
     vehicle_id: "",
     notities: "",
@@ -64,7 +66,8 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     setType(null);
     setSelectedDate(undefined);
     setVehicleSearch("");
-    setForm({ tijd: "10:00", klant_naam: "", vehicle_id: "", notities: "", onderwerp: "", betalingsstatus: "openstaand" });
+    setTijdvenster(false);
+    setForm({ tijd: "10:00", eind_tijd: "11:00", klant_naam: "", vehicle_id: "", notities: "", onderwerp: "", betalingsstatus: "openstaand" });
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -89,9 +92,11 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     try {
       const dateStr = format(selectedDate, "yyyy-MM-dd");
       const datum_tijd = new Date(`${dateStr}T${form.tijd}`).toISOString();
+      const eind_datum_tijd = tijdvenster ? new Date(`${dateStr}T${form.eind_tijd}`).toISOString() : null;
       await onSubmit({
         type,
         datum_tijd,
+        eind_datum_tijd,
         customer_id: null,
         vehicle_id: form.vehicle_id || null,
         medewerker: null,
