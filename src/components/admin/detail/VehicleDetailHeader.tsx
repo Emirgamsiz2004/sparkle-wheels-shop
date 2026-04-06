@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Vehicle, statusLabels, statusColors } from "@/types/vehicle";
-import { ArrowLeft, ClipboardCheck, ChevronDown, Plus, MoreHorizontal, Banknote, Trash2, ShoppingCart, FileText, CalendarPlus, Receipt, ListChecks } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, ChevronDown, Plus, MoreHorizontal, Banknote, Trash2, ShoppingCart, FileText, CalendarPlus, Receipt, ListChecks, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
@@ -9,6 +9,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SocialPostDialog from "@/components/admin/SocialPostDialog";
 
 interface Props {
   vehicle: Vehicle;
@@ -32,6 +33,7 @@ const btnCls = "inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium
 const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAanbetaling, onOpenKosten, onOpenTaak, onOpenVerkoop, onOpenReservering, onOpenAfspraak, onDelete }: Props) => {
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [socialOpen, setSocialOpen] = useState(false);
 
   const handleGenerateDoc = (type: string) => {
     if (type === "proefrit") {
@@ -116,6 +118,10 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           </DropdownMenu>
         )}
 
+        <button onClick={() => setSocialOpen(true)} className={btnCls}>
+          <Sparkles className="w-3.5 h-3.5" /> Genereer Post
+        </button>
+
         {/* Status dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -182,6 +188,12 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenAa
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <SocialPostDialog
+        open={socialOpen}
+        onOpenChange={setSocialOpen}
+        vehicle={{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, bouwjaar: vehicle.bouwjaar, kilometerstand: vehicle.kilometerstand, verkoopprijs: vehicle.verkoopprijs, kleur: vehicle.kleur }}
+      />
     </div>
   );
 };
