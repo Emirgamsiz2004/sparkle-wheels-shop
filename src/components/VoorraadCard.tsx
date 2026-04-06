@@ -19,7 +19,6 @@ const Spec = ({ icon: Icon, label }: { icon: React.ElementType; label: string })
   ) : null;
 
 const statusBadge: Record<string, { label: string; className: string } | null> = {
-  verkocht: { label: "Verkocht", className: "bg-red-600 text-white" },
   gereserveerd: { label: "Gereserveerd", className: "bg-amber-500 text-white" },
 };
 
@@ -36,7 +35,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
     >
       <Link
         to={`/voorraad/${voertuig.id}`}
-        className={`group flex flex-col overflow-hidden rounded-lg border border-border bg-card hover:border-accent/40 transition-colors duration-300 ${isSold ? "opacity-75" : ""}`}
+        className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card hover:border-accent/40 transition-colors duration-300"
       >
         {/* Image */}
         <div className="relative aspect-[16/10] overflow-hidden bg-secondary">
@@ -45,13 +44,27 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
               src={voertuig.afbeelding}
               alt={title}
               loading="lazy"
-              className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${isSold ? "grayscale" : ""}`}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Car className="w-12 h-12 text-muted-foreground/30" />
             </div>
           )}
+
+          {/* Verkocht diagonal banner */}
+          {isSold && (
+            <div className="absolute inset-0 pointer-events-none">
+              <div
+                className="absolute top-[20px] -left-[40px] w-[200px] bg-foreground/85 text-background text-center py-1.5 text-sm font-extrabold uppercase tracking-[0.15em] shadow-lg"
+                style={{ transform: "rotate(-35deg)" }}
+              >
+                Verkocht
+              </div>
+            </div>
+          )}
+
+          {/* Gereserveerd badge */}
           {badge && (
             <span className={`absolute top-3 left-3 px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded ${badge.className}`}>
               {badge.label}
