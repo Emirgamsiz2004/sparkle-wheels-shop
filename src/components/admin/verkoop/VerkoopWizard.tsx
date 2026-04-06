@@ -319,6 +319,36 @@ const VerkoopWizard = ({ vehicle, open, onOpenChange, onComplete, initialStep, e
         beschrijving: `Verkocht aan ${klant.voornaam} ${klant.achternaam} voor ${formatEuroDecimal(details.verkoopprijs)}`,
       } as any);
 
+      // Save koopovereenkomst to document archive
+      await supabase.from("document_archive").insert({
+        document_type: "koopovereenkomst",
+        kenteken: vehicle.kenteken || null,
+        klant_naam: `${klant.voornaam} ${klant.achternaam}`,
+        vehicle_id: vehicle.id,
+        metadata: {
+          verkoopprijs: details.verkoopprijs,
+          betaalwijze: details.betaalwijze,
+          garantie_type: details.garantieType,
+          garantie_maanden: details.garantieMaanden,
+          koper_email: klant.email,
+          koper_telefoon: klant.telefoon,
+        },
+      } as any);
+
+      // Save factuur to document archive if created
+      if (moneybirdFactuurId) {
+        await supabase.from("document_archive").insert({
+          document_type: "factuur",
+          kenteken: vehicle.kenteken || null,
+          klant_naam: `${klant.voornaam} ${klant.achternaam}`,
+          vehicle_id: vehicle.id,
+          metadata: {
+            moneybird_factuur_id: moneybirdFactuurId,
+            verkoopprijs: details.verkoopprijs,
+          },
+        } as any);
+      }
+
       // Make event
       const kostprijs = calcKostprijs(vehicle);
       await supabase.from("make_events").insert({
