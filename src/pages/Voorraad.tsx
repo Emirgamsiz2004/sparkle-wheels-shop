@@ -10,6 +10,9 @@ import { useVoorraadFeed } from "@/hooks/useVoorraadFeed";
 const Voorraad = () => {
   const { data: voertuigen, isLoading, isError, error } = useVoorraadFeed();
 
+  const beschikbaar = voertuigen?.filter((v) => v.dbStatus !== "verkocht") ?? [];
+  const verkocht = voertuigen?.filter((v) => v.dbStatus === "verkocht") ?? [];
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -81,22 +84,47 @@ const Voorraad = () => {
             </div>
           )}
 
-          {/* Grid */}
-          {voertuigen && voertuigen.length > 0 && (
+          {/* Available vehicles grid */}
+          {beschikbaar.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {voertuigen.map((v, i) => (
+              {beschikbaar.map((v, i) => (
                 <VoorraadCard key={v.id} voertuig={v} index={i} />
               ))}
             </div>
           )}
 
           {/* Empty */}
-          {voertuigen && voertuigen.length === 0 && (
+          {voertuigen && beschikbaar.length === 0 && !isLoading && (
             <div className="flex flex-col items-center justify-center py-32 gap-4 text-center">
               <p className="text-sm text-muted-foreground font-body">
                 Er staan momenteel geen voertuigen in de voorraad.
               </p>
             </div>
+          )}
+
+          {/* Sold vehicles section */}
+          {verkocht.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="mt-20"
+            >
+              <div className="mb-10">
+                <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
+                  Recent verkocht
+                </p>
+                <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight">
+                  Eerder verkocht
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {verkocht.map((v, i) => (
+                  <VoorraadCard key={v.id} voertuig={v} index={i} />
+                ))}
+              </div>
+            </motion.div>
           )}
         </div>
       </section>
