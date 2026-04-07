@@ -257,11 +257,11 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
             {isConsignatie ? "Consignatiedossier" : "Inkoopdossier"}
           </h3>
           <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-            inkoopDocsComplete === INKOOP_DOCS.length
+            inkoopComplete
               ? "bg-emerald-500/15 text-emerald-400"
               : "bg-amber-500/15 text-amber-400"
           }`}>
-            {inkoopDocsComplete}/{INKOOP_DOCS.length} compleet
+            {inkoopComplete ? "Compleet" : `${inkoopDocsPresent}/${inkoopDocsRequired} nodig`}
           </span>
         </div>
         <div className="bg-card border border-border rounded-lg divide-y divide-border">
