@@ -41,11 +41,10 @@ const VERKOOP_DOCUMENTEN = [
   { type: "Vrijwaringsbewijs", label: "Vrijwaringsbewijs" },
 ];
 
-// Inkoop documents (regulier)
+// Inkoop documents (regulier) — only 1 of 2 needed
 const INKOOP_DOCUMENTEN = [
-  { type: "Inkoopverklaring", label: "Inkoopverklaring" },
-  { type: "Inkoopfactuur", label: "Inkoopfactuur" },
-  { type: "Inkoopovereenkomst", label: "Inkoopovereenkomst" },
+  { type: "Inkoopverklaring", label: "Inkoopverklaring (particulier)" },
+  { type: "Inkoopfactuur", label: "Inkoopfactuur (bedrijf)" },
 ];
 
 // Inkoop documents (consignatie)
@@ -155,9 +154,11 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   // Check which documents are present
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
 
-  // Inkoop documents
+  // Inkoop documents — for regulier only 1 of 2 needed
   const INKOOP_DOCS = isConsignatie ? CONSIGNATIE_DOCUMENTEN : INKOOP_DOCUMENTEN;
-  const inkoopDocsComplete = INKOOP_DOCS.filter(d => hasDocument(d.type)).length;
+  const inkoopDocsPresent = INKOOP_DOCS.filter(d => hasDocument(d.type)).length;
+  const inkoopDocsRequired = isConsignatie ? 1 : 1; // need at least 1
+  const inkoopComplete = inkoopDocsPresent >= inkoopDocsRequired;
 
   // Check which data fields are filled
   const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
@@ -256,11 +257,11 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
             {isConsignatie ? "Consignatiedossier" : "Inkoopdossier"}
           </h3>
           <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-            inkoopDocsComplete === INKOOP_DOCS.length
+            inkoopComplete
               ? "bg-emerald-500/15 text-emerald-400"
               : "bg-amber-500/15 text-amber-400"
           }`}>
-            {inkoopDocsComplete}/{INKOOP_DOCS.length} compleet
+            {inkoopComplete ? "Compleet" : `${inkoopDocsPresent}/${inkoopDocsRequired} nodig`}
           </span>
         </div>
         <div className="bg-card border border-border rounded-lg divide-y divide-border">
