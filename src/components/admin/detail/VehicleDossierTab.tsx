@@ -154,9 +154,11 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   // Check which documents are present
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
 
-  // Inkoop documents
+  // Inkoop documents — for regulier only 1 of 2 needed
   const INKOOP_DOCS = isConsignatie ? CONSIGNATIE_DOCUMENTEN : INKOOP_DOCUMENTEN;
-  const inkoopDocsComplete = INKOOP_DOCS.filter(d => hasDocument(d.type)).length;
+  const inkoopDocsPresent = INKOOP_DOCS.filter(d => hasDocument(d.type)).length;
+  const inkoopDocsRequired = isConsignatie ? 1 : 1; // need at least 1
+  const inkoopComplete = inkoopDocsPresent >= inkoopDocsRequired;
 
   // Check which data fields are filled
   const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
