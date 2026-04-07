@@ -150,6 +150,11 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   };
 
   const isVerkocht = vehicleStatus === "verkocht";
+  const isConsignatie = verkoopType === "consignatie";
+
+  // Inkoop documents
+  const INKOOP_DOCS = isConsignatie ? CONSIGNATIE_DOCUMENTEN : INKOOP_DOCUMENTEN;
+  const inkoopDocsComplete = INKOOP_DOCS.filter(d => hasDocument(d.type)).length;
 
   // Check which verkoop documents are present
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
