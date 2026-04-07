@@ -291,7 +291,12 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
                     )}
                     <span className={`text-sm flex-1 ${present ? "text-foreground" : "text-muted-foreground"}`}>{doc.label}</span>
                     {present ? (
-                      <span className="text-[10px] text-emerald-400">Aanwezig</span>
+                        <button
+                          onClick={() => { const fp = getDocFilePath(doc.type); if (fp) handleOpenDocument(fp); }}
+                          className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:underline"
+                        >
+                          <ExternalLink className="w-3 h-3" /> Openen
+                        </button>
                     ) : (
                       <button
                         onClick={() => { setUploadType(doc.type); setUploadOpen(true); }}
