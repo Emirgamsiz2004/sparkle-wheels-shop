@@ -41,11 +41,10 @@ const VERKOOP_DOCUMENTEN = [
   { type: "Vrijwaringsbewijs", label: "Vrijwaringsbewijs" },
 ];
 
-// Inkoop documents (regulier)
+// Inkoop documents (regulier) — only 1 of 2 needed
 const INKOOP_DOCUMENTEN = [
-  { type: "Inkoopverklaring", label: "Inkoopverklaring" },
-  { type: "Inkoopfactuur", label: "Inkoopfactuur" },
-  { type: "Inkoopovereenkomst", label: "Inkoopovereenkomst" },
+  { type: "Inkoopverklaring", label: "Inkoopverklaring (particulier)" },
+  { type: "Inkoopfactuur", label: "Inkoopfactuur (bedrijf)" },
 ];
 
 // Inkoop documents (consignatie)
