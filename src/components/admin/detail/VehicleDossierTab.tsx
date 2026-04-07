@@ -37,11 +37,8 @@ interface Aanbetaling {
 // Required documents when vehicle is sold
 const VERKOOP_DOCUMENTEN = [
   { type: "Koopovereenkomst", label: "Koopovereenkomst" },
-  { type: "Factuur", label: "Factuur" },
-  { type: "Kentekenbewijs", label: "Kentekenbewijs (overschrijving)" },
+  { type: "Verkoopfactuur", label: "Verkoopfactuur" },
   { type: "Vrijwaringsbewijs", label: "Vrijwaringsbewijs" },
-  { type: "Betalingsbewijs", label: "Betalingsbewijs" },
-  { type: "Afleverbon", label: "Afleverbon" },
 ];
 
 // Required data fields when vehicle is sold
