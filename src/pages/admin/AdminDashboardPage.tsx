@@ -170,6 +170,29 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
+      {/* ═══ BLOK 0 — Totale Omzet & Winst ═══ */}
+      <div className="grid grid-cols-2 gap-4">
+        {loading ? (
+          <>
+            <Skeleton className="h-[96px] rounded-md" />
+            <Skeleton className="h-[96px] rounded-md" />
+          </>
+        ) : (
+          <>
+            <div className="bg-card border border-border rounded-md p-4 sm:p-5">
+              <p className="text-[11px] text-muted-foreground mb-1">Totale omzet</p>
+              <p className="text-2xl font-bold tabular-nums text-foreground">{formatEuro(kpis.omzet)}</p>
+              {compare && <div className="mt-1.5"><Trend current={kpis.omzet} previous={kpis.omzetPrev ?? 0} /></div>}
+            </div>
+            <div className="bg-card border border-border rounded-md p-4 sm:p-5">
+              <p className="text-[11px] text-muted-foreground mb-1">Totale winst</p>
+              <p className="text-2xl font-bold tabular-nums text-emerald-500">{formatEuro(kpis.brutowinst)}</p>
+              {compare && <div className="mt-1.5"><Trend current={kpis.brutowinst} previous={kpis.brutwinstPrev ?? 0} /></div>}
+            </div>
+          </>
+        )}
+      </div>
+
       {/* ═══ BLOK 1 — Omzet grafiek ═══ */}
       <div className="bg-card border border-border rounded-md p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
