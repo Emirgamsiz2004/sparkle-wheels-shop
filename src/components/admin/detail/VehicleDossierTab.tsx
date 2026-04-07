@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus } from "lucide-react";
+import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus, ExternalLink } from "lucide-react";
 import VehicleFotosTab from "@/components/admin/VehicleFotosTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
 import { toast } from "sonner";
@@ -76,7 +76,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const [archiveDocs, setArchiveDocs] = useState<ArchiveDoc[]>([]);
   const [testDrives, setTestDrives] = useState<TestDrive[]>([]);
   const [aanbetalingen, setAanbetalingen] = useState<Aanbetaling[]>([]);
-  const [verkoopDocs, setVerkoopDocs] = useState<{ type: string; naam: string }[]>([]);
+  const [verkoopDocs, setVerkoopDocs] = useState<{ type: string; naam: string; file_path: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadType, setUploadType] = useState("");
@@ -90,7 +90,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         supabase.from("document_archive").select("*").eq("vehicle_id", vehicleId).order("created_at", { ascending: false }),
         supabase.from("test_drives").select("*").eq("vehicle_id", vehicleId).order("start_tijd", { ascending: false }),
         supabase.from("aanbetalingen").select("*").eq("vehicle_id", vehicleId).order("datum", { ascending: false }),
-        supabase.from("vehicle_documents").select("type, naam").eq("vehicle_id", vehicleId),
+        supabase.from("vehicle_documents").select("type, naam, file_path").eq("vehicle_id", vehicleId),
       ]);
       setArchiveDocs((archRes.data as ArchiveDoc[]) || []);
       setTestDrives((tdRes.data as TestDrive[]) || []);
@@ -125,7 +125,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     } as any);
     if (error) { toast.error("Opslaan mislukt"); } else {
       toast.success(`${uploadType} geüpload!`);
-      setVerkoopDocs(prev => [...prev, { type: uploadType, naam: uploadType }]);
+      setVerkoopDocs(prev => [...prev, { type: uploadType, naam: uploadType, file_path: path }]);
     }
     setUploading(false);
     setUploadOpen(false);
@@ -153,6 +153,13 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
 
   // Check which documents are present
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
+  const getDocFilePath = (type: string) => verkoopDocs.find(d => d.type === type)?.file_path;
+
+  const handleOpenDocument = async (filePath: string) => {
+    const { data, error } = await supabase.storage.from("vehicle-documents").createSignedUrl(filePath, 300);
+    if (error || !data?.signedUrl) { toast.error("Openen mislukt"); return; }
+    window.open(data.signedUrl, "_blank");
+  };
 
   // Inkoop documents — for regulier only 1 of 2 needed
   const INKOOP_DOCS = isConsignatie ? CONSIGNATIE_DOCUMENTEN : INKOOP_DOCUMENTEN;
@@ -232,7 +239,12 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
                       )}
                       <span className={`text-sm flex-1 ${present ? "text-foreground" : "text-muted-foreground"}`}>{doc.label}</span>
                       {present ? (
-                        <span className="text-[10px] text-emerald-400">Aanwezig</span>
+                        <button
+                          onClick={() => { const fp = getDocFilePath(doc.type); if (fp) handleOpenDocument(fp); }}
+                          className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:underline"
+                        >
+                          <ExternalLink className="w-3 h-3" /> Openen
+                        </button>
                       ) : (
                         <button
                           onClick={() => { setUploadType(doc.type); setUploadOpen(true); }}
@@ -279,7 +291,12 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
                     )}
                     <span className={`text-sm flex-1 ${present ? "text-foreground" : "text-muted-foreground"}`}>{doc.label}</span>
                     {present ? (
-                      <span className="text-[10px] text-emerald-400">Aanwezig</span>
+                        <button
+                          onClick={() => { const fp = getDocFilePath(doc.type); if (fp) handleOpenDocument(fp); }}
+                          className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:underline"
+                        >
+                          <ExternalLink className="w-3 h-3" /> Openen
+                        </button>
                     ) : (
                       <button
                         onClick={() => { setUploadType(doc.type); setUploadOpen(true); }}
