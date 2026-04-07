@@ -19,10 +19,10 @@ interface Doc {
 }
 
 const docCategories = [
-  { key: "inkoop", label: "Inkoop", types: ["Inkoopverklaring", "Taxatierapport", "RDW Check"] },
-  { key: "verkoop", label: "Verkoop", types: ["Verkoopovereenkomst", "Afleverbon", "Garantiebewijs"] },
+  { key: "inkoop", label: "Inkoop", types: ["Inkoopverklaring", "Inkoopfactuur", "Inkoopovereenkomst", "Consignatieovereenkomst", "Taxatierapport", "RDW Check"] },
+  { key: "verkoop", label: "Verkoop", types: ["Koopovereenkomst", "Verkoopfactuur", "Vrijwaringsbewijs", "Garantiebewijs", "Afleverbon"] },
   { key: "voertuig", label: "Voertuig", types: ["Kentekenbewijs", "Carpass", "APK Rapport", "Onderhoudsboekje"] },
-  { key: "financieel", label: "Financieel", types: ["Factuur", "Creditnota", "Betalingsbewijs"] },
+  { key: "financieel", label: "Financieel", types: ["Kostenfactuur", "Factuur", "Creditnota", "Betalingsbewijs"] },
   { key: "overig", label: "Overig", types: ["Overig"] },
 ];
 

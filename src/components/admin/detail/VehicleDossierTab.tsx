@@ -41,6 +41,18 @@ const VERKOOP_DOCUMENTEN = [
   { type: "Vrijwaringsbewijs", label: "Vrijwaringsbewijs" },
 ];
 
+// Inkoop documents (regulier)
+const INKOOP_DOCUMENTEN = [
+  { type: "Inkoopverklaring", label: "Inkoopverklaring" },
+  { type: "Inkoopfactuur", label: "Inkoopfactuur" },
+  { type: "Inkoopovereenkomst", label: "Inkoopovereenkomst" },
+];
+
+// Inkoop documents (consignatie)
+const CONSIGNATIE_DOCUMENTEN = [
+  { type: "Consignatieovereenkomst", label: "Consignatieovereenkomst" },
+];
+
 // Required data fields when vehicle is sold
 const VERKOOP_GEGEVENS = [
   { key: "koperNaam", label: "Koper naam" },
@@ -53,6 +65,7 @@ const VERKOOP_GEGEVENS = [
 interface VehicleDossierTabProps {
   vehicleId: string;
   vehicleStatus?: string;
+  verkoopType?: string;
   koperNaam?: string | null;
   koperEmail?: string | null;
   koperTelefoon?: string | null;
@@ -60,7 +73,7 @@ interface VehicleDossierTabProps {
   verkoopprijs?: number | null;
 }
 
-const VehicleDossierTab = ({ vehicleId, vehicleStatus, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs }: VehicleDossierTabProps) => {
+const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs }: VehicleDossierTabProps) => {
   const [archiveDocs, setArchiveDocs] = useState<ArchiveDoc[]>([]);
   const [testDrives, setTestDrives] = useState<TestDrive[]>([]);
   const [aanbetalingen, setAanbetalingen] = useState<Aanbetaling[]>([]);
@@ -137,9 +150,14 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, koperNaam, koperEmail, ko
   };
 
   const isVerkocht = vehicleStatus === "verkocht";
+  const isConsignatie = verkoopType === "consignatie";
 
-  // Check which verkoop documents are present
+  // Check which documents are present
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
+
+  // Inkoop documents
+  const INKOOP_DOCS = isConsignatie ? CONSIGNATIE_DOCUMENTEN : INKOOP_DOCUMENTEN;
+  const inkoopDocsComplete = INKOOP_DOCS.filter(d => hasDocument(d.type)).length;
 
   // Check which data fields are filled
   const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
@@ -231,7 +249,52 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, koperNaam, koperEmail, ko
         </div>
       )}
 
-      {/* Upload dialog with scan option */}
+      {/* Inkoopdossier */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            {isConsignatie ? "Consignatiedossier" : "Inkoopdossier"}
+          </h3>
+          <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+            inkoopDocsComplete === INKOOP_DOCS.length
+              ? "bg-emerald-500/15 text-emerald-400"
+              : "bg-amber-500/15 text-amber-400"
+          }`}>
+            {inkoopDocsComplete}/{INKOOP_DOCS.length} compleet
+          </span>
+        </div>
+        <div className="bg-card border border-border rounded-lg divide-y divide-border">
+          <div className="px-4 py-2.5">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">Documenten</p>
+            <div className="space-y-1.5">
+              {INKOOP_DOCS.map(doc => {
+                const present = hasDocument(doc.type);
+                return (
+                  <div key={doc.type} className="flex items-center gap-2.5">
+                    {present ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    ) : (
+                      <Circle className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                    )}
+                    <span className={`text-sm flex-1 ${present ? "text-foreground" : "text-muted-foreground"}`}>{doc.label}</span>
+                    {present ? (
+                      <span className="text-[10px] text-emerald-400">Aanwezig</span>
+                    ) : (
+                      <button
+                        onClick={() => { setUploadType(doc.type); setUploadOpen(true); }}
+                        className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+                      >
+                        <Upload className="w-3 h-3" /> Uploaden
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
         <DialogContent className="max-w-[calc(100vw-2rem)]">
           <DialogHeader><DialogTitle>{uploadType} uploaden</DialogTitle></DialogHeader>

@@ -145,6 +145,7 @@ const AdminVoertuigDetailPage = () => {
           <VehicleDossierTab
             vehicleId={vehicle.id}
             vehicleStatus={vehicle.status}
+            verkoopType={vehicle.verkoopType}
             koperNaam={vehicle.koperNaam}
             koperEmail={vehicle.koperEmail}
             koperTelefoon={vehicle.koperTelefoon}
