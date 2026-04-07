@@ -41,6 +41,18 @@ const VERKOOP_DOCUMENTEN = [
   { type: "Vrijwaringsbewijs", label: "Vrijwaringsbewijs" },
 ];
 
+// Inkoop documents (regulier)
+const INKOOP_DOCUMENTEN = [
+  { type: "Inkoopverklaring", label: "Inkoopverklaring" },
+  { type: "Inkoopfactuur", label: "Inkoopfactuur" },
+  { type: "Inkoopovereenkomst", label: "Inkoopovereenkomst" },
+];
+
+// Inkoop documents (consignatie)
+const CONSIGNATIE_DOCUMENTEN = [
+  { type: "Consignatieovereenkomst", label: "Consignatieovereenkomst" },
+];
+
 // Required data fields when vehicle is sold
 const VERKOOP_GEGEVENS = [
   { key: "koperNaam", label: "Koper naam" },
@@ -53,6 +65,7 @@ const VERKOOP_GEGEVENS = [
 interface VehicleDossierTabProps {
   vehicleId: string;
   vehicleStatus?: string;
+  verkoopType?: string;
   koperNaam?: string | null;
   koperEmail?: string | null;
   koperTelefoon?: string | null;
@@ -60,7 +73,7 @@ interface VehicleDossierTabProps {
   verkoopprijs?: number | null;
 }
 
-const VehicleDossierTab = ({ vehicleId, vehicleStatus, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs }: VehicleDossierTabProps) => {
+const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs }: VehicleDossierTabProps) => {
   const [archiveDocs, setArchiveDocs] = useState<ArchiveDoc[]>([]);
   const [testDrives, setTestDrives] = useState<TestDrive[]>([]);
   const [aanbetalingen, setAanbetalingen] = useState<Aanbetaling[]>([]);
