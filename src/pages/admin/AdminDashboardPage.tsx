@@ -187,7 +187,7 @@ const AdminDashboardPage = () => {
             <div className="bg-card border border-border rounded-md p-4 sm:p-5">
               <p className="text-[11px] text-muted-foreground mb-1">Totale winst</p>
               <p className="text-2xl font-bold tabular-nums text-emerald-500">{formatEuro(kpis.brutowinst)}</p>
-              {compare && <div className="mt-1.5"><Trend current={kpis.brutowinst} previous={kpis.brutowinstPrev ?? 0} /></div>}
+              {compare && <div className="mt-1.5"><Trend current={kpis.brutowinst} previous={kpis.brutwinstPrev ?? 0} /></div>}
             </div>
           </>
         )}
