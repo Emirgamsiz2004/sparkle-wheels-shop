@@ -253,7 +253,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, koperNaam, koperEmail, ko
               >
                 <Camera className="w-6 h-6 text-muted-foreground" />
                 <span className="text-sm font-medium text-foreground">Scannen</span>
-                <span className="text-[10px] text-muted-foreground">Camera openen</span>
+                <span className="text-[10px] text-muted-foreground">Foto → PDF scan</span>
               </button>
             </div>
             {uploading && (
@@ -274,7 +274,17 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, koperNaam, koperEmail, ko
               accept="image/*"
               capture="environment"
               className="hidden"
-              onChange={(e) => { if (e.target.files?.[0]) handleFileUpload(e.target.files[0]); }}
+              onChange={async (e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                try {
+                  const { convertImageToScanPdf } = await import("@/lib/scanToPdf");
+                  const pdfFile = await convertImageToScanPdf(f);
+                  handleFileUpload(pdfFile);
+                } catch {
+                  handleFileUpload(f);
+                }
+              }}
             />
           </div>
         </DialogContent>
