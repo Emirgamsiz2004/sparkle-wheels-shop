@@ -267,14 +267,20 @@ export default function GlobalSearch() {
 
   return (
     <>
-      {/* Search trigger in header */}
+      {/* Search trigger — icon only on mobile, full bar on desktop */}
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-[3px] border border-border bg-muted/50 hover:bg-muted text-muted-foreground text-[13px] transition-colors min-w-[200px] lg:min-w-[280px]"
+        className="lg:hidden flex items-center justify-center w-8 h-8 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+      >
+        <Search className="w-4 h-4" />
+      </button>
+      <button
+        onClick={() => setOpen(true)}
+        className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-[3px] border border-border bg-muted/50 hover:bg-muted text-muted-foreground text-[13px] transition-colors min-w-[280px]"
       >
         <Search className="w-3.5 h-3.5" />
         <span className="flex-1 text-left truncate">Zoek op kenteken, klant, voertuig...</span>
-        <kbd className="hidden md:inline-flex items-center gap-0.5 rounded-[3px] border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
+        <kbd className="inline-flex items-center gap-0.5 rounded-[3px] border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
           ⌘K
         </kbd>
       </button>
