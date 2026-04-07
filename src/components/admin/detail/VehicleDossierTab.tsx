@@ -153,6 +153,13 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
 
   // Check which documents are present
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
+  const getDocFilePath = (type: string) => verkoopDocs.find(d => d.type === type)?.file_path;
+
+  const handleOpenDocument = async (filePath: string) => {
+    const { data, error } = await supabase.storage.from("vehicle-documents").createSignedUrl(filePath, 300);
+    if (error || !data?.signedUrl) { toast.error("Openen mislukt"); return; }
+    window.open(data.signedUrl, "_blank");
+  };
 
   // Inkoop documents — for regulier only 1 of 2 needed
   const INKOOP_DOCS = isConsignatie ? CONSIGNATIE_DOCUMENTEN : INKOOP_DOCUMENTEN;
