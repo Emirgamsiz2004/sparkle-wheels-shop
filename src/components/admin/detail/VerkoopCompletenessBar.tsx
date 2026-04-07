@@ -15,11 +15,8 @@ interface Props {
 
 const REQUIRED_DOCS = [
   "Koopovereenkomst",
-  "Factuur",
-  "Kentekenbewijs",
+  "Verkoopfactuur",
   "Vrijwaringsbewijs",
-  "Betalingsbewijs",
-  "Afleverbon",
 ];
 
 const REQUIRED_DATA = [
