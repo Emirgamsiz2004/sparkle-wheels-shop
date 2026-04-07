@@ -165,24 +165,38 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
         </div>
       </div>
 
-      {/* Reparatie/Onderhoud klant info */}
-      {vehicle.status === "reparatie_onderhoud" && (
+      {/* Klant / koper info */}
+      {(vehicle.status === "reparatie_onderhoud" || vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
         <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gekoppelde klant</h3>
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            {vehicle.status === "reparatie_onderhoud" ? "Gekoppelde klant" : "Kopergegevens"}
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs text-muted-foreground mb-1">Klant naam</label>
-              <input value={form.koperNaam || ""} onChange={(e) => update("koperNaam", e.target.value)} className={inputCls} placeholder="Naam klant" />
+              <label className="block text-xs text-muted-foreground mb-1">Naam</label>
+              <input value={form.koperNaam || ""} onChange={(e) => update("koperNaam", e.target.value)} className={inputCls} placeholder="Naam koper" />
             </div>
             <div>
               <label className="block text-xs text-muted-foreground mb-1">Telefoon</label>
-              <input value={form.koperTelefoon || ""} onChange={(e) => update("koperTelefoon", e.target.value)} className={inputCls} />
+              <input value={form.koperTelefoon || ""} onChange={(e) => update("koperTelefoon", e.target.value)} className={inputCls} placeholder="06-12345678" />
             </div>
             <div>
               <label className="block text-xs text-muted-foreground mb-1">E-mail</label>
-              <input value={form.koperEmail || ""} onChange={(e) => update("koperEmail", e.target.value)} className={inputCls} />
+              <input value={form.koperEmail || ""} onChange={(e) => update("koperEmail", e.target.value)} className={inputCls} placeholder="email@voorbeeld.nl" />
             </div>
           </div>
+          {vehicle.status === "verkocht" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">Verkoopdatum</label>
+                <input type="date" value={form.verkoopDatum || ""} onChange={(e) => update("verkoopDatum", e.target.value)} className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1">Verkoopprijs</label>
+                <input type="number" value={form.verkoopprijs || ""} onChange={(e) => update("verkoopprijs", Number(e.target.value))} className={inputCls} placeholder="0" />
+              </div>
+            </div>
+          )}
           <button onClick={handleSaveVehicleInfo} className="px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">Opslaan</button>
         </div>
       )}
