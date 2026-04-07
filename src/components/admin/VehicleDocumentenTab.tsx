@@ -168,7 +168,17 @@ const VehicleDocumentenTab = ({ vehicleId }: { vehicleId: string }) => {
                   <label className="flex items-center gap-1.5 px-3 py-2 text-sm bg-card border border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors shrink-0">
                     <Camera className="w-4 h-4 text-muted-foreground" />
                     <span className="hidden sm:inline text-foreground">Scan</span>
-                    <input type="file" accept="image/*" capture="environment" onChange={(e) => setForm(f => ({ ...f, file: e.target.files?.[0] || null }))} className="hidden" />
+                    <input type="file" accept="image/*" capture="environment" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        const { convertImageToScanPdf } = await import("@/lib/scanToPdf");
+                        const pdfFile = await convertImageToScanPdf(file);
+                        setForm(f => ({ ...f, file: pdfFile }));
+                      } catch {
+                        setForm(f => ({ ...f, file }));
+                      }
+                    }} className="hidden" />
                   </label>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">PDF, DOCX, JPG, PNG, Excel — max 20MB</p>
