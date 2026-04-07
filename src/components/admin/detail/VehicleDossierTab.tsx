@@ -125,7 +125,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     } as any);
     if (error) { toast.error("Opslaan mislukt"); } else {
       toast.success(`${uploadType} geüpload!`);
-      setVerkoopDocs(prev => [...prev, { type: uploadType, naam: uploadType }]);
+      setVerkoopDocs(prev => [...prev, { type: uploadType, naam: uploadType, file_path: path }]);
     }
     setUploading(false);
     setUploadOpen(false);
