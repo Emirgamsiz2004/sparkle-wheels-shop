@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus } from "lucide-react";
+import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus, ExternalLink } from "lucide-react";
 import VehicleFotosTab from "@/components/admin/VehicleFotosTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
 import { toast } from "sonner";
