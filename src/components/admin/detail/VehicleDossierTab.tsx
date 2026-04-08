@@ -118,7 +118,9 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
 
   const makeDocName = (docType: string, ext: string) => {
     const cleanKenteken = (kenteken || "GEEN").replace(/[-\s]/g, "");
-    return `${merk || "Onbekend"}-${model || "Onbekend"}-${bouwjaar || "0000"}-${cleanKenteken}-${docType}.${ext}`;
+    const prefix = (verkoopType === "consignatie" || vehicleStatus === "consignatie") ? "Consignatie" : "";
+    const base = `${prefix ? prefix + "-" : ""}${merk || "Onbekend"}-${model || "Onbekend"}-${bouwjaar || "0000"}-${cleanKenteken}-${docType}`;
+    return `${base}.${ext}`;
   };
 
   const handleFileUpload = async (file: File) => {
