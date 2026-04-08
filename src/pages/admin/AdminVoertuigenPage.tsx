@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw, AlertTriangle } from "lucide-react";
+import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw, AlertTriangle, FileWarning } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
@@ -24,6 +24,25 @@ const AdminVoertuigenPage = () => {
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
   const isMobile = useIsMobile();
+  const [consignatieWarningCount, setConsignatieWarningCount] = useState(0);
+
+  // Check consignatie vehicles without overeenkomst
+  const consignatieVehicles = useMemo(() => vehicles.filter(v => v.status === "consignatie"), [vehicles]);
+
+  useEffect(() => {
+    if (consignatieVehicles.length === 0) { setConsignatieWarningCount(0); return; }
+    const checkDocs = async () => {
+      const ids = consignatieVehicles.map(v => v.id);
+      const { data } = await supabase
+        .from("vehicle_documents")
+        .select("vehicle_id")
+        .in("vehicle_id", ids)
+        .eq("type", "Consignatieovereenkomst");
+      const idsWithDoc = new Set((data || []).map((d: any) => d.vehicle_id));
+      setConsignatieWarningCount(consignatieVehicles.filter(v => !idsWithDoc.has(v.id)).length);
+    };
+    checkDocs();
+  }, [consignatieVehicles]);
 
   // APK warning: vehicles expiring within 4 weeks or already expired (only non-sold)
   const apkWarningVehicles = useMemo(() => {
@@ -81,6 +100,17 @@ const AdminVoertuigenPage = () => {
         >
           <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
           <span>{apkWarningVehicles.length} voertuig{apkWarningVehicles.length !== 1 ? "en" : ""} met APK die binnenkort verloopt of al verlopen is</span>
+        </button>
+      )}
+
+      {/* Consignatie warning bar */}
+      {consignatieWarningCount > 0 && (
+        <button
+          onClick={() => { setFilter("consignatie"); setSearch(""); }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium bg-amber-500/10 border border-amber-500/25 rounded-md text-amber-400 hover:bg-amber-500/15 transition-colors"
+        >
+          <FileWarning className="w-3.5 h-3.5 shrink-0" />
+          <span>{consignatieWarningCount} consignatievoertuig{consignatieWarningCount !== 1 ? "en" : ""} zonder consignatieovereenkomst</span>
         </button>
       )}
       <div className="flex items-center justify-between gap-3">

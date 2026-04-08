@@ -118,7 +118,9 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
 
   const makeDocName = (docType: string, ext: string) => {
     const cleanKenteken = (kenteken || "GEEN").replace(/[-\s]/g, "");
-    return `${merk || "Onbekend"}-${model || "Onbekend"}-${bouwjaar || "0000"}-${cleanKenteken}-${docType}.${ext}`;
+    const prefix = (verkoopType === "consignatie" || vehicleStatus === "consignatie") ? "Consignatie" : "";
+    const base = `${prefix ? prefix + "-" : ""}${merk || "Onbekend"}-${model || "Onbekend"}-${bouwjaar || "0000"}-${cleanKenteken}-${docType}`;
+    return `${base}.${ext}`;
   };
 
   const handleFileUpload = async (file: File) => {
@@ -163,7 +165,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   };
 
   const isVerkocht = vehicleStatus === "verkocht";
-  const isConsignatie = verkoopType === "consignatie";
+  const isConsignatie = verkoopType === "consignatie" || vehicleStatus === "consignatie";
 
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
   const getDoc = (type: string) => verkoopDocs.find(d => d.type === type);
@@ -186,7 +188,8 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   } else {
     if (!hasDocument("Consignatieovereenkomst")) inkoopMissing.push("Consignatieovereenkomst");
   }
-  const inkoopExtraDocs = verkoopDocs.filter(d => d.type === "Overig-inkoop");
+  const inkoopExtraDocs = verkoopDocs.filter(d => d.type === (isConsignatie ? "Overig-consignatie" : "Overig-inkoop"));
+  const overigUploadType = isConsignatie ? "Overig-consignatie" : "Overig-inkoop";
 
   // Check which data fields are filled
   const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
@@ -382,7 +385,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Overige documenten</h4>
             <button
-              onClick={() => { setUploadType("Overig-inkoop"); setUploadOpen(true); }}
+              onClick={() => { setUploadType(overigUploadType); setUploadOpen(true); }}
               className="text-[10px] text-primary hover:underline"
             >
               + Toevoegen
