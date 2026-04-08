@@ -1934,6 +1934,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          aanbetalingsbedrag: number | null
           apk_vervaldatum: string | null
           betaalmethode: string | null
           bouwjaar: number | null
@@ -1942,15 +1943,22 @@ export type Database = {
           consignatie_eigenaar_email: string | null
           consignatie_eigenaar_naam: string | null
           consignatie_eigenaar_telefoon: string | null
+          contant_bedrag: number | null
           created_at: string
           customer_id: string | null
           feed_id: string | null
+          financiering_actief: boolean | null
+          financiering_bedrag: number | null
           google_drive_folder_id: string | null
           google_drive_folder_url: string | null
           google_drive_synced: boolean | null
           id: string
           inkoop_datum: string | null
           inkoopprijs: number | null
+          inruil_kenteken: string | null
+          inruil_merk: string | null
+          inruil_model: string | null
+          inruil_waarde: number | null
           kenteken: string | null
           kilometerstand: number | null
           kleur: string | null
@@ -1962,6 +1970,7 @@ export type Database = {
           merk: string
           model: string
           opmerkingen: string | null
+          overboeking_bedrag: number | null
           status: string | null
           totale_kosten: number | null
           user_id: string | null
@@ -1970,6 +1979,7 @@ export type Database = {
           verkoopprijs: number | null
         }
         Insert: {
+          aanbetalingsbedrag?: number | null
           apk_vervaldatum?: string | null
           betaalmethode?: string | null
           bouwjaar?: number | null
@@ -1978,15 +1988,22 @@ export type Database = {
           consignatie_eigenaar_email?: string | null
           consignatie_eigenaar_naam?: string | null
           consignatie_eigenaar_telefoon?: string | null
+          contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
           feed_id?: string | null
+          financiering_actief?: boolean | null
+          financiering_bedrag?: number | null
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
           id?: string
           inkoop_datum?: string | null
           inkoopprijs?: number | null
+          inruil_kenteken?: string | null
+          inruil_merk?: string | null
+          inruil_model?: string | null
+          inruil_waarde?: number | null
           kenteken?: string | null
           kilometerstand?: number | null
           kleur?: string | null
@@ -1998,6 +2015,7 @@ export type Database = {
           merk: string
           model: string
           opmerkingen?: string | null
+          overboeking_bedrag?: number | null
           status?: string | null
           totale_kosten?: number | null
           user_id?: string | null
@@ -2006,6 +2024,7 @@ export type Database = {
           verkoopprijs?: number | null
         }
         Update: {
+          aanbetalingsbedrag?: number | null
           apk_vervaldatum?: string | null
           betaalmethode?: string | null
           bouwjaar?: number | null
@@ -2014,15 +2033,22 @@ export type Database = {
           consignatie_eigenaar_email?: string | null
           consignatie_eigenaar_naam?: string | null
           consignatie_eigenaar_telefoon?: string | null
+          contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
           feed_id?: string | null
+          financiering_actief?: boolean | null
+          financiering_bedrag?: number | null
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
           id?: string
           inkoop_datum?: string | null
           inkoopprijs?: number | null
+          inruil_kenteken?: string | null
+          inruil_merk?: string | null
+          inruil_model?: string | null
+          inruil_waarde?: number | null
           kenteken?: string | null
           kilometerstand?: number | null
           kleur?: string | null
@@ -2034,6 +2060,7 @@ export type Database = {
           merk?: string
           model?: string
           opmerkingen?: string | null
+          overboeking_bedrag?: number | null
           status?: string | null
           totale_kosten?: number | null
           user_id?: string | null
