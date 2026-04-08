@@ -10,7 +10,7 @@ import { buildInkoopverklaringPdf } from "@/lib/inkoopverklaringPdf";
 import { useInkoopverklaringen, Inkoopverklaring } from "@/hooks/useInkoopverklaringen";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import VehicleSearchSelect from "@/components/admin/VehicleSearchSelect";
 import { toast } from "sonner";
 import { Loader2, Download, Link2, Check, CreditCard, IdCard, Car } from "lucide-react";
 import SignaturePad from "signature_pad";
@@ -362,18 +362,12 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
 
               <div className="space-y-2 pt-2">
                 <Label className="text-xs text-muted-foreground">Koppelen aan voertuig</Label>
-                <Select value={linkVehicleId} onValueChange={setLinkVehicleId}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecteer voertuig..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    {availableVehicles.map(v => (
-                      <SelectItem key={v.id} value={v.id}>
-                        {v.kenteken || "—"} — {v.merk} {v.model}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <VehicleSearchSelect
+                  vehicles={availableVehicles.map(v => ({ id: v.id, kenteken: v.kenteken, merk: v.merk, model: v.model }))}
+                  value={linkVehicleId}
+                  onValueChange={setLinkVehicleId}
+                  placeholder="Zoek voertuig..."
+                />
                 <Button variant="outline" onClick={handleLink} disabled={!linkVehicleId} className="gap-2 w-full">
                   <Link2 className="w-4 h-4" /> Koppelen aan voertuig
                 </Button>
