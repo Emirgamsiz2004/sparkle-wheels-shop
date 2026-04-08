@@ -569,4 +569,62 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   );
 };
 
+const DocRow = ({ label, present, statusLabel, subText, onOpen, onUpload, onDelete }: {
+  label: string;
+  present: boolean;
+  statusLabel: string;
+  subText?: string;
+  onOpen?: () => void;
+  onUpload: () => void;
+  onDelete?: () => void;
+}) => (
+  <div className="flex items-center gap-3 px-4 py-3">
+    {present ? (
+      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+    ) : (
+      <Circle className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+    )}
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-2">
+        <p className={`text-sm ${present ? "text-foreground font-medium" : "text-muted-foreground"}`}>{label}</p>
+        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+          present ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
+        }`}>
+          {statusLabel}
+        </span>
+      </div>
+      {subText && <p className="text-[10px] text-muted-foreground truncate mt-0.5">{subText}</p>}
+    </div>
+    <div className="flex items-center gap-1">
+      {present && onOpen && (
+        <button onClick={onOpen} className="p-1.5 text-muted-foreground hover:text-foreground">
+          <ExternalLink className="w-3.5 h-3.5" />
+        </button>
+      )}
+      {present && onDelete && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button className="p-1.5 text-muted-foreground hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Document verwijderen?</AlertDialogTitle>
+              <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuleren</AlertDialogCancel>
+              <AlertDialogAction onClick={onDelete}>Verwijderen</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+      {!present && (
+        <button onClick={onUpload} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-primary hover:underline">
+          <Upload className="w-3 h-3" /> Uploaden
+        </button>
+      )}
+    </div>
+  </div>
+);
+
 export default VehicleDossierTab;
