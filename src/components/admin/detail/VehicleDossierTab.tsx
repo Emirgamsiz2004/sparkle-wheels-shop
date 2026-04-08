@@ -175,11 +175,18 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     window.open(data.signedUrl, "_blank");
   };
 
-  // Inkoop documents — for regulier only 1 of 2 needed
-  const INKOOP_DOCS = isConsignatie ? CONSIGNATIE_DOCUMENTEN : INKOOP_DOCUMENTEN;
-  const inkoopDocsPresent = INKOOP_DOCS.filter(d => hasDocument(d.type)).length;
-  const inkoopDocsRequired = isConsignatie ? 1 : 1; // need at least 1
-  const inkoopComplete = inkoopDocsPresent >= inkoopDocsRequired;
+  // Inkoop completeness: inkoopverklaring (from wizard or uploaded) + vrijwaringsbewijs
+  const hasInkoopverklaring = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring") || hasDocument("Inkoopfactuur");
+  const hasInkoopVrijwaring = hasDocument("Vrijwaringsbewijs-inkoop");
+  const inkoopComplete = isConsignatie ? hasDocument("Consignatieovereenkomst") : (hasInkoopverklaring && hasInkoopVrijwaring);
+  const inkoopMissing: string[] = [];
+  if (!isConsignatie) {
+    if (!hasInkoopverklaring) inkoopMissing.push("Inkoopverklaring");
+    if (!hasInkoopVrijwaring) inkoopMissing.push("Vrijwaringsbewijs");
+  } else {
+    if (!hasDocument("Consignatieovereenkomst")) inkoopMissing.push("Consignatieovereenkomst");
+  }
+  const inkoopExtraDocs = verkoopDocs.filter(d => d.type === "Overig-inkoop");
 
   // Check which data fields are filled
   const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
