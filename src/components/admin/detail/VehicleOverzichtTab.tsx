@@ -87,6 +87,8 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
 
   const inputCls = "w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all";
 
+  const hasPaymentInfo = !!(vehicle.contantBedrag || vehicle.overboekingBedrag || vehicle.aanbetalingsbedrag || vehicle.financieringActief || vehicle.inruilKenteken);
+
   return (
     <div className="space-y-5">
       {/* KPI cards - read only */}
@@ -201,84 +203,30 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
         </div>
       )}
 
-      {/* Betalingsdetails - alleen voor verkocht */}
+      {/* Betalingsoverzicht - read only samenvatting */}
       {(vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
-        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Betalingsdetails</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Contant betaald</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">€</span>
-                <input type="text" inputMode="decimal" value={form.contantBedrag || ""} onChange={(e) => update("contantBedrag", Number(e.target.value.replace(/[^0-9.]/g, "")))} className={cn(inputCls, "pl-7")} placeholder="0" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Overboeking</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">€</span>
-                <input type="text" inputMode="decimal" value={form.overboekingBedrag || ""} onChange={(e) => update("overboekingBedrag", Number(e.target.value.replace(/[^0-9.]/g, "")))} className={cn(inputCls, "pl-7")} placeholder="0" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Aanbetaling</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">€</span>
-                <input type="text" inputMode="decimal" value={form.aanbetalingsbedrag || ""} onChange={(e) => update("aanbetalingsbedrag", Number(e.target.value.replace(/[^0-9.]/g, "")))} className={cn(inputCls, "pl-7")} placeholder="0" />
-              </div>
-            </div>
+        hasPaymentInfo ? (
+          <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Betalingsoverzicht</h3>
+            <table className="w-full text-sm">
+              <tbody>
+                {!!vehicle.contantBedrag && <InfoRow label="Contant" value={formatEuroDecimal(vehicle.contantBedrag)} />}
+                {!!vehicle.overboekingBedrag && <InfoRow label="Overboeking" value={formatEuroDecimal(vehicle.overboekingBedrag)} />}
+                {!!vehicle.aanbetalingsbedrag && <InfoRow label="Aanbetaling" value={formatEuroDecimal(vehicle.aanbetalingsbedrag)} />}
+                {vehicle.financieringActief && <InfoRow label="Financiering" value={formatEuroDecimal(vehicle.financieringBedrag || 0)} />}
+                {vehicle.inruilKenteken && (
+                  <InfoRow label="Inruil" value={`${vehicle.inruilKenteken}${vehicle.inruilMerk ? ` — ${vehicle.inruilMerk} ${vehicle.inruilModel || ""}` : ""} (${formatEuro(vehicle.inruilWaarde || 0)})`} isLast />
+                )}
+              </tbody>
+            </table>
+            <p className="text-[10px] text-muted-foreground">Bewerk in het Financieel tabblad</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Financiering</label>
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" checked={form.financieringActief || false} onChange={(e) => update("financieringActief", e.target.checked)} className="rounded border-border" />
-                  <span className="text-foreground">Ja, gefinancierd</span>
-                </label>
-              </div>
-            </div>
-            {form.financieringActief && (
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">Financieringsbedrag</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">€</span>
-                  <input type="text" inputMode="decimal" value={form.financieringBedrag || ""} onChange={(e) => update("financieringBedrag", Number(e.target.value.replace(/[^0-9.]/g, "")))} className={cn(inputCls, "pl-7")} placeholder="0" />
-                </div>
-              </div>
-            )}
+        ) : (
+          <div className="bg-card border border-border rounded-lg p-4">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Betalingsoverzicht</h3>
+            <p className="text-xs text-muted-foreground">Nog geen betalingsdetails ingevuld — vul deze in via het Financieel tabblad.</p>
           </div>
-          <button onClick={handleSaveVehicleInfo} className="px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">Opslaan</button>
-        </div>
-      )}
-
-      {/* Inruilauto - alleen voor verkocht */}
-      {(vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
-        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Inruilauto</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Kenteken inruil</label>
-              <input value={form.inruilKenteken || ""} onChange={(e) => update("inruilKenteken", e.target.value.toUpperCase())} className={inputCls} placeholder="XX-999-X" />
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Merk</label>
-              <input value={form.inruilMerk || ""} onChange={(e) => update("inruilMerk", e.target.value)} className={inputCls} placeholder="Merk" />
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Model</label>
-              <input value={form.inruilModel || ""} onChange={(e) => update("inruilModel", e.target.value)} className={inputCls} placeholder="Model" />
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Inruilwaarde</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">€</span>
-                <input type="text" inputMode="decimal" value={form.inruilWaarde || ""} onChange={(e) => update("inruilWaarde", Number(e.target.value.replace(/[^0-9.]/g, "")))} className={cn(inputCls, "pl-7")} placeholder="0" />
-              </div>
-            </div>
-          </div>
-          <button onClick={handleSaveVehicleInfo} className="px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">Opslaan</button>
-        </div>
+        )
       )}
 
       {/* Notes - auto-save */}
