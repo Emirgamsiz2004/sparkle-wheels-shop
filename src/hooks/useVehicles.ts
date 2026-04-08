@@ -50,6 +50,15 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
   marktplaatsUrl: row.marktplaats_url || undefined,
   feedId: row.feed_id || undefined,
   apkVervaldatum: row.apk_vervaldatum || undefined,
+  inruilKenteken: row.inruil_kenteken || undefined,
+  inruilMerk: row.inruil_merk || undefined,
+  inruilModel: row.inruil_model || undefined,
+  inruilWaarde: Number(row.inruil_waarde) || 0,
+  contantBedrag: Number(row.contant_bedrag) || 0,
+  overboekingBedrag: Number(row.overboeking_bedrag) || 0,
+  financieringActief: row.financiering_actief || false,
+  financieringBedrag: Number(row.financiering_bedrag) || 0,
+  aanbetalingsbedrag: Number(row.aanbetalingsbedrag) || 0,
 });
 
 export function useVehicles() {
@@ -166,6 +175,15 @@ export function useVehicles() {
       marktplaats_url: updated.marktplaatsUrl || null,
       kostprijs: updated.kostprijsCalc || null,
       apk_vervaldatum: updated.apkVervaldatum || null,
+      inruil_kenteken: updated.inruilKenteken || null,
+      inruil_merk: updated.inruilMerk || null,
+      inruil_model: updated.inruilModel || null,
+      inruil_waarde: updated.inruilWaarde || 0,
+      contant_bedrag: updated.contantBedrag || 0,
+      overboeking_bedrag: updated.overboekingBedrag || 0,
+      financiering_actief: updated.financieringActief || false,
+      financiering_bedrag: updated.financieringBedrag || 0,
+      aanbetalingsbedrag: updated.aanbetalingsbedrag || 0,
     } as any).eq('id', updated.id);
     if (error) { toast.error('Fout bij bijwerken voertuig'); return; }
     toast.success('Voertuig bijgewerkt');
