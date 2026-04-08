@@ -54,6 +54,16 @@ export interface Vehicle {
   marktplaatsUrl?: string;
   feedId?: string;
   apkVervaldatum?: string;
+  // Inruil & betalingsdetails
+  inruilKenteken?: string;
+  inruilMerk?: string;
+  inruilModel?: string;
+  inruilWaarde?: number;
+  contantBedrag?: number;
+  overboekingBedrag?: number;
+  financieringActief?: boolean;
+  financieringBedrag?: number;
+  aanbetalingsbedrag?: number;
 }
 
 export const isConsignatie = (vehicle: Vehicle): boolean =>
