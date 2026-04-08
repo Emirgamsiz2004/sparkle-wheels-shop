@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus, ExternalLink } from "lucide-react";
+import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus, ExternalLink, Trash2, AlertTriangle } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import VehicleFotosTab from "@/components/admin/VehicleFotosTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
 import { toast } from "sonner";
