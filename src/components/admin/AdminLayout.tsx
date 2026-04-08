@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet, BarChart3,
-  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target, Clock, CalendarDays,
+  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target, Clock, CalendarDays, BadgeDollarSign,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
@@ -22,6 +22,7 @@ const navGroups: NavGroup[] = [
       { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
       { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
       { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
+      { label: "Verkopen", icon: BadgeDollarSign, path: "/admin/verkopen" },
       { label: "Klanten", icon: Users, path: "/admin/klanten" },
       { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
     ],
