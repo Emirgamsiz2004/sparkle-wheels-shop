@@ -16,7 +16,6 @@ const tabs = [
   { label: "Consignatie", value: "consignatie" },
   { label: "In behandeling", value: "in_behandeling" },
   { label: "Inkoop", value: "inkoop" },
-  { label: "Verkocht", value: "verkocht" },
 ];
 
 const AdminVoertuigenPage = () => {
@@ -59,7 +58,7 @@ const AdminVoertuigenPage = () => {
   };
 
   const filtered = vehicles.filter((v) => {
-    if (filter === "voorraad" && v.status === "verkocht") return false;
+    if (v.status === "verkocht") return false; // Sold vehicles are in Verkopen module
     if (filter !== "voorraad" && v.status !== filter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -87,7 +86,7 @@ const AdminVoertuigenPage = () => {
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-medium text-foreground">Voertuigen</h1>
-          <p className="text-sm text-muted-foreground">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
+          <p className="text-sm text-muted-foreground">{vehicles.filter(v => v.status !== "verkocht").length} voertuig{vehicles.filter(v => v.status !== "verkocht").length !== 1 ? "en" : ""}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
