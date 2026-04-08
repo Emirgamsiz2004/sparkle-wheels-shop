@@ -77,6 +77,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const [testDrives, setTestDrives] = useState<TestDrive[]>([]);
   const [aanbetalingen, setAanbetalingen] = useState<Aanbetaling[]>([]);
   const [verkoopDocs, setVerkoopDocs] = useState<{ type: string; naam: string; file_path: string }[]>([]);
+  const [inkoopverklaringen, setInkoopverklaringen] = useState<{ id: string; document_naam: string; verkoper_naam: string; datum: string; pdf_path: string | null; inkoopprijs: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadType, setUploadType] = useState("");
@@ -86,16 +87,18 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
 
   useEffect(() => {
     const fetchAll = async () => {
-      const [archRes, tdRes, abRes, docRes] = await Promise.all([
+      const [archRes, tdRes, abRes, docRes, ikvRes] = await Promise.all([
         supabase.from("document_archive").select("*").eq("vehicle_id", vehicleId).order("created_at", { ascending: false }),
         supabase.from("test_drives").select("*").eq("vehicle_id", vehicleId).order("start_tijd", { ascending: false }),
         supabase.from("aanbetalingen").select("*").eq("vehicle_id", vehicleId).order("datum", { ascending: false }),
         supabase.from("vehicle_documents").select("type, naam, file_path").eq("vehicle_id", vehicleId),
+        supabase.from("inkoopverklaringen").select("id, document_naam, verkoper_naam, datum, pdf_path, inkoopprijs").eq("vehicle_id", vehicleId).order("datum", { ascending: false }),
       ]);
       setArchiveDocs((archRes.data as ArchiveDoc[]) || []);
       setTestDrives((tdRes.data as TestDrive[]) || []);
       setAanbetalingen((abRes.data as Aanbetaling[]) || []);
       setVerkoopDocs((docRes.data as any[]) || []);
+      setInkoopverklaringen((ikvRes.data as any[]) || []);
       setLoading(false);
     };
     fetchAll();
