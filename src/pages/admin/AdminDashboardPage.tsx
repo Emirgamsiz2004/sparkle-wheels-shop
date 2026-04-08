@@ -5,10 +5,10 @@ import { useDashboardData, getPeriodRange, calcTrend, PeriodKey } from "@/hooks/
 import { formatEuro, isConsignatie } from "@/types/vehicle";
 import {
   Loader2, TrendingUp, TrendingDown, Minus, Download,
-  Calendar as CalendarIcon, ChevronRight,
+  Calendar as CalendarIcon, ChevronRight, ChevronDown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, startOfMonth as startOfM, endOfMonth, startOfYear as startOfY, endOfYear } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -20,8 +20,8 @@ import {
 
 /* ─── Constants ─── */
 const periodLabels: Record<PeriodKey, string> = {
-  vandaag: "Vandaag", week: "Deze week", maand: "Deze maand",
-  kwartaal: "Dit kwartaal", jaar: "Dit jaar", custom: "Aangepast",
+  gisteren: "Gisteren", vandaag: "Vandaag", "7dagen": "7 dagen", "30dagen": "30 dagen",
+  maand: "Deze maand", kwartaal: "Dit kwartaal", jaar: "Dit jaar", custom: "Aangepast",
 };
 
 const DONUT_COLORS = ["#3b82f6", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444"];
@@ -65,6 +65,30 @@ const AdminDashboardPage = () => {
   const [compare, setCompare] = useState(true);
   const [customFrom, setCustomFrom] = useState<Date>();
   const [customTo, setCustomTo] = useState<Date>();
+  const [monthYearOpen, setMonthYearOpen] = useState(false);
+  const [myYear, setMyYear] = useState(new Date().getFullYear());
+
+  const monthNames = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
+  const currentYear = new Date().getFullYear();
+  const selectableYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  const selectMonth = (monthIdx: number, year: number) => {
+    const from = startOfM(new Date(year, monthIdx));
+    const to = endOfMonth(new Date(year, monthIdx));
+    setCustomFrom(from);
+    setCustomTo(to > new Date() ? new Date() : to);
+    setPeriod("custom");
+    setMonthYearOpen(false);
+  };
+
+  const selectYear = (year: number) => {
+    const from = startOfY(new Date(year, 0));
+    const to = endOfYear(new Date(year, 0));
+    setCustomFrom(from);
+    setCustomTo(to > new Date() ? new Date() : to);
+    setPeriod("custom");
+    setMonthYearOpen(false);
+  };
 
   const range = useMemo(() => getPeriodRange(period, customFrom, customTo), [period, customFrom, customTo]);
   const data = useDashboardData(vehicles, testDrives, range, compare);
@@ -142,7 +166,7 @@ const AdminDashboardPage = () => {
           </label>
         </div>
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-          <div className="flex items-center gap-1.5 min-w-max">
+          <div className="flex items-center gap-1.5 min-w-max flex-wrap">
             {(Object.keys(periodLabels) as PeriodKey[]).filter(k => k !== 'custom').map(k => (
               <button key={k} onClick={() => setPeriod(k)}
                 className={`px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
@@ -151,21 +175,71 @@ const AdminDashboardPage = () => {
                 {periodLabels[k]}
               </button>
             ))}
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
-                  period === 'custom' ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}>
-                  <CalendarIcon className="w-3 h-3" />
-                  {period === 'custom' && customFrom && customTo ? `${format(customFrom, 'dd/MM')} - ${format(customTo, 'dd/MM')}` : "Custom"}
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Calendar mode="range" selected={{ from: customFrom, to: customTo }}
-                  onSelect={(r: any) => { setCustomFrom(r?.from); setCustomTo(r?.to); if (r?.from && r?.to) setPeriod('custom'); }}
-                  numberOfMonths={1} className="p-3 pointer-events-auto" />
-              </PopoverContent>
-            </Popover>
+
+            {/* Month/Year picker */}
+            <div className="relative">
+              <button
+                onClick={() => setMonthYearOpen(!monthYearOpen)}
+                className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
+                  period === 'custom' && !monthYearOpen ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <CalendarIcon className="w-3 h-3" />
+                {period === 'custom' && customFrom && customTo
+                  ? `${format(customFrom, 'dd MMM yyyy', { locale: nl })} – ${format(customTo, 'dd MMM yyyy', { locale: nl })}`
+                  : "Maand / Jaar"}
+                <ChevronDown className={`w-3 h-3 transition-transform ${monthYearOpen ? "rotate-180" : ""}`} />
+              </button>
+              {monthYearOpen && (
+                <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-[3px] shadow-lg p-3 min-w-[280px]">
+                  {/* Year selector */}
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground">Jaar selecteren</p>
+                    <button onClick={() => setMonthYearOpen(false)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
+                  </div>
+                  <div className="flex gap-1 mb-3">
+                    {selectableYears.map(y => (
+                      <button key={y} onClick={() => { setMyYear(y); selectYear(y); }}
+                        className={`flex-1 py-1.5 text-[11px] font-medium rounded-[3px] border transition-colors ${
+                          myYear === y ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:bg-muted"
+                        }`}>
+                        {y}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Month grid */}
+                  <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground mb-2">Maand selecteren</p>
+                  <div className="grid grid-cols-4 gap-1">
+                    {monthNames.map((m, i) => {
+                      const isFuture = myYear === currentYear && i > new Date().getMonth();
+                      return (
+                        <button key={m} disabled={isFuture} onClick={() => selectMonth(i, myYear)}
+                          className={`py-1.5 text-[11px] font-medium rounded-[3px] border transition-colors ${
+                            isFuture ? "text-muted-foreground/30 border-transparent cursor-not-allowed" : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
+                          }`}>
+                          {m}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {/* Custom range via calendar */}
+                  <div className="border-t border-border mt-3 pt-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 transition-colors">
+                          <CalendarIcon className="w-3 h-3" /> Aangepast bereik kiezen...
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <Calendar mode="range" selected={{ from: customFrom, to: customTo }}
+                          onSelect={(r: any) => { setCustomFrom(r?.from); setCustomTo(r?.to); if (r?.from && r?.to) { setPeriod('custom'); setMonthYearOpen(false); } }}
+                          numberOfMonths={1} className="p-3 pointer-events-auto" />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
