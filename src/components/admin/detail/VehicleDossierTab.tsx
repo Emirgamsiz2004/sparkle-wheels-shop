@@ -294,67 +294,137 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
               ? "bg-emerald-500/15 text-emerald-400"
               : "bg-amber-500/15 text-amber-400"
           }`}>
-            {inkoopComplete ? "Compleet" : `${inkoopDocsPresent}/${inkoopDocsRequired} nodig`}
+            {inkoopComplete ? "Compleet" : "Onvolledig"}
           </span>
         </div>
-        <div className="bg-card border border-border rounded-lg divide-y divide-border">
-          <div className="px-4 py-2.5">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">Documenten</p>
-            <div className="space-y-1.5">
-              {INKOOP_DOCS.map(doc => {
-                const present = hasDocument(doc.type);
-                return (
-                  <div key={doc.type} className="flex items-center gap-2.5">
-                    {present ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    ) : (
-                      <Circle className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
-                    )}
-                    <span className={`text-sm flex-1 ${present ? "text-foreground" : "text-muted-foreground"}`}>{doc.label}</span>
-                    {present ? (
-                        <button
-                          onClick={() => { const fp = getDocFilePath(doc.type); if (fp) handleOpenDocument(fp); }}
-                          className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:underline"
-                        >
-                          <ExternalLink className="w-3 h-3" /> Openen
-                        </button>
-                    ) : (
-                      <button
-                        onClick={() => { setUploadType(doc.type); setUploadOpen(true); }}
-                        className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
-                      >
-                        <Upload className="w-3 h-3" /> Uploaden
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+
+        {/* Warning if incomplete */}
+        {!inkoopComplete && inkoopMissing.length > 0 && (
+          <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-md bg-amber-500/10 border border-amber-500/20">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+            <p className="text-xs text-amber-400">
+              Dossier onvolledig — {inkoopMissing.join(" en ")} ontbreekt.
+            </p>
           </div>
+        )}
+
+        <div className="bg-card border border-border rounded-lg divide-y divide-border">
+          {/* Inkoopverklaring row */}
+          {!isConsignatie && (
+            <DocRow
+              label="Inkoopverklaring"
+              present={hasInkoopverklaring}
+              statusLabel={hasInkoopverklaring ? (inkoopverklaringen.length > 0 ? "Aangemaakt" : "Geüpload") : "Ontbreekt"}
+              onOpen={inkoopverklaringen.length > 0 && inkoopverklaringen[0].pdf_path ? async () => {
+                const { data } = await supabase.storage.from("vehicle-documents").createSignedUrl(inkoopverklaringen[0].pdf_path!, 60);
+                if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+              } : hasDocument("Inkoopverklaring") || hasDocument("Inkoopfactuur") ? () => {
+                const fp = getDocFilePath("Inkoopverklaring") || getDocFilePath("Inkoopfactuur");
+                if (fp) handleOpenDocument(fp);
+              } : undefined}
+              onUpload={() => { setUploadType("Inkoopverklaring"); setUploadOpen(true); }}
+              onDelete={hasDocument("Inkoopverklaring") ? async () => {
+                const doc = getDoc("Inkoopverklaring");
+                if (doc) {
+                  await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
+                  await supabase.from("vehicle_documents").delete().eq("id", doc.id);
+                  setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
+                  toast.success("Document verwijderd");
+                }
+              } : undefined}
+              subText={inkoopverklaringen.length > 0 ? `${inkoopverklaringen[0].document_naam} · ${inkoopverklaringen[0].verkoper_naam}` : undefined}
+            />
+          )}
+
+          {/* Consignatie row */}
+          {isConsignatie && (
+            <DocRow
+              label="Consignatieovereenkomst"
+              present={hasDocument("Consignatieovereenkomst")}
+              statusLabel={hasDocument("Consignatieovereenkomst") ? "Geüpload" : "Ontbreekt"}
+              onOpen={hasDocument("Consignatieovereenkomst") ? () => { const fp = getDocFilePath("Consignatieovereenkomst"); if (fp) handleOpenDocument(fp); } : undefined}
+              onUpload={() => { setUploadType("Consignatieovereenkomst"); setUploadOpen(true); }}
+              onDelete={hasDocument("Consignatieovereenkomst") ? async () => {
+                const doc = getDoc("Consignatieovereenkomst");
+                if (doc) {
+                  await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
+                  await supabase.from("vehicle_documents").delete().eq("id", doc.id);
+                  setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
+                  toast.success("Document verwijderd");
+                }
+              } : undefined}
+            />
+          )}
+
+          {/* Vrijwaringsbewijs row */}
+          {!isConsignatie && (
+            <DocRow
+              label="Vrijwaringsbewijs"
+              present={hasInkoopVrijwaring}
+              statusLabel={hasInkoopVrijwaring ? "Geüpload" : "Ontbreekt"}
+              onOpen={hasInkoopVrijwaring ? () => { const fp = getDocFilePath("Vrijwaringsbewijs-inkoop"); if (fp) handleOpenDocument(fp); } : undefined}
+              onUpload={() => { setUploadType("Vrijwaringsbewijs-inkoop"); setUploadOpen(true); }}
+              onDelete={hasInkoopVrijwaring ? async () => {
+                const doc = getDoc("Vrijwaringsbewijs-inkoop");
+                if (doc) {
+                  await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
+                  await supabase.from("vehicle_documents").delete().eq("id", doc.id);
+                  setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
+                  toast.success("Document verwijderd");
+                }
+              } : undefined}
+            />
+          )}
+        </div>
+
+        {/* Overige inkoop documenten */}
+        <div className="mt-3">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Overige documenten</h4>
+            <button
+              onClick={() => { setUploadType("Overig-inkoop"); setUploadOpen(true); }}
+              className="text-[10px] text-primary hover:underline"
+            >
+              + Toevoegen
+            </button>
+          </div>
+          {inkoopExtraDocs.length === 0 ? (
+            <p className="text-xs text-muted-foreground bg-card border border-border rounded-lg px-4 py-4 text-center">Geen overige documenten</p>
+          ) : (
+            <div className="bg-card border border-border rounded-lg divide-y divide-border">
+              {inkoopExtraDocs.map(doc => (
+                <div key={doc.id} className="flex items-center gap-3 px-4 py-2.5">
+                  <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <p className="text-sm text-foreground flex-1 truncate">{doc.naam}</p>
+                  <button onClick={() => handleOpenDocument(doc.file_path)} className="p-1 text-muted-foreground hover:text-foreground">
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button className="p-1 text-muted-foreground hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Document verwijderen?</AlertDialogTitle>
+                        <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                        <AlertDialogAction onClick={async () => {
+                          await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
+                          await supabase.from("vehicle_documents").delete().eq("id", doc.id);
+                          setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
+                          toast.success("Document verwijderd");
+                        }}>Verwijderen</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Gekoppelde inkoopverklaringen */}
-      {inkoopverklaringen.length > 0 && (
-        <div>
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Inkoopverklaringen</h3>
-          <div className="bg-card border border-border rounded-lg divide-y divide-border">
-            {inkoopverklaringen.map(ikv => (
-              <div key={ikv.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{ikv.document_naam}</p>
-                  <p className="text-xs text-muted-foreground">{ikv.verkoper_naam} · € {Number(ikv.inkoopprijs).toLocaleString("nl-NL")}</p>
-                </div>
-                {ikv.pdf_path && (
-                  <button
-                    onClick={async () => {
-                      const { data } = await supabase.storage.from("vehicle-documents").createSignedUrl(ikv.pdf_path!, 60);
-                      if (data?.signedUrl) window.open(data.signedUrl, "_blank");
-                    }}
-                    className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:underline shrink-0"
-                  >
-                    <ExternalLink className="w-3 h-3" /> PDF
-                  </button>
                 )}
               </div>
             ))}
