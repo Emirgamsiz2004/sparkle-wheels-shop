@@ -1082,6 +1082,92 @@ export type Database = {
         }
         Relationships: []
       }
+      inkoopverklaringen: {
+        Row: {
+          bouwjaar: number | null
+          chassisnummer: string | null
+          created_at: string
+          datum: string
+          document_naam: string
+          handtekening_data: string | null
+          id: string
+          inkoopprijs: number
+          kenteken: string | null
+          kilometerstand: number | null
+          legitimatie_nummer: string
+          legitimatie_type: string
+          merk: string
+          model: string
+          pdf_path: string | null
+          status: string
+          user_id: string | null
+          vehicle_id: string | null
+          verkoper_adres: string
+          verkoper_email: string | null
+          verkoper_naam: string
+          verkoper_telefoon: string
+          verkoper_woonplaats: string
+        }
+        Insert: {
+          bouwjaar?: number | null
+          chassisnummer?: string | null
+          created_at?: string
+          datum?: string
+          document_naam: string
+          handtekening_data?: string | null
+          id?: string
+          inkoopprijs?: number
+          kenteken?: string | null
+          kilometerstand?: number | null
+          legitimatie_nummer: string
+          legitimatie_type: string
+          merk: string
+          model: string
+          pdf_path?: string | null
+          status?: string
+          user_id?: string | null
+          vehicle_id?: string | null
+          verkoper_adres: string
+          verkoper_email?: string | null
+          verkoper_naam: string
+          verkoper_telefoon: string
+          verkoper_woonplaats: string
+        }
+        Update: {
+          bouwjaar?: number | null
+          chassisnummer?: string | null
+          created_at?: string
+          datum?: string
+          document_naam?: string
+          handtekening_data?: string | null
+          id?: string
+          inkoopprijs?: number
+          kenteken?: string | null
+          kilometerstand?: number | null
+          legitimatie_nummer?: string
+          legitimatie_type?: string
+          merk?: string
+          model?: string
+          pdf_path?: string | null
+          status?: string
+          user_id?: string | null
+          vehicle_id?: string | null
+          verkoper_adres?: string
+          verkoper_email?: string | null
+          verkoper_naam?: string
+          verkoper_telefoon?: string
+          verkoper_woonplaats?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inkoopverklaringen_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_history: {
         Row: {
           beschrijving: string
