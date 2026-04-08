@@ -345,6 +345,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
       )}
 
 
+      <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
         <DialogContent className="max-w-[calc(100vw-2rem)]">
           <DialogHeader><DialogTitle>{uploadType} uploaden</DialogTitle></DialogHeader>
           <div className="space-y-4 mt-2">
