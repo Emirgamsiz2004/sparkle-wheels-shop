@@ -77,7 +77,7 @@ interface VehicleDossierTabProps {
   kenteken?: string | null;
 }
 
-const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs }: VehicleDossierTabProps) => {
+const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs, merk, model, bouwjaar, kenteken }: VehicleDossierTabProps) => {
   const [archiveDocs, setArchiveDocs] = useState<ArchiveDoc[]>([]);
   const [testDrives, setTestDrives] = useState<TestDrive[]>([]);
   const [aanbetalingen, setAanbetalingen] = useState<Aanbetaling[]>([]);
