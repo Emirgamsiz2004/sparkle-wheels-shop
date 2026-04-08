@@ -16,7 +16,6 @@ const tabs = [
   { label: "Consignatie", value: "consignatie" },
   { label: "In behandeling", value: "in_behandeling" },
   { label: "Inkoop", value: "inkoop" },
-  { label: "Verkocht", value: "verkocht" },
 ];
 
 const AdminVoertuigenPage = () => {
@@ -59,7 +58,7 @@ const AdminVoertuigenPage = () => {
   };
 
   const filtered = vehicles.filter((v) => {
-    if (filter === "voorraad" && v.status === "verkocht") return false;
+    if (v.status === "verkocht") return false; // Sold vehicles are in Verkopen module
     if (filter !== "voorraad" && v.status !== filter) return false;
     if (search) {
       const q = search.toLowerCase();
