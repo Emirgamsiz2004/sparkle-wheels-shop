@@ -151,6 +151,10 @@ const AdminVoertuigDetailPage = () => {
             koperTelefoon={vehicle.koperTelefoon}
             verkoopDatum={vehicle.verkoopDatum}
             verkoopprijs={vehicle.verkoopprijs}
+            merk={vehicle.merk}
+            model={vehicle.model}
+            bouwjaar={vehicle.bouwjaar}
+            kenteken={vehicle.kenteken}
           />
         )}
         {activeTab === "taken" && (
