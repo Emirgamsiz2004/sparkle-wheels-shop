@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import VehicleSearchSelect from "@/components/admin/VehicleSearchSelect";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Search, Plus, FileText, Download, Link2, Loader2 } from "lucide-react";
@@ -213,18 +213,12 @@ export default function InkoopverklaringenTab() {
 
                   {!selected.vehicleId && (
                     <div className="space-y-2">
-                      <Select value={linkVehicleId} onValueChange={setLinkVehicleId}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Koppel aan voertuig..." />
-                        </SelectTrigger>
-                        <SelectContent className="bg-card border-border">
-                          {availableVehicles.map(v => (
-                            <SelectItem key={v.id} value={v.id}>
-                              {v.kenteken || "—"} — {v.merk} {v.model}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <VehicleSearchSelect
+                        vehicles={availableVehicles.map(v => ({ id: v.id, kenteken: v.kenteken, merk: v.merk, model: v.model }))}
+                        value={linkVehicleId}
+                        onValueChange={setLinkVehicleId}
+                        placeholder="Zoek voertuig..."
+                      />
                       <Button variant="outline" onClick={handleLink} disabled={!linkVehicleId} className="gap-2 w-full">
                         <Link2 className="w-4 h-4" /> Koppelen
                       </Button>
