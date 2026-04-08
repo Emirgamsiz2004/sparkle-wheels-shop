@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface Props {
   vehicle: Vehicle;
@@ -30,6 +31,17 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",
+    // Betalingsdetails
+    contantBedrag: vehicle.contantBedrag ? String(vehicle.contantBedrag) : "",
+    overboekingBedrag: vehicle.overboekingBedrag ? String(vehicle.overboekingBedrag) : "",
+    aanbetalingsbedrag: vehicle.aanbetalingsbedrag ? String(vehicle.aanbetalingsbedrag) : "",
+    financieringActief: vehicle.financieringActief || false,
+    financieringBedrag: vehicle.financieringBedrag ? String(vehicle.financieringBedrag) : "",
+    // Inruil
+    inruilKenteken: vehicle.inruilKenteken || "",
+    inruilMerk: vehicle.inruilMerk || "",
+    inruilModel: vehicle.inruilModel || "",
+    inruilWaarde: vehicle.inruilWaarde ? String(vehicle.inruilWaarde) : "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -58,6 +70,17 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
       consignatieEigenaarTelefoon: form.consignatieEigenaarTelefoon || undefined,
       consignatieEigenaarEmail: form.consignatieEigenaarEmail || undefined,
       kostprijsCalc: kostprijsVal,
+      // Betalingsdetails
+      contantBedrag: Number(form.contantBedrag) || 0,
+      overboekingBedrag: Number(form.overboekingBedrag) || 0,
+      aanbetalingsbedrag: Number(form.aanbetalingsbedrag) || 0,
+      financieringActief: form.financieringActief,
+      financieringBedrag: Number(form.financieringBedrag) || 0,
+      // Inruil
+      inruilKenteken: form.inruilKenteken || undefined,
+      inruilMerk: form.inruilMerk || undefined,
+      inruilModel: form.inruilModel || undefined,
+      inruilWaarde: Number(form.inruilWaarde) || 0,
     });
     onLogActivity("financieel_bewerkt", "Financiële gegevens bijgewerkt");
     setSaving(false);
@@ -146,6 +169,70 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
           {saving && <Loader2 className="w-4 h-4 animate-spin" />} Opslaan
         </button>
       </div>
+
+      {/* Betalingsdetails */}
+      {(vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
+        <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Betalingsdetails</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Contant betaald (€)</label>
+              <input type="text" inputMode="decimal" value={form.contantBedrag} onChange={(e) => setForm(f => ({ ...f, contantBedrag: e.target.value.replace(/[^0-9.]/g, "") }))} placeholder="0" className={inputCls} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Overboeking (€)</label>
+              <input type="text" inputMode="decimal" value={form.overboekingBedrag} onChange={(e) => setForm(f => ({ ...f, overboekingBedrag: e.target.value.replace(/[^0-9.]/g, "") }))} placeholder="0" className={inputCls} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Aanbetaling (€)</label>
+              <input type="text" inputMode="decimal" value={form.aanbetalingsbedrag} onChange={(e) => setForm(f => ({ ...f, aanbetalingsbedrag: e.target.value.replace(/[^0-9.]/g, "") }))} placeholder="0" className={inputCls} />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex items-center gap-3 pt-1">
+              <Switch checked={form.financieringActief} onCheckedChange={(checked) => setForm(f => ({ ...f, financieringActief: checked }))} />
+              <span className="text-sm text-foreground">Gefinancierd</span>
+            </div>
+            {form.financieringActief && (
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Financieringsbedrag (€)</label>
+                <input type="text" inputMode="decimal" value={form.financieringBedrag} onChange={(e) => setForm(f => ({ ...f, financieringBedrag: e.target.value.replace(/[^0-9.]/g, "") }))} placeholder="0" className={inputCls} />
+              </div>
+            )}
+          </div>
+          <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:bg-foreground/90 disabled:opacity-40 transition-all active:scale-[0.98]">
+            {saving && <Loader2 className="w-4 h-4 animate-spin" />} Opslaan
+          </button>
+        </div>
+      )}
+
+      {/* Inruilauto */}
+      {(vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
+        <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Inruilauto</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Kenteken</label>
+              <input value={form.inruilKenteken} onChange={(e) => setForm(f => ({ ...f, inruilKenteken: e.target.value.toUpperCase() }))} placeholder="XX-999-X" className={inputCls} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Merk</label>
+              <input value={form.inruilMerk} onChange={(e) => setForm(f => ({ ...f, inruilMerk: e.target.value }))} placeholder="Merk" className={inputCls} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Model</label>
+              <input value={form.inruilModel} onChange={(e) => setForm(f => ({ ...f, inruilModel: e.target.value }))} placeholder="Model" className={inputCls} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Inruilwaarde (€)</label>
+              <input type="text" inputMode="decimal" value={form.inruilWaarde} onChange={(e) => setForm(f => ({ ...f, inruilWaarde: e.target.value.replace(/[^0-9.]/g, "") }))} placeholder="0" className={inputCls} />
+            </div>
+          </div>
+          <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:bg-foreground/90 disabled:opacity-40 transition-all active:scale-[0.98]">
+            {saving && <Loader2 className="w-4 h-4 animate-spin" />} Opslaan
+          </button>
+        </div>
+      )}
 
       {/* Kosten lijst */}
       <div className="bg-card border border-border rounded-lg overflow-hidden">
