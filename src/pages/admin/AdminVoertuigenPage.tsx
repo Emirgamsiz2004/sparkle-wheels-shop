@@ -24,6 +24,25 @@ const AdminVoertuigenPage = () => {
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
   const isMobile = useIsMobile();
+  const [consignatieWarningCount, setConsignatieWarningCount] = useState(0);
+
+  // Check consignatie vehicles without overeenkomst
+  const consignatieVehicles = useMemo(() => vehicles.filter(v => v.status === "consignatie"), [vehicles]);
+
+  useEffect(() => {
+    if (consignatieVehicles.length === 0) { setConsignatieWarningCount(0); return; }
+    const checkDocs = async () => {
+      const ids = consignatieVehicles.map(v => v.id);
+      const { data } = await supabase
+        .from("vehicle_documents")
+        .select("vehicle_id")
+        .in("vehicle_id", ids)
+        .eq("type", "Consignatieovereenkomst");
+      const idsWithDoc = new Set((data || []).map((d: any) => d.vehicle_id));
+      setConsignatieWarningCount(consignatieVehicles.filter(v => !idsWithDoc.has(v.id)).length);
+    };
+    checkDocs();
+  }, [consignatieVehicles]);
 
   // APK warning: vehicles expiring within 4 weeks or already expired (only non-sold)
   const apkWarningVehicles = useMemo(() => {
