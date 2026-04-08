@@ -316,7 +316,35 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         </div>
       </div>
 
-      <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+      {/* Gekoppelde inkoopverklaringen */}
+      {inkoopverklaringen.length > 0 && (
+        <div>
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Inkoopverklaringen</h3>
+          <div className="bg-card border border-border rounded-lg divide-y divide-border">
+            {inkoopverklaringen.map(ikv => (
+              <div key={ikv.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">{ikv.document_naam}</p>
+                  <p className="text-xs text-muted-foreground">{ikv.verkoper_naam} · € {Number(ikv.inkoopprijs).toLocaleString("nl-NL")}</p>
+                </div>
+                {ikv.pdf_path && (
+                  <button
+                    onClick={async () => {
+                      const { data } = await supabase.storage.from("vehicle-documents").createSignedUrl(ikv.pdf_path!, 60);
+                      if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                    }}
+                    className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:underline shrink-0"
+                  >
+                    <ExternalLink className="w-3 h-3" /> PDF
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+
         <DialogContent className="max-w-[calc(100vw-2rem)]">
           <DialogHeader><DialogTitle>{uploadType} uploaden</DialogTitle></DialogHeader>
           <div className="space-y-4 mt-2">
