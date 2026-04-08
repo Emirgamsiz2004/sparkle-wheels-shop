@@ -385,7 +385,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Overige documenten</h4>
             <button
-              onClick={() => { setUploadType("Overig-inkoop"); setUploadOpen(true); }}
+              onClick={() => { setUploadType(overigUploadType); setUploadOpen(true); }}
               className="text-[10px] text-primary hover:underline"
             >
               + Toevoegen
