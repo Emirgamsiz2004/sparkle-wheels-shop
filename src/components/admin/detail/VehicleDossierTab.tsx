@@ -188,7 +188,8 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   } else {
     if (!hasDocument("Consignatieovereenkomst")) inkoopMissing.push("Consignatieovereenkomst");
   }
-  const inkoopExtraDocs = verkoopDocs.filter(d => d.type === "Overig-inkoop");
+  const inkoopExtraDocs = verkoopDocs.filter(d => d.type === (isConsignatie ? "Overig-consignatie" : "Overig-inkoop"));
+  const overigUploadType = isConsignatie ? "Overig-consignatie" : "Overig-inkoop";
 
   // Check which data fields are filled
   const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
