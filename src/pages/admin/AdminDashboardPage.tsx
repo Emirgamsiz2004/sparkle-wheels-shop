@@ -5,10 +5,10 @@ import { useDashboardData, getPeriodRange, calcTrend, PeriodKey } from "@/hooks/
 import { formatEuro, isConsignatie } from "@/types/vehicle";
 import {
   Loader2, TrendingUp, TrendingDown, Minus, Download,
-  Calendar as CalendarIcon, ChevronRight,
+  Calendar as CalendarIcon, ChevronRight, ChevronDown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, startOfMonth as startOfM, endOfMonth, startOfYear as startOfY, endOfYear } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
