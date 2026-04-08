@@ -20,8 +20,8 @@ import {
 
 /* ─── Constants ─── */
 const periodLabels: Record<PeriodKey, string> = {
-  vandaag: "Vandaag", week: "Deze week", maand: "Deze maand",
-  kwartaal: "Dit kwartaal", jaar: "Dit jaar", custom: "Aangepast",
+  gisteren: "Gisteren", vandaag: "Vandaag", "7dagen": "7 dagen", "30dagen": "30 dagen",
+  maand: "Deze maand", kwartaal: "Dit kwartaal", jaar: "Dit jaar", custom: "Aangepast",
 };
 
 const DONUT_COLORS = ["#3b82f6", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444"];
