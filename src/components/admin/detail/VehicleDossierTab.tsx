@@ -116,16 +116,22 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     window.open(data.signedUrl, "_blank");
   };
 
+  const makeDocName = (docType: string, ext: string) => {
+    const cleanKenteken = (kenteken || "GEEN").replace(/[-\s]/g, "");
+    return `${merk || "Onbekend"}-${model || "Onbekend"}-${bouwjaar || "0000"}-${cleanKenteken}-${docType}.${ext}`;
+  };
+
   const handleFileUpload = async (file: File) => {
     if (!file || !uploadType) return;
     setUploading(true);
-    const ext = file.name.split(".").pop();
-    const path = `${vehicleId}/${Date.now()}.${ext}`;
+    const ext = file.name.split(".").pop() || "pdf";
+    const docName = makeDocName(uploadType, ext);
+    const path = `${vehicleId}/${Date.now()}-${docName}`;
     const { error: storageError } = await supabase.storage.from("vehicle-documents").upload(path, file);
     if (storageError) { toast.error("Upload mislukt"); setUploading(false); return; }
     const { error } = await supabase.from("vehicle_documents").insert({
       vehicle_id: vehicleId,
-      naam: uploadType,
+      naam: docName,
       type: uploadType,
       file_path: path,
       file_size: file.size,
@@ -133,7 +139,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     } as any);
     if (error) { toast.error("Opslaan mislukt"); } else {
       toast.success(`${uploadType} geüpload!`);
-      setVerkoopDocs(prev => [...prev, { type: uploadType, naam: uploadType, file_path: path }]);
+      setVerkoopDocs(prev => [...prev, { type: uploadType, naam: docName, file_path: path, id: Date.now().toString() }]);
     }
     setUploading(false);
     setUploadOpen(false);
