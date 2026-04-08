@@ -102,6 +102,17 @@ const AdminVoertuigenPage = () => {
           <span>{apkWarningVehicles.length} voertuig{apkWarningVehicles.length !== 1 ? "en" : ""} met APK die binnenkort verloopt of al verlopen is</span>
         </button>
       )}
+
+      {/* Consignatie warning bar */}
+      {consignatieWarningCount > 0 && (
+        <button
+          onClick={() => { setFilter("consignatie"); setSearch(""); }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium bg-amber-500/10 border border-amber-500/25 rounded-md text-amber-400 hover:bg-amber-500/15 transition-colors"
+        >
+          <FileWarning className="w-3.5 h-3.5 shrink-0" />
+          <span>{consignatieWarningCount} consignatievoertuig{consignatieWarningCount !== 1 ? "en" : ""} zonder consignatieovereenkomst</span>
+        </button>
+      )}
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-medium text-foreground">Voertuigen</h1>
