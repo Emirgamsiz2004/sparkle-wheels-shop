@@ -425,12 +425,6 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
           )}
         </div>
       </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
 
       <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
