@@ -53,7 +53,7 @@ export default function InkoopverklaringenTab() {
     setDetailOpen(true);
   };
 
-  const availableVehicles = vehicles.filter(v => v.status !== "verkocht" && v.status !== "gearchiveerd");
+  const availableVehicles = vehicles.filter(v => v.status !== "verkocht");
 
   const formatDate = (d: string) => {
     if (!d) return "";

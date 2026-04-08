@@ -184,7 +184,7 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
     onComplete?.();
   };
 
-  const availableVehicles = vehicles.filter(v => v.status !== "verkocht" && v.status !== "gearchiveerd");
+  const availableVehicles = vehicles.filter(v => v.status !== "verkocht");
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
