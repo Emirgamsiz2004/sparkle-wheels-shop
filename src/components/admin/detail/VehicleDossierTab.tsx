@@ -165,8 +165,8 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const isVerkocht = vehicleStatus === "verkocht";
   const isConsignatie = verkoopType === "consignatie";
 
-  // Check which documents are present
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
+  const getDoc = (type: string) => verkoopDocs.find(d => d.type === type);
   const getDocFilePath = (type: string) => verkoopDocs.find(d => d.type === type)?.file_path;
 
   const handleOpenDocument = async (filePath: string) => {
