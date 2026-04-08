@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface Props {
   vehicle: Vehicle;
@@ -30,6 +31,17 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",
+    // Betalingsdetails
+    contantBedrag: vehicle.contantBedrag ? String(vehicle.contantBedrag) : "",
+    overboekingBedrag: vehicle.overboekingBedrag ? String(vehicle.overboekingBedrag) : "",
+    aanbetalingsbedrag: vehicle.aanbetalingsbedrag ? String(vehicle.aanbetalingsbedrag) : "",
+    financieringActief: vehicle.financieringActief || false,
+    financieringBedrag: vehicle.financieringBedrag ? String(vehicle.financieringBedrag) : "",
+    // Inruil
+    inruilKenteken: vehicle.inruilKenteken || "",
+    inruilMerk: vehicle.inruilMerk || "",
+    inruilModel: vehicle.inruilModel || "",
+    inruilWaarde: vehicle.inruilWaarde ? String(vehicle.inruilWaarde) : "",
   });
   const [saving, setSaving] = useState(false);
 
