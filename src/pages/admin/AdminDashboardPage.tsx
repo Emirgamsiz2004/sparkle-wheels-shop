@@ -65,6 +65,30 @@ const AdminDashboardPage = () => {
   const [compare, setCompare] = useState(true);
   const [customFrom, setCustomFrom] = useState<Date>();
   const [customTo, setCustomTo] = useState<Date>();
+  const [monthYearOpen, setMonthYearOpen] = useState(false);
+  const [myYear, setMyYear] = useState(new Date().getFullYear());
+
+  const monthNames = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
+  const currentYear = new Date().getFullYear();
+  const selectableYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  const selectMonth = (monthIdx: number, year: number) => {
+    const from = startOfM(new Date(year, monthIdx));
+    const to = endOfMonth(new Date(year, monthIdx));
+    setCustomFrom(from);
+    setCustomTo(to > new Date() ? new Date() : to);
+    setPeriod("custom");
+    setMonthYearOpen(false);
+  };
+
+  const selectYear = (year: number) => {
+    const from = startOfY(new Date(year, 0));
+    const to = endOfYear(new Date(year, 0));
+    setCustomFrom(from);
+    setCustomTo(to > new Date() ? new Date() : to);
+    setPeriod("custom");
+    setMonthYearOpen(false);
+  };
 
   const range = useMemo(() => getPeriodRange(period, customFrom, customTo), [period, customFrom, customTo]);
   const data = useDashboardData(vehicles, testDrives, range, compare);
