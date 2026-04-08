@@ -265,15 +265,170 @@ export default function GlobalSearch() {
   const recentPages = getRecentPages();
   const showDefault = query.trim().length < 2;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close on click outside (mobile dropdown)
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const searchContent = (
+    <>
+      {/* Search input */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+        <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+        <input
+          ref={inputRef}
+          value={query}
+          onChange={e => handleQueryChange(e.target.value)}
+          placeholder="Zoek op kenteken, klant, voertuig..."
+          className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground font-['DM_Sans']"
+        />
+        {query && (
+          <button onClick={() => { setQuery(""); setCategories([]); inputRef.current?.focus(); }} className="text-muted-foreground hover:text-foreground">
+            <X className="w-4 h-4" />
+          </button>
+        )}
+        <button onClick={() => setOpen(false)} className="text-[11px] text-muted-foreground border border-border rounded-[3px] px-1.5 py-0.5 hover:bg-muted">
+          ESC
+        </button>
+      </div>
+
+      {/* Results / Default */}
+      <div className="max-h-[60vh] overflow-y-auto">
+        <AnimatePresence mode="wait">
+          {showDefault ? (
+            <motion.div
+              key="default"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="p-4 space-y-5"
+            >
+              <div>
+                <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/60 mb-2 font-['Poppins']">Snelkoppelingen</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickActions.map(a => (
+                    <button
+                      key={a.link}
+                      onClick={() => handleSelect(a.link)}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-[3px] border border-border bg-muted/30 hover:bg-muted text-[13px] text-foreground transition-colors text-left"
+                    >
+                      <div className="w-7 h-7 rounded-[3px] bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <a.icon className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <span className="font-['DM_Sans']">{a.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {recentPages.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/60 mb-2 font-['Poppins']">Recent bezocht</p>
+                  <div className="space-y-0.5">
+                    {recentPages.map((p, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleSelect(p.link)}
+                        className="flex items-center gap-2.5 w-full px-3 py-2 rounded-[3px] text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors text-left"
+                      >
+                        <span className="font-['DM_Sans']">{p.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ) : loading ? (
+            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 flex justify-center">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-foreground/30" />
+            </motion.div>
+          ) : categories.length === 0 ? (
+            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 text-center">
+              <p className="text-sm text-muted-foreground font-['DM_Sans']">Geen resultaten gevonden voor '{query}'</p>
+            </motion.div>
+          ) : (
+            <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="py-2">
+              {categories.map((cat, ci) => (
+                <div key={cat.label} className={ci > 0 ? "border-t border-border" : ""}>
+                  <div className="px-4 py-2 flex items-center gap-2">
+                    <cat.icon className="w-3.5 h-3.5 text-muted-foreground/60" />
+                    <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/60 font-['Poppins']">{cat.label}</p>
+                  </div>
+                  <div className="px-2">
+                    {cat.results.map(r => (
+                      <button
+                        key={r.id}
+                        onClick={() => handleSelect(r.link)}
+                        className="flex items-center gap-3 w-full px-3 py-2 rounded-[3px] hover:bg-muted/50 transition-colors text-left group"
+                      >
+                        <div className="w-7 h-7 rounded-[3px] bg-muted flex items-center justify-center flex-shrink-0 group-hover:bg-accent">
+                          <cat.icon className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] text-foreground truncate font-['DM_Sans']">{r.title}</p>
+                          <p className="text-[11px] text-muted-foreground truncate font-['DM_Sans']">{r.subtitle}</p>
+                        </div>
+                        {r.badge && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-[3px] font-medium capitalize flex-shrink-0 ${r.badgeColor}`}>
+                            {r.badge}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {cat.results.length >= 5 && (
+                    <button
+                      onClick={() => handleSelect(cat.moduleLink)}
+                      className="w-full px-4 py-2 text-[12px] text-primary hover:text-primary/80 transition-colors text-left font-['DM_Sans']"
+                    >
+                      Bekijk alle resultaten in {cat.label} →
+                    </button>
+                  )}
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
+  );
+
   return (
     <>
-      {/* Search trigger — icon only on mobile, full bar on desktop */}
-      <button
-        onClick={() => setOpen(true)}
-        className="lg:hidden flex items-center justify-center w-8 h-8 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-      >
-        <Search className="w-4 h-4" />
-      </button>
+      {/* Mobile: inline dropdown */}
+      <div ref={containerRef} className="lg:hidden relative">
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex items-center justify-center w-8 h-8 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scaleY: 0.95 }}
+              animate={{ opacity: 1, y: 0, scaleY: 1 }}
+              exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
+              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+              style={{ transformOrigin: "top right" }}
+              className="absolute right-0 top-full mt-2 w-[calc(100vw-32px)] max-w-[400px] bg-card border border-border rounded-[3px] shadow-xl shadow-background/60 z-[70] overflow-hidden"
+            >
+              {searchContent}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Desktop: dialog modal */}
       <button
         onClick={() => setOpen(true)}
         className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-[3px] border border-border bg-muted/50 hover:bg-muted text-muted-foreground text-[13px] transition-colors min-w-[280px]"
@@ -284,150 +439,9 @@ export default function GlobalSearch() {
           ⌘K
         </kbd>
       </button>
-
-      {/* Search modal */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[640px] p-0 gap-0 rounded-[3px] overflow-hidden [&>button]:hidden">
-          {/* Search input */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-            <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <input
-              ref={inputRef}
-              value={query}
-              onChange={e => handleQueryChange(e.target.value)}
-              placeholder="Zoek op kenteken, klant, voertuig..."
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground font-['DM_Sans']"
-            />
-            {query && (
-              <button onClick={() => { setQuery(""); setCategories([]); inputRef.current?.focus(); }} className="text-muted-foreground hover:text-foreground">
-                <X className="w-4 h-4" />
-              </button>
-            )}
-            <button onClick={() => setOpen(false)} className="text-[11px] text-muted-foreground border border-border rounded-[3px] px-1.5 py-0.5 hover:bg-muted">
-              ESC
-            </button>
-          </div>
-
-          {/* Results / Default */}
-          <div className="max-h-[60vh] overflow-y-auto">
-            <AnimatePresence mode="wait">
-              {showDefault ? (
-                <motion.div
-                  key="default"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="p-4 space-y-5"
-                >
-                  {/* Quick actions */}
-                  <div>
-                    <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/60 mb-2 font-['Poppins']">Snelkoppelingen</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {quickActions.map(a => (
-                        <button
-                          key={a.link}
-                          onClick={() => handleSelect(a.link)}
-                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-[3px] border border-border bg-muted/30 hover:bg-muted text-[13px] text-foreground transition-colors text-left"
-                        >
-                          <div className="w-7 h-7 rounded-[3px] bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <a.icon className="w-3.5 h-3.5 text-primary" />
-                          </div>
-                          <span className="font-['DM_Sans']">{a.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Recent pages */}
-                  {recentPages.length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/60 mb-2 font-['Poppins']">Recent bezocht</p>
-                      <div className="space-y-0.5">
-                        {recentPages.map((p, i) => (
-                          <button
-                            key={i}
-                            onClick={() => handleSelect(p.link)}
-                            className="flex items-center gap-2.5 w-full px-3 py-2 rounded-[3px] text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors text-left"
-                          >
-                            <span className="font-['DM_Sans']">{p.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              ) : loading ? (
-                <motion.div
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="p-8 flex justify-center"
-                >
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-foreground/30" />
-                </motion.div>
-              ) : categories.length === 0 ? (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="p-8 text-center"
-                >
-                  <p className="text-sm text-muted-foreground font-['DM_Sans']">Geen resultaten gevonden voor '{query}'</p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="results"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="py-2"
-                >
-                  {categories.map((cat, ci) => (
-                    <div key={cat.label} className={ci > 0 ? "border-t border-border" : ""}>
-                      <div className="px-4 py-2 flex items-center gap-2">
-                        <cat.icon className="w-3.5 h-3.5 text-muted-foreground/60" />
-                        <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/60 font-['Poppins']">{cat.label}</p>
-                      </div>
-                      <div className="px-2">
-                        {cat.results.map(r => (
-                          <button
-                            key={r.id}
-                            onClick={() => handleSelect(r.link)}
-                            className="flex items-center gap-3 w-full px-3 py-2 rounded-[3px] hover:bg-muted/50 transition-colors text-left group"
-                          >
-                            <div className="w-7 h-7 rounded-[3px] bg-muted flex items-center justify-center flex-shrink-0 group-hover:bg-accent">
-                              <cat.icon className="w-3.5 h-3.5 text-muted-foreground" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[13px] text-foreground truncate font-['DM_Sans']">{r.title}</p>
-                              <p className="text-[11px] text-muted-foreground truncate font-['DM_Sans']">{r.subtitle}</p>
-                            </div>
-                            {r.badge && (
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded-[3px] font-medium capitalize flex-shrink-0 ${r.badgeColor}`}>
-                                {r.badge}
-                              </span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                      {cat.results.length >= 5 && (
-                        <button
-                          onClick={() => handleSelect(cat.moduleLink)}
-                          className="w-full px-4 py-2 text-[12px] text-primary hover:text-primary/80 transition-colors text-left font-['DM_Sans']"
-                        >
-                          Bekijk alle resultaten in {cat.label} →
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+        <DialogContent className="hidden lg:block sm:max-w-[640px] p-0 gap-0 rounded-[3px] overflow-hidden [&>button]:hidden">
+          {searchContent}
         </DialogContent>
       </Dialog>
     </>
