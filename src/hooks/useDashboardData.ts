@@ -4,7 +4,7 @@ import { TestDrive } from '@/hooks/useTestDrives';
 import { startOfDay, startOfWeek, startOfMonth, startOfQuarter, startOfYear, isWithinInterval, parseISO, differenceInDays, format, getDay } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
-export type PeriodKey = 'vandaag' | 'week' | 'maand' | 'kwartaal' | 'jaar' | 'custom';
+export type PeriodKey = 'gisteren' | 'vandaag' | '7dagen' | '30dagen' | 'maand' | 'kwartaal' | 'jaar' | 'custom';
 
 export interface PeriodRange { from: Date; to: Date; }
 
@@ -12,8 +12,22 @@ export function getPeriodRange(key: PeriodKey, customFrom?: Date, customTo?: Dat
   const now = new Date();
   const today = startOfDay(now);
   switch (key) {
+    case 'gisteren': {
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      return { from: yesterday, to: today };
+    }
     case 'vandaag': return { from: today, to: now };
-    case 'week': return { from: startOfWeek(now, { weekStartsOn: 1 }), to: now };
+    case '7dagen': {
+      const d = new Date(today);
+      d.setDate(d.getDate() - 6);
+      return { from: d, to: now };
+    }
+    case '30dagen': {
+      const d = new Date(today);
+      d.setDate(d.getDate() - 29);
+      return { from: d, to: now };
+    }
     case 'maand': return { from: startOfMonth(now), to: now };
     case 'kwartaal': return { from: startOfQuarter(now), to: now };
     case 'jaar': return { from: startOfYear(now), to: now };
