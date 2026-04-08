@@ -23,12 +23,12 @@ const FacebookIcon = ({ className }: { className?: string }) => (
 
 // Opening hours schedule (Google Maps)
 const SCHEDULE: { open: number; close: number }[] = [
-  { open: -1, close: -1 },     // Zo: Gesloten
-  { open: 600, close: 1080 },  // Ma: 10:00–18:00
-  { open: 600, close: 1080 },  // Di: 10:00–18:00
-  { open: 600, close: 1080 },  // Wo: 10:00–18:00
-  { open: 600, close: 1080 },  // Do: 10:00–18:00
-  { open: 600, close: 1080 },  // Vr: 10:00–18:00
+  { open: 600, close: 1020 },  // Zo: 10:00–17:00
+  { open: 540, close: 1080 },  // Ma: 09:00–18:00
+  { open: 540, close: 1080 },  // Di: 09:00–18:00
+  { open: 540, close: 1080 },  // Wo: 09:00–18:00
+  { open: 540, close: 1080 },  // Do: 09:00–18:00
+  { open: 540, close: 1080 },  // Vr: 09:00–18:00
   { open: 600, close: 1020 },  // Za: 10:00–17:00
 ];
 
@@ -105,7 +105,7 @@ const AnnouncementBar = () => {
           {/* Address */}
           <span className="hidden lg:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground whitespace-nowrap">
             <MapPin className="w-3 h-3 shrink-0" />
-            Cilinderweg 99, Roelofarendsveen
+            Cilinderweg 99, 2371 DZ Roelofarendsveen
           </span>
         </div>
 

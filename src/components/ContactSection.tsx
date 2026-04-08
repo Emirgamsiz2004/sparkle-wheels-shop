@@ -5,7 +5,7 @@ const contactInfo = [
   { icon: Phone, label: "Telefoon", value: "06-12693825", href: "tel:+31612693825" },
   { icon: MessageCircle, label: "WhatsApp", value: "Stuur een bericht", href: "https://wa.me/31612693825" },
   { icon: Mail, label: "E-mail", value: "info@platinautomotive.nl", href: "mailto:info@platinautomotive.nl" },
-  { icon: MapPin, label: "Adres", value: "Cilinderweg 99, Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+Roelofarendsveen" },
+  { icon: MapPin, label: "Adres", value: "Cilinderweg 99\n2371 DZ Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+2371DZ+Roelofarendsveen" },
 ];
 
 const ContactSection = () => {
@@ -84,11 +84,9 @@ const ContactSection = () => {
                 <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground">Openingstijden</p>
               </div>
               <div className="flex items-center gap-2 md:gap-3 mt-1.5 text-xs font-body text-foreground">
-                <span>Ma–Vr: 10:00 – 18:00</span>
+                <span>Ma–Vr: 09:00 – 18:00</span>
                 <span className="text-border">·</span>
-                <span>Za: 10:00 – 17:00</span>
-                <span className="text-border">·</span>
-                <span>Zo: Gesloten</span>
+                <span>Za–Zo: 10:00 – 17:00</span>
               </div>
             </div>
           </motion.div>
