@@ -71,6 +71,10 @@ interface VehicleDossierTabProps {
   koperTelefoon?: string | null;
   verkoopDatum?: string | null;
   verkoopprijs?: number | null;
+  merk?: string;
+  model?: string;
+  bouwjaar?: number | null;
+  kenteken?: string | null;
 }
 
 const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs }: VehicleDossierTabProps) => {
