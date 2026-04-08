@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw, AlertTriangle } from "lucide-react";
+import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw, AlertTriangle, FileWarning } from "lucide-react";
 import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
