@@ -12,28 +12,17 @@ import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; }
-interface NavGroup { label: string; items: NavItem[]; }
 
-const navGroups: NavGroup[] = [
-  {
-    label: "",
-    items: [
-      { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-      { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
-      { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
-      { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
-      { label: "Verkopen", icon: BadgeDollarSign, path: "/admin/verkopen" },
-      { label: "Klanten", icon: Users, path: "/admin/klanten" },
-      { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
-    ],
-  },
-  {
-    label: "Financiën",
-    items: [
-      { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
-      { label: "Uren", icon: Clock, path: "/admin/uren" },
-    ],
-  },
+const navItems: NavItem[] = [
+  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+  { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
+  { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
+  { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
+  { label: "Verkopen", icon: BadgeDollarSign, path: "/admin/verkopen" },
+  { label: "Klanten", icon: Users, path: "/admin/klanten" },
+  { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
+  { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
+  { label: "Uren", icon: Clock, path: "/admin/uren" },
 ];
 
 const AdminLayout = () => {
@@ -114,43 +103,34 @@ const AdminLayout = () => {
           </button>
         </div>
 
-        <nav className="flex-1 px-2 py-3 space-y-4 overflow-y-auto">
-          {navGroups.map((group, gi) => (
-            <div key={gi}>
-              {group.label && (
-                <p className="px-3 mb-1.5 text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/40">
-                  {group.label}
-                </p>
-              )}
-              <div className="space-y-px">
-                {group.items.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 ${
-                      isActive(item.path)
-                        ? "bg-accent text-foreground font-medium"
-                        : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
-                    }`}
-                  >
-                    <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
-                    <span className="flex-1">{item.label}</span>
-                    {item.path === "/admin/leads" && overdueLeads > 0 && (
-                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground">
-                        {overdueLeads}
-                      </span>
-                    )}
-                    {item.path === "/admin/planning" && upcomingAppts > 0 && (
-                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground">
-                        {upcomingAppts}
-                      </span>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
+        <nav className="flex-1 px-2 py-3 overflow-y-auto">
+          <div className="space-y-px">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 ${
+                  isActive(item.path)
+                    ? "bg-accent text-foreground font-medium"
+                    : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
+                }`}
+              >
+                <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
+                <span className="flex-1">{item.label}</span>
+                {item.path === "/admin/leads" && overdueLeads > 0 && (
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground">
+                    {overdueLeads}
+                  </span>
+                )}
+                {item.path === "/admin/planning" && upcomingAppts > 0 && (
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground">
+                    {upcomingAppts}
+                  </span>
+                )}
+              </Link>
+            ))}
+          </div>
         </nav>
 
         <div className="p-2 border-t border-[hsl(var(--sidebar-border))]">
