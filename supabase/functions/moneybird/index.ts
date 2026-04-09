@@ -8,6 +8,25 @@ const corsHeaders = {
 
 const MB_BASE = "https://moneybird.com/api/v2";
 
+function normalizeMoneybirdPeriodValue(value: string) {
+  const trimmed = value.trim();
+  if (/^\d{4}$/.test(trimmed)) {
+    return `${trimmed}0101..${trimmed}1231`;
+  }
+  return trimmed;
+}
+
+function normalizeMoneybirdFilter(filter?: unknown) {
+  if (typeof filter !== "string") return undefined;
+  const trimmedFilter = filter.trim();
+  if (!trimmedFilter) return undefined;
+
+  return trimmedFilter.replace(
+    /period:([^,]+)/g,
+    (_match, value: string) => `period:${normalizeMoneybirdPeriodValue(value)}`
+  );
+}
+
 async function mbFetch(path: string, options: RequestInit = {}) {
   const token = Deno.env.get("MONEYBIRD_API_TOKEN");
   const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
@@ -137,8 +156,9 @@ Deno.serve(async (req) => {
 
       case "get_sales_invoices": {
         const { filter, page } = params;
+        const normalizedFilter = normalizeMoneybirdFilter(filter);
         let path = `sales_invoices.json?per_page=100&page=${page || 1}`;
-        if (filter) path += `&filter=${encodeURIComponent(filter)}`;
+        if (normalizedFilter) path += `&filter=${encodeURIComponent(normalizedFilter)}`;
         result = await mbFetch(path);
         break;
       }
@@ -175,17 +195,22 @@ Deno.serve(async (req) => {
 
       // ─── Financieel overzicht (BTW) ───
       case "get_financial_statements": {
-        const { year } = params;
-        const y = year || new Date().getFullYear();
-        result = await mbFetch(`financial_statements.json?filter=period:${y}0101..${y}1231`);
+        const { year, filter } = params;
+        const normalizedFinancialFilter =
+          normalizeMoneybirdFilter(filter) ||
+          normalizeMoneybirdFilter(`period:${year || new Date().getFullYear()}`);
+        result = await mbFetch(
+          `financial_statements.json?filter=${encodeURIComponent(normalizedFinancialFilter || "")}`
+        );
         break;
       }
 
       // ─── Ontvangsten (bonnetjes/inkoopfacturen) ───
       case "get_receipts": {
         const { page, filter } = params;
+        const normalizedFilter = normalizeMoneybirdFilter(filter);
         let path = `receipts.json?per_page=100&page=${page || 1}`;
-        if (filter) path += `&filter=${encodeURIComponent(filter)}`;
+        if (normalizedFilter) path += `&filter=${encodeURIComponent(normalizedFilter)}`;
         result = await mbFetch(path);
         break;
       }
@@ -193,8 +218,9 @@ Deno.serve(async (req) => {
       // ─── Purchase invoices ───
       case "get_purchase_invoices": {
         const { page: piPage, filter: piFilter } = params;
+        const normalizedFilter = normalizeMoneybirdFilter(piFilter);
         let piPath = `documents/purchase_invoices.json?per_page=100&page=${piPage || 1}`;
-        if (piFilter) piPath += `&filter=${encodeURIComponent(piFilter)}`;
+        if (normalizedFilter) piPath += `&filter=${encodeURIComponent(normalizedFilter)}`;
         result = await mbFetch(piPath);
         break;
       }
