@@ -12,6 +12,7 @@ import SlidingTabs from "@/components/admin/SlidingTabs";
 
 const tabs = [
   { label: "Voorraad", value: "voorraad" },
+  { label: "Nieuw", value: "nieuw" },
   { label: "Te koop", value: "te_koop" },
   { label: "Consignatie", value: "consignatie" },
   { label: "In behandeling", value: "in_behandeling" },
