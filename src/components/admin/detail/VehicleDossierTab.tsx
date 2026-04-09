@@ -184,11 +184,9 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const hasInkoopverklaringDoc = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring");
   const hasInkoopfactuurDoc = hasDocument("Inkoopfactuur");
   const hasInkoopDocument = hasInkoopverklaringDoc || hasInkoopfactuurDoc;
-  const hasInkoopVrijwaring = hasDocument("Vrijwaringsbewijs-inkoop");
-  const inkoopComplete = hasInkoopDocument && hasInkoopVrijwaring;
+  const inkoopComplete = hasInkoopDocument;
   const inkoopMissing: string[] = [];
   if (!hasInkoopDocument) inkoopMissing.push("Inkoopverklaring of Inkoopfactuur");
-  if (!hasInkoopVrijwaring) inkoopMissing.push("Vrijwaringsbewijs");
 
   // Consignatie completeness
   const consignatieComplete = hasDocument("Consignatieovereenkomst");
@@ -409,21 +407,6 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
                 }
               } : undefined}
             />
-            <DocRow
-              label="Vrijwaringsbewijs"
-              present={hasInkoopVrijwaring}
-              statusLabel={hasInkoopVrijwaring ? "Geüpload" : "Ontbreekt"}
-              onOpen={hasInkoopVrijwaring ? () => { const fp = getDocFilePath("Vrijwaringsbewijs-inkoop"); if (fp) handleOpenDocument(fp); } : undefined}
-              onUpload={() => { setUploadType("Vrijwaringsbewijs-inkoop"); setUploadOpen(true); }}
-              onDelete={hasInkoopVrijwaring ? async () => {
-                const doc = getDoc("Vrijwaringsbewijs-inkoop");
-                if (doc) {
-                  await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
-                  await supabase.from("vehicle_documents").delete().eq("id", doc.id);
-                  setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
-                  toast.success("Document verwijderd");
-                }
-              } : undefined}
             />
           </div>
           {/* Overige inkoop documenten */}
