@@ -407,7 +407,6 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
                 }
               } : undefined}
             />
-            />
           </div>
           {/* Overige inkoop documenten */}
           <div className="mt-3">
