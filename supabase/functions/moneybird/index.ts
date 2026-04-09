@@ -180,6 +180,24 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── Ontvangsten (bonnetjes/inkoopfacturen) ───
+      case "get_receipts": {
+        const { page, filter } = params;
+        let path = `receipts.json?per_page=100&page=${page || 1}`;
+        if (filter) path += `&filter=${encodeURIComponent(filter)}`;
+        result = await mbFetch(path);
+        break;
+      }
+
+      // ─── Purchase invoices ───
+      case "get_purchase_invoices": {
+        const { page: piPage, filter: piFilter } = params;
+        let piPath = `documents/purchase_invoices.json?per_page=100&page=${piPage || 1}`;
+        if (piFilter) piPath += `&filter=${encodeURIComponent(piFilter)}`;
+        result = await mbFetch(piPath);
+        break;
+      }
+
       // ─── Algemeen: administratie info ───
       case "get_administration": {
         const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");

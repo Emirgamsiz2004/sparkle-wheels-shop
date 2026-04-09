@@ -93,6 +93,9 @@ export function useMoneybird() {
 
   const getTaxRates = useCallback(() => invoke('get_tax_rates'), [invoke]);
   const getLedgerAccounts = useCallback(() => invoke('get_ledger_accounts'), [invoke]);
+  const getFinancialStatements = useCallback((year?: number) => invoke('get_financial_statements', { year }), [invoke]);
+  const getReceipts = useCallback((page?: number, filter?: string) => invoke('get_receipts', { page, filter }), [invoke]);
+  const getPurchaseInvoices = useCallback((page?: number, filter?: string) => invoke('get_purchase_invoices', { page, filter }), [invoke]);
 
   const downloadInvoicePdf = useCallback(
     (invoiceId: string) => invoke('download_invoice_pdf', { invoice_id: invoiceId }),
@@ -110,5 +113,8 @@ export function useMoneybird() {
     downloadInvoicePdf,
     getTaxRates,
     getLedgerAccounts,
+    getFinancialStatements,
+    getReceipts,
+    getPurchaseInvoices,
   };
 }
