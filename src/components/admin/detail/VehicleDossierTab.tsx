@@ -245,6 +245,8 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const dataComplete = VERKOOP_GEGEVENS.filter(d => hasData(d.key)).length;
   const totalComplete = docsComplete + dataComplete;
   const totalRequired = VERKOOP_DOCUMENTEN.length + VERKOOP_GEGEVENS.length;
+  const verkoopOverride = !!overrides["verkoop"];
+  const verkoopFullyComplete = totalComplete === totalRequired || verkoopOverride;
 
   return (
     <div className="space-y-6">
@@ -253,13 +255,24 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Verkoopdossier</h3>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-              totalComplete === totalRequired 
-                ? "bg-emerald-500/15 text-emerald-400" 
-                : "bg-amber-500/15 text-amber-400"
-            }`}>
-              {totalComplete}/{totalRequired} compleet
-            </span>
+            <div className="flex items-center gap-2">
+              {!verkoopFullyComplete ? (
+                <button onClick={() => toggleOverride("verkoop")} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Compleet markeren
+                </button>
+              ) : verkoopOverride && (
+                <button onClick={() => toggleOverride("verkoop")} className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Handmatig ✓
+                </button>
+              )}
+              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                verkoopFullyComplete
+                  ? "bg-emerald-500/15 text-emerald-400" 
+                  : "bg-amber-500/15 text-amber-400"
+              }`}>
+                {verkoopFullyComplete ? "Compleet" : `${totalComplete}/${totalRequired} compleet`}
+              </span>
+            </div>
           </div>
 
           <div className="bg-card border border-border rounded-lg divide-y divide-border">
