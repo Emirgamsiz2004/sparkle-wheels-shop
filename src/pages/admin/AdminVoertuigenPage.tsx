@@ -84,6 +84,17 @@ const AdminVoertuigenPage = () => {
     return d;
   }, []);
 
+  const nieuwCount = useMemo(() => vehicles.filter(v => {
+    if (v.status === "verkocht") return false;
+    return new Date(v.createdAt || "") >= threeDaysAgo;
+  }).length, [vehicles, threeDaysAgo]);
+
+  const tabs = useMemo(() => BASE_TABS.map(t =>
+    t.value === "nieuw" && nieuwCount > 0
+      ? { ...t, label: `Nieuw (${nieuwCount})` }
+      : t
+  ), [nieuwCount]);
+
   const filtered = vehicles.filter((v) => {
     if (v.status === "verkocht") return false;
     if (filter === "nieuw") {
