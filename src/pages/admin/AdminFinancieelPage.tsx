@@ -229,7 +229,14 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
     const totalKosten = v.kosten.reduce((s: number, k: any) => s + k.amount, 0);
     const kostprijs = inkoopprijs + totalKosten;
     const winst = verkoopprijs - kostprijs;
-    const btwMarge = winst > 0 ? winst * (21 / 121) : 0;
+    let btwMarge: number;
+    if (v.btwMargeType === 'btw') {
+      // BTW-auto: 21% BTW over volledige verkoopprijs
+      btwMarge = verkoopprijs * (21 / 121);
+    } else {
+      // Margeregeling: BTW alleen over de winst
+      btwMarge = winst > 0 ? winst * (21 / 121) : 0;
+    }
     return { inkoopprijs, verkoopprijs, kostprijs, winst, btwMarge };
   };
 
