@@ -291,34 +291,83 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         </div>
       )}
 
-      {/* Inkoopdossier */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            {isConsignatie ? "Consignatiedossier" : "Inkoopdossier"}
-          </h3>
-          <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-            inkoopComplete
-              ? "bg-emerald-500/15 text-emerald-400"
-              : "bg-amber-500/15 text-amber-400"
-          }`}>
-            {inkoopComplete ? "Compleet" : "Onvolledig"}
-          </span>
-        </div>
-
-        {/* Warning if incomplete */}
-        {!inkoopComplete && inkoopMissing.length > 0 && (
-          <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-md bg-amber-500/10 border border-amber-500/20">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
-            <p className="text-xs text-amber-400">
-              Dossier onvolledig — {inkoopMissing.join(" en ")} ontbreekt.
-            </p>
+      {/* Consignatiedossier - show for consignatie vehicles (also when sold) */}
+      {showConsignatieSection && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Consignatiedossier</h3>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+              consignatieComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
+            }`}>
+              {consignatieComplete ? "Compleet" : "Onvolledig"}
+            </span>
           </div>
-        )}
+          {!consignatieComplete && consignatieMissing.length > 0 && (
+            <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-md bg-amber-500/10 border border-amber-500/20">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+              <p className="text-xs text-amber-400">Dossier onvolledig — {consignatieMissing.join(" en ")} ontbreekt.</p>
+            </div>
+          )}
+          <div className="bg-card border border-border rounded-lg divide-y divide-border">
+            <DocRow
+              label="Consignatieovereenkomst"
+              present={hasDocument("Consignatieovereenkomst")}
+              statusLabel={hasDocument("Consignatieovereenkomst") ? "Geüpload" : "Ontbreekt"}
+              onOpen={hasDocument("Consignatieovereenkomst") ? () => { const fp = getDocFilePath("Consignatieovereenkomst"); if (fp) handleOpenDocument(fp); } : undefined}
+              onUpload={() => { setUploadType("Consignatieovereenkomst"); setUploadOpen(true); }}
+              onDelete={hasDocument("Consignatieovereenkomst") ? async () => {
+                const doc = getDoc("Consignatieovereenkomst");
+                if (doc) {
+                  await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
+                  await supabase.from("vehicle_documents").delete().eq("id", doc.id);
+                  setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
+                  toast.success("Document verwijderd");
+                }
+              } : undefined}
+            />
+          </div>
+          {/* Overige consignatie documenten */}
+          <div className="mt-3">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Overige documenten</h4>
+              <button onClick={() => { setUploadType("Overig-consignatie"); setUploadOpen(true); }} className="text-[10px] text-primary hover:underline">+ Toevoegen</button>
+            </div>
+            {consignatieExtraDocs.length === 0 ? (
+              <p className="text-xs text-muted-foreground bg-card border border-border rounded-lg px-4 py-4 text-center">Geen overige documenten</p>
+            ) : (
+              <div className="bg-card border border-border rounded-lg divide-y divide-border">
+                {consignatieExtraDocs.map(doc => (
+                  <ExtraDocRow key={doc.id} doc={doc} onOpen={handleOpenDocument} onDelete={async () => {
+                    await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
+                    await supabase.from("vehicle_documents").delete().eq("id", doc.id);
+                    setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
+                    toast.success("Document verwijderd");
+                  }} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
-        <div className="bg-card border border-border rounded-lg divide-y divide-border">
-          {/* Inkoopverklaring row */}
-          {!isConsignatie && (
+      {/* Inkoopdossier - show for regulier vehicles (also when sold) */}
+      {showInkoopSection && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Inkoopdossier</h3>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+              inkoopComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
+            }`}>
+              {inkoopComplete ? "Compleet" : "Onvolledig"}
+            </span>
+          </div>
+          {!inkoopComplete && inkoopMissing.length > 0 && (
+            <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-md bg-amber-500/10 border border-amber-500/20">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+              <p className="text-xs text-amber-400">Dossier onvolledig — {inkoopMissing.join(" en ")} ontbreekt.</p>
+            </div>
+          )}
+          <div className="bg-card border border-border rounded-lg divide-y divide-border">
             <DocRow
               label="Inkoopverklaring"
               present={hasInkoopverklaring}
@@ -342,30 +391,6 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
               } : undefined}
               subText={inkoopverklaringen.length > 0 ? `${inkoopverklaringen[0].document_naam} · ${inkoopverklaringen[0].verkoper_naam}` : undefined}
             />
-          )}
-
-          {/* Consignatie row */}
-          {isConsignatie && (
-            <DocRow
-              label="Consignatieovereenkomst"
-              present={hasDocument("Consignatieovereenkomst")}
-              statusLabel={hasDocument("Consignatieovereenkomst") ? "Geüpload" : "Ontbreekt"}
-              onOpen={hasDocument("Consignatieovereenkomst") ? () => { const fp = getDocFilePath("Consignatieovereenkomst"); if (fp) handleOpenDocument(fp); } : undefined}
-              onUpload={() => { setUploadType("Consignatieovereenkomst"); setUploadOpen(true); }}
-              onDelete={hasDocument("Consignatieovereenkomst") ? async () => {
-                const doc = getDoc("Consignatieovereenkomst");
-                if (doc) {
-                  await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
-                  await supabase.from("vehicle_documents").delete().eq("id", doc.id);
-                  setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
-                  toast.success("Document verwijderd");
-                }
-              } : undefined}
-            />
-          )}
-
-          {/* Vrijwaringsbewijs row */}
-          {!isConsignatie && (
             <DocRow
               label="Vrijwaringsbewijs"
               present={hasInkoopVrijwaring}
@@ -382,57 +407,30 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
                 }
               } : undefined}
             />
-          )}
-        </div>
-
-        {/* Overige inkoop documenten */}
-        <div className="mt-3">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Overige documenten</h4>
-            <button
-              onClick={() => { setUploadType(overigUploadType); setUploadOpen(true); }}
-              className="text-[10px] text-primary hover:underline"
-            >
-              + Toevoegen
-            </button>
           </div>
-          {inkoopExtraDocs.length === 0 ? (
-            <p className="text-xs text-muted-foreground bg-card border border-border rounded-lg px-4 py-4 text-center">Geen overige documenten</p>
-          ) : (
-            <div className="bg-card border border-border rounded-lg divide-y divide-border">
-              {inkoopExtraDocs.map(doc => (
-                <div key={doc.id} className="flex items-center gap-3 px-4 py-2.5">
-                  <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                  <p className="text-sm text-foreground flex-1 truncate">{doc.naam}</p>
-                  <button onClick={() => handleOpenDocument(doc.file_path)} className="p-1 text-muted-foreground hover:text-foreground">
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <button className="p-1 text-muted-foreground hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Document verwijderen?</AlertDialogTitle>
-                        <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                        <AlertDialogAction onClick={async () => {
-                          await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
-                          await supabase.from("vehicle_documents").delete().eq("id", doc.id);
-                          setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
-                          toast.success("Document verwijderd");
-                        }}>Verwijderen</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              ))}
+          {/* Overige inkoop documenten */}
+          <div className="mt-3">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Overige documenten</h4>
+              <button onClick={() => { setUploadType("Overig-inkoop"); setUploadOpen(true); }} className="text-[10px] text-primary hover:underline">+ Toevoegen</button>
             </div>
-          )}
+            {inkoopExtraDocs.length === 0 ? (
+              <p className="text-xs text-muted-foreground bg-card border border-border rounded-lg px-4 py-4 text-center">Geen overige documenten</p>
+            ) : (
+              <div className="bg-card border border-border rounded-lg divide-y divide-border">
+                {inkoopExtraDocs.map(doc => (
+                  <ExtraDocRow key={doc.id} doc={doc} onOpen={handleOpenDocument} onDelete={async () => {
+                    await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
+                    await supabase.from("vehicle_documents").delete().eq("id", doc.id);
+                    setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
+                    toast.success("Document verwijderd");
+                  }} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
 
       <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
