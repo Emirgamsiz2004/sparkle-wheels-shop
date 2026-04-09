@@ -402,7 +402,13 @@ export default function GlobalSearch() {
     </>
   );
 
-  const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => setIsDesktop(mql.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
   return (
     <>
