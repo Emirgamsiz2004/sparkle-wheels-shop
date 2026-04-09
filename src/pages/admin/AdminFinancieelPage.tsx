@@ -541,6 +541,125 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
   );
 }
 
+/* ──────────── MONEYBIRD BTW SUMMARY ──────────── */
+
+function MoneybirdBtwSummary({ year, btwOntvangen, btwBetaald }: { year: number; btwOntvangen: number; btwBetaald: number }) {
+  const { getSalesInvoices, getReceipts, loading } = useMoneybird();
+  const [mbData, setMbData] = useState<{ salesBtw: number; receiptsBtw: number; loaded: boolean }>({ salesBtw: 0, receiptsBtw: 0, loaded: false });
+  const [fetching, setFetching] = useState(false);
+
+  const fetchMbData = async () => {
+    setFetching(true);
+    try {
+      // Fetch sales invoices for this year
+      const invoices = await getSalesInvoices(1, `period:${year}`);
+      const salesBtw = (Array.isArray(invoices) ? invoices : []).reduce((sum: number, inv: any) => {
+        const totalTax = parseFloat(inv.total_tax || '0');
+        return sum + totalTax;
+      }, 0);
+
+      // Fetch receipts/purchase invoices for this year
+      const receipts = await getReceipts(1, `period:${year}`);
+      const receiptsBtw = (Array.isArray(receipts) ? receipts : []).reduce((sum: number, r: any) => {
+        const totalTax = parseFloat(r.total_tax || '0');
+        return sum + totalTax;
+      }, 0);
+
+      setMbData({ salesBtw, receiptsBtw, loaded: true });
+    } catch {
+      // Silently fail — Moneybird might not be configured
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const teBetalen = btwOntvangen - btwBetaald;
+  const mbTeBetalen = mbData.salesBtw - mbData.receiptsBtw;
+
+  return (
+    <div className="bg-card rounded-xl border border-border p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <Receipt className="w-4 h-4" />
+          BTW Totaaloverzicht {year}
+        </h3>
+        {!mbData.loaded && (
+          <button
+            onClick={fetchMbData}
+            disabled={fetching || loading}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
+          >
+            {fetching ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+            Ophalen uit Moneybird
+          </button>
+        )}
+        {mbData.loaded && (
+          <button
+            onClick={fetchMbData}
+            disabled={fetching || loading}
+            className="inline-flex items-center gap-1 px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <RefreshCw className={`w-3 h-3 ${fetching ? 'animate-spin' : ''}`} /> Vernieuwen
+          </button>
+        )}
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="text-left px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Bron</th>
+              <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">BTW Ontvangen</th>
+              <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">BTW Betaald</th>
+              <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Saldo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-border/50">
+              <td className="px-3 py-2 text-foreground font-medium">Voertuigverkopen (berekend)</td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatEuroDecimal(btwOntvangen)}</td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatEuroDecimal(btwBetaald)}</td>
+              <td className={`px-3 py-2 text-right font-medium tabular-nums ${teBetalen >= 0 ? "text-destructive" : "text-emerald-400"}`}>
+                {teBetalen >= 0 ? "" : "−"}{formatEuroDecimal(Math.abs(teBetalen))}
+              </td>
+            </tr>
+            {mbData.loaded && (
+              <tr className="border-b border-border/50">
+                <td className="px-3 py-2 text-foreground font-medium flex items-center gap-1.5">
+                  <Link2 className="w-3.5 h-3.5 text-muted-foreground" /> Moneybird
+                </td>
+                <td className="px-3 py-2 text-right tabular-nums">{formatEuroDecimal(mbData.salesBtw)}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{formatEuroDecimal(mbData.receiptsBtw)}</td>
+                <td className={`px-3 py-2 text-right font-medium tabular-nums ${mbTeBetalen >= 0 ? "text-destructive" : "text-emerald-400"}`}>
+                  {mbTeBetalen >= 0 ? "" : "−"}{formatEuroDecimal(Math.abs(mbTeBetalen))}
+                </td>
+              </tr>
+            )}
+          </tbody>
+          {mbData.loaded && (
+            <tfoot>
+              <tr className="border-t-2 border-border bg-accent/20">
+                <td className="px-3 py-2.5 text-foreground font-bold">Totaal</td>
+                <td className="px-3 py-2.5 text-right font-bold tabular-nums">{formatEuroDecimal(btwOntvangen + mbData.salesBtw)}</td>
+                <td className="px-3 py-2.5 text-right font-bold tabular-nums">{formatEuroDecimal(btwBetaald + mbData.receiptsBtw)}</td>
+                <td className={`px-3 py-2.5 text-right font-bold text-lg tabular-nums ${(teBetalen + mbTeBetalen) >= 0 ? "text-destructive" : "text-emerald-400"}`}>
+                  {(teBetalen + mbTeBetalen) >= 0 ? "" : "−"}{formatEuroDecimal(Math.abs(teBetalen + mbTeBetalen))}
+                </td>
+              </tr>
+            </tfoot>
+          )}
+        </table>
+      </div>
+
+      {!mbData.loaded && (
+        <p className="text-xs text-muted-foreground text-center py-2 mt-2">
+          Klik op "Ophalen uit Moneybird" om de BTW uit je boekhouding te laden en te combineren.
+        </p>
+      )}
+    </div>
+  );
+}
+
 /* ──────────── EDITABLE PRICE CELL ──────────── */
 
 function EditablePrice({ value, original, onChange }: { value: number; original: number; onChange: (v: number) => void }) {
