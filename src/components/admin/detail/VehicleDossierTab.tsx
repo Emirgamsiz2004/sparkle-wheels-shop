@@ -180,12 +180,14 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     window.open(data.signedUrl, "_blank");
   };
 
-  // Inkoop completeness
-  const hasInkoopverklaring = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring") || hasDocument("Inkoopfactuur");
+  // Inkoop completeness — either Inkoopverklaring (particulier) OR Inkoopfactuur (bedrijf) is sufficient
+  const hasInkoopverklaringDoc = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring");
+  const hasInkoopfactuurDoc = hasDocument("Inkoopfactuur");
+  const hasInkoopDocument = hasInkoopverklaringDoc || hasInkoopfactuurDoc;
   const hasInkoopVrijwaring = hasDocument("Vrijwaringsbewijs-inkoop");
-  const inkoopComplete = hasInkoopverklaring && hasInkoopVrijwaring;
+  const inkoopComplete = hasInkoopDocument && hasInkoopVrijwaring;
   const inkoopMissing: string[] = [];
-  if (!hasInkoopverklaring) inkoopMissing.push("Inkoopverklaring");
+  if (!hasInkoopDocument) inkoopMissing.push("Inkoopverklaring of Inkoopfactuur");
   if (!hasInkoopVrijwaring) inkoopMissing.push("Vrijwaringsbewijs");
 
   // Consignatie completeness
