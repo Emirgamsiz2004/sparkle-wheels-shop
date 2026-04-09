@@ -177,7 +177,6 @@ const AdminVerkoopDetailPage = () => {
   const totalKosten = calcTotalKosten(vehicle);
   const hasDoc = (type: string) => docs.some(d => d.type === type);
   const getDoc = (type: string) => docs.find(d => d.type === type);
-  const extraDocs = docs.filter(d => !VERKOOP_DOCUMENTEN.some(vd => vd.type === d.type));
 
   const betaalwijze = sale?.betaalwijze || vehicle.betaalmethode || "—";
   const garantieType = sale?.garantie_type || "geen";
