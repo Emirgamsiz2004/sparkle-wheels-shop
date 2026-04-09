@@ -274,8 +274,60 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
 
       {/* Kosten lijst */}
       <div className="bg-card border border-border rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-border">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Kosten ({vehicle.kosten.length})</h3>
+          <Dialog open={costOpen} onOpenChange={setCostOpen}>
+            <DialogTrigger asChild>
+              <button className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors">
+                <Plus className="w-3 h-3" /> Toevoegen
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[calc(100vw-2rem)]">
+              <DialogHeader><DialogTitle>Kosten Toevoegen</DialogTitle></DialogHeader>
+              <div className="space-y-3 mt-2">
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Categorie</label>
+                  <select value={costForm.category} onChange={(e) => setCostForm(f => ({ ...f, category: e.target.value as CostItem["category"] }))} className={inputCls}>
+                    {Object.entries(costCategories).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Omschrijving</label>
+                  <input value={costForm.description} onChange={(e) => setCostForm(f => ({ ...f, description: e.target.value }))} className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Leverancier (optioneel)</label>
+                  <input value={costForm.leverancier} onChange={(e) => setCostForm(f => ({ ...f, leverancier: e.target.value }))} className={inputCls} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Bedrag excl. BTW (€)</label>
+                    <input type="number" step="0.01" value={costForm.amount} onChange={(e) => setCostForm(f => ({ ...f, amount: Number(e.target.value) }))} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">BTW %</label>
+                    <select value={costForm.btwPercentage} onChange={(e) => setCostForm(f => ({ ...f, btwPercentage: Number(e.target.value) }))} className={inputCls}>
+                      <option value={0}>0%</option>
+                      <option value={9}>9%</option>
+                      <option value={21}>21%</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Datum</label>
+                  <input type="date" value={costForm.date} onChange={(e) => setCostForm(f => ({ ...f, date: e.target.value }))} className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Factuur (optioneel)</label>
+                  <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setCostFile(e.target.files?.[0] || null)} className="w-full text-sm text-foreground" />
+                  {costFile && <p className="text-xs text-muted-foreground mt-1">📎 {costFile.name}</p>}
+                </div>
+                <button onClick={handleAddCost} disabled={costSaving || !costForm.description} className="w-full py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:bg-foreground/90 disabled:opacity-40 flex items-center justify-center gap-2 transition-all">
+                  {costSaving && <Loader2 className="w-4 h-4 animate-spin" />} Toevoegen
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         {vehicle.kosten.length === 0 ? (
           <div className="px-4 py-8 text-center text-sm text-muted-foreground">Nog geen kosten toegevoegd.</div>
