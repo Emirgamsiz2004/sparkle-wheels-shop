@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Vehicle, CostItem, formatEuroDecimal, calcKostprijs, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge, calcConsignatieCommissie, isConsignatie, costCategories } from "@/types/vehicle";
-import { Loader2, Info, Trash2, Paperclip } from "lucide-react";
+import { Loader2, Info, Trash2, Paperclip, Plus, Upload } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
