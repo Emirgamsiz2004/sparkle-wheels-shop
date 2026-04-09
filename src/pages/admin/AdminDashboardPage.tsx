@@ -67,6 +67,7 @@ const AdminDashboardPage = () => {
   const [customFrom, setCustomFrom] = useState<Date>();
   const [customTo, setCustomTo] = useState<Date>();
   const [monthYearOpen, setMonthYearOpen] = useState(false);
+  const [customRangeOpen, setCustomRangeOpen] = useState(false);
   const [myYear, setMyYear] = useState(new Date().getFullYear());
 
   const monthNames = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
