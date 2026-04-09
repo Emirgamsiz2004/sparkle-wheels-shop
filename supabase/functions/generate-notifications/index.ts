@@ -345,28 +345,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 9. Proefrit gestart maar formulier niet ingevuld na 2 uur
-    {
-      const twoHoursAgo = new Date(now.getTime() - 2 * 3600000).toISOString()
-      const { data: pending } = await supabase
-        .from('test_drives')
-        .select('id, voertuig_merk, voertuig_model, voertuig_kenteken, vehicle_id')
-        .eq('status', 'actief')
-        .is('formulier_ingevuld_op', null)
-        .lte('start_tijd', twoHoursAgo)
+    // 9. (verwijderd — geen melding bij formulier niet ingevuld)
 
-      for (const td of pending || []) {
-        const key = `proefrit_form_pending_2h:${td.id}`
-        if (await alreadySent(key)) continue
-
-        const msg = `Proefrit van ${td.voertuig_merk} ${td.voertuig_model} (${td.voertuig_kenteken || '?'}) gestart maar formulier nog niet ingevuld na 2 uur`
-        q(msg, '📋', `/admin/proefriten`)
-        await markSent(key, 'proefrit_form_pending_2h', msg, td.vehicle_id, td.id)
-        await insertInApp(adminIds, 'proefrit_form_pending_2h', msg, `/admin/proefriten`, td.vehicle_id)
-      }
-    }
-
-    // 10. Proefrit actief > 30 minuten
+    // 10. Proefrit actief > 30 minuten (alleen 30 min melding, geen 60 min)
     {
       const thirtyMinAgo = new Date(now.getTime() - 30 * 60000).toISOString()
       const { data: longRides } = await supabase
@@ -376,26 +357,12 @@ Deno.serve(async (req) => {
         .lte('start_tijd', thirtyMinAgo)
 
       for (const td of longRides || []) {
-        const startTime = new Date(td.start_tijd).getTime()
-        const minutes = Math.round((now.getTime() - startTime) / 60000)
-
-        if (minutes >= 60) {
-          // 60 min — second and final warning
-          const key = `proefrit_60min:${td.id}`
-          if (await alreadySent(key)) continue
-          const msg = `Proefrit van ${td.voertuig_merk} ${td.voertuig_model} (${td.voertuig_kenteken || '?'}) loopt al meer dan 60 minuten. Controleer dit.`
-          q(msg, '🚨', `/admin/proefriten`)
-          await markSent(key, 'proefrit_60min', msg, td.vehicle_id, td.id)
-          await insertInApp(adminIds, 'proefrit_60min', msg, `/admin/proefriten`, td.vehicle_id)
-        } else {
-          // 30 min — first warning
-          const key = `proefrit_30min:${td.id}`
-          if (await alreadySent(key)) continue
-          const msg = `Proefrit van ${td.voertuig_merk} ${td.voertuig_model} (${td.voertuig_kenteken || '?'}) loopt al meer dan 30 minuten. Vergeten af te sluiten?`
-          q(msg, '⏱️', `/admin/proefriten`)
-          await markSent(key, 'proefrit_30min', msg, td.vehicle_id, td.id)
-          await insertInApp(adminIds, 'proefrit_30min', msg, `/admin/proefriten`, td.vehicle_id)
-        }
+        const key = `proefrit_30min:${td.id}`
+        if (await alreadySent(key)) continue
+        const msg = `Proefrit van ${td.voertuig_merk} ${td.voertuig_model} (${td.voertuig_kenteken || '?'}) loopt al meer dan 30 minuten. Vergeten af te sluiten?`
+        q(msg, '⏱️', `/admin/proefriten`)
+        await markSent(key, 'proefrit_30min', msg, td.vehicle_id, td.id)
+        await insertInApp(adminIds, 'proefrit_30min', msg, `/admin/proefriten`, td.vehicle_id)
       }
     }
 
