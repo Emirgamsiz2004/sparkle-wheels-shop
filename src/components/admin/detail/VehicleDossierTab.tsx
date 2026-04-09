@@ -103,12 +103,46 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
       setArchiveDocs((archRes.data as ArchiveDoc[]) || []);
       setTestDrives((tdRes.data as TestDrive[]) || []);
       setAanbetalingen((abRes.data as Aanbetaling[]) || []);
-      setVerkoopDocs((docRes.data as any[]) || []);
+      const docs = (docRes.data as any[]) || [];
+      // Extract overrides from docs
+      const ov: Record<string, boolean> = {};
+      const regularDocs = docs.filter(d => {
+        if (d.type?.startsWith("dossier-override-")) {
+          ov[d.type.replace("dossier-override-", "")] = true;
+          return false;
+        }
+        return true;
+      });
+      setOverrides(ov);
+      setVerkoopDocs(regularDocs);
       setInkoopverklaringen((ikvRes.data as any[]) || []);
       setLoading(false);
     };
     fetchAll();
   }, [vehicleId]);
+
+  const toggleOverride = async (section: string) => {
+    const type = `dossier-override-${section}`;
+    if (overrides[section]) {
+      // Remove override
+      const { data } = await supabase.from("vehicle_documents").select("id").eq("vehicle_id", vehicleId).eq("type", type);
+      if (data && data.length > 0) {
+        await supabase.from("vehicle_documents").delete().eq("id", data[0].id);
+      }
+      setOverrides(prev => { const n = { ...prev }; delete n[section]; return n; });
+      toast.success("Override verwijderd");
+    } else {
+      // Add override
+      await supabase.from("vehicle_documents").insert({
+        vehicle_id: vehicleId,
+        naam: `Dossier ${section} handmatig compleet gemarkeerd`,
+        type,
+        file_path: `overrides/${vehicleId}-${section}`,
+      } as any);
+      setOverrides(prev => ({ ...prev, [section]: true }));
+      toast.success("Dossier als compleet gemarkeerd");
+    }
+  };
 
   const handleDownload = async (filePath: string | null, bucket: string | null) => {
     if (!filePath || !bucket) return;
