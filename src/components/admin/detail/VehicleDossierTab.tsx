@@ -166,6 +166,9 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
 
   const isVerkocht = vehicleStatus === "verkocht";
   const isConsignatie = verkoopType === "consignatie" || vehicleStatus === "consignatie";
+  // When sold, show both consignatie AND inkoop sections if it was a consignatie vehicle
+  const showConsignatieSection = isConsignatie;
+  const showInkoopSection = !isConsignatie;
 
   const hasDocument = (type: string) => verkoopDocs.some(d => d.type === type);
   const getDoc = (type: string) => verkoopDocs.find(d => d.type === type);
@@ -177,19 +180,21 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     window.open(data.signedUrl, "_blank");
   };
 
-  // Inkoop completeness: inkoopverklaring (from wizard or uploaded) + vrijwaringsbewijs
+  // Inkoop completeness
   const hasInkoopverklaring = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring") || hasDocument("Inkoopfactuur");
   const hasInkoopVrijwaring = hasDocument("Vrijwaringsbewijs-inkoop");
-  const inkoopComplete = isConsignatie ? hasDocument("Consignatieovereenkomst") : (hasInkoopverklaring && hasInkoopVrijwaring);
+  const inkoopComplete = hasInkoopverklaring && hasInkoopVrijwaring;
   const inkoopMissing: string[] = [];
-  if (!isConsignatie) {
-    if (!hasInkoopverklaring) inkoopMissing.push("Inkoopverklaring");
-    if (!hasInkoopVrijwaring) inkoopMissing.push("Vrijwaringsbewijs");
-  } else {
-    if (!hasDocument("Consignatieovereenkomst")) inkoopMissing.push("Consignatieovereenkomst");
-  }
-  const inkoopExtraDocs = verkoopDocs.filter(d => d.type === (isConsignatie ? "Overig-consignatie" : "Overig-inkoop"));
-  const overigUploadType = isConsignatie ? "Overig-consignatie" : "Overig-inkoop";
+  if (!hasInkoopverklaring) inkoopMissing.push("Inkoopverklaring");
+  if (!hasInkoopVrijwaring) inkoopMissing.push("Vrijwaringsbewijs");
+
+  // Consignatie completeness
+  const consignatieComplete = hasDocument("Consignatieovereenkomst");
+  const consignatieMissing: string[] = [];
+  if (!consignatieComplete) consignatieMissing.push("Consignatieovereenkomst");
+
+  const inkoopExtraDocs = verkoopDocs.filter(d => d.type === "Overig-inkoop");
+  const consignatieExtraDocs = verkoopDocs.filter(d => d.type === "Overig-consignatie");
 
   // Check which data fields are filled
   const vehicleData: Record<string, any> = { koperNaam, koperEmail, koperTelefoon, verkoopDatum, verkoopprijs };
