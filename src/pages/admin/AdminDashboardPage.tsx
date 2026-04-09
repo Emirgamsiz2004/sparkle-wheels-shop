@@ -5,7 +5,7 @@ import { useDashboardData, getPeriodRange, calcTrend, PeriodKey } from "@/hooks/
 import { formatEuro, isConsignatie } from "@/types/vehicle";
 import {
   Loader2, TrendingUp, TrendingDown, Minus, Download,
-  Calendar as CalendarIcon, ChevronRight, ChevronDown,
+  Calendar as CalendarIcon, ChevronDown, ChevronRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, parseISO, startOfMonth as startOfM, endOfMonth, startOfYear as startOfY, endOfYear } from "date-fns";
@@ -19,8 +19,9 @@ import {
 } from "recharts";
 
 /* ─── Constants ─── */
+const periodOrder: PeriodKey[] = ["vandaag", "gisteren", "7dagen", "30dagen", "maand", "kwartaal", "jaar"];
 const periodLabels: Record<PeriodKey, string> = {
-  gisteren: "Gisteren", vandaag: "Vandaag", "7dagen": "7 dagen", "30dagen": "30 dagen",
+  vandaag: "Vandaag", gisteren: "Gisteren", "7dagen": "7 dagen", "30dagen": "30 dagen",
   maand: "Deze maand", kwartaal: "Dit kwartaal", jaar: "Dit jaar", custom: "Aangepast",
 };
 
