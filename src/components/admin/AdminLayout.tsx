@@ -130,6 +130,7 @@ const AdminLayout = () => {
                 )}
               </Link>
             ))}
+          </div>
         </nav>
 
         <div className="p-2 border-t border-[hsl(var(--sidebar-border))]">
