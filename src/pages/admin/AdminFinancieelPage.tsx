@@ -325,12 +325,15 @@ function OverzichtTab({ vehicles }: { vehicles: any[] }) {
 /* ──────────── BTW AANGIFTE TAB ──────────── */
 
 function BtwTab({ vehicles }: { vehicles: any[] }) {
-  const currentYear = new Date().getFullYear();
-  const currentQuarter = Math.floor(new Date().getMonth() / 3) + 1;
-  const [year, setYear] = useState(currentYear);
-  const [selectedQ, setSelectedQ] = useState<number>(currentQuarter);
-  // Local-only overrides: { [vehicleId]: { inkoopprijs?: number, verkoopprijs?: number } }
+  const now = new Date();
+  const [periodType, setPeriodType] = useState<PeriodType>('maand');
+  const [year, setYear] = useState(now.getFullYear());
+  const [quarter, setQuarter] = useState(Math.floor(now.getMonth() / 3) + 1);
+  const [month, setMonth] = useState(now.getMonth());
+  const [customFrom, setCustomFrom] = useState<Date | undefined>();
+  const [customTo, setCustomTo] = useState<Date | undefined>();
   const [overrides, setOverrides] = useState<Record<string, { inkoopprijs?: number; verkoopprijs?: number }>>({});
+  const availableYears = getAvailableYears(vehicles);
 
   const setOverride = (id: string, field: 'inkoopprijs' | 'verkoopprijs', value: number) => {
     setOverrides(prev => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
@@ -345,77 +348,61 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
     const winst = verkoopprijs - kostprijs;
     let btwMarge: number;
     if (v.btwMargeType === 'btw') {
-      // BTW-auto: 21% BTW over volledige verkoopprijs
       btwMarge = verkoopprijs * (21 / 121);
     } else {
-      // Margeregeling: BTW alleen over de winst
       btwMarge = winst > 0 ? winst * (21 / 121) : 0;
     }
     return { inkoopprijs, verkoopprijs, kostprijs, winst, btwMarge };
   };
 
-  const verkocht = vehicles.filter((v) => {
-    if (v.status !== "verkocht" || !v.verkoopDatum) return false;
-    return new Date(v.verkoopDatum).getFullYear() === year;
-  });
+  const filtered = filterByPeriod(vehicles, periodType, year, quarter, month, customFrom, customTo);
 
-  const getQuarterData = (months: number[]) => {
-    const qVehicles = verkocht.filter((v) => months.includes(new Date(v.verkoopDatum!).getMonth()));
-    const btwOntvangen = qVehicles.reduce((s, v) => s + getEffective(v).btwMarge, 0);
-    const btwBetaald = qVehicles.reduce((s, v) => {
-      return s + v.kosten.reduce((cs: number, k: any) => {
-        if (k.date) {
-          const m = new Date(k.date).getMonth();
-          if (months.includes(m) && new Date(k.date).getFullYear() === year) return cs + k.amount * ((k.btwPercentage || 21) / 100);
+  const btwOntvangen = filtered.reduce((s, v) => s + getEffective(v).btwMarge, 0);
+  const btwBetaald = filtered.reduce((s, v) => {
+    return s + v.kosten.reduce((cs: number, k: any) => {
+      if (k.date) {
+        const kd = new Date(k.date);
+        // Check if cost falls within the selected period
+        let inPeriod = false;
+        if (periodType === 'custom' && customFrom && customTo) {
+          inPeriod = kd >= customFrom && kd <= customTo;
+        } else if (periodType === 'jaar') {
+          inPeriod = kd.getFullYear() === year;
+        } else if (periodType === 'kwartaal') {
+          inPeriod = kd.getFullYear() === year && quarters[quarter - 1].months.includes(kd.getMonth());
+        } else if (periodType === 'maand') {
+          inPeriod = kd.getFullYear() === year && kd.getMonth() === month;
         }
-        return cs;
-      }, 0);
+        if (inPeriod) return cs + k.amount * ((k.btwPercentage || 21) / 100);
+      }
+      return cs;
     }, 0);
-    return { btwOntvangen, btwBetaald, teBetalen: btwOntvangen - btwBetaald, count: qVehicles.length, vehicles: qVehicles };
-  };
+  }, 0);
+  const teBetalen = btwOntvangen - btwBetaald;
 
-  const yearTotal = quarters.reduce((acc, q) => {
-    const d = getQuarterData(q.months);
-    return { ontvangen: acc.ontvangen + d.btwOntvangen, betaald: acc.betaald + d.btwBetaald, teBetalen: acc.teBetalen + d.teBetalen };
-  }, { ontvangen: 0, betaald: 0, teBetalen: 0 });
-
-  const selectedQuarter = quarters.find(q => q.q === selectedQ)!;
-  const selectedData = getQuarterData(selectedQuarter.months);
-
-  const availableYears = Array.from(new Set(
-    vehicles.filter(v => v.status === "verkocht" && v.verkoopDatum)
-      .map(v => new Date(v.verkoopDatum).getFullYear())
-  )).sort((a, b) => b - a);
-  if (!availableYears.includes(currentYear)) availableYears.unshift(currentYear);
+  // Year totals for context
+  const yearVerkocht = vehicles.filter(v => v.status === 'verkocht' && v.verkoopDatum && new Date(v.verkoopDatum).getFullYear() === year);
+  const yearBtwOntvangen = yearVerkocht.reduce((s, v) => s + getEffective(v).btwMarge, 0);
+  const yearBtwBetaald = yearVerkocht.reduce((s, v) => {
+    return s + v.kosten.reduce((cs: number, k: any) => {
+      if (k.date && new Date(k.date).getFullYear() === year) return cs + k.amount * ((k.btwPercentage || 21) / 100);
+      return cs;
+    }, 0);
+  }, 0);
 
   const hasOverrides = Object.keys(overrides).length > 0;
+  const periodLabel = getPeriodLabel(periodType, year, quarter, month, customFrom, customTo);
 
   return (
     <div className="space-y-4">
-      {/* Year & Quarter selectors */}
       <div className="flex flex-wrap items-center gap-3">
-        <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
-          {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
-        </select>
-        <div className="flex gap-1 bg-card border border-border rounded-lg p-0.5">
-          {quarters.map(q => {
-            const qData = getQuarterData(q.months);
-            return (
-              <button
-                key={q.q}
-                onClick={() => setSelectedQ(q.q)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                  selectedQ === q.q
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                }`}
-              >
-                Q{q.q}
-                {qData.count > 0 && <span className="ml-1 opacity-70">({qData.count})</span>}
-              </button>
-            );
-          })}
-        </div>
+        <PeriodSelector
+          periodType={periodType} setPeriodType={setPeriodType}
+          year={year} setYear={setYear} quarter={quarter} setQuarter={setQuarter}
+          month={month} setMonth={setMonth} customFrom={customFrom} setCustomFrom={setCustomFrom}
+          customTo={customTo} setCustomTo={setCustomTo} availableYears={availableYears}
+          showMonth
+        />
         {hasOverrides && (
           <button
             onClick={() => setOverrides({})}
@@ -435,38 +422,35 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
         </div>
       )}
 
-      {/* Selected quarter detail */}
+      {/* Period detail */}
       <div className="bg-card rounded-xl border border-border p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-foreground">{selectedQuarter.label} — {year}</h3>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-widest bg-accent/50 px-2 py-0.5 rounded">Deadline: {selectedQuarter.deadline}</span>
+          <h3 className="text-sm font-semibold text-foreground">BTW Overzicht — {periodLabel}</h3>
         </div>
 
-        {/* Summary cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           <div className="bg-secondary/30 rounded-lg p-3">
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Verkocht</p>
-            <p className="text-xl font-bold text-foreground">{selectedData.count}</p>
+            <p className="text-xl font-bold text-foreground">{filtered.length}</p>
           </div>
           <div className="bg-secondary/30 rounded-lg p-3">
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Ontvangen</p>
-            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(selectedData.btwOntvangen)}</p>
+            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(btwOntvangen)}</p>
           </div>
           <div className="bg-secondary/30 rounded-lg p-3">
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Betaald</p>
-            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(selectedData.btwBetaald)}</p>
+            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(btwBetaald)}</p>
           </div>
           <div className="bg-secondary/30 rounded-lg p-3">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{selectedData.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
-            <p className={`text-xl font-bold ${selectedData.teBetalen >= 0 ? "text-destructive" : "text-emerald-400"}`}>
-              {formatEuroDecimal(Math.abs(selectedData.teBetalen))}
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
+            <p className={`text-xl font-bold ${teBetalen >= 0 ? "text-destructive" : "text-emerald-400"}`}>
+              {formatEuroDecimal(Math.abs(teBetalen))}
             </p>
           </div>
         </div>
 
-        {/* Vehicle list for this quarter */}
-        {selectedData.vehicles.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">Geen voertuigen verkocht in dit kwartaal.</p>
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">Geen voertuigen verkocht in deze periode.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -474,6 +458,7 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
                 <tr className="border-b border-border">
                   <th className="text-left px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Voertuig</th>
                   <th className="text-left px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Datum</th>
+                  <th className="text-left px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Type</th>
                   <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Inkoopprijs</th>
                   <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Verkoopprijs</th>
                   <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Marge</th>
@@ -481,7 +466,7 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
                 </tr>
               </thead>
               <tbody>
-                {selectedData.vehicles.map((v: any) => {
+                {filtered.map((v: any) => {
                   const eff = getEffective(v);
                   const isOverridden = !!overrides[v.id];
                   return (
@@ -490,19 +475,16 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
                         {v.merk} {v.model} <span className="text-muted-foreground font-normal">({v.kenteken})</span>
                       </td>
                       <td className="px-3 py-2 text-muted-foreground">{new Date(v.verkoopDatum).toLocaleDateString("nl-NL")}</td>
-                      <td className="px-3 py-2 text-right">
-                        <EditablePrice
-                          value={eff.inkoopprijs}
-                          original={v.inkoopprijs}
-                          onChange={(val) => setOverride(v.id, 'inkoopprijs', val)}
-                        />
+                      <td className="px-3 py-2">
+                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${v.btwMargeType === 'btw' ? 'bg-blue-500/15 text-blue-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
+                          {v.btwMargeType === 'btw' ? 'BTW' : 'Marge'}
+                        </span>
                       </td>
                       <td className="px-3 py-2 text-right">
-                        <EditablePrice
-                          value={eff.verkoopprijs}
-                          original={v.verkoopprijs}
-                          onChange={(val) => setOverride(v.id, 'verkoopprijs', val)}
-                        />
+                        <EditablePrice value={eff.inkoopprijs} original={v.inkoopprijs} onChange={(val) => setOverride(v.id, 'inkoopprijs', val)} />
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <EditablePrice value={eff.verkoopprijs} original={v.verkoopprijs} onChange={(val) => setOverride(v.id, 'verkoopprijs', val)} />
                       </td>
                       <td className={`px-3 py-2 text-right font-medium ${eff.winst >= 0 ? "text-emerald-400" : "text-destructive"}`}>{formatEuroDecimal(eff.winst)}</td>
                       <td className="px-3 py-2 text-right text-foreground">{formatEuroDecimal(eff.btwMarge)}</td>
@@ -512,11 +494,11 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
               </tbody>
               <tfoot>
                 <tr className="border-t border-border">
-                  <td colSpan={4} className="px-3 py-2 text-sm font-medium text-foreground">Totaal Q{selectedQ}</td>
+                  <td colSpan={5} className="px-3 py-2 text-sm font-medium text-foreground">Totaal</td>
                   <td className="px-3 py-2 text-right font-bold text-foreground">
-                    {formatEuroDecimal(selectedData.vehicles.reduce((s: number, v: any) => s + getEffective(v).winst, 0))}
+                    {formatEuroDecimal(filtered.reduce((s: number, v: any) => s + getEffective(v).winst, 0))}
                   </td>
-                  <td className="px-3 py-2 text-right font-bold text-foreground">{formatEuroDecimal(selectedData.btwOntvangen)}</td>
+                  <td className="px-3 py-2 text-right font-bold text-foreground">{formatEuroDecimal(btwOntvangen)}</td>
                 </tr>
               </tfoot>
             </table>
@@ -530,16 +512,16 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Ontvangen</p>
-            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(yearTotal.ontvangen)}</p>
+            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(yearBtwOntvangen)}</p>
           </div>
           <div>
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Betaald</p>
-            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(yearTotal.betaald)}</p>
+            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(yearBtwBetaald)}</p>
           </div>
           <div>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{yearTotal.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
-            <p className={`text-xl font-bold ${yearTotal.teBetalen >= 0 ? "text-destructive" : "text-emerald-400"}`}>
-              {formatEuroDecimal(Math.abs(yearTotal.teBetalen))}
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{(yearBtwOntvangen - yearBtwBetaald) >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
+            <p className={`text-xl font-bold ${(yearBtwOntvangen - yearBtwBetaald) >= 0 ? "text-destructive" : "text-emerald-400"}`}>
+              {formatEuroDecimal(Math.abs(yearBtwOntvangen - yearBtwBetaald))}
             </p>
           </div>
         </div>
