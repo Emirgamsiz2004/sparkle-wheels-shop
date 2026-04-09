@@ -87,6 +87,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadType, setUploadType] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
