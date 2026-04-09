@@ -47,6 +47,7 @@ export interface Vehicle {
   googleDriveFolderUrl?: string | null;
   googleDriveSynced?: boolean;
   verkoopType: VerkoopType;
+  btwMargeType: 'marge' | 'btw';
   consignatieCommissiePerc?: number;
   consignatieEigenaarNaam?: string;
   consignatieEigenaarTelefoon?: string;
@@ -101,6 +102,11 @@ export const calcMarge = (vehicle: Vehicle): number => {
 };
 
 export const calcBtwMarge = (vehicle: Vehicle): number => {
+  if (vehicle.btwMargeType === 'btw') {
+    // BTW-auto: 21% BTW over de verkoopprijs (excl. BTW = prijs / 1.21)
+    return vehicle.verkoopprijs * (21 / 121);
+  }
+  // Margeregeling: BTW alleen over de winst
   const winst = calcWinst(vehicle);
   if (winst <= 0) return 0;
   return winst * (21 / 121);
