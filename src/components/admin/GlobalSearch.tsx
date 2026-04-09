@@ -402,6 +402,14 @@ export default function GlobalSearch() {
     </>
   );
 
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => setIsDesktop(mql.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
   return (
     <>
       {/* Mobile: fixed overlay dropdown */}
@@ -413,24 +421,24 @@ export default function GlobalSearch() {
           <Search className="w-4 h-4" />
         </button>
         <AnimatePresence>
-          {open && (
+          {open && !isDesktop && (
             <>
-              {/* Backdrop */}
+              {/* Backdrop — light transparent overlay */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="fixed inset-0 bg-background/60 backdrop-blur-sm z-[69]"
+                className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[69]"
                 onClick={() => setOpen(false)}
               />
               {/* Dropdown panel pinned below header */}
               <motion.div
-                initial={{ opacity: 0, y: -12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-                className="fixed left-3 right-3 top-[56px] bg-card border border-border rounded-lg shadow-2xl z-[70] overflow-hidden max-h-[calc(100vh-72px)]"
+                initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+                className="fixed left-2 right-2 top-[52px] bg-card border border-border rounded-[6px] shadow-2xl z-[70] overflow-hidden max-h-[calc(100vh-64px)]"
               >
                 {searchContent}
               </motion.div>
@@ -450,11 +458,13 @@ export default function GlobalSearch() {
           ⌘K
         </kbd>
       </button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="hidden lg:block sm:max-w-[640px] p-0 gap-0 rounded-[3px] overflow-hidden [&>button]:hidden">
-          {searchContent}
-        </DialogContent>
-      </Dialog>
+      {isDesktop && (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="sm:max-w-[640px] p-0 gap-0 rounded-[3px] overflow-hidden [&>button]:hidden">
+            {searchContent}
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }
