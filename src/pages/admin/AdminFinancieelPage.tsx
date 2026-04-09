@@ -212,7 +212,9 @@ function OverzichtTab({ vehicles }: { vehicles: any[] }) {
 
 function BtwTab({ vehicles }: { vehicles: any[] }) {
   const currentYear = new Date().getFullYear();
+  const currentQuarter = Math.floor(new Date().getMonth() / 3) + 1;
   const [year, setYear] = useState(currentYear);
+  const [selectedQ, setSelectedQ] = useState<number>(currentQuarter);
 
   const verkocht = vehicles.filter((v) => {
     if (v.status !== "verkocht" || !v.verkoopDatum) return false;
@@ -231,7 +233,7 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
         return cs;
       }, 0);
     }, 0);
-    return { btwOntvangen, btwBetaald, teBetalen: btwOntvangen - btwBetaald, count: qVehicles.length };
+    return { btwOntvangen, btwBetaald, teBetalen: btwOntvangen - btwBetaald, count: qVehicles.length, vehicles: qVehicles };
   };
 
   const yearTotal = quarters.reduce((acc, q) => {
@@ -239,36 +241,116 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
     return { ontvangen: acc.ontvangen + d.btwOntvangen, betaald: acc.betaald + d.btwBetaald, teBetalen: acc.teBetalen + d.teBetalen };
   }, { ontvangen: 0, betaald: 0, teBetalen: 0 });
 
+  const selectedQuarter = quarters.find(q => q.q === selectedQ)!;
+  const selectedData = getQuarterData(selectedQuarter.months);
+
+  const availableYears = Array.from(new Set(
+    vehicles.filter(v => v.status === "verkocht" && v.verkoopDatum)
+      .map(v => new Date(v.verkoopDatum).getFullYear())
+  )).sort((a, b) => b - a);
+  if (!availableYears.includes(currentYear)) availableYears.unshift(currentYear);
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">Kwartaaloverzicht margeregeling — {year}</p>
+      {/* Year & Quarter selectors */}
+      <div className="flex flex-wrap items-center gap-3">
         <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
-          <option value={currentYear}>{currentYear}</option>
-          <option value={currentYear - 1}>{currentYear - 1}</option>
+          {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
         </select>
+        <div className="flex gap-1 bg-card border border-border rounded-lg p-0.5">
+          {quarters.map(q => {
+            const qData = getQuarterData(q.months);
+            return (
+              <button
+                key={q.q}
+                onClick={() => setSelectedQ(q.q)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                  selectedQ === q.q
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+              >
+                Q{q.q}
+                {qData.count > 0 && <span className="ml-1 opacity-70">({qData.count})</span>}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {quarters.map((q) => {
-          const data = getQuarterData(q.months);
-          return (
-            <div key={q.q} className="bg-card rounded-xl border border-border p-5 hover:border-primary/20 transition-colors duration-200">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-foreground">{q.label}</h3>
-                <span className="text-[10px] text-muted-foreground uppercase tracking-widest bg-accent/50 px-2 py-0.5 rounded">{q.deadline}</span>
-              </div>
-              <div className="space-y-2.5">
-                <BtwRow label="BTW Ontvangen (marge)" value={formatEuroDecimal(data.btwOntvangen)} />
-                <BtwRow label="BTW Betaald (kosten)" value={formatEuroDecimal(data.btwBetaald)} />
-                <div className="border-t border-border pt-2.5">
-                  <BtwRow label={data.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"} value={formatEuroDecimal(Math.abs(data.teBetalen))} bold color={data.teBetalen < 0} />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">{data.count} voertuig{data.count !== 1 ? "en" : ""} verkocht</p>
-              </div>
-            </div>
-          );
-        })}
+      {/* Selected quarter detail */}
+      <div className="bg-card rounded-xl border border-border p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-foreground">{selectedQuarter.label} — {year}</h3>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-widest bg-accent/50 px-2 py-0.5 rounded">Deadline: {selectedQuarter.deadline}</span>
+        </div>
+
+        {/* Summary cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+          <div className="bg-secondary/30 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Verkocht</p>
+            <p className="text-xl font-bold text-foreground">{selectedData.count}</p>
+          </div>
+          <div className="bg-secondary/30 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Ontvangen</p>
+            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(selectedData.btwOntvangen)}</p>
+          </div>
+          <div className="bg-secondary/30 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">BTW Betaald</p>
+            <p className="text-xl font-bold text-foreground">{formatEuroDecimal(selectedData.btwBetaald)}</p>
+          </div>
+          <div className="bg-secondary/30 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{selectedData.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
+            <p className={`text-xl font-bold ${selectedData.teBetalen >= 0 ? "text-destructive" : "text-emerald-400"}`}>
+              {formatEuroDecimal(Math.abs(selectedData.teBetalen))}
+            </p>
+          </div>
+        </div>
+
+        {/* Vehicle list for this quarter */}
+        {selectedData.vehicles.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">Geen voertuigen verkocht in dit kwartaal.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Voertuig</th>
+                  <th className="text-left px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Datum</th>
+                  <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Verkoop</th>
+                  <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Kostprijs</th>
+                  <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Marge</th>
+                  <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">BTW Marge</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedData.vehicles.map((v: any) => {
+                  const winst = calcWinst(v);
+                  const btw = calcBtwMarge(v);
+                  return (
+                    <tr key={v.id} className="border-b border-border/50 hover:bg-accent/10">
+                      <td className="px-3 py-2 text-foreground font-medium">{v.merk} {v.model} <span className="text-muted-foreground font-normal">({v.kenteken})</span></td>
+                      <td className="px-3 py-2 text-muted-foreground">{new Date(v.verkoopDatum).toLocaleDateString("nl-NL")}</td>
+                      <td className="px-3 py-2 text-right text-foreground">{formatEuroDecimal(v.verkoopprijs)}</td>
+                      <td className="px-3 py-2 text-right text-muted-foreground">{formatEuroDecimal(calcKostprijs(v))}</td>
+                      <td className={`px-3 py-2 text-right font-medium ${winst >= 0 ? "text-emerald-400" : "text-destructive"}`}>{formatEuroDecimal(winst)}</td>
+                      <td className="px-3 py-2 text-right text-foreground">{formatEuroDecimal(btw)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t border-border">
+                  <td colSpan={4} className="px-3 py-2 text-sm font-medium text-foreground">Totaal Q{selectedQ}</td>
+                  <td className="px-3 py-2 text-right font-bold text-foreground">
+                    {formatEuroDecimal(selectedData.vehicles.reduce((s: number, v: any) => s + calcWinst(v), 0))}
+                  </td>
+                  <td className="px-3 py-2 text-right font-bold text-foreground">{formatEuroDecimal(selectedData.btwOntvangen)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Year totals */}
@@ -285,7 +367,7 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
           </div>
           <div>
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{yearTotal.teBetalen >= 0 ? "Te Betalen" : "Te Ontvangen"}</p>
-            <p className={`text-xl font-bold ${yearTotal.teBetalen >= 0 ? "text-red-400" : "text-emerald-400"}`}>
+            <p className={`text-xl font-bold ${yearTotal.teBetalen >= 0 ? "text-destructive" : "text-emerald-400"}`}>
               {formatEuroDecimal(Math.abs(yearTotal.teBetalen))}
             </p>
           </div>
