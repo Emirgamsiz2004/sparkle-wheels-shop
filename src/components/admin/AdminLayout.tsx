@@ -128,7 +128,7 @@ const AdminLayout = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors ${
+                    className={`flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 ${
                       isActive(item.path)
                         ? "bg-accent text-foreground font-medium"
                         : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
@@ -157,7 +157,7 @@ const AdminLayout = () => {
           <Link
             to="/admin/instellingen"
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors ${
+            className={`flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 ${
               isActive("/admin/instellingen")
                 ? "bg-accent text-foreground font-medium"
                 : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
@@ -170,7 +170,7 @@ const AdminLayout = () => {
             <p className="text-[11px] text-muted-foreground truncate mb-1 px-3">{user.email}</p>
             <button
               onClick={signOut}
-              className="flex items-center gap-2.5 px-3 py-[7px] text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors w-full"
+              className="flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] text-sm lg:text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors w-full min-h-[44px] lg:min-h-0"
             >
               <LogOut className="w-4 h-4 opacity-70" />
               Uitloggen
@@ -181,8 +181,8 @@ const AdminLayout = () => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen min-w-0">
-        <header className="sticky top-0 z-30 flex items-center justify-between h-12 px-4 bg-background border-b border-border gap-3">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground p-1 flex-shrink-0">
+        <header className="sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 bg-background border-b border-border gap-3">
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground p-2 -ml-1 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center">
             <Menu className="w-5 h-5" />
           </button>
           <img src={logo} alt="Platin" className="h-6 w-auto object-contain lg:hidden flex-shrink-0" loading="eager" decoding="sync" />
