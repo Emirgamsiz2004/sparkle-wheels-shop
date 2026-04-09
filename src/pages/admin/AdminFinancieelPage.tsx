@@ -76,19 +76,133 @@ const AdminFinancieelPage = () => {
   );
 };
 
+/* ──────────── PERIOD TYPES ──────────── */
+
+type PeriodType = 'jaar' | 'kwartaal' | 'maand' | 'custom';
+
+const maandNamen = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+
+function getAvailableYears(vehicles: any[]): number[] {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(new Set(
+    vehicles.filter(v => v.status === 'verkocht' && v.verkoopDatum)
+      .map(v => new Date(v.verkoopDatum).getFullYear())
+  )).sort((a, b) => b - a);
+  if (!years.includes(currentYear)) years.unshift(currentYear);
+  return years;
+}
+
+function filterByPeriod(vehicles: any[], periodType: PeriodType, year: number, quarter: number, month: number, customFrom?: Date, customTo?: Date) {
+  return vehicles.filter(v => {
+    if (v.status !== 'verkocht' || !v.verkoopDatum) return false;
+    const d = new Date(v.verkoopDatum);
+    if (periodType === 'custom' && customFrom && customTo) {
+      return d >= customFrom && d <= customTo;
+    }
+    if (d.getFullYear() !== year) return false;
+    if (periodType === 'kwartaal') {
+      const qMonths = quarters[quarter - 1].months;
+      return qMonths.includes(d.getMonth());
+    }
+    if (periodType === 'maand') return d.getMonth() === month;
+    return true; // jaar
+  });
+}
+
+/* ──────────── PERIOD SELECTOR COMPONENT ──────────── */
+
+function PeriodSelector({ periodType, setPeriodType, year, setYear, quarter, setQuarter, month, setMonth, customFrom, setCustomFrom, customTo, setCustomTo, availableYears, showMonth = false }: {
+  periodType: PeriodType; setPeriodType: (t: PeriodType) => void;
+  year: number; setYear: (y: number) => void;
+  quarter: number; setQuarter: (q: number) => void;
+  month: number; setMonth: (m: number) => void;
+  customFrom?: Date; setCustomFrom: (d: Date | undefined) => void;
+  customTo?: Date; setCustomTo: (d: Date | undefined) => void;
+  availableYears: number[];
+  showMonth?: boolean;
+}) {
+  const periods: { key: PeriodType; label: string }[] = [
+    { key: 'jaar', label: 'Jaar' },
+    { key: 'kwartaal', label: 'Kwartaal' },
+    { key: 'maand', label: 'Maand' },
+    { key: 'custom', label: 'Periode' },
+  ];
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="flex gap-0.5 bg-card border border-border rounded-lg p-0.5">
+        {periods.map(p => (
+          <button
+            key={p.key}
+            onClick={() => setPeriodType(p.key)}
+            className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-all ${
+              periodType === p.key
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+            }`}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+
+      {periodType !== 'custom' && (
+        <select value={year} onChange={e => setYear(Number(e.target.value))} className="px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+          {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+      )}
+
+      {periodType === 'kwartaal' && (
+        <div className="flex gap-0.5 bg-card border border-border rounded-lg p-0.5">
+          {[1,2,3,4].map(q => (
+            <button key={q} onClick={() => setQuarter(q)}
+              className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-all ${quarter === q ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}
+            >Q{q}</button>
+          ))}
+        </div>
+      )}
+
+      {periodType === 'maand' && (
+        <select value={month} onChange={e => setMonth(Number(e.target.value))} className="px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
+          {maandNamen.map((m, i) => <option key={i} value={i}>{m}</option>)}
+        </select>
+      )}
+
+      {periodType === 'custom' && (
+        <div className="flex items-center gap-1.5">
+          <input type="date" value={customFrom ? customFrom.toISOString().split('T')[0] : ''} onChange={e => setCustomFrom(e.target.value ? new Date(e.target.value) : undefined)}
+            className="px-2 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+          <span className="text-xs text-muted-foreground">t/m</span>
+          <input type="date" value={customTo ? customTo.toISOString().split('T')[0] : ''} onChange={e => setCustomTo(e.target.value ? new Date(e.target.value + 'T23:59:59') : undefined)}
+            className="px-2 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function getPeriodLabel(periodType: PeriodType, year: number, quarter: number, month: number, customFrom?: Date, customTo?: Date): string {
+  if (periodType === 'jaar') return String(year);
+  if (periodType === 'kwartaal') return `Q${quarter} ${year}`;
+  if (periodType === 'maand') return `${maandNamen[month]} ${year}`;
+  if (periodType === 'custom' && customFrom && customTo) return `${customFrom.toLocaleDateString('nl-NL')} t/m ${customTo.toLocaleDateString('nl-NL')}`;
+  return '';
+}
+
 /* ──────────── VERKOOP & WINST TAB ──────────── */
 
 function OverzichtTab({ vehicles }: { vehicles: any[] }) {
-  const currentYear = new Date().getFullYear();
-  const [yearFilter, setYearFilter] = useState<string>("alle");
+  const now = new Date();
+  const [periodType, setPeriodType] = useState<PeriodType>('jaar');
+  const [year, setYear] = useState(now.getFullYear());
+  const [quarter, setQuarter] = useState(Math.floor(now.getMonth() / 3) + 1);
+  const [month, setMonth] = useState(now.getMonth());
+  const [customFrom, setCustomFrom] = useState<Date | undefined>();
+  const [customTo, setCustomTo] = useState<Date | undefined>();
   const isMobile = useIsMobile();
+  const availableYears = getAvailableYears(vehicles);
 
-  const filtered = vehicles.filter((v) => {
-    if (v.status !== "verkocht") return false;
-    if (yearFilter === "alle") return true;
-    const year = v.verkoopDatum ? new Date(v.verkoopDatum).getFullYear() : new Date(v.inkoopDatum).getFullYear();
-    return year === Number(yearFilter);
-  });
+  const filtered = filterByPeriod(vehicles, periodType, year, quarter, month, customFrom, customTo);
 
   const totals = filtered.reduce(
     (acc, v) => ({
@@ -108,11 +222,18 @@ function OverzichtTab({ vehicles }: { vehicles: any[] }) {
     const csv = [headers.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = `financieel-overzicht-${yearFilter}.csv`; a.click();
+    const a = document.createElement("a"); a.href = url; a.download = `financieel-overzicht.csv`; a.click();
   };
 
   return (
     <div className="space-y-4">
+      <PeriodSelector
+        periodType={periodType} setPeriodType={setPeriodType}
+        year={year} setYear={setYear} quarter={quarter} setQuarter={setQuarter}
+        month={month} setMonth={setMonth} customFrom={customFrom} setCustomFrom={setCustomFrom}
+        customTo={customTo} setCustomTo={setCustomTo} availableYears={availableYears}
+      />
+
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <SummaryCard label="Totale omzet" value={formatEuroDecimal(totals.verkoop)} />
@@ -122,17 +243,10 @@ function OverzichtTab({ vehicles }: { vehicles: any[] }) {
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{filtered.length} verkochte voertuig{filtered.length !== 1 ? "en" : ""}</p>
-        <div className="flex items-center gap-2">
-          <select value={yearFilter} onChange={(e) => setYearFilter(e.target.value)} className="px-2.5 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
-            <option value="alle">Alle jaren</option>
-            <option value={String(currentYear)}>{currentYear}</option>
-            <option value={String(currentYear - 1)}>{currentYear - 1}</option>
-          </select>
-          <button onClick={exportCsv} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
-            <Download className="w-3.5 h-3.5" /> CSV
-          </button>
-        </div>
+        <p className="text-sm text-muted-foreground">{filtered.length} verkochte voertuig{filtered.length !== 1 ? "en" : ""} — {getPeriodLabel(periodType, year, quarter, month, customFrom, customTo)}</p>
+        <button onClick={exportCsv} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
+          <Download className="w-3.5 h-3.5" /> CSV
+        </button>
       </div>
 
       <div className="bg-card rounded-lg border border-border overflow-hidden">
