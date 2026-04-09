@@ -8,12 +8,7 @@ import { Vehicle, formatEuro, formatEuroDecimal, calcKostprijs, calcWinst, calcM
 import SlidingTabs from "@/components/admin/SlidingTabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-
-const VERKOOP_DOCUMENTEN = [
-  { type: "Koopovereenkomst", label: "Koopovereenkomst", generated: true },
-  { type: "Verkoopfactuur", label: "Factuur", generated: true },
-  { type: "Machtigingsformulier", label: "Machtigingsformulier", generated: false },
-];
+import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 
 const tabItems = [
   { label: "Gegevens", value: "gegevens" },
