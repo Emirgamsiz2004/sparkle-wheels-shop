@@ -404,8 +404,8 @@ export default function GlobalSearch() {
 
   return (
     <>
-      {/* Mobile: inline dropdown */}
-      <div ref={containerRef} className="lg:hidden relative">
+      {/* Mobile: fixed overlay dropdown */}
+      <div ref={containerRef} className="lg:hidden">
         <button
           onClick={() => setOpen(!open)}
           className="flex items-center justify-center w-8 h-8 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -414,16 +414,27 @@ export default function GlobalSearch() {
         </button>
         <AnimatePresence>
           {open && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, scaleY: 0.95 }}
-              animate={{ opacity: 1, y: 0, scaleY: 1 }}
-              exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
-              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-              style={{ transformOrigin: "top right" }}
-              className="absolute right-0 top-full mt-2 w-[calc(100vw-32px)] max-w-[400px] bg-card border border-border rounded-[3px] shadow-xl shadow-background/60 z-[70] overflow-hidden"
-            >
-              {searchContent}
-            </motion.div>
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="fixed inset-0 bg-background/60 backdrop-blur-sm z-[69]"
+                onClick={() => setOpen(false)}
+              />
+              {/* Dropdown panel pinned below header */}
+              <motion.div
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+                className="fixed left-3 right-3 top-[56px] bg-card border border-border rounded-lg shadow-2xl z-[70] overflow-hidden max-h-[calc(100vh-72px)]"
+              >
+                {searchContent}
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>
