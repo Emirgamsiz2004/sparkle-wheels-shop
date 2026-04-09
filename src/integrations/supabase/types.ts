@@ -1444,6 +1444,44 @@ export type Database = {
         }
         Relationships: []
       }
+      slack_notification_log: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          id: string
+          message: string | null
+          notification_key: string
+          notification_type: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          id?: string
+          message?: string | null
+          notification_key: string
+          notification_type: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          id?: string
+          message?: string | null
+          notification_key?: string
+          notification_type?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slack_notification_log_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string
