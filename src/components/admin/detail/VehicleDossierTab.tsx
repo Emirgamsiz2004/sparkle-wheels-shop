@@ -215,13 +215,14 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     window.open(data.signedUrl, "_blank");
   };
 
-  // Inkoop completeness — either Inkoopverklaring (particulier) OR Inkoopfactuur (bedrijf) is sufficient
+  // Inkoop completeness — either Inkoopverklaring (particulier) OR Inkoopfactuur (bedrijf) is sufficient, or override
   const hasInkoopverklaringDoc = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring");
   const hasInkoopfactuurDoc = hasDocument("Inkoopfactuur");
   const hasInkoopDocument = hasInkoopverklaringDoc || hasInkoopfactuurDoc;
-  const inkoopComplete = hasInkoopDocument;
+  const inkoopOverride = !!overrides["inkoop"];
+  const inkoopComplete = hasInkoopDocument || inkoopOverride;
   const inkoopMissing: string[] = [];
-  if (!hasInkoopDocument) inkoopMissing.push("Inkoopverklaring of Inkoopfactuur");
+  if (!hasInkoopDocument && !inkoopOverride) inkoopMissing.push("Inkoopverklaring of Inkoopfactuur");
 
   // Consignatie completeness
   const consignatieComplete = hasDocument("Consignatieovereenkomst");
