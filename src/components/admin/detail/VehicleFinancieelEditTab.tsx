@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Vehicle, CostItem, formatEuroDecimal, calcKostprijs, calcWinst, calcBtwMarge, calcNettoMarge, calcMarge, calcConsignatieCommissie, isConsignatie, costCategories } from "@/types/vehicle";
-import { Loader2, Info, Trash2, Paperclip } from "lucide-react";
+import { Loader2, Info, Trash2, Paperclip, Plus, Upload } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -31,19 +32,56 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",
-    // Betalingsdetails
     contantBedrag: vehicle.contantBedrag ? String(vehicle.contantBedrag) : "",
     overboekingBedrag: vehicle.overboekingBedrag ? String(vehicle.overboekingBedrag) : "",
     aanbetalingsbedrag: vehicle.aanbetalingsbedrag ? String(vehicle.aanbetalingsbedrag) : "",
     financieringActief: vehicle.financieringActief || false,
     financieringBedrag: vehicle.financieringBedrag ? String(vehicle.financieringBedrag) : "",
-    // Inruil
     inruilKenteken: vehicle.inruilKenteken || "",
     inruilMerk: vehicle.inruilMerk || "",
     inruilModel: vehicle.inruilModel || "",
     inruilWaarde: vehicle.inruilWaarde ? String(vehicle.inruilWaarde) : "",
   });
   const [saving, setSaving] = useState(false);
+  const [costOpen, setCostOpen] = useState(false);
+  const [costSaving, setCostSaving] = useState(false);
+  const [costFile, setCostFile] = useState<File | null>(null);
+  const [costForm, setCostForm] = useState({
+    category: "overig" as CostItem["category"],
+    description: "",
+    leverancier: "",
+    amount: 0,
+    btwPercentage: 21,
+    date: new Date().toISOString().split("T")[0],
+  });
+
+  const handleAddCost = async () => {
+    if (!costForm.description) return;
+    setCostSaving(true);
+    let filePath: string | undefined;
+    let fileName: string | undefined;
+    if (costFile) {
+      const ext = costFile.name.split(".").pop();
+      const path = `${vehicle.id}/kosten/${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("vehicle-documents").upload(path, costFile);
+      if (uploadErr) { toast.error("Factuur upload mislukt"); setCostSaving(false); return; }
+      filePath = path;
+      fileName = costFile.name;
+      await supabase.from("vehicle_documents").insert({
+        vehicle_id: vehicle.id, naam: costFile.name, type: "Factuur",
+        file_path: path, file_size: costFile.size, mime_type: costFile.type,
+      } as any);
+    }
+    await onAddCost(vehicle.id, {
+      ...costForm, description: costForm.description, amount: costForm.amount,
+      leverancier: costForm.leverancier || undefined, filePath, fileName,
+    });
+    onLogActivity("kosten_toegevoegd", `Kosten toegevoegd: ${costForm.description} (€${costForm.amount})`);
+    setCostSaving(false);
+    setCostOpen(false);
+    setCostFile(null);
+    setCostForm({ category: "overig", description: "", leverancier: "", amount: 0, btwPercentage: 21, date: new Date().toISOString().split("T")[0] });
+  };
 
   const isConsig = form.verkoopType === "consignatie";
 
@@ -236,8 +274,60 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
 
       {/* Kosten lijst */}
       <div className="bg-card border border-border rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-border">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Kosten ({vehicle.kosten.length})</h3>
+          <Dialog open={costOpen} onOpenChange={setCostOpen}>
+            <DialogTrigger asChild>
+              <button className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors">
+                <Plus className="w-3 h-3" /> Toevoegen
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[calc(100vw-2rem)]">
+              <DialogHeader><DialogTitle>Kosten Toevoegen</DialogTitle></DialogHeader>
+              <div className="space-y-3 mt-2">
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Categorie</label>
+                  <select value={costForm.category} onChange={(e) => setCostForm(f => ({ ...f, category: e.target.value as CostItem["category"] }))} className={inputCls}>
+                    {Object.entries(costCategories).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Omschrijving</label>
+                  <input value={costForm.description} onChange={(e) => setCostForm(f => ({ ...f, description: e.target.value }))} className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Leverancier (optioneel)</label>
+                  <input value={costForm.leverancier} onChange={(e) => setCostForm(f => ({ ...f, leverancier: e.target.value }))} className={inputCls} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Bedrag excl. BTW (€)</label>
+                    <input type="number" step="0.01" value={costForm.amount} onChange={(e) => setCostForm(f => ({ ...f, amount: Number(e.target.value) }))} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">BTW %</label>
+                    <select value={costForm.btwPercentage} onChange={(e) => setCostForm(f => ({ ...f, btwPercentage: Number(e.target.value) }))} className={inputCls}>
+                      <option value={0}>0%</option>
+                      <option value={9}>9%</option>
+                      <option value={21}>21%</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Datum</label>
+                  <input type="date" value={costForm.date} onChange={(e) => setCostForm(f => ({ ...f, date: e.target.value }))} className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Factuur (optioneel)</label>
+                  <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setCostFile(e.target.files?.[0] || null)} className="w-full text-sm text-foreground" />
+                  {costFile && <p className="text-xs text-muted-foreground mt-1">📎 {costFile.name}</p>}
+                </div>
+                <button onClick={handleAddCost} disabled={costSaving || !costForm.description} className="w-full py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:bg-foreground/90 disabled:opacity-40 flex items-center justify-center gap-2 transition-all">
+                  {costSaving && <Loader2 className="w-4 h-4 animate-spin" />} Toevoegen
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         {vehicle.kosten.length === 0 ? (
           <div className="px-4 py-8 text-center text-sm text-muted-foreground">Nog geen kosten toegevoegd.</div>
