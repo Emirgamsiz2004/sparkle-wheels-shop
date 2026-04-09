@@ -180,12 +180,14 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     window.open(data.signedUrl, "_blank");
   };
 
-  // Inkoop completeness
-  const hasInkoopverklaring = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring") || hasDocument("Inkoopfactuur");
+  // Inkoop completeness — either Inkoopverklaring (particulier) OR Inkoopfactuur (bedrijf) is sufficient
+  const hasInkoopverklaringDoc = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring");
+  const hasInkoopfactuurDoc = hasDocument("Inkoopfactuur");
+  const hasInkoopDocument = hasInkoopverklaringDoc || hasInkoopfactuurDoc;
   const hasInkoopVrijwaring = hasDocument("Vrijwaringsbewijs-inkoop");
-  const inkoopComplete = hasInkoopverklaring && hasInkoopVrijwaring;
+  const inkoopComplete = hasInkoopDocument && hasInkoopVrijwaring;
   const inkoopMissing: string[] = [];
-  if (!hasInkoopverklaring) inkoopMissing.push("Inkoopverklaring");
+  if (!hasInkoopDocument) inkoopMissing.push("Inkoopverklaring of Inkoopfactuur");
   if (!hasInkoopVrijwaring) inkoopMissing.push("Vrijwaringsbewijs");
 
   // Consignatie completeness
@@ -369,14 +371,14 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
           )}
           <div className="bg-card border border-border rounded-lg divide-y divide-border">
             <DocRow
-              label="Inkoopverklaring"
-              present={hasInkoopverklaring}
-              statusLabel={hasInkoopverklaring ? (inkoopverklaringen.length > 0 ? "Aangemaakt" : "Geüpload") : "Ontbreekt"}
+              label="Inkoopverklaring (particulier)"
+              present={hasInkoopverklaringDoc}
+              statusLabel={hasInkoopverklaringDoc ? (inkoopverklaringen.length > 0 ? "Aangemaakt" : "Geüpload") : "Ontbreekt"}
               onOpen={inkoopverklaringen.length > 0 && inkoopverklaringen[0].pdf_path ? async () => {
                 const { data } = await supabase.storage.from("vehicle-documents").createSignedUrl(inkoopverklaringen[0].pdf_path!, 60);
                 if (data?.signedUrl) window.open(data.signedUrl, "_blank");
-              } : hasDocument("Inkoopverklaring") || hasDocument("Inkoopfactuur") ? () => {
-                const fp = getDocFilePath("Inkoopverklaring") || getDocFilePath("Inkoopfactuur");
+              } : hasDocument("Inkoopverklaring") ? () => {
+                const fp = getDocFilePath("Inkoopverklaring");
                 if (fp) handleOpenDocument(fp);
               } : undefined}
               onUpload={() => { setUploadType("Inkoopverklaring"); setUploadOpen(true); }}
@@ -390,6 +392,22 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
                 }
               } : undefined}
               subText={inkoopverklaringen.length > 0 ? `${inkoopverklaringen[0].document_naam} · ${inkoopverklaringen[0].verkoper_naam}` : undefined}
+            />
+            <DocRow
+              label="Inkoopfactuur (bedrijf)"
+              present={hasInkoopfactuurDoc}
+              statusLabel={hasInkoopfactuurDoc ? "Geüpload" : "Ontbreekt"}
+              onOpen={hasInkoopfactuurDoc ? () => { const fp = getDocFilePath("Inkoopfactuur"); if (fp) handleOpenDocument(fp); } : undefined}
+              onUpload={() => { setUploadType("Inkoopfactuur"); setUploadOpen(true); }}
+              onDelete={hasInkoopfactuurDoc ? async () => {
+                const doc = getDoc("Inkoopfactuur");
+                if (doc) {
+                  await supabase.storage.from("vehicle-documents").remove([doc.file_path]);
+                  await supabase.from("vehicle_documents").delete().eq("id", doc.id);
+                  setVerkoopDocs(prev => prev.filter(d => d.id !== doc.id));
+                  toast.success("Document verwijderd");
+                }
+              } : undefined}
             />
             <DocRow
               label="Vrijwaringsbewijs"
