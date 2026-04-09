@@ -633,4 +633,29 @@ const DocRow = ({ label, present, statusLabel, subText, onOpen, onUpload, onDele
   </div>
 );
 
+const ExtraDocRow = ({ doc, onOpen, onDelete }: { doc: { id: string; naam: string; file_path: string }; onOpen: (fp: string) => void; onDelete: () => void }) => (
+  <div className="flex items-center gap-3 px-4 py-2.5">
+    <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+    <p className="text-sm text-foreground flex-1 truncate">{doc.naam}</p>
+    <button onClick={() => onOpen(doc.file_path)} className="p-1 text-muted-foreground hover:text-foreground">
+      <ExternalLink className="w-3.5 h-3.5" />
+    </button>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button className="p-1 text-muted-foreground hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Document verwijderen?</AlertDialogTitle>
+          <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen?</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuleren</AlertDialogCancel>
+          <AlertDialogAction onClick={onDelete}>Verwijderen</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </div>
+);
+
 export default VehicleDossierTab;
