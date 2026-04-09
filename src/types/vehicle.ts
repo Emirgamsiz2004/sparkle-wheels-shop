@@ -64,6 +64,7 @@ export interface Vehicle {
   financieringActief?: boolean;
   financieringBedrag?: number;
   aanbetalingsbedrag?: number;
+  createdAt?: string;
 }
 
 export const isConsignatie = (vehicle: Vehicle): boolean =>
