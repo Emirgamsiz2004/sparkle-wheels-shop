@@ -47,7 +47,6 @@ async function existingNotification(userId: string, type: string, vehicleId?: st
   if (vehicleId) query = query.eq('vehicle_id', vehicleId)
   if (taskId) query = query.eq('task_id', taskId)
   if (appointmentId) query = query.eq('appointment_id', appointmentId)
-  // Only check recent (last 24h for recurring, last 2h for one-time)
   const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   query = query.gte('created_at', cutoff)
   const { count } = await query
@@ -56,6 +55,53 @@ async function existingNotification(userId: string, type: string, vehicleId?: st
 
 async function insertNotification(n: NotificationPayload) {
   await supabase.from('notifications').insert(n)
+}
+
+// Slack notification helper — collects messages to send in batch
+const slackMessages: { text: string; emoji: string; link?: string }[] = []
+
+function queueSlack(text: string, emoji: string, link?: string) {
+  slackMessages.push({ text, emoji, link })
+}
+
+async function sendSlackBatch() {
+  if (slackMessages.length === 0) return
+  
+  // Get Slack channel from settings, default to #meldingen
+  const { data: setting } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'slack_notification_channel')
+    .maybeSingle()
+  const channel = setting?.value || '#meldingen'
+
+  // Build a single rich message with all notifications
+  const blocks: any[] = [
+    {
+      type: 'header',
+      text: { type: 'plain_text', text: `🔔 Platin Automotive — ${slackMessages.length} melding${slackMessages.length > 1 ? 'en' : ''}`, emoji: true }
+    },
+    { type: 'divider' },
+  ]
+
+  for (const msg of slackMessages) {
+    const linkText = msg.link ? ` <${APP_URL}${msg.link}|Bekijken>` : ''
+    blocks.push({
+      type: 'section',
+      text: { type: 'mrkdwn', text: `${msg.emoji} ${msg.text}${linkText}` }
+    })
+  }
+
+  const fallbackText = slackMessages.map(m => `${m.emoji} ${m.text}`).join('\n')
+
+  try {
+    await supabase.functions.invoke('send-slack-notification', {
+      body: { channel, text: fallbackText, blocks },
+    })
+    console.log(`Sent ${slackMessages.length} notifications to Slack channel ${channel}`)
+  } catch (err) {
+    console.error('Failed to send Slack batch:', err)
+  }
 }
 
 Deno.serve(async (req) => {
@@ -97,6 +143,7 @@ Deno.serve(async (req) => {
 
         if (isEnabled(prefs, type, 'in_app') && !(await existingNotification(userId, type, v.id))) {
           await insertNotification({ user_id: userId, type, title, link: `/admin/voertuigen/${v.id}`, vehicle_id: v.id })
+          queueSlack(title, isExpired ? '🚨' : '⚠️', `/admin/voertuigen/${v.id}`)
         }
         if (isEnabled(prefs, type, 'email')) {
           apkWarnings.push({ merk: v.merk, model: v.model, kenteken: v.kenteken || '', datum: v.apk_vervaldatum })
@@ -119,8 +166,8 @@ Deno.serve(async (req) => {
             : `${v.merk} ${v.model} staat al 60 dagen te koop`
           if (isEnabled(prefs, type, 'in_app') && !(await existingNotification(userId, type, v.id))) {
             await insertNotification({ user_id: userId, type, title, link: `/admin/voertuigen/${v.id}`, vehicle_id: v.id })
+            queueSlack(title, days === 90 ? '🔴' : '🟡', `/admin/voertuigen/${v.id}`)
           }
-          // Email for 90 days only
           if (days === 90 && isEnabled(prefs, type, 'email') && !(await existingNotification(userId, `${type}_email`, v.id))) {
             await supabase.functions.invoke('send-transactional-email', {
               body: {
@@ -151,6 +198,7 @@ Deno.serve(async (req) => {
         const title = `${klantNaam} heeft het proefrit formulier ingevuld voor ${td.voertuig_merk} ${td.voertuig_model}`
         if (isEnabled(prefs, type, 'in_app') && !(await existingNotification(userId, type, undefined, undefined))) {
           await insertNotification({ user_id: userId, type, title, link: `/admin/proefriten`, metadata: { test_drive_id: td.id } })
+          queueSlack(title, '✅', `/admin/proefriten`)
         }
         if (isEnabled(prefs, type, 'email')) {
           await supabase.functions.invoke('send-transactional-email', {
@@ -178,6 +226,7 @@ Deno.serve(async (req) => {
         const title = `Proefrit van ${td.voertuig_merk} ${td.voertuig_model} wacht nog op formulier`
         if (isEnabled(prefs, type, 'in_app') && !(await existingNotification(userId, type, td.vehicle_id))) {
           await insertNotification({ user_id: userId, type, title, link: `/admin/proefriten`, vehicle_id: td.vehicle_id })
+          queueSlack(title, '📋', `/admin/proefriten`)
         }
       }
 
@@ -198,6 +247,7 @@ Deno.serve(async (req) => {
           : `Taak '${t.omschrijving}' op ${v.merk} ${v.model} moet vandaag af`
         if (isEnabled(prefs, type, 'in_app') && !(await existingNotification(userId, type, undefined, t.id))) {
           await insertNotification({ user_id: userId, type, title, link: `/admin/voertuigen/${t.vehicle_id}`, vehicle_id: t.vehicle_id, task_id: t.id })
+          queueSlack(title, isOverdue ? '🔥' : '📌', `/admin/voertuigen/${t.vehicle_id}`)
         }
         if (isOverdue && isEnabled(prefs, type, 'email')) {
           overdueTasksList.push({ omschrijving: t.omschrijving, merk: v.merk, model: v.model, deadline: t.deadline! })
@@ -221,6 +271,7 @@ Deno.serve(async (req) => {
         const title = `Afspraak met ${klantNaam}${voertuig ? ` voor ${voertuig}` : ''} begint over 30 minuten`
         if (isEnabled(prefs, type, 'in_app') && !(await existingNotification(userId, type, undefined, undefined, a.id))) {
           await insertNotification({ user_id: userId, type, title, link: `/admin/planning`, vehicle_id: a.vehicle_id, customer_id: a.customer_id, appointment_id: a.id })
+          queueSlack(title, '📅', `/admin/planning`)
         }
       }
 
@@ -249,7 +300,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    // Send all queued Slack notifications as one bundled message
+    await sendSlackBatch()
+
+    return new Response(JSON.stringify({ success: true, slack_notifications: slackMessages.length }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   } catch (error) {
     console.error('Error generating notifications:', error)
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
