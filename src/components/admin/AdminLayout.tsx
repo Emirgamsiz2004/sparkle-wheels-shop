@@ -12,28 +12,17 @@ import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; }
-interface NavGroup { label: string; items: NavItem[]; }
 
-const navGroups: NavGroup[] = [
-  {
-    label: "",
-    items: [
-      { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-      { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
-      { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
-      { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
-      { label: "Verkopen", icon: BadgeDollarSign, path: "/admin/verkopen" },
-      { label: "Klanten", icon: Users, path: "/admin/klanten" },
-      { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
-    ],
-  },
-  {
-    label: "Financiën",
-    items: [
-      { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
-      { label: "Uren", icon: Clock, path: "/admin/uren" },
-    ],
-  },
+const navItems: NavItem[] = [
+  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+  { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
+  { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
+  { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
+  { label: "Verkopen", icon: BadgeDollarSign, path: "/admin/verkopen" },
+  { label: "Klanten", icon: Users, path: "/admin/klanten" },
+  { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
+  { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
+  { label: "Uren", icon: Clock, path: "/admin/uren" },
 ];
 
 const AdminLayout = () => {
