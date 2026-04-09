@@ -32,19 +32,56 @@ const VehicleFinancieelEditTab = ({ vehicle, onSave, onAddCost, onRemoveCost, on
     consignatieEigenaarNaam: vehicle.consignatieEigenaarNaam || "",
     consignatieEigenaarTelefoon: vehicle.consignatieEigenaarTelefoon || "",
     consignatieEigenaarEmail: vehicle.consignatieEigenaarEmail || "",
-    // Betalingsdetails
     contantBedrag: vehicle.contantBedrag ? String(vehicle.contantBedrag) : "",
     overboekingBedrag: vehicle.overboekingBedrag ? String(vehicle.overboekingBedrag) : "",
     aanbetalingsbedrag: vehicle.aanbetalingsbedrag ? String(vehicle.aanbetalingsbedrag) : "",
     financieringActief: vehicle.financieringActief || false,
     financieringBedrag: vehicle.financieringBedrag ? String(vehicle.financieringBedrag) : "",
-    // Inruil
     inruilKenteken: vehicle.inruilKenteken || "",
     inruilMerk: vehicle.inruilMerk || "",
     inruilModel: vehicle.inruilModel || "",
     inruilWaarde: vehicle.inruilWaarde ? String(vehicle.inruilWaarde) : "",
   });
   const [saving, setSaving] = useState(false);
+  const [costOpen, setCostOpen] = useState(false);
+  const [costSaving, setCostSaving] = useState(false);
+  const [costFile, setCostFile] = useState<File | null>(null);
+  const [costForm, setCostForm] = useState({
+    category: "overig" as CostItem["category"],
+    description: "",
+    leverancier: "",
+    amount: 0,
+    btwPercentage: 21,
+    date: new Date().toISOString().split("T")[0],
+  });
+
+  const handleAddCost = async () => {
+    if (!costForm.description) return;
+    setCostSaving(true);
+    let filePath: string | undefined;
+    let fileName: string | undefined;
+    if (costFile) {
+      const ext = costFile.name.split(".").pop();
+      const path = `${vehicle.id}/kosten/${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("vehicle-documents").upload(path, costFile);
+      if (uploadErr) { toast.error("Factuur upload mislukt"); setCostSaving(false); return; }
+      filePath = path;
+      fileName = costFile.name;
+      await supabase.from("vehicle_documents").insert({
+        vehicle_id: vehicle.id, naam: costFile.name, type: "Factuur",
+        file_path: path, file_size: costFile.size, mime_type: costFile.type,
+      } as any);
+    }
+    await onAddCost(vehicle.id, {
+      ...costForm, description: costForm.description, amount: costForm.amount,
+      leverancier: costForm.leverancier || undefined, filePath, fileName,
+    });
+    onLogActivity("kosten_toegevoegd", `Kosten toegevoegd: ${costForm.description} (€${costForm.amount})`);
+    setCostSaving(false);
+    setCostOpen(false);
+    setCostFile(null);
+    setCostForm({ category: "overig", description: "", leverancier: "", amount: 0, btwPercentage: 21, date: new Date().toISOString().split("T")[0] });
+  };
 
   const isConsig = form.verkoopType === "consignatie";
 
