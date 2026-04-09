@@ -224,10 +224,10 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const inkoopMissing: string[] = [];
   if (!hasInkoopDocument && !inkoopOverride) inkoopMissing.push("Inkoopverklaring of Inkoopfactuur");
 
-  // Consignatie completeness
-  const consignatieComplete = hasDocument("Consignatieovereenkomst");
+  const consignatieOverride = !!overrides["consignatie"];
+  const consignatieComplete = hasDocument("Consignatieovereenkomst") || consignatieOverride;
   const consignatieMissing: string[] = [];
-  if (!consignatieComplete) consignatieMissing.push("Consignatieovereenkomst");
+  if (!hasDocument("Consignatieovereenkomst") && !consignatieOverride) consignatieMissing.push("Consignatieovereenkomst");
 
   const inkoopExtraDocs = verkoopDocs.filter(d => d.type === "Overig-inkoop");
   const consignatieExtraDocs = verkoopDocs.filter(d => d.type === "Overig-consignatie");
