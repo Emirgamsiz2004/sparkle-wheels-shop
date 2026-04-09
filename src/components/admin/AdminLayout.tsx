@@ -187,10 +187,13 @@ const AdminLayout = () => {
           </button>
           <img src={logo} alt="Platin" className="h-6 w-auto object-contain lg:hidden flex-shrink-0" loading="eager" decoding="sync" />
           <div className="hidden lg:block flex-shrink-0" />
-          <div className="flex-1 flex justify-center">
+          <div className="flex-1 hidden lg:flex justify-center">
             <GlobalSearch />
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
+            <div className="lg:hidden">
+              <GlobalSearch />
+            </div>
             <NotificationBell />
           </div>
         </header>
