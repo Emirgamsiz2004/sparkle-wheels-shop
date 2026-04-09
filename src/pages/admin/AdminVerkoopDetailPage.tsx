@@ -1,13 +1,12 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ArrowLeft, Phone, FileText, Download, Upload, Camera, ExternalLink, Trash2, CheckCircle2, Circle, Clock } from "lucide-react";
+import { Loader2, ArrowLeft, Phone, FileText, Download, Upload, Camera, ExternalLink, Trash2, CheckCircle2, Circle, Clock, Save, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { Vehicle, formatEuro, formatEuroDecimal, calcKostprijs, calcWinst, calcMarge, calcTotalKosten, isConsignatie, calcConsignatieCommissie } from "@/types/vehicle";
 import SlidingTabs from "@/components/admin/SlidingTabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { useRef } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const VERKOOP_DOCUMENTEN = [
@@ -17,6 +16,7 @@ const VERKOOP_DOCUMENTEN = [
 ];
 
 const tabItems = [
+  { label: "Gegevens", value: "gegevens" },
   { label: "Documenten", value: "documenten" },
   { label: "Geschiedenis", value: "geschiedenis" },
 ];
@@ -24,8 +24,8 @@ const tabItems = [
 const AdminVerkoopDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { vehicles, loading, updateVehicle, removeCost } = useVehicles();
-  const [activeTab, setActiveTab] = useState("documenten");
+  const { vehicles, loading, updateVehicle } = useVehicles();
+  const [activeTab, setActiveTab] = useState("gegevens");
   const [docs, setDocs] = useState<{ id: string; type: string; naam: string; file_path: string }[]>([]);
   const [activityLog, setActivityLog] = useState<{ id: string; actie_type: string; beschrijving: string; created_at: string }[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -35,8 +35,50 @@ const AdminVerkoopDetailPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [sale, setSale] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
+
+  // Editable fields
+  const [form, setForm] = useState({
+    koperNaam: "",
+    koperEmail: "",
+    koperTelefoon: "",
+    verkoopDatum: "",
+    verkoopprijs: "",
+    betaalmethode: "overboeking",
+    contantBedrag: "",
+    overboekingBedrag: "",
+    financieringActief: false,
+    financieringBedrag: "",
+    aanbetalingsbedrag: "",
+    inruilKenteken: "",
+    inruilMerk: "",
+    inruilModel: "",
+    inruilWaarde: "",
+  });
 
   const vehicle = vehicles.find(v => v.id === id);
+
+  // Initialize form from vehicle
+  useEffect(() => {
+    if (!vehicle) return;
+    setForm({
+      koperNaam: vehicle.koperNaam || "",
+      koperEmail: vehicle.koperEmail || "",
+      koperTelefoon: vehicle.koperTelefoon || "",
+      verkoopDatum: vehicle.verkoopDatum || "",
+      verkoopprijs: String(vehicle.verkoopprijs || ""),
+      betaalmethode: vehicle.betaalmethode || "overboeking",
+      contantBedrag: String(vehicle.contantBedrag || ""),
+      overboekingBedrag: String(vehicle.overboekingBedrag || ""),
+      financieringActief: vehicle.financieringActief || false,
+      financieringBedrag: String(vehicle.financieringBedrag || ""),
+      aanbetalingsbedrag: String(vehicle.aanbetalingsbedrag || ""),
+      inruilKenteken: vehicle.inruilKenteken || "",
+      inruilMerk: vehicle.inruilMerk || "",
+      inruilModel: vehicle.inruilModel || "",
+      inruilWaarde: String(vehicle.inruilWaarde || ""),
+    });
+  }, [vehicle?.id]);
 
   useEffect(() => {
     if (!id) return;
@@ -53,6 +95,34 @@ const AdminVerkoopDetailPage = () => {
     };
     fetchData();
   }, [id]);
+
+  const handleSave = async () => {
+    if (!id) return;
+    setSaving(true);
+    try {
+      await updateVehicle(id, {
+        koperNaam: form.koperNaam || undefined,
+        koperEmail: form.koperEmail || undefined,
+        koperTelefoon: form.koperTelefoon || undefined,
+        verkoopDatum: form.verkoopDatum || undefined,
+        verkoopprijs: Number(form.verkoopprijs) || 0,
+        betaalmethode: form.betaalmethode || undefined,
+        contantBedrag: Number(form.contantBedrag) || 0,
+        overboekingBedrag: Number(form.overboekingBedrag) || 0,
+        financieringActief: form.financieringActief,
+        financieringBedrag: Number(form.financieringBedrag) || 0,
+        aanbetalingsbedrag: Number(form.aanbetalingsbedrag) || 0,
+        inruilKenteken: form.inruilKenteken || undefined,
+        inruilMerk: form.inruilMerk || undefined,
+        inruilModel: form.inruilModel || undefined,
+        inruilWaarde: Number(form.inruilWaarde) || 0,
+      } as any);
+      toast.success("Gegevens opgeslagen");
+    } catch {
+      toast.error("Opslaan mislukt");
+    }
+    setSaving(false);
+  };
 
   const handleOpenDocument = async (filePath: string) => {
     const { data, error } = await supabase.storage.from("vehicle-documents").createSignedUrl(filePath, 300);
@@ -72,7 +142,7 @@ const AdminVerkoopDetailPage = () => {
     setUploading(true);
     const ext = file.name.split(".").pop();
     const cleanKenteken = (vehicle.kenteken || "GEEN").replace(/[-\s]/g, "");
-    const fileName = `IKV-${vehicle.merk}-${vehicle.model}-${vehicle.bouwjaar}-${cleanKenteken}-${uploadType}.${ext}`;
+    const fileName = `Verkoop-${vehicle.merk}-${vehicle.model}-${vehicle.bouwjaar}-${cleanKenteken}-${uploadType}.${ext}`;
     const path = `${id}/${Date.now()}-${fileName}`;
     const { error: storageError } = await supabase.storage.from("vehicle-documents").upload(path, file);
     if (storageError) { toast.error("Upload mislukt"); setUploading(false); return; }
@@ -152,41 +222,36 @@ const AdminVerkoopDetailPage = () => {
 
       {/* Three info blocks */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Financieel */}
         <div className="bg-card border border-border rounded-lg p-4">
           <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">Financieel</h3>
           <table className="w-full text-sm">
             <tbody>
-              <Row label="Inkoopprijs" value={isConsignatie(vehicle) ? `${vehicle.consignatieCommissiePerc}% comm.` : formatEuroDecimal(vehicle.inkoopprijs)} />
-              <Row label="Kosten" value={formatEuroDecimal(totalKosten)} />
-              <Row label="Verkoopprijs" value={formatEuroDecimal(vehicle.verkoopprijs)} />
-              <Row label="Marge" value={`${formatEuroDecimal(winst)} (${marge.toFixed(1)}%)`} valueColor={winst >= 0 ? "text-emerald-500" : "text-red-500"} isLast />
+              <InfoRow label="Inkoopprijs" value={isConsignatie(vehicle) ? `${vehicle.consignatieCommissiePerc}% comm.` : formatEuroDecimal(vehicle.inkoopprijs)} />
+              <InfoRow label="Kosten" value={formatEuroDecimal(totalKosten)} />
+              <InfoRow label="Verkoopprijs" value={formatEuroDecimal(vehicle.verkoopprijs)} />
+              <InfoRow label="Marge" value={`${formatEuroDecimal(winst)} (${marge.toFixed(1)}%)`} valueColor={winst >= 0 ? "text-emerald-500" : "text-red-500"} isLast />
             </tbody>
           </table>
         </div>
-
-        {/* Betaling */}
         <div className="bg-card border border-border rounded-lg p-4">
           <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">Betaling</h3>
           <table className="w-full text-sm">
             <tbody>
-              <Row label="Betaalwijze" value={betaalwijze === "overboeking" ? "Overboeking" : betaalwijze === "contant" ? "Contant" : betaalwijze === "financiering" ? "Financiering" : betaalwijze === "combinatie" ? "Combinatie" : betaalwijze} />
-              {!!vehicle.aanbetalingsbedrag && <Row label="Aanbetaling" value={formatEuroDecimal(vehicle.aanbetalingsbedrag)} />}
-              {!!vehicle.contantBedrag && <Row label="Contant" value={formatEuroDecimal(vehicle.contantBedrag)} />}
-              {!!vehicle.overboekingBedrag && <Row label="Overboeking" value={formatEuroDecimal(vehicle.overboekingBedrag)} />}
-              {vehicle.financieringActief && <Row label="Financiering" value={formatEuroDecimal(vehicle.financieringBedrag || 0)} />}
-              {vehicle.inruilKenteken && <Row label="Inruil" value={`${vehicle.inruilKenteken} (${formatEuro(vehicle.inruilWaarde || 0)})`} isLast />}
+              <InfoRow label="Betaalwijze" value={betaalwijze === "overboeking" ? "Overboeking" : betaalwijze === "contant" ? "Contant" : betaalwijze === "financiering" ? "Financiering" : betaalwijze === "combinatie" ? "Combinatie" : betaalwijze} />
+              {!!vehicle.aanbetalingsbedrag && <InfoRow label="Aanbetaling" value={formatEuroDecimal(vehicle.aanbetalingsbedrag)} />}
+              {!!vehicle.contantBedrag && <InfoRow label="Contant" value={formatEuroDecimal(vehicle.contantBedrag)} />}
+              {!!vehicle.overboekingBedrag && <InfoRow label="Overboeking" value={formatEuroDecimal(vehicle.overboekingBedrag)} />}
+              {vehicle.financieringActief && <InfoRow label="Financiering" value={formatEuroDecimal(vehicle.financieringBedrag || 0)} />}
+              {vehicle.inruilKenteken && <InfoRow label="Inruil" value={`${vehicle.inruilKenteken} (${formatEuro(vehicle.inruilWaarde || 0)})`} isLast />}
             </tbody>
           </table>
         </div>
-
-        {/* Garantie */}
         <div className="bg-card border border-border rounded-lg p-4">
           <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">Garantie</h3>
           <table className="w-full text-sm">
             <tbody>
-              <Row label="Type" value={garantieType === "geen" ? "Geen garantie" : garantieType} />
-              {garantieMaanden > 0 && <Row label="Duur" value={`${garantieMaanden} maanden`} isLast />}
+              <InfoRow label="Type" value={garantieType === "geen" ? "Geen garantie" : garantieType} />
+              {garantieMaanden > 0 && <InfoRow label="Duur" value={`${garantieMaanden} maanden`} isLast />}
             </tbody>
           </table>
         </div>
@@ -196,6 +261,99 @@ const AdminVerkoopDetailPage = () => {
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
         <SlidingTabs tabs={tabItems} value={activeTab} onChange={setActiveTab} className="min-w-max" />
       </div>
+
+      {/* Tab: Gegevens */}
+      {activeTab === "gegevens" && (
+        <div className="space-y-5">
+          {/* Kopergegevens */}
+          <div className="bg-card border border-border rounded-lg p-4 sm:p-5">
+            <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest mb-4">Kopergegevens</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Naam koper" value={form.koperNaam} onChange={v => setForm(f => ({ ...f, koperNaam: v }))} placeholder="Volledige naam" />
+              <Field label="E-mail" value={form.koperEmail} onChange={v => setForm(f => ({ ...f, koperEmail: v }))} placeholder="email@voorbeeld.nl" type="email" />
+              <Field label="Telefoon" value={form.koperTelefoon} onChange={v => setForm(f => ({ ...f, koperTelefoon: v }))} placeholder="06-12345678" type="tel" />
+              <Field label="Verkoopdatum" value={form.verkoopDatum} onChange={v => setForm(f => ({ ...f, verkoopDatum: v }))} type="date" />
+            </div>
+          </div>
+
+          {/* Verkoopbedrag & betaalwijze */}
+          <div className="bg-card border border-border rounded-lg p-4 sm:p-5">
+            <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest mb-4">Betaalgegevens</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Verkoopprijs" value={form.verkoopprijs} onChange={v => setForm(f => ({ ...f, verkoopprijs: v }))} type="number" prefix="€" />
+              <div>
+                <label className="text-xs text-muted-foreground mb-1.5 block">Betaalwijze</label>
+                <select
+                  value={form.betaalmethode}
+                  onChange={e => setForm(f => ({ ...f, betaalmethode: e.target.value }))}
+                  className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  <option value="overboeking">Overboeking</option>
+                  <option value="contant">Contant</option>
+                  <option value="financiering">Financiering</option>
+                  <option value="combinatie">Combinatie</option>
+                </select>
+              </div>
+              {(form.betaalmethode === "contant" || form.betaalmethode === "combinatie") && (
+                <Field label="Contant bedrag" value={form.contantBedrag} onChange={v => setForm(f => ({ ...f, contantBedrag: v }))} type="number" prefix="€" />
+              )}
+              {(form.betaalmethode === "overboeking" || form.betaalmethode === "combinatie") && (
+                <Field label="Overboeking bedrag" value={form.overboekingBedrag} onChange={v => setForm(f => ({ ...f, overboekingBedrag: v }))} type="number" prefix="€" />
+              )}
+              <Field label="Aanbetaling" value={form.aanbetalingsbedrag} onChange={v => setForm(f => ({ ...f, aanbetalingsbedrag: v }))} type="number" prefix="€" />
+              <div>
+                <label className="text-xs text-muted-foreground mb-1.5 block">Financiering</label>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, financieringActief: !f.financieringActief }))}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${form.financieringActief ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border hover:bg-accent"}`}
+                  >
+                    {form.financieringActief ? "Ja" : "Nee"}
+                  </button>
+                  {form.financieringActief && (
+                    <div className="flex-1">
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">€</span>
+                        <input
+                          type="number"
+                          value={form.financieringBedrag}
+                          onChange={e => setForm(f => ({ ...f, financieringBedrag: e.target.value }))}
+                          className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                          placeholder="Bedrag"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Inruil */}
+          <div className="bg-card border border-border rounded-lg p-4 sm:p-5">
+            <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest mb-4">Inruil</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Kenteken inruil" value={form.inruilKenteken} onChange={v => setForm(f => ({ ...f, inruilKenteken: v.toUpperCase() }))} placeholder="XX-XXX-X" />
+              <Field label="Merk" value={form.inruilMerk} onChange={v => setForm(f => ({ ...f, inruilMerk: v }))} placeholder="Merk" />
+              <Field label="Model" value={form.inruilModel} onChange={v => setForm(f => ({ ...f, inruilModel: v }))} placeholder="Model" />
+              <Field label="Inruilwaarde" value={form.inruilWaarde} onChange={v => setForm(f => ({ ...f, inruilWaarde: v }))} type="number" prefix="€" />
+            </div>
+          </div>
+
+          {/* Save button */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Opslaan
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Tab: Documenten */}
       {activeTab === "documenten" && (
@@ -230,7 +388,7 @@ const AdminVerkoopDetailPage = () => {
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>Document verwijderen?</AlertDialogTitle>
-                              <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</AlertDialogDescription>
+                              <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen?</AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Annuleren</AlertDialogCancel>
@@ -282,7 +440,7 @@ const AdminVerkoopDetailPage = () => {
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>Document verwijderen?</AlertDialogTitle>
-                          <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</AlertDialogDescription>
+                          <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen?</AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Annuleren</AlertDialogCancel>
@@ -306,7 +464,7 @@ const AdminVerkoopDetailPage = () => {
           ) : (
             <div className="relative pl-5 space-y-0">
               <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
-              {activityLog.map((log, i) => (
+              {activityLog.map((log) => (
                 <div key={log.id} className="relative pb-4">
                   <div className="absolute left-[-13px] top-1.5 w-2.5 h-2.5 rounded-full bg-border border-2 border-background" />
                   <div className="ml-3">
@@ -366,11 +524,31 @@ const AdminVerkoopDetailPage = () => {
   );
 };
 
-const Row = ({ label, value, valueColor, isLast }: { label: string; value: string; valueColor?: string; isLast?: boolean }) => (
+/* ─── Helpers ─── */
+
+const InfoRow = ({ label, value, valueColor, isLast }: { label: string; value: string; valueColor?: string; isLast?: boolean }) => (
   <tr className={!isLast ? "border-b border-border/50" : ""}>
     <td className="py-2 pr-3 text-xs text-muted-foreground whitespace-nowrap">{label}</td>
     <td className={`py-2 text-sm font-medium tabular-nums text-right ${valueColor || "text-foreground"}`}>{value}</td>
   </tr>
+);
+
+const Field = ({ label, value, onChange, placeholder, type = "text", prefix }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; prefix?: string;
+}) => (
+  <div>
+    <label className="text-xs text-muted-foreground mb-1.5 block">{label}</label>
+    <div className="relative">
+      {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{prefix}</span>}
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full ${prefix ? "pl-7" : "pl-3"} pr-3 py-2 text-sm bg-background border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground`}
+      />
+    </div>
+  </div>
 );
 
 export default AdminVerkoopDetailPage;
