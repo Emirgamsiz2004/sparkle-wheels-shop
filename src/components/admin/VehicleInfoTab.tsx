@@ -147,6 +147,33 @@ const VehicleInfoTab = ({ vehicle, onSave }: Props) => {
         )}
       </div>
 
+      {/* BTW / Marge selectie */}
+      {!isConsignatie && (
+        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">BTW Regime</h3>
+          <div className="flex gap-2">
+            {[
+              { value: 'marge', label: 'Margeregeling', desc: 'BTW alleen over winstmarge (particuliere inkoop)' },
+              { value: 'btw', label: 'BTW-auto', desc: 'Volledige BTW over verkoopprijs (zakelijke inkoop)' },
+            ].map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => update("btwMargeType", opt.value)}
+                className={cn(
+                  "flex-1 text-left p-3 rounded-lg border transition-colors",
+                  form.btwMargeType === opt.value
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:bg-accent/50"
+                )}
+              >
+                <p className="text-sm font-medium text-foreground">{opt.label}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{opt.desc}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Financieel — alleen bij niet-consignatie */}
       {!isConsignatie && (
         <div className="bg-card border border-border rounded-lg p-4 space-y-4">
