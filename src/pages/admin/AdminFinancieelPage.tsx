@@ -215,6 +215,23 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
   const currentQuarter = Math.floor(new Date().getMonth() / 3) + 1;
   const [year, setYear] = useState(currentYear);
   const [selectedQ, setSelectedQ] = useState<number>(currentQuarter);
+  // Local-only overrides: { [vehicleId]: { inkoopprijs?: number, verkoopprijs?: number } }
+  const [overrides, setOverrides] = useState<Record<string, { inkoopprijs?: number; verkoopprijs?: number }>>({});
+
+  const setOverride = (id: string, field: 'inkoopprijs' | 'verkoopprijs', value: number) => {
+    setOverrides(prev => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
+  };
+
+  const getEffective = (v: any) => {
+    const o = overrides[v.id];
+    const inkoopprijs = o?.inkoopprijs ?? v.inkoopprijs;
+    const verkoopprijs = o?.verkoopprijs ?? v.verkoopprijs;
+    const totalKosten = v.kosten.reduce((s: number, k: any) => s + k.amount, 0);
+    const kostprijs = inkoopprijs + totalKosten;
+    const winst = verkoopprijs - kostprijs;
+    const btwMarge = winst > 0 ? winst * (21 / 121) : 0;
+    return { inkoopprijs, verkoopprijs, kostprijs, winst, btwMarge };
+  };
 
   const verkocht = vehicles.filter((v) => {
     if (v.status !== "verkocht" || !v.verkoopDatum) return false;
@@ -223,7 +240,7 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
 
   const getQuarterData = (months: number[]) => {
     const qVehicles = verkocht.filter((v) => months.includes(new Date(v.verkoopDatum!).getMonth()));
-    const btwOntvangen = qVehicles.reduce((s, v) => s + calcBtwMarge(v), 0);
+    const btwOntvangen = qVehicles.reduce((s, v) => s + getEffective(v).btwMarge, 0);
     const btwBetaald = qVehicles.reduce((s, v) => {
       return s + v.kosten.reduce((cs: number, k: any) => {
         if (k.date) {
@@ -249,6 +266,8 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
       .map(v => new Date(v.verkoopDatum).getFullYear())
   )).sort((a, b) => b - a);
   if (!availableYears.includes(currentYear)) availableYears.unshift(currentYear);
+
+  const hasOverrides = Object.keys(overrides).length > 0;
 
   return (
     <div className="space-y-4">
@@ -276,7 +295,24 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
             );
           })}
         </div>
+        {hasOverrides && (
+          <button
+            onClick={() => setOverrides({})}
+            className="ml-auto px-2.5 py-1.5 text-xs font-medium text-destructive border border-destructive/30 rounded-md hover:bg-destructive/10 transition-colors"
+          >
+            Reset aanpassingen
+          </button>
+        )}
       </div>
+
+      {hasOverrides && (
+        <div className="flex items-start gap-2 px-3 py-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
+          <Info className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            <strong className="text-amber-400">Let op:</strong> Je hebt prijzen aangepast. Deze aanpassingen gelden alleen binnen dit BTW-overzicht en worden niet opgeslagen.
+          </p>
+        </div>
+      )}
 
       {/* Selected quarter detail */}
       <div className="bg-card rounded-xl border border-border p-5">
@@ -317,24 +353,38 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
                 <tr className="border-b border-border">
                   <th className="text-left px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Voertuig</th>
                   <th className="text-left px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Datum</th>
-                  <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Verkoop</th>
-                  <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Kostprijs</th>
+                  <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Inkoopprijs</th>
+                  <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Verkoopprijs</th>
                   <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">Marge</th>
                   <th className="text-right px-3 py-2 text-[10px] font-medium text-muted-foreground uppercase">BTW Marge</th>
                 </tr>
               </thead>
               <tbody>
                 {selectedData.vehicles.map((v: any) => {
-                  const winst = calcWinst(v);
-                  const btw = calcBtwMarge(v);
+                  const eff = getEffective(v);
+                  const isOverridden = !!overrides[v.id];
                   return (
-                    <tr key={v.id} className="border-b border-border/50 hover:bg-accent/10">
-                      <td className="px-3 py-2 text-foreground font-medium">{v.merk} {v.model} <span className="text-muted-foreground font-normal">({v.kenteken})</span></td>
+                    <tr key={v.id} className={`border-b border-border/50 hover:bg-accent/10 ${isOverridden ? "bg-amber-500/5" : ""}`}>
+                      <td className="px-3 py-2 text-foreground font-medium">
+                        {v.merk} {v.model} <span className="text-muted-foreground font-normal">({v.kenteken})</span>
+                      </td>
                       <td className="px-3 py-2 text-muted-foreground">{new Date(v.verkoopDatum).toLocaleDateString("nl-NL")}</td>
-                      <td className="px-3 py-2 text-right text-foreground">{formatEuroDecimal(v.verkoopprijs)}</td>
-                      <td className="px-3 py-2 text-right text-muted-foreground">{formatEuroDecimal(calcKostprijs(v))}</td>
-                      <td className={`px-3 py-2 text-right font-medium ${winst >= 0 ? "text-emerald-400" : "text-destructive"}`}>{formatEuroDecimal(winst)}</td>
-                      <td className="px-3 py-2 text-right text-foreground">{formatEuroDecimal(btw)}</td>
+                      <td className="px-3 py-2 text-right">
+                        <EditablePrice
+                          value={eff.inkoopprijs}
+                          original={v.inkoopprijs}
+                          onChange={(val) => setOverride(v.id, 'inkoopprijs', val)}
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <EditablePrice
+                          value={eff.verkoopprijs}
+                          original={v.verkoopprijs}
+                          onChange={(val) => setOverride(v.id, 'verkoopprijs', val)}
+                        />
+                      </td>
+                      <td className={`px-3 py-2 text-right font-medium ${eff.winst >= 0 ? "text-emerald-400" : "text-destructive"}`}>{formatEuroDecimal(eff.winst)}</td>
+                      <td className="px-3 py-2 text-right text-foreground">{formatEuroDecimal(eff.btwMarge)}</td>
                     </tr>
                   );
                 })}
@@ -343,7 +393,7 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
                 <tr className="border-t border-border">
                   <td colSpan={4} className="px-3 py-2 text-sm font-medium text-foreground">Totaal Q{selectedQ}</td>
                   <td className="px-3 py-2 text-right font-bold text-foreground">
-                    {formatEuroDecimal(selectedData.vehicles.reduce((s: number, v: any) => s + calcWinst(v), 0))}
+                    {formatEuroDecimal(selectedData.vehicles.reduce((s: number, v: any) => s + getEffective(v).winst, 0))}
                   </td>
                   <td className="px-3 py-2 text-right font-bold text-foreground">{formatEuroDecimal(selectedData.btwOntvangen)}</td>
                 </tr>
@@ -377,11 +427,53 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
       <div className="flex items-start gap-3 px-4 py-3.5 bg-primary/5 rounded-xl border border-primary/10">
         <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
         <p className="text-xs text-muted-foreground">
-          Aangifte doen via <strong className="text-foreground">Mijn Belastingdienst Zakelijk</strong> op{" "}
+          <strong className="text-foreground">Tip:</strong> Klik op een inkoop- of verkoopprijs om deze tijdelijk aan te passen voor de BTW-berekening. Aangifte doen via{" "}
           <a href="https://mbd.belastingdienst.nl" target="_blank" rel="noopener noreferrer" className="underline text-primary hover:text-primary/80">mbd.belastingdienst.nl</a>
         </p>
       </div>
     </div>
+  );
+}
+
+/* ──────────── EDITABLE PRICE CELL ──────────── */
+
+function EditablePrice({ value, original, onChange }: { value: number; original: number; onChange: (v: number) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [input, setInput] = useState(String(value));
+  const isModified = value !== original;
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        type="number"
+        step="0.01"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onBlur={() => {
+          const parsed = parseFloat(input);
+          if (!isNaN(parsed)) onChange(parsed);
+          setEditing(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") { e.currentTarget.blur(); }
+          if (e.key === "Escape") { setInput(String(value)); setEditing(false); }
+        }}
+        className="w-24 px-1.5 py-0.5 text-sm text-right tabular-nums bg-background border border-primary/50 rounded focus:outline-none focus:ring-1 focus:ring-primary"
+      />
+    );
+  }
+
+  return (
+    <button
+      onClick={() => { setInput(String(value)); setEditing(true); }}
+      className={`tabular-nums hover:underline cursor-pointer transition-colors ${
+        isModified ? "text-amber-400 font-medium" : "text-foreground"
+      }`}
+      title={isModified ? `Origineel: ${formatEuroDecimal(original)}` : "Klik om aan te passen"}
+    >
+      {formatEuroDecimal(value)}
+    </button>
   );
 }
 
