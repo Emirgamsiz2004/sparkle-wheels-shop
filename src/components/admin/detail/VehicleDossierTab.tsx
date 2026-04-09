@@ -332,11 +332,22 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Consignatiedossier</h3>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-              consignatieComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
-            }`}>
-              {consignatieComplete ? "Compleet" : "Onvolledig"}
-            </span>
+            <div className="flex items-center gap-2">
+              {!consignatieComplete ? (
+                <button onClick={() => toggleOverride("consignatie")} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Compleet markeren
+                </button>
+              ) : consignatieOverride && (
+                <button onClick={() => toggleOverride("consignatie")} className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Handmatig ✓
+                </button>
+              )}
+              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                consignatieComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
+              }`}>
+                {consignatieComplete ? "Compleet" : "Onvolledig"}
+              </span>
+            </div>
           </div>
           {!consignatieComplete && consignatieMissing.length > 0 && (
             <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-md bg-amber-500/10 border border-amber-500/20">
@@ -391,11 +402,22 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Inkoopdossier</h3>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-              inkoopComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
-            }`}>
-              {inkoopComplete ? "Compleet" : "Onvolledig"}
-            </span>
+            <div className="flex items-center gap-2">
+              {!inkoopComplete ? (
+                <button onClick={() => toggleOverride("inkoop")} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Compleet markeren
+                </button>
+              ) : inkoopOverride && (
+                <button onClick={() => toggleOverride("inkoop")} className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Handmatig ✓
+                </button>
+              )}
+              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                inkoopComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
+              }`}>
+                {inkoopComplete ? "Compleet" : "Onvolledig"}
+              </span>
+            </div>
           </div>
           {!inkoopComplete && inkoopMissing.length > 0 && (
             <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-md bg-amber-500/10 border border-amber-500/20">
