@@ -10,8 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
-const tabs = [
+const BASE_TABS = [
   { label: "Voorraad", value: "voorraad" },
+  { label: "Nieuw", value: "nieuw" },
   { label: "Te koop", value: "te_koop" },
   { label: "Consignatie", value: "consignatie" },
   { label: "In behandeling", value: "in_behandeling" },
@@ -76,9 +77,32 @@ const AdminVoertuigenPage = () => {
     setSyncing(false);
   };
 
+  const threeDaysAgo = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 3);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const nieuwCount = useMemo(() => vehicles.filter(v => {
+    if (v.status === "verkocht") return false;
+    return new Date(v.createdAt || "") >= threeDaysAgo;
+  }).length, [vehicles, threeDaysAgo]);
+
+  const tabs = useMemo(() => BASE_TABS.map(t =>
+    t.value === "nieuw" && nieuwCount > 0
+      ? { ...t, label: `Nieuw (${nieuwCount})` }
+      : t
+  ), [nieuwCount]);
+
   const filtered = vehicles.filter((v) => {
-    if (v.status === "verkocht") return false; // Sold vehicles are in Verkopen module
-    if (filter !== "voorraad" && v.status !== filter) return false;
+    if (v.status === "verkocht") return false;
+    if (filter === "nieuw") {
+      const createdAt = new Date(v.createdAt || "");
+      if (createdAt < threeDaysAgo) return false;
+    } else if (filter !== "voorraad" && v.status !== filter) {
+      return false;
+    }
     if (search) {
       const q = search.toLowerCase();
       return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || v.kenteken?.toLowerCase().includes(q);
