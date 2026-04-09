@@ -8,12 +8,7 @@ import { Vehicle, formatEuro, formatEuroDecimal, calcKostprijs, calcWinst, calcM
 import SlidingTabs from "@/components/admin/SlidingTabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-
-const VERKOOP_DOCUMENTEN = [
-  { type: "Koopovereenkomst", label: "Koopovereenkomst", generated: true },
-  { type: "Verkoopfactuur", label: "Factuur", generated: true },
-  { type: "Machtigingsformulier", label: "Machtigingsformulier", generated: false },
-];
+import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 
 const tabItems = [
   { label: "Gegevens", value: "gegevens" },
@@ -182,7 +177,6 @@ const AdminVerkoopDetailPage = () => {
   const totalKosten = calcTotalKosten(vehicle);
   const hasDoc = (type: string) => docs.some(d => d.type === type);
   const getDoc = (type: string) => docs.find(d => d.type === type);
-  const extraDocs = docs.filter(d => !VERKOOP_DOCUMENTEN.some(vd => vd.type === d.type));
 
   const betaalwijze = sale?.betaalwijze || vehicle.betaalmethode || "—";
   const garantieType = sale?.garantie_type || "geen";
@@ -357,103 +351,20 @@ const AdminVerkoopDetailPage = () => {
 
       {/* Tab: Documenten */}
       {activeTab === "documenten" && (
-        <div className="space-y-4">
-          <div className="bg-card border border-border rounded-lg divide-y divide-border">
-            {VERKOOP_DOCUMENTEN.map(doc => {
-              const existing = getDoc(doc.type);
-              return (
-                <div key={doc.type} className="flex items-center gap-3 px-4 py-3">
-                  {existing ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  ) : (
-                    <Circle className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${existing ? "text-foreground font-medium" : "text-muted-foreground"}`}>{doc.label}</p>
-                    {existing && <p className="text-[10px] text-muted-foreground truncate">{existing.naam}</p>}
-                    {doc.generated && !existing && <p className="text-[10px] text-muted-foreground">Gegenereerd door systeem</p>}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {existing ? (
-                      <>
-                        <button onClick={() => handleOpenDocument(existing.file_path)} className="p-1.5 text-muted-foreground hover:text-foreground">
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button className="p-1.5 text-muted-foreground hover:text-red-400">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Document verwijderen?</AlertDialogTitle>
-                              <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen?</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteDoc(existing.id, existing.file_path)}>Verwijderen</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => { setUploadType(doc.type); setUploadOpen(true); }}
-                        className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-primary hover:underline"
-                      >
-                        <Upload className="w-3 h-3" /> Uploaden
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Extra documents */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Overige documenten</h3>
-              <button
-                onClick={() => { setUploadType("Overig"); setUploadOpen(true); }}
-                className="text-xs text-primary hover:underline"
-              >
-                + Toevoegen
-              </button>
-            </div>
-            {extraDocs.length === 0 ? (
-              <p className="text-xs text-muted-foreground bg-card border border-border rounded-lg px-4 py-6 text-center">Geen overige documenten</p>
-            ) : (
-              <div className="bg-card border border-border rounded-lg divide-y divide-border">
-                {extraDocs.map(doc => (
-                  <div key={doc.id} className="flex items-center gap-3 px-4 py-3">
-                    <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <p className="text-sm text-foreground flex-1 truncate">{doc.naam}</p>
-                    <button onClick={() => handleOpenDocument(doc.file_path)} className="p-1.5 text-muted-foreground hover:text-foreground">
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <button className="p-1.5 text-muted-foreground hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Document verwijderen?</AlertDialogTitle>
-                          <AlertDialogDescription>Weet je zeker dat je dit document wilt verwijderen?</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeleteDoc(doc.id, doc.file_path)}>Verwijderen</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        <VehicleDossierTab
+          vehicleId={vehicle.id}
+          vehicleStatus={vehicle.status}
+          verkoopType={vehicle.verkoopType}
+          koperNaam={vehicle.koperNaam}
+          koperEmail={vehicle.koperEmail}
+          koperTelefoon={vehicle.koperTelefoon}
+          verkoopDatum={vehicle.verkoopDatum}
+          verkoopprijs={vehicle.verkoopprijs}
+          merk={vehicle.merk}
+          model={vehicle.model}
+          bouwjaar={vehicle.bouwjaar}
+          kenteken={vehicle.kenteken}
+        />
       )}
 
       {/* Tab: Geschiedenis */}
