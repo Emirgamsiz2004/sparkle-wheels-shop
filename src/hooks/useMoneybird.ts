@@ -113,5 +113,8 @@ export function useMoneybird() {
     downloadInvoicePdf,
     getTaxRates,
     getLedgerAccounts,
+    getFinancialStatements,
+    getReceipts,
+    getPurchaseInvoices,
   };
 }
