@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus, ExternalLink, Trash2, AlertTriangle } from "lucide-react";
+import { FileText, Download, Loader2, Upload, Camera, CheckCircle2, Circle, Plus, ExternalLink, Trash2, AlertTriangle, ShieldCheck } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import VehicleFotosTab from "@/components/admin/VehicleFotosTab";
 import VehicleDocumentenTab from "@/components/admin/VehicleDocumentenTab";
@@ -87,6 +87,7 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadType, setUploadType] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -102,12 +103,46 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
       setArchiveDocs((archRes.data as ArchiveDoc[]) || []);
       setTestDrives((tdRes.data as TestDrive[]) || []);
       setAanbetalingen((abRes.data as Aanbetaling[]) || []);
-      setVerkoopDocs((docRes.data as any[]) || []);
+      const docs = (docRes.data as any[]) || [];
+      // Extract overrides from docs
+      const ov: Record<string, boolean> = {};
+      const regularDocs = docs.filter(d => {
+        if (d.type?.startsWith("dossier-override-")) {
+          ov[d.type.replace("dossier-override-", "")] = true;
+          return false;
+        }
+        return true;
+      });
+      setOverrides(ov);
+      setVerkoopDocs(regularDocs);
       setInkoopverklaringen((ikvRes.data as any[]) || []);
       setLoading(false);
     };
     fetchAll();
   }, [vehicleId]);
+
+  const toggleOverride = async (section: string) => {
+    const type = `dossier-override-${section}`;
+    if (overrides[section]) {
+      // Remove override
+      const { data } = await supabase.from("vehicle_documents").select("id").eq("vehicle_id", vehicleId).eq("type", type);
+      if (data && data.length > 0) {
+        await supabase.from("vehicle_documents").delete().eq("id", data[0].id);
+      }
+      setOverrides(prev => { const n = { ...prev }; delete n[section]; return n; });
+      toast.success("Override verwijderd");
+    } else {
+      // Add override
+      await supabase.from("vehicle_documents").insert({
+        vehicle_id: vehicleId,
+        naam: `Dossier ${section} handmatig compleet gemarkeerd`,
+        type,
+        file_path: `overrides/${vehicleId}-${section}`,
+      } as any);
+      setOverrides(prev => ({ ...prev, [section]: true }));
+      toast.success("Dossier als compleet gemarkeerd");
+    }
+  };
 
   const handleDownload = async (filePath: string | null, bucket: string | null) => {
     if (!filePath || !bucket) return;
@@ -180,18 +215,19 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
     window.open(data.signedUrl, "_blank");
   };
 
-  // Inkoop completeness — either Inkoopverklaring (particulier) OR Inkoopfactuur (bedrijf) is sufficient
+  // Inkoop completeness — either Inkoopverklaring (particulier) OR Inkoopfactuur (bedrijf) is sufficient, or override
   const hasInkoopverklaringDoc = inkoopverklaringen.length > 0 || hasDocument("Inkoopverklaring");
   const hasInkoopfactuurDoc = hasDocument("Inkoopfactuur");
   const hasInkoopDocument = hasInkoopverklaringDoc || hasInkoopfactuurDoc;
-  const inkoopComplete = hasInkoopDocument;
+  const inkoopOverride = !!overrides["inkoop"];
+  const inkoopComplete = hasInkoopDocument || inkoopOverride;
   const inkoopMissing: string[] = [];
-  if (!hasInkoopDocument) inkoopMissing.push("Inkoopverklaring of Inkoopfactuur");
+  if (!hasInkoopDocument && !inkoopOverride) inkoopMissing.push("Inkoopverklaring of Inkoopfactuur");
 
-  // Consignatie completeness
-  const consignatieComplete = hasDocument("Consignatieovereenkomst");
+  const consignatieOverride = !!overrides["consignatie"];
+  const consignatieComplete = hasDocument("Consignatieovereenkomst") || consignatieOverride;
   const consignatieMissing: string[] = [];
-  if (!consignatieComplete) consignatieMissing.push("Consignatieovereenkomst");
+  if (!hasDocument("Consignatieovereenkomst") && !consignatieOverride) consignatieMissing.push("Consignatieovereenkomst");
 
   const inkoopExtraDocs = verkoopDocs.filter(d => d.type === "Overig-inkoop");
   const consignatieExtraDocs = verkoopDocs.filter(d => d.type === "Overig-consignatie");
@@ -209,6 +245,8 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
   const dataComplete = VERKOOP_GEGEVENS.filter(d => hasData(d.key)).length;
   const totalComplete = docsComplete + dataComplete;
   const totalRequired = VERKOOP_DOCUMENTEN.length + VERKOOP_GEGEVENS.length;
+  const verkoopOverride = !!overrides["verkoop"];
+  const verkoopFullyComplete = totalComplete === totalRequired || verkoopOverride;
 
   return (
     <div className="space-y-6">
@@ -217,13 +255,24 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Verkoopdossier</h3>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-              totalComplete === totalRequired 
-                ? "bg-emerald-500/15 text-emerald-400" 
-                : "bg-amber-500/15 text-amber-400"
-            }`}>
-              {totalComplete}/{totalRequired} compleet
-            </span>
+            <div className="flex items-center gap-2">
+              {!verkoopFullyComplete ? (
+                <button onClick={() => toggleOverride("verkoop")} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Compleet markeren
+                </button>
+              ) : verkoopOverride && (
+                <button onClick={() => toggleOverride("verkoop")} className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Handmatig ✓
+                </button>
+              )}
+              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                verkoopFullyComplete
+                  ? "bg-emerald-500/15 text-emerald-400" 
+                  : "bg-amber-500/15 text-amber-400"
+              }`}>
+                {verkoopFullyComplete ? "Compleet" : `${totalComplete}/${totalRequired} compleet`}
+              </span>
+            </div>
           </div>
 
           <div className="bg-card border border-border rounded-lg divide-y divide-border">
@@ -296,11 +345,22 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Consignatiedossier</h3>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-              consignatieComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
-            }`}>
-              {consignatieComplete ? "Compleet" : "Onvolledig"}
-            </span>
+            <div className="flex items-center gap-2">
+              {!consignatieComplete ? (
+                <button onClick={() => toggleOverride("consignatie")} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Compleet markeren
+                </button>
+              ) : consignatieOverride && (
+                <button onClick={() => toggleOverride("consignatie")} className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Handmatig ✓
+                </button>
+              )}
+              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                consignatieComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
+              }`}>
+                {consignatieComplete ? "Compleet" : "Onvolledig"}
+              </span>
+            </div>
           </div>
           {!consignatieComplete && consignatieMissing.length > 0 && (
             <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-md bg-amber-500/10 border border-amber-500/20">
@@ -355,11 +415,22 @@ const VehicleDossierTab = ({ vehicleId, vehicleStatus, verkoopType, koperNaam, k
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Inkoopdossier</h3>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-              inkoopComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
-            }`}>
-              {inkoopComplete ? "Compleet" : "Onvolledig"}
-            </span>
+            <div className="flex items-center gap-2">
+              {!inkoopComplete ? (
+                <button onClick={() => toggleOverride("inkoop")} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Compleet markeren
+                </button>
+              ) : inkoopOverride && (
+                <button onClick={() => toggleOverride("inkoop")} className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:text-foreground transition-colors">
+                  <ShieldCheck className="w-3 h-3" /> Handmatig ✓
+                </button>
+              )}
+              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                inkoopComplete ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
+              }`}>
+                {inkoopComplete ? "Compleet" : "Onvolledig"}
+              </span>
+            </div>
           </div>
           {!inkoopComplete && inkoopMissing.length > 0 && (
             <div className="flex items-start gap-2 mb-3 px-3 py-2 rounded-md bg-amber-500/10 border border-amber-500/20">
