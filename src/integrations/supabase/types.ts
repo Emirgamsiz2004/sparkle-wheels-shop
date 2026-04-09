@@ -2063,6 +2063,7 @@ export type Database = {
           betaalmethode: string | null
           bouwjaar: number | null
           brandstof: string | null
+          btw_marge_type: string
           consignatie_commissie_perc: number | null
           consignatie_eigenaar_email: string | null
           consignatie_eigenaar_naam: string | null
@@ -2108,6 +2109,7 @@ export type Database = {
           betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
+          btw_marge_type?: string
           consignatie_commissie_perc?: number | null
           consignatie_eigenaar_email?: string | null
           consignatie_eigenaar_naam?: string | null
@@ -2153,6 +2155,7 @@ export type Database = {
           betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
+          btw_marge_type?: string
           consignatie_commissie_perc?: number | null
           consignatie_eigenaar_email?: string | null
           consignatie_eigenaar_naam?: string | null
