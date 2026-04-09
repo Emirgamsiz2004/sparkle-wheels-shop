@@ -77,9 +77,21 @@ const AdminVoertuigenPage = () => {
     setSyncing(false);
   };
 
+  const threeDaysAgo = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 3);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
   const filtered = vehicles.filter((v) => {
-    if (v.status === "verkocht") return false; // Sold vehicles are in Verkopen module
-    if (filter !== "voorraad" && v.status !== filter) return false;
+    if (v.status === "verkocht") return false;
+    if (filter === "nieuw") {
+      const createdAt = new Date(v.createdAt || "");
+      if (createdAt < threeDaysAgo) return false;
+    } else if (filter !== "voorraad" && v.status !== filter) {
+      return false;
+    }
     if (search) {
       const q = search.toLowerCase();
       return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || v.kenteken?.toLowerCase().includes(q);
