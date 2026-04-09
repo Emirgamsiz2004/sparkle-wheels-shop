@@ -176,7 +176,8 @@ Deno.serve(async (req) => {
       // ─── Financieel overzicht (BTW) ───
       case "get_financial_statements": {
         const { year } = params;
-        result = await mbFetch(`financial_statements.json?filter=period:${year || new Date().getFullYear()}`);
+        const y = year || new Date().getFullYear();
+        result = await mbFetch(`financial_statements.json?filter=period:${y}0101..${y}1231`);
         break;
       }
 
