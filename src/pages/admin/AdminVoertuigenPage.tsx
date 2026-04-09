@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
-const tabs = [
+const BASE_TABS = [
   { label: "Voorraad", value: "voorraad" },
   { label: "Nieuw", value: "nieuw" },
   { label: "Te koop", value: "te_koop" },
