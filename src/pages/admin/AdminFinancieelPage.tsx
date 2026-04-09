@@ -527,6 +527,9 @@ function BtwTab({ vehicles }: { vehicles: any[] }) {
         </div>
       </div>
 
+      {/* Moneybird BTW samenvatting */}
+      <MoneybirdBtwSummary year={year} btwOntvangen={btwOntvangen} btwBetaald={btwBetaald} />
+
       <div className="flex items-start gap-3 px-4 py-3.5 bg-primary/5 rounded-xl border border-primary/10">
         <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
         <p className="text-xs text-muted-foreground">
