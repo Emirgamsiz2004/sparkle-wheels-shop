@@ -97,10 +97,11 @@ const AdminVerkoopDetailPage = () => {
   }, [id]);
 
   const handleSave = async () => {
-    if (!id) return;
+    if (!id || !vehicle) return;
     setSaving(true);
     try {
-      await updateVehicle(id, {
+      await updateVehicle({
+        ...vehicle,
         koperNaam: form.koperNaam || undefined,
         koperEmail: form.koperEmail || undefined,
         koperTelefoon: form.koperTelefoon || undefined,
@@ -116,8 +117,7 @@ const AdminVerkoopDetailPage = () => {
         inruilMerk: form.inruilMerk || undefined,
         inruilModel: form.inruilModel || undefined,
         inruilWaarde: Number(form.inruilWaarde) || 0,
-      } as any);
-      toast.success("Gegevens opgeslagen");
+      } as Vehicle);
     } catch {
       toast.error("Opslaan mislukt");
     }
