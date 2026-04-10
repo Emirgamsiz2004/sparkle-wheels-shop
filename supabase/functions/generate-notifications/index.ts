@@ -563,13 +563,13 @@ Deno.serve(async (req) => {
         const daysSinceCreated = Math.floor((now.getTime() - createdAt.getTime()) / 86400000)
 
         // Check for each 28-day cycle
-        if (daysSinceCreated < 28) continue
-        const currentCycle = Math.floor(daysSinceCreated / 28)
+        if (daysSinceCreated < 31) continue
+        const currentCycle = Math.floor(daysSinceCreated / 31)
 
         const key = `marktplaats_ad_expired:${v.id}:cycle${currentCycle}`
         if (await alreadySent(key)) continue
 
-        const msg = `Marktplaats advertentie van ${v.merk} ${v.model} (${v.kenteken || '?'}) is waarschijnlijk verlopen (${currentCycle * 28} dagen). Controleer en vervang de link.`
+        const msg = `Marktplaats advertentie van ${v.merk} ${v.model} (${v.kenteken || '?'}) is waarschijnlijk verlopen (${currentCycle * 31} dagen). Controleer en vervang de link.`
         q(msg, '🔄', `/admin/voertuigen/${v.id}`)
         await markSent(key, 'marktplaats_ad_expired', msg, v.id)
         await insertInApp(adminIds, 'marktplaats_ad_expired', msg, `/admin/voertuigen/${v.id}`, v.id)
