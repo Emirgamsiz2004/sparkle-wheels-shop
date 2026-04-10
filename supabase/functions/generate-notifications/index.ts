@@ -545,6 +545,37 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ════════════════════════════════════════════
+    // MARKTPLAATS ADVERTENTIE VERLOPEN (elke 28 dagen)
+    // ════════════════════════════════════════════
+
+    // 18. Marktplaats advertentie verlopen — herinnering om link te vervangen
+    {
+      const { data: mpVehicles } = await supabase
+        .from('vehicles')
+        .select('id, merk, model, kenteken, marktplaats_url, created_at')
+        .in('status', ['te_koop', 'consignatie'])
+        .not('marktplaats_url', 'is', null)
+
+      for (const v of mpVehicles || []) {
+        if (!v.marktplaats_url) continue
+        const createdAt = new Date(v.created_at)
+        const daysSinceCreated = Math.floor((now.getTime() - createdAt.getTime()) / 86400000)
+
+        // Check for each 28-day cycle
+        if (daysSinceCreated < 28) continue
+        const currentCycle = Math.floor(daysSinceCreated / 28)
+
+        const key = `marktplaats_ad_expired:${v.id}:cycle${currentCycle}`
+        if (await alreadySent(key)) continue
+
+        const msg = `Marktplaats advertentie van ${v.merk} ${v.model} (${v.kenteken || '?'}) is waarschijnlijk verlopen (${currentCycle * 28} dagen). Controleer en vervang de link.`
+        q(msg, '🔄', `/admin/voertuigen/${v.id}`)
+        await markSent(key, 'marktplaats_ad_expired', msg, v.id)
+        await insertInApp(adminIds, 'marktplaats_ad_expired', msg, `/admin/voertuigen/${v.id}`, v.id)
+      }
+    }
+
     // ─── Send all queued Slack messages ───
     await sendSlackBatch()
 
