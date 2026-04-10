@@ -2,7 +2,8 @@ import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
-import { ShieldCheck, CheckCircle, AlertTriangle, Globe } from "lucide-react";
+import { ShieldCheck, CheckCircle, AlertTriangle, Globe, FileDown, Phone, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import logoAutotrust from "@/assets/logo-autotrust.png";
 
 const Garantie = () => {
