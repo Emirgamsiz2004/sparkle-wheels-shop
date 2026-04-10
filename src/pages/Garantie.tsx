@@ -2,7 +2,8 @@ import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
-import { ShieldCheck, CheckCircle, AlertTriangle, Globe } from "lucide-react";
+import { ShieldCheck, CheckCircle, AlertTriangle, Globe, FileDown, Phone, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import logoAutotrust from "@/assets/logo-autotrust.png";
 
 const Garantie = () => {
@@ -130,6 +131,66 @@ const Garantie = () => {
               </ul>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Overzichtskaart */}
+      <section className="py-16 bg-muted/30">
+        <div className="max-w-4xl mx-auto px-4">
+          <motion.div
+            className="bg-card rounded-2xl border border-border p-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <FileDown className="h-10 w-10 text-primary mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              Garantie Overzichtskaart
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+              Bekijk in één oogopslag wat er gedekt wordt bij de Instap en Uitgebreide garantiepakketten. Download de overzichtskaart voor alle details.
+            </p>
+            <a
+              href="/garantie-overzichtskaart.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              <FileDown className="h-4 w-4" />
+              Overzichtskaart bekijken (PDF)
+            </a>
+
+            <div className="mt-8 pt-6 border-t border-border">
+              <p className="text-sm text-muted-foreground mb-4">
+                Wilt u weten welk garantiepakket het beste past bij uw voertuig? Neem vrijblijvend contact met ons op.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href="tel:+31713018060"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-colors text-sm"
+                >
+                  <Phone className="h-4 w-4" />
+                  Bel ons: 071 - 301 80 60
+                </a>
+                <a
+                  href="https://wa.me/31612345678"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 border border-border font-medium rounded-lg hover:bg-accent transition-colors text-sm text-foreground"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  WhatsApp
+                </a>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 border border-border font-medium rounded-lg hover:bg-accent transition-colors text-sm text-foreground"
+                >
+                  Contactformulier
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
