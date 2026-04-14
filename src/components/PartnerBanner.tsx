@@ -3,6 +3,7 @@ import logoAutotrack from "@/assets/logo-autotrack.png";
 import logoMarktplaats from "@/assets/logo-marktplaats.png";
 import logoAutoscout24 from "@/assets/logo-autoscout24.png";
 import logoFinanciallease from "@/assets/logo-financiallease.png";
+import logoVwe from "@/assets/logo-vwe.png";
 
 const partners = [
   { name: "AutoTrust", logo: logoAutotrust },
@@ -10,6 +11,7 @@ const partners = [
   { name: "Marktplaats", logo: logoMarktplaats },
   { name: "AutoScout24", logo: logoAutoscout24 },
   { name: "FinancialLease.nl", logo: logoFinanciallease },
+  { name: "VWE Automotive", logo: logoVwe },
 ];
 
 const repeatedPartners = [...partners, ...partners];
