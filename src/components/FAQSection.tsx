@@ -11,34 +11,34 @@ const faqs: { question: string; answer: string; link?: string; linkText?: string
   {
     question: "Kopen jullie ook auto's in?",
     answer:
-      "Ja, wij kopen auto's in. We kijken daarbij wel of het voertuig past binnen ons aanbod. Past de auto bij ons, dan nemen we hem graag over. Past hij er niet tussen, dan kunnen we alsnog een bod doen — in dat geval wordt het voertuig doorverkocht via ons partnernetwerk, wat betekent dat de inkoopprijs iets lager ligt. Neem contact op voor een vrijblijvende taxatie.",
+      "Ja, wij kopen auto's in. We beoordelen altijd of het voertuig past binnen ons aanbod. Past de auto bij ons, dan nemen we hem graag over. Past hij er niet tussen, dan kunnen we alsnog een bod doen — het voertuig wordt dan doorverkocht via ons partnernetwerk, waardoor de inkoopprijs iets lager uitvalt. Neem gerust contact op voor een vrijblijvende taxatie.",
   },
   {
     question: "Bieden jullie garantie aan?",
     answer:
-      "Ja. Wij werken samen met AutoTrust, een dochteronderneming van BOVAG. Via deze samenwerking kunnen wij officiële AutoTrust garantiepakketten aanbieden op voertuigen die daarvoor in aanmerking komen. Zo rijdt u met zekerheid weg.",
+      "Ja. Wij werken samen met AutoTrust, een dochteronderneming van BOVAG. Via deze samenwerking bieden wij officiële AutoTrust-garantiepakketten aan op voertuigen die daarvoor in aanmerking komen. Zo rijdt u met zekerheid weg.",
     link: "/garantie",
-    linkText: "Bekijk onze garantiepakketten →",
+    linkText: "Bekijk onze garantiepakketten",
   },
   {
     question: "Doen jullie ook onderhoud en reparaties?",
     answer:
-      "Ja, wij voeren onderhoud en reparaties uit. APK-keuringen voeren wij zelf niet uit, maar voor al het overige onderhoud en herstelwerk kunt u bij ons terecht.",
+      "Ja, wij voeren klein onderhoud en reparaties uit. APK-keuringen voeren wij zelf niet uit, maar voor overig onderhoud en herstelwerk kunt u bij ons terecht.",
   },
   {
     question: "Hoe kan ik betalen?",
     answer:
-      "Wij accepteren de volgende betaalmethoden: pinbetaling, contant tot €3.000, bankoverschrijving en financiering. Voor financiering werken wij samen met financiallease.nl — wij kunnen de aanvraag voor u verzorgen. Vraag ernaar tijdens uw bezoek.",
+      "Wij accepteren pinbetaling, contant (tot € 3.000), bankoverschrijving en financiering. Voor financiering werken wij samen met financiallease.nl — wij verzorgen de aanvraag graag voor u. Vraag ernaar tijdens uw bezoek.",
   },
   {
     question: "Moet ik een afspraak maken om langs te komen?",
     answer:
-      "U bent altijd welkom tijdens onze openingstijden, zonder afspraak. Wilt u een specifieke auto bezichtigen? Dan stellen wij het op prijs als u van tevoren even laat weten dat u komt en voor welke auto — zo zorgen wij dat het voertuig aanwezig, schoongemaakt en klaar staat voor bezichtiging. Buiten openingstijden zijn wij beschikbaar op afspraak.",
+      "U bent altijd welkom tijdens onze openingstijden, zonder afspraak. Wilt u een specifieke auto bezichtigen? Laat dan even weten dat u komt en voor welke auto, zodat wij het voertuig klaar kunnen zetten. Buiten openingstijden zijn wij beschikbaar op afspraak.",
   },
   {
     question: "Kunnen jullie een auto bezorgen?",
     answer:
-      "Ja, bezorging is mogelijk. Wij brengen de auto naar uw gewenste locatie, zoals uw thuis- of werkadres. Hier zijn bezorgkosten aan verbonden. Neem contact op voor meer informatie en een prijsopgave.",
+      "Ja, bezorging is mogelijk. Wij brengen de auto naar uw gewenste locatie, bijvoorbeeld uw thuis- of werkadres. Hier zijn bezorgkosten aan verbonden. Neem contact op voor meer informatie.",
   },
 ];
 
@@ -68,24 +68,25 @@ const FAQSection = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-3xl mx-auto"
         >
-          <Accordion type="single" collapsible className="space-y-3">
+          <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem
                 key={index}
                 value={`faq-${index}`}
-                className="border border-border rounded-lg px-6 bg-background"
+                className="border-b border-border px-0 last:border-b-0"
               >
-                <AccordionTrigger className="text-left text-base font-semibold font-body text-foreground hover:no-underline">
+                <AccordionTrigger className="text-left text-sm md:text-base font-semibold font-body text-foreground hover:no-underline py-5">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground font-body font-light leading-relaxed">
+                <AccordionContent className="text-sm text-muted-foreground font-body font-light leading-relaxed pb-5">
                   {faq.answer}
                   {faq.link && (
                     <Link
                       to={faq.link}
-                      className="mt-3 inline-block text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs tracking-[0.1em] uppercase font-medium text-foreground/70 hover:text-foreground transition-colors"
                     >
                       {faq.linkText}
+                      <span aria-hidden="true">→</span>
                     </Link>
                   )}
                 </AccordionContent>
