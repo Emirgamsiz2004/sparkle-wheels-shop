@@ -63,6 +63,8 @@ const Footer = () => {
             <p className="text-[10px] tracking-[0.3em] uppercase font-body font-semibold text-muted-foreground mb-1">Contact</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Cilinderweg 99</p>
             <p className="text-[11px] font-body text-muted-foreground/70">2371 DZ Roelofarendsveen</p>
+            <p className="text-[11px] font-body text-muted-foreground/70">KvK: 99146193</p>
+            <p className="text-[11px] font-body text-muted-foreground/70">BTW: NL868825463B01</p>
             <a href="tel:+31612693825" className="text-[11px] font-body text-muted-foreground/70 hover:text-foreground transition-colors w-fit">06-12693825</a>
             <a href="mailto:info@platinautomotive.nl" className="text-[11px] font-body text-muted-foreground/70 hover:text-foreground transition-colors w-fit">info@platinautomotive.nl</a>
           </div>
