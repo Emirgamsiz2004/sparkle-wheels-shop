@@ -22,6 +22,9 @@ const Index = () => {
         <link rel="canonical" href="https://platinautomotive.nl/" />
         <meta property="og:title" content="Platin Automotive | Occasions & Detailing Roelofarendsveen" />
         <meta property="og:description" content="Betrouwbare occasions, detailing en consignatie in Roelofarendsveen. Eerlijke prijzen, persoonlijk advies." />
+        <meta property="og:image" content="https://platinautomotive.nl/images/platin-logo.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://platinautomotive.nl/images/platin-logo.png" />
         <meta property="og:url" content="https://platinautomotive.nl/" />
         <meta property="og:type" content="website" />
         <meta name="robots" content="index, follow" />

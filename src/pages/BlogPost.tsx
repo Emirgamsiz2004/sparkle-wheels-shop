@@ -123,7 +123,9 @@ const BlogPost = () => {
         <meta property="og:description" content={post.meta_description || post.excerpt || ""} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://platinautomotive.nl/blog/${post.slug}`} />
-        {post.featured_image && <meta property="og:image" content={post.featured_image} />}
+        <meta property="og:image" content={post.featured_image || "https://platinautomotive.nl/images/platin-logo.png"} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={post.featured_image || "https://platinautomotive.nl/images/platin-logo.png"} />
         {articleJsonLd && (
           <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
         )}
