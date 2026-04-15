@@ -22,8 +22,8 @@ const AutoCustomizing = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Auto Customizing — Sterrenhemels & Ambient Verlichting | Platin Automotive</title>
-        <meta name="description" content="Sterrenhemels, ambient verlichting, bekleding op maat. Maak uw auto uniek bij Platin Automotive in Roelofarendsveen." />
+        <title>Auto Customizing Roelofarendsveen | Styling & Modificaties | Platin</title>
+        <meta name="description" content="Geef jouw auto een unieke look bij Platin Automotive. Professioneel auto customizing in Roelofarendsveen: folie, styling en modificaties op maat." />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-customizing" />
         <meta name="robots" content="index, follow" />
       </Helmet>

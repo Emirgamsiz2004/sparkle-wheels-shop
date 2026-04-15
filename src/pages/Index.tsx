@@ -16,9 +16,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Occasions Kopen & Verkopen in Roelofarendsveen | Platin Automotive</title>
-        <meta name="description" content="Platin Automotive in Roelofarendsveen — betrouwbare occasions, auto detailing, onderhoud en consignatie verkoop. Persoonlijk advies, eerlijke prijzen. Bel 06-12693825." />
-        <meta name="keywords" content="occasions Roelofarendsveen, auto kopen Roelofarendsveen, auto detailing, consignatie verkoop, auto onderhoud" />
+        <title>Autohandelaar Roelofarendsveen | Occasions & Detailing | Platin Automotive</title>
+        <meta name="description" content="Platin Automotive – uw betrouwbare autohandelaar in Roelofarendsveen. Occasions, detailing, onderhoud & consignatie. RDW-erkend. Bel of WhatsApp ons!" />
+        <link rel="canonical" href="https://platinautomotive.nl/" />
         <link rel="canonical" href="https://platinautomotive.nl/" />
         <meta property="og:title" content="Platin Automotive | Occasions & Detailing Roelofarendsveen" />
         <meta property="og:description" content="Betrouwbare occasions, detailing en consignatie in Roelofarendsveen. Eerlijke prijzen, persoonlijk advies." />

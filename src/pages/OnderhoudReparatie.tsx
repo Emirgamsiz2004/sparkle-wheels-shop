@@ -23,8 +23,8 @@ const OnderhoudReparatie = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Auto Onderhoud & Reparatie Roelofarendsveen | Platin Automotive</title>
-        <meta name="description" content="Klein onderhoud en reparaties in Roelofarendsveen. Olie verversen, remmen, APK-klaar maken. Snel, eerlijk en door vakmensen." />
+        <title>Auto Onderhoud & Reparatie Roelofarendsveen | Alle Merken</title>
+        <meta name="description" content="Betrouwbaar onderhoud en reparatie voor alle merken bij Platin Automotive. Snelle service, eerlijke prijs in Roelofarendsveen. Maak vandaag een afspraak." />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/onderhoud-reparatie" />
         <meta name="robots" content="index, follow" />
       </Helmet>

@@ -26,8 +26,8 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Blog | Platin Automotive Roelofarendsveen</title>
-        <meta name="description" content="Lees onze blogs over occasions, autoadvies en het laatste nieuws van Platin Automotive in Roelofarendsveen." />
+        <title>Auto Tips & Nieuws | Blog Platin Automotive Roelofarendsveen</title>
+        <meta name="description" content="Lees onze blogs over occasions kopen, auto detailing, onderhoud en consignatie. Handige tips van Platin Automotive in Roelofarendsveen." />
         <link rel="canonical" href="https://platinautomotive.nl/blog" />
       </Helmet>
       <Navbar />
