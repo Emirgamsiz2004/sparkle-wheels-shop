@@ -65,8 +65,8 @@ const AutoZoeken = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Auto op Aanvraag Zoeken | Platin Automotive Roelofarendsveen</title>
-        <meta name="description" content="Uw droomauto niet in ons aanbod? Wij zoeken hem voor u. Snel, persoonlijk en op maat. Neem contact op met Platin Automotive." />
+        <title>Auto Zoeken op Maat | Platin Automotive Roelofarendsveen</title>
+        <meta name="description" content="Kunnen we jouw droomauto niet vinden? Platin Automotive zoekt hem voor jou! Gratis zoekopdracht in heel Nederland. Vertel ons wat je zoekt." />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-zoeken" />
         <meta name="robots" content="index, follow" />
       </Helmet>

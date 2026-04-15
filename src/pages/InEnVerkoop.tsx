@@ -33,8 +33,8 @@ const InEnVerkoop = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Occasions Kopen & Verkopen Roelofarendsveen | Platin Automotive</title>
-        <meta name="description" content="Op zoek naar een betrouwbare occasion in Roelofarendsveen? Platin Automotive biedt eerlijk geprijsde auto's. Kom langs of bekijk ons aanbod." />
+        <title>Auto Inkopen & Verkopen Roelofarendsveen | Platin Automotive</title>
+        <meta name="description" content="Platin Automotive koopt en verkoopt auto's in Roelofarendsveen. Eerlijke inruilprijs, snelle afhandeling. Verkoop je auto vandaag – gratis waardebepaling!" />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/in-en-verkoop" />
         <meta name="robots" content="index, follow" />
       </Helmet>

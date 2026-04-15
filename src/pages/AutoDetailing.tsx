@@ -23,8 +23,8 @@ const AutoDetailing = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Auto Detailing Roelofarendsveen | Interieur & Exterieur | Platin Automotive</title>
-        <meta name="description" content="Professionele auto detailing in Roelofarendsveen. Interieur en exterieur reiniging, polijsten en beschermen. Uw auto weer als nieuw." />
+        <title>Auto Detailing Roelofarendsveen | Interieur & Exterieur | Platin</title>
+        <meta name="description" content="Professionele auto detailing bij Platin Automotive. Interieur- en exterieurreiniging, polijsten, lakbescherming. Resultaat gegarandeerd – maak een afspraak!" />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-detailing" />
         <meta name="robots" content="index, follow" />
       </Helmet>

@@ -141,8 +141,8 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Contact | Platin Automotive Roelofarendsveen</title>
-        <meta name="description" content="Neem contact op met Platin Automotive in Roelofarendsveen. Bel 06-12693825, stuur een WhatsApp of kom langs op Cilinderweg 99." />
+        <title>Contact Platin Automotive | Roelofarendsveen – Bel of WhatsApp</title>
+        <meta name="description" content="Neem contact op met Platin Automotive. Bel +31612693825, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 9–18u." />
         <link rel="canonical" href="https://platinautomotive.nl/contact" />
         <meta name="robots" content="index, follow" />
       </Helmet>
