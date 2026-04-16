@@ -5,6 +5,7 @@ import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle, Send } from "luc
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -68,7 +69,7 @@ const ContactForm = () => {
     setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = contactFormSchema.safeParse(formData);
     if (!result.success) {
@@ -80,8 +81,35 @@ const ContactForm = () => {
       return;
     }
 
-    const message = `Hallo, ik ben ${encodeURIComponent(result.data.naam)}.%0A%0AE-mail: ${encodeURIComponent(result.data.email)}${result.data.telefoon ? `%0ATelefoon: ${encodeURIComponent(result.data.telefoon)}` : ""}%0A%0A${encodeURIComponent(result.data.bericht)}`;
-    window.open(`https://wa.me/31612693825?text=${message}`, "_blank");
+    try {
+      const id = crypto.randomUUID();
+      // Save to database
+      await supabase.from("contact_aanmeldingen").insert({
+        id,
+        naam: result.data.naam,
+        email: result.data.email,
+        telefoon: result.data.telefoon || null,
+        bericht: result.data.bericht,
+      });
+
+      // Send email notification
+      await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "nieuwe-contact-aanmelding",
+          recipientEmail: "info@platinautomotive.nl",
+          idempotencyKey: `contact-aanmelding-${id}`,
+          templateData: {
+            type: "contact",
+            naam: result.data.naam,
+            email: result.data.email,
+            telefoon: result.data.telefoon || "",
+            bericht: result.data.bericht,
+          },
+        },
+      });
+    } catch (err) {
+      console.error("Contact form error:", err);
+    }
 
     setSubmitted(true);
     toast({ title: "Bericht verstuurd", description: "We nemen zo snel mogelijk contact met u op." });
