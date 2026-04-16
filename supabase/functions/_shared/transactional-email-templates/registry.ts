@@ -14,6 +14,7 @@ import { template as apkOverview } from './apk-overview.tsx'
 import { template as vehicleLongStock } from './vehicle-long-stock.tsx'
 import { template as proefritFormCompleted } from './proefrit-form-completed.tsx'
 import { template as tasksOverdueOverview } from './tasks-overdue-overview.tsx'
+import { template as nieuweContactAanmelding } from './nieuwe-contact-aanmelding.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'proefrit-overeenkomst': proefritOvereenkomst,
@@ -21,4 +22,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'vehicle-long-stock': vehicleLongStock,
   'proefrit-form-completed': proefritFormCompleted,
   'tasks-overdue-overview': tasksOverdueOverview,
+  'nieuwe-contact-aanmelding': nieuweContactAanmelding,
 }

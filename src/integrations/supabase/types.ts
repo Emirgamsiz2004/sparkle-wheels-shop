@@ -649,6 +649,36 @@ export type Database = {
           },
         ]
       }
+      contact_aanmeldingen: {
+        Row: {
+          bericht: string
+          created_at: string
+          email: string
+          id: string
+          naam: string
+          status: string
+          telefoon: string | null
+        }
+        Insert: {
+          bericht: string
+          created_at?: string
+          email: string
+          id?: string
+          naam: string
+          status?: string
+          telefoon?: string | null
+        }
+        Update: {
+          bericht?: string
+          created_at?: string
+          email?: string
+          id?: string
+          naam?: string
+          status?: string
+          telefoon?: string | null
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           achternaam: string
