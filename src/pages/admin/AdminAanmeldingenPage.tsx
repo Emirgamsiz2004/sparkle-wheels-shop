@@ -89,7 +89,7 @@ const AdminAanmeldingenPage = () => {
         <p className="text-sm text-muted-foreground mt-1">Inzendingen via de website</p>
       </div>
 
-      <SlidingTabs tabs={tabs} activeTab={tab} onTabChange={setTab} />
+      <SlidingTabs tabs={tabs} value={tab} onChange={setTab} />
 
       {tab === "contact" && (
         <div className="space-y-3">
