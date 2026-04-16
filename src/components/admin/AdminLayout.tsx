@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet, BarChart3,
-  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target, Clock, CalendarDays, BadgeDollarSign,
+  Megaphone, Newspaper, FileText, Settings, LogOut, Menu, X, Receipt, Link2, ClipboardCheck, Archive, Users, Target, Clock, CalendarDays, BadgeDollarSign, Inbox,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
@@ -23,6 +23,7 @@ const navItems: NavItem[] = [
   { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
   { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
   { label: "Uren", icon: Clock, path: "/admin/uren" },
+  { label: "Aanmeldingen", icon: Inbox, path: "/admin/aanmeldingen" },
 ];
 
 const AdminLayout = () => {

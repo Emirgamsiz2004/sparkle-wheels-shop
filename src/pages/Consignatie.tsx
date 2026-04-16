@@ -253,8 +253,10 @@ const Consignatie = () => {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
+      const id = crypto.randomUUID();
       // Sla aanmelding op in database
       const { error: dbError } = await supabase.from("consignatie_aanmeldingen").insert({
+        id,
         naam: data.naam,
         telefoon: data.telefoon,
         email: data.email,
@@ -277,6 +279,29 @@ const Consignatie = () => {
 
       if (dbError) throw dbError;
 
+      // Stuur e-mailnotificatie
+      try {
+        await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "nieuwe-contact-aanmelding",
+            recipientEmail: "info@platinautomotive.nl",
+            idempotencyKey: `consignatie-aanmelding-${id}`,
+            templateData: {
+              type: "consignatie",
+              naam: data.naam,
+              email: data.email,
+              telefoon: data.telefoon,
+              merk: data.merk,
+              model: data.model,
+              bouwjaar: data.bouwjaar,
+              kenteken: data.kenteken,
+            },
+          },
+        });
+      } catch {
+        console.log("E-mailnotificatie kon niet worden verzonden");
+      }
+
       // Stuur WhatsApp notificatie
       try {
         await supabase.functions.invoke("send-whatsapp-notification", {
@@ -291,7 +316,6 @@ const Consignatie = () => {
           },
         });
       } catch {
-        // WhatsApp notificatie is niet kritiek
         console.log("WhatsApp notificatie kon niet worden verzonden");
       }
 
