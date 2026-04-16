@@ -229,8 +229,6 @@ const VoertuigDetail = () => {
                 </div>
               )}
 
-              {/* Trade-in section */}
-              <TradeInSection />
             </motion.div>
 
             {/* RIGHT — Sidebar (40%, sticky) */}

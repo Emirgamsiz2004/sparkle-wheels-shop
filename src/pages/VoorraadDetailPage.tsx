@@ -321,7 +321,7 @@ const VoorraadDetailPage = () => {
                 </div>
               )}
 
-              <TradeInSection />
+              
             </motion.div>
 
             {/* RIGHT — Sidebar (40%, sticky) — DESKTOP ONLY */}
