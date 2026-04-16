@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import TradeInSection from "@/components/TradeInSection";
+
 import {
   ArrowLeft,
   Phone,
