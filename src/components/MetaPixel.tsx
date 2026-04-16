@@ -1,7 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-
-const META_PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID;
+import { supabase } from "@/integrations/supabase/client";
 
 declare global {
   interface Window {
@@ -13,17 +12,23 @@ declare global {
 const MetaPixel = () => {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
+  const [pixelId, setPixelId] = useState<string | null>(null);
 
+  // Fetch pixel ID once
   useEffect(() => {
-    if (isAdmin || !META_PIXEL_ID) return;
-
+    if (isAdmin) return;
     const consent = localStorage.getItem("cookie_consent");
     if (consent !== "accepted") return;
 
-    // Prevent double-init
-    if (window.fbq) return;
+    supabase.functions.invoke("get-meta-pixel").then(({ data }) => {
+      if (data?.pixelId) setPixelId(data.pixelId);
+    });
+  }, [isAdmin]);
 
-    // Meta Pixel base code
+  // Init pixel when ID is available
+  useEffect(() => {
+    if (!pixelId || window.fbq) return;
+
     (function (f: any, b: any, e: any, v: string, n?: any, t?: any, s?: any) {
       if (f.fbq) return;
       n = f.fbq = function () {
@@ -41,19 +46,17 @@ const MetaPixel = () => {
       s.parentNode.insertBefore(t, s);
     })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
 
-    window.fbq("init", META_PIXEL_ID);
+    window.fbq("init", pixelId);
     window.fbq("track", "PageView");
-  }, [isAdmin]);
+  }, [pixelId]);
 
   // Track page views on route changes
   useEffect(() => {
-    if (isAdmin || !META_PIXEL_ID) return;
     if (!window.fbq) return;
-
     window.fbq("track", "PageView");
-  }, [location.pathname, isAdmin]);
+  }, [location.pathname]);
 
-  if (isAdmin || !META_PIXEL_ID) return null;
+  if (isAdmin || !pixelId) return null;
 
   return (
     <noscript>
@@ -61,7 +64,7 @@ const MetaPixel = () => {
         height="1"
         width="1"
         style={{ display: "none" }}
-        src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+        src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
         alt=""
       />
     </noscript>
