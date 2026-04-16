@@ -44,6 +44,7 @@ import AdminLeadsPage from "./pages/admin/AdminLeadsPage";
 import AdminLeadDetailPage from "./pages/admin/AdminLeadDetailPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
 import AdminUrenPage from "./pages/admin/AdminUrenPage";
+import AdminAanmeldingenPage from "./pages/admin/AdminAanmeldingenPage";
 import AdminPlanningPage from "./pages/admin/AdminPlanningPage";
 import OccasionsAlphen from "./pages/OccasionsAlphen";
 import OccasionsLeiden from "./pages/OccasionsLeiden";
@@ -105,6 +106,7 @@ const App = () => (
                 <Route path="leads/:id" element={<AdminLeadDetailPage />} />
                 <Route path="uren" element={<AdminUrenPage />} />
                 <Route path="planning" element={<AdminPlanningPage />} />
+                <Route path="aanmeldingen" element={<AdminAanmeldingenPage />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
             </Routes>
@@ -161,6 +163,7 @@ const App = () => (
                 <Route path="leads/:id" element={<AdminLeadDetailPage />} />
                 <Route path="uren" element={<AdminUrenPage />} />
                 <Route path="planning" element={<AdminPlanningPage />} />
+                <Route path="aanmeldingen" element={<AdminAanmeldingenPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
