@@ -11,7 +11,7 @@ const OverOns = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Over Platin Automotive | Eerlijke Autohandelaar Roelofarendsveen</title>
+        <title>Over Ons | Platin Automotive Roelofarendsveen</title>
         <meta name="description" content="Platin Automotive is een eerlijk en persoonlijk autobedrijf in Roelofarendsveen. RDW-erkend, topbeoordeeld door klanten uit heel Zuid-Holland." />
         <link rel="canonical" href="https://platinautomotive.nl/over-ons" />
         <meta name="robots" content="index, follow" />
