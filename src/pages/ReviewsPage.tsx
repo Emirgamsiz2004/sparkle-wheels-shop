@@ -63,6 +63,7 @@ const ReviewsPage = () => {
       <Helmet>
         <title>Klantreviews | Platin Automotive</title>
         <meta name="description" content="Lees wat onze klanten zeggen over Platin Automotive. Bekijk alle Google Reviews." />
+        <link rel="canonical" href="https://platinautomotive.nl/reviews" />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <Navbar />
