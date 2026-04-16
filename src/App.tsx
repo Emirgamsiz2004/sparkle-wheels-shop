@@ -61,6 +61,7 @@ import CookiePolicy from "./pages/CookiePolicy";
 import AlgemeneVoorwaarden from "./pages/AlgemeneVoorwaarden";
 import CookieBanner from "./components/CookieBanner";
 import AnnouncementBar from "./components/AnnouncementBar";
+import MetaPixel from "./components/MetaPixel";
 
 const queryClient = new QueryClient();
 
@@ -164,6 +165,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           )}
+          <MetaPixel />
           <WhatsAppButton />
           <CookieBanner />
         </BrowserRouter>
