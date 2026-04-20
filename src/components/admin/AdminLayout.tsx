@@ -11,23 +11,25 @@ import NotificationBell from "@/components/admin/NotificationBell";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
 
-interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; }
+interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
 const navItems: NavItem[] = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard", medewerker: true },
   { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
-  { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
-  { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
+  { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop", medewerker: true },
+  { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten", medewerker: true },
   { label: "Verkopen", icon: BadgeDollarSign, path: "/admin/verkopen" },
   { label: "Klanten", icon: Users, path: "/admin/klanten" },
-  { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
+  { label: "Planning", icon: CalendarDays, path: "/admin/planning", medewerker: true },
   { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
-  { label: "Uren", icon: Clock, path: "/admin/uren" },
+  { label: "Uren", icon: Clock, path: "/admin/uren", medewerker: true },
   { label: "Aanmeldingen", icon: Inbox, path: "/admin/aanmeldingen" },
 ];
 
+const ALLOWED_MEDEWERKER_PREFIXES = ["/admin/dashboard", "/admin/inkoop", "/admin/proefriten", "/admin/planning", "/admin/uren"];
+
 const AdminLayout = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, isAdmin, isMedewerker, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
