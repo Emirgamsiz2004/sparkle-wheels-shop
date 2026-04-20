@@ -76,6 +76,18 @@ const AdminLayout = () => {
     if (!loading && !user) navigate("/admin/login");
   }, [user, loading, navigate]);
 
+  // Block medewerker from non-allowed routes
+  useEffect(() => {
+    if (!loading && user && role === "medewerker") {
+      const allowed = ALLOWED_MEDEWERKER_PREFIXES.some(
+        (p) => location.pathname === p || location.pathname.startsWith(p + "/")
+      );
+      if (!allowed && !location.pathname.startsWith("/admin/instellingen")) {
+        navigate("/admin/planning", { replace: true });
+      }
+    }
+  }, [user, loading, role, location.pathname, navigate]);
+
   if (loading) {
     return (
       <div className="admin-theme min-h-screen flex items-center justify-center bg-background">
@@ -85,6 +97,8 @@ const AdminLayout = () => {
   }
 
   if (!user) return null;
+
+  const visibleNavItems = isAdmin ? navItems : navItems.filter((i) => i.medewerker);
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + "/");
 
