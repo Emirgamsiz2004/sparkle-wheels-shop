@@ -229,6 +229,8 @@ input[type="number"] {
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
@@ -243,6 +245,30 @@ input[type="number"] {
   ::selection {
     background: hsl(0 0% 78%);
     color: hsl(0 0% 5%);
+  }
+
+  /* Prevent iOS auto-zoom on input focus — inputs must be ≥16px on mobile */
+  @media (max-width: 768px) {
+    input,
+    textarea,
+    select,
+    [contenteditable] {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Admin: use small viewport units so keyboard doesn't resize layout */
+  .admin-theme {
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  /* Admin dialogs: stable height, scroll inside dialog instead of page jump */
+  body:has(.admin-theme) [data-radix-portal] [role="dialog"] {
+    max-height: 90vh;
+    max-height: 90svh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
