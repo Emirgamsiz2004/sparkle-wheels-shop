@@ -64,11 +64,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq('user_id', userId)
         .order('role', { ascending: true }); // admin < medewerker alphabetically; we'll prioritize admin manually
       const roles = (data ?? []).map((r: any) => r.role as string);
+      // Default = admin (volledige toegang). Alleen wanneer expliciet ALLEEN 'medewerker' is toegewezen,
+      // krijgt de gebruiker beperkte toegang.
       if (roles.includes('admin')) setRole('admin');
-      else if (roles.includes('medewerker')) setRole('medewerker');
-      else setRole(null);
+      else if (roles.length > 0 && roles.every((r) => r === 'medewerker')) setRole('medewerker');
+      else setRole('admin');
     } catch {
-      setRole(null);
+      setRole('admin');
     }
   };
 
