@@ -122,7 +122,7 @@ const AdminLayout = () => {
 
         <nav className="flex-1 px-2 py-3 overflow-y-auto">
           <div className="space-y-px">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
