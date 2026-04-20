@@ -11,23 +11,25 @@ import NotificationBell from "@/components/admin/NotificationBell";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
 
-interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; }
+interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
 const navItems: NavItem[] = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard", medewerker: true },
   { label: "Voertuigen", icon: Car, path: "/admin/voertuigen" },
-  { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop" },
-  { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten" },
+  { label: "Inkoop", icon: ShoppingCart, path: "/admin/inkoop", medewerker: true },
+  { label: "Proefriten", icon: ClipboardCheck, path: "/admin/proefriten", medewerker: true },
   { label: "Verkopen", icon: BadgeDollarSign, path: "/admin/verkopen" },
   { label: "Klanten", icon: Users, path: "/admin/klanten" },
-  { label: "Planning", icon: CalendarDays, path: "/admin/planning" },
+  { label: "Planning", icon: CalendarDays, path: "/admin/planning", medewerker: true },
   { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
-  { label: "Uren", icon: Clock, path: "/admin/uren" },
+  { label: "Uren", icon: Clock, path: "/admin/uren", medewerker: true },
   { label: "Aanmeldingen", icon: Inbox, path: "/admin/aanmeldingen" },
 ];
 
+const ALLOWED_MEDEWERKER_PREFIXES = ["/admin/dashboard", "/admin/inkoop", "/admin/proefriten", "/admin/planning", "/admin/uren"];
+
 const AdminLayout = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, isAdmin, isMedewerker, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -74,6 +76,18 @@ const AdminLayout = () => {
     if (!loading && !user) navigate("/admin/login");
   }, [user, loading, navigate]);
 
+  // Block medewerker from non-allowed routes
+  useEffect(() => {
+    if (!loading && user && role === "medewerker") {
+      const allowed = ALLOWED_MEDEWERKER_PREFIXES.some(
+        (p) => location.pathname === p || location.pathname.startsWith(p + "/")
+      );
+      if (!allowed && !location.pathname.startsWith("/admin/instellingen")) {
+        navigate("/admin/planning", { replace: true });
+      }
+    }
+  }, [user, loading, role, location.pathname, navigate]);
+
   if (loading) {
     return (
       <div className="admin-theme min-h-screen flex items-center justify-center bg-background">
@@ -83,6 +97,8 @@ const AdminLayout = () => {
   }
 
   if (!user) return null;
+
+  const visibleNavItems = isAdmin ? navItems : navItems.filter((i) => i.medewerker);
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + "/");
 
@@ -106,7 +122,7 @@ const AdminLayout = () => {
 
         <nav className="flex-1 px-2 py-3 overflow-y-auto">
           <div className="space-y-px">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
