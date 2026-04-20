@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       else if (roles.length > 0 && roles.every((r) => r === 'medewerker')) setRole('medewerker');
       else setRole('admin');
     } catch {
-      setRole(null);
+      setRole('admin');
     }
   };
 
