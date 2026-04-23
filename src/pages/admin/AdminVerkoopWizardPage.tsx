@@ -156,7 +156,14 @@ const AdminVerkoopWizardPage = () => {
         setInruilKvk(existing.inruil_kvk || "");
         setInruilBtw(existing.inruil_btw || "");
         // Stap 2 hydration
-        setLaterOphalen(!!existing.later_ophalen);
+        // Stap 2 hydration
+        const aw = (existing as any).afleverwijze;
+        if (aw === "vandaag" || aw === "later" || aw === "aflevering") {
+          setAfleverwijze(aw);
+        } else {
+          setAfleverwijze(existing.later_ophalen ? "later" : "vandaag");
+        }
+        setAfleveradres((existing as any).afleveradres || "");
         setLeverdatum(existing.leverdatum || "");
         setAanbetalingBedrag(existing.aanbetaling_bedrag ?? "");
         if (["cash", "pin", "ideal", "overboeking"].includes(existing.aanbetaling_betaalwijze)) {
