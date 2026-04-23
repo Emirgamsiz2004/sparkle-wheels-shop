@@ -156,9 +156,10 @@ const AdminVerkoopWizardPage = () => {
         setLaterOphalen(!!existing.later_ophalen);
         setLeverdatum(existing.leverdatum || "");
         setAanbetalingBedrag(existing.aanbetaling_bedrag ?? "");
-        if (existing.aanbetaling_betaalwijze === "cash" || existing.aanbetaling_betaalwijze === "pin" || existing.aanbetaling_betaalwijze === "ideal") {
-          setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze);
+        if (["cash", "pin", "ideal", "overboeking"].includes(existing.aanbetaling_betaalwijze)) {
+          setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze as Betaalwijze);
         }
+        setAanbetalingBankrekening((existing as any).aanbetaling_bankrekening || "");
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
