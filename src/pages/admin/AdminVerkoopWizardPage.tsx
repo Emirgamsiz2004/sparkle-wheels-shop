@@ -454,6 +454,7 @@ const labelCls = "block text-xs font-medium text-muted-foreground mb-1.5";
 
 const Stap1Voertuig = (p: Stap1Props) => {
   const v = p.vehicle;
+  const { refetch } = useVehicles();
   const radioCls = (active: boolean) =>
     `flex-1 px-4 py-2.5 text-sm rounded-[10px] border transition-colors cursor-pointer text-center ${
       active
@@ -461,27 +462,235 @@ const Stap1Voertuig = (p: Stap1Props) => {
         : "border-border text-muted-foreground hover:bg-accent/50"
     }`;
 
+  // Bewerk-modus state voor voertuiggegevens
+  const [editMode, setEditMode] = useState(false);
+  const [savingVehicle, setSavingVehicle] = useState(false);
+  const [edit, setEdit] = useState({
+    merk: v.merk || "",
+    model: v.model || "",
+    bouwjaar: v.bouwjaar || ("" as number | ""),
+    kleur: v.kleur || "",
+    brandstof: v.brandstof || "benzine",
+    kenteken: v.kenteken || "",
+    chassisNummer: v.chassisNummer || "",
+    apkVervaldatum: v.apkVervaldatum || "",
+  });
+
+  const startEdit = () => {
+    setEdit({
+      merk: v.merk || "",
+      model: v.model || "",
+      bouwjaar: v.bouwjaar || "",
+      kleur: v.kleur || "",
+      brandstof: v.brandstof || "benzine",
+      kenteken: v.kenteken || "",
+      chassisNummer: v.chassisNummer || "",
+      apkVervaldatum: v.apkVervaldatum || "",
+    });
+    setEditMode(true);
+  };
+
+  const cancelEdit = () => setEditMode(false);
+
+  const saveVehicle = async () => {
+    setSavingVehicle(true);
+    const { error } = await supabase
+      .from("vehicles")
+      .update({
+        merk: edit.merk,
+        model: edit.model,
+        bouwjaar: edit.bouwjaar === "" ? null : Number(edit.bouwjaar),
+        kleur: edit.kleur || null,
+        brandstof: edit.brandstof,
+        kenteken: edit.kenteken || null,
+        chassis_nummer: edit.chassisNummer || null,
+        apk_vervaldatum: edit.apkVervaldatum || null,
+      } as any)
+      .eq("id", v.id);
+    setSavingVehicle(false);
+    if (error) {
+      toast.error("Opslaan voertuig mislukt");
+      console.error(error);
+      return;
+    }
+    toast.success("Voertuiggegevens opgeslagen");
+    setEditMode(false);
+    refetch();
+  };
+
+  const fieldLabel = "block text-[11px] uppercase tracking-wide text-muted-foreground mb-1";
+  const fieldValue = "text-sm text-foreground";
+
   return (
     <div className="space-y-6">
-      {/* Read-only voertuig samenvatting */}
+      {/* Voertuig gegevens (read-only of bewerkbaar) */}
       <div className="rounded-[14px] border border-border bg-card p-5">
-        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Voertuig</div>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-          <InfoRow label="Merk + model" value={`${v.merk} ${v.model} ${v.bouwjaar || ""}`} />
-          <InfoRow label="Kenteken" value={v.kenteken || "-"} mono />
-          <InfoRow label="Kleur" value={v.kleur || "-"} />
-          <InfoRow label="Brandstof" value={v.brandstof ? brandstofLabels[v.brandstof as keyof typeof brandstofLabels] : "-"} />
-          <InfoRow label="APK tot" value={v.apkVervaldatum || "-"} />
-          <div>
-            <label className={labelCls}>KM-stand</label>
-            <input
-              type="number"
-              inputMode="numeric"
-              value={p.kmStand}
-              onChange={(e) => p.setKmStand(e.target.value === "" ? "" : Number(e.target.value))}
-              className={inputCls}
-              placeholder="0"
-            />
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">Voertuig</div>
+          {!editMode ? (
+            <button
+              type="button"
+              onClick={startEdit}
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-[8px] hover:bg-accent/50"
+              aria-label="Voertuig bewerken"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              Bewerken
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={cancelEdit}
+                disabled={savingVehicle}
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-[8px] hover:bg-accent/50"
+              >
+                <X className="w-3.5 h-3.5" />
+                Annuleren
+              </button>
+              <button
+                type="button"
+                onClick={saveVehicle}
+                disabled={savingVehicle}
+                className="inline-flex items-center gap-1.5 text-xs text-foreground bg-foreground/10 hover:bg-foreground/15 transition-colors px-3 py-1.5 rounded-[8px] border border-foreground/30 disabled:opacity-50"
+              >
+                {savingVehicle ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                Opslaan
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+          {/* Linker kolom */}
+          <div className="space-y-4">
+            <div>
+              <label className={fieldLabel}>Merk + Model</label>
+              {editMode ? (
+                <div className="flex gap-2">
+                  <input
+                    value={edit.merk}
+                    onChange={(e) => setEdit({ ...edit, merk: e.target.value })}
+                    className={inputCls}
+                    placeholder="Merk"
+                  />
+                  <input
+                    value={edit.model}
+                    onChange={(e) => setEdit({ ...edit, model: e.target.value })}
+                    className={inputCls}
+                    placeholder="Model"
+                  />
+                </div>
+              ) : (
+                <div className={fieldValue}>{`${v.merk} ${v.model}`.trim() || "-"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className={fieldLabel}>Bouwjaar</label>
+              {editMode ? (
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={edit.bouwjaar}
+                  onChange={(e) => setEdit({ ...edit, bouwjaar: e.target.value === "" ? "" : Number(e.target.value) })}
+                  className={inputCls}
+                  placeholder="2020"
+                />
+              ) : (
+                <div className={fieldValue}>{v.bouwjaar || "-"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className={fieldLabel}>Kleur</label>
+              {editMode ? (
+                <input
+                  value={edit.kleur}
+                  onChange={(e) => setEdit({ ...edit, kleur: e.target.value })}
+                  className={inputCls}
+                />
+              ) : (
+                <div className={fieldValue}>{v.kleur || "-"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className={fieldLabel}>Brandstof</label>
+              {editMode ? (
+                <select
+                  value={edit.brandstof}
+                  onChange={(e) => setEdit({ ...edit, brandstof: e.target.value as any })}
+                  className={inputCls}
+                >
+                  {Object.entries(brandstofLabels).map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+                </select>
+              ) : (
+                <div className={fieldValue}>
+                  {v.brandstof ? brandstofLabels[v.brandstof as keyof typeof brandstofLabels] : "-"}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Rechter kolom */}
+          <div className="space-y-4">
+            <div>
+              <label className={fieldLabel}>Kenteken</label>
+              {editMode ? (
+                <input
+                  value={edit.kenteken}
+                  onChange={(e) => setEdit({ ...edit, kenteken: e.target.value.toUpperCase() })}
+                  className={`${inputCls} font-mono uppercase`}
+                  placeholder="XX-XX-XX"
+                />
+              ) : (
+                <div className={`${fieldValue} font-mono uppercase`}>{v.kenteken || "-"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className={fieldLabel}>Chassisnummer</label>
+              {editMode ? (
+                <input
+                  value={edit.chassisNummer}
+                  onChange={(e) => setEdit({ ...edit, chassisNummer: e.target.value.toUpperCase() })}
+                  className={`${inputCls} font-mono uppercase`}
+                  placeholder="VIN"
+                />
+              ) : (
+                <div className={`${fieldValue} font-mono uppercase`}>{v.chassisNummer || "-"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className={fieldLabel}>APK tot</label>
+              {editMode ? (
+                <input
+                  type="date"
+                  value={edit.apkVervaldatum}
+                  onChange={(e) => setEdit({ ...edit, apkVervaldatum: e.target.value })}
+                  className={inputCls}
+                />
+              ) : (
+                <div className={fieldValue}>{v.apkVervaldatum || "-"}</div>
+              )}
+            </div>
+
+            {/* KM-stand altijd bewerkbaar */}
+            <div>
+              <label className={fieldLabel}>KM-stand</label>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={p.kmStand}
+                onChange={(e) => p.setKmStand(e.target.value === "" ? "" : Number(e.target.value))}
+                className={inputCls}
+                placeholder="0"
+              />
+            </div>
           </div>
         </div>
       </div>
