@@ -8,6 +8,8 @@ import { brandstofLabels, Vehicle } from "@/types/vehicle";
 import { fetchRdwData } from "@/lib/rdw";
 import { formatKenteken, isValidKenteken } from "@/lib/kenteken";
 import logo from "@/assets/logo.svg";
+import { openAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
+import { FileText } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────
 // Stappen definitie
