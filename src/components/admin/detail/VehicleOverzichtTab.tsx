@@ -360,8 +360,8 @@ const ApkRow = ({ apkVervaldatum, isLast }: { apkVervaldatum?: string; isLast?: 
   const status = getApkStatus(apkVervaldatum);
   return (
     <tr className={!isLast ? "border-b border-border/50" : ""}>
-      <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap align-middle">APK tot</td>
-      <td className={`py-2.5 text-sm font-medium tabular-nums text-right align-middle ${status.color}`}>{status.label}</td>
+      <td className="py-1.5 pr-4 text-[12px] text-muted-foreground whitespace-nowrap align-middle">APK tot</td>
+      <td className={`py-1.5 text-[13px] font-medium tabular-nums text-right align-middle ${status.color}`}>{status.label}</td>
     </tr>
   );
 };
