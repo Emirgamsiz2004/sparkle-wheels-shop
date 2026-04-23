@@ -143,6 +143,12 @@ const AdminVerkoopWizardPage = () => {
   const [garantieLooptijd, setGarantieLooptijd] = useState<number | "">("");
   const [garantiePrijs, setGarantiePrijs] = useState<number | "">("");
 
+  // Stap 5 state
+  const [overeenkomstnummer, setOvereenkomstnummer] = useState<string>("");
+  const [opmerkingen, setOpmerkingen] = useState<string>("");
+  const [contractGetekend, setContractGetekend] = useState<boolean>(false);
+  const [pdfGenereerd, setPdfGenereerd] = useState<boolean>(false);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
