@@ -152,16 +152,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           )}
         </div>
 
-        {/* Right - Financial summary - all inline editable */}
+        {/* Right - Financial summary - simplified */}
         <div className="bg-card border border-border rounded-lg p-4 space-y-0">
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Financieel overzicht</h3>
           <table className="w-full text-sm">
             <tbody>
               <EditableEuroRow label="Inkoopprijs" value={vehicle.inkoopprijs} onSave={async (val) => { await onSave({ ...vehicle, inkoopprijs: val }); onLogActivity("inkoopprijs_gewijzigd", `Inkoopprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} />
-              <InfoRow label="Totale kosten" value={formatEuroDecimal(totalKosten)} />
-              <InfoRow label="Kostprijs" value={formatEuroDecimal(kostprijs)} />
               <EditableEuroRow label="Verkoopprijs" value={vehicle.verkoopprijs} onSave={async (val) => { await onSave({ ...vehicle, verkoopprijs: val }); onLogActivity("verkoopprijs_gewijzigd", `Verkoopprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} />
-              <InfoRow label="Nettomarge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} valueColor={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} isLast />
+              <InfoRow label="Marge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} valueColor={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} isLast />
             </tbody>
           </table>
         </div>
@@ -242,19 +240,6 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
         <p className="text-[10px] text-muted-foreground">Auto-save na 2 seconden</p>
       </div>
 
-      {/* Marktplaats URL */}
-      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-        <label className="block text-xs text-muted-foreground">Marktplaats URL</label>
-        <div className="flex gap-2">
-          <input type="url" value={marktplaatsUrl} onChange={(e) => setMarktplaatsUrl(e.target.value)} placeholder="https://www.marktplaats.nl/v/auto-s/..." className={cn(inputCls, "flex-1")} />
-          <button onClick={handleSaveUrl} className="px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">Opslaan</button>
-          {marktplaatsUrl && (
-            <a href={marktplaatsUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 text-muted-foreground hover:text-foreground">
-              <Link2 className="w-4 h-4" />
-            </a>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
