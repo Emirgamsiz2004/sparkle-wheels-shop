@@ -2361,6 +2361,8 @@ interface Stap5Props {
   setRestBetaalwijze: (v: "cash" | "pin" | "ideal" | "overboeking" | "financiering") => void;
   financieringMaatschappij: string;
   setFinancieringMaatschappij: (v: string) => void;
+  betaalwijzeDetails: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>;
+  setBetaalwijzeDetails: (v: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>) => void;
   onAutoSave: () => Promise<any>;
   verkoopId: string | null;
 }
