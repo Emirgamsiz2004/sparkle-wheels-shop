@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import LatestBlogSection from "@/components/LatestBlogSection";
 import FAQSection from "@/components/FAQSection";
 import PartnerBanner from "@/components/PartnerBanner";
+import AfleveringSection from "@/components/AfleveringSection";
 
 const Index = () => {
   return (
@@ -32,6 +33,7 @@ const Index = () => {
       <HeroSection />
       <InventorySection />
       <ConsignatieSection />
+      <AfleveringSection />
       <PartnerBanner />
       <ServicesSection />
       <AboutSection />
