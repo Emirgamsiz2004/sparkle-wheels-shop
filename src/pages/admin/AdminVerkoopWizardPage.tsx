@@ -1881,4 +1881,210 @@ const formatDateNl = (iso: string) => {
   return `${d}-${m}-${y}`;
 };
 
+// ─────────────────────────────────────────────────────────────
+// Stap 4 — Garantie
+// ─────────────────────────────────────────────────────────────
+interface Stap4Props {
+  garantieType: "geen" | "autotrust";
+  setGarantieType: (v: "geen" | "autotrust") => void;
+  pakket: string;
+  setPakket: (v: string) => void;
+  looptijd: number | "";
+  setLooptijd: (v: number | "") => void;
+  prijs: number | "";
+  setPrijs: (v: number | "") => void;
+}
+
+const Stap4Garantie = ({
+  garantieType, setGarantieType,
+  pakket, setPakket,
+  looptijd, setLooptijd,
+  prijs, setPrijs,
+}: Stap4Props) => {
+  const looptijdOpties = [3, 6, 12, 24];
+
+  return (
+    <div className="space-y-6">
+      {/* Twee garantie kaarten */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Geen garantie */}
+        <button
+          type="button"
+          onClick={() => setGarantieType("geen")}
+          className={cn(
+            "text-left rounded-[14px] border bg-card p-6 transition-all hover:border-emerald-500/50",
+            garantieType === "geen"
+              ? "border-emerald-500 ring-2 ring-emerald-500/20"
+              : "border-border"
+          )}
+        >
+          <div className="flex items-start gap-4">
+            <div className={cn(
+              "h-11 w-11 rounded-full flex items-center justify-center shrink-0 transition-colors",
+              garantieType === "geen" ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"
+            )}>
+              <ShieldOff className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <h3 className="text-base font-semibold text-foreground">Geen garantie</h3>
+                {garantieType === "geen" && (
+                  <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                    <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Voertuig wordt verkocht in huidige staat zonder garantie
+              </p>
+            </div>
+          </div>
+        </button>
+
+        {/* Autotrust */}
+        <button
+          type="button"
+          onClick={() => setGarantieType("autotrust")}
+          className={cn(
+            "text-left rounded-[14px] border bg-card p-6 transition-all hover:border-emerald-500/50",
+            garantieType === "autotrust"
+              ? "border-emerald-500 ring-2 ring-emerald-500/20"
+              : "border-border"
+          )}
+        >
+          <div className="flex items-start gap-4">
+            <div className={cn(
+              "h-11 w-11 rounded-full flex items-center justify-center shrink-0 transition-colors",
+              garantieType === "autotrust" ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"
+            )}>
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <h3 className="text-base font-semibold text-foreground">Autotrust garantiepakket</h3>
+                {garantieType === "autotrust" && (
+                  <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                    <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Garantie via Autotrust — klant regelt claims rechtstreeks met Autotrust
+              </p>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* Geen garantie info */}
+      {garantieType === "geen" && (
+        <div className="rounded-[12px] border border-amber-500/30 bg-amber-500/5 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="space-y-2 text-sm">
+              <p className="font-medium text-foreground">
+                De volgende tekst wordt automatisch vermeld op de koopovereenkomst en factuur:
+              </p>
+              <p className="text-muted-foreground italic leading-relaxed">
+                "Het voertuig wordt verkocht zonder garantie, in de staat zoals bezichtigd en geaccepteerd door koper. Koper doet uitdrukkelijk afstand van elk recht op non-conformiteit als bedoeld in artikel 7:17 BW."
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Autotrust velden */}
+      {garantieType === "autotrust" && (
+        <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Pakket naam <span className="text-destructive">*</span>
+            </label>
+            <input
+              type="text"
+              value={pakket}
+              onChange={(e) => setPakket(e.target.value)}
+              placeholder="bijv. Autotrust Basis"
+              className="w-full h-10 px-3 text-sm bg-background border border-input rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Looptijd in maanden <span className="text-destructive">*</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {looptijdOpties.map((opt) => {
+                const active = Number(looptijd) === opt;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setLooptijd(opt)}
+                    className={cn(
+                      "px-4 h-10 rounded-[10px] border text-sm font-medium transition-colors",
+                      active
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-600"
+                        : "border-border bg-background text-foreground hover:bg-accent"
+                    )}
+                  >
+                    {opt} mnd
+                  </button>
+                );
+              })}
+              <input
+                type="number"
+                min={1}
+                value={looptijd === "" ? "" : looptijd}
+                onChange={(e) => setLooptijd(e.target.value === "" ? "" : Number(e.target.value))}
+                placeholder="Anders…"
+                className="w-28 h-10 px-3 text-sm bg-background border border-input rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Garantieprijs <span className="text-destructive">*</span>
+            </label>
+            <div className="relative max-w-xs">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">€</span>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                value={prijs === "" ? "" : prijs}
+                onChange={(e) => setPrijs(e.target.value === "" ? "" : Number(e.target.value))}
+                placeholder="0,00"
+                className="w-full h-10 pl-7 pr-3 text-sm bg-background border border-input rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+            </div>
+          </div>
+
+          {/* Info tekst */}
+          <div className="rounded-[12px] border border-amber-500/30 bg-amber-500/5 p-4 mt-2">
+            <div className="flex gap-3">
+              <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-2 text-sm">
+                <p className="font-medium text-foreground">
+                  De volgende tekst wordt automatisch vermeld op de koopovereenkomst en factuur:
+                </p>
+                <p className="text-muted-foreground italic leading-relaxed">
+                  "Voertuig wordt verkocht met <span className="not-italic font-medium text-foreground">{pakket || "[pakket]"}</span> garantie, looptijd <span className="not-italic font-medium text-foreground">{looptijd || "[X]"}</span> maanden via Autotrust. Garantie wordt rechtstreeks afgehandeld tussen koper en Autotrust. Verkoper is na overdracht niet aansprakelijk voor garantieclaims."
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Reminder */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+            Vergeet niet het garantiepakket aan te vragen via het Autotrust / VWE portaal
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default AdminVerkoopWizardPage;
