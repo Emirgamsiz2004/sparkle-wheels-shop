@@ -9,7 +9,14 @@ import { fetchRdwData } from "@/lib/rdw";
 import { formatKenteken, isValidKenteken } from "@/lib/kenteken";
 import logo from "@/assets/logo.svg";
 import { openAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
-import { FileText } from "lucide-react";
+import { FileText, CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
+import { nl } from "date-fns/locale";
+
+type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
 // ─────────────────────────────────────────────────────────────
 // Stappen definitie
