@@ -1513,6 +1513,15 @@ const Stap3Klant = (p: Stap3Props) => {
     p.setCustomerId(null);
   };
 
+  const switchKlantType = (zakelijk: boolean) => {
+    if (p.zakelijk === zakelijk) return;
+    p.setZakelijk(zakelijk);
+    // Reset selectie & zoek bij wisselen klanttype
+    p.setCustomerId(null);
+    setSuggesties([]);
+    setZoekterm("");
+  };
+
   const toggleCls = (active: boolean) =>
     `flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-[10px] border transition-colors cursor-pointer ${
       active
@@ -1522,6 +1531,18 @@ const Stap3Klant = (p: Stap3Props) => {
 
   return (
     <div className="space-y-6">
+      {/* Klanttype switcher */}
+      <div className="flex gap-3">
+        <button type="button" onClick={() => switchKlantType(false)} className={toggleCls(!p.zakelijk)}>
+          <User className="w-4 h-4" />
+          Particulier
+        </button>
+        <button type="button" onClick={() => switchKlantType(true)} className={toggleCls(p.zakelijk)}>
+          <Building2 className="w-4 h-4" />
+          Zakelijk
+        </button>
+      </div>
+
       {/* Mode switcher */}
       <div className="flex gap-3">
         <button type="button" onClick={switchToExisting} className={toggleCls(mode === "existing")}>
