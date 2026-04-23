@@ -432,10 +432,22 @@ const AdminVerkoopWizardPage = () => {
   }
 
   // ─────────────────────────────────────────────────────────
+  // Lock body scroll — alleen de wizard content kolom scrollt
+  useEffect(() => {
+    const prevHtml = document.documentElement.style.overflow;
+    const prevBody = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prevHtml;
+      document.body.style.overflow = prevBody;
+    };
+  }, []);
+
   return (
-    <div className="admin-theme min-h-screen bg-background text-foreground">
+    <div className="admin-theme h-screen overflow-hidden bg-background text-foreground">
       {/* Fixed sidebar */}
-      <aside className="fixed top-0 left-0 h-screen w-[280px] z-10 border-r border-border bg-sidebar flex flex-col overflow-y-auto">
+      <aside className="fixed top-0 left-0 h-screen w-[280px] z-10 border-r border-border bg-sidebar flex flex-col">
           <div className="p-5 border-b border-sidebar-border">
             <img src={logo} alt="Platin Automotive" className="h-7 w-auto" />
           </div>
