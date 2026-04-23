@@ -17,6 +17,7 @@ import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
+import DashboardAppointmentsCard from "@/components/admin/DashboardAppointmentsCard";
 
 /* ─── Constants ─── */
 const periodOrder: PeriodKey[] = ["vandaag", "gisteren", "7dagen", "30dagen", "maand", "kwartaal", "jaar"];
@@ -266,6 +267,9 @@ const AdminDashboardPage = () => {
           </div>
         </div>
       </div>
+
+      {/* ═══ Afspraken kaart ═══ */}
+      <DashboardAppointmentsCard />
 
       {/* ═══ BLOK 0 — Totale Omzet & Winst ═══ */}
       <div className="grid grid-cols-2 gap-4">
