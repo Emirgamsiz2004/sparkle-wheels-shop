@@ -2354,6 +2354,7 @@ export type Database = {
           inruil_type: string | null
           inruil_uitvoering: string | null
           inruil_waarde: number | null
+          klant_type: string | null
           later_ophalen: boolean | null
           leges: number | null
           leverdatum: string | null
@@ -2427,6 +2428,7 @@ export type Database = {
           inruil_type?: string | null
           inruil_uitvoering?: string | null
           inruil_waarde?: number | null
+          klant_type?: string | null
           later_ophalen?: boolean | null
           leges?: number | null
           leverdatum?: string | null
@@ -2500,6 +2502,7 @@ export type Database = {
           inruil_type?: string | null
           inruil_uitvoering?: string | null
           inruil_waarde?: number | null
+          klant_type?: string | null
           later_ophalen?: boolean | null
           leges?: number | null
           leverdatum?: string | null

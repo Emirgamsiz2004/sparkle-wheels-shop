@@ -187,6 +187,8 @@ const AdminVerkoopWizardPage = () => {
         }
         setAanbetalingBankrekening((existing as any).aanbetaling_bankrekening || "");
         // Stap 3 hydration
+        if ((existing as any).klant_type === "zakelijk") setKlantZakelijk(true);
+        else if ((existing as any).klant_type === "particulier") setKlantZakelijk(false);
         if (existing.customer_id) {
           setCustomerId(existing.customer_id);
           const { data: cust } = await supabase
@@ -204,7 +206,7 @@ const AdminVerkoopWizardPage = () => {
             setKlantLand(cust.land || "Nederland");
             setKlantTelefoon(cust.telefoon || "");
             setKlantEmail(cust.email || "");
-            setKlantZakelijk(!!cust.is_zakelijk);
+            if ((existing as any).klant_type == null) setKlantZakelijk(!!cust.is_zakelijk);
             setKlantBedrijfsnaam(cust.bedrijfsnaam || "");
             setKlantKvk(cust.kvk_nummer || "");
             setKlantBtw(cust.btw_nummer || "");
@@ -275,6 +277,7 @@ const AdminVerkoopWizardPage = () => {
       aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
       aanbetaling_bankrekening: laterOphalen && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
       customer_id: customerId,
+      klant_type: klantZakelijk ? "zakelijk" : "particulier",
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -285,7 +288,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
@@ -299,18 +302,21 @@ const AdminVerkoopWizardPage = () => {
       }
     }
     if (activeStap === 3) {
-      if (!klantVoornaam.trim() || !klantAchternaam.trim()) { toast.error("Voor- en achternaam zijn verplicht"); return; }
-      if (!klantAdres.trim() || !klantPostcode.trim() || !klantWoonplaats.trim()) { toast.error("Adres, postcode en woonplaats zijn verplicht"); return; }
-      if (!klantTelefoon.trim()) { toast.error("Telefoonnummer is verplicht"); return; }
       if (klantZakelijk) {
         if (!klantBedrijfsnaam.trim()) { toast.error("Bedrijfsnaam is verplicht"); return; }
         if (!klantKvk.trim()) { toast.error("KVK-nummer is verplicht"); return; }
       }
+      if (!klantVoornaam.trim() || !klantAchternaam.trim()) {
+        toast.error(klantZakelijk ? "Contactpersoon voor- en achternaam zijn verplicht" : "Voor- en achternaam zijn verplicht");
+        return;
+      }
+      if (!klantAdres.trim() || !klantPostcode.trim() || !klantWoonplaats.trim()) { toast.error("Adres, postcode en woonplaats zijn verplicht"); return; }
+      if (!klantTelefoon.trim()) { toast.error("Telefoonnummer is verplicht"); return; }
       // Klant aanmaken of bijwerken
       const customerPayload: any = {
         voornaam: klantVoornaam.trim(),
         achternaam: klantAchternaam.trim(),
-        geboortedatum: klantGeboortedatum || null,
+        geboortedatum: !klantZakelijk ? (klantGeboortedatum || null) : null,
         adres: klantAdres.trim() || null,
         postcode: klantPostcode.trim() || null,
         woonplaats: klantWoonplaats.trim() || null,
@@ -1457,7 +1463,7 @@ const Stap3Klant = (p: Stap3Props) => {
   const [zoeken, setZoeken] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
-  // Debounced search
+  // Debounced search — filter op klanttype (zakelijk/particulier)
   useEffect(() => {
     if (mode !== "existing") return;
     const term = zoekterm.trim();
@@ -1467,13 +1473,14 @@ const Stap3Klant = (p: Stap3Props) => {
       const { data, error } = await supabase
         .from("customers")
         .select("id,voornaam,achternaam,email,telefoon,bedrijfsnaam,adres,postcode,woonplaats,plaats,land,geboortedatum,is_zakelijk,kvk_nummer,btw_nummer")
+        .eq("is_zakelijk", p.zakelijk)
         .or(`voornaam.ilike.%${term}%,achternaam.ilike.%${term}%,email.ilike.%${term}%,telefoon.ilike.%${term}%,bedrijfsnaam.ilike.%${term}%`)
         .limit(8);
       setZoeken(false);
       if (!error && data) setSuggesties(data as CustomerSuggestion[]);
     }, 250);
     return () => clearTimeout(t);
-  }, [zoekterm, mode]);
+  }, [zoekterm, mode, p.zakelijk]);
 
   const selectKlant = (c: CustomerSuggestion) => {
     p.setCustomerId(c.id);
@@ -1486,7 +1493,7 @@ const Stap3Klant = (p: Stap3Props) => {
     p.setLand(c.land || "Nederland");
     p.setTelefoon(c.telefoon || "");
     p.setEmail(c.email || "");
-    p.setZakelijk(!!c.is_zakelijk);
+    // klanttype blijft gestuurd door de top-toggle; matched al via filter
     p.setBedrijfsnaam(c.bedrijfsnaam || "");
     p.setKvk(c.kvk_nummer || "");
     p.setBtw(c.btw_nummer || "");
@@ -1506,6 +1513,15 @@ const Stap3Klant = (p: Stap3Props) => {
     p.setCustomerId(null);
   };
 
+  const switchKlantType = (zakelijk: boolean) => {
+    if (p.zakelijk === zakelijk) return;
+    p.setZakelijk(zakelijk);
+    // Reset selectie & zoek bij wisselen klanttype
+    p.setCustomerId(null);
+    setSuggesties([]);
+    setZoekterm("");
+  };
+
   const toggleCls = (active: boolean) =>
     `flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-[10px] border transition-colors cursor-pointer ${
       active
@@ -1515,6 +1531,18 @@ const Stap3Klant = (p: Stap3Props) => {
 
   return (
     <div className="space-y-6">
+      {/* Klanttype switcher */}
+      <div className="flex gap-3">
+        <button type="button" onClick={() => switchKlantType(false)} className={toggleCls(!p.zakelijk)}>
+          <User className="w-4 h-4" />
+          Particulier
+        </button>
+        <button type="button" onClick={() => switchKlantType(true)} className={toggleCls(p.zakelijk)}>
+          <Building2 className="w-4 h-4" />
+          Zakelijk
+        </button>
+      </div>
+
       {/* Mode switcher */}
       <div className="flex gap-3">
         <button type="button" onClick={switchToExisting} className={toggleCls(mode === "existing")}>
@@ -1597,66 +1625,92 @@ const Stap3Klant = (p: Stap3Props) => {
       {/* Nieuwe klant formulier */}
       {mode === "new" && (
         <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+          {/* Zakelijk: bedrijfsgegevens bovenaan */}
+          {p.zakelijk && (
+            <>
+              <div>
+                <label className={labelCls}>Bedrijfsnaam *</label>
+                <input type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>KVK-nummer *</label>
+                  <input type="text" value={p.kvk} onChange={(e) => p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
+                </div>
+                <div>
+                  <label className={labelCls}>BTW-nummer (optioneel)</label>
+                  <input type="text" value={p.btw} onChange={(e) => p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
+                </div>
+              </div>
+              <div className="border-t border-border pt-5">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Contactpersoon</div>
+              </div>
+            </>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Voornaam *</label>
+              <label className={labelCls}>{p.zakelijk ? "Voornaam contactpersoon *" : "Voornaam *"}</label>
               <input type="text" value={p.voornaam} onChange={(e) => p.setVoornaam(e.target.value)} className={inputCls} maxLength={80} />
             </div>
             <div>
-              <label className={labelCls}>Achternaam *</label>
+              <label className={labelCls}>{p.zakelijk ? "Achternaam contactpersoon *" : "Achternaam *"}</label>
               <input type="text" value={p.achternaam} onChange={(e) => p.setAchternaam(e.target.value)} className={inputCls} maxLength={80} />
             </div>
           </div>
 
-          <div>
-            <label className={labelCls}>Geboortedatum *</label>
-            <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className={cn(
-                    "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                    !p.geboortedatum && "text-muted-foreground",
-                  )}
-                >
-                  <span>
-                    {p.geboortedatum
-                      ? format(parseISO(p.geboortedatum), "d MMMM yyyy", { locale: nl })
-                      : "Kies een datum"}
-                  </span>
-                  <CalendarIcon className="h-4 w-4 text-foreground/70" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
-                <Calendar
-                  mode="single"
-                  selected={p.geboortedatum ? parseISO(p.geboortedatum) : undefined}
-                  onSelect={(d) => {
-                    if (d) {
-                      const yyyy = d.getFullYear();
-                      const mm = String(d.getMonth() + 1).padStart(2, "0");
-                      const dd = String(d.getDate()).padStart(2, "0");
-                      p.setGeboortedatum(`${yyyy}-${mm}-${dd}`);
-                      setDatePickerOpen(false);
-                    }
-                  }}
-                  captionLayout="dropdown-buttons"
-                  fromYear={1920}
-                  toYear={new Date().getFullYear()}
-                  defaultMonth={p.geboortedatum ? parseISO(p.geboortedatum) : new Date(1990, 0, 1)}
-                  disabled={(date) => date > new Date()}
-                  initialFocus
-                  locale={nl}
-                  className={cn("p-3 pointer-events-auto")}
-                  classNames={{
-                    day_selected:
-                      "bg-emerald-600 text-white rounded-full border-0 ring-0 hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white focus:ring-0 focus:outline-none",
-                    day_today: "bg-muted text-foreground font-semibold",
-                  }}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+          {/* Geboortedatum alleen voor particulier */}
+          {!p.zakelijk && (
+            <div>
+              <label className={labelCls}>Geboortedatum *</label>
+              <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                      !p.geboortedatum && "text-muted-foreground",
+                    )}
+                  >
+                    <span>
+                      {p.geboortedatum
+                        ? format(parseISO(p.geboortedatum), "d MMMM yyyy", { locale: nl })
+                        : "Kies een datum"}
+                    </span>
+                    <CalendarIcon className="h-4 w-4 text-foreground/70" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={p.geboortedatum ? parseISO(p.geboortedatum) : undefined}
+                    onSelect={(d) => {
+                      if (d) {
+                        const yyyy = d.getFullYear();
+                        const mm = String(d.getMonth() + 1).padStart(2, "0");
+                        const dd = String(d.getDate()).padStart(2, "0");
+                        p.setGeboortedatum(`${yyyy}-${mm}-${dd}`);
+                        setDatePickerOpen(false);
+                      }
+                    }}
+                    captionLayout="dropdown-buttons"
+                    fromYear={1920}
+                    toYear={new Date().getFullYear()}
+                    defaultMonth={p.geboortedatum ? parseISO(p.geboortedatum) : new Date(1990, 0, 1)}
+                    disabled={(date) => date > new Date()}
+                    initialFocus
+                    locale={nl}
+                    className={cn("p-3 pointer-events-auto")}
+                    classNames={{
+                      day_selected:
+                        "bg-emerald-600 text-white rounded-full border-0 ring-0 hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white focus:ring-0 focus:outline-none",
+                      day_today: "bg-muted text-foreground font-semibold",
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
 
           <div>
             <label className={labelCls}>Adres *</label>
@@ -1688,41 +1742,6 @@ const Stap3Klant = (p: Stap3Props) => {
           <div>
             <label className={labelCls}>E-mailadres (optioneel)</label>
             <input type="email" value={p.email} onChange={(e) => p.setEmail(e.target.value)} className={inputCls} placeholder="naam@voorbeeld.nl" maxLength={150} />
-          </div>
-
-          <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
-            <input
-              type="checkbox"
-              checked={p.zakelijk}
-              onChange={(e) => p.setZakelijk(e.target.checked)}
-              className="w-4 h-4 rounded border-border bg-input text-foreground focus:ring-1 focus:ring-ring"
-            />
-            <span className="text-sm text-foreground">Zakelijke klant</span>
-          </label>
-
-          <div
-            className={`grid transition-all duration-300 ease-out ${
-              p.zakelijk ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-            }`}
-          >
-            <div className="overflow-hidden">
-              <div className="border-t border-border pt-5 space-y-4">
-                <div>
-                  <label className={labelCls}>Bedrijfsnaam *</label>
-                  <input type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelCls}>KVK-nummer *</label>
-                    <input type="text" value={p.kvk} onChange={(e) => p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
-                  </div>
-                  <div>
-                    <label className={labelCls}>BTW-nummer (optioneel)</label>
-                    <input type="text" value={p.btw} onChange={(e) => p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       )}

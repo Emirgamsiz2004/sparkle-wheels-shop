@@ -1,0 +1,1 @@
+ALTER TABLE public.verkopen ADD COLUMN IF NOT EXISTS klant_type text;
