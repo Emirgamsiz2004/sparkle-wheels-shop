@@ -263,7 +263,7 @@ const AdminVerkopenPage = () => {
                         <tr
                           key={v.id}
                           onClick={() => window.location.href = `/admin/verkopen/${v.id}`}
-                          className="border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer"
+                          className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer"
                         >
                           <td className="px-3 py-2.5 text-muted-foreground text-[11px] whitespace-nowrap">
                             {v.verkoopDatum ? new Date(v.verkoopDatum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "—"}

@@ -255,7 +255,7 @@ export default function AdminInkoopPage() {
                         key={c.id}
                         onClick={() => setSelected(c)}
                         className={cn(
-                          'border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer',
+                          'border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer',
                           currentSelected?.id === c.id && 'bg-foreground/5'
                         )}
                       >

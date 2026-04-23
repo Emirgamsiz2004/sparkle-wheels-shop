@@ -141,7 +141,7 @@ const AdminKlantenPage = () => {
                   <tr
                     key={c.id}
                     onClick={() => navigate(`/admin/klanten/${c.id}`)}
-                    className="border-b border-border/50 hover:bg-muted/40 cursor-pointer transition-colors"
+                    className="border-b border-border/50 hover:bg-muted/70 cursor-pointer transition-colors"
                   >
                     <td className="px-3 py-2.5 text-foreground">{c.voornaam} {c.achternaam}</td>
                     <td className="px-3 py-2.5 text-muted-foreground text-xs">{c.telefoon || "—"}</td>

@@ -216,7 +216,7 @@ const AdminVoertuigenPage = () => {
                     <tr
                       key={v.id}
                       onClick={() => navigate(`/admin/voertuigen/${v.id}`)}
-                      className="border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer"
+                      className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer"
                     >
                       <td className="px-3 py-2.5 text-foreground">
                         {v.merk} {v.model} <span className="text-muted-foreground text-xs">({v.bouwjaar})</span>
