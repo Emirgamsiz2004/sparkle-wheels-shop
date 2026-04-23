@@ -32,18 +32,10 @@ const AdminVoertuigDetailPage = () => {
   const { addAppointment } = useAppointments();
   const [activeTab, setActiveTab] = useState("overzicht");
   const [proefritOpen, setProefritOpen] = useState(false);
-  const [consignatieOpen, setConsignatieOpen] = useState(false);
-  const [aanbetalingOpen, setAanbetalingOpen] = useState(false);
   const [kostenOpen, setKostenOpen] = useState(false);
   const [verkoopOpen, setVerkoopOpen] = useState(false);
-  const [reserveringOpen, setReserveringOpen] = useState(false);
   const [afspraakOpen, setAfspraakOpen] = useState(false);
   const [afspraakType, setAfspraakType] = useState<string | undefined>();
-
-  // When "Taak toevoegen" is clicked, switch to taken tab
-  const handleOpenTaak = useCallback(() => {
-    setActiveTab("taken");
-  }, []);
 
   const vehicle = vehicles.find((v) => v.id === id);
 
@@ -98,13 +90,9 @@ const AdminVoertuigDetailPage = () => {
         vehicle={vehicle}
         onStatusChange={handleStatusChange}
         onOpenProefrit={() => setProefritOpen(true)}
-        onOpenAanbetaling={() => setAanbetalingOpen(true)}
         onOpenKosten={() => setKostenOpen(true)}
-        onOpenTaak={handleOpenTaak}
         onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
         onOpenVerkoop={() => setVerkoopOpen(true)}
-        onOpenReservering={() => setReserveringOpen(true)}
-        onDelete={handleDelete}
       />
 
       <VerkoopCompletenessBar
@@ -133,9 +121,6 @@ const AdminVoertuigDetailPage = () => {
         {activeTab === "overzicht" && (
           <VehicleOverzichtTab vehicle={vehicle} onSave={updateVehicle} onLogActivity={logActivity} />
         )}
-        {activeTab === "financieel" && (
-          <VehicleFinancieelEditTab vehicle={vehicle} onSave={updateVehicle} onAddCost={handleAddCostWithLog} onRemoveCost={removeCost} onLogActivity={logActivity} />
-        )}
         {activeTab === "dossier" && (
           <VehicleDossierTab
             vehicleId={vehicle.id}
@@ -163,8 +148,6 @@ const AdminVoertuigDetailPage = () => {
         onClose={() => setProefritOpen(false)}
         vehicle={{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, kenteken: vehicle.kenteken, bouwjaar: vehicle.bouwjaar, kilometerstand: vehicle.kilometerstand }}
       />
-      <ConsignatieOvereenkomstDialog open={consignatieOpen} onClose={() => setConsignatieOpen(false)} vehicle={vehicle} />
-      <AanbetalingDialog open={aanbetalingOpen} onClose={() => setAanbetalingOpen(false)} vehicle={vehicle} onStatusChange={refetch} />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
       <VerkoopWizard
         open={verkoopOpen}
@@ -179,8 +162,20 @@ const AdminVoertuigDetailPage = () => {
           email: vehicle.koperEmail || "",
         } : undefined}
       />
-      <ReserveringWizard open={reserveringOpen} onOpenChange={setReserveringOpen} vehicle={vehicle} onComplete={refetch} />
       <AppointmentFormDialog
+        open={afspraakOpen}
+        onOpenChange={(v) => { setAfspraakOpen(v); if (!v) setAfspraakType(undefined); }}
+        customers={customers.map(c => ({ id: c.id, voornaam: c.voornaam, achternaam: c.achternaam }))}
+        vehicles={[{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, kenteken: vehicle.kenteken }]}
+        defaultType={afspraakType}
+        onSubmit={async (data) => {
+          await addAppointment({ ...data, vehicle_id: vehicle.id });
+          toast.success("Afspraak ingepland");
+        }}
+      />
+    </div>
+  );
+};
         open={afspraakOpen}
         onOpenChange={(v) => { setAfspraakOpen(v); if (!v) setAfspraakType(undefined); }}
         customers={customers.map(c => ({ id: c.id, voornaam: c.voornaam, achternaam: c.achternaam }))}
