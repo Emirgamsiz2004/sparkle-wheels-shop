@@ -228,6 +228,8 @@ const AdminVerkoopWizardPage = () => {
       inruil_kvk: inruil && inruilVerkoper === "zakelijk" ? inruilKvk || null : null,
       inruil_btw: inruil && inruilVerkoper === "zakelijk" ? inruilBtw || null : null,
       later_ophalen: laterOphalen,
+      afleverwijze,
+      afleveradres: afleverwijze === "aflevering" ? (afleveradres || null) : null,
       leverdatum: laterOphalen ? (leverdatum || null) : new Date().toISOString().slice(0, 10),
       aanbetaling_bedrag: laterOphalen && aanbetalingBedrag !== "" ? Number(aanbetalingBedrag) : null,
       aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
