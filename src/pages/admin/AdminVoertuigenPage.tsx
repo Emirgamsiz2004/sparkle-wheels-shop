@@ -266,7 +266,7 @@ const ApkBadge = ({ apkVervaldatum }: { apkVervaldatum?: string }) => {
   const isExpired = apk.getTime() < today.getTime();
   const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
   return (
-    <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap border ${
+    <span className={`${BADGE_BASE} ${
       isRed
         ? "bg-red-500/10 text-red-400 border-red-500/25"
         : "bg-amber-500/10 text-amber-400 border-amber-500/25"
