@@ -1493,7 +1493,7 @@ const Stap3Klant = (p: Stap3Props) => {
     p.setLand(c.land || "Nederland");
     p.setTelefoon(c.telefoon || "");
     p.setEmail(c.email || "");
-    p.setZakelijk(!!c.is_zakelijk);
+    // klanttype blijft gestuurd door de top-toggle; matched al via filter
     p.setBedrijfsnaam(c.bedrijfsnaam || "");
     p.setKvk(c.kvk_nummer || "");
     p.setBtw(c.btw_nummer || "");
