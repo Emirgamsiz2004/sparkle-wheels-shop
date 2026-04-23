@@ -2369,7 +2369,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       await p.onAutoSave();
 
       const { buildKoopovereenkomstDoc } = await import("@/lib/koopovereenkomstPdf");
-      const doc = buildKoopovereenkomstDoc({
+      const doc = await buildKoopovereenkomstDoc({
         voertuig: {
           merk: p.vehicle.merk,
           model: p.vehicle.model,
@@ -2380,6 +2380,9 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           kleur: p.vehicle.kleur,
           brandstof: p.vehicle.brandstof,
           uitvoering: p.vehicle.uitvoering,
+          apkTot: (p.vehicle as any).apkTot || (p.vehicle as any).apk_tot,
+          nap: (p.vehicle as any).nap !== false,
+          btwType: voertuigTypeLabel,
         },
         klant: {
           voornaam: p.klant.voornaam,
@@ -2390,9 +2393,14 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           telefoon: p.klant.telefoon,
           email: p.klant.email,
           geboortedatum: p.klant.geboortedatum,
+          bedrijfsnaam: (p.klant as any).bedrijfsnaam,
+          kvk: (p.klant as any).kvk,
+          isZakelijk: !!(p.klant as any).zakelijk,
         },
         financieel: {
           verkoopprijs: p.verkoopprijs,
+          afleverkosten: p.afleverkosten,
+          leges: p.leges,
           betaalwijze: p.restBetaalwijze + (p.restBetaalwijze === "financiering" && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : ""),
           aanbetalingActief: (p.aanbetalingBedrag || 0) > 0,
           aanbetalingsbedrag: p.aanbetalingBedrag,
@@ -2404,6 +2412,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           kosten: garantieKosten,
           betaler: garantieKosten > 0 ? "klant" : "geen",
         },
+        overeenkomstnummer: p.overeenkomstnummer,
         wwftBevestigd: false,
         datum: new Date().toISOString().slice(0, 10),
         plaats: "Roelofarendsveen",
