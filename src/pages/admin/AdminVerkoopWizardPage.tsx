@@ -108,11 +108,14 @@ const AdminVerkoopWizardPage = () => {
   const [inruilBtw, setInruilBtw] = useState("");
 
   // Stap 2 state
-  const [laterOphalen, setLaterOphalen] = useState<boolean>(false);
+  const [afleverwijze, setAfleverwijze] = useState<"vandaag" | "later" | "aflevering">("vandaag");
+  const [afleveradres, setAfleveradres] = useState<string>("");
   const [leverdatum, setLeverdatum] = useState<string>("");
   const [aanbetalingBedrag, setAanbetalingBedrag] = useState<number | "">("");
   const [aanbetalingBetaalwijze, setAanbetalingBetaalwijze] = useState<Betaalwijze>("");
   const [aanbetalingBankrekening, setAanbetalingBankrekening] = useState<string>("");
+  // Compat: laterOphalen blijft afgeleid
+  const laterOphalen = afleverwijze !== "vandaag";
 
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
@@ -153,7 +156,14 @@ const AdminVerkoopWizardPage = () => {
         setInruilKvk(existing.inruil_kvk || "");
         setInruilBtw(existing.inruil_btw || "");
         // Stap 2 hydration
-        setLaterOphalen(!!existing.later_ophalen);
+        // Stap 2 hydration
+        const aw = (existing as any).afleverwijze;
+        if (aw === "vandaag" || aw === "later" || aw === "aflevering") {
+          setAfleverwijze(aw);
+        } else {
+          setAfleverwijze(existing.later_ophalen ? "later" : "vandaag");
+        }
+        setAfleveradres((existing as any).afleveradres || "");
         setLeverdatum(existing.leverdatum || "");
         setAanbetalingBedrag(existing.aanbetaling_bedrag ?? "");
         if (["cash", "pin", "ideal", "overboeking"].includes(existing.aanbetaling_betaalwijze)) {
@@ -218,6 +228,8 @@ const AdminVerkoopWizardPage = () => {
       inruil_kvk: inruil && inruilVerkoper === "zakelijk" ? inruilKvk || null : null,
       inruil_btw: inruil && inruilVerkoper === "zakelijk" ? inruilBtw || null : null,
       later_ophalen: laterOphalen,
+      afleverwijze,
+      afleveradres: afleverwijze === "aflevering" ? (afleveradres || null) : null,
       leverdatum: laterOphalen ? (leverdatum || null) : new Date().toISOString().slice(0, 10),
       aanbetaling_bedrag: laterOphalen && aanbetalingBedrag !== "" ? Number(aanbetalingBedrag) : null,
       aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
@@ -232,17 +244,17 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
     if (activeStap === 2) {
-      if (laterOphalen) {
+      if (afleverwijze === "later") {
         if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
-        if (aanbetalingBedrag === "" || Number(aanbetalingBedrag) <= 0) {
-          toast.error("Aanbetalingsbedrag is verplicht"); return;
-        }
-        if (!aanbetalingBetaalwijze) { toast.error("Kies een betaalmethode"); return; }
+        // Aanbetaling is optioneel
+      } else if (afleverwijze === "aflevering") {
+        if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
+        if (!afleveradres.trim()) { toast.error("Afleveradres is verplicht"); return; }
       }
     }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
@@ -410,8 +422,10 @@ const AdminVerkoopWizardPage = () => {
               <Stap2Aflevering
                 vehicle={vehicle}
                 verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
-                laterOphalen={laterOphalen}
-                setLaterOphalen={setLaterOphalen}
+                afleverwijze={afleverwijze}
+                setAfleverwijze={setAfleverwijze}
+                afleveradres={afleveradres}
+                setAfleveradres={setAfleveradres}
                 leverdatum={leverdatum}
                 setLeverdatum={setLeverdatum}
                 aanbetalingBedrag={aanbetalingBedrag}
@@ -420,6 +434,7 @@ const AdminVerkoopWizardPage = () => {
                 setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
                 aanbetalingBankrekening={aanbetalingBankrekening}
                 setAanbetalingBankrekening={setAanbetalingBankrekening}
+                onAutoSave={() => saveCurrent()}
               />
             )}
 
@@ -990,8 +1005,10 @@ const TogglePill = ({
 interface Stap2Props {
   vehicle: any;
   verkoopprijs: number;
-  laterOphalen: boolean;
-  setLaterOphalen: (v: boolean) => void;
+  afleverwijze: "vandaag" | "later" | "aflevering";
+  setAfleverwijze: (v: "vandaag" | "later" | "aflevering") => void;
+  afleveradres: string;
+  setAfleveradres: (v: string) => void;
   leverdatum: string;
   setLeverdatum: (v: string) => void;
   aanbetalingBedrag: number | "";
@@ -1000,12 +1017,38 @@ interface Stap2Props {
   setAanbetalingBetaalwijze: (v: Betaalwijze) => void;
   aanbetalingBankrekening: string;
   setAanbetalingBankrekening: (v: string) => void;
+  onAutoSave?: () => void | Promise<any>;
 }
 
 const Stap2Aflevering = (p: Stap2Props) => {
   const aanbetaling = p.aanbetalingBedrag === "" ? 0 : Number(p.aanbetalingBedrag);
   const restbedrag = Math.max(0, (p.verkoopprijs || 0) - aanbetaling);
   const today = new Date().toISOString().slice(0, 10);
+  const laterOphalen = p.afleverwijze !== "vandaag";
+
+  // Autosave bij later ophalen / aflevering: zodra leverdatum + (aanbetaling of adres) ingevuld zijn
+  const autoSaveSig = useMemo(() => {
+    if (!laterOphalen) return null;
+    const filledAanbet = p.aanbetalingBedrag !== "" && Number(p.aanbetalingBedrag) > 0;
+    const filledAdres = p.afleverwijze === "aflevering" ? p.afleveradres.trim().length > 0 : true;
+    if (!p.leverdatum) return null;
+    if (p.afleverwijze === "later" && !filledAanbet) return null;
+    if (p.afleverwijze === "aflevering" && !filledAdres) return null;
+    return [
+      p.afleverwijze,
+      p.leverdatum,
+      String(p.aanbetalingBedrag),
+      p.aanbetalingBetaalwijze,
+      p.aanbetalingBankrekening,
+      p.afleveradres,
+    ].join("|");
+  }, [laterOphalen, p.afleverwijze, p.leverdatum, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, p.aanbetalingBankrekening, p.afleveradres]);
+
+  useEffect(() => {
+    if (!autoSaveSig || !p.onAutoSave) return;
+    const t = setTimeout(() => { p.onAutoSave?.(); }, 600);
+    return () => clearTimeout(t);
+  }, [autoSaveSig]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const optionCls = (active: boolean) =>
     `flex-1 px-4 py-3 text-sm rounded-[10px] border transition-colors cursor-pointer text-center font-medium ${
@@ -1056,81 +1099,99 @@ const Stap2Aflevering = (p: Stap2Props) => {
       {/* Sectie 1 — Aflevering */}
       <div className="rounded-[14px] border border-border bg-card p-5 space-y-4">
         <div className="text-xs uppercase tracking-wide text-muted-foreground">Aflevering</div>
-        <div className="flex gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
             type="button"
-            onClick={() => p.setLaterOphalen(false)}
-            className={optionCls(!p.laterOphalen)}
+            onClick={() => p.setAfleverwijze("vandaag")}
+            className={optionCls(p.afleverwijze === "vandaag")}
           >
             Vandaag afleveren
           </button>
           <button
             type="button"
-            onClick={() => p.setLaterOphalen(true)}
-            className={optionCls(p.laterOphalen)}
+            onClick={() => p.setAfleverwijze("later")}
+            className={optionCls(p.afleverwijze === "later")}
           >
             Wordt later opgehaald
+          </button>
+          <button
+            type="button"
+            onClick={() => p.setAfleverwijze("aflevering")}
+            className={optionCls(p.afleverwijze === "aflevering")}
+          >
+            Aflevering
           </button>
         </div>
 
         <div
           className={`grid transition-all duration-300 ease-out ${
-            p.laterOphalen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
+            laterOphalen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
           }`}
         >
           <div className="overflow-hidden">
-            <div className="border-t border-border pt-4">
-              <label className={labelCls}>Verwachte leverdatum *</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                      !p.leverdatum && "text-muted-foreground",
-                    )}
-                  >
-                    <span>
-                      {p.leverdatum
-                        ? format(parseISO(p.leverdatum), "d MMMM yyyy", { locale: nl })
-                        : "Kies een datum"}
-                    </span>
-                    <CalendarIcon className="h-4 w-4 text-foreground/70" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-0 bg-popover border-border"
-                  align="start"
-                >
-                  <Calendar
-                    mode="single"
-                    selected={p.leverdatum ? parseISO(p.leverdatum) : undefined}
-                    onSelect={(d) => {
-                      if (d) {
-                        // Local yyyy-mm-dd to avoid timezone shift
-                        const yyyy = d.getFullYear();
-                        const mm = String(d.getMonth() + 1).padStart(2, "0");
-                        const dd = String(d.getDate()).padStart(2, "0");
-                        p.setLeverdatum(`${yyyy}-${mm}-${dd}`);
-                      }
-                    }}
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                    initialFocus
-                    locale={nl}
-                    className={cn("p-3 pointer-events-auto")}
-                    classNames={{
-                      day_selected:
-                        "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white",
-                      day_today: "bg-accent/60 text-accent-foreground font-semibold",
-                    }}
+            <div className="border-t border-border pt-4 space-y-4">
+              <div>
+                <label className={labelCls}>Verwachte leverdatum *</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        !p.leverdatum && "text-muted-foreground",
+                      )}
+                    >
+                      <span>
+                        {p.leverdatum
+                          ? format(parseISO(p.leverdatum), "d MMMM yyyy", { locale: nl })
+                          : "Kies een datum"}
+                      </span>
+                      <CalendarIcon className="h-4 w-4 text-foreground/70" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={p.leverdatum ? parseISO(p.leverdatum) : undefined}
+                      onSelect={(d) => {
+                        if (d) {
+                          const yyyy = d.getFullYear();
+                          const mm = String(d.getMonth() + 1).padStart(2, "0");
+                          const dd = String(d.getDate()).padStart(2, "0");
+                          p.setLeverdatum(`${yyyy}-${mm}-${dd}`);
+                        }
+                      }}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                      locale={nl}
+                      className={cn("p-3 pointer-events-auto")}
+                      classNames={{
+                        day_selected:
+                          "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white",
+                        day_today: "bg-accent/60 text-accent-foreground font-semibold",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {p.afleverwijze === "aflevering" && (
+                <div>
+                  <label className={labelCls}>Afleveradres *</label>
+                  <input
+                    type="text"
+                    value={p.afleveradres}
+                    onChange={(e) => p.setAfleveradres(e.target.value)}
+                    className={inputCls}
+                    placeholder="Straat 1, 1234 AB Plaats"
                   />
-                </PopoverContent>
-              </Popover>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {!p.laterOphalen && (
+        {p.afleverwijze === "vandaag" && (
           <div className="text-xs text-muted-foreground border-t border-border pt-4">
             Leverdatum wordt automatisch op vandaag ({formatDateNl(today)}) gezet. Geen aanbetaling vereist.
           </div>
@@ -1140,7 +1201,7 @@ const Stap2Aflevering = (p: Stap2Props) => {
       {/* Sectie 2 — Aanbetaling */}
       <div
         className={`grid transition-all duration-300 ease-out ${
-          p.laterOphalen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          laterOphalen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
       >
         <div className="overflow-hidden">
@@ -1148,7 +1209,7 @@ const Stap2Aflevering = (p: Stap2Props) => {
             <div className="text-xs uppercase tracking-wide text-muted-foreground">Aanbetaling</div>
 
             <div>
-              <label className={labelCls}>Aanbetalingsbedrag (€) *</label>
+              <label className={labelCls}>Aanbetalingsbedrag (€)</label>
               <input
                 type="number"
                 inputMode="numeric"
@@ -1171,7 +1232,7 @@ const Stap2Aflevering = (p: Stap2Props) => {
             </div>
 
             <div>
-              <label className={labelCls}>Betaalmethode *</label>
+              <label className={labelCls}>Betaalmethode</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {(["cash", "pin", "ideal", "overboeking"] as const).map((m) => (
                   <button
@@ -1216,6 +1277,12 @@ const Stap2Aflevering = (p: Stap2Props) => {
           </div>
         </div>
       </div>
+
+      {laterOphalen && (
+        <p className="text-xs text-muted-foreground text-center pt-1">
+          Wijzigingen worden automatisch bewaard
+        </p>
+      )}
     </div>
   );
 };
