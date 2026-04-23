@@ -2354,8 +2354,12 @@ export type Database = {
           id: string
           inruil: boolean | null
           inruil_bedrijfsnaam: string | null
+          inruil_betaalwijze: string | null
+          inruil_bouwjaar: number | null
           inruil_btw: string | null
           inruil_chassis: string | null
+          inruil_contactpersoon: string | null
+          inruil_inkoopverklaring_id: string | null
           inruil_kenteken: string | null
           inruil_kleur: string | null
           inruil_km: number | null
@@ -2365,6 +2369,13 @@ export type Database = {
           inruil_op_naam: boolean | null
           inruil_type: string | null
           inruil_uitvoering: string | null
+          inruil_verkoper_achternaam: string | null
+          inruil_verkoper_adres: string | null
+          inruil_verkoper_geboortedatum: string | null
+          inruil_verkoper_postcode: string | null
+          inruil_verkoper_telefoon: string | null
+          inruil_verkoper_voornaam: string | null
+          inruil_verkoper_woonplaats: string | null
           inruil_waarde: number | null
           klant_type: string | null
           later_ophalen: boolean | null
@@ -2430,8 +2441,12 @@ export type Database = {
           id?: string
           inruil?: boolean | null
           inruil_bedrijfsnaam?: string | null
+          inruil_betaalwijze?: string | null
+          inruil_bouwjaar?: number | null
           inruil_btw?: string | null
           inruil_chassis?: string | null
+          inruil_contactpersoon?: string | null
+          inruil_inkoopverklaring_id?: string | null
           inruil_kenteken?: string | null
           inruil_kleur?: string | null
           inruil_km?: number | null
@@ -2441,6 +2456,13 @@ export type Database = {
           inruil_op_naam?: boolean | null
           inruil_type?: string | null
           inruil_uitvoering?: string | null
+          inruil_verkoper_achternaam?: string | null
+          inruil_verkoper_adres?: string | null
+          inruil_verkoper_geboortedatum?: string | null
+          inruil_verkoper_postcode?: string | null
+          inruil_verkoper_telefoon?: string | null
+          inruil_verkoper_voornaam?: string | null
+          inruil_verkoper_woonplaats?: string | null
           inruil_waarde?: number | null
           klant_type?: string | null
           later_ophalen?: boolean | null
@@ -2506,8 +2528,12 @@ export type Database = {
           id?: string
           inruil?: boolean | null
           inruil_bedrijfsnaam?: string | null
+          inruil_betaalwijze?: string | null
+          inruil_bouwjaar?: number | null
           inruil_btw?: string | null
           inruil_chassis?: string | null
+          inruil_contactpersoon?: string | null
+          inruil_inkoopverklaring_id?: string | null
           inruil_kenteken?: string | null
           inruil_kleur?: string | null
           inruil_km?: number | null
@@ -2517,6 +2543,13 @@ export type Database = {
           inruil_op_naam?: boolean | null
           inruil_type?: string | null
           inruil_uitvoering?: string | null
+          inruil_verkoper_achternaam?: string | null
+          inruil_verkoper_adres?: string | null
+          inruil_verkoper_geboortedatum?: string | null
+          inruil_verkoper_postcode?: string | null
+          inruil_verkoper_telefoon?: string | null
+          inruil_verkoper_voornaam?: string | null
+          inruil_verkoper_woonplaats?: string | null
           inruil_waarde?: number | null
           klant_type?: string | null
           later_ophalen?: boolean | null
@@ -2562,6 +2595,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verkopen_inruil_inkoopverklaring_id_fkey"
+            columns: ["inruil_inkoopverklaring_id"]
+            isOneToOne: false
+            referencedRelation: "inkoopverklaringen"
             referencedColumns: ["id"]
           },
           {

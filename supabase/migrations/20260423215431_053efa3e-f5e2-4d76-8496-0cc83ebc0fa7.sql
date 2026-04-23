@@ -1,0 +1,40 @@
+-- Rollback per ongeluk toegevoegde kolommen op vehicle_sales
+ALTER TABLE public.vehicle_sales
+  DROP COLUMN IF EXISTS inruil_van_toepassing,
+  DROP COLUMN IF EXISTS inruil_type,
+  DROP COLUMN IF EXISTS inruil_kenteken,
+  DROP COLUMN IF EXISTS inruil_merk,
+  DROP COLUMN IF EXISTS inruil_model,
+  DROP COLUMN IF EXISTS inruil_bouwjaar,
+  DROP COLUMN IF EXISTS inruil_kilometerstand,
+  DROP COLUMN IF EXISTS inruil_kleur,
+  DROP COLUMN IF EXISTS inruil_chassisnummer,
+  DROP COLUMN IF EXISTS inruil_waarde,
+  DROP COLUMN IF EXISTS inruil_betaalwijze,
+  DROP COLUMN IF EXISTS inruil_verkoper_voornaam,
+  DROP COLUMN IF EXISTS inruil_verkoper_achternaam,
+  DROP COLUMN IF EXISTS inruil_verkoper_geboortedatum,
+  DROP COLUMN IF EXISTS inruil_verkoper_adres,
+  DROP COLUMN IF EXISTS inruil_verkoper_postcode,
+  DROP COLUMN IF EXISTS inruil_verkoper_woonplaats,
+  DROP COLUMN IF EXISTS inruil_verkoper_telefoon,
+  DROP COLUMN IF EXISTS inruil_bedrijfsnaam,
+  DROP COLUMN IF EXISTS inruil_kvk_nummer,
+  DROP COLUMN IF EXISTS inruil_btw_nummer,
+  DROP COLUMN IF EXISTS inruil_contactpersoon,
+  DROP COLUMN IF EXISTS inruil_inkoopverklaring_id,
+  DROP COLUMN IF EXISTS stap6_afgerond;
+
+-- Voeg ontbrekende velden toe aan de echte verkopen-tabel
+ALTER TABLE public.verkopen
+  ADD COLUMN IF NOT EXISTS inruil_bouwjaar integer,
+  ADD COLUMN IF NOT EXISTS inruil_betaalwijze text,
+  ADD COLUMN IF NOT EXISTS inruil_verkoper_voornaam text,
+  ADD COLUMN IF NOT EXISTS inruil_verkoper_achternaam text,
+  ADD COLUMN IF NOT EXISTS inruil_verkoper_geboortedatum date,
+  ADD COLUMN IF NOT EXISTS inruil_verkoper_adres text,
+  ADD COLUMN IF NOT EXISTS inruil_verkoper_postcode text,
+  ADD COLUMN IF NOT EXISTS inruil_verkoper_woonplaats text,
+  ADD COLUMN IF NOT EXISTS inruil_verkoper_telefoon text,
+  ADD COLUMN IF NOT EXISTS inruil_contactpersoon text,
+  ADD COLUMN IF NOT EXISTS inruil_inkoopverklaring_id uuid REFERENCES public.inkoopverklaringen(id) ON DELETE SET NULL;

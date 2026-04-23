@@ -18,6 +18,7 @@ import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
+import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
@@ -67,8 +68,9 @@ const STEPS: StepDef[] = [
 const isStepDone = (stap: number, completed: Record<number, boolean>) => completed[stap] === true;
 
 const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean): boolean => {
-  // Optionele inruil-stappen
-  if ((stap === 6 || stap === 9) && !inruil) return true;
+  // Stap 9 (inruil op naam) volledig verbergen zonder inruil
+  if (stap === 9 && !inruil) return true;
+  // Stap 6 mag altijd geopend worden — toont 'niet van toepassing' indien geen inruil
   // Stappen 6-12 vereisen 5
   if (stap >= 6 && stap <= 12 && !completed[5]) return true;
   // Stappen 9-12 vereisen 8
@@ -151,6 +153,22 @@ const AdminVerkoopWizardPage = () => {
   const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering">("overboeking");
   const [financieringMaatschappij, setFinancieringMaatschappij] = useState<string>("");
   const [betaalwijzeDetails, setBetaalwijzeDetails] = useState<Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>>([]);
+
+  // Stap 6 state — Inruil document
+  const [stap6DocType, setStap6DocType] = useState<"particulier" | "zakelijk">("particulier");
+  const [inrVerkVoornaam, setInrVerkVoornaam] = useState("");
+  const [inrVerkAchternaam, setInrVerkAchternaam] = useState("");
+  const [inrVerkGeboortedatum, setInrVerkGeboortedatum] = useState("");
+  const [inrVerkAdres, setInrVerkAdres] = useState("");
+  const [inrVerkPostcode, setInrVerkPostcode] = useState("");
+  const [inrVerkWoonplaats, setInrVerkWoonplaats] = useState("");
+  const [inrVerkTelefoon, setInrVerkTelefoon] = useState("");
+  const [inrContactpersoon, setInrContactpersoon] = useState("");
+  const [inrBedrijfAdres, setInrBedrijfAdres] = useState("");
+  const [inrBedrijfPostcode, setInrBedrijfPostcode] = useState("");
+  const [inrBedrijfWoonplaats, setInrBedrijfWoonplaats] = useState("");
+  const [inrBetaalwijze, setInrBetaalwijze] = useState<"verrekend" | "contant" | "overboeking" | "">("");
+  const [inkoopverklaringId, setInkoopverklaringId] = useState<string | null>(null);
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
@@ -314,8 +332,20 @@ const AdminVerkoopWizardPage = () => {
         setVerkoopprijs(vehicle.verkoopprijs || "");
         setVoertuigType((vehicle.btwMargeType as any) || "marge");
         if (vehicle.kilometerstand) setKmStand(vehicle.kilometerstand);
-      }
-
+        }
+        // Stap 6 hydration
+        const e: any = existing;
+        if (e.inruil_type === "particulier" || e.inruil_type === "zakelijk") setStap6DocType(e.inruil_type);
+        setInrVerkVoornaam(e.inruil_verkoper_voornaam || "");
+        setInrVerkAchternaam(e.inruil_verkoper_achternaam || "");
+        setInrVerkGeboortedatum(e.inruil_verkoper_geboortedatum || "");
+        setInrVerkAdres(e.inruil_verkoper_adres || "");
+        setInrVerkPostcode(e.inruil_verkoper_postcode || "");
+        setInrVerkWoonplaats(e.inruil_verkoper_woonplaats || "");
+        setInrVerkTelefoon(e.inruil_verkoper_telefoon || "");
+        setInrContactpersoon(e.inruil_contactpersoon || "");
+        if (["verrekend", "contant", "overboeking"].includes(e.inruil_betaalwijze)) setInrBetaalwijze(e.inruil_betaalwijze);
+        setInkoopverklaringId(e.inruil_inkoopverklaring_id || null);
       if (vehicle.kilometerstand && kmStand === "") setKmStand(vehicle.kilometerstand);
     })();
 
@@ -364,6 +394,20 @@ const AdminVerkoopWizardPage = () => {
       financiering_maatschappij: (restBetaalwijze === "financiering" || betaalwijzeDetails.some(d => d.methode === "financiering"))
         ? (financieringMaatschappij.trim() || null) : null,
       betaalwijze_details: betaalwijzeDetails as any,
+      // Stap 6 — inruil document
+      inruil_type: inruil ? stap6DocType : null,
+      inruil_verkoper_voornaam: inruil && stap6DocType === "particulier" ? (inrVerkVoornaam.trim() || null) : null,
+      inruil_verkoper_achternaam: inruil && stap6DocType === "particulier" ? (inrVerkAchternaam.trim() || null) : null,
+      inruil_verkoper_geboortedatum: inruil && stap6DocType === "particulier" && inrVerkGeboortedatum ? inrVerkGeboortedatum : null,
+      inruil_verkoper_adres: inruil && stap6DocType === "particulier" ? (inrVerkAdres.trim() || null) : null,
+      inruil_verkoper_postcode: inruil && stap6DocType === "particulier" ? (inrVerkPostcode.trim() || null) : null,
+      inruil_verkoper_woonplaats: inruil && stap6DocType === "particulier" ? (inrVerkWoonplaats.trim() || null) : null,
+      inruil_verkoper_telefoon: inruil && stap6DocType === "particulier" ? (inrVerkTelefoon.trim() || null) : null,
+      inruil_contactpersoon: inruil && stap6DocType === "zakelijk" ? (inrContactpersoon.trim() || null) : null,
+      inruil_betaalwijze: inruil && inrBetaalwijze ? inrBetaalwijze : null,
+      inruil_inkoopverklaring_id: inkoopverklaringId,
+      ...extra,
+    };
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
