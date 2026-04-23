@@ -305,86 +305,98 @@ const AdminVerkoopWizardPage = () => {
           </div>
         </aside>
 
-        {/* Hoofdinhoud */}
-        <main className="flex-1 flex flex-col min-w-0">
-          <div className="flex-1">
-            <div className="max-w-3xl mx-auto px-8 py-10">
-              <div className="mb-8">
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">
-                  Stap {currentStep.num} van 12
-                </div>
-                <h1 className="text-2xl font-semibold text-foreground mb-1">{currentStep.title}</h1>
-                <p className="text-sm text-muted-foreground">{currentStep.description}</p>
+      {/* Hoofdinhoud */}
+      <main className="ml-[280px] min-h-screen">
+        <div className="px-8 pt-6 pb-32">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={handleTerug}
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Terug naar voertuig
+              </button>
+              <div className="text-xs text-muted-foreground">
+                {doneCount}/{totalSteps} stappen voltooid
               </div>
-
-              {/* Stap inhoud */}
-              {activeStap === 1 && (
-                <Stap1Voertuig
-                  vehicle={vehicle}
-                  kmStand={kmStand}
-                  setKmStand={setKmStand}
-                  verkoopprijs={verkoopprijs}
-                  setVerkoopprijs={setVerkoopprijs}
-                  voertuigType={voertuigType}
-                  setVoertuigType={setVoertuigType}
-                  afleverkosten={afleverkosten}
-                  setAfleverkosten={setAfleverkosten}
-                  leges={leges}
-                  setLeges={setLeges}
-                  inruil={inruil}
-                  setInruil={setInruil}
-                  inruilKenteken={inruilKenteken}
-                  setInruilKenteken={setInruilKenteken}
-                  inruilMerk={inruilMerk}
-                  setInruilMerk={setInruilMerk}
-                  inruilModel={inruilModel}
-                  setInruilModel={setInruilModel}
-                  inruilKm={inruilKm}
-                  setInruilKm={setInruilKm}
-                  inruilWaarde={inruilWaarde}
-                  setInruilWaarde={setInruilWaarde}
-                  inruilVerkoper={inruilVerkoper}
-                  setInruilVerkoper={setInruilVerkoper}
-                  inruilBedrijfsnaam={inruilBedrijfsnaam}
-                  setInruilBedrijfsnaam={setInruilBedrijfsnaam}
-                  inruilKvk={inruilKvk}
-                  setInruilKvk={setInruilKvk}
-                  inruilBtw={inruilBtw}
-                  setInruilBtw={setInruilBtw}
-                />
-              )}
-
-              {activeStap !== 1 && (
-                <div className="rounded-[14px] border border-border bg-card p-8 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    Inhoud voor deze stap volgt binnenkort.
-                  </p>
-                </div>
-              )}
             </div>
-          </div>
 
-          {/* Footer met navigatie */}
-          <div className="border-t border-border bg-card/40 px-8 py-4 flex items-center justify-between">
-            <button
-              onClick={handleVorige}
-              disabled={activeStap === 1}
-              className="px-5 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              Vorige
-            </button>
-            <div className="text-[11px] text-muted-foreground">
-              {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
+            <div className="mb-8">
+              <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">
+                Stap {currentStep.num} van 12
+              </div>
+              <h1 className="text-2xl font-semibold text-foreground mb-1">{currentStep.title}</h1>
+              <p className="text-sm text-muted-foreground">{currentStep.description}</p>
             </div>
-            <button
-              onClick={handleVolgende}
-              disabled={saving}
-              className="px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
-            >
-              {activeStap === 12 ? "Bevestigen" : "Volgende"}
-            </button>
+
+            {/* Stap inhoud */}
+            {activeStap === 1 && (
+              <Stap1Voertuig
+                vehicle={vehicle}
+                kmStand={kmStand}
+                setKmStand={setKmStand}
+                verkoopprijs={verkoopprijs}
+                setVerkoopprijs={setVerkoopprijs}
+                voertuigType={voertuigType}
+                setVoertuigType={setVoertuigType}
+                afleverkosten={afleverkosten}
+                setAfleverkosten={setAfleverkosten}
+                leges={leges}
+                setLeges={setLeges}
+                inruil={inruil}
+                setInruil={setInruil}
+                inruilKenteken={inruilKenteken}
+                setInruilKenteken={setInruilKenteken}
+                inruilMerk={inruilMerk}
+                setInruilMerk={setInruilMerk}
+                inruilModel={inruilModel}
+                setInruilModel={setInruilModel}
+                inruilKm={inruilKm}
+                setInruilKm={setInruilKm}
+                inruilWaarde={inruilWaarde}
+                setInruilWaarde={setInruilWaarde}
+                inruilVerkoper={inruilVerkoper}
+                setInruilVerkoper={setInruilVerkoper}
+                inruilBedrijfsnaam={inruilBedrijfsnaam}
+                setInruilBedrijfsnaam={setInruilBedrijfsnaam}
+                inruilKvk={inruilKvk}
+                setInruilKvk={setInruilKvk}
+                inruilBtw={inruilBtw}
+                setInruilBtw={setInruilBtw}
+              />
+            )}
+
+            {activeStap !== 1 && (
+              <div className="rounded-[14px] border border-border bg-card p-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Inhoud voor deze stap volgt binnenkort.
+                </p>
+              </div>
+            )}
           </div>
-        </main>
+        </div>
+      </main>
+
+      {/* Fixed footer met navigatie */}
+      <div className="fixed bottom-0 left-[280px] right-0 z-10 border-t border-border bg-card/95 backdrop-blur px-8 py-4 flex items-center justify-between">
+        <button
+          onClick={handleVorige}
+          disabled={activeStap === 1}
+          className="px-5 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Vorige
+        </button>
+        <div className="text-[11px] text-muted-foreground">
+          {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
+        </div>
+        <button
+          onClick={handleVolgende}
+          disabled={saving}
+          className="px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
+        >
+          {activeStap === 12 ? "Bevestigen" : "Volgende"}
+        </button>
       </div>
     </div>
   );
