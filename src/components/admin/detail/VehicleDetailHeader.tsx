@@ -78,7 +78,7 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenKo
                 <CalendarPlus className="w-3.5 h-3.5" /> Afspraak <ChevronDown className="w-3 h-3" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
+            <DropdownMenuContent align="start" className="p-1.5 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
               {[
                 { label: "Bezichtiging", type: "bezichtiging" },
                 { label: "Proefrit", type: "proefrit" },
