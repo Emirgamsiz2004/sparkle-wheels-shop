@@ -111,7 +111,8 @@ const AdminVerkoopWizardPage = () => {
   const [laterOphalen, setLaterOphalen] = useState<boolean>(false);
   const [leverdatum, setLeverdatum] = useState<string>("");
   const [aanbetalingBedrag, setAanbetalingBedrag] = useState<number | "">("");
-  const [aanbetalingBetaalwijze, setAanbetalingBetaalwijze] = useState<"cash" | "pin" | "ideal" | "">("");
+  const [aanbetalingBetaalwijze, setAanbetalingBetaalwijze] = useState<Betaalwijze>("");
+  const [aanbetalingBankrekening, setAanbetalingBankrekening] = useState<string>("");
 
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
