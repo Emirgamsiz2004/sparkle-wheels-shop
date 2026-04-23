@@ -244,17 +244,17 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
     if (activeStap === 2) {
-      if (laterOphalen) {
+      if (afleverwijze === "later") {
         if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
-        if (aanbetalingBedrag === "" || Number(aanbetalingBedrag) <= 0) {
-          toast.error("Aanbetalingsbedrag is verplicht"); return;
-        }
-        if (!aanbetalingBetaalwijze) { toast.error("Kies een betaalmethode"); return; }
+        // Aanbetaling is optioneel
+      } else if (afleverwijze === "aflevering") {
+        if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
+        if (!afleveradres.trim()) { toast.error("Afleveradres is verplicht"); return; }
       }
     }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
