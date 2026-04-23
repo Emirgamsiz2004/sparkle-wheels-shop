@@ -417,6 +417,8 @@ const AdminVerkoopWizardPage = () => {
                 setAanbetalingBedrag={setAanbetalingBedrag}
                 aanbetalingBetaalwijze={aanbetalingBetaalwijze}
                 setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
+                aanbetalingBankrekening={aanbetalingBankrekening}
+                setAanbetalingBankrekening={setAanbetalingBankrekening}
               />
             )}
 
