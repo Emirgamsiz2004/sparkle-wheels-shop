@@ -268,10 +268,17 @@ function buildHtml(data: KoopovereenkomstData): string {
     ${(data.financieel.leges || 0) > 0 ? `<div class="fin-row"><span class="desc">Leges</span><span class="amt">${formatEur(data.financieel.leges || 0)}</span></div>` : ""}
     <div class="fin-divider"></div>
     <div class="fin-row bold"><span class="desc">Totaalbedrag</span><span class="amt">${formatEur(totaal)}</span></div>
-    ${aanbetaling > 0 ? `<div class="fin-row"><span class="desc">Aanbetaling</span><span class="amt">- ${formatEur(aanbetaling)}</span></div>` : ""}
-    ${aanbetaling > 0 ? `<div class="fin-row rest"><span class="desc">Restbedrag</span><span class="amt">${formatEur(restbedrag)}</span></div>` : ""}
-    <div class="fin-meta"><strong>Betaalwijze:</strong> ${escapeHtml(data.financieel.betaalwijze || "—")}</div>
-    <div class="fin-meta"><strong>Verwachte leverdatum:</strong> ${escapeHtml(formatDate(data.afleverDatum))}</div>
+    ${aanbetaling > 0 ? `<div class="fin-row"><span class="desc">Aanbetaling</span><span class="amt">- ${formatEur(aanbetaling)}</span></div><div class="fin-divider"></div>` : ""}
+    <div class="fin-row rest"><span class="desc">Restbedrag</span><span class="amt">${formatEur(restbedrag)}</span></div>
+    ${(data.financieel.betalingen && data.financieel.betalingen.length > 0)
+      ? data.financieel.betalingen.map(b => {
+          const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering" };
+          const label = labels[b.methode] || b.methode;
+          const suffix = b.methode === "financiering" && b.maatschappij ? ` (${escapeHtml(b.maatschappij)})` : "";
+          return `<div class="pay-row"><span class="pay-desc">${escapeHtml(label)}${suffix}</span><span class="pay-amt">${formatEur(b.bedrag || 0)}</span></div>`;
+        }).join("")
+      : `<div class="fin-meta"><strong>Betaalwijze:</strong> ${escapeHtml(data.financieel.betaalwijze || "—")}</div>`}
+    <div class="fin-meta" style="margin-top:8px;"><strong>Verwachte leverdatum:</strong> ${escapeHtml(formatDate(data.afleverDatum))}</div>
   </div>
 
   <!-- GARANTIETEKST -->
