@@ -441,6 +441,12 @@ const AdminVerkoopWizardPage = () => {
         if (garantiePrijs === "" || Number(garantiePrijs) < 0) { toast.error("Garantieprijs is verplicht"); return; }
       }
     }
+    if (activeStap === 5) {
+      if (!contractGetekend) {
+        toast.error("Bevestig eerst dat de koopovereenkomst getekend is voordat je verder gaat");
+        return;
+      }
+    }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
     if (!ok) return;
     setCompleted((p) => ({ ...p, [activeStap]: true }));
