@@ -1209,7 +1209,7 @@ const Stap2Aflevering = (p: Stap2Props) => {
             <div className="text-xs uppercase tracking-wide text-muted-foreground">Aanbetaling</div>
 
             <div>
-              <label className={labelCls}>Aanbetalingsbedrag (€) *</label>
+              <label className={labelCls}>Aanbetalingsbedrag (€)</label>
               <input
                 type="number"
                 inputMode="numeric"
