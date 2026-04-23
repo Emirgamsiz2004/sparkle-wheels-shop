@@ -259,7 +259,7 @@ export default function AdminInkoopPage() {
                           currentSelected?.id === c.id && 'bg-foreground/5'
                         )}
                       >
-                        <td className="px-3 py-1.5">
+                        <td className="px-3 py-2.5">
                           <div className="flex items-center gap-2">
                             <div>
                               <p className="text-foreground">{c.merk} {c.model}</p>
@@ -276,21 +276,21 @@ export default function AdminInkoopPage() {
                             </a>
                           )}
                         </td>
-                        <td className="px-3 py-1.5 text-right text-muted-foreground text-xs tabular-nums">{formatEuro(c.vraagprijs)}</td>
-                        <td className="px-3 py-1.5 text-right font-medium text-xs tabular-nums">
+                        <td className="px-3 py-2.5 text-right text-muted-foreground text-xs tabular-nums">{formatEuro(c.vraagprijs)}</td>
+                        <td className="px-3 py-2.5 text-right font-medium text-xs tabular-nums">
                           {formatEuro(totaalInkoop)}
                           {c.geschatteKosten > 0 && (
                             <p className="text-[10px] text-muted-foreground/70">incl. €{c.geschatteKosten.toLocaleString('nl-NL')} kosten</p>
                           )}
                         </td>
-                        <td className="px-3 py-1.5 text-right font-medium text-xs tabular-nums">{formatEuro(c.geschatteVerkoopprijs)}</td>
-                        <td className="px-3 py-1.5 text-right text-xs tabular-nums">
+                        <td className="px-3 py-2.5 text-right font-medium text-xs tabular-nums">{formatEuro(c.geschatteVerkoopprijs)}</td>
+                        <td className="px-3 py-2.5 text-right text-xs tabular-nums">
                           <span className={cn('font-semibold', isProfit ? 'text-emerald-400' : 'text-red-400')}>{formatEuro(winst)}</span>
                         </td>
-                        <td className="px-3 py-1.5 text-right">
+                        <td className="px-3 py-2.5 text-right">
                           <span className={cn(BADGE_BASE, isProfit ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-red-500/15 text-red-400 border-red-500/30')}>{marge.toFixed(1)}%</span>
                         </td>
-                        <td className="px-3 py-1.5" onClick={e => e.stopPropagation()}>
+                        <td className="px-3 py-2.5" onClick={e => e.stopPropagation()}>
                           <Select value={c.interesseStatus} onValueChange={(v) => updateStatus(c.id, v as InkoopCandidate['interesseStatus'])}>
                             <SelectTrigger className="h-6 w-auto border-0 bg-transparent p-0 gap-0 shadow-none focus:ring-0 [&>svg]:hidden">
                               <span className={cn(BADGE_BASE, 'cursor-pointer hover:opacity-80', interesseColors[c.interesseStatus])}>

@@ -143,11 +143,11 @@ const AdminKlantenPage = () => {
                     onClick={() => navigate(`/admin/klanten/${c.id}`)}
                     className="border-b border-border/50 hover:bg-muted/40 cursor-pointer transition-colors"
                   >
-                    <td className="px-3 py-1.5 text-foreground">{c.voornaam} {c.achternaam}</td>
-                    <td className="px-3 py-1.5 text-muted-foreground text-xs">{c.telefoon || "—"}</td>
-                    <td className="px-3 py-1.5 text-muted-foreground text-xs">{c.email}</td>
-                    <td className="px-3 py-1.5 text-muted-foreground text-xs">{formatDate(c.laatste_contact)}</td>
-                    <td className="px-3 py-1.5">
+                    <td className="px-3 py-2.5 text-foreground">{c.voornaam} {c.achternaam}</td>
+                    <td className="px-3 py-2.5 text-muted-foreground text-xs">{c.telefoon || "—"}</td>
+                    <td className="px-3 py-2.5 text-muted-foreground text-xs">{c.email}</td>
+                    <td className="px-3 py-2.5 text-muted-foreground text-xs">{formatDate(c.laatste_contact)}</td>
+                    <td className="px-3 py-2.5">
                       <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
                         {statusLabels[c.status]}
                       </span>

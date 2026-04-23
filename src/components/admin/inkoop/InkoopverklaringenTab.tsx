@@ -123,13 +123,13 @@ export default function InkoopverklaringenTab() {
             <tbody>
               {filtered.map(v => (
                 <tr key={v.id} onClick={() => openDetail(v)} className="border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer">
-                  <td className="px-3 py-1.5 text-foreground">{v.documentNaam}</td>
-                  <td className="px-3 py-1.5 text-muted-foreground text-xs">{v.verkoperNaam}</td>
-                  <td className="px-3 py-1.5 text-muted-foreground text-[11px] font-mono uppercase">{v.kenteken || "—"}</td>
-                  <td className="px-3 py-1.5 text-xs">{v.merk} {v.model}</td>
-                  <td className="px-3 py-1.5 text-right tabular-nums text-xs">{formatEuro(v.inkoopprijs)}</td>
-                  <td className="px-3 py-1.5 text-muted-foreground text-xs">{formatDate(v.datum)}</td>
-                  <td className="px-3 py-1.5">
+                  <td className="px-3 py-2.5 text-foreground">{v.documentNaam}</td>
+                  <td className="px-3 py-2.5 text-muted-foreground text-xs">{v.verkoperNaam}</td>
+                  <td className="px-3 py-2.5 text-muted-foreground text-[11px] font-mono uppercase">{v.kenteken || "—"}</td>
+                  <td className="px-3 py-2.5 text-xs">{v.merk} {v.model}</td>
+                  <td className="px-3 py-2.5 text-right tabular-nums text-xs">{formatEuro(v.inkoopprijs)}</td>
+                  <td className="px-3 py-2.5 text-muted-foreground text-xs">{formatDate(v.datum)}</td>
+                  <td className="px-3 py-2.5">
                     <span className={cn(BADGE_BASE, v.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
                       {v.status === "ondertekend" ? "Ondertekend" : "Concept"}
                     </span>

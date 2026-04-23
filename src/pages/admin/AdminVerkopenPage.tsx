@@ -265,24 +265,24 @@ const AdminVerkopenPage = () => {
                           onClick={() => window.location.href = `/admin/verkopen/${v.id}`}
                           className="border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer"
                         >
-                          <td className="px-3 py-1.5 text-muted-foreground text-[11px] whitespace-nowrap">
+                          <td className="px-3 py-2.5 text-muted-foreground text-[11px] whitespace-nowrap">
                             {v.verkoopDatum ? new Date(v.verkoopDatum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                           </td>
-                          <td className="px-3 py-1.5 text-foreground">
+                          <td className="px-3 py-2.5 text-foreground">
                             {v.merk} {v.model} <span className="text-muted-foreground text-xs">({v.bouwjaar})</span>
                           </td>
-                          <td className="px-3 py-1.5">
+                          <td className="px-3 py-2.5">
                             <span className="text-muted-foreground text-[11px] font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
                           </td>
-                          <td className="px-3 py-1.5 text-xs">{v.koperNaam || "—"}</td>
-                          <td className="px-3 py-1.5 text-right tabular-nums text-xs">
+                          <td className="px-3 py-2.5 text-xs">{v.koperNaam || "—"}</td>
+                          <td className="px-3 py-2.5 text-right tabular-nums text-xs">
                             {isConsignatie(v) ? <span className="text-muted-foreground">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
                           </td>
-                          <td className="px-3 py-1.5 text-right tabular-nums text-xs">{formatEuro(v.verkoopprijs)}</td>
-                          <td className={`px-3 py-1.5 text-right font-medium tabular-nums text-xs ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                          <td className="px-3 py-2.5 text-right tabular-nums text-xs">{formatEuro(v.verkoopprijs)}</td>
+                          <td className={`px-3 py-2.5 text-right font-medium tabular-nums text-xs ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                             {formatEuro(winst)} <span className="text-[10px] font-normal opacity-60">({marge.toFixed(0)}%)</span>
                           </td>
-                          <td className="px-3 py-1.5 text-center">
+                          <td className="px-3 py-2.5 text-center">
                             {complete !== undefined && (
                               complete
                                 ? <span className={`${BADGE_BASE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`}>Compleet</span>
