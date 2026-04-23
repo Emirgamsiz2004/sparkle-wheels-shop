@@ -419,6 +419,13 @@ const AdminVerkoopWizardPage = () => {
       if (next <= 12) setActiveStap(next);
       return;
     }
+    if (activeStap === 4) {
+      if (garantieType === "autotrust") {
+        if (!garantiePakket.trim()) { toast.error("Pakket naam is verplicht"); return; }
+        if (garantieLooptijd === "" || Number(garantieLooptijd) <= 0) { toast.error("Looptijd is verplicht"); return; }
+        if (garantiePrijs === "" || Number(garantiePrijs) < 0) { toast.error("Garantieprijs is verplicht"); return; }
+      }
+    }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
     if (!ok) return;
     setCompleted((p) => ({ ...p, [activeStap]: true }));
