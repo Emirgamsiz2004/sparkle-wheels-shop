@@ -136,6 +136,18 @@ const AdminVerkoopWizardPage = () => {
   const [klantKvk, setKlantKvk] = useState("");
   const [klantBtw, setKlantBtw] = useState("");
 
+  // Lock body scroll — alleen de wizard content kolom scrollt
+  useEffect(() => {
+    const prevHtml = document.documentElement.style.overflow;
+    const prevBody = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prevHtml;
+      document.body.style.overflow = prevBody;
+    };
+  }, []);
+
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
     if (!vehicleId || !vehicle) return;
