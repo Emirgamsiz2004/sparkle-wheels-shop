@@ -18,6 +18,7 @@ import {
   XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 import DashboardAppointmentsCard from "@/components/admin/DashboardAppointmentsCard";
+import DashboardLopendeVerkopenCard from "@/components/admin/DashboardLopendeVerkopenCard";
 
 /* ─── Constants ─── */
 const periodOrder: PeriodKey[] = ["7dagen", "30dagen", "kwartaal", "jaar"];
@@ -358,6 +359,9 @@ const AdminDashboardPage = () => {
           </div>
         </div>
       </div>
+
+      {/* ═══ Lopende verkopen ═══ */}
+      <DashboardLopendeVerkopenCard />
 
       {/* ═══ Afspraken kaart ═══ */}
       <DashboardAppointmentsCard />
