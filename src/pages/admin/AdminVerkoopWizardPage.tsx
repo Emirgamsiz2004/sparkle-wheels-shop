@@ -2587,46 +2587,126 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
               </div>
             </div>
 
-            {/* Betaalwijze restbedrag */}
-            <div className="space-y-3">
-              <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Betaalwijze restbedrag</div>
-              <div className="flex flex-wrap gap-2">
-                {([
-                  { v: "cash", l: "Cash" },
-                  { v: "pin", l: "Pin" },
-                  { v: "ideal", l: "iDEAL" },
-                  { v: "overboeking", l: "Overboeking" },
-                  { v: "financiering", l: "Financiering" },
-                ] as const).map((opt) => (
+            {/* Betaalwijze restbedrag — meerdere methodes mogelijk */}
+            {(() => {
+              const methodeLabels: Record<string, string> = {
+                cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering",
+              };
+              const totaalIngevuld = p.betaalwijzeDetails.reduce((s, d) => s + (Number(d.bedrag) || 0), 0);
+              const verschil = +(restbedrag - totaalIngevuld).toFixed(2);
+              const klopt = Math.abs(verschil) < 0.01 && p.betaalwijzeDetails.length > 0;
+              const heeftFinanciering = p.betaalwijzeDetails.some((d) => d.methode === "financiering");
+
+              const updateRow = (idx: number, patch: Partial<{ methode: typeof p.betaalwijzeDetails[number]["methode"]; bedrag: number }>) => {
+                const next = p.betaalwijzeDetails.map((r, i) => (i === idx ? { ...r, ...patch } : r));
+                p.setBetaalwijzeDetails(next);
+              };
+              const removeRow = (idx: number) => p.setBetaalwijzeDetails(p.betaalwijzeDetails.filter((_, i) => i !== idx));
+              const addRow = () => {
+                const nogToeTeWijzen = Math.max(0, +(restbedrag - totaalIngevuld).toFixed(2));
+                p.setBetaalwijzeDetails([
+                  ...p.betaalwijzeDetails,
+                  { methode: "overboeking", bedrag: nogToeTeWijzen },
+                ]);
+              };
+
+              return (
+                <div className="space-y-3">
+                  <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Betaalwijze restbedrag</div>
+
+                  {p.betaalwijzeDetails.length === 0 && (
+                    <div className="text-[12px] text-muted-foreground italic">
+                      Nog geen betaalwijze toegevoegd. Klik op "+ Betaalwijze toevoegen".
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {p.betaalwijzeDetails.map((row, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <select
+                          autoComplete="off"
+                          value={row.methode}
+                          onChange={(e) => updateRow(idx, { methode: e.target.value as any })}
+                          className={cn(inputCls, "flex-1 max-w-[180px]")}
+                        >
+                          {Object.entries(methodeLabels).map(([v, l]) => (
+                            <option key={v} value={v}>{l}</option>
+                          ))}
+                        </select>
+                        <div className="relative flex-1 max-w-[200px]">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[13px]">€</span>
+                          <input
+                            autoComplete="off"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={row.bedrag === 0 ? "" : row.bedrag}
+                            onChange={(e) => updateRow(idx, { bedrag: e.target.value === "" ? 0 : Number(e.target.value) })}
+                            placeholder="0,00"
+                            className={cn(inputCls, "pl-7")}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeRow(idx)}
+                          className="h-9 w-9 rounded-[10px] border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors flex items-center justify-center"
+                          aria-label="Verwijder regel"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
                   <button
-                    key={opt.v}
                     type="button"
-                    onClick={() => p.setRestBetaalwijze(opt.v)}
-                    className={cn(
-                      "px-4 py-2 rounded-[10px] text-[13px] font-medium border transition-colors",
-                      p.restBetaalwijze === opt.v
-                        ? "bg-foreground text-background border-foreground"
-                        : "bg-transparent text-foreground border-border hover:border-foreground/40"
-                    )}
+                    onClick={addRow}
+                    className="text-[12px] font-medium text-foreground hover:text-foreground/70 transition-colors inline-flex items-center gap-1"
                   >
-                    {opt.l}
+                    <Plus className="w-3.5 h-3.5" /> Betaalwijze toevoegen
                   </button>
-                ))}
-              </div>
-              {p.restBetaalwijze === "financiering" && (
-                <div className="pt-2">
-                  <label className={labelCls}>Financieringsmaatschappij (optioneel)</label>
-                  <input
-                    autoComplete="off"
-                    type="text"
-                    value={p.financieringMaatschappij}
-                    onChange={(e) => p.setFinancieringMaatschappij(e.target.value)}
-                    placeholder="Bijv. Santander, Hiltermann, ..."
-                    className={inputCls}
-                  />
+
+                  {p.betaalwijzeDetails.length > 0 && (
+                    <div className="pt-2 space-y-1 border-t border-border/50">
+                      <div className="flex items-center justify-between text-[12px]">
+                        <span className="text-muted-foreground">Totaal ingevuld</span>
+                        <span className="font-medium text-foreground">{fmtEur(totaalIngevuld)}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[12px]">
+                        <span className="text-muted-foreground">Restbedrag nog toe te wijzen</span>
+                        <span className={cn("font-medium", klopt ? "text-emerald-500" : Math.abs(verschil) > 0.01 ? "text-destructive" : "text-foreground")}>
+                          {fmtEur(verschil)}
+                        </span>
+                      </div>
+                      {klopt && (
+                        <div className="flex items-center gap-1.5 text-[12px] text-emerald-500 pt-1">
+                          <Check className="w-3.5 h-3.5" /> Totaal klopt met restbedrag
+                        </div>
+                      )}
+                      {!klopt && p.betaalwijzeDetails.length > 0 && Math.abs(verschil) >= 0.01 && (
+                        <div className="text-[12px] text-destructive pt-1">
+                          {verschil > 0 ? `Nog ${fmtEur(verschil)} toe te wijzen` : `${fmtEur(Math.abs(verschil))} te veel ingevuld`}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {heeftFinanciering && (
+                    <div className="pt-2">
+                      <label className={labelCls}>Financieringsmaatschappij (optioneel)</label>
+                      <input
+                        autoComplete="off"
+                        type="text"
+                        value={p.financieringMaatschappij}
+                        onChange={(e) => p.setFinancieringMaatschappij(e.target.value)}
+                        placeholder="Bijv. Santander, Hiltermann, ..."
+                        className={inputCls}
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              );
+            })()}
           </div>
         </div>
       </div>
