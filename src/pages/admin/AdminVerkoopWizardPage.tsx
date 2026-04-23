@@ -386,7 +386,22 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap !== 1 && (
+            {activeStap === 2 && (
+              <Stap2Aflevering
+                vehicle={vehicle}
+                verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
+                laterOphalen={laterOphalen}
+                setLaterOphalen={setLaterOphalen}
+                leverdatum={leverdatum}
+                setLeverdatum={setLeverdatum}
+                aanbetalingBedrag={aanbetalingBedrag}
+                setAanbetalingBedrag={setAanbetalingBedrag}
+                aanbetalingBetaalwijze={aanbetalingBetaalwijze}
+                setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
+              />
+            )}
+
+            {activeStap !== 1 && activeStap !== 2 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
