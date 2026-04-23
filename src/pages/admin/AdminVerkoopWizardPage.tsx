@@ -225,6 +225,16 @@ const AdminVerkoopWizardPage = () => {
   }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze]);
 
   const handleVolgende = async () => {
+    // Stap-specifieke validatie
+    if (activeStap === 2) {
+      if (laterOphalen) {
+        if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
+        if (aanbetalingBedrag === "" || Number(aanbetalingBedrag) <= 0) {
+          toast.error("Aanbetalingsbedrag is verplicht"); return;
+        }
+        if (!aanbetalingBetaalwijze) { toast.error("Kies een betaalmethode"); return; }
+      }
+    }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
     if (!ok) return;
     setCompleted((p) => ({ ...p, [activeStap]: true }));
