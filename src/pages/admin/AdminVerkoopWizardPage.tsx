@@ -1246,24 +1246,6 @@ const Stap2Aflevering = (p: Stap2Props) => {
                 ))}
               </div>
 
-              <div
-                className={`grid transition-all duration-300 ease-out ${
-                  p.aanbetalingBetaalwijze === "overboeking"
-                    ? "grid-rows-[1fr] opacity-100 mt-3"
-                    : "grid-rows-[0fr] opacity-0 mt-0"
-                }`}
-              >
-                <div className="overflow-hidden">
-                  <label className={labelCls}>Bankrekeningnummer / naam (optioneel)</label>
-                  <input
-                    type="text"
-                    value={p.aanbetalingBankrekening}
-                    onChange={(e) => p.setAanbetalingBankrekening(e.target.value)}
-                    className={inputCls}
-                    placeholder="NL00 BANK 0123 4567 89 / Naam"
-                  />
-                </div>
-              </div>
             </div>
 
             <button
