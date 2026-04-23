@@ -1463,7 +1463,7 @@ const Stap3Klant = (p: Stap3Props) => {
   const [zoeken, setZoeken] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
-  // Debounced search
+  // Debounced search — filter op klanttype (zakelijk/particulier)
   useEffect(() => {
     if (mode !== "existing") return;
     const term = zoekterm.trim();
@@ -1473,13 +1473,14 @@ const Stap3Klant = (p: Stap3Props) => {
       const { data, error } = await supabase
         .from("customers")
         .select("id,voornaam,achternaam,email,telefoon,bedrijfsnaam,adres,postcode,woonplaats,plaats,land,geboortedatum,is_zakelijk,kvk_nummer,btw_nummer")
+        .eq("is_zakelijk", p.zakelijk)
         .or(`voornaam.ilike.%${term}%,achternaam.ilike.%${term}%,email.ilike.%${term}%,telefoon.ilike.%${term}%,bedrijfsnaam.ilike.%${term}%`)
         .limit(8);
       setZoeken(false);
       if (!error && data) setSuggesties(data as CustomerSuggestion[]);
     }, 250);
     return () => clearTimeout(t);
-  }, [zoekterm, mode]);
+  }, [zoekterm, mode, p.zakelijk]);
 
   const selectKlant = (c: CustomerSuggestion) => {
     p.setCustomerId(c.id);
