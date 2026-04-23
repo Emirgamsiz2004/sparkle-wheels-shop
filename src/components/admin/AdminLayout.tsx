@@ -33,6 +33,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopExpanded, setDesktopExpanded] = useState(false);
   const [overdueLeads, setOverdueLeads] = useState(0);
 
   // Fetch overdue leads count
