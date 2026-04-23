@@ -111,14 +111,19 @@ function buildHtml(data: KoopovereenkomstData): string {
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; }
   body {
     font-family: Arial, Helvetica, sans-serif;
     color: #1a1a1a;
-    background: #fff;
     width: 794px;
-    padding: 50px 56px;
-    font-size: 9.5px;
-    line-height: 1.45;
+    font-size: 10.5px;
+    line-height: 1.5;
+  }
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    padding: 64px 68px 56px 68px;
+    background: #fff;
   }
 
   /* ───── HEADER ───── */
@@ -126,118 +131,117 @@ function buildHtml(data: KoopovereenkomstData): string {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    padding-bottom: 12px;
+    padding-bottom: 14px;
     border-bottom: 1.5px solid #1a1a1a;
   }
   .brand { line-height: 1; }
-  .brand .name { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #1a1a1a; }
-  .brand .sub { font-size: 8.5px; letter-spacing: 5px; color: #666; margin-top: 4px; }
+  .brand .name { font-size: 26px; font-weight: 700; letter-spacing: 1px; color: #1a1a1a; }
+  .brand .sub { font-size: 9px; letter-spacing: 5px; color: #666; margin-top: 5px; }
   .doc-title { text-align: right; }
-  .doc-title .t { font-size: 13px; font-weight: 700; letter-spacing: 2.5px; color: #1a1a1a; }
-  .doc-title .m { font-size: 9px; color: #555; margin-top: 4px; }
+  .doc-title .t { font-size: 14px; font-weight: 700; letter-spacing: 2.5px; color: #1a1a1a; }
+  .doc-title .m { font-size: 10px; color: #555; margin-top: 5px; }
 
   .company-info {
     display: flex;
     justify-content: space-between;
-    font-size: 8px;
+    font-size: 9px;
     color: #666;
-    margin-top: 6px;
-    padding-bottom: 14px;
+    margin-top: 8px;
+    padding-bottom: 18px;
   }
-  .company-info span { margin-right: 16px; }
 
   /* ───── PARTIJEN ───── */
-  .parties { display: flex; gap: 24px; margin-top: 6px; }
+  .parties { display: flex; gap: 32px; margin-top: 4px; }
   .party { flex: 1; }
   .party h3 {
-    font-size: 8px; font-weight: 700; color: #666;
+    font-size: 9px; font-weight: 700; color: #666;
     text-transform: uppercase; letter-spacing: 1.5px;
-    padding-bottom: 4px; margin-bottom: 6px;
+    padding-bottom: 6px; margin-bottom: 8px;
     border-bottom: 0.5px solid #ccc;
   }
-  .party .name { font-size: 10.5px; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
-  .party p { font-size: 9px; color: #333; line-height: 1.5; }
+  .party .name { font-size: 11.5px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+  .party p { font-size: 10px; color: #333; line-height: 1.55; }
 
   /* ───── SECTIES ───── */
-  .section { margin-top: 16px; }
+  .section { margin-top: 22px; }
   .section h3 {
-    font-size: 8px; font-weight: 700; color: #666;
+    font-size: 9px; font-weight: 700; color: #666;
     text-transform: uppercase; letter-spacing: 1.5px;
-    padding-bottom: 4px; margin-bottom: 8px;
+    padding-bottom: 6px; margin-bottom: 10px;
     border-bottom: 0.5px solid #ccc;
   }
 
   /* ───── VOERTUIG TABEL ───── */
   table.specs { width: 100%; border-collapse: collapse; }
   table.specs td {
-    padding: 4px 0;
-    font-size: 9px;
+    padding: 5px 0;
+    font-size: 10px;
     vertical-align: top;
-    width: 16.66%;
   }
-  table.specs td.lbl { color: #777; padding-right: 6px; width: 16.66%; }
-  table.specs td.val { color: #1a1a1a; font-weight: 600; padding-right: 18px; width: 16.66%; }
+  table.specs td.lbl { color: #777; padding-right: 8px; width: 11%; }
+  table.specs td.val { color: #1a1a1a; font-weight: 600; padding-right: 22px; width: 22%; }
 
   /* ───── FINANCIEEL ───── */
   table.fin { width: 100%; border-collapse: collapse; }
   table.fin td {
-    padding: 4px 0;
-    font-size: 9.5px;
+    padding: 5px 0;
+    font-size: 10.5px;
     vertical-align: middle;
   }
   table.fin td.amt { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   table.fin tr.sub td { color: #333; }
-  table.fin tr.divider td { border-top: 0.5px solid #999; padding-top: 6px; }
+  table.fin tr.divider td { border-top: 0.5px solid #999; padding-top: 7px; }
   table.fin tr.total td { font-weight: 700; color: #1a1a1a; }
-  table.fin tr.rest td { font-weight: 700; font-size: 11px; padding-top: 6px; border-top: 1px solid #1a1a1a; }
-  table.fin tr.pay td { font-size: 8.5px; color: #666; padding: 2px 0 2px 14px; }
+  table.fin tr.rest td { font-weight: 700; font-size: 12.5px; padding-top: 8px; border-top: 1px solid #1a1a1a; }
+  table.fin tr.pay td { font-size: 9.5px; color: #666; padding: 3px 0 3px 18px; }
   table.fin tr.pay td.amt { padding-right: 0; }
 
-  .fin-foot { display: flex; justify-content: space-between; font-size: 9px; color: #444; margin-top: 10px; padding-top: 8px; border-top: 0.5px solid #e5e5e5; }
+  .fin-foot { display: flex; justify-content: space-between; font-size: 10px; color: #444; margin-top: 12px; padding-top: 10px; border-top: 0.5px solid #e5e5e5; }
   .fin-foot strong { color: #1a1a1a; font-weight: 700; }
 
   /* ───── GARANTIE ───── */
   .garantie {
-    margin-top: 14px;
-    font-size: 8.5px;
+    margin-top: 18px;
+    font-size: 9.5px;
     color: #444;
-    line-height: 1.55;
-    padding: 8px 10px;
+    line-height: 1.6;
+    padding: 10px 14px;
     background: #fafafa;
     border-left: 2px solid #999;
   }
 
-  .opm { margin-top: 8px; font-size: 8.5px; color: #444; }
+  .opm { margin-top: 10px; font-size: 9.5px; color: #444; }
   .opm strong { color: #1a1a1a; }
 
   /* ───── HANDTEKENINGEN ───── */
-  .signs { display: flex; gap: 40px; margin-top: 24px; }
+  .signs { display: flex; gap: 48px; margin-top: 30px; }
   .sign { flex: 1; }
   .sign h4 {
-    font-size: 8px; font-weight: 700; color: #666;
+    font-size: 9px; font-weight: 700; color: #666;
     text-transform: uppercase; letter-spacing: 1.5px;
-    padding-bottom: 4px; margin-bottom: 6px;
+    padding-bottom: 6px; margin-bottom: 8px;
     border-bottom: 0.5px solid #ccc;
   }
-  .sign .name { font-size: 10px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; }
-  .sign .row { font-size: 9px; color: #444; margin-top: 8px; display: flex; align-items: baseline; gap: 6px; }
-  .sign .row .label { color: #666; min-width: 50px; }
-  .sign .row .line { flex: 1; border-bottom: 0.5px solid #888; height: 11px; }
-  .sign .siglabel { font-size: 9px; color: #666; margin-top: 14px; }
-  .sign .sigbox { border-bottom: 0.5px solid #1a1a1a; height: 32px; margin-top: 2px; }
+  .sign .name { font-size: 11px; font-weight: 700; color: #1a1a1a; margin-bottom: 14px; }
+  .sign .row { font-size: 10px; color: #444; margin-top: 10px; display: flex; align-items: baseline; gap: 8px; }
+  .sign .row .label { color: #666; min-width: 55px; }
+  .sign .row .line { flex: 1; border-bottom: 0.5px solid #888; height: 13px; }
+  .sign .siglabel { font-size: 10px; color: #666; margin-top: 16px; }
+  .sign .sigbox { border-bottom: 0.5px solid #1a1a1a; height: 38px; margin-top: 4px; }
 
   /* ───── FOOTER ───── */
   .footer {
-    margin-top: 18px;
-    padding-top: 8px;
+    margin-top: 24px;
+    padding-top: 10px;
     border-top: 0.5px solid #ccc;
-    font-size: 7.5px;
+    font-size: 8.5px;
     color: #888;
     text-align: center;
     line-height: 1.5;
   }
 </style></head>
 <body>
+<div class="page">
 
   <!-- HEADER -->
   <div class="header">
@@ -362,6 +366,7 @@ function buildHtml(data: KoopovereenkomstData): string {
     Platin Automotive &nbsp;·&nbsp; platinautomotive.nl &nbsp;·&nbsp; KVK ${escapeHtml(data.bedrijf?.kvk || "99146193")}
   </div>
 
+</div>
 </body></html>`;
 }
 
@@ -378,8 +383,8 @@ async function renderToPdf(data: KoopovereenkomstData): Promise<jsPDF> {
   container.innerHTML = html;
   document.body.appendChild(container);
 
-  const target = container.querySelector("body") as HTMLElement | null;
-  const node = target || container;
+    const target = container.querySelector(".page") as HTMLElement | null;
+    const node = target || container;
 
   try {
     const canvas = await html2canvas(node, {
