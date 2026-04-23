@@ -34,6 +34,13 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("admin.sidebar.expanded") === "true";
+  });
+  useEffect(() => {
+    localStorage.setItem("admin.sidebar.expanded", String(sidebarExpanded));
+  }, [sidebarExpanded]);
   const [overdueLeads, setOverdueLeads] = useState(0);
 
   // Fetch overdue leads count
