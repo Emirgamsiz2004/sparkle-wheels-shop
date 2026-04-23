@@ -23,6 +23,7 @@ import { Search, ShoppingCart, ExternalLink, Download, FileSpreadsheet, ChevronR
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useInkoopCandidates } from '@/hooks/useInkoopCandidates';
+import { BADGE_BASE } from '@/components/admin/StatusBadge';
 
 const pageTabs = [
   { label: "Shortlist", value: "shortlist" },
