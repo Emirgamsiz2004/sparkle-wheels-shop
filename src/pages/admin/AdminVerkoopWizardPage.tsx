@@ -628,7 +628,20 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && (
+            {activeStap === 4 && (
+              <Stap4Garantie
+                garantieType={garantieType}
+                setGarantieType={setGarantieType}
+                pakket={garantiePakket}
+                setPakket={setGarantiePakket}
+                looptijd={garantieLooptijd}
+                setLooptijd={setGarantieLooptijd}
+                prijs={garantiePrijs}
+                setPrijs={setGarantiePrijs}
+              />
+            )}
+
+            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && activeStap !== 4 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
