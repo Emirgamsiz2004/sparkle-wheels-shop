@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SlidingTabs from "@/components/admin/SlidingTabs";
+import { BADGE_BASE } from "@/components/admin/StatusBadge";
 
 const allStatuses: Customer["status"][] = ["prospect", "klant", "inactief"];
 
@@ -110,7 +111,7 @@ const AdminKlantenPage = () => {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-foreground">{c.voornaam} {c.achternaam}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border ${statusColors[c.status]}`}>
+                  <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
                     {statusLabels[c.status]}
                   </span>
                   <span className="text-xs text-muted-foreground truncate">{c.email}</span>
@@ -128,11 +129,11 @@ const AdminKlantenPage = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-muted/20 border-b border-border">
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Naam</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Telefoon</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">E-mail</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Laatste contact</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Status</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Naam</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Telefoon</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">E-mail</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Laatste contact</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -140,14 +141,14 @@ const AdminKlantenPage = () => {
                   <tr
                     key={c.id}
                     onClick={() => navigate(`/admin/klanten/${c.id}`)}
-                    className="border-b border-border/50 hover:bg-accent/30 cursor-pointer transition-colors"
+                    className="border-b border-border/50 hover:bg-muted/40 cursor-pointer transition-colors"
                   >
-                    <td className="px-4 py-3 font-medium text-foreground">{c.voornaam} {c.achternaam}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{c.telefoon || "—"}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{c.email}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{formatDate(c.laatste_contact)}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border whitespace-nowrap ${statusColors[c.status]}`}>
+                    <td className="px-3 py-1.5 text-foreground">{c.voornaam} {c.achternaam}</td>
+                    <td className="px-3 py-1.5 text-muted-foreground text-xs">{c.telefoon || "—"}</td>
+                    <td className="px-3 py-1.5 text-muted-foreground text-xs">{c.email}</td>
+                    <td className="px-3 py-1.5 text-muted-foreground text-xs">{formatDate(c.laatste_contact)}</td>
+                    <td className="px-3 py-1.5">
+                      <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
                         {statusLabels[c.status]}
                       </span>
                     </td>

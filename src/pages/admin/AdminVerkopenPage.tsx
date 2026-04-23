@@ -6,6 +6,7 @@ import { formatEuro, calcWinst, calcMarge, isConsignatie } from "@/types/vehicle
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import SlidingTabs from "@/components/admin/SlidingTabs";
+import { BADGE_BASE } from "@/components/admin/StatusBadge";
 
 type TabValue = "in_behandeling" | "afgerond";
 
@@ -249,7 +250,7 @@ const AdminVerkopenPage = () => {
                   <thead>
                     <tr className="border-b border-border">
                       {["Verkoopdatum", "Voertuig", "Kenteken", "Koper", "Inkoopprijs", "Verkoopprijs", "Marge", "Dossier"].map((h, i) => (
-                        <th key={h} className={`${i >= 4 && i <= 6 ? "text-right" : i === 7 ? "text-center" : "text-left"} px-4 py-2.5 text-xs font-medium text-muted-foreground`}>{h}</th>
+                        <th key={h} className={`${i >= 4 && i <= 6 ? "text-right" : i === 7 ? "text-center" : "text-left"} px-3 py-2 text-[11px] font-medium text-muted-foreground`}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -259,29 +260,33 @@ const AdminVerkopenPage = () => {
                       const marge = calcMarge(v);
                       const complete = docStatus[v.id];
                       return (
-                        <tr key={v.id} className="border-b border-border/50 hover:bg-accent/20 transition-colors cursor-pointer" onClick={() => window.location.href = `/admin/verkopen/${v.id}`}>
-                          <td className="px-4 py-2.5 text-muted-foreground text-xs whitespace-nowrap">
+                        <tr
+                          key={v.id}
+                          onClick={() => window.location.href = `/admin/verkopen/${v.id}`}
+                          className="border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer"
+                        >
+                          <td className="px-3 py-1.5 text-muted-foreground text-[11px] whitespace-nowrap">
                             {v.verkoopDatum ? new Date(v.verkoopDatum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                           </td>
-                          <td className="px-4 py-2.5">
-                            <span className="text-foreground hover:underline">{v.merk} {v.model} <span className="text-muted-foreground">({v.bouwjaar})</span></span>
+                          <td className="px-3 py-1.5 text-foreground">
+                            {v.merk} {v.model} <span className="text-muted-foreground text-xs">({v.bouwjaar})</span>
                           </td>
-                          <td className="px-4 py-2.5">
-                            <span className="text-muted-foreground text-xs font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
+                          <td className="px-3 py-1.5">
+                            <span className="text-muted-foreground text-[11px] font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
                           </td>
-                          <td className="px-4 py-2.5 text-sm">{v.koperNaam || "—"}</td>
-                          <td className="px-4 py-2.5 text-right tabular-nums">
-                            {isConsignatie(v) ? <span className="text-muted-foreground text-xs">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
+                          <td className="px-3 py-1.5 text-xs">{v.koperNaam || "—"}</td>
+                          <td className="px-3 py-1.5 text-right tabular-nums text-xs">
+                            {isConsignatie(v) ? <span className="text-muted-foreground">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
                           </td>
-                          <td className="px-4 py-2.5 text-right tabular-nums">{formatEuro(v.verkoopprijs)}</td>
-                          <td className={`px-4 py-2.5 text-right font-medium tabular-nums ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                            {formatEuro(winst)} <span className="text-xs font-normal opacity-60">({marge.toFixed(0)}%)</span>
+                          <td className="px-3 py-1.5 text-right tabular-nums text-xs">{formatEuro(v.verkoopprijs)}</td>
+                          <td className={`px-3 py-1.5 text-right font-medium tabular-nums text-xs ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                            {formatEuro(winst)} <span className="text-[10px] font-normal opacity-60">({marge.toFixed(0)}%)</span>
                           </td>
-                          <td className="px-4 py-2.5 text-center">
+                          <td className="px-3 py-1.5 text-center">
                             {complete !== undefined && (
                               complete
-                                ? <span className="inline-flex px-2 py-0.5 text-[10px] font-medium rounded bg-emerald-500/15 text-emerald-400">Compleet</span>
-                                : <span className="inline-flex px-2 py-0.5 text-[10px] font-medium rounded bg-amber-500/15 text-amber-400">Ontbrekend</span>
+                                ? <span className={`${BADGE_BASE} bg-emerald-500/15 text-emerald-400 border-emerald-500/30`}>Compleet</span>
+                                : <span className={`${BADGE_BASE} bg-amber-500/15 text-amber-400 border-amber-500/30`}>Ontbrekend</span>
                             )}
                           </td>
                         </tr>

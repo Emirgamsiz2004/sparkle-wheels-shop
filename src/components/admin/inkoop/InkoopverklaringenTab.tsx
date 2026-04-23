@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import InkoopverklaringWizard from "./InkoopverklaringWizard";
 import { formatEuro } from "@/types/vehicle";
+import { BADGE_BASE } from "@/components/admin/StatusBadge";
 
 export default function InkoopverklaringenTab() {
   const { verklaringen, loading, linkToVehicle, refetch } = useInkoopverklaringen();
@@ -110,28 +111,28 @@ export default function InkoopverklaringenTab() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/30">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Document</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Verkoper</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kenteken</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Voertuig</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Inkoopprijs</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Datum</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Document</th>
+                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Verkoper</th>
+                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Kenteken</th>
+                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Voertuig</th>
+                <th className="text-right px-3 py-2 text-[11px] font-medium text-muted-foreground">Inkoopprijs</th>
+                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Datum</th>
+                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody>
               {filtered.map(v => (
-                <tr key={v.id} onClick={() => openDetail(v)} className="hover:bg-secondary/30 transition-all cursor-pointer">
-                  <td className="px-4 py-3 font-medium">{v.documentNaam}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{v.verkoperNaam}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{v.kenteken || "—"}</td>
-                  <td className="px-4 py-3">{v.merk} {v.model}</td>
-                  <td className="px-4 py-3 text-right font-medium">{formatEuro(v.inkoopprijs)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{formatDate(v.datum)}</td>
-                  <td className="px-4 py-3">
-                    <Badge className={cn("text-xs border", v.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
+                <tr key={v.id} onClick={() => openDetail(v)} className="border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer">
+                  <td className="px-3 py-1.5 text-foreground">{v.documentNaam}</td>
+                  <td className="px-3 py-1.5 text-muted-foreground text-xs">{v.verkoperNaam}</td>
+                  <td className="px-3 py-1.5 text-muted-foreground text-[11px] font-mono uppercase">{v.kenteken || "—"}</td>
+                  <td className="px-3 py-1.5 text-xs">{v.merk} {v.model}</td>
+                  <td className="px-3 py-1.5 text-right tabular-nums text-xs">{formatEuro(v.inkoopprijs)}</td>
+                  <td className="px-3 py-1.5 text-muted-foreground text-xs">{formatDate(v.datum)}</td>
+                  <td className="px-3 py-1.5">
+                    <span className={cn(BADGE_BASE, v.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
                       {v.status === "ondertekend" ? "Ondertekend" : "Concept"}
-                    </Badge>
+                    </span>
                   </td>
                 </tr>
               ))}
