@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { useMoneybird } from "@/hooks/useMoneybird";
+import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
@@ -1392,10 +1393,15 @@ const Stap2Aflevering = (p: Stap2Props) => {
               {p.afleverwijze === "aflevering" && (
                 <div>
                   <label className={labelCls}>Afleveradres *</label>
-                  <input
-                    type="text"
+                  <AddressAutocomplete
                     value={p.afleveradres}
-                    onChange={(e) => p.setAfleveradres(e.target.value)}
+                    onChange={p.setAfleveradres}
+                    onAddressSelected={(d) => {
+                      const full = [d.adres, [d.postcode, d.woonplaats].filter(Boolean).join(" ")]
+                        .filter(Boolean)
+                        .join(", ");
+                      p.setAfleveradres(full || d.adres);
+                    }}
                     className={inputCls}
                     placeholder="Straat 1, 1234 AB Plaats"
                   />
@@ -1923,7 +1929,19 @@ const Stap3Klant = (p: Stap3Props) => {
 
           <div>
             <label className={labelCls}>Adres *</label>
-            <input type="text" value={p.adres} onChange={(e) => p.setAdres(e.target.value)} className={inputCls} placeholder="Straat 1" maxLength={150} />
+            <AddressAutocomplete
+              value={p.adres}
+              onChange={p.setAdres}
+              onAddressSelected={(d) => {
+                p.setAdres(d.adres);
+                if (d.postcode) p.setPostcode(d.postcode);
+                if (d.woonplaats) p.setWoonplaats(d.woonplaats);
+                if (d.land) p.setLand(d.land);
+              }}
+              className={inputCls}
+              placeholder="Straat 1"
+              maxLength={150}
+            />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
