@@ -1043,6 +1043,8 @@ const Stap2Aflevering = (p: Stap2Props) => {
           ? "Pin"
           : p.aanbetalingBetaalwijze === "ideal"
           ? "iDEAL"
+          : p.aanbetalingBetaalwijze === "overboeking"
+          ? `Overboeking${p.aanbetalingBankrekening ? ` (${p.aanbetalingBankrekening})` : ""}`
           : undefined,
       leverdatum: p.leverdatum,
       datum: today,
