@@ -247,6 +247,10 @@ const AdminVerkoopWizardPage = () => {
         setGarantiePakket(existing.garantie_pakket || "");
         setGarantieLooptijd(existing.garantie_looptijd ?? "");
         setGarantiePrijs(existing.garantie_prijs ?? "");
+        // Stap 5 hydration
+        setOvereenkomstnummer((existing as any).overeenkomstnummer || "");
+        setOpmerkingen((existing as any).opmerkingen || "");
+        setContractGetekend(!!existing.contract_getekend);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
