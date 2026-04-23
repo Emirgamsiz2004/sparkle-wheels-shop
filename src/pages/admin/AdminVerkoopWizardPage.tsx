@@ -117,6 +117,22 @@ const AdminVerkoopWizardPage = () => {
   // Compat: laterOphalen blijft afgeleid
   const laterOphalen = afleverwijze !== "vandaag";
 
+  // Stap 3 state
+  const [customerId, setCustomerId] = useState<string | null>(null);
+  const [klantVoornaam, setKlantVoornaam] = useState("");
+  const [klantAchternaam, setKlantAchternaam] = useState("");
+  const [klantGeboortedatum, setKlantGeboortedatum] = useState("");
+  const [klantAdres, setKlantAdres] = useState("");
+  const [klantPostcode, setKlantPostcode] = useState("");
+  const [klantWoonplaats, setKlantWoonplaats] = useState("");
+  const [klantLand, setKlantLand] = useState("Nederland");
+  const [klantTelefoon, setKlantTelefoon] = useState("");
+  const [klantEmail, setKlantEmail] = useState("");
+  const [klantZakelijk, setKlantZakelijk] = useState(false);
+  const [klantBedrijfsnaam, setKlantBedrijfsnaam] = useState("");
+  const [klantKvk, setKlantKvk] = useState("");
+  const [klantBtw, setKlantBtw] = useState("");
+
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
     if (!vehicleId || !vehicle) return;
