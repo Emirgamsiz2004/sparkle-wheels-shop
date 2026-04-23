@@ -2317,6 +2317,7 @@ export type Database = {
       }
       verkopen: {
         Row: {
+          aanbetaling_bankrekening: string | null
           aanbetaling_bedrag: number | null
           aanbetaling_betaalwijze: string | null
           aanbetaling_datum: string | null
@@ -2387,6 +2388,7 @@ export type Database = {
           wizard_status: string | null
         }
         Insert: {
+          aanbetaling_bankrekening?: string | null
           aanbetaling_bedrag?: number | null
           aanbetaling_betaalwijze?: string | null
           aanbetaling_datum?: string | null
@@ -2457,6 +2459,7 @@ export type Database = {
           wizard_status?: string | null
         }
         Update: {
+          aanbetaling_bankrekening?: string | null
           aanbetaling_bedrag?: number | null
           aanbetaling_betaalwijze?: string | null
           aanbetaling_datum?: string | null
