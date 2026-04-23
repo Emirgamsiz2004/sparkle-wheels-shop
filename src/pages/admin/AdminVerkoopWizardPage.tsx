@@ -1568,20 +1568,10 @@ const Stap3Klant = (p: Stap3Props) => {
         : "border-border text-muted-foreground hover:bg-accent/50"
     }`;
 
+  const klantTypeKey = p.zakelijk ? "zakelijk" : "particulier";
+
   return (
     <div className="space-y-6">
-      {/* Klanttype switcher */}
-      <div className="flex gap-3">
-        <button type="button" onClick={() => switchKlantType(false)} className={toggleCls(!p.zakelijk)}>
-          <User className="w-4 h-4" />
-          Particulier
-        </button>
-        <button type="button" onClick={() => switchKlantType(true)} className={toggleCls(p.zakelijk)}>
-          <Building2 className="w-4 h-4" />
-          Zakelijk
-        </button>
-      </div>
-
       {/* Mode switcher */}
       <div className="flex gap-3">
         <button type="button" onClick={switchToExisting} className={toggleCls(mode === "existing")}>
