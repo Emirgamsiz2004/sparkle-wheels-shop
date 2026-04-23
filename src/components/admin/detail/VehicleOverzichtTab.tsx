@@ -256,8 +256,8 @@ const ReadField = ({ label, value, valueColor }: { label: string; value: string;
 
 const InfoRow = ({ label, value, valueColor, isLast }: { label: string; value: string; valueColor?: string; isLast?: boolean }) => (
   <tr className={!isLast ? "border-b border-border/50" : ""}>
-    <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap align-middle">{label}</td>
-    <td className={`py-2.5 text-sm font-medium tabular-nums text-right align-middle ${valueColor || "text-foreground"}`}>{value}</td>
+    <td className="py-1.5 pr-4 text-[12px] text-muted-foreground whitespace-nowrap align-middle">{label}</td>
+    <td className={`py-1.5 text-[13px] font-medium tabular-nums text-right align-middle ${valueColor || "text-foreground"}`}>{value}</td>
   </tr>
 );
 
