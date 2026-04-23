@@ -12,6 +12,31 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+/* Globale dunne, fade-out scrollbar (zichtbaar tijdens scrollen) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.5s ease;
+}
+.is-scrolling::-webkit-scrollbar-thumb,
+*:hover::-webkit-scrollbar-thumb {
+  background: hsl(var(--foreground) / 0.2);
+}
+.is-scrolling {
+  scrollbar-color: hsl(var(--foreground) / 0.2) transparent;
+}
+
 /* Fonts loaded via index.html */
 
 @layer base {
