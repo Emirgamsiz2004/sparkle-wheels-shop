@@ -1,7 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
-import { Link } from "react-router-dom";
-import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw, AlertTriangle, FileWarning } from "lucide-react";
+
+import { useNavigate, Link } from "react-router-dom";
+import { Plus, Search, Loader2, ChevronRight, RefreshCw, AlertTriangle, FileWarning } from "lucide-react";
+import { BADGE_BASE } from "@/components/admin/StatusBadge";
 import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors, Vehicle } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
