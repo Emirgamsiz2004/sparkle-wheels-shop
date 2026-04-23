@@ -111,14 +111,19 @@ function buildHtml(data: KoopovereenkomstData): string {
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; }
   body {
     font-family: Arial, Helvetica, sans-serif;
     color: #1a1a1a;
-    background: #fff;
     width: 794px;
-    padding: 50px 56px;
-    font-size: 9.5px;
-    line-height: 1.45;
+    font-size: 10.5px;
+    line-height: 1.5;
+  }
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    padding: 64px 68px 56px 68px;
+    background: #fff;
   }
 
   /* ───── HEADER ───── */
