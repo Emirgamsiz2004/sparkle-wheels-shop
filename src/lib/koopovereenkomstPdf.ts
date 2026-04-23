@@ -34,6 +34,7 @@ export interface KoopovereenkomstData {
     afleverkosten?: number;
     leges?: number;
     betaalwijze: string;
+    betalingen?: Array<{ methode: string; bedrag: number; maatschappij?: string }>;
     aanbetalingActief: boolean;
     aanbetalingsbedrag?: number;
     restbedrag?: number;
@@ -169,6 +170,8 @@ function buildHtml(data: KoopovereenkomstData): string {
   .fin-row.rest { font-weight: 700; font-size: 11px; padding-top: 4px; }
   .fin-meta { font-size: 8.5px; color: #333; margin-top: 6px; }
   .fin-meta strong { color: #000; }
+  .pay-row { display: flex; justify-content: space-between; font-size: 8px; color: #666; padding: 1px 0 1px 10px; }
+  .pay-row .pay-amt { font-variant-numeric: tabular-nums; }
 
   /* GARANTIE BOX */
   .garantie-box {
@@ -267,10 +270,17 @@ function buildHtml(data: KoopovereenkomstData): string {
     ${(data.financieel.leges || 0) > 0 ? `<div class="fin-row"><span class="desc">Leges</span><span class="amt">${formatEur(data.financieel.leges || 0)}</span></div>` : ""}
     <div class="fin-divider"></div>
     <div class="fin-row bold"><span class="desc">Totaalbedrag</span><span class="amt">${formatEur(totaal)}</span></div>
-    ${aanbetaling > 0 ? `<div class="fin-row"><span class="desc">Aanbetaling</span><span class="amt">- ${formatEur(aanbetaling)}</span></div>` : ""}
-    ${aanbetaling > 0 ? `<div class="fin-row rest"><span class="desc">Restbedrag</span><span class="amt">${formatEur(restbedrag)}</span></div>` : ""}
-    <div class="fin-meta"><strong>Betaalwijze:</strong> ${escapeHtml(data.financieel.betaalwijze || "—")}</div>
-    <div class="fin-meta"><strong>Verwachte leverdatum:</strong> ${escapeHtml(formatDate(data.afleverDatum))}</div>
+    ${aanbetaling > 0 ? `<div class="fin-row"><span class="desc">Aanbetaling</span><span class="amt">- ${formatEur(aanbetaling)}</span></div><div class="fin-divider"></div>` : ""}
+    <div class="fin-row rest"><span class="desc">Restbedrag</span><span class="amt">${formatEur(restbedrag)}</span></div>
+    ${(data.financieel.betalingen && data.financieel.betalingen.length > 0)
+      ? data.financieel.betalingen.map(b => {
+          const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering" };
+          const label = labels[b.methode] || b.methode;
+          const suffix = b.methode === "financiering" && b.maatschappij ? ` (${escapeHtml(b.maatschappij)})` : "";
+          return `<div class="pay-row"><span class="pay-desc">${escapeHtml(label)}${suffix}</span><span class="pay-amt">${formatEur(b.bedrag || 0)}</span></div>`;
+        }).join("")
+      : `<div class="fin-meta"><strong>Betaalwijze:</strong> ${escapeHtml(data.financieel.betaalwijze || "—")}</div>`}
+    <div class="fin-meta" style="margin-top:8px;"><strong>Verwachte leverdatum:</strong> ${escapeHtml(formatDate(data.afleverDatum))}</div>
   </div>
 
   <!-- GARANTIETEKST -->

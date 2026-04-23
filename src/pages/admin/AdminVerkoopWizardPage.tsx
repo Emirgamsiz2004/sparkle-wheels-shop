@@ -2425,6 +2425,13 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
                 return `${labels[d.methode] || d.methode}: ${new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(d.bedrag || 0)}`;
               }).join(" + ") + (p.betaalwijzeDetails.some(d => d.methode === "financiering") && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : "")
             : p.restBetaalwijze + (p.restBetaalwijze === "financiering" && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : ""),
+          betalingen: (p.betaalwijzeDetails && p.betaalwijzeDetails.length > 0)
+            ? p.betaalwijzeDetails.map(d => ({
+                methode: d.methode,
+                bedrag: d.bedrag || 0,
+                maatschappij: d.methode === "financiering" ? p.financieringMaatschappij : undefined,
+              }))
+            : undefined,
           aanbetalingActief: (p.aanbetalingBedrag || 0) > 0,
           aanbetalingsbedrag: p.aanbetalingBedrag,
           restbedrag,
