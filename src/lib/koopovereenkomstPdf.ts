@@ -366,6 +366,7 @@ function buildHtml(data: KoopovereenkomstData): string {
     Platin Automotive &nbsp;·&nbsp; platinautomotive.nl &nbsp;·&nbsp; KVK ${escapeHtml(data.bedrijf?.kvk || "99146193")}
   </div>
 
+</div>
 </body></html>`;
 }
 
