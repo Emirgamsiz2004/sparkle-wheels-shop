@@ -1081,13 +1081,51 @@ const Stap2Aflevering = (p: Stap2Props) => {
           <div className="overflow-hidden">
             <div className="border-t border-border pt-4">
               <label className={labelCls}>Verwachte leverdatum *</label>
-              <input
-                type="date"
-                value={p.leverdatum}
-                min={today}
-                onChange={(e) => p.setLeverdatum(e.target.value)}
-                className={inputCls}
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                      !p.leverdatum && "text-muted-foreground",
+                    )}
+                  >
+                    <span>
+                      {p.leverdatum
+                        ? format(parseISO(p.leverdatum), "d MMMM yyyy", { locale: nl })
+                        : "Kies een datum"}
+                    </span>
+                    <CalendarIcon className="h-4 w-4 text-foreground/70" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 bg-popover border-border"
+                  align="start"
+                >
+                  <Calendar
+                    mode="single"
+                    selected={p.leverdatum ? parseISO(p.leverdatum) : undefined}
+                    onSelect={(d) => {
+                      if (d) {
+                        // Local yyyy-mm-dd to avoid timezone shift
+                        const yyyy = d.getFullYear();
+                        const mm = String(d.getMonth() + 1).padStart(2, "0");
+                        const dd = String(d.getDate()).padStart(2, "0");
+                        p.setLeverdatum(`${yyyy}-${mm}-${dd}`);
+                      }
+                    }}
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    initialFocus
+                    locale={nl}
+                    className={cn("p-3 pointer-events-auto")}
+                    classNames={{
+                      day_selected:
+                        "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white",
+                      day_today: "bg-accent/60 text-accent-foreground font-semibold",
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
