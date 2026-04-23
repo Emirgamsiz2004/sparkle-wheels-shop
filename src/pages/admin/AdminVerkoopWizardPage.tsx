@@ -1024,6 +1024,31 @@ const Stap2Aflevering = (p: Stap2Props) => {
   const aanbetaling = p.aanbetalingBedrag === "" ? 0 : Number(p.aanbetalingBedrag);
   const restbedrag = Math.max(0, (p.verkoopprijs || 0) - aanbetaling);
   const today = new Date().toISOString().slice(0, 10);
+  const laterOphalen = p.afleverwijze !== "vandaag";
+
+  // Autosave bij later ophalen / aflevering: zodra leverdatum + (aanbetaling of adres) ingevuld zijn
+  const autoSaveSig = useMemo(() => {
+    if (!laterOphalen) return null;
+    const filledAanbet = p.aanbetalingBedrag !== "" && Number(p.aanbetalingBedrag) > 0;
+    const filledAdres = p.afleverwijze === "aflevering" ? p.afleveradres.trim().length > 0 : true;
+    if (!p.leverdatum) return null;
+    if (p.afleverwijze === "later" && !filledAanbet) return null;
+    if (p.afleverwijze === "aflevering" && !filledAdres) return null;
+    return [
+      p.afleverwijze,
+      p.leverdatum,
+      String(p.aanbetalingBedrag),
+      p.aanbetalingBetaalwijze,
+      p.aanbetalingBankrekening,
+      p.afleveradres,
+    ].join("|");
+  }, [laterOphalen, p.afleverwijze, p.leverdatum, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, p.aanbetalingBankrekening, p.afleveradres]);
+
+  useEffect(() => {
+    if (!autoSaveSig || !p.onAutoSave) return;
+    const t = setTimeout(() => { p.onAutoSave?.(); }, 600);
+    return () => clearTimeout(t);
+  }, [autoSaveSig]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const optionCls = (active: boolean) =>
     `flex-1 px-4 py-3 text-sm rounded-[10px] border transition-colors cursor-pointer text-center font-medium ${
