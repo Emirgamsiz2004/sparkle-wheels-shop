@@ -186,6 +186,30 @@ const AdminVerkoopWizardPage = () => {
           setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze as Betaalwijze);
         }
         setAanbetalingBankrekening((existing as any).aanbetaling_bankrekening || "");
+        // Stap 3 hydration
+        if (existing.customer_id) {
+          setCustomerId(existing.customer_id);
+          const { data: cust } = await supabase
+            .from("customers")
+            .select("*")
+            .eq("id", existing.customer_id)
+            .maybeSingle();
+          if (cust) {
+            setKlantVoornaam(cust.voornaam || "");
+            setKlantAchternaam(cust.achternaam || "");
+            setKlantGeboortedatum(cust.geboortedatum || "");
+            setKlantAdres(cust.adres || "");
+            setKlantPostcode(cust.postcode || "");
+            setKlantWoonplaats(cust.woonplaats || cust.plaats || "");
+            setKlantLand(cust.land || "Nederland");
+            setKlantTelefoon(cust.telefoon || "");
+            setKlantEmail(cust.email || "");
+            setKlantZakelijk(!!cust.is_zakelijk);
+            setKlantBedrijfsnaam(cust.bedrijfsnaam || "");
+            setKlantKvk(cust.kvk_nummer || "");
+            setKlantBtw(cust.btw_nummer || "");
+          }
+        }
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
