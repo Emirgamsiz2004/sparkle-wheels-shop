@@ -330,7 +330,7 @@ const AdminVerkoopWizardPage = () => {
 
         {/* Hoofdinhoud */}
         <main className="flex-1 flex flex-col min-w-0">
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1">
             <div className="max-w-3xl mx-auto px-8 py-10">
               <div className="mb-8">
                 <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">
