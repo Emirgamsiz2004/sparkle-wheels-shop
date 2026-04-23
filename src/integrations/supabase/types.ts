@@ -2348,6 +2348,7 @@ export type Database = {
           customer_id: string | null
           factuur_betaald: boolean | null
           financiering: boolean | null
+          financiering_maatschappij: string | null
           garantie_looptijd: number | null
           garantie_pakket: string | null
           garantie_prijs: number | null
@@ -2436,6 +2437,7 @@ export type Database = {
           customer_id?: string | null
           factuur_betaald?: boolean | null
           financiering?: boolean | null
+          financiering_maatschappij?: string | null
           garantie_looptijd?: number | null
           garantie_pakket?: string | null
           garantie_prijs?: number | null
@@ -2524,6 +2526,7 @@ export type Database = {
           customer_id?: string | null
           factuur_betaald?: boolean | null
           financiering?: boolean | null
+          financiering_maatschappij?: string | null
           garantie_looptijd?: number | null
           garantie_pakket?: string | null
           garantie_prijs?: number | null

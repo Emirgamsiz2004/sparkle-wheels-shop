@@ -1,0 +1,1 @@
+ALTER TABLE public.verkopen ADD COLUMN IF NOT EXISTS financiering_maatschappij text;
