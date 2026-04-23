@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, Lock, Loader2, Pencil, Save, X } from "lucide-react";
+import { ArrowLeft, Check, Lock, Loader2, Pencil, Save, X, Search, User, Building2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useVehicles } from "@/hooks/useVehicles";
@@ -117,6 +117,22 @@ const AdminVerkoopWizardPage = () => {
   // Compat: laterOphalen blijft afgeleid
   const laterOphalen = afleverwijze !== "vandaag";
 
+  // Stap 3 state
+  const [customerId, setCustomerId] = useState<string | null>(null);
+  const [klantVoornaam, setKlantVoornaam] = useState("");
+  const [klantAchternaam, setKlantAchternaam] = useState("");
+  const [klantGeboortedatum, setKlantGeboortedatum] = useState("");
+  const [klantAdres, setKlantAdres] = useState("");
+  const [klantPostcode, setKlantPostcode] = useState("");
+  const [klantWoonplaats, setKlantWoonplaats] = useState("");
+  const [klantLand, setKlantLand] = useState("Nederland");
+  const [klantTelefoon, setKlantTelefoon] = useState("");
+  const [klantEmail, setKlantEmail] = useState("");
+  const [klantZakelijk, setKlantZakelijk] = useState(false);
+  const [klantBedrijfsnaam, setKlantBedrijfsnaam] = useState("");
+  const [klantKvk, setKlantKvk] = useState("");
+  const [klantBtw, setKlantBtw] = useState("");
+
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
     if (!vehicleId || !vehicle) return;
@@ -170,6 +186,30 @@ const AdminVerkoopWizardPage = () => {
           setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze as Betaalwijze);
         }
         setAanbetalingBankrekening((existing as any).aanbetaling_bankrekening || "");
+        // Stap 3 hydration
+        if (existing.customer_id) {
+          setCustomerId(existing.customer_id);
+          const { data: cust } = await supabase
+            .from("customers")
+            .select("*")
+            .eq("id", existing.customer_id)
+            .maybeSingle();
+          if (cust) {
+            setKlantVoornaam(cust.voornaam || "");
+            setKlantAchternaam(cust.achternaam || "");
+            setKlantGeboortedatum(cust.geboortedatum || "");
+            setKlantAdres(cust.adres || "");
+            setKlantPostcode(cust.postcode || "");
+            setKlantWoonplaats(cust.woonplaats || cust.plaats || "");
+            setKlantLand(cust.land || "Nederland");
+            setKlantTelefoon(cust.telefoon || "");
+            setKlantEmail(cust.email || "");
+            setKlantZakelijk(!!cust.is_zakelijk);
+            setKlantBedrijfsnaam(cust.bedrijfsnaam || "");
+            setKlantKvk(cust.kvk_nummer || "");
+            setKlantBtw(cust.btw_nummer || "");
+          }
+        }
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -234,6 +274,7 @@ const AdminVerkoopWizardPage = () => {
       aanbetaling_bedrag: laterOphalen && aanbetalingBedrag !== "" ? Number(aanbetalingBedrag) : null,
       aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
       aanbetaling_bankrekening: laterOphalen && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
+      customer_id: customerId,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -244,7 +285,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
@@ -256,6 +297,52 @@ const AdminVerkoopWizardPage = () => {
         if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
         if (!afleveradres.trim()) { toast.error("Afleveradres is verplicht"); return; }
       }
+    }
+    if (activeStap === 3) {
+      if (!klantVoornaam.trim() || !klantAchternaam.trim()) { toast.error("Voor- en achternaam zijn verplicht"); return; }
+      if (!klantAdres.trim() || !klantPostcode.trim() || !klantWoonplaats.trim()) { toast.error("Adres, postcode en woonplaats zijn verplicht"); return; }
+      if (!klantTelefoon.trim()) { toast.error("Telefoonnummer is verplicht"); return; }
+      if (klantZakelijk) {
+        if (!klantBedrijfsnaam.trim()) { toast.error("Bedrijfsnaam is verplicht"); return; }
+        if (!klantKvk.trim()) { toast.error("KVK-nummer is verplicht"); return; }
+      }
+      // Klant aanmaken of bijwerken
+      const customerPayload: any = {
+        voornaam: klantVoornaam.trim(),
+        achternaam: klantAchternaam.trim(),
+        geboortedatum: klantGeboortedatum || null,
+        adres: klantAdres.trim() || null,
+        postcode: klantPostcode.trim() || null,
+        woonplaats: klantWoonplaats.trim() || null,
+        plaats: klantWoonplaats.trim() || null,
+        land: klantLand || "Nederland",
+        telefoon: klantTelefoon.trim(),
+        email: klantEmail.trim() || `${klantVoornaam.trim().toLowerCase()}.${klantAchternaam.trim().toLowerCase()}@geen-email.local`,
+        is_zakelijk: klantZakelijk,
+        bedrijfsnaam: klantZakelijk ? klantBedrijfsnaam.trim() : null,
+        kvk_nummer: klantZakelijk ? klantKvk.trim() : null,
+        btw_nummer: klantZakelijk ? (klantBtw.trim() || null) : null,
+        status: "klant",
+      };
+      let custId = customerId;
+      if (custId) {
+        const { error: updErr } = await supabase.from("customers").update(customerPayload).eq("id", custId);
+        if (updErr) { toast.error("Opslaan klant mislukt"); console.error(updErr); return; }
+      } else {
+        const { data: created, error: insErr } = await supabase.from("customers").insert(customerPayload).select().single();
+        if (insErr || !created) { toast.error("Aanmaken klant mislukt"); console.error(insErr); return; }
+        custId = created.id;
+        setCustomerId(custId);
+      }
+      const ok = await saveCurrent({ stap3_afgerond: true, customer_id: custId });
+      if (!ok) return;
+      setCompleted((p) => ({ ...p, [activeStap]: true }));
+      let next = activeStap + 1;
+      const nextCompleted = { ...completed, [activeStap]: true };
+      while (next <= 12 && isStepBlocked(next, nextCompleted, inruil)) next++;
+      if (next <= 12) setActiveStap(next);
+      toast.success("Klant opgeslagen");
+      return;
     }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
     if (!ok) return;
@@ -438,7 +525,27 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap !== 1 && activeStap !== 2 && (
+            {activeStap === 3 && (
+              <Stap3Klant
+                customerId={customerId}
+                setCustomerId={setCustomerId}
+                voornaam={klantVoornaam} setVoornaam={setKlantVoornaam}
+                achternaam={klantAchternaam} setAchternaam={setKlantAchternaam}
+                geboortedatum={klantGeboortedatum} setGeboortedatum={setKlantGeboortedatum}
+                adres={klantAdres} setAdres={setKlantAdres}
+                postcode={klantPostcode} setPostcode={setKlantPostcode}
+                woonplaats={klantWoonplaats} setWoonplaats={setKlantWoonplaats}
+                land={klantLand} setLand={setKlantLand}
+                telefoon={klantTelefoon} setTelefoon={setKlantTelefoon}
+                email={klantEmail} setEmail={setKlantEmail}
+                zakelijk={klantZakelijk} setZakelijk={setKlantZakelijk}
+                bedrijfsnaam={klantBedrijfsnaam} setBedrijfsnaam={setKlantBedrijfsnaam}
+                kvk={klantKvk} setKvk={setKlantKvk}
+                btw={klantBtw} setBtw={setKlantBtw}
+              />
+            )}
+
+            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
@@ -1266,6 +1373,325 @@ const Stap2Aflevering = (p: Stap2Props) => {
         <p className="text-xs text-muted-foreground text-center pt-1">
           Wijzigingen worden automatisch bewaard
         </p>
+      )}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// Stap 3 — Klantgegevens
+// ─────────────────────────────────────────────────────────────
+interface Stap3Props {
+  customerId: string | null;
+  setCustomerId: (v: string | null) => void;
+  voornaam: string; setVoornaam: (v: string) => void;
+  achternaam: string; setAchternaam: (v: string) => void;
+  geboortedatum: string; setGeboortedatum: (v: string) => void;
+  adres: string; setAdres: (v: string) => void;
+  postcode: string; setPostcode: (v: string) => void;
+  woonplaats: string; setWoonplaats: (v: string) => void;
+  land: string; setLand: (v: string) => void;
+  telefoon: string; setTelefoon: (v: string) => void;
+  email: string; setEmail: (v: string) => void;
+  zakelijk: boolean; setZakelijk: (v: boolean) => void;
+  bedrijfsnaam: string; setBedrijfsnaam: (v: string) => void;
+  kvk: string; setKvk: (v: string) => void;
+  btw: string; setBtw: (v: string) => void;
+}
+
+interface CustomerSuggestion {
+  id: string;
+  voornaam: string;
+  achternaam: string;
+  email: string;
+  telefoon: string;
+  bedrijfsnaam: string | null;
+  adres: string | null;
+  postcode: string | null;
+  woonplaats: string | null;
+  plaats: string | null;
+  land: string | null;
+  geboortedatum: string | null;
+  is_zakelijk: boolean | null;
+  kvk_nummer: string | null;
+  btw_nummer: string | null;
+}
+
+const Stap3Klant = (p: Stap3Props) => {
+  const [mode, setMode] = useState<"existing" | "new">(p.customerId ? "existing" : "new");
+  const [zoekterm, setZoekterm] = useState("");
+  const [suggesties, setSuggesties] = useState<CustomerSuggestion[]>([]);
+  const [zoeken, setZoeken] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+
+  // Debounced search
+  useEffect(() => {
+    if (mode !== "existing") return;
+    const term = zoekterm.trim();
+    if (term.length < 2) { setSuggesties([]); return; }
+    const t = setTimeout(async () => {
+      setZoeken(true);
+      const { data, error } = await supabase
+        .from("customers")
+        .select("id,voornaam,achternaam,email,telefoon,bedrijfsnaam,adres,postcode,woonplaats,plaats,land,geboortedatum,is_zakelijk,kvk_nummer,btw_nummer")
+        .or(`voornaam.ilike.%${term}%,achternaam.ilike.%${term}%,email.ilike.%${term}%,telefoon.ilike.%${term}%,bedrijfsnaam.ilike.%${term}%`)
+        .limit(8);
+      setZoeken(false);
+      if (!error && data) setSuggesties(data as CustomerSuggestion[]);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [zoekterm, mode]);
+
+  const selectKlant = (c: CustomerSuggestion) => {
+    p.setCustomerId(c.id);
+    p.setVoornaam(c.voornaam || "");
+    p.setAchternaam(c.achternaam || "");
+    p.setGeboortedatum(c.geboortedatum || "");
+    p.setAdres(c.adres || "");
+    p.setPostcode(c.postcode || "");
+    p.setWoonplaats(c.woonplaats || c.plaats || "");
+    p.setLand(c.land || "Nederland");
+    p.setTelefoon(c.telefoon || "");
+    p.setEmail(c.email || "");
+    p.setZakelijk(!!c.is_zakelijk);
+    p.setBedrijfsnaam(c.bedrijfsnaam || "");
+    p.setKvk(c.kvk_nummer || "");
+    p.setBtw(c.btw_nummer || "");
+    setSuggesties([]);
+    setZoekterm(`${c.voornaam} ${c.achternaam}`.trim());
+  };
+
+  const switchToNew = () => {
+    setMode("new");
+    p.setCustomerId(null);
+    setSuggesties([]);
+    setZoekterm("");
+  };
+
+  const switchToExisting = () => {
+    setMode("existing");
+    p.setCustomerId(null);
+  };
+
+  const toggleCls = (active: boolean) =>
+    `flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-[10px] border transition-colors cursor-pointer ${
+      active
+        ? "bg-foreground/10 border-foreground/40 text-foreground font-medium"
+        : "border-border text-muted-foreground hover:bg-accent/50"
+    }`;
+
+  return (
+    <div className="space-y-6">
+      {/* Mode switcher */}
+      <div className="flex gap-3">
+        <button type="button" onClick={switchToExisting} className={toggleCls(mode === "existing")}>
+          <Search className="w-4 h-4" />
+          Bestaande klant selecteren
+        </button>
+        <button type="button" onClick={switchToNew} className={toggleCls(mode === "new")}>
+          <UserPlus className="w-4 h-4" />
+          Nieuwe klant
+        </button>
+      </div>
+
+      {/* Existing klant zoeker */}
+      {mode === "existing" && (
+        <div className="rounded-[14px] border border-border bg-card p-6 space-y-4">
+          <div>
+            <label className={labelCls}>Zoek klant</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={zoekterm}
+                onChange={(e) => { setZoekterm(e.target.value); if (p.customerId) p.setCustomerId(null); }}
+                placeholder="Zoek op naam, telefoon of email..."
+                className={cn(inputCls, "pl-9")}
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {zoeken && (
+            <div className="text-xs text-muted-foreground flex items-center gap-2">
+              <Loader2 className="w-3 h-3 animate-spin" /> Zoeken...
+            </div>
+          )}
+
+          {suggesties.length > 0 && (
+            <div className="border border-border rounded-[10px] divide-y divide-border overflow-hidden">
+              {suggesties.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => selectKlant(c)}
+                  className="w-full text-left px-4 py-3 hover:bg-accent/50 transition-colors flex items-center gap-3"
+                >
+                  <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center shrink-0">
+                    {c.is_zakelijk ? <Building2 className="w-4 h-4" /> : <User className="w-4 h-4" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-foreground font-medium truncate">
+                      {c.voornaam} {c.achternaam}
+                      {c.is_zakelijk && c.bedrijfsnaam ? ` — ${c.bedrijfsnaam}` : ""}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {c.email}{c.telefoon ? ` · ${c.telefoon}` : ""}{c.woonplaats ? ` · ${c.woonplaats}` : ""}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {p.customerId && (
+            <div className="rounded-[10px] border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm">
+              <div className="flex items-center gap-2 text-emerald-400 font-medium mb-1">
+                <Check className="w-4 h-4" /> Klant geselecteerd
+              </div>
+              <div className="text-foreground">
+                {p.voornaam} {p.achternaam}
+                {p.zakelijk && p.bedrijfsnaam ? ` — ${p.bedrijfsnaam}` : ""}
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {p.email}{p.telefoon ? ` · ${p.telefoon}` : ""}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Nieuwe klant formulier */}
+      {mode === "new" && (
+        <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Voornaam *</label>
+              <input type="text" value={p.voornaam} onChange={(e) => p.setVoornaam(e.target.value)} className={inputCls} maxLength={80} />
+            </div>
+            <div>
+              <label className={labelCls}>Achternaam *</label>
+              <input type="text" value={p.achternaam} onChange={(e) => p.setAchternaam(e.target.value)} className={inputCls} maxLength={80} />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>Geboortedatum *</label>
+            <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className={cn(
+                    "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                    !p.geboortedatum && "text-muted-foreground",
+                  )}
+                >
+                  <span>
+                    {p.geboortedatum
+                      ? format(parseISO(p.geboortedatum), "d MMMM yyyy", { locale: nl })
+                      : "Kies een datum"}
+                  </span>
+                  <CalendarIcon className="h-4 w-4 text-foreground/70" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
+                <Calendar
+                  mode="single"
+                  selected={p.geboortedatum ? parseISO(p.geboortedatum) : undefined}
+                  onSelect={(d) => {
+                    if (d) {
+                      const yyyy = d.getFullYear();
+                      const mm = String(d.getMonth() + 1).padStart(2, "0");
+                      const dd = String(d.getDate()).padStart(2, "0");
+                      p.setGeboortedatum(`${yyyy}-${mm}-${dd}`);
+                      setDatePickerOpen(false);
+                    }
+                  }}
+                  captionLayout="dropdown-buttons"
+                  fromYear={1920}
+                  toYear={new Date().getFullYear()}
+                  defaultMonth={p.geboortedatum ? parseISO(p.geboortedatum) : new Date(1990, 0, 1)}
+                  disabled={(date) => date > new Date()}
+                  initialFocus
+                  locale={nl}
+                  className={cn("p-3 pointer-events-auto")}
+                  classNames={{
+                    day_selected:
+                      "bg-emerald-600 text-white rounded-full border-0 ring-0 hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white focus:ring-0 focus:outline-none",
+                    day_today: "bg-muted text-foreground font-semibold",
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div>
+            <label className={labelCls}>Adres *</label>
+            <input type="text" value={p.adres} onChange={(e) => p.setAdres(e.target.value)} className={inputCls} placeholder="Straat 1" maxLength={150} />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className={labelCls}>Postcode *</label>
+              <input type="text" value={p.postcode} onChange={(e) => p.setPostcode(e.target.value)} className={inputCls} placeholder="1234 AB" maxLength={10} />
+            </div>
+            <div className="sm:col-span-2">
+              <label className={labelCls}>Woonplaats *</label>
+              <input type="text" value={p.woonplaats} onChange={(e) => p.setWoonplaats(e.target.value)} className={inputCls} maxLength={100} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Land</label>
+              <input type="text" value={p.land} onChange={(e) => p.setLand(e.target.value)} className={inputCls} maxLength={60} />
+            </div>
+            <div>
+              <label className={labelCls}>Telefoonnummer *</label>
+              <input type="tel" value={p.telefoon} onChange={(e) => p.setTelefoon(e.target.value)} className={inputCls} placeholder="06-12345678" maxLength={30} />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>E-mailadres (optioneel)</label>
+            <input type="email" value={p.email} onChange={(e) => p.setEmail(e.target.value)} className={inputCls} placeholder="naam@voorbeeld.nl" maxLength={150} />
+          </div>
+
+          <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
+            <input
+              type="checkbox"
+              checked={p.zakelijk}
+              onChange={(e) => p.setZakelijk(e.target.checked)}
+              className="w-4 h-4 rounded border-border bg-input text-foreground focus:ring-1 focus:ring-ring"
+            />
+            <span className="text-sm text-foreground">Zakelijke klant</span>
+          </label>
+
+          <div
+            className={`grid transition-all duration-300 ease-out ${
+              p.zakelijk ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="border-t border-border pt-5 space-y-4">
+                <div>
+                  <label className={labelCls}>Bedrijfsnaam *</label>
+                  <input type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>KVK-nummer *</label>
+                    <input type="text" value={p.kvk} onChange={(e) => p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>BTW-nummer (optioneel)</label>
+                    <input type="text" value={p.btw} onChange={(e) => p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
