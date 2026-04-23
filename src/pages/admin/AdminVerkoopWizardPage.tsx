@@ -993,8 +993,10 @@ interface Stap2Props {
   setLeverdatum: (v: string) => void;
   aanbetalingBedrag: number | "";
   setAanbetalingBedrag: (v: number | "") => void;
-  aanbetalingBetaalwijze: "cash" | "pin" | "ideal" | "";
-  setAanbetalingBetaalwijze: (v: "cash" | "pin" | "ideal" | "") => void;
+  aanbetalingBetaalwijze: Betaalwijze;
+  setAanbetalingBetaalwijze: (v: Betaalwijze) => void;
+  aanbetalingBankrekening: string;
+  setAanbetalingBankrekening: (v: string) => void;
 }
 
 const Stap2Aflevering = (p: Stap2Props) => {
