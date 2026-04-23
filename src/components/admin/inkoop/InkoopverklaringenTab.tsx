@@ -89,18 +89,18 @@ export default function InkoopverklaringenTab() {
       ) : isMobile ? (
         <div className="space-y-2">
           {filtered.map(v => (
-            <div key={v.id} onClick={() => openDetail(v)} className="bg-card border border-border rounded-xl p-3.5 cursor-pointer active:bg-secondary/30 transition-all">
+            <div key={v.id} onClick={() => handleDownload(v)} className="bg-card border border-border rounded-xl p-3.5 cursor-pointer active:bg-secondary/30 transition-all">
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div className="min-w-0">
-                  <p className="font-semibold text-sm truncate">{v.documentNaam}</p>
-                  <p className="text-xs text-muted-foreground">{v.verkoperNaam}</p>
+                  <p className="font-semibold text-sm truncate">{v.merk} {v.model}</p>
+                  <p className="text-xs text-muted-foreground font-mono uppercase">{v.kenteken || "—"}</p>
                 </div>
                 <Badge className={cn("text-[10px] border whitespace-nowrap shrink-0", v.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
                   {v.status === "ondertekend" ? "Ondertekend" : "Concept"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{v.kenteken || "—"} · {v.merk} {v.model}</span>
+                <span className="truncate">{v.verkoperNaam}</span>
                 <span>{formatEuro(v.inkoopprijs)}</span>
               </div>
             </div>
@@ -111,28 +111,35 @@ export default function InkoopverklaringenTab() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/30">
-                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Document</th>
-                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Verkoper</th>
-                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Kenteken</th>
                 <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Voertuig</th>
+                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Kenteken</th>
+                <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Verkoper</th>
                 <th className="text-right px-3 py-2 text-[11px] font-medium text-muted-foreground">Inkoopprijs</th>
                 <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Datum</th>
                 <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Status</th>
+                <th className="text-right px-3 py-2 text-[11px] font-medium text-muted-foreground w-20">Acties</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(v => (
-                <tr key={v.id} onClick={() => openDetail(v)} className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer">
-                  <td className="px-3 py-2.5 text-foreground">{v.documentNaam}</td>
-                  <td className="px-3 py-2.5 text-muted-foreground text-xs">{v.verkoperNaam}</td>
+                <tr key={v.id} onClick={() => handleDownload(v)} className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer group">
+                  <td className="px-3 py-2.5 text-foreground font-medium">{v.merk} {v.model}</td>
                   <td className="px-3 py-2.5 text-muted-foreground text-[11px] font-mono uppercase">{v.kenteken || "—"}</td>
-                  <td className="px-3 py-2.5 text-xs">{v.merk} {v.model}</td>
+                  <td className="px-3 py-2.5 text-muted-foreground text-xs">{v.verkoperNaam}</td>
                   <td className="px-3 py-2.5 text-right tabular-nums text-xs">{formatEuro(v.inkoopprijs)}</td>
                   <td className="px-3 py-2.5 text-muted-foreground text-xs">{formatDate(v.datum)}</td>
                   <td className="px-3 py-2.5">
                     <span className={cn(BADGE_BASE, v.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
                       {v.status === "ondertekend" ? "Ondertekend" : "Concept"}
                     </span>
+                  </td>
+                  <td className="px-3 py-2.5 text-right">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openDetail(v); }}
+                      className="text-[11px] text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+                    >
+                      Details
+                    </button>
                   </td>
                 </tr>
               ))}
