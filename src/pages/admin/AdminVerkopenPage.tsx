@@ -5,28 +5,20 @@ import { Search, Loader2, ChevronRight, Download, CheckCircle2, AlertCircle } fr
 import { formatEuro, calcWinst, calcMarge, isConsignatie } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
-import SlidingTabs from "@/components/admin/SlidingTabs";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
 
-type TabValue = "in_behandeling" | "afgerond";
-
-const tabs = [
-  { label: "In behandeling", value: "in_behandeling" },
-  { label: "Afgerond", value: "afgerond" },
-];
+type FilterValue = "alle" | "in_behandeling" | "afgerond";
 
 const AdminVerkopenPage = () => {
   const { vehicles, loading } = useVehicles();
   const [search, setSearch] = useState("");
-  const [tab, setTab] = useState<TabValue>("in_behandeling");
+  const [filter, setFilter] = useState<FilterValue>("alle");
   const isMobile = useIsMobile();
   const [docStatus, setDocStatus] = useState<Record<string, boolean>>({});
   const [pendingSales, setPendingSales] = useState<any[]>([]);
 
-  // Sold vehicles = afgerond
   const soldVehicles = useMemo(() => vehicles.filter(v => v.status === "verkocht"), [vehicles]);
 
-  // Pending sales: vehicle_sales with status != 'voltooid'
   useEffect(() => {
     const fetchPending = async () => {
       const { data } = await supabase
@@ -39,23 +31,22 @@ const AdminVerkopenPage = () => {
     fetchPending();
   }, [vehicles]);
 
-  // Filter afgerond
-  const filteredSold = useMemo(() => {
-    return soldVehicles.filter(v => {
-      if (search) {
-        const q = search.toLowerCase();
-        return (
-          v.merk.toLowerCase().includes(q) ||
-          v.model.toLowerCase().includes(q) ||
-          v.kenteken?.toLowerCase().includes(q) ||
-          v.koperNaam?.toLowerCase().includes(q)
-        );
-      }
-      return true;
-    }).sort((a, b) => (b.verkoopDatum || "").localeCompare(a.verkoopDatum || ""));
-  }, [soldVehicles, search]);
+  const matchesSearch = (v: any) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      v.merk?.toLowerCase().includes(q) ||
+      v.model?.toLowerCase().includes(q) ||
+      v.kenteken?.toLowerCase().includes(q) ||
+      v.koperNaam?.toLowerCase().includes(q)
+    );
+  };
 
-  // Filter in behandeling — combineer pending sales met voertuiginfo
+  const filteredSold = useMemo(
+    () => soldVehicles.filter(matchesSearch).sort((a, b) => (b.verkoopDatum || "").localeCompare(a.verkoopDatum || "")),
+    [soldVehicles, search]
+  );
+
   const filteredPending = useMemo(() => {
     return pendingSales
       .map(ps => {
@@ -63,15 +54,9 @@ const AdminVerkopenPage = () => {
         return vehicle ? { ...ps, vehicle } : null;
       })
       .filter(Boolean)
-      .filter((row: any) => {
-        if (!search) return true;
-        const q = search.toLowerCase();
-        const v = row.vehicle;
-        return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || v.kenteken?.toLowerCase().includes(q);
-      });
+      .filter((row: any) => matchesSearch(row.vehicle));
   }, [pendingSales, vehicles, search]);
 
-  // Doc completeness for sold
   useEffect(() => {
     if (soldVehicles.length === 0) return;
     const fetchDocs = async () => {
@@ -128,6 +113,26 @@ const AdminVerkopenPage = () => {
     return <div className="flex items-center justify-center py-20"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
   }
 
+  const showPending = filter === "alle" || filter === "in_behandeling";
+  const showSold = filter === "alle" || filter === "afgerond";
+
+  const FilterButton = ({ value, label, count }: { value: FilterValue; label: string; count: number }) => {
+    const active = filter === value;
+    return (
+      <button
+        onClick={() => setFilter(active ? "alle" : value)}
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+          active
+            ? "bg-foreground text-background border-foreground"
+            : "bg-card text-muted-foreground border-border hover:bg-accent hover:text-foreground"
+        }`}
+      >
+        {label}
+        <span className={`tabular-nums ${active ? "opacity-70" : "opacity-60"}`}>{count}</span>
+      </button>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
@@ -137,16 +142,17 @@ const AdminVerkopenPage = () => {
             {filteredPending.length} in behandeling · {soldVehicles.length} afgerond
           </p>
         </div>
-        {tab === "afgerond" && (
+        {showSold && (
           <button onClick={handleExport} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">
             <Download className="w-3.5 h-3.5" /> Export
           </button>
         )}
       </div>
 
-      <div className="space-y-3 overflow-hidden">
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-          <SlidingTabs tabs={tabs} value={tab} onChange={(v) => setTab(v as TabValue)} className="min-w-max" />
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterButton value="in_behandeling" label="In behandeling" count={filteredPending.length} />
+          <FilterButton value="afgerond" label="Afgerond" count={filteredSold.length} />
         </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -160,45 +166,50 @@ const AdminVerkopenPage = () => {
         </div>
       </div>
 
-      {tab === "in_behandeling" ? (
-        filteredPending.length === 0 ? (
-          <div className="bg-card rounded-lg border border-border px-4 py-12 text-center text-sm text-muted-foreground">
-            Geen verkopen in behandeling.
-          </div>
-        ) : (
-          <div className="space-y-1.5">
-            {filteredPending.map((row: any) => {
-              const v = row.vehicle;
-              return (
-                <Link
-                  key={row.id}
-                  to={`/admin/voertuigen/${v.id}`}
-                  className="flex items-center justify-between gap-3 bg-card border border-border rounded-lg p-3 hover:bg-accent/20 active:bg-accent/30 transition-colors"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-foreground">{v.merk} {v.model}</p>
-                      <span className="text-xs text-muted-foreground">({v.bouwjaar})</span>
+      {showPending && (
+        <div className="space-y-2">
+          {filter === "alle" && <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">In behandeling</h2>}
+          {filteredPending.length === 0 ? (
+            <div className="bg-card rounded-lg border border-border px-4 py-8 text-center text-sm text-muted-foreground">
+              Geen verkopen in behandeling.
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              {filteredPending.map((row: any) => {
+                const v = row.vehicle;
+                return (
+                  <Link
+                    key={row.id}
+                    to={`/admin/voertuigen/${v.id}`}
+                    className="flex items-center justify-between gap-3 bg-card border border-border rounded-lg p-3 hover:bg-accent/20 active:bg-accent/30 transition-colors"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-foreground">{v.merk} {v.model}</p>
+                        <span className="text-xs text-muted-foreground">({v.bouwjaar})</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
+                        <span className="inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                          Stap {row.wizard_stap || 1} / 5
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1.5">
+                        {row.verkoopprijs > 0 && <span className="text-xs text-muted-foreground tabular-nums">{formatEuro(row.verkoopprijs)}</span>}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
-                      <span className="inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                        Stap {row.wizard_stap || 1} / 5
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 mt-1.5">
-                      {row.verkoopprijs > 0 && <span className="text-xs text-muted-foreground tabular-nums">{formatEuro(row.verkoopprijs)}</span>}
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                </Link>
-              );
-            })}
-          </div>
-        )
-      ) : (
-        <>
-          {/* Totals voor afgerond */}
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {showSold && (
+        <div className="space-y-3">
+          {filter === "alle" && <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Afgerond</h2>}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <TotalCard label="Omzet" value={formatEuro(totals.omzet)} />
             <TotalCard label="Inkoop" value={formatEuro(totals.inkoop)} />
@@ -207,7 +218,7 @@ const AdminVerkopenPage = () => {
           </div>
 
           {filteredSold.length === 0 ? (
-            <div className="bg-card rounded-lg border border-border px-4 py-12 text-center text-sm text-muted-foreground">
+            <div className="bg-card rounded-lg border border-border px-4 py-8 text-center text-sm text-muted-foreground">
               Geen afgeronde verkopen gevonden.
             </div>
           ) : isMobile ? (
@@ -297,7 +308,7 @@ const AdminVerkopenPage = () => {
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
