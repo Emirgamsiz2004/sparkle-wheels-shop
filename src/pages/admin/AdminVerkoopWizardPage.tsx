@@ -394,6 +394,20 @@ const AdminVerkoopWizardPage = () => {
       financiering_maatschappij: (restBetaalwijze === "financiering" || betaalwijzeDetails.some(d => d.methode === "financiering"))
         ? (financieringMaatschappij.trim() || null) : null,
       betaalwijze_details: betaalwijzeDetails as any,
+      // Stap 6 — inruil document
+      inruil_type: inruil ? stap6DocType : null,
+      inruil_verkoper_voornaam: inruil && stap6DocType === "particulier" ? (inrVerkVoornaam.trim() || null) : null,
+      inruil_verkoper_achternaam: inruil && stap6DocType === "particulier" ? (inrVerkAchternaam.trim() || null) : null,
+      inruil_verkoper_geboortedatum: inruil && stap6DocType === "particulier" && inrVerkGeboortedatum ? inrVerkGeboortedatum : null,
+      inruil_verkoper_adres: inruil && stap6DocType === "particulier" ? (inrVerkAdres.trim() || null) : null,
+      inruil_verkoper_postcode: inruil && stap6DocType === "particulier" ? (inrVerkPostcode.trim() || null) : null,
+      inruil_verkoper_woonplaats: inruil && stap6DocType === "particulier" ? (inrVerkWoonplaats.trim() || null) : null,
+      inruil_verkoper_telefoon: inruil && stap6DocType === "particulier" ? (inrVerkTelefoon.trim() || null) : null,
+      inruil_contactpersoon: inruil && stap6DocType === "zakelijk" ? (inrContactpersoon.trim() || null) : null,
+      inruil_betaalwijze: inruil && inrBetaalwijze ? inrBetaalwijze : null,
+      inruil_inkoopverklaring_id: inkoopverklaringId,
+      ...extra,
+    };
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
