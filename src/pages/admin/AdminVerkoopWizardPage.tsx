@@ -1672,19 +1672,23 @@ const Stap3Klant = (p: Stap3Props) => {
 
       {/* Nieuwe klant formulier */}
       {mode === "new" && (
-        <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+        <div className="w-full rounded-[14px] border border-border bg-card p-6 space-y-5">
           <InlineKlantTypeToggle zakelijk={p.zakelijk} onChange={switchKlantType} />
 
-          {/* Zakelijk: bedrijfsgegevens bovenaan — fade in/out */}
+          {/* Zakelijk: bedrijfsgegevens bovenaan — smooth height + fade + slide */}
           <div
-            key={`zak-${klantTypeKey}`}
             className={cn(
-              "transition-all duration-200 ease-out overflow-hidden",
-              p.zakelijk ? "opacity-100 max-h-[600px] animate-fade-in" : "opacity-0 max-h-0 pointer-events-none",
+              "grid transition-all duration-[250ms] ease-out",
+              p.zakelijk ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0 pointer-events-none",
             )}
           >
-            {p.zakelijk && (
-              <div className="space-y-5">
+            <div className="overflow-hidden min-h-0">
+              <div
+                className={cn(
+                  "space-y-5 transition-all duration-[250ms] ease-out",
+                  p.zakelijk ? "translate-y-0" : "-translate-y-2",
+                )}
+              >
                 <div>
                   <label className={labelCls}>Bedrijfsnaam *</label>
                   <input type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
@@ -1703,7 +1707,7 @@ const Stap3Klant = (p: Stap3Props) => {
                   <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Contactpersoon</div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
           <div key={`names-${klantTypeKey}`} className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
