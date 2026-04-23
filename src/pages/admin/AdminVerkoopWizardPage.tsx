@@ -148,6 +148,8 @@ const AdminVerkoopWizardPage = () => {
   const [opmerkingen, setOpmerkingen] = useState<string>("");
   const [contractGetekend, setContractGetekend] = useState<boolean>(false);
   const [pdfGenereerd, setPdfGenereerd] = useState<boolean>(false);
+  const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering">("overboeking");
+  const [financieringMaatschappij, setFinancieringMaatschappij] = useState<string>("");
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
@@ -266,6 +268,11 @@ const AdminVerkoopWizardPage = () => {
         setOvereenkomstnummer((existing as any).overeenkomstnummer || "");
         setOpmerkingen((existing as any).opmerkingen || "");
         setContractGetekend(!!existing.contract_getekend);
+        const bw = (existing as any).betaalwijze;
+        if (["cash", "pin", "ideal", "overboeking", "financiering"].includes(bw)) {
+          setRestBetaalwijze(bw);
+        }
+        setFinancieringMaatschappij((existing as any).financiering_maatschappij || "");
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -340,6 +347,9 @@ const AdminVerkoopWizardPage = () => {
       opmerkingen: opmerkingen.trim() || null,
       contract_getekend: contractGetekend,
       contract_getekend_datum: contractGetekend ? new Date().toISOString().slice(0, 10) : null,
+      betaalwijze: restBetaalwijze,
+      financiering: restBetaalwijze === "financiering",
+      financiering_maatschappij: restBetaalwijze === "financiering" ? (financieringMaatschappij.trim() || null) : null,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -350,7 +360,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
@@ -733,6 +743,10 @@ const AdminVerkoopWizardPage = () => {
                 }}
                 pdfGenereerd={pdfGenereerd}
                 setPdfGenereerd={setPdfGenereerd}
+                restBetaalwijze={restBetaalwijze}
+                setRestBetaalwijze={setRestBetaalwijze}
+                financieringMaatschappij={financieringMaatschappij}
+                setFinancieringMaatschappij={setFinancieringMaatschappij}
                 onAutoSave={() => saveCurrent()}
                 verkoopId={verkoopId}
               />
@@ -2327,6 +2341,10 @@ interface Stap5Props {
   setContractGetekend: (v: boolean) => void;
   pdfGenereerd: boolean;
   setPdfGenereerd: (v: boolean) => void;
+  restBetaalwijze: "cash" | "pin" | "ideal" | "overboeking" | "financiering";
+  setRestBetaalwijze: (v: "cash" | "pin" | "ideal" | "overboeking" | "financiering") => void;
+  financieringMaatschappij: string;
+  setFinancieringMaatschappij: (v: string) => void;
   onAutoSave: () => Promise<any>;
   verkoopId: string | null;
 }
@@ -2375,7 +2393,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         },
         financieel: {
           verkoopprijs: p.verkoopprijs,
-          betaalwijze: p.aanbetalingBetaalwijze || "overboeking",
+          betaalwijze: p.restBetaalwijze + (p.restBetaalwijze === "financiering" && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : ""),
           aanbetalingActief: (p.aanbetalingBedrag || 0) > 0,
           aanbetalingsbedrag: p.aanbetalingBedrag,
           restbedrag,
@@ -2434,56 +2452,153 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       {/* Sectie 1 — Samenvatting */}
       <div>
         <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-3">Samenvatting</div>
-        <div className="grid md:grid-cols-3 gap-4">
-          {/* Voertuig */}
-          <div className="rounded-[14px] border border-border bg-card p-5">
-            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Voertuig</div>
-            <div className="space-y-1.5 text-sm">
-              <div className="font-medium text-foreground">{p.vehicle.merk} {p.vehicle.model}</div>
-              <div className="text-muted-foreground">Bouwjaar {p.vehicle.bouwjaar || "—"}</div>
-              <div className="font-mono uppercase text-foreground">{p.vehicle.kenteken || "—"}</div>
-              <div className="text-muted-foreground">{p.kmStand.toLocaleString("nl-NL")} km</div>
-              <div className="pt-2">
-                <span className="inline-block px-2 py-0.5 rounded-full bg-foreground/10 text-foreground text-[11px] font-medium">{voertuigTypeLabel}</span>
+        {/* Rij 1: Voertuig 60% + Klant 40% */}
+        <div className="grid md:grid-cols-5 gap-4 mb-4">
+          {/* Voertuig — 3/5 */}
+          <div className="md:col-span-3 rounded-[14px] border border-border bg-card px-6 py-5">
+            <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-[0.1em] mb-4">Voertuig</div>
+            <div className="space-y-3">
+              <div className="text-[14px] font-semibold text-foreground">{p.vehicle.merk} {p.vehicle.model}</div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                <div>
+                  <div className="text-[11px] text-muted-foreground mb-0.5">Bouwjaar</div>
+                  <div className="text-[14px] text-foreground">{p.vehicle.bouwjaar || "—"}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground mb-0.5">Kenteken</div>
+                  <div className="text-[14px] font-mono uppercase text-foreground">{p.vehicle.kenteken || "—"}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground mb-0.5">Kilometerstand</div>
+                  <div className="text-[14px] text-foreground">{p.kmStand.toLocaleString("nl-NL")} km</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground mb-0.5">Voertuigtype</div>
+                  <div>
+                    <span className="inline-block px-2 py-0.5 rounded-full bg-foreground/10 text-foreground text-[12px] font-medium">{voertuigTypeLabel}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Klant */}
-          <div className="rounded-[14px] border border-border bg-card p-5">
-            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Klant</div>
-            <div className="space-y-1.5 text-sm">
-              <div className="font-medium text-foreground">{klantNaam || "—"}</div>
+          {/* Klant — 2/5 */}
+          <div className="md:col-span-2 rounded-[14px] border border-border bg-card px-6 py-5">
+            <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-[0.1em] mb-4">Klant</div>
+            <div className="space-y-3">
+              <div className="text-[14px] font-semibold text-foreground">{klantNaam || "—"}</div>
               {p.klant.zakelijk && p.klant.bedrijfsnaam && (
-                <div className="text-muted-foreground">Contact: {p.klant.voornaam} {p.klant.achternaam}</div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground mb-0.5">Contactpersoon</div>
+                  <div className="text-[14px] text-foreground">{p.klant.voornaam} {p.klant.achternaam}</div>
+                </div>
               )}
-              <div className="text-muted-foreground">{p.klant.adres || "—"}</div>
-              <div className="text-muted-foreground">{p.klant.postcode} {p.klant.woonplaats}</div>
+              <div>
+                <div className="text-[11px] text-muted-foreground mb-0.5">Adres</div>
+                <div className="text-[14px] text-foreground">{p.klant.adres || "—"}</div>
+                <div className="text-[14px] text-foreground">{p.klant.postcode} {p.klant.woonplaats}</div>
+              </div>
               {p.klant.zakelijk ? (
-                <div className="text-muted-foreground">KVK: {p.klant.kvk || "—"}</div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground mb-0.5">KVK-nummer</div>
+                  <div className="text-[14px] text-foreground">{p.klant.kvk || "—"}</div>
+                </div>
               ) : (
-                <div className="text-muted-foreground">Geboren: {p.klant.geboortedatum ? new Date(p.klant.geboortedatum).toLocaleDateString("nl-NL") : "—"}</div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground mb-0.5">Geboortedatum</div>
+                  <div className="text-[14px] text-foreground">{p.klant.geboortedatum ? new Date(p.klant.geboortedatum).toLocaleDateString("nl-NL") : "—"}</div>
+                </div>
               )}
             </div>
           </div>
+        </div>
 
-          {/* Financieel */}
-          <div className="rounded-[14px] border border-border bg-card p-5">
-            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Financieel</div>
-            <div className="space-y-1.5 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Verkoopprijs</span><span className="text-foreground">{fmtEur(p.verkoopprijs)}</span></div>
-              {p.afleverkosten > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Afleverkosten</span><span className="text-foreground">{fmtEur(p.afleverkosten)}</span></div>}
-              {p.leges > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Leges</span><span className="text-foreground">{fmtEur(p.leges)}</span></div>}
-              {garantieKosten > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Garantie</span><span className="text-foreground">{fmtEur(garantieKosten)}</span></div>}
-              {(p.aanbetalingBedrag || 0) > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Aanbetaling</span><span className="text-foreground">- {fmtEur(p.aanbetalingBedrag)}</span></div>}
-              <div className="border-t border-border pt-1.5 mt-1.5 flex justify-between font-medium"><span className="text-foreground">Restbedrag</span><span className="text-foreground">{fmtEur(restbedrag)}</span></div>
-              <div className="pt-2 text-xs text-muted-foreground">
+        {/* Rij 2: Financieel — volle breedte */}
+        <div className="rounded-[14px] border border-border bg-card px-6 py-5">
+          <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-[0.1em] mb-4">Financieel</div>
+          <div className="grid md:grid-cols-2 gap-x-8 gap-y-3">
+            <div className="space-y-2.5">
+              <div className="flex justify-between items-baseline">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Verkoopprijs</span>
+                <span className="text-[14px] text-foreground">{fmtEur(p.verkoopprijs)}</span>
+              </div>
+              {p.afleverkosten > 0 && (
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Afleverkosten</span>
+                  <span className="text-[14px] text-foreground">{fmtEur(p.afleverkosten)}</span>
+                </div>
+              )}
+              {p.leges > 0 && (
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Leges</span>
+                  <span className="text-[14px] text-foreground">{fmtEur(p.leges)}</span>
+                </div>
+              )}
+              {garantieKosten > 0 && (
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Garantie</span>
+                  <span className="text-[14px] text-foreground">{fmtEur(garantieKosten)}</span>
+                </div>
+              )}
+              {(p.aanbetalingBedrag || 0) > 0 && (
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Aanbetaling</span>
+                  <span className="text-[14px] text-foreground">- {fmtEur(p.aanbetalingBedrag)}</span>
+                </div>
+              )}
+              <div className="border-t border-border pt-2.5 mt-1 flex justify-between items-baseline">
+                <span className="text-[12px] font-semibold text-foreground uppercase tracking-wide">Restbedrag</span>
+                <span className="text-[16px] font-semibold text-foreground">{fmtEur(restbedrag)}</span>
+              </div>
+              <div className="pt-1 text-[12px] text-muted-foreground">
                 Garantie: {p.garantie.type === "geen" ? "Geen" : `${p.garantie.pakket || "Autotrust"} — ${p.garantie.looptijd || 0} mnd`}
               </div>
+            </div>
+
+            {/* Betaalwijze restbedrag */}
+            <div className="space-y-3">
+              <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Betaalwijze restbedrag</div>
+              <div className="flex flex-wrap gap-2">
+                {([
+                  { v: "cash", l: "Cash" },
+                  { v: "pin", l: "Pin" },
+                  { v: "ideal", l: "iDEAL" },
+                  { v: "overboeking", l: "Overboeking" },
+                  { v: "financiering", l: "Financiering" },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.v}
+                    type="button"
+                    onClick={() => p.setRestBetaalwijze(opt.v)}
+                    className={cn(
+                      "px-4 py-2 rounded-[10px] text-[13px] font-medium border transition-colors",
+                      p.restBetaalwijze === opt.v
+                        ? "bg-foreground text-background border-foreground"
+                        : "bg-transparent text-foreground border-border hover:border-foreground/40"
+                    )}
+                  >
+                    {opt.l}
+                  </button>
+                ))}
+              </div>
+              {p.restBetaalwijze === "financiering" && (
+                <div className="pt-2">
+                  <label className={labelCls}>Financieringsmaatschappij (optioneel)</label>
+                  <input
+                    autoComplete="off"
+                    type="text"
+                    value={p.financieringMaatschappij}
+                    onChange={(e) => p.setFinancieringMaatschappij(e.target.value)}
+                    placeholder="Bijv. Santander, Hiltermann, ..."
+                    className={inputCls}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
 
       {/* Sectie 2 — Extra opties */}
       <div className="rounded-[14px] border border-border bg-card p-6 space-y-4">
