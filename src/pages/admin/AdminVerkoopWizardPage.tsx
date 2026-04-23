@@ -298,6 +298,52 @@ const AdminVerkoopWizardPage = () => {
         if (!afleveradres.trim()) { toast.error("Afleveradres is verplicht"); return; }
       }
     }
+    if (activeStap === 3) {
+      if (!klantVoornaam.trim() || !klantAchternaam.trim()) { toast.error("Voor- en achternaam zijn verplicht"); return; }
+      if (!klantAdres.trim() || !klantPostcode.trim() || !klantWoonplaats.trim()) { toast.error("Adres, postcode en woonplaats zijn verplicht"); return; }
+      if (!klantTelefoon.trim()) { toast.error("Telefoonnummer is verplicht"); return; }
+      if (klantZakelijk) {
+        if (!klantBedrijfsnaam.trim()) { toast.error("Bedrijfsnaam is verplicht"); return; }
+        if (!klantKvk.trim()) { toast.error("KVK-nummer is verplicht"); return; }
+      }
+      // Klant aanmaken of bijwerken
+      const customerPayload: any = {
+        voornaam: klantVoornaam.trim(),
+        achternaam: klantAchternaam.trim(),
+        geboortedatum: klantGeboortedatum || null,
+        adres: klantAdres.trim() || null,
+        postcode: klantPostcode.trim() || null,
+        woonplaats: klantWoonplaats.trim() || null,
+        plaats: klantWoonplaats.trim() || null,
+        land: klantLand || "Nederland",
+        telefoon: klantTelefoon.trim(),
+        email: klantEmail.trim() || `${klantVoornaam.trim().toLowerCase()}.${klantAchternaam.trim().toLowerCase()}@geen-email.local`,
+        is_zakelijk: klantZakelijk,
+        bedrijfsnaam: klantZakelijk ? klantBedrijfsnaam.trim() : null,
+        kvk_nummer: klantZakelijk ? klantKvk.trim() : null,
+        btw_nummer: klantZakelijk ? (klantBtw.trim() || null) : null,
+        status: "klant",
+      };
+      let custId = customerId;
+      if (custId) {
+        const { error: updErr } = await supabase.from("customers").update(customerPayload).eq("id", custId);
+        if (updErr) { toast.error("Opslaan klant mislukt"); console.error(updErr); return; }
+      } else {
+        const { data: created, error: insErr } = await supabase.from("customers").insert(customerPayload).select().single();
+        if (insErr || !created) { toast.error("Aanmaken klant mislukt"); console.error(insErr); return; }
+        custId = created.id;
+        setCustomerId(custId);
+      }
+      const ok = await saveCurrent({ stap3_afgerond: true, customer_id: custId });
+      if (!ok) return;
+      setCompleted((p) => ({ ...p, [activeStap]: true }));
+      let next = activeStap + 1;
+      const nextCompleted = { ...completed, [activeStap]: true };
+      while (next <= 12 && isStepBlocked(next, nextCompleted, inruil)) next++;
+      if (next <= 12) setActiveStap(next);
+      toast.success("Klant opgeslagen");
+      return;
+    }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
     if (!ok) return;
     setCompleted((p) => ({ ...p, [activeStap]: true }));
