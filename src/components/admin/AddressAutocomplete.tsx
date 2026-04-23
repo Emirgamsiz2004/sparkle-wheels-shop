@@ -139,7 +139,7 @@ const AddressAutocomplete = ({
         <input
           type="text"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) = autoComplete="off"> onChange(e.target.value)}
           onKeyDown={onKey}
           onFocus={() => predictions.length > 0 && setOpen(true)}
           placeholder={placeholder}
