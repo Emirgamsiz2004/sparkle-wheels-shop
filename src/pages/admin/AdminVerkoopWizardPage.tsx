@@ -408,8 +408,6 @@ const AdminVerkoopWizardPage = () => {
       inruil_inkoopverklaring_id: inkoopverklaringId,
       ...extra,
     };
-      ...extra,
-    };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
     setSaving(false);
     if (error) {
