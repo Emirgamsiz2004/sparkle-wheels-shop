@@ -233,6 +233,13 @@ const AdminVerkoopWizardPage = () => {
             setKlantBtw(cust.btw_nummer || "");
           }
         }
+        // Stap 4 hydration
+        if (existing.garantie_type === "geen" || existing.garantie_type === "autotrust") {
+          setGarantieType(existing.garantie_type);
+        }
+        setGarantiePakket(existing.garantie_pakket || "");
+        setGarantieLooptijd(existing.garantie_looptijd ?? "");
+        setGarantiePrijs(existing.garantie_prijs ?? "");
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
