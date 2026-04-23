@@ -840,7 +840,7 @@ const AdminVerkoopWizardPage = () => {
                 setInruilBetaalwijze={setInrBetaalwijze}
                 inkoopverklaringId={inkoopverklaringId}
                 setInkoopverklaringId={setInkoopverklaringId}
-                onAutoSave={() => saveCurrent()}
+                onAutoSave={async () => { await saveCurrent(); }}
               />
             )}
 
