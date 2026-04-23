@@ -544,15 +544,11 @@ const Stap1Voertuig = (p: Stap1Props) => {
 
       {/* Inruil */}
       <div className="rounded-[14px] border border-border bg-card p-5">
-        <label className="flex items-center gap-2.5 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={p.inruil}
-            onChange={(e) => p.setInruil(e.target.checked)}
-            className="w-4 h-4 rounded border-border bg-input accent-foreground"
-          />
-          <span className="text-sm font-medium text-foreground">Inruil van toepassing</span>
-        </label>
+        <TogglePill
+          active={p.inruil}
+          onChange={p.setInruil}
+          label="Inruil van toepassing"
+        />
 
         {p.inruil && (
           <div className="mt-5 space-y-4 border-t border-border pt-5">
@@ -637,6 +633,38 @@ const InfoRow = ({ label, value, mono }: { label: string; value: string; mono?: 
     <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
     <div className={`text-sm text-foreground ${mono ? "font-mono uppercase" : ""}`}>{value}</div>
   </div>
+);
+
+// Toggle pill — vervangt checkboxes voor een nettere UI
+const TogglePill = ({
+  active,
+  onChange,
+  label,
+}: {
+  active: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={active}
+    onClick={() => onChange(!active)}
+    className={[
+      "inline-flex items-center gap-2.5 px-4 py-2 rounded-full border text-sm font-medium transition-colors select-none",
+      active
+        ? "bg-foreground text-background border-foreground"
+        : "bg-transparent text-muted-foreground border-border hover:bg-accent/50 hover:text-foreground",
+    ].join(" ")}
+  >
+    <span
+      className={[
+        "w-2 h-2 rounded-full transition-colors",
+        active ? "bg-background" : "bg-muted-foreground/40",
+      ].join(" ")}
+    />
+    {label}
+  </button>
 );
 
 export default AdminVerkoopWizardPage;
