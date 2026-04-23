@@ -677,7 +677,68 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && activeStap !== 4 && (
+            {activeStap === 5 && (
+              <Stap5Koopovereenkomst
+                vehicle={vehicle}
+                kmStand={kmStand === "" ? (vehicle.kilometerstand || 0) : Number(kmStand)}
+                voertuigType={voertuigType}
+                verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
+                afleverkosten={afleverkosten === "" ? 0 : Number(afleverkosten)}
+                leges={leges === "" ? 0 : Number(leges)}
+                aanbetalingBedrag={aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag)}
+                aanbetalingBetaalwijze={aanbetalingBetaalwijze}
+                leverdatum={leverdatum}
+                klant={{
+                  voornaam: klantVoornaam,
+                  achternaam: klantAchternaam,
+                  adres: klantAdres,
+                  postcode: klantPostcode,
+                  woonplaats: klantWoonplaats,
+                  land: klantLand,
+                  telefoon: klantTelefoon,
+                  email: klantEmail,
+                  geboortedatum: klantGeboortedatum,
+                  zakelijk: klantZakelijk,
+                  bedrijfsnaam: klantBedrijfsnaam,
+                  kvk: klantKvk,
+                  btw: klantBtw,
+                }}
+                garantie={{
+                  type: garantieType,
+                  pakket: garantiePakket,
+                  looptijd: garantieLooptijd === "" ? 0 : Number(garantieLooptijd),
+                  prijs: garantiePrijs === "" ? 0 : Number(garantiePrijs),
+                }}
+                inruil={inruil ? {
+                  kenteken: inruilKenteken,
+                  merk: inruilMerk,
+                  model: inruilModel,
+                  km: inruilKm === "" ? 0 : Number(inruilKm),
+                  waarde: inruilWaarde === "" ? 0 : Number(inruilWaarde),
+                } : null}
+                overeenkomstnummer={overeenkomstnummer}
+                setOvereenkomstnummer={setOvereenkomstnummer}
+                opmerkingen={opmerkingen}
+                setOpmerkingen={setOpmerkingen}
+                contractGetekend={contractGetekend}
+                setContractGetekend={(v) => {
+                  setContractGetekend(v);
+                  // Direct opslaan zodat status persistent is
+                  if (verkoopId) {
+                    supabase.from("verkopen").update({
+                      contract_getekend: v,
+                      contract_getekend_datum: v ? new Date().toISOString().slice(0, 10) : null,
+                    }).eq("id", verkoopId);
+                  }
+                }}
+                pdfGenereerd={pdfGenereerd}
+                setPdfGenereerd={setPdfGenereerd}
+                onAutoSave={() => saveCurrent()}
+                verkoopId={verkoopId}
+              />
+            )}
+
+            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && activeStap !== 4 && activeStap !== 5 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
