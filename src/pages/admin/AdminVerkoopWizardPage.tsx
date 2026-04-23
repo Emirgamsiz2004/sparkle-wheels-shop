@@ -519,7 +519,40 @@ const Stap1Voertuig = (p: Stap1Props) => {
   };
 
   const fieldLabel = "block text-[11px] uppercase tracking-wide text-muted-foreground mb-1";
-  const fieldValue = "text-sm text-foreground";
+
+  // Crossfade-veld: read-only tekst en input nemen exact dezelfde ruimte in
+  // (zelfde padding/border/hoogte) en faden in/uit afhankelijk van editMode.
+  const Field = ({
+    children,
+    display,
+    mono,
+  }: {
+    children: React.ReactNode;
+    display: React.ReactNode;
+    mono?: boolean;
+  }) => (
+    <div className="relative">
+      {/* Display laag */}
+      <div
+        className={[
+          "px-3 py-2.5 text-sm border border-transparent rounded-[10px] transition-opacity duration-300 ease-out",
+          mono ? "font-mono uppercase" : "",
+          editMode ? "opacity-0 pointer-events-none" : "opacity-100",
+        ].join(" ")}
+      >
+        {display}
+      </div>
+      {/* Edit laag — absoluut overlay zodat layout stabiel blijft */}
+      <div
+        className={[
+          "absolute inset-0 transition-opacity duration-300 ease-out",
+          editMode ? "opacity-100" : "opacity-0 pointer-events-none",
+        ].join(" ")}
+      >
+        {children}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
