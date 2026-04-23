@@ -599,7 +599,7 @@ const Stap1Voertuig = (p: Stap1Props) => {
           <div className="space-y-4">
             <div>
               <label className={fieldLabel}>Merk + Model</label>
-              {editMode ? (
+              <Field display={`${v.merk} ${v.model}`.trim() || "-"}>
                 <div className="flex gap-2">
                   <input
                     value={edit.merk}
@@ -614,14 +614,12 @@ const Stap1Voertuig = (p: Stap1Props) => {
                     placeholder="Model"
                   />
                 </div>
-              ) : (
-                <div className={fieldValue}>{`${v.merk} ${v.model}`.trim() || "-"}</div>
-              )}
+              </Field>
             </div>
 
             <div>
               <label className={fieldLabel}>Bouwjaar</label>
-              {editMode ? (
+              <Field display={v.bouwjaar || "-"}>
                 <input
                   type="number"
                   inputMode="numeric"
@@ -630,27 +628,23 @@ const Stap1Voertuig = (p: Stap1Props) => {
                   className={inputCls}
                   placeholder="2020"
                 />
-              ) : (
-                <div className={fieldValue}>{v.bouwjaar || "-"}</div>
-              )}
+              </Field>
             </div>
 
             <div>
               <label className={fieldLabel}>Kleur</label>
-              {editMode ? (
+              <Field display={v.kleur || "-"}>
                 <input
                   value={edit.kleur}
                   onChange={(e) => setEdit({ ...edit, kleur: e.target.value })}
                   className={inputCls}
                 />
-              ) : (
-                <div className={fieldValue}>{v.kleur || "-"}</div>
-              )}
+              </Field>
             </div>
 
             <div>
               <label className={fieldLabel}>Brandstof</label>
-              {editMode ? (
+              <Field display={v.brandstof ? brandstofLabels[v.brandstof as keyof typeof brandstofLabels] : "-"}>
                 <select
                   value={edit.brandstof}
                   onChange={(e) => setEdit({ ...edit, brandstof: e.target.value as any })}
@@ -660,11 +654,7 @@ const Stap1Voertuig = (p: Stap1Props) => {
                     <option key={key} value={key}>{label}</option>
                   ))}
                 </select>
-              ) : (
-                <div className={fieldValue}>
-                  {v.brandstof ? brandstofLabels[v.brandstof as keyof typeof brandstofLabels] : "-"}
-                </div>
-              )}
+              </Field>
             </div>
           </div>
 
@@ -672,44 +662,38 @@ const Stap1Voertuig = (p: Stap1Props) => {
           <div className="space-y-4">
             <div>
               <label className={fieldLabel}>Kenteken</label>
-              {editMode ? (
+              <Field display={v.kenteken || "-"} mono>
                 <input
                   value={edit.kenteken}
                   onChange={(e) => setEdit({ ...edit, kenteken: e.target.value.toUpperCase() })}
                   className={`${inputCls} font-mono uppercase`}
                   placeholder="XX-XX-XX"
                 />
-              ) : (
-                <div className={`${fieldValue} font-mono uppercase`}>{v.kenteken || "-"}</div>
-              )}
+              </Field>
             </div>
 
             <div>
               <label className={fieldLabel}>Chassisnummer</label>
-              {editMode ? (
+              <Field display={v.chassisNummer || "-"} mono>
                 <input
                   value={edit.chassisNummer}
                   onChange={(e) => setEdit({ ...edit, chassisNummer: e.target.value.toUpperCase() })}
                   className={`${inputCls} font-mono uppercase`}
                   placeholder="VIN"
                 />
-              ) : (
-                <div className={`${fieldValue} font-mono uppercase`}>{v.chassisNummer || "-"}</div>
-              )}
+              </Field>
             </div>
 
             <div>
               <label className={fieldLabel}>APK tot</label>
-              {editMode ? (
+              <Field display={v.apkVervaldatum || "-"}>
                 <input
                   type="date"
                   value={edit.apkVervaldatum}
                   onChange={(e) => setEdit({ ...edit, apkVervaldatum: e.target.value })}
                   className={inputCls}
                 />
-              ) : (
-                <div className={fieldValue}>{v.apkVervaldatum || "-"}</div>
-              )}
+              </Field>
             </div>
 
             {/* KM-stand altijd bewerkbaar */}
