@@ -268,6 +268,11 @@ const AdminVerkoopWizardPage = () => {
         setOvereenkomstnummer((existing as any).overeenkomstnummer || "");
         setOpmerkingen((existing as any).opmerkingen || "");
         setContractGetekend(!!existing.contract_getekend);
+        const bw = (existing as any).betaalwijze;
+        if (["cash", "pin", "ideal", "overboeking", "financiering"].includes(bw)) {
+          setRestBetaalwijze(bw);
+        }
+        setFinancieringMaatschappij((existing as any).financiering_maatschappij || "");
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
