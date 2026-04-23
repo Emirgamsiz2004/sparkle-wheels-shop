@@ -2341,6 +2341,10 @@ interface Stap5Props {
   setContractGetekend: (v: boolean) => void;
   pdfGenereerd: boolean;
   setPdfGenereerd: (v: boolean) => void;
+  restBetaalwijze: "cash" | "pin" | "ideal" | "overboeking" | "financiering";
+  setRestBetaalwijze: (v: "cash" | "pin" | "ideal" | "overboeking" | "financiering") => void;
+  financieringMaatschappij: string;
+  setFinancieringMaatschappij: (v: string) => void;
   onAutoSave: () => Promise<any>;
   verkoopId: string | null;
 }
