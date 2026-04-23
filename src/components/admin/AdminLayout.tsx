@@ -108,40 +108,48 @@ const AdminLayout = () => {
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[240px] bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex flex-col transition-transform duration-200 ease-out lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <div className="h-14 px-4 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
-          <Link to="/admin/dashboard" className="flex items-center gap-2.5">
-            <img src={logo} alt="Platin" className="h-7 w-auto object-contain" loading="eager" decoding="sync" />
-            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">Admin</span>
+      {/* Spacer reserves the collapsed sidebar width on desktop */}
+      <div className="hidden lg:block w-[56px] flex-shrink-0" aria-hidden="true" />
+
+      {/* Sidebar — mobile drawer (240px). Desktop: fixed, collapsed 56px, hover expands to 220px over content */}
+      <aside
+        className={`group/sidebar fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex flex-col transition-[transform,width] duration-200 ease-out overflow-hidden
+          w-[240px] lg:w-[56px] lg:hover:w-[220px] lg:translate-x-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+      >
+        <div className="h-14 px-4 lg:px-3 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
+          <Link to="/admin/dashboard" className="flex items-center gap-2.5 min-w-0">
+            <img src={logo} alt="Platin" className="h-7 w-auto object-contain flex-shrink-0" loading="eager" decoding="sync" />
+            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground whitespace-nowrap lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">Admin</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <nav className="flex-1 px-2 py-3 overflow-y-auto">
+        <nav className="flex-1 px-2 py-3 overflow-y-auto overflow-x-hidden">
           <div className="space-y-px">
             {visibleNavItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 ${
+                title={item.label}
+                className={`relative flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 whitespace-nowrap ${
                   isActive(item.path)
                     ? "bg-accent text-foreground font-medium"
                     : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
                 }`}
               >
                 <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
-                <span className="flex-1">{item.label}</span>
+                <span className="flex-1 lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">{item.label}</span>
                 {item.path === "/admin/leads" && overdueLeads > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground">
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">
                     {overdueLeads}
                   </span>
                 )}
                 {item.path === "/admin/planning" && upcomingAppts > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground">
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">
                     {upcomingAppts}
                   </span>
                 )}
@@ -154,23 +162,25 @@ const AdminLayout = () => {
           <Link
             to="/admin/instellingen"
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 ${
+            title="Instellingen"
+            className={`flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 whitespace-nowrap ${
               isActive("/admin/instellingen")
                 ? "bg-accent text-foreground font-medium"
                 : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
             }`}
           >
-            <Settings className="w-4 h-4 opacity-70" />
-            Instellingen
+            <Settings className="w-4 h-4 flex-shrink-0 opacity-70" />
+            <span className="lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">Instellingen</span>
           </Link>
           <div className="mt-1.5 pt-1.5 border-t border-[hsl(var(--sidebar-border))]">
-            <p className="text-[11px] text-muted-foreground truncate mb-1 px-3">{user.email}</p>
+            <p className="text-[11px] text-muted-foreground truncate mb-1 px-3 whitespace-nowrap lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">{user.email}</p>
             <button
               onClick={signOut}
-              className="flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] text-sm lg:text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors w-full min-h-[44px] lg:min-h-0"
+              title="Uitloggen"
+              className="flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] text-sm lg:text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors w-full min-h-[44px] lg:min-h-0 whitespace-nowrap"
             >
-              <LogOut className="w-4 h-4 opacity-70" />
-              Uitloggen
+              <LogOut className="w-4 h-4 flex-shrink-0 opacity-70" />
+              <span className="lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">Uitloggen</span>
             </button>
           </div>
         </div>
