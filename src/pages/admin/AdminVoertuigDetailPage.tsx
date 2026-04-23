@@ -176,18 +176,5 @@ const AdminVoertuigDetailPage = () => {
     </div>
   );
 };
-        open={afspraakOpen}
-        onOpenChange={(v) => { setAfspraakOpen(v); if (!v) setAfspraakType(undefined); }}
-        customers={customers.map(c => ({ id: c.id, voornaam: c.voornaam, achternaam: c.achternaam }))}
-        vehicles={[{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, kenteken: vehicle.kenteken }]}
-        defaultType={afspraakType}
-        onSubmit={async (data) => {
-          await addAppointment({ ...data, vehicle_id: vehicle.id });
-          toast.success("Afspraak ingepland");
-        }}
-      />
-    </div>
-  );
-};
 
 export default AdminVoertuigDetailPage;
