@@ -282,10 +282,10 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
   if (editing) {
     return (
       <tr className="border-b border-border/50">
-        <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap align-middle">{label}</td>
-        <td className="py-2 text-right align-middle">
+        <td className="py-1.5 pr-4 text-[12px] text-muted-foreground whitespace-nowrap align-middle">{label}</td>
+        <td className="py-1 text-right align-middle">
           <div className="inline-flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">€</span>
+            <span className="text-[12px] text-muted-foreground">€</span>
             <input
               autoFocus
               type="text"
@@ -294,7 +294,7 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
               onChange={(e) => setEditVal(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleSave}
-              className="w-24 px-2 py-1 text-sm text-right bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring tabular-nums"
+              className="w-24 px-2 py-1 text-[13px] text-right bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring tabular-nums"
             />
           </div>
         </td>
@@ -304,13 +304,13 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
 
   return (
     <tr className="border-b border-border/50 group">
-      <td className="py-2.5 pr-4 align-middle">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">{label}</span>
+      <td className="py-1.5 pr-4 align-middle">
+        <span className="text-[12px] text-muted-foreground whitespace-nowrap">{label}</span>
         {hint && <p className="text-[10px] text-muted-foreground/60">{hint}</p>}
       </td>
-      <td className="py-2.5 text-right align-middle">
+      <td className="py-1.5 text-right align-middle">
         <div className="inline-flex items-center gap-1.5">
-          <span className="text-sm font-medium tabular-nums text-foreground">{formatEuroDecimal(value)}</span>
+          <span className="text-[13px] font-medium tabular-nums text-foreground">{formatEuroDecimal(value)}</span>
           <button onClick={() => { setEditVal(value ? String(value) : ""); setEditing(true); }} className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-foreground transition-opacity">
             <Pencil className="w-3 h-3" />
           </button>
