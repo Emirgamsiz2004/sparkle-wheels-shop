@@ -1133,6 +1133,14 @@ const Stap2Aflevering = (p: Stap2Props) => {
   const restbedrag = Math.max(0, (p.verkoopprijs || 0) - aanbetaling);
   const today = new Date().toISOString().slice(0, 10);
   const laterOphalen = p.afleverwijze !== "vandaag";
+  const isAflevering = p.afleverwijze === "aflevering";
+
+  // Bij "Aflevering": forceer betaalmethode op overboeking
+  useEffect(() => {
+    if (isAflevering && p.aanbetalingBetaalwijze !== "overboeking") {
+      p.setAanbetalingBetaalwijze("overboeking");
+    }
+  }, [isAflevering]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Autosave bij later ophalen / aflevering: zodra leverdatum + (aanbetaling of adres) ingevuld zijn
   const autoSaveSig = useMemo(() => {
@@ -1315,56 +1323,81 @@ const Stap2Aflevering = (p: Stap2Props) => {
       >
         <div className="overflow-hidden">
           <div className="rounded-[14px] border border-border bg-card p-5 space-y-5">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">Aanbetaling</div>
-
-            <div>
-              <label className={labelCls}>Aanbetalingsbedrag (€)</label>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={p.aanbetalingBedrag}
-                onChange={(e) =>
-                  p.setAanbetalingBedrag(e.target.value === "" ? "" : Number(e.target.value))
-                }
-                className={inputCls}
-                placeholder="0"
-              />
-              <div className="mt-2 flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Restbedrag</span>
-                <span className="font-medium text-foreground">
-                  {new Intl.NumberFormat("nl-NL", {
-                    style: "currency",
-                    currency: "EUR",
-                  }).format(restbedrag)}
-                </span>
-              </div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              {isAflevering ? "Betaling vooraf" : "Aanbetaling"}
             </div>
 
-            <div>
-              <label className={labelCls}>Betaalmethode</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {(["cash", "pin", "ideal", "overboeking"] as const).map((m) => (
-                  <button
-                    type="button"
-                    key={m}
-                    onClick={() => p.setAanbetalingBetaalwijze(m)}
-                    className={payCls(p.aanbetalingBetaalwijze === m)}
-                  >
-                    {m === "cash" ? "Cash" : m === "pin" ? "Pin" : m === "ideal" ? "iDEAL" : "Overboeking"}
-                  </button>
-                ))}
-              </div>
+            {isAflevering ? (
+              <>
+                <div className="rounded-[10px] border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground leading-relaxed">
+                  Bij aflevering wordt de volledige betaling vooraf geregeld via overboeking.
+                  De auto wordt afgeleverd zodra de betaling ontvangen is.
+                </div>
 
-            </div>
+                <div>
+                  <label className={labelCls}>Betaalmethode</label>
+                  <div className="grid grid-cols-1 gap-2">
+                    <button
+                      type="button"
+                      disabled
+                      className={`${payCls(true)} cursor-default opacity-100`}
+                    >
+                      Overboeking
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <label className={labelCls}>Aanbetalingsbedrag (€)</label>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    value={p.aanbetalingBedrag}
+                    onChange={(e) =>
+                      p.setAanbetalingBedrag(e.target.value === "" ? "" : Number(e.target.value))
+                    }
+                    className={inputCls}
+                    placeholder="0"
+                  />
+                  <div className="mt-2 flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Restbedrag</span>
+                    <span className="font-medium text-foreground">
+                      {new Intl.NumberFormat("nl-NL", {
+                        style: "currency",
+                        currency: "EUR",
+                      }).format(restbedrag)}
+                    </span>
+                  </div>
+                </div>
 
-            <button
-              type="button"
-              onClick={handlePdf}
-              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent transition-colors"
-            >
-              <FileText className="w-4 h-4" />
-              Aanbetalingsbewijs genereren
-            </button>
+                <div>
+                  <label className={labelCls}>Betaalmethode</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {(["cash", "pin", "ideal", "overboeking"] as const).map((m) => (
+                      <button
+                        type="button"
+                        key={m}
+                        onClick={() => p.setAanbetalingBetaalwijze(m)}
+                        className={payCls(p.aanbetalingBetaalwijze === m)}
+                      >
+                        {m === "cash" ? "Cash" : m === "pin" ? "Pin" : m === "ideal" ? "iDEAL" : "Overboeking"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handlePdf}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  Aanbetalingsbewijs genereren
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
