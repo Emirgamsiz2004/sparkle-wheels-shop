@@ -148,7 +148,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
         {(() => {
           const eenvoudigeMarge = (vehicle.verkoopprijs || 0) - (vehicle.inkoopprijs || 0);
           return (
-            <div className="bg-card border border-border rounded-lg p-4 space-y-0">
+            <div className="bg-card border border-border rounded-lg p-3 space-y-0">
               <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Financieel overzicht</h3>
               <table className="w-full text-sm">
                 <tbody>
