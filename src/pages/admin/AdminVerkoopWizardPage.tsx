@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
+import { useMoneybird } from "@/hooks/useMoneybird";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
