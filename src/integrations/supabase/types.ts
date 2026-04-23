@@ -696,6 +696,7 @@ export type Database = {
           kvk_nummer: string | null
           laatste_contact: string | null
           land: string | null
+          moneybird_contact_id: string | null
           notities: string | null
           plaats: string | null
           postcode: string | null
@@ -718,6 +719,7 @@ export type Database = {
           kvk_nummer?: string | null
           laatste_contact?: string | null
           land?: string | null
+          moneybird_contact_id?: string | null
           notities?: string | null
           plaats?: string | null
           postcode?: string | null
@@ -740,6 +742,7 @@ export type Database = {
           kvk_nummer?: string | null
           laatste_contact?: string | null
           land?: string | null
+          moneybird_contact_id?: string | null
           notities?: string | null
           plaats?: string | null
           postcode?: string | null

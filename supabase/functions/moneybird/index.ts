@@ -87,19 +87,36 @@ Deno.serve(async (req) => {
       }
 
       case "create_contact": {
-        const { company_name, firstname, lastname, email, phone } = params;
+        const {
+          company_name, firstname, lastname, email, phone,
+          address1, address2, zipcode, city, country,
+          chamber_of_commerce, tax_number,
+        } = params;
+        const contactPayload: Record<string, any> = {
+          company_name: company_name || `${firstname || ""} ${lastname || ""}`.trim(),
+          firstname: firstname || undefined,
+          lastname: lastname || undefined,
+          email: email || undefined,
+          phone: phone || undefined,
+          address1: address1 || undefined,
+          address2: address2 || undefined,
+          zipcode: zipcode || undefined,
+          city: city || undefined,
+          country: country || undefined,
+          chamber_of_commerce: chamber_of_commerce || undefined,
+          tax_number: tax_number || undefined,
+        };
         result = await mbFetch("contacts.json", {
           method: "POST",
-          body: JSON.stringify({
-            contact: {
-              company_name: company_name || `${firstname || ""} ${lastname || ""}`.trim(),
-              firstname,
-              lastname,
-              email,
-              phone,
-            },
-          }),
+          body: JSON.stringify({ contact: contactPayload }),
         });
+        break;
+      }
+
+      case "get_contact": {
+        const { contact_id } = params;
+        if (!contact_id) throw new Error("contact_id is required");
+        result = await mbFetch(`contacts/${contact_id}.json`);
         break;
       }
 
