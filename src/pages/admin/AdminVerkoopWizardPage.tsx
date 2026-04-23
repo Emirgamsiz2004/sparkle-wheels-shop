@@ -83,6 +83,7 @@ const AdminVerkoopWizardPage = () => {
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const navigate = useNavigate();
   const { vehicles, loading: loadingVehicles } = useVehicles();
+  const { invoke: invokeMoneybird } = useMoneybird();
 
   const vehicle = vehicles.find((v) => v.id === vehicleId);
 
