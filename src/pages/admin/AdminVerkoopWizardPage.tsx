@@ -9,7 +9,14 @@ import { fetchRdwData } from "@/lib/rdw";
 import { formatKenteken, isValidKenteken } from "@/lib/kenteken";
 import logo from "@/assets/logo.svg";
 import { openAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
-import { FileText } from "lucide-react";
+import { FileText, CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
+import { nl } from "date-fns/locale";
+
+type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
 // ─────────────────────────────────────────────────────────────
 // Stappen definitie
@@ -104,7 +111,8 @@ const AdminVerkoopWizardPage = () => {
   const [laterOphalen, setLaterOphalen] = useState<boolean>(false);
   const [leverdatum, setLeverdatum] = useState<string>("");
   const [aanbetalingBedrag, setAanbetalingBedrag] = useState<number | "">("");
-  const [aanbetalingBetaalwijze, setAanbetalingBetaalwijze] = useState<"cash" | "pin" | "ideal" | "">("");
+  const [aanbetalingBetaalwijze, setAanbetalingBetaalwijze] = useState<Betaalwijze>("");
+  const [aanbetalingBankrekening, setAanbetalingBankrekening] = useState<string>("");
 
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
@@ -148,9 +156,10 @@ const AdminVerkoopWizardPage = () => {
         setLaterOphalen(!!existing.later_ophalen);
         setLeverdatum(existing.leverdatum || "");
         setAanbetalingBedrag(existing.aanbetaling_bedrag ?? "");
-        if (existing.aanbetaling_betaalwijze === "cash" || existing.aanbetaling_betaalwijze === "pin" || existing.aanbetaling_betaalwijze === "ideal") {
-          setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze);
+        if (["cash", "pin", "ideal", "overboeking"].includes(existing.aanbetaling_betaalwijze)) {
+          setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze as Betaalwijze);
         }
+        setAanbetalingBankrekening((existing as any).aanbetaling_bankrekening || "");
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -212,6 +221,7 @@ const AdminVerkoopWizardPage = () => {
       leverdatum: laterOphalen ? (leverdatum || null) : new Date().toISOString().slice(0, 10),
       aanbetaling_bedrag: laterOphalen && aanbetalingBedrag !== "" ? Number(aanbetalingBedrag) : null,
       aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
+      aanbetaling_bankrekening: laterOphalen && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -222,7 +232,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
@@ -408,6 +418,8 @@ const AdminVerkoopWizardPage = () => {
                 setAanbetalingBedrag={setAanbetalingBedrag}
                 aanbetalingBetaalwijze={aanbetalingBetaalwijze}
                 setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
+                aanbetalingBankrekening={aanbetalingBankrekening}
+                setAanbetalingBankrekening={setAanbetalingBankrekening}
               />
             )}
 
@@ -984,8 +996,10 @@ interface Stap2Props {
   setLeverdatum: (v: string) => void;
   aanbetalingBedrag: number | "";
   setAanbetalingBedrag: (v: number | "") => void;
-  aanbetalingBetaalwijze: "cash" | "pin" | "ideal" | "";
-  setAanbetalingBetaalwijze: (v: "cash" | "pin" | "ideal" | "") => void;
+  aanbetalingBetaalwijze: Betaalwijze;
+  setAanbetalingBetaalwijze: (v: Betaalwijze) => void;
+  aanbetalingBankrekening: string;
+  setAanbetalingBankrekening: (v: string) => void;
 }
 
 const Stap2Aflevering = (p: Stap2Props) => {
@@ -1029,6 +1043,8 @@ const Stap2Aflevering = (p: Stap2Props) => {
           ? "Pin"
           : p.aanbetalingBetaalwijze === "ideal"
           ? "iDEAL"
+          : p.aanbetalingBetaalwijze === "overboeking"
+          ? `Overboeking${p.aanbetalingBankrekening ? ` (${p.aanbetalingBankrekening})` : ""}`
           : undefined,
       leverdatum: p.leverdatum,
       datum: today,
@@ -1065,13 +1081,51 @@ const Stap2Aflevering = (p: Stap2Props) => {
           <div className="overflow-hidden">
             <div className="border-t border-border pt-4">
               <label className={labelCls}>Verwachte leverdatum *</label>
-              <input
-                type="date"
-                value={p.leverdatum}
-                min={today}
-                onChange={(e) => p.setLeverdatum(e.target.value)}
-                className={inputCls}
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                      !p.leverdatum && "text-muted-foreground",
+                    )}
+                  >
+                    <span>
+                      {p.leverdatum
+                        ? format(parseISO(p.leverdatum), "d MMMM yyyy", { locale: nl })
+                        : "Kies een datum"}
+                    </span>
+                    <CalendarIcon className="h-4 w-4 text-foreground/70" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 bg-popover border-border"
+                  align="start"
+                >
+                  <Calendar
+                    mode="single"
+                    selected={p.leverdatum ? parseISO(p.leverdatum) : undefined}
+                    onSelect={(d) => {
+                      if (d) {
+                        // Local yyyy-mm-dd to avoid timezone shift
+                        const yyyy = d.getFullYear();
+                        const mm = String(d.getMonth() + 1).padStart(2, "0");
+                        const dd = String(d.getDate()).padStart(2, "0");
+                        p.setLeverdatum(`${yyyy}-${mm}-${dd}`);
+                      }
+                    }}
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    initialFocus
+                    locale={nl}
+                    className={cn("p-3 pointer-events-auto")}
+                    classNames={{
+                      day_selected:
+                        "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white",
+                      day_today: "bg-accent/60 text-accent-foreground font-semibold",
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
@@ -1118,17 +1172,36 @@ const Stap2Aflevering = (p: Stap2Props) => {
 
             <div>
               <label className={labelCls}>Betaalmethode *</label>
-              <div className="flex gap-2">
-                {(["cash", "pin", "ideal"] as const).map((m) => (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {(["cash", "pin", "ideal", "overboeking"] as const).map((m) => (
                   <button
                     type="button"
                     key={m}
                     onClick={() => p.setAanbetalingBetaalwijze(m)}
                     className={payCls(p.aanbetalingBetaalwijze === m)}
                   >
-                    {m === "cash" ? "Cash" : m === "pin" ? "Pin" : "iDEAL"}
+                    {m === "cash" ? "Cash" : m === "pin" ? "Pin" : m === "ideal" ? "iDEAL" : "Overboeking"}
                   </button>
                 ))}
+              </div>
+
+              <div
+                className={`grid transition-all duration-300 ease-out ${
+                  p.aanbetalingBetaalwijze === "overboeking"
+                    ? "grid-rows-[1fr] opacity-100 mt-3"
+                    : "grid-rows-[0fr] opacity-0 mt-0"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <label className={labelCls}>Bankrekeningnummer / naam (optioneel)</label>
+                  <input
+                    type="text"
+                    value={p.aanbetalingBankrekening}
+                    onChange={(e) => p.setAanbetalingBankrekening(e.target.value)}
+                    className={inputCls}
+                    placeholder="NL00 BANK 0123 4567 89 / Naam"
+                  />
+                </div>
               </div>
             </div>
 
