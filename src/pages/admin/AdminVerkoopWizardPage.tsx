@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useVehicles } from "@/hooks/useVehicles";
 import { brandstofLabels, Vehicle } from "@/types/vehicle";
+import { fetchRdwData } from "@/lib/rdw";
+import { formatKenteken, isValidKenteken } from "@/lib/kenteken";
 import logo from "@/assets/logo.svg";
 
 // ─────────────────────────────────────────────────────────────
@@ -465,6 +467,7 @@ const Stap1Voertuig = (p: Stap1Props) => {
   // Bewerk-modus state voor voertuiggegevens
   const [editMode, setEditMode] = useState(false);
   const [savingVehicle, setSavingVehicle] = useState(false);
+  const [inruilLookupLoading, setInruilLookupLoading] = useState(false);
   const [edit, setEdit] = useState({
     merk: v.merk || "",
     model: v.model || "",
@@ -781,7 +784,29 @@ const Stap1Voertuig = (p: Stap1Props) => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Kenteken inruil</label>
-                <input value={p.inruilKenteken} onChange={(e) => p.setInruilKenteken(e.target.value.toUpperCase())} className={inputCls} placeholder="XX-XX-XX" />
+                <div className="relative">
+                  <input
+                    value={p.inruilKenteken}
+                    onChange={(e) => p.setInruilKenteken(formatKenteken(e.target.value))}
+                    onBlur={async () => {
+                      const k = formatKenteken(p.inruilKenteken);
+                      if (!isValidKenteken(k)) return;
+                      p.setInruilKenteken(k);
+                      if (inruilLookupLoading) return;
+                      setInruilLookupLoading(true);
+                      const data = await fetchRdwData(k);
+                      setInruilLookupLoading(false);
+                      if (!data) return;
+                      if (data.merk) p.setInruilMerk(data.merk);
+                      if (data.model) p.setInruilModel(data.model);
+                    }}
+                    className={`${inputCls} font-mono uppercase pr-9`}
+                    placeholder="XX-XX-XX"
+                  />
+                  {inruilLookupLoading && (
+                    <Loader2 className="w-4 h-4 animate-spin text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2" />
+                  )}
+                </div>
               </div>
               <div>
                 <label className={labelCls}>Kilometerstand inruil</label>
