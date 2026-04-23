@@ -1656,30 +1656,40 @@ const Stap3Klant = (p: Stap3Props) => {
       {/* Nieuwe klant formulier */}
       {mode === "new" && (
         <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
-          {/* Zakelijk: bedrijfsgegevens bovenaan */}
-          {p.zakelijk && (
-            <>
-              <div>
-                <label className={labelCls}>Bedrijfsnaam *</label>
-                <input type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>KVK-nummer *</label>
-                  <input type="text" value={p.kvk} onChange={(e) => p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
-                </div>
-                <div>
-                  <label className={labelCls}>BTW-nummer (optioneel)</label>
-                  <input type="text" value={p.btw} onChange={(e) => p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
-                </div>
-              </div>
-              <div className="border-t border-border pt-5">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Contactpersoon</div>
-              </div>
-            </>
-          )}
+          <InlineKlantTypeToggle zakelijk={p.zakelijk} onChange={switchKlantType} />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Zakelijk: bedrijfsgegevens bovenaan — fade in/out */}
+          <div
+            key={`zak-${klantTypeKey}`}
+            className={cn(
+              "transition-all duration-200 ease-out overflow-hidden",
+              p.zakelijk ? "opacity-100 max-h-[600px] animate-fade-in" : "opacity-0 max-h-0 pointer-events-none",
+            )}
+          >
+            {p.zakelijk && (
+              <div className="space-y-5">
+                <div>
+                  <label className={labelCls}>Bedrijfsnaam *</label>
+                  <input type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>KVK-nummer *</label>
+                    <input type="text" value={p.kvk} onChange={(e) => p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>BTW-nummer (optioneel)</label>
+                    <input type="text" value={p.btw} onChange={(e) => p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
+                  </div>
+                </div>
+                <div className="border-t border-border pt-5">
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Contactpersoon</div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div key={`names-${klantTypeKey}`} className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
             <div>
               <label className={labelCls}>{p.zakelijk ? "Voornaam contactpersoon *" : "Voornaam *"}</label>
               <input type="text" value={p.voornaam} onChange={(e) => p.setVoornaam(e.target.value)} className={inputCls} maxLength={80} />
@@ -1690,8 +1700,14 @@ const Stap3Klant = (p: Stap3Props) => {
             </div>
           </div>
 
-          {/* Geboortedatum alleen voor particulier */}
-          {!p.zakelijk && (
+          {/* Geboortedatum alleen voor particulier — fade */}
+          <div
+            className={cn(
+              "transition-all duration-200 ease-out overflow-hidden",
+              !p.zakelijk ? "opacity-100 max-h-[120px] animate-fade-in" : "opacity-0 max-h-0 pointer-events-none",
+            )}
+          >
+            {!p.zakelijk && (
             <div>
               <label className={labelCls}>Geboortedatum *</label>
               <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
