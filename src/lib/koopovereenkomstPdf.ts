@@ -170,6 +170,8 @@ function buildHtml(data: KoopovereenkomstData): string {
   .fin-row.rest { font-weight: 700; font-size: 11px; padding-top: 4px; }
   .fin-meta { font-size: 8.5px; color: #333; margin-top: 6px; }
   .fin-meta strong { color: #000; }
+  .pay-row { display: flex; justify-content: space-between; font-size: 8px; color: #666; padding: 1px 0 1px 10px; }
+  .pay-row .pay-amt { font-variant-numeric: tabular-nums; }
 
   /* GARANTIE BOX */
   .garantie-box {
