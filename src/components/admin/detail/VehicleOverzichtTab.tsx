@@ -90,19 +90,11 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   const hasPaymentInfo = !!(vehicle.contantBedrag || vehicle.overboekingBedrag || vehicle.aanbetalingsbedrag || vehicle.financieringActief || vehicle.inruilKenteken);
 
   return (
-    <div className="space-y-5">
-      {/* KPI cards - read only */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <KpiCard label="Kostprijs" value={formatEuroDecimal(kostprijs)} />
-        <KpiCard label="Verkoopprijs" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(vehicle.verkoopprijs) : "—"} />
-        <KpiCard label="Nettomarge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} color={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
-        <KpiCard label="Marge %" value={vehicle.verkoopprijs > 0 ? `${margePerc.toFixed(1)}%` : "—"} color={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
-      </div>
-
+    <div className="space-y-4">
       {/* Two columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left - Vehicle info - inline editable */}
-        <div className="bg-card border border-border rounded-lg p-4 space-y-0">
+        <div className="bg-card border border-border rounded-lg p-3 space-y-0">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Voertuiggegevens</h3>
             {editMode ? (
@@ -156,7 +148,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
         {(() => {
           const eenvoudigeMarge = (vehicle.verkoopprijs || 0) - (vehicle.inkoopprijs || 0);
           return (
-            <div className="bg-card border border-border rounded-lg p-4 space-y-0">
+            <div className="bg-card border border-border rounded-lg p-3 space-y-0">
               <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Financieel overzicht</h3>
               <table className="w-full text-sm">
                 <tbody>
@@ -233,13 +225,12 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
       )}
 
       {/* Notes - auto-save */}
-      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+      <div className="bg-card border border-border rounded-lg p-3 space-y-2">
         <label className="block text-xs text-muted-foreground uppercase tracking-wider font-medium">Notities</label>
         <textarea
           value={notes}
           onChange={(e) => handleNotesChange(e.target.value)}
-          rows={3}
-          className={cn(inputCls, "resize-none")}
+          className={cn(inputCls, "resize-none h-20")}
           placeholder="Notities voor jezelf... (wordt automatisch opgeslagen)"
         />
         <p className="text-[10px] text-muted-foreground">Auto-save na 2 seconden</p>
@@ -265,8 +256,8 @@ const ReadField = ({ label, value, valueColor }: { label: string; value: string;
 
 const InfoRow = ({ label, value, valueColor, isLast }: { label: string; value: string; valueColor?: string; isLast?: boolean }) => (
   <tr className={!isLast ? "border-b border-border/50" : ""}>
-    <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap align-middle">{label}</td>
-    <td className={`py-2.5 text-sm font-medium tabular-nums text-right align-middle ${valueColor || "text-foreground"}`}>{value}</td>
+    <td className="py-1.5 pr-4 text-[12px] text-muted-foreground whitespace-nowrap align-middle">{label}</td>
+    <td className={`py-1.5 text-[13px] font-medium tabular-nums text-right align-middle ${valueColor || "text-foreground"}`}>{value}</td>
   </tr>
 );
 
@@ -291,10 +282,10 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
   if (editing) {
     return (
       <tr className="border-b border-border/50">
-        <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap align-middle">{label}</td>
-        <td className="py-2 text-right align-middle">
+        <td className="py-1.5 pr-4 text-[12px] text-muted-foreground whitespace-nowrap align-middle">{label}</td>
+        <td className="py-1 text-right align-middle">
           <div className="inline-flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">€</span>
+            <span className="text-[12px] text-muted-foreground">€</span>
             <input
               autoFocus
               type="text"
@@ -303,7 +294,7 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
               onChange={(e) => setEditVal(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleSave}
-              className="w-24 px-2 py-1 text-sm text-right bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring tabular-nums"
+              className="w-24 px-2 py-1 text-[13px] text-right bg-secondary/50 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring tabular-nums"
             />
           </div>
         </td>
@@ -313,13 +304,13 @@ const EditableEuroRow = ({ label, value, onSave, hint }: { label: string; value:
 
   return (
     <tr className="border-b border-border/50 group">
-      <td className="py-2.5 pr-4 align-middle">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">{label}</span>
+      <td className="py-1.5 pr-4 align-middle">
+        <span className="text-[12px] text-muted-foreground whitespace-nowrap">{label}</span>
         {hint && <p className="text-[10px] text-muted-foreground/60">{hint}</p>}
       </td>
-      <td className="py-2.5 text-right align-middle">
+      <td className="py-1.5 text-right align-middle">
         <div className="inline-flex items-center gap-1.5">
-          <span className="text-sm font-medium tabular-nums text-foreground">{formatEuroDecimal(value)}</span>
+          <span className="text-[13px] font-medium tabular-nums text-foreground">{formatEuroDecimal(value)}</span>
           <button onClick={() => { setEditVal(value ? String(value) : ""); setEditing(true); }} className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-foreground transition-opacity">
             <Pencil className="w-3 h-3" />
           </button>
@@ -369,8 +360,8 @@ const ApkRow = ({ apkVervaldatum, isLast }: { apkVervaldatum?: string; isLast?: 
   const status = getApkStatus(apkVervaldatum);
   return (
     <tr className={!isLast ? "border-b border-border/50" : ""}>
-      <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap align-middle">APK tot</td>
-      <td className={`py-2.5 text-sm font-medium tabular-nums text-right align-middle ${status.color}`}>{status.label}</td>
+      <td className="py-1.5 pr-4 text-[12px] text-muted-foreground whitespace-nowrap align-middle">APK tot</td>
+      <td className={`py-1.5 text-[13px] font-medium tabular-nums text-right align-middle ${status.color}`}>{status.label}</td>
     </tr>
   );
 };

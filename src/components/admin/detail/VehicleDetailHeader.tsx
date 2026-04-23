@@ -29,17 +29,17 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenKo
         <ArrowLeft className="w-4 h-4" /> Terug
       </button>
 
-      <div className="flex items-center gap-3 flex-wrap">
-        <h1 className="text-lg font-medium text-foreground">
+      <div className="flex items-center gap-2 flex-wrap">
+        <h1 className="text-base font-medium text-foreground leading-tight">
           {vehicle.merk} {vehicle.model} {vehicle.bouwjaar}
         </h1>
-        <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border whitespace-nowrap ${statusColors[vehicle.status]}`}>
+        {vehicle.kenteken && (
+          <span className="text-[11px] font-mono text-muted-foreground uppercase">{vehicle.kenteken}</span>
+        )}
+        <span className={`inline-flex items-center justify-center min-w-[80px] h-5 px-1.5 text-[10px] font-medium rounded border whitespace-nowrap leading-none ${statusColors[vehicle.status]}`}>
           {statusLabels[vehicle.status]}
         </span>
       </div>
-      {vehicle.kenteken && (
-        <span className="text-xs font-mono text-muted-foreground uppercase">{vehicle.kenteken}</span>
-      )}
 
       {/* Action bar */}
       <div className="flex items-center gap-2 flex-wrap -mx-0.5">
