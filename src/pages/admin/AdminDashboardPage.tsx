@@ -67,7 +67,9 @@ const AdminDashboardPage = () => {
   const [compare, setCompare] = useState(true);
   const [customFrom, setCustomFrom] = useState<Date>();
   const [customTo, setCustomTo] = useState<Date>();
-  const [monthYearOpen, setMonthYearOpen] = useState(false);
+  const [monthOpen, setMonthOpen] = useState(false);
+  const [quarterOpen, setQuarterOpen] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
   const [customRangeOpen, setCustomRangeOpen] = useState(false);
   const [myYear, setMyYear] = useState(new Date().getFullYear());
 
@@ -75,13 +77,30 @@ const AdminDashboardPage = () => {
   const currentYear = new Date().getFullYear();
   const selectableYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
+  const closeAllDropdowns = () => {
+    setMonthOpen(false);
+    setQuarterOpen(false);
+    setYearOpen(false);
+    setCustomRangeOpen(false);
+  };
+
   const selectMonth = (monthIdx: number, year: number) => {
     const from = startOfM(new Date(year, monthIdx));
     const to = endOfMonth(new Date(year, monthIdx));
     setCustomFrom(from);
     setCustomTo(to > new Date() ? new Date() : to);
     setPeriod("custom");
-    setMonthYearOpen(false);
+    closeAllDropdowns();
+  };
+
+  const selectQuarter = (quarterIdx: number, year: number) => {
+    const startMonth = quarterIdx * 3;
+    const from = startOfM(new Date(year, startMonth));
+    const to = endOfMonth(new Date(year, startMonth + 2));
+    setCustomFrom(from);
+    setCustomTo(to > new Date() ? new Date() : to);
+    setPeriod("custom");
+    closeAllDropdowns();
   };
 
   const selectYear = (year: number) => {
@@ -90,7 +109,7 @@ const AdminDashboardPage = () => {
     setCustomFrom(from);
     setCustomTo(to > new Date() ? new Date() : to);
     setPeriod("custom");
-    setMonthYearOpen(false);
+    closeAllDropdowns();
   };
 
   const range = useMemo(() => getPeriodRange(period, customFrom, customTo), [period, customFrom, customTo]);
