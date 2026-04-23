@@ -1132,7 +1132,7 @@ const Stap2Aflevering = (p: Stap2Props) => {
             <div className="border-t border-border pt-4 space-y-4">
               <div>
                 <label className={labelCls}>Verwachte leverdatum *</label>
-                <Popover>
+                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
                   <PopoverTrigger asChild>
                     <button
                       type="button"
@@ -1159,6 +1159,7 @@ const Stap2Aflevering = (p: Stap2Props) => {
                           const mm = String(d.getMonth() + 1).padStart(2, "0");
                           const dd = String(d.getDate()).padStart(2, "0");
                           p.setLeverdatum(`${yyyy}-${mm}-${dd}`);
+                          setDatePickerOpen(false);
                         }
                       }}
                       disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
@@ -1167,8 +1168,8 @@ const Stap2Aflevering = (p: Stap2Props) => {
                       className={cn("p-3 pointer-events-auto")}
                       classNames={{
                         day_selected:
-                          "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white",
-                        day_today: "bg-accent/60 text-accent-foreground font-semibold",
+                          "bg-emerald-600 text-white rounded-full border-0 ring-0 hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white focus:ring-0 focus:outline-none",
+                        day_today: "bg-muted text-foreground font-semibold",
                       }}
                     />
                   </PopoverContent>
