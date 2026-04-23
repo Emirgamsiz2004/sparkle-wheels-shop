@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, Lock, Loader2, Pencil, Save, X } from "lucide-react";
 import { toast } from "sonner";
@@ -468,6 +468,7 @@ const Stap1Voertuig = (p: Stap1Props) => {
   const [editMode, setEditMode] = useState(false);
   const [savingVehicle, setSavingVehicle] = useState(false);
   const [inruilLookupLoading, setInruilLookupLoading] = useState(false);
+  const inruilSectionRef = useRef<HTMLDivElement>(null);
   const [edit, setEdit] = useState({
     merk: v.merk || "",
     model: v.model || "",
@@ -772,10 +773,17 @@ const Stap1Voertuig = (p: Stap1Props) => {
       </div>
 
       {/* Inruil */}
-      <div className="rounded-[14px] border border-border bg-card p-5">
+      <div ref={inruilSectionRef} className="rounded-[14px] border border-border bg-card p-5 scroll-mt-24">
         <TogglePill
           active={p.inruil}
-          onChange={p.setInruil}
+          onChange={(v) => {
+            p.setInruil(v);
+            if (v) {
+              setTimeout(() => {
+                inruilSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }, 350);
+            }
+          }}
           label="Inruil van toepassing"
         />
 
