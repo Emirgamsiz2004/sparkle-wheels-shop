@@ -12,7 +12,7 @@ export interface Customer {
   postcode?: string;
   plaats?: string;
   geboortedatum?: string;
-  status: "prospect" | "geinteresseerd" | "actief" | "klant" | "inactief";
+  status: "prospect" | "klant" | "inactief";
   notities?: string;
   laatste_contact?: string;
   created_at: string;
@@ -23,16 +23,12 @@ export interface Customer {
 
 export const statusLabels: Record<Customer["status"], string> = {
   prospect: "Prospect",
-  geinteresseerd: "Geïnteresseerd",
-  actief: "Actief",
   klant: "Klant",
   inactief: "Inactief",
 };
 
 export const statusColors: Record<Customer["status"], string> = {
   prospect: "bg-muted text-muted-foreground border-border",
-  geinteresseerd: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-  actief: "bg-orange-500/10 text-orange-400 border-orange-500/30",
   klant: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
   inactief: "bg-muted text-muted-foreground border-border",
 };

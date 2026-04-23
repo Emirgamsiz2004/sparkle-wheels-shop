@@ -6,7 +6,7 @@ import { ArrowLeft, Phone, MessageCircle, Pencil, Loader2, ChevronDown, FileText
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-const allStatuses: Customer["status"][] = ["prospect", "geinteresseerd", "actief", "klant", "inactief"];
+const allStatuses: Customer["status"][] = ["prospect", "klant", "inactief"];
 
 const AdminKlantDetailPage = () => {
   const { id } = useParams<{ id: string }>();
