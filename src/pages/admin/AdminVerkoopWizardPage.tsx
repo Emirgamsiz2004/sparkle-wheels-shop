@@ -275,6 +275,7 @@ const AdminVerkoopWizardPage = () => {
       aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
       aanbetaling_bankrekening: laterOphalen && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
       customer_id: customerId,
+      klant_type: klantZakelijk ? "zakelijk" : "particulier",
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
