@@ -34,6 +34,7 @@ export interface KoopovereenkomstData {
     afleverkosten?: number;
     leges?: number;
     betaalwijze: string;
+    betalingen?: Array<{ methode: string; bedrag: number; maatschappij?: string }>;
     aanbetalingActief: boolean;
     aanbetalingsbedrag?: number;
     restbedrag?: number;
