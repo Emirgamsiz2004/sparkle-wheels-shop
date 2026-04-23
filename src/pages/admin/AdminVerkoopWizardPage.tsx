@@ -187,6 +187,8 @@ const AdminVerkoopWizardPage = () => {
         }
         setAanbetalingBankrekening((existing as any).aanbetaling_bankrekening || "");
         // Stap 3 hydration
+        if ((existing as any).klant_type === "zakelijk") setKlantZakelijk(true);
+        else if ((existing as any).klant_type === "particulier") setKlantZakelijk(false);
         if (existing.customer_id) {
           setCustomerId(existing.customer_id);
           const { data: cust } = await supabase
@@ -204,7 +206,7 @@ const AdminVerkoopWizardPage = () => {
             setKlantLand(cust.land || "Nederland");
             setKlantTelefoon(cust.telefoon || "");
             setKlantEmail(cust.email || "");
-            setKlantZakelijk(!!cust.is_zakelijk);
+            if ((existing as any).klant_type == null) setKlantZakelijk(!!cust.is_zakelijk);
             setKlantBedrijfsnaam(cust.bedrijfsnaam || "");
             setKlantKvk(cust.kvk_nummer || "");
             setKlantBtw(cust.btw_nummer || "");
