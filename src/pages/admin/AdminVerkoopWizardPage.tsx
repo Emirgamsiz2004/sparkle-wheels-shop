@@ -1497,11 +1497,16 @@ interface CustomerSuggestion {
 }
 
 const InlineKlantTypeToggle = ({ zakelijk, onChange }: { zakelijk: boolean; onChange: (z: boolean) => void }) => (
-  <div className="flex items-center justify-end gap-3 pb-1">
+  <div className="flex items-center justify-end gap-3">
     <span className={cn("text-xs transition-colors", !zakelijk ? "text-foreground font-medium" : "text-muted-foreground")}>
       Particulier
     </span>
-    <Switch checked={zakelijk} onCheckedChange={onChange} aria-label="Klanttype" />
+    <Switch
+      checked={zakelijk}
+      onCheckedChange={onChange}
+      aria-label="Klanttype"
+      className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-muted [&>span]:data-[state=checked]:bg-background [&>span]:data-[state=unchecked]:bg-foreground/60"
+    />
     <span className={cn("text-xs transition-colors", zakelijk ? "text-foreground font-medium" : "text-muted-foreground")}>
       Zakelijk
     </span>
