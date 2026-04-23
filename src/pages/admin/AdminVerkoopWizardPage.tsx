@@ -12,6 +12,7 @@ import { openAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
 import { FileText, CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
