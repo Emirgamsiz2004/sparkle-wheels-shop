@@ -965,15 +965,15 @@ const Stap1Voertuig = (p: Stap1Props) => {
               <label className={fieldLabel}>Merk + Model</label>
               <Field display={`${v.merk} ${v.model}`.trim() || "-"}>
                 <div className="flex gap-2">
-                  <input
+                  <input autoComplete="off"
                     value={edit.merk}
-                    onChange={(e) = autoComplete="off"> setEdit({ ...edit, merk: e.target.value })}
+                    onChange={(e) => setEdit({ ...edit, merk: e.target.value })}
                     className={inputCls}
                     placeholder="Merk"
                   />
-                  <input
+                  <input autoComplete="off"
                     value={edit.model}
-                    onChange={(e) = autoComplete="off"> setEdit({ ...edit, model: e.target.value })}
+                    onChange={(e) => setEdit({ ...edit, model: e.target.value })}
                     className={inputCls}
                     placeholder="Model"
                   />
@@ -984,11 +984,11 @@ const Stap1Voertuig = (p: Stap1Props) => {
             <div>
               <label className={fieldLabel}>Bouwjaar</label>
               <Field display={v.bouwjaar || "-"}>
-                <input
+                <input autoComplete="off"
                   type="number"
                   inputMode="numeric"
                   value={edit.bouwjaar}
-                  onChange={(e) = autoComplete="off"> setEdit({ ...edit, bouwjaar: e.target.value === "" ? "" : Number(e.target.value) })}
+                  onChange={(e) => setEdit({ ...edit, bouwjaar: e.target.value === "" ? "" : Number(e.target.value) })}
                   className={inputCls}
                   placeholder="2020"
                 />
@@ -998,9 +998,9 @@ const Stap1Voertuig = (p: Stap1Props) => {
             <div>
               <label className={fieldLabel}>Kleur</label>
               <Field display={v.kleur || "-"}>
-                <input
+                <input autoComplete="off"
                   value={edit.kleur}
-                  onChange={(e) = autoComplete="off"> setEdit({ ...edit, kleur: e.target.value })}
+                  onChange={(e) => setEdit({ ...edit, kleur: e.target.value })}
                   className={inputCls}
                 />
               </Field>
@@ -1009,9 +1009,9 @@ const Stap1Voertuig = (p: Stap1Props) => {
             <div>
               <label className={fieldLabel}>Brandstof</label>
               <Field display={v.brandstof ? brandstofLabels[v.brandstof as keyof typeof brandstofLabels] : "-"}>
-                <select
+                <select autoComplete="off"
                   value={edit.brandstof}
-                  onChange={(e) = autoComplete="off"> setEdit({ ...edit, brandstof: e.target.value as any })}
+                  onChange={(e) => setEdit({ ...edit, brandstof: e.target.value as any })}
                   className={inputCls}
                 >
                   {Object.entries(brandstofLabels).map(([key, label]) => (
@@ -1027,9 +1027,9 @@ const Stap1Voertuig = (p: Stap1Props) => {
             <div>
               <label className={fieldLabel}>Kenteken</label>
               <Field display={v.kenteken || "-"} mono>
-                <input
+                <input autoComplete="off"
                   value={edit.kenteken}
-                  onChange={(e) = autoComplete="off"> setEdit({ ...edit, kenteken: e.target.value.toUpperCase() })}
+                  onChange={(e) => setEdit({ ...edit, kenteken: e.target.value.toUpperCase() })}
                   className={`${inputCls} font-mono uppercase`}
                   placeholder="XX-XX-XX"
                 />
@@ -1039,9 +1039,9 @@ const Stap1Voertuig = (p: Stap1Props) => {
             <div>
               <label className={fieldLabel}>Chassisnummer</label>
               <Field display={v.chassisNummer || "-"} mono>
-                <input
+                <input autoComplete="off"
                   value={edit.chassisNummer}
-                  onChange={(e) = autoComplete="off"> setEdit({ ...edit, chassisNummer: e.target.value.toUpperCase() })}
+                  onChange={(e) => setEdit({ ...edit, chassisNummer: e.target.value.toUpperCase() })}
                   className={`${inputCls} font-mono uppercase`}
                   placeholder="VIN"
                 />
@@ -1051,10 +1051,10 @@ const Stap1Voertuig = (p: Stap1Props) => {
             <div>
               <label className={fieldLabel}>APK tot</label>
               <Field display={v.apkVervaldatum || "-"}>
-                <input
+                <input autoComplete="off"
                   type="date"
                   value={edit.apkVervaldatum}
-                  onChange={(e) = autoComplete="off"> setEdit({ ...edit, apkVervaldatum: e.target.value })}
+                  onChange={(e) => setEdit({ ...edit, apkVervaldatum: e.target.value })}
                   className={inputCls}
                 />
               </Field>
@@ -1063,11 +1063,11 @@ const Stap1Voertuig = (p: Stap1Props) => {
             {/* KM-stand altijd bewerkbaar */}
             <div>
               <label className={fieldLabel}>KM-stand</label>
-              <input
+              <input autoComplete="off"
                 type="number"
                 inputMode="numeric"
                 value={p.kmStand}
-                onChange={(e) = autoComplete="off"> p.setKmStand(e.target.value === "" ? "" : Number(e.target.value))}
+                onChange={(e) => p.setKmStand(e.target.value === "" ? "" : Number(e.target.value))}
                 className={inputCls}
                 placeholder="0"
               />
@@ -1080,11 +1080,11 @@ const Stap1Voertuig = (p: Stap1Props) => {
       <div className="rounded-[14px] border border-border bg-card p-5 space-y-5">
         <div>
           <label className={labelCls}>Verkoopprijs (€)</label>
-          <input
+          <input autoComplete="off"
             type="number"
             inputMode="numeric"
             value={p.verkoopprijs}
-            onChange={(e) = autoComplete="off"> p.setVerkoopprijs(e.target.value === "" ? "" : Number(e.target.value))}
+            onChange={(e) => p.setVerkoopprijs(e.target.value === "" ? "" : Number(e.target.value))}
             className={inputCls}
             placeholder="0"
           />
@@ -1109,22 +1109,22 @@ const Stap1Voertuig = (p: Stap1Props) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Afleverkosten (€)</label>
-            <input
+            <input autoComplete="off"
               type="number"
               inputMode="numeric"
               value={p.afleverkosten}
-              onChange={(e) = autoComplete="off"> p.setAfleverkosten(e.target.value === "" ? "" : Number(e.target.value))}
+              onChange={(e) => p.setAfleverkosten(e.target.value === "" ? "" : Number(e.target.value))}
               className={inputCls}
               placeholder="Optioneel"
             />
           </div>
           <div>
             <label className={labelCls}>Leges (€)</label>
-            <input
+            <input autoComplete="off"
               type="number"
               inputMode="numeric"
               value={p.leges}
-              onChange={(e) = autoComplete="off"> p.setLeges(e.target.value === "" ? "" : Number(e.target.value))}
+              onChange={(e) => p.setLeges(e.target.value === "" ? "" : Number(e.target.value))}
               className={inputCls}
               placeholder="Optioneel"
             />
@@ -1158,9 +1158,9 @@ const Stap1Voertuig = (p: Stap1Props) => {
               <div>
                 <label className={labelCls}>Kenteken inruil</label>
                 <div className="relative">
-                  <input
+                  <input autoComplete="off"
                     value={p.inruilKenteken}
-                    onChange={(e) = autoComplete="off"> p.setInruilKenteken(formatKenteken(e.target.value))}
+                    onChange={(e) => p.setInruilKenteken(formatKenteken(e.target.value))}
                     onBlur={async () => {
                       const k = formatKenteken(p.inruilKenteken);
                       if (!isValidKenteken(k)) return;
@@ -1183,30 +1183,30 @@ const Stap1Voertuig = (p: Stap1Props) => {
               </div>
               <div>
                 <label className={labelCls}>Kilometerstand inruil</label>
-                <input
+                <input autoComplete="off"
                   type="number"
                   inputMode="numeric"
                   value={p.inruilKm}
-                  onChange={(e) = autoComplete="off"> p.setInruilKm(e.target.value === "" ? "" : Number(e.target.value))}
+                  onChange={(e) => p.setInruilKm(e.target.value === "" ? "" : Number(e.target.value))}
                   className={inputCls}
                   placeholder="0"
                 />
               </div>
               <div>
                 <label className={labelCls}>Merk inruil</label>
-                <input value={p.inruilMerk} onChange={(e) = autoComplete="off"> p.setInruilMerk(e.target.value)} className={inputCls} />
+                <input autoComplete="off" value={p.inruilMerk} onChange={(e) => p.setInruilMerk(e.target.value)} className={inputCls} />
               </div>
               <div>
                 <label className={labelCls}>Model inruil</label>
-                <input value={p.inruilModel} onChange={(e) = autoComplete="off"> p.setInruilModel(e.target.value)} className={inputCls} />
+                <input autoComplete="off" value={p.inruilModel} onChange={(e) => p.setInruilModel(e.target.value)} className={inputCls} />
               </div>
               <div className="col-span-2">
                 <label className={labelCls}>Inruilwaarde (€)</label>
-                <input
+                <input autoComplete="off"
                   type="number"
                   inputMode="numeric"
                   value={p.inruilWaarde}
-                  onChange={(e) = autoComplete="off"> p.setInruilWaarde(e.target.value === "" ? "" : Number(e.target.value))}
+                  onChange={(e) => p.setInruilWaarde(e.target.value === "" ? "" : Number(e.target.value))}
                   className={inputCls}
                   placeholder="0"
                 />
@@ -1238,15 +1238,15 @@ const Stap1Voertuig = (p: Stap1Props) => {
                 <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
                   <div className="col-span-2">
                     <label className={labelCls}>Bedrijfsnaam</label>
-                    <input value={p.inruilBedrijfsnaam} onChange={(e) = autoComplete="off"> p.setInruilBedrijfsnaam(e.target.value)} className={inputCls} />
+                    <input autoComplete="off" value={p.inruilBedrijfsnaam} onChange={(e) => p.setInruilBedrijfsnaam(e.target.value)} className={inputCls} />
                   </div>
                   <div>
                     <label className={labelCls}>KVK-nummer</label>
-                    <input value={p.inruilKvk} onChange={(e) = autoComplete="off"> p.setInruilKvk(e.target.value)} className={inputCls} />
+                    <input autoComplete="off" value={p.inruilKvk} onChange={(e) => p.setInruilKvk(e.target.value)} className={inputCls} />
                   </div>
                   <div>
                     <label className={labelCls}>BTW-nummer</label>
-                    <input value={p.inruilBtw} onChange={(e) = autoComplete="off"> p.setInruilBtw(e.target.value)} className={inputCls} />
+                    <input autoComplete="off" value={p.inruilBtw} onChange={(e) => p.setInruilBtw(e.target.value)} className={inputCls} />
                   </div>
                 </div>
               </div>
@@ -1550,11 +1550,11 @@ const Stap2Aflevering = (p: Stap2Props) => {
               <>
                 <div>
                   <label className={labelCls}>Aanbetalingsbedrag (€)</label>
-                  <input
+                  <input autoComplete="off"
                     type="number"
                     inputMode="numeric"
                     value={p.aanbetalingBedrag}
-                    onChange={(e) = autoComplete="off">
+                    onChange={(e) =>
                       p.setAanbetalingBedrag(e.target.value === "" ? "" : Number(e.target.value))
                     }
                     className={inputCls}
@@ -1757,34 +1757,34 @@ const GeboortedatumInputs = ({ value, onChange }: { value: string; onChange: (v:
   return (
     <div>
       <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-2 items-center">
-        <input
+        <input autoComplete="off"
           inputMode="numeric"
           pattern="[0-9]*"
           placeholder="DD"
           value={dag}
-          onChange={(e) = autoComplete="off"> handleDag(e.target.value)}
+          onChange={(e) => handleDag(e.target.value)}
           maxLength={2}
           className={cn(baseCls, error && "border-destructive")}
           aria-label="Dag"
         />
-        <input
+        <input autoComplete="off"
           ref={maandRef}
           inputMode="numeric"
           pattern="[0-9]*"
           placeholder="MM"
           value={maand}
-          onChange={(e) = autoComplete="off"> handleMaand(e.target.value)}
+          onChange={(e) => handleMaand(e.target.value)}
           maxLength={2}
           className={cn(baseCls, error && "border-destructive")}
           aria-label="Maand"
         />
-        <input
+        <input autoComplete="off"
           ref={jaarRef}
           inputMode="numeric"
           pattern="[0-9]*"
           placeholder="JJJJ"
           value={jaar}
-          onChange={(e) = autoComplete="off"> handleJaar(e.target.value)}
+          onChange={(e) => handleJaar(e.target.value)}
           maxLength={4}
           className={cn(baseCls, error && "border-destructive")}
           aria-label="Jaar"
@@ -1892,10 +1892,10 @@ const Stap3Klant = (p: Stap3Props) => {
             <label className={labelCls}>Zoek klant</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
+              <input autoComplete="off"
                 type="text"
                 value={zoekterm}
-                onChange={(e) = autoComplete="off"> { setZoekterm(e.target.value); if (p.customerId) p.setCustomerId(null); }}
+                onChange={(e) => { setZoekterm(e.target.value); if (p.customerId) p.setCustomerId(null); }}
                 placeholder="Zoek op naam, telefoon of email..."
                 className={cn(inputCls, "pl-9")}
                 autoFocus
@@ -1973,16 +1973,16 @@ const Stap3Klant = (p: Stap3Props) => {
               >
                 <div>
                   <label className={labelCls}>Bedrijfsnaam *</label>
-                  <input type="text" value={p.bedrijfsnaam} onChange={(e) = autoComplete="off"> p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
+                  <input autoComplete="off" type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className={labelCls}>KVK-nummer *</label>
-                    <input type="text" value={p.kvk} onChange={(e) = autoComplete="off"> p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
+                    <input autoComplete="off" type="text" value={p.kvk} onChange={(e) => p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
                   </div>
                   <div>
                     <label className={labelCls}>BTW-nummer (optioneel)</label>
-                    <input type="text" value={p.btw} onChange={(e) = autoComplete="off"> p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
+                    <input autoComplete="off" type="text" value={p.btw} onChange={(e) => p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
                   </div>
                 </div>
                 <div className="border-t border-border pt-5">
@@ -1995,11 +1995,11 @@ const Stap3Klant = (p: Stap3Props) => {
           <div key={`names-${klantTypeKey}`} className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
             <div>
               <label className={labelCls}>{p.zakelijk ? "Voornaam contactpersoon *" : "Voornaam *"}</label>
-              <input type="text" value={p.voornaam} onChange={(e) = autoComplete="off"> p.setVoornaam(e.target.value)} className={inputCls} maxLength={80} />
+              <input autoComplete="off" type="text" value={p.voornaam} onChange={(e) => p.setVoornaam(e.target.value)} className={inputCls} maxLength={80} />
             </div>
             <div>
               <label className={labelCls}>{p.zakelijk ? "Achternaam contactpersoon *" : "Achternaam *"}</label>
-              <input type="text" value={p.achternaam} onChange={(e) = autoComplete="off"> p.setAchternaam(e.target.value)} className={inputCls} maxLength={80} />
+              <input autoComplete="off" type="text" value={p.achternaam} onChange={(e) => p.setAchternaam(e.target.value)} className={inputCls} maxLength={80} />
             </div>
           </div>
 
@@ -2043,28 +2043,28 @@ const Stap3Klant = (p: Stap3Props) => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className={labelCls}>Postcode *</label>
-              <input type="text" value={p.postcode} onChange={(e) = autoComplete="off"> p.setPostcode(e.target.value)} className={inputCls} placeholder="1234 AB" maxLength={10} />
+              <input autoComplete="off" type="text" value={p.postcode} onChange={(e) => p.setPostcode(e.target.value)} className={inputCls} placeholder="1234 AB" maxLength={10} />
             </div>
             <div className="sm:col-span-2">
               <label className={labelCls}>Woonplaats *</label>
-              <input type="text" value={p.woonplaats} onChange={(e) = autoComplete="off"> p.setWoonplaats(e.target.value)} className={inputCls} maxLength={100} />
+              <input autoComplete="off" type="text" value={p.woonplaats} onChange={(e) => p.setWoonplaats(e.target.value)} className={inputCls} maxLength={100} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Land</label>
-              <input type="text" value={p.land} onChange={(e) = autoComplete="off"> p.setLand(e.target.value)} className={inputCls} maxLength={60} />
+              <input autoComplete="off" type="text" value={p.land} onChange={(e) => p.setLand(e.target.value)} className={inputCls} maxLength={60} />
             </div>
             <div>
               <label className={labelCls}>Telefoonnummer *</label>
-              <input type="tel" value={p.telefoon} onChange={(e) = autoComplete="off"> p.setTelefoon(e.target.value)} className={inputCls} placeholder="06-12345678" maxLength={30} />
+              <input autoComplete="off" type="tel" value={p.telefoon} onChange={(e) => p.setTelefoon(e.target.value)} className={inputCls} placeholder="06-12345678" maxLength={30} />
             </div>
           </div>
 
           <div>
             <label className={labelCls}>E-mailadres (optioneel)</label>
-            <input type="email" value={p.email} onChange={(e) = autoComplete="off"> p.setEmail(e.target.value)} className={inputCls} placeholder="naam@voorbeeld.nl" maxLength={150} />
+            <input autoComplete="off" type="email" value={p.email} onChange={(e) => p.setEmail(e.target.value)} className={inputCls} placeholder="naam@voorbeeld.nl" maxLength={150} />
           </div>
         </div>
       )}
@@ -2197,10 +2197,10 @@ const Stap4Garantie = ({
             <label className="block text-sm font-medium text-foreground mb-2">
               Pakket naam <span className="text-destructive">*</span>
             </label>
-            <input
+            <input autoComplete="off"
               type="text"
               value={pakket}
-              onChange={(e) = autoComplete="off"> setPakket(e.target.value)}
+              onChange={(e) => setPakket(e.target.value)}
               placeholder="bijv. Autotrust Basis"
               className="w-full h-10 px-3 text-sm bg-background border border-input rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
             />
@@ -2229,11 +2229,11 @@ const Stap4Garantie = ({
                   </button>
                 );
               })}
-              <input
+              <input autoComplete="off"
                 type="number"
                 min={1}
                 value={looptijd === "" ? "" : looptijd}
-                onChange={(e) = autoComplete="off"> setLooptijd(e.target.value === "" ? "" : Number(e.target.value))}
+                onChange={(e) => setLooptijd(e.target.value === "" ? "" : Number(e.target.value))}
                 placeholder="Anders…"
                 className="w-28 h-10 px-3 text-sm bg-background border border-input rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
               />
@@ -2246,12 +2246,12 @@ const Stap4Garantie = ({
             </label>
             <div className="relative max-w-xs">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">€</span>
-              <input
+              <input autoComplete="off"
                 type="number"
                 min={0}
                 step="0.01"
                 value={prijs === "" ? "" : prijs}
-                onChange={(e) = autoComplete="off"> setPrijs(e.target.value === "" ? "" : Number(e.target.value))}
+                onChange={(e) => setPrijs(e.target.value === "" ? "" : Number(e.target.value))}
                 placeholder="0,00"
                 className="w-full h-10 pl-7 pr-3 text-sm bg-background border border-input rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
               />
@@ -2491,10 +2491,10 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Overeenkomstnummer</label>
-            <input
+            <input autoComplete="off"
               type="text"
               value={p.overeenkomstnummer}
-              onChange={(e) = autoComplete="off"> p.setOvereenkomstnummer(e.target.value)}
+              onChange={(e) => p.setOvereenkomstnummer(e.target.value)}
               placeholder="PA-2026-001"
               className={`${inputCls} font-mono`}
             />
@@ -2502,9 +2502,9 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         </div>
         <div>
           <label className={labelCls}>Opmerkingen / bijzonderheden (optioneel)</label>
-          <textarea
+          <textarea autoComplete="off"
             value={p.opmerkingen}
-            onChange={(e) = autoComplete="off"> p.setOpmerkingen(e.target.value)}
+            onChange={(e) => p.setOpmerkingen(e.target.value)}
             rows={3}
             placeholder="Vermeld bijzonderheden die op de koopovereenkomst moeten verschijnen…"
             className={`${inputCls} resize-y min-h-[80px]`}
