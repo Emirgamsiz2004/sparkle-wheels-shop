@@ -468,6 +468,7 @@ const Stap1Voertuig = (p: Stap1Props) => {
   const [editMode, setEditMode] = useState(false);
   const [savingVehicle, setSavingVehicle] = useState(false);
   const [inruilLookupLoading, setInruilLookupLoading] = useState(false);
+  const inruilSectionRef = useRef<HTMLDivElement>(null);
   const [edit, setEdit] = useState({
     merk: v.merk || "",
     model: v.model || "",
