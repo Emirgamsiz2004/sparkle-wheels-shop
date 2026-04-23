@@ -1277,6 +1277,12 @@ const Stap2Aflevering = (p: Stap2Props) => {
           </div>
         </div>
       </div>
+
+      {laterOphalen && (
+        <p className="text-xs text-muted-foreground text-center pt-1">
+          Wijzigingen worden automatisch bewaard
+        </p>
+      )}
     </div>
   );
 };
