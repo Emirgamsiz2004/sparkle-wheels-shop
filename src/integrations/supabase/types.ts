@@ -1977,6 +1977,7 @@ export type Database = {
           aanbetalingsbedrag: number | null
           afleverdatum: string | null
           betaalwijze: string
+          betaalwijze_details: Json
           contant_bedrag: number | null
           created_at: string
           customer_id: string | null
@@ -2006,6 +2007,7 @@ export type Database = {
           aanbetalingsbedrag?: number | null
           afleverdatum?: string | null
           betaalwijze?: string
+          betaalwijze_details?: Json
           contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
@@ -2035,6 +2037,7 @@ export type Database = {
           aanbetalingsbedrag?: number | null
           afleverdatum?: string | null
           betaalwijze?: string
+          betaalwijze_details?: Json
           contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
