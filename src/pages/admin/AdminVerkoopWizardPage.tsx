@@ -274,6 +274,7 @@ const AdminVerkoopWizardPage = () => {
       aanbetaling_bedrag: laterOphalen && aanbetalingBedrag !== "" ? Number(aanbetalingBedrag) : null,
       aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
       aanbetaling_bankrekening: laterOphalen && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
+      customer_id: customerId,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -284,7 +285,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
