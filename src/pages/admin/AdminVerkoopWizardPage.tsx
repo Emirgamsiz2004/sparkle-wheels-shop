@@ -635,7 +635,7 @@ const InfoRow = ({ label, value, mono }: { label: string; value: string; mono?: 
   </div>
 );
 
-// Toggle pill — vervangt checkboxes voor een nettere UI
+// Toggle switch — aan/uit schakelaar
 const TogglePill = ({
   active,
   onChange,
@@ -645,26 +645,27 @@ const TogglePill = ({
   onChange: (v: boolean) => void;
   label: string;
 }) => (
-  <button
-    type="button"
-    role="switch"
-    aria-checked={active}
-    onClick={() => onChange(!active)}
-    className={[
-      "inline-flex items-center gap-2.5 px-4 py-2 rounded-full border text-sm font-medium transition-colors select-none",
-      active
-        ? "bg-foreground text-background border-foreground"
-        : "bg-transparent text-muted-foreground border-border hover:bg-accent/50 hover:text-foreground",
-    ].join(" ")}
-  >
-    <span
+  <label className="flex items-center justify-between gap-4 cursor-pointer select-none">
+    <span className="text-sm font-medium text-foreground">{label}</span>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={active}
+      onClick={() => onChange(!active)}
       className={[
-        "w-2 h-2 rounded-full transition-colors",
-        active ? "bg-background" : "bg-muted-foreground/40",
+        "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors",
+        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+        active ? "bg-foreground" : "bg-muted border border-border",
       ].join(" ")}
-    />
-    {label}
-  </button>
+    >
+      <span
+        className={[
+          "inline-block h-4 w-4 rounded-full shadow-sm transition-transform",
+          active ? "translate-x-6 bg-background" : "translate-x-1 bg-muted-foreground/70",
+        ].join(" ")}
+      />
+    </button>
+  </label>
 );
 
 export default AdminVerkoopWizardPage;
