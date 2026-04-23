@@ -743,6 +743,10 @@ const AdminVerkoopWizardPage = () => {
                 }}
                 pdfGenereerd={pdfGenereerd}
                 setPdfGenereerd={setPdfGenereerd}
+                restBetaalwijze={restBetaalwijze}
+                setRestBetaalwijze={setRestBetaalwijze}
+                financieringMaatschappij={financieringMaatschappij}
+                setFinancieringMaatschappij={setFinancieringMaatschappij}
                 onAutoSave={() => saveCurrent()}
                 verkoopId={verkoopId}
               />
