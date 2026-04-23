@@ -20,9 +20,9 @@ import {
 import DashboardAppointmentsCard from "@/components/admin/DashboardAppointmentsCard";
 
 /* ─── Constants ─── */
-const periodOrder: PeriodKey[] = ["vandaag", "7dagen", "maand", "jaar"];
+const periodOrder: PeriodKey[] = ["7dagen", "30dagen", "kwartaal", "jaar"];
 const periodLabels: Record<PeriodKey, string> = {
-  vandaag: "Vandaag", gisteren: "Gisteren", "7dagen": "Deze week", "30dagen": "30 dagen",
+  vandaag: "Vandaag", gisteren: "Gisteren", "7dagen": "7 dagen", "30dagen": "30 dagen",
   maand: "Deze maand", kwartaal: "Dit kwartaal", jaar: "Dit jaar", custom: "Aangepast",
 };
 
