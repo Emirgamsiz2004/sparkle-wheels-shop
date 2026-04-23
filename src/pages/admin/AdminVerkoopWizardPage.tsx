@@ -1005,8 +1005,10 @@ const TogglePill = ({
 interface Stap2Props {
   vehicle: any;
   verkoopprijs: number;
-  laterOphalen: boolean;
-  setLaterOphalen: (v: boolean) => void;
+  afleverwijze: "vandaag" | "later" | "aflevering";
+  setAfleverwijze: (v: "vandaag" | "later" | "aflevering") => void;
+  afleveradres: string;
+  setAfleveradres: (v: string) => void;
   leverdatum: string;
   setLeverdatum: (v: string) => void;
   aanbetalingBedrag: number | "";
@@ -1015,6 +1017,7 @@ interface Stap2Props {
   setAanbetalingBetaalwijze: (v: Betaalwijze) => void;
   aanbetalingBankrekening: string;
   setAanbetalingBankrekening: (v: string) => void;
+  onAutoSave?: () => void | Promise<any>;
 }
 
 const Stap2Aflevering = (p: Stap2Props) => {
