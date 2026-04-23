@@ -2393,7 +2393,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         },
         financieel: {
           verkoopprijs: p.verkoopprijs,
-          betaalwijze: p.aanbetalingBetaalwijze || "overboeking",
+          betaalwijze: p.restBetaalwijze + (p.restBetaalwijze === "financiering" && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : ""),
           aanbetalingActief: (p.aanbetalingBedrag || 0) > 0,
           aanbetalingsbedrag: p.aanbetalingBedrag,
           restbedrag,
