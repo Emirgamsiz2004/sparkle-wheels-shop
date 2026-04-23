@@ -55,6 +55,7 @@ export interface Vehicle {
   marktplaatsUrl?: string;
   feedId?: string;
   apkVervaldatum?: string;
+  chassisNummer?: string;
   // Inruil & betalingsdetails
   inruilKenteken?: string;
   inruilMerk?: string;

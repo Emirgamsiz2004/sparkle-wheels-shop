@@ -51,6 +51,7 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
   marktplaatsUrl: row.marktplaats_url || undefined,
   feedId: row.feed_id || undefined,
   apkVervaldatum: row.apk_vervaldatum || undefined,
+  chassisNummer: row.chassis_nummer || undefined,
   createdAt: row.created_at || undefined,
   inruilKenteken: row.inruil_kenteken || undefined,
   inruilMerk: row.inruil_merk || undefined,

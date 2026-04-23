@@ -232,9 +232,8 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           value={notes}
           onChange={(e) => handleNotesChange(e.target.value)}
           className={cn(inputCls, "resize-none h-20")}
-          placeholder="Notities voor jezelf... (wordt automatisch opgeslagen)"
+          placeholder="Notities voor jezelf..."
         />
-        <p className="text-[10px] text-muted-foreground">Auto-save na 2 seconden</p>
       </div>
 
     </div>
