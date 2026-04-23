@@ -100,6 +100,12 @@ const AdminVerkoopWizardPage = () => {
   const [inruilKvk, setInruilKvk] = useState("");
   const [inruilBtw, setInruilBtw] = useState("");
 
+  // Stap 2 state
+  const [laterOphalen, setLaterOphalen] = useState<boolean>(false);
+  const [leverdatum, setLeverdatum] = useState<string>("");
+  const [aanbetalingBedrag, setAanbetalingBedrag] = useState<number | "">("");
+  const [aanbetalingBetaalwijze, setAanbetalingBetaalwijze] = useState<"cash" | "pin" | "ideal" | "">("");
+
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
     if (!vehicleId || !vehicle) return;
