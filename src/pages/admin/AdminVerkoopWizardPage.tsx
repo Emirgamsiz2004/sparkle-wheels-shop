@@ -525,7 +525,27 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap !== 1 && activeStap !== 2 && (
+            {activeStap === 3 && (
+              <Stap3Klant
+                customerId={customerId}
+                setCustomerId={setCustomerId}
+                voornaam={klantVoornaam} setVoornaam={setKlantVoornaam}
+                achternaam={klantAchternaam} setAchternaam={setKlantAchternaam}
+                geboortedatum={klantGeboortedatum} setGeboortedatum={setKlantGeboortedatum}
+                adres={klantAdres} setAdres={setKlantAdres}
+                postcode={klantPostcode} setPostcode={setKlantPostcode}
+                woonplaats={klantWoonplaats} setWoonplaats={setKlantWoonplaats}
+                land={klantLand} setLand={setKlantLand}
+                telefoon={klantTelefoon} setTelefoon={setKlantTelefoon}
+                email={klantEmail} setEmail={setKlantEmail}
+                zakelijk={klantZakelijk} setZakelijk={setKlantZakelijk}
+                bedrijfsnaam={klantBedrijfsnaam} setBedrijfsnaam={setKlantBedrijfsnaam}
+                kvk={klantKvk} setKvk={setKlantKvk}
+                btw={klantBtw} setBtw={setKlantBtw}
+              />
+            )}
+
+            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
