@@ -18,6 +18,7 @@ export interface Appointment {
   betalingsstatus: "volledig_betaald" | "openstaand" | null;
   voertuig_klaargemaakt: boolean;
   status: AppointmentStatus;
+  google_event_id: string | null;
   created_at: string;
   updated_at: string;
   // Joined
@@ -46,6 +47,38 @@ export const typeDotColors: Record<AppointmentType, string> = {
   aflevering: "bg-purple-400",
 };
 
+const SELECT = "*, customer:customers(id, voornaam, achternaam, telefoon, email), vehicle:vehicles(id, merk, model, kenteken)";
+
+async function syncToGoogle(action: "create" | "update" | "delete", appointmentId: string) {
+  try {
+    const { data: appt } = await supabase.from("appointments").select(SELECT).eq("id", appointmentId).maybeSingle();
+    if (!appt) return;
+    const { data, error } = await supabase.functions.invoke("sync-google-calendar", {
+      body: { action, appointment: appt },
+    });
+    if (error) {
+      console.warn("Google Calendar sync warning:", error);
+      return;
+    }
+    if (data?.google_event_id && data.google_event_id !== (appt as any).google_event_id) {
+      await supabase.from("appointments").update({ google_event_id: data.google_event_id }).eq("id", appointmentId);
+    }
+  } catch (e) {
+    console.warn("Google Calendar sync exception:", e);
+  }
+}
+
+async function syncDeleteToGoogle(appointment: Appointment) {
+  if (!appointment.google_event_id) return;
+  try {
+    await supabase.functions.invoke("sync-google-calendar", {
+      body: { action: "delete", appointment },
+    });
+  } catch (e) {
+    console.warn("Google Calendar delete warning:", e);
+  }
+}
+
 export const useAppointments = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +87,7 @@ export const useAppointments = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("appointments")
-      .select("*, customer:customers(id, voornaam, achternaam, telefoon, email), vehicle:vehicles(id, merk, model, kenteken)")
+      .select(SELECT)
       .order("datum_tijd", { ascending: true });
 
     if (error) {
@@ -70,13 +103,14 @@ export const useAppointments = () => {
     fetchAppointments();
   }, [fetchAppointments]);
 
-  const addAppointment = async (appointment: Omit<Appointment, "id" | "created_at" | "updated_at" | "customer" | "vehicle">) => {
-    const { error } = await supabase.from("appointments").insert(appointment as any);
+  const addAppointment = async (appointment: Omit<Appointment, "id" | "created_at" | "updated_at" | "customer" | "vehicle" | "google_event_id">) => {
+    const { data, error } = await supabase.from("appointments").insert(appointment as any).select("id").maybeSingle();
     if (error) {
       toast.error("Fout bij aanmaken afspraak");
       throw error;
     }
     toast.success("Afspraak gepland");
+    if (data?.id) syncToGoogle("create", data.id);
     await fetchAppointments();
   };
 
@@ -87,15 +121,18 @@ export const useAppointments = () => {
       toast.error("Fout bij bijwerken afspraak");
       throw error;
     }
+    syncToGoogle("update", id);
     await fetchAppointments();
   };
 
   const deleteAppointment = async (id: string) => {
+    const existing = appointments.find((a) => a.id === id);
     const { error } = await supabase.from("appointments").delete().eq("id", id);
     if (error) {
       toast.error("Fout bij verwijderen afspraak");
       throw error;
     }
+    if (existing) syncDeleteToGoogle(existing);
     toast.success("Afspraak verwijderd");
     await fetchAppointments();
   };
