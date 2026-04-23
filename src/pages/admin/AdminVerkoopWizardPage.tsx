@@ -420,8 +420,10 @@ const AdminVerkoopWizardPage = () => {
               <Stap2Aflevering
                 vehicle={vehicle}
                 verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
-                laterOphalen={laterOphalen}
-                setLaterOphalen={setLaterOphalen}
+                afleverwijze={afleverwijze}
+                setAfleverwijze={setAfleverwijze}
+                afleveradres={afleveradres}
+                setAfleveradres={setAfleveradres}
                 leverdatum={leverdatum}
                 setLeverdatum={setLeverdatum}
                 aanbetalingBedrag={aanbetalingBedrag}
@@ -430,6 +432,7 @@ const AdminVerkoopWizardPage = () => {
                 setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
                 aanbetalingBankrekening={aanbetalingBankrekening}
                 setAanbetalingBankrekening={setAanbetalingBankrekening}
+                onAutoSave={() => saveCurrent()}
               />
             )}
 
