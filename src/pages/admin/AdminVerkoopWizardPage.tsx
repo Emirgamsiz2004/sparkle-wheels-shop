@@ -232,7 +232,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
