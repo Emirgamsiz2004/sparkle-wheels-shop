@@ -331,7 +331,10 @@ const AdminVerkoopWizardPage = () => {
         status: "klant",
       };
       let custId = customerId;
+      let existingMbId: string | null = null;
       if (custId) {
+        const { data: prev } = await supabase.from("customers").select("moneybird_contact_id").eq("id", custId).maybeSingle();
+        existingMbId = (prev as any)?.moneybird_contact_id ?? null;
         const { error: updErr } = await supabase.from("customers").update(customerPayload).eq("id", custId);
         if (updErr) { toast.error("Opslaan klant mislukt"); console.error(updErr); return; }
       } else {
@@ -339,7 +342,42 @@ const AdminVerkoopWizardPage = () => {
         if (insErr || !created) { toast.error("Aanmaken klant mislukt"); console.error(insErr); return; }
         custId = created.id;
         setCustomerId(custId);
+        existingMbId = (created as any).moneybird_contact_id ?? null;
       }
+
+      // Sync naar Moneybird (alleen als nog geen contact gekoppeld is)
+      let mbContactId = existingMbId;
+      if (!mbContactId) {
+        try {
+          const mbPayload: Record<string, any> = {
+            firstname: klantVoornaam.trim(),
+            lastname: klantAchternaam.trim(),
+            address1: klantAdres.trim(),
+            zipcode: klantPostcode.trim(),
+            city: klantWoonplaats.trim(),
+            country: klantLand || "Nederland",
+            phone: klantTelefoon.trim(),
+            email: klantEmail.trim() || undefined,
+          };
+          if (klantZakelijk) {
+            mbPayload.company_name = klantBedrijfsnaam.trim();
+            mbPayload.chamber_of_commerce = klantKvk.trim();
+            if (klantBtw.trim()) mbPayload.tax_number = klantBtw.trim();
+          }
+          const mbContact = await invokeMoneybird("create_contact", mbPayload);
+          if (mbContact?.id) {
+            mbContactId = String(mbContact.id);
+            await supabase.from("customers").update({ moneybird_contact_id: mbContactId } as any).eq("id", custId);
+            toast.success("Klant aangemaakt in Moneybird");
+          }
+        } catch (e) {
+          console.error("Moneybird contact sync mislukt:", e);
+          toast.error("Klant opgeslagen, maar Moneybird-sync mislukt");
+        }
+      } else {
+        toast.success("Klant opgeslagen");
+      }
+
       const ok = await saveCurrent({ stap3_afgerond: true, customer_id: custId });
       if (!ok) return;
       setCompleted((p) => ({ ...p, [activeStap]: true }));
@@ -347,7 +385,6 @@ const AdminVerkoopWizardPage = () => {
       const nextCompleted = { ...completed, [activeStap]: true };
       while (next <= 12 && isStepBlocked(next, nextCompleted, inruil)) next++;
       if (next <= 12) setActiveStap(next);
-      toast.success("Klant opgeslagen");
       return;
     }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
