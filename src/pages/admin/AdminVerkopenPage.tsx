@@ -229,7 +229,7 @@ const AdminVerkopenPage = () => {
                 return (
                   <Link
                     key={v.id}
-                    to={`/admin/verkopen/${v.id}`}
+                    to={`/admin/voertuigen/${v.id}`}
                     className="flex items-center justify-between gap-3 bg-card border border-border rounded-lg p-3 active:bg-accent/30 transition-colors"
                   >
                     <div className="min-w-0 flex-1">
@@ -273,7 +273,7 @@ const AdminVerkopenPage = () => {
                       return (
                         <tr
                           key={v.id}
-                          onClick={() => window.location.href = `/admin/verkopen/${v.id}`}
+                          onClick={() => window.location.href = `/admin/voertuigen/${v.id}`}
                           className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer"
                         >
                           <td className="px-3 py-2.5 text-muted-foreground text-[11px] whitespace-nowrap">

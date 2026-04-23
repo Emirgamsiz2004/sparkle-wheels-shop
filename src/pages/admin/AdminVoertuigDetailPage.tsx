@@ -13,7 +13,6 @@ import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
 import VerkoopCompletenessBar from "@/components/admin/detail/VerkoopCompletenessBar";
-import VerkoopWizard from "@/components/admin/verkoop/VerkoopWizard";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useAppointments } from "@/hooks/useAppointments";
@@ -33,7 +32,6 @@ const AdminVoertuigDetailPage = () => {
   const [activeTab, setActiveTab] = useState("overzicht");
   const [proefritOpen, setProefritOpen] = useState(false);
   const [kostenOpen, setKostenOpen] = useState(false);
-  const [verkoopOpen, setVerkoopOpen] = useState(false);
   const [afspraakOpen, setAfspraakOpen] = useState(false);
   const [afspraakType, setAfspraakType] = useState<string | undefined>();
 
@@ -92,7 +90,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenProefrit={() => setProefritOpen(true)}
         onOpenKosten={() => setKostenOpen(true)}
         onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
-        onOpenVerkoop={() => setVerkoopOpen(true)}
+        onOpenVerkoop={() => { /* tijdelijk uitgeschakeld — verkoopwizard verwijderd */ }}
       />
 
       <VerkoopCompletenessBar
@@ -149,19 +147,6 @@ const AdminVoertuigDetailPage = () => {
         vehicle={{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, kenteken: vehicle.kenteken, bouwjaar: vehicle.bouwjaar, kilometerstand: vehicle.kilometerstand }}
       />
       <AddCostDialog open={kostenOpen} onClose={() => setKostenOpen(false)} vehicleId={vehicle.id} onAddCost={handleAddCostWithLog} />
-      <VerkoopWizard
-        open={verkoopOpen}
-        onOpenChange={setVerkoopOpen}
-        vehicle={vehicle}
-        onComplete={refetch}
-        initialStep={vehicle.status === "gereserveerd" ? 2 : undefined}
-        existingCustomer={vehicle.status === "gereserveerd" && vehicle.koperNaam ? {
-          voornaam: vehicle.koperNaam?.split(" ")[0] || "",
-          achternaam: vehicle.koperNaam?.split(" ").slice(1).join(" ") || "",
-          telefoon: vehicle.koperTelefoon || "",
-          email: vehicle.koperEmail || "",
-        } : undefined}
-      />
       <AppointmentFormDialog
         open={afspraakOpen}
         onOpenChange={(v) => { setAfspraakOpen(v); if (!v) setAfspraakType(undefined); }}
