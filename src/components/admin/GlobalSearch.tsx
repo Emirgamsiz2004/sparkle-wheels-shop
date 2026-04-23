@@ -171,7 +171,7 @@ export default function GlobalSearch() {
 
       if (drives.length > 0) {
         cats.push({
-          label: "Proefriten",
+          label: "Proefritten",
           icon: ClipboardCheck,
           moduleLink: "/admin/proefriten",
           results: drives.map(td => {

@@ -171,7 +171,7 @@ const GeschiedenisTab = ({ customerId, customerEmail }: { customerId: string; cu
       setLoading(true);
       const timeline: any[] = [];
 
-      // Proefriten via test_drive_customers email match
+      // Proefritten via test_drive_customers email match
       const { data: tdCustomers } = await supabase.from("test_drive_customers").select("id").eq("email", customerEmail);
       const customerIds = tdCustomers?.map((c: any) => c.id) || [];
 
@@ -226,7 +226,7 @@ const GeschiedenisTab = ({ customerId, customerEmail }: { customerId: string; cu
     <div className="space-y-4">
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Proefriten" value={String(stats.proefriten)} />
+        <StatCard label="Proefritten" value={String(stats.proefriten)} />
         <StatCard label="Aankopen" value={String(stats.aankopen)} />
         <StatCard label="Eerste contact" value={stats.eersteContact} />
         <StatCard label="Laatste contact" value={stats.laatsteContact} />
