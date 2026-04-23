@@ -139,18 +139,25 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
               </div>
             </div>
           ) : (
-            <table className="w-full text-sm">
-              <tbody>
-                <InfoRow label="Kenteken" value={vehicle.kenteken?.toUpperCase() || "—"} />
-                <InfoRow label="Merk" value={vehicle.merk} />
-                <InfoRow label="Model" value={vehicle.model} />
-                <InfoRow label="Bouwjaar" value={String(vehicle.bouwjaar)} />
-                <InfoRow label="Kleur" value={vehicle.kleur || "—"} />
-                <InfoRow label="Brandstof" value={brandstofLabels[vehicle.brandstof] || vehicle.brandstof} />
-                <InfoRow label="KM-stand" value={vehicle.kilometerstand?.toLocaleString("nl-NL") || "—"} />
-                <ApkRow apkVervaldatum={vehicle.apkVervaldatum} isLast />
-              </tbody>
-            </table>
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-6">
+              <table className="w-full text-sm">
+                <tbody>
+                  <InfoRow label="Kenteken" value={vehicle.kenteken?.toUpperCase() || "—"} />
+                  <InfoRow label="Chassisnummer" value={vehicle.chassisNummer || "—"} />
+                  <InfoRow label="Merk" value={vehicle.merk} />
+                  <InfoRow label="Model" value={vehicle.model} />
+                  <InfoRow label="Bouwjaar" value={String(vehicle.bouwjaar)} isLast />
+                </tbody>
+              </table>
+              <table className="w-full text-sm">
+                <tbody>
+                  <InfoRow label="Kleur" value={vehicle.kleur || "—"} />
+                  <InfoRow label="Brandstof" value={brandstofLabels[vehicle.brandstof] || vehicle.brandstof} />
+                  <InfoRow label="KM-stand" value={vehicle.kilometerstand?.toLocaleString("nl-NL") || "—"} />
+                  <ApkRow apkVervaldatum={vehicle.apkVervaldatum} isLast />
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
@@ -225,9 +232,8 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           value={notes}
           onChange={(e) => handleNotesChange(e.target.value)}
           className={cn(inputCls, "resize-none h-20")}
-          placeholder="Notities voor jezelf... (wordt automatisch opgeslagen)"
+          placeholder="Notities voor jezelf..."
         />
-        <p className="text-[10px] text-muted-foreground">Auto-save na 2 seconden</p>
       </div>
 
     </div>
