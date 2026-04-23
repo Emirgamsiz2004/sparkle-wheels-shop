@@ -1201,7 +1201,7 @@ const Stap2Aflevering = (p: Stap2Props) => {
       {/* Sectie 2 — Aanbetaling */}
       <div
         className={`grid transition-all duration-300 ease-out ${
-          p.laterOphalen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          laterOphalen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
       >
         <div className="overflow-hidden">
