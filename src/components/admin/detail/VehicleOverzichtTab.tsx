@@ -90,15 +90,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   const hasPaymentInfo = !!(vehicle.contantBedrag || vehicle.overboekingBedrag || vehicle.aanbetalingsbedrag || vehicle.financieringActief || vehicle.inruilKenteken);
 
   return (
-    <div className="space-y-5">
-      {/* KPI cards - read only */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <KpiCard label="Kostprijs" value={formatEuroDecimal(kostprijs)} />
-        <KpiCard label="Verkoopprijs" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(vehicle.verkoopprijs) : "—"} />
-        <KpiCard label="Nettomarge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} color={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
-        <KpiCard label="Marge %" value={vehicle.verkoopprijs > 0 ? `${margePerc.toFixed(1)}%` : "—"} color={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
-      </div>
-
+    <div className="space-y-4">
       {/* Two columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Left - Vehicle info - inline editable */}
