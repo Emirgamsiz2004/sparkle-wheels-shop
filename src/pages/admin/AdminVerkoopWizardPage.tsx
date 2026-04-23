@@ -18,6 +18,7 @@ import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
+import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
