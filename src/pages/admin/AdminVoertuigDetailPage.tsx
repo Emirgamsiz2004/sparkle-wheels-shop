@@ -90,7 +90,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenProefrit={() => setProefritOpen(true)}
         onOpenKosten={() => setKostenOpen(true)}
         onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
-        onOpenVerkoop={() => { /* tijdelijk uitgeschakeld — verkoopwizard verwijderd */ }}
+        onOpenVerkoop={() => navigate(`/admin/verkopen/nieuw/${vehicle.id}`)}
       />
 
       <VerkoopCompletenessBar

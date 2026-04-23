@@ -36,6 +36,7 @@ import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
 import AdminBlogPage from "./pages/admin/AdminBlogPage";
 import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
 import AdminVerkopenPage from "./pages/admin/AdminVerkopenPage";
+import AdminVerkoopWizardPage from "./pages/admin/AdminVerkoopWizardPage";
 import AdminArchiefPage from "./pages/admin/AdminArchiefPage";
 import AdminKlantenPage from "./pages/admin/AdminKlantenPage";
 import AdminKlantDetailPage from "./pages/admin/AdminKlantDetailPage";
@@ -136,6 +137,7 @@ const App = () => (
               <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/verkopen/nieuw/:vehicleId" element={<AdminVerkoopWizardPage />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboardPage />} />
                 <Route path="dashboard" element={<AdminDashboardPage />} />
