@@ -772,10 +772,17 @@ const Stap1Voertuig = (p: Stap1Props) => {
       </div>
 
       {/* Inruil */}
-      <div className="rounded-[14px] border border-border bg-card p-5">
+      <div ref={inruilSectionRef} className="rounded-[14px] border border-border bg-card p-5 scroll-mt-24">
         <TogglePill
           active={p.inruil}
-          onChange={p.setInruil}
+          onChange={(v) => {
+            p.setInruil(v);
+            if (v) {
+              setTimeout(() => {
+                inruilSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }, 350);
+            }
+          }}
           label="Inruil van toepassing"
         />
 
