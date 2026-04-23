@@ -154,6 +154,22 @@ const AdminVerkoopWizardPage = () => {
   const [financieringMaatschappij, setFinancieringMaatschappij] = useState<string>("");
   const [betaalwijzeDetails, setBetaalwijzeDetails] = useState<Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>>([]);
 
+  // Stap 6 state — Inruil document
+  const [stap6DocType, setStap6DocType] = useState<"particulier" | "zakelijk">("particulier");
+  const [inrVerkVoornaam, setInrVerkVoornaam] = useState("");
+  const [inrVerkAchternaam, setInrVerkAchternaam] = useState("");
+  const [inrVerkGeboortedatum, setInrVerkGeboortedatum] = useState("");
+  const [inrVerkAdres, setInrVerkAdres] = useState("");
+  const [inrVerkPostcode, setInrVerkPostcode] = useState("");
+  const [inrVerkWoonplaats, setInrVerkWoonplaats] = useState("");
+  const [inrVerkTelefoon, setInrVerkTelefoon] = useState("");
+  const [inrContactpersoon, setInrContactpersoon] = useState("");
+  const [inrBedrijfAdres, setInrBedrijfAdres] = useState("");
+  const [inrBedrijfPostcode, setInrBedrijfPostcode] = useState("");
+  const [inrBedrijfWoonplaats, setInrBedrijfWoonplaats] = useState("");
+  const [inrBetaalwijze, setInrBetaalwijze] = useState<"verrekend" | "contant" | "overboeking" | "">("");
+  const [inkoopverklaringId, setInkoopverklaringId] = useState<string | null>(null);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
