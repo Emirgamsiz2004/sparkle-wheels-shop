@@ -1329,9 +1329,10 @@ const Stap2Aflevering = (p: Stap2Props) => {
                       locale={nl}
                       className={cn("p-3 pointer-events-auto")}
                       classNames={{
+                        day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full border-0 outline-none ring-0 shadow-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0",
                         day_selected:
-                          "bg-emerald-600 text-white rounded-full border-0 ring-0 hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white focus:ring-0 focus:outline-none",
-                        day_today: "bg-muted text-foreground font-semibold",
+                          "!bg-emerald-600 !text-white rounded-full !border-0 !outline-none !ring-0 !shadow-none hover:!bg-emerald-600 hover:!text-white focus:!bg-emerald-600 focus:!text-white focus:!outline-none focus:!ring-0 focus-visible:!outline-none focus-visible:!ring-0",
+                        day_today: "bg-muted text-foreground font-semibold border-0 outline-none ring-0",
                       }}
                     />
                   </PopoverContent>
@@ -1775,9 +1776,10 @@ const Stap3Klant = (p: Stap3Props) => {
                       locale={nl}
                       className={cn("p-3 pointer-events-auto")}
                       classNames={{
+                        day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full border-0 outline-none ring-0 shadow-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0",
                         day_selected:
-                          "bg-emerald-600 text-white rounded-full border-0 ring-0 hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white focus:ring-0 focus:outline-none",
-                        day_today: "bg-muted text-foreground font-semibold",
+                          "!bg-emerald-600 !text-white rounded-full !border-0 !outline-none !ring-0 !shadow-none hover:!bg-emerald-600 hover:!text-white focus:!bg-emerald-600 focus:!text-white focus:!outline-none focus:!ring-0 focus-visible:!outline-none focus-visible:!ring-0",
+                        day_today: "bg-muted text-foreground font-semibold border-0 outline-none ring-0",
                       }}
                     />
                   </PopoverContent>
