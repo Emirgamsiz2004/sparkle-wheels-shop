@@ -12,6 +12,7 @@ import { openAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
 import { FileText, CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -489,7 +490,7 @@ const AdminVerkoopWizardPage = () => {
         </aside>
 
       {/* Hoofdinhoud */}
-      <main className="ml-[280px] min-h-screen">
+      <main className="ml-[280px] min-h-screen overflow-y-scroll" style={{ scrollbarGutter: "stable" }}>
         <div className="px-8 pt-6 pb-32">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
@@ -1495,6 +1496,18 @@ interface CustomerSuggestion {
   btw_nummer: string | null;
 }
 
+const InlineKlantTypeToggle = ({ zakelijk, onChange }: { zakelijk: boolean; onChange: (z: boolean) => void }) => (
+  <div className="flex items-center justify-end gap-3 pb-1">
+    <span className={cn("text-xs transition-colors", !zakelijk ? "text-foreground font-medium" : "text-muted-foreground")}>
+      Particulier
+    </span>
+    <Switch checked={zakelijk} onCheckedChange={onChange} aria-label="Klanttype" />
+    <span className={cn("text-xs transition-colors", zakelijk ? "text-foreground font-medium" : "text-muted-foreground")}>
+      Zakelijk
+    </span>
+  </div>
+);
+
 const Stap3Klant = (p: Stap3Props) => {
   const [mode, setMode] = useState<"existing" | "new">(p.customerId ? "existing" : "new");
   const [zoekterm, setZoekterm] = useState("");
@@ -1568,20 +1581,10 @@ const Stap3Klant = (p: Stap3Props) => {
         : "border-border text-muted-foreground hover:bg-accent/50"
     }`;
 
+  const klantTypeKey = p.zakelijk ? "zakelijk" : "particulier";
+
   return (
     <div className="space-y-6">
-      {/* Klanttype switcher */}
-      <div className="flex gap-3">
-        <button type="button" onClick={() => switchKlantType(false)} className={toggleCls(!p.zakelijk)}>
-          <User className="w-4 h-4" />
-          Particulier
-        </button>
-        <button type="button" onClick={() => switchKlantType(true)} className={toggleCls(p.zakelijk)}>
-          <Building2 className="w-4 h-4" />
-          Zakelijk
-        </button>
-      </div>
-
       {/* Mode switcher */}
       <div className="flex gap-3">
         <button type="button" onClick={switchToExisting} className={toggleCls(mode === "existing")}>
@@ -1597,6 +1600,7 @@ const Stap3Klant = (p: Stap3Props) => {
       {/* Existing klant zoeker */}
       {mode === "existing" && (
         <div className="rounded-[14px] border border-border bg-card p-6 space-y-4">
+          <InlineKlantTypeToggle zakelijk={p.zakelijk} onChange={switchKlantType} />
           <div>
             <label className={labelCls}>Zoek klant</label>
             <div className="relative">
@@ -1664,30 +1668,40 @@ const Stap3Klant = (p: Stap3Props) => {
       {/* Nieuwe klant formulier */}
       {mode === "new" && (
         <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
-          {/* Zakelijk: bedrijfsgegevens bovenaan */}
-          {p.zakelijk && (
-            <>
-              <div>
-                <label className={labelCls}>Bedrijfsnaam *</label>
-                <input type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>KVK-nummer *</label>
-                  <input type="text" value={p.kvk} onChange={(e) => p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
-                </div>
-                <div>
-                  <label className={labelCls}>BTW-nummer (optioneel)</label>
-                  <input type="text" value={p.btw} onChange={(e) => p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
-                </div>
-              </div>
-              <div className="border-t border-border pt-5">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Contactpersoon</div>
-              </div>
-            </>
-          )}
+          <InlineKlantTypeToggle zakelijk={p.zakelijk} onChange={switchKlantType} />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Zakelijk: bedrijfsgegevens bovenaan — fade in/out */}
+          <div
+            key={`zak-${klantTypeKey}`}
+            className={cn(
+              "transition-all duration-200 ease-out overflow-hidden",
+              p.zakelijk ? "opacity-100 max-h-[600px] animate-fade-in" : "opacity-0 max-h-0 pointer-events-none",
+            )}
+          >
+            {p.zakelijk && (
+              <div className="space-y-5">
+                <div>
+                  <label className={labelCls}>Bedrijfsnaam *</label>
+                  <input type="text" value={p.bedrijfsnaam} onChange={(e) => p.setBedrijfsnaam(e.target.value)} className={inputCls} maxLength={150} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>KVK-nummer *</label>
+                    <input type="text" value={p.kvk} onChange={(e) => p.setKvk(e.target.value)} className={inputCls} maxLength={20} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>BTW-nummer (optioneel)</label>
+                    <input type="text" value={p.btw} onChange={(e) => p.setBtw(e.target.value)} className={inputCls} maxLength={30} />
+                  </div>
+                </div>
+                <div className="border-t border-border pt-5">
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Contactpersoon</div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div key={`names-${klantTypeKey}`} className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
             <div>
               <label className={labelCls}>{p.zakelijk ? "Voornaam contactpersoon *" : "Voornaam *"}</label>
               <input type="text" value={p.voornaam} onChange={(e) => p.setVoornaam(e.target.value)} className={inputCls} maxLength={80} />
@@ -1698,8 +1712,14 @@ const Stap3Klant = (p: Stap3Props) => {
             </div>
           </div>
 
-          {/* Geboortedatum alleen voor particulier */}
-          {!p.zakelijk && (
+          {/* Geboortedatum alleen voor particulier — fade */}
+          <div
+            className={cn(
+              "transition-all duration-200 ease-out overflow-hidden",
+              !p.zakelijk ? "opacity-100 max-h-[120px] animate-fade-in" : "opacity-0 max-h-0 pointer-events-none",
+            )}
+          >
+            {!p.zakelijk && (
             <div>
               <label className={labelCls}>Geboortedatum *</label>
               <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
@@ -1749,7 +1769,8 @@ const Stap3Klant = (p: Stap3Props) => {
                 </PopoverContent>
               </Popover>
             </div>
-          )}
+            )}
+          </div>
 
           <div>
             <label className={labelCls}>Adres *</label>
