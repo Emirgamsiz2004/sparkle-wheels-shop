@@ -321,6 +321,10 @@ const AdminVerkoopWizardPage = () => {
       garantie_pakket: garantieType === "autotrust" ? (garantiePakket.trim() || null) : null,
       garantie_looptijd: garantieType === "autotrust" && garantieLooptijd !== "" ? Number(garantieLooptijd) : null,
       garantie_prijs: garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0,
+      overeenkomstnummer: overeenkomstnummer.trim() || null,
+      opmerkingen: opmerkingen.trim() || null,
+      contract_getekend: contractGetekend,
+      contract_getekend_datum: contractGetekend ? new Date().toISOString().slice(0, 10) : null,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -331,7 +335,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
