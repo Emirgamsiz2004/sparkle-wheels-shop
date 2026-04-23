@@ -544,15 +544,11 @@ const Stap1Voertuig = (p: Stap1Props) => {
 
       {/* Inruil */}
       <div className="rounded-[14px] border border-border bg-card p-5">
-        <label className="flex items-center gap-2.5 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={p.inruil}
-            onChange={(e) => p.setInruil(e.target.checked)}
-            className="w-4 h-4 rounded border-border bg-input accent-foreground"
-          />
-          <span className="text-sm font-medium text-foreground">Inruil van toepassing</span>
-        </label>
+        <TogglePill
+          active={p.inruil}
+          onChange={p.setInruil}
+          label="Inruil van toepassing"
+        />
 
         {p.inruil && (
           <div className="mt-5 space-y-4 border-t border-border pt-5">
