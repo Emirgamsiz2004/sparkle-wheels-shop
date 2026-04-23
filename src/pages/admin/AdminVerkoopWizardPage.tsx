@@ -792,10 +792,10 @@ const Stap1Voertuig = (p: Stap1Props) => {
                       const k = formatKenteken(p.inruilKenteken);
                       if (!isValidKenteken(k)) return;
                       p.setInruilKenteken(k);
-                      if (p.inruilLookupLoading) return;
-                      p.setInruilLookupLoading(true);
+                      if (inruilLookupLoading) return;
+                      setInruilLookupLoading(true);
                       const data = await fetchRdwData(k);
-                      p.setInruilLookupLoading(false);
+                      setInruilLookupLoading(false);
                       if (!data) return;
                       if (data.merk) p.setInruilMerk(data.merk);
                       if (data.model) p.setInruilModel(data.model);
@@ -803,7 +803,7 @@ const Stap1Voertuig = (p: Stap1Props) => {
                     className={`${inputCls} font-mono uppercase pr-9`}
                     placeholder="XX-XX-XX"
                   />
-                  {p.inruilLookupLoading && (
+                  {inruilLookupLoading && (
                     <Loader2 className="w-4 h-4 animate-spin text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2" />
                   )}
                 </div>
