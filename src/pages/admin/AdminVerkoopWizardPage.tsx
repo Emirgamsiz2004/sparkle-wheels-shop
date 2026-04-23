@@ -635,4 +635,36 @@ const InfoRow = ({ label, value, mono }: { label: string; value: string; mono?: 
   </div>
 );
 
+// Toggle pill — vervangt checkboxes voor een nettere UI
+const TogglePill = ({
+  active,
+  onChange,
+  label,
+}: {
+  active: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={active}
+    onClick={() => onChange(!active)}
+    className={[
+      "inline-flex items-center gap-2.5 px-4 py-2 rounded-full border text-sm font-medium transition-colors select-none",
+      active
+        ? "bg-foreground text-background border-foreground"
+        : "bg-transparent text-muted-foreground border-border hover:bg-accent/50 hover:text-foreground",
+    ].join(" ")}
+  >
+    <span
+      className={[
+        "w-2 h-2 rounded-full transition-colors",
+        active ? "bg-background" : "bg-muted-foreground/40",
+      ].join(" ")}
+    />
+    {label}
+  </button>
+);
+
 export default AdminVerkoopWizardPage;
