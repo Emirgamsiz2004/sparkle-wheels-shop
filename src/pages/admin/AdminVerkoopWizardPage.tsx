@@ -1172,17 +1172,36 @@ const Stap2Aflevering = (p: Stap2Props) => {
 
             <div>
               <label className={labelCls}>Betaalmethode *</label>
-              <div className="flex gap-2">
-                {(["cash", "pin", "ideal"] as const).map((m) => (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {(["cash", "pin", "ideal", "overboeking"] as const).map((m) => (
                   <button
                     type="button"
                     key={m}
                     onClick={() => p.setAanbetalingBetaalwijze(m)}
                     className={payCls(p.aanbetalingBetaalwijze === m)}
                   >
-                    {m === "cash" ? "Cash" : m === "pin" ? "Pin" : "iDEAL"}
+                    {m === "cash" ? "Cash" : m === "pin" ? "Pin" : m === "ideal" ? "iDEAL" : "Overboeking"}
                   </button>
                 ))}
+              </div>
+
+              <div
+                className={`grid transition-all duration-300 ease-out ${
+                  p.aanbetalingBetaalwijze === "overboeking"
+                    ? "grid-rows-[1fr] opacity-100 mt-3"
+                    : "grid-rows-[0fr] opacity-0 mt-0"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <label className={labelCls}>Bankrekeningnummer / naam (optioneel)</label>
+                  <input
+                    type="text"
+                    value={p.aanbetalingBankrekening}
+                    onChange={(e) => p.setAanbetalingBankrekening(e.target.value)}
+                    className={inputCls}
+                    placeholder="NL00 BANK 0123 4567 89 / Naam"
+                  />
+                </div>
               </div>
             </div>
 
