@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVehicles } from "@/hooks/useVehicles";
@@ -7,26 +7,21 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Vehicle, statusLabels } from "@/types/vehicle";
 import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog";
-import ConsignatieOvereenkomstDialog from "@/components/admin/ConsignatieOvereenkomstDialog";
-import AanbetalingDialog from "@/components/admin/AanbetalingDialog";
 import VehicleDetailHeader from "@/components/admin/detail/VehicleDetailHeader";
 import VehicleOverzichtTab from "@/components/admin/detail/VehicleOverzichtTab";
-import VehicleFinancieelEditTab from "@/components/admin/detail/VehicleFinancieelEditTab";
 import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
 import VerkoopCompletenessBar from "@/components/admin/detail/VerkoopCompletenessBar";
 import VerkoopWizard from "@/components/admin/verkoop/VerkoopWizard";
-import ReserveringWizard from "@/components/admin/verkoop/ReserveringWizard";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useAppointments } from "@/hooks/useAppointments";
 
 const tabItems = [
   { key: "overzicht", label: "Overzicht" },
-  { key: "financieel", label: "Financieel" },
   { key: "dossier", label: "Dossier" },
-  { key: "taken", label: "Taken & activiteit" },
+  { key: "taken", label: "Activiteit" },
 ];
 
 const AdminVoertuigDetailPage = () => {
