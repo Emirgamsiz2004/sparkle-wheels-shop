@@ -2,32 +2,32 @@ import { useState, useMemo, useEffect } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Link } from "react-router-dom";
 import { Plus, Search, Loader2, Eye, ChevronRight, RefreshCw, AlertTriangle, FileWarning } from "lucide-react";
-import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors } from "@/types/vehicle";
+import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors, Vehicle } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { getApkStatus } from "@/components/admin/detail/VehicleOverzichtTab";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import SlidingTabs from "@/components/admin/SlidingTabs";
 
-const BASE_TABS = [
-  { label: "Voorraad", value: "voorraad" },
-  { label: "Nieuw", value: "nieuw" },
-  { label: "Te koop", value: "te_koop" },
-  { label: "Consignatie", value: "consignatie" },
-  { label: "In behandeling", value: "in_behandeling" },
-  { label: "Inkoop", value: "inkoop" },
+const STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: "alle", label: "Alle statussen" },
+  { value: "inkoop", label: "Inkoop" },
+  { value: "in_behandeling", label: "In behandeling" },
+  { value: "te_koop", label: "Te koop" },
+  { value: "consignatie", label: "Consignatie" },
+  { value: "gereserveerd", label: "Gereserveerd" },
+  { value: "reparatie_onderhoud", label: "Reparatie/Onderhoud" },
+  { value: "verkocht", label: "Verkocht" },
 ];
 
 const AdminVoertuigenPage = () => {
   const { vehicles, loading, refetch } = useVehicles();
-  const [filter, setFilter] = useState("voorraad");
+  const [statusFilter, setStatusFilter] = useState("alle");
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
   const isMobile = useIsMobile();
   const [consignatieWarningCount, setConsignatieWarningCount] = useState(0);
 
-  // Check consignatie vehicles without overeenkomst
   const consignatieVehicles = useMemo(() => vehicles.filter(v => v.status === "consignatie"), [vehicles]);
 
   useEffect(() => {
@@ -45,14 +45,12 @@ const AdminVoertuigenPage = () => {
     checkDocs();
   }, [consignatieVehicles]);
 
-  // APK warning: vehicles expiring within 4 weeks or already expired (only non-sold)
   const apkWarningVehicles = useMemo(() => {
     return vehicles.filter((v) => {
       if (v.status === "verkocht") return false;
       const status = getApkStatus(v.apkVervaldatum);
       if (status.level === 'red') return true;
       if (status.level === 'orange') {
-        // Check if within 4 weeks
         if (!v.apkVervaldatum) return false;
         const today = new Date(); today.setHours(0,0,0,0);
         const apk = new Date(v.apkVervaldatum);
@@ -77,32 +75,8 @@ const AdminVoertuigenPage = () => {
     setSyncing(false);
   };
 
-  const threeDaysAgo = useMemo(() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 3);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
-
-  const nieuwCount = useMemo(() => vehicles.filter(v => {
-    if (v.status === "verkocht") return false;
-    return new Date(v.createdAt || "") >= threeDaysAgo;
-  }).length, [vehicles, threeDaysAgo]);
-
-  const tabs = useMemo(() => BASE_TABS.map(t =>
-    t.value === "nieuw" && nieuwCount > 0
-      ? { ...t, label: `Nieuw (${nieuwCount})` }
-      : t
-  ), [nieuwCount]);
-
   const filtered = vehicles.filter((v) => {
-    if (v.status === "verkocht") return false;
-    if (filter === "nieuw") {
-      const createdAt = new Date(v.createdAt || "");
-      if (createdAt < threeDaysAgo) return false;
-    } else if (filter !== "voorraad" && v.status !== filter) {
-      return false;
-    }
+    if (statusFilter !== "alle" && v.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
       return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || v.kenteken?.toLowerCase().includes(q);
@@ -116,10 +90,9 @@ const AdminVoertuigenPage = () => {
 
   return (
     <div className="space-y-4">
-      {/* APK Warning bar */}
       {apkWarningVehicles.length > 0 && (
         <button
-          onClick={() => { setFilter("voorraad"); setSearch(""); }}
+          onClick={() => { setStatusFilter("alle"); setSearch(""); }}
           className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium bg-amber-500/10 border border-amber-500/25 rounded-md text-amber-400 hover:bg-amber-500/15 transition-colors"
         >
           <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
@@ -127,10 +100,9 @@ const AdminVoertuigenPage = () => {
         </button>
       )}
 
-      {/* Consignatie warning bar */}
       {consignatieWarningCount > 0 && (
         <button
-          onClick={() => { setFilter("consignatie"); setSearch(""); }}
+          onClick={() => { setStatusFilter("consignatie"); setSearch(""); }}
           className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium bg-amber-500/10 border border-amber-500/25 rounded-md text-amber-400 hover:bg-amber-500/15 transition-colors"
         >
           <FileWarning className="w-3.5 h-3.5 shrink-0" />
@@ -140,7 +112,7 @@ const AdminVoertuigenPage = () => {
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-medium text-foreground">Voertuigen</h1>
-          <p className="text-sm text-muted-foreground">{vehicles.filter(v => v.status !== "verkocht").length} voertuig{vehicles.filter(v => v.status !== "verkocht").length !== 1 ? "en" : ""}</p>
+          <p className="text-sm text-muted-foreground">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -157,29 +129,27 @@ const AdminVoertuigenPage = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="space-y-3 overflow-hidden">
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-          <SlidingTabs
-            tabs={tabs}
-            value={filter}
-            onChange={setFilter}
-            className="min-w-max"
-          />
-        </div>
-        <div className="relative">
+      {/* Search + status filter */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Zoek op merk, model, kenteken..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:max-w-xs pl-8 pr-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+            className="w-full pl-8 pr-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
           />
         </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="w-full sm:w-auto px-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
+        >
+          {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
       </div>
 
-      {/* Content */}
       {filtered.length === 0 ? (
         <div className="bg-card rounded-lg border border-border px-4 py-12 text-center text-sm text-muted-foreground">
           {vehicles.length === 0 ? (

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
-const allStatuses: Customer["status"][] = ["prospect", "geinteresseerd", "actief", "klant", "inactief"];
+const allStatuses: Customer["status"][] = ["prospect", "klant", "inactief"];
 
 const statusTabs = [
   { label: "Alle", value: "alle" },

@@ -18,8 +18,6 @@ const statusConfig: Record<string, { label: string; icon: typeof Clock; color: s
 };
 
 const tabs = [
-  { label: "Alle", value: "alle" },
-  { label: "Wacht op klant", value: "wacht_op_klant" },
   { label: "Actief", value: "actief" },
   { label: "Afgesloten", value: "afgesloten" },
   { label: "Onvolledig", value: "onvolledig" },
@@ -28,7 +26,7 @@ const tabs = [
 const AdminProefrittenPage = () => {
   const { testDrives, loading, refetch } = useTestDrives();
   const { appointments } = useAppointments();
-  const [filter, setFilter] = useState("alle");
+  const [filter, setFilter] = useState("actief");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<TestDrive | null>(null);
   const [ending, setEnding] = useState<TestDrive | null>(null);
@@ -43,7 +41,7 @@ const AdminProefrittenPage = () => {
   }, [appointments]);
 
   const filtered = testDrives.filter((td) => {
-    if (filter !== "alle" && td.status !== filter) return false;
+    if (td.status !== filter) return false;
     if (search) {
       const q = search.toLowerCase();
       const name = `${td.customer?.voornaam || ""} ${td.customer?.achternaam || ""}`.toLowerCase();
