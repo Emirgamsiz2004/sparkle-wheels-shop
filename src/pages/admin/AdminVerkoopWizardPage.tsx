@@ -1787,53 +1787,7 @@ const Stap3Klant = (p: Stap3Props) => {
                 )}
               >
                 <label className={labelCls}>Geboortedatum *</label>
-                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className={cn(
-                        "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                        !p.geboortedatum && "text-muted-foreground",
-                      )}
-                    >
-                      <span>
-                        {p.geboortedatum
-                          ? format(parseISO(p.geboortedatum), "d MMMM yyyy", { locale: nl })
-                          : "Kies een datum"}
-                      </span>
-                      <CalendarIcon className="h-4 w-4 text-foreground/70" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={p.geboortedatum ? parseISO(p.geboortedatum) : undefined}
-                      onSelect={(d) => {
-                        if (d) {
-                          const yyyy = d.getFullYear();
-                          const mm = String(d.getMonth() + 1).padStart(2, "0");
-                          const dd = String(d.getDate()).padStart(2, "0");
-                          p.setGeboortedatum(`${yyyy}-${mm}-${dd}`);
-                          setDatePickerOpen(false);
-                        }
-                      }}
-                      captionLayout="dropdown-buttons"
-                      fromYear={1920}
-                      toYear={new Date().getFullYear()}
-                      defaultMonth={p.geboortedatum ? parseISO(p.geboortedatum) : new Date(1990, 0, 1)}
-                      disabled={(date) => date > new Date()}
-                      initialFocus
-                      locale={nl}
-                      className={cn("p-3 pointer-events-auto")}
-                      classNames={{
-                        day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full border-0 outline-none ring-0 shadow-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0",
-                        day_selected:
-                          "!bg-emerald-600 !text-white !rounded-full !border-0 !outline-none !ring-0 !shadow-none hover:!bg-emerald-600 hover:!text-white focus:!bg-emerald-600 focus:!text-white focus:!outline-none focus:!ring-0 focus-visible:!outline-none focus-visible:!ring-0",
-                        day_today: "bg-muted text-foreground font-semibold rounded-full border-0 outline-none ring-0 aria-selected:bg-emerald-600 aria-selected:text-white",
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <GeboortedatumInputs value={p.geboortedatum} onChange={p.setGeboortedatum} />
               </div>
             </div>
           </div>
