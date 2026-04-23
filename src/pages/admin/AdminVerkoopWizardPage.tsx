@@ -1133,6 +1133,14 @@ const Stap2Aflevering = (p: Stap2Props) => {
   const restbedrag = Math.max(0, (p.verkoopprijs || 0) - aanbetaling);
   const today = new Date().toISOString().slice(0, 10);
   const laterOphalen = p.afleverwijze !== "vandaag";
+  const isAflevering = p.afleverwijze === "aflevering";
+
+  // Bij "Aflevering": forceer betaalmethode op overboeking
+  useEffect(() => {
+    if (isAflevering && p.aanbetalingBetaalwijze !== "overboeking") {
+      p.setAanbetalingBetaalwijze("overboeking");
+    }
+  }, [isAflevering]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Autosave bij later ophalen / aflevering: zodra leverdatum + (aanbetaling of adres) ingevuld zijn
   const autoSaveSig = useMemo(() => {
