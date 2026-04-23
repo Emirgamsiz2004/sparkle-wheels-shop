@@ -1232,7 +1232,7 @@ const Stap2Aflevering = (p: Stap2Props) => {
             </div>
 
             <div>
-              <label className={labelCls}>Betaalmethode *</label>
+              <label className={labelCls}>Betaalmethode</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {(["cash", "pin", "ideal", "overboeking"] as const).map((m) => (
                   <button
