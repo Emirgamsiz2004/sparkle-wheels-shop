@@ -686,11 +686,16 @@ export type Database = {
         Row: {
           achternaam: string
           adres: string | null
+          bedrijfsnaam: string | null
+          btw_nummer: string | null
           created_at: string
           email: string
           geboortedatum: string | null
           id: string
+          is_zakelijk: boolean | null
+          kvk_nummer: string | null
           laatste_contact: string | null
+          land: string | null
           notities: string | null
           plaats: string | null
           postcode: string | null
@@ -698,15 +703,21 @@ export type Database = {
           telefoon: string
           updated_at: string
           voornaam: string
+          woonplaats: string | null
         }
         Insert: {
           achternaam: string
           adres?: string | null
+          bedrijfsnaam?: string | null
+          btw_nummer?: string | null
           created_at?: string
           email: string
           geboortedatum?: string | null
           id?: string
+          is_zakelijk?: boolean | null
+          kvk_nummer?: string | null
           laatste_contact?: string | null
+          land?: string | null
           notities?: string | null
           plaats?: string | null
           postcode?: string | null
@@ -714,15 +725,21 @@ export type Database = {
           telefoon?: string
           updated_at?: string
           voornaam: string
+          woonplaats?: string | null
         }
         Update: {
           achternaam?: string
           adres?: string | null
+          bedrijfsnaam?: string | null
+          btw_nummer?: string | null
           created_at?: string
           email?: string
           geboortedatum?: string | null
           id?: string
+          is_zakelijk?: boolean | null
+          kvk_nummer?: string | null
           laatste_contact?: string | null
+          land?: string | null
           notities?: string | null
           plaats?: string | null
           postcode?: string | null
@@ -730,6 +747,7 @@ export type Database = {
           telefoon?: string
           updated_at?: string
           voornaam?: string
+          woonplaats?: string | null
         }
         Relationships: []
       }
@@ -2092,11 +2110,13 @@ export type Database = {
       vehicles: {
         Row: {
           aanbetalingsbedrag: number | null
+          afleverkosten: number | null
           apk_vervaldatum: string | null
           betaalmethode: string | null
           bouwjaar: number | null
           brandstof: string | null
           btw_marge_type: string
+          chassis_nummer: string | null
           consignatie_commissie_perc: number | null
           consignatie_eigenaar_email: string | null
           consignatie_eigenaar_naam: string | null
@@ -2104,9 +2124,11 @@ export type Database = {
           contant_bedrag: number | null
           created_at: string
           customer_id: string | null
+          datum_deel_1: string | null
           feed_id: string | null
           financiering_actief: boolean | null
           financiering_bedrag: number | null
+          gewicht: number | null
           google_drive_folder_id: string | null
           google_drive_folder_url: string | null
           google_drive_synced: boolean | null
@@ -2124,25 +2146,32 @@ export type Database = {
           koper_naam: string | null
           koper_telefoon: string | null
           kostprijs: number | null
+          leges: number | null
           marktplaats_url: string | null
           merk: string
           model: string
+          nap: boolean | null
           opmerkingen: string | null
           overboeking_bedrag: number | null
           status: string | null
           totale_kosten: number | null
+          uitvoering: string | null
           user_id: string | null
+          vehicle_type: string | null
           verkoop_datum: string | null
           verkoop_type: string | null
           verkoopprijs: number | null
+          verwijderingsbijdrage: number | null
         }
         Insert: {
           aanbetalingsbedrag?: number | null
+          afleverkosten?: number | null
           apk_vervaldatum?: string | null
           betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
           btw_marge_type?: string
+          chassis_nummer?: string | null
           consignatie_commissie_perc?: number | null
           consignatie_eigenaar_email?: string | null
           consignatie_eigenaar_naam?: string | null
@@ -2150,9 +2179,11 @@ export type Database = {
           contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
+          datum_deel_1?: string | null
           feed_id?: string | null
           financiering_actief?: boolean | null
           financiering_bedrag?: number | null
+          gewicht?: number | null
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
@@ -2170,25 +2201,32 @@ export type Database = {
           koper_naam?: string | null
           koper_telefoon?: string | null
           kostprijs?: number | null
+          leges?: number | null
           marktplaats_url?: string | null
           merk: string
           model: string
+          nap?: boolean | null
           opmerkingen?: string | null
           overboeking_bedrag?: number | null
           status?: string | null
           totale_kosten?: number | null
+          uitvoering?: string | null
           user_id?: string | null
+          vehicle_type?: string | null
           verkoop_datum?: string | null
           verkoop_type?: string | null
           verkoopprijs?: number | null
+          verwijderingsbijdrage?: number | null
         }
         Update: {
           aanbetalingsbedrag?: number | null
+          afleverkosten?: number | null
           apk_vervaldatum?: string | null
           betaalmethode?: string | null
           bouwjaar?: number | null
           brandstof?: string | null
           btw_marge_type?: string
+          chassis_nummer?: string | null
           consignatie_commissie_perc?: number | null
           consignatie_eigenaar_email?: string | null
           consignatie_eigenaar_naam?: string | null
@@ -2196,9 +2234,11 @@ export type Database = {
           contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
+          datum_deel_1?: string | null
           feed_id?: string | null
           financiering_actief?: boolean | null
           financiering_bedrag?: number | null
+          gewicht?: number | null
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
@@ -2216,17 +2256,22 @@ export type Database = {
           koper_naam?: string | null
           koper_telefoon?: string | null
           kostprijs?: number | null
+          leges?: number | null
           marktplaats_url?: string | null
           merk?: string
           model?: string
+          nap?: boolean | null
           opmerkingen?: string | null
           overboeking_bedrag?: number | null
           status?: string | null
           totale_kosten?: number | null
+          uitvoering?: string | null
           user_id?: string | null
+          vehicle_type?: string | null
           verkoop_datum?: string | null
           verkoop_type?: string | null
           verkoopprijs?: number | null
+          verwijderingsbijdrage?: number | null
         }
         Relationships: [
           {
@@ -2234,6 +2279,266 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verkoop_documenten: {
+        Row: {
+          aangemaakt_op: string | null
+          id: string
+          pdf_url: string | null
+          type: string | null
+          verkoop_id: string | null
+        }
+        Insert: {
+          aangemaakt_op?: string | null
+          id?: string
+          pdf_url?: string | null
+          type?: string | null
+          verkoop_id?: string | null
+        }
+        Update: {
+          aangemaakt_op?: string | null
+          id?: string
+          pdf_url?: string | null
+          type?: string | null
+          verkoop_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verkoop_documenten_verkoop_id_fkey"
+            columns: ["verkoop_id"]
+            isOneToOne: false
+            referencedRelation: "verkopen"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verkopen: {
+        Row: {
+          aanbetaling_bedrag: number | null
+          aanbetaling_betaalwijze: string | null
+          aanbetaling_datum: string | null
+          aanbetaling_ontvangen: boolean | null
+          afleverkosten: number | null
+          bedankbericht_gestuurd: boolean | null
+          betaalwijze: string | null
+          betaling_datum: string | null
+          betaling_ontvangen: boolean | null
+          contract_getekend: boolean | null
+          contract_getekend_datum: string | null
+          created_at: string | null
+          customer_id: string | null
+          factuur_betaald: boolean | null
+          financiering: boolean | null
+          garantie_looptijd: number | null
+          garantie_pakket: string | null
+          garantie_prijs: number | null
+          garantie_type: string | null
+          id: string
+          inruil: boolean | null
+          inruil_bedrijfsnaam: string | null
+          inruil_btw: string | null
+          inruil_chassis: string | null
+          inruil_kenteken: string | null
+          inruil_kleur: string | null
+          inruil_km: number | null
+          inruil_kvk: string | null
+          inruil_merk: string | null
+          inruil_model: string | null
+          inruil_op_naam: boolean | null
+          inruil_type: string | null
+          inruil_uitvoering: string | null
+          inruil_waarde: number | null
+          later_ophalen: boolean | null
+          leges: number | null
+          leverdatum: string | null
+          moneybird_factuur_id: string | null
+          moneybird_factuur_url: string | null
+          overboeking_bedrag: number | null
+          rdw_check_gedaan: boolean | null
+          review_gevraagd: boolean | null
+          sleutels_aantal: number | null
+          stap1_afgerond: boolean | null
+          stap10_afgerond: boolean | null
+          stap11_afgerond: boolean | null
+          stap12_afgerond: boolean | null
+          stap2_afgerond: boolean | null
+          stap3_afgerond: boolean | null
+          stap4_afgerond: boolean | null
+          stap5_afgerond: boolean | null
+          stap6_afgerond: boolean | null
+          stap7_afgerond: boolean | null
+          stap8_afgerond: boolean | null
+          stap9_afgerond: boolean | null
+          uitlevering_datum: string | null
+          uitlevering_foto: boolean | null
+          updated_at: string | null
+          vehicle_id: string | null
+          verkoop_type: string | null
+          verkoopprijs: number | null
+          verwijderingsbijdrage: number | null
+          vrijwaring_aangevraagd: boolean | null
+          vrijwaring_bevestigd: boolean | null
+          vrijwaring_datum: string | null
+          vrijwaring_tijdstip: string | null
+          wizard_stap: number | null
+          wizard_status: string | null
+        }
+        Insert: {
+          aanbetaling_bedrag?: number | null
+          aanbetaling_betaalwijze?: string | null
+          aanbetaling_datum?: string | null
+          aanbetaling_ontvangen?: boolean | null
+          afleverkosten?: number | null
+          bedankbericht_gestuurd?: boolean | null
+          betaalwijze?: string | null
+          betaling_datum?: string | null
+          betaling_ontvangen?: boolean | null
+          contract_getekend?: boolean | null
+          contract_getekend_datum?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          factuur_betaald?: boolean | null
+          financiering?: boolean | null
+          garantie_looptijd?: number | null
+          garantie_pakket?: string | null
+          garantie_prijs?: number | null
+          garantie_type?: string | null
+          id?: string
+          inruil?: boolean | null
+          inruil_bedrijfsnaam?: string | null
+          inruil_btw?: string | null
+          inruil_chassis?: string | null
+          inruil_kenteken?: string | null
+          inruil_kleur?: string | null
+          inruil_km?: number | null
+          inruil_kvk?: string | null
+          inruil_merk?: string | null
+          inruil_model?: string | null
+          inruil_op_naam?: boolean | null
+          inruil_type?: string | null
+          inruil_uitvoering?: string | null
+          inruil_waarde?: number | null
+          later_ophalen?: boolean | null
+          leges?: number | null
+          leverdatum?: string | null
+          moneybird_factuur_id?: string | null
+          moneybird_factuur_url?: string | null
+          overboeking_bedrag?: number | null
+          rdw_check_gedaan?: boolean | null
+          review_gevraagd?: boolean | null
+          sleutels_aantal?: number | null
+          stap1_afgerond?: boolean | null
+          stap10_afgerond?: boolean | null
+          stap11_afgerond?: boolean | null
+          stap12_afgerond?: boolean | null
+          stap2_afgerond?: boolean | null
+          stap3_afgerond?: boolean | null
+          stap4_afgerond?: boolean | null
+          stap5_afgerond?: boolean | null
+          stap6_afgerond?: boolean | null
+          stap7_afgerond?: boolean | null
+          stap8_afgerond?: boolean | null
+          stap9_afgerond?: boolean | null
+          uitlevering_datum?: string | null
+          uitlevering_foto?: boolean | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+          verkoop_type?: string | null
+          verkoopprijs?: number | null
+          verwijderingsbijdrage?: number | null
+          vrijwaring_aangevraagd?: boolean | null
+          vrijwaring_bevestigd?: boolean | null
+          vrijwaring_datum?: string | null
+          vrijwaring_tijdstip?: string | null
+          wizard_stap?: number | null
+          wizard_status?: string | null
+        }
+        Update: {
+          aanbetaling_bedrag?: number | null
+          aanbetaling_betaalwijze?: string | null
+          aanbetaling_datum?: string | null
+          aanbetaling_ontvangen?: boolean | null
+          afleverkosten?: number | null
+          bedankbericht_gestuurd?: boolean | null
+          betaalwijze?: string | null
+          betaling_datum?: string | null
+          betaling_ontvangen?: boolean | null
+          contract_getekend?: boolean | null
+          contract_getekend_datum?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          factuur_betaald?: boolean | null
+          financiering?: boolean | null
+          garantie_looptijd?: number | null
+          garantie_pakket?: string | null
+          garantie_prijs?: number | null
+          garantie_type?: string | null
+          id?: string
+          inruil?: boolean | null
+          inruil_bedrijfsnaam?: string | null
+          inruil_btw?: string | null
+          inruil_chassis?: string | null
+          inruil_kenteken?: string | null
+          inruil_kleur?: string | null
+          inruil_km?: number | null
+          inruil_kvk?: string | null
+          inruil_merk?: string | null
+          inruil_model?: string | null
+          inruil_op_naam?: boolean | null
+          inruil_type?: string | null
+          inruil_uitvoering?: string | null
+          inruil_waarde?: number | null
+          later_ophalen?: boolean | null
+          leges?: number | null
+          leverdatum?: string | null
+          moneybird_factuur_id?: string | null
+          moneybird_factuur_url?: string | null
+          overboeking_bedrag?: number | null
+          rdw_check_gedaan?: boolean | null
+          review_gevraagd?: boolean | null
+          sleutels_aantal?: number | null
+          stap1_afgerond?: boolean | null
+          stap10_afgerond?: boolean | null
+          stap11_afgerond?: boolean | null
+          stap12_afgerond?: boolean | null
+          stap2_afgerond?: boolean | null
+          stap3_afgerond?: boolean | null
+          stap4_afgerond?: boolean | null
+          stap5_afgerond?: boolean | null
+          stap6_afgerond?: boolean | null
+          stap7_afgerond?: boolean | null
+          stap8_afgerond?: boolean | null
+          stap9_afgerond?: boolean | null
+          uitlevering_datum?: string | null
+          uitlevering_foto?: boolean | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+          verkoop_type?: string | null
+          verkoopprijs?: number | null
+          verwijderingsbijdrage?: number | null
+          vrijwaring_aangevraagd?: boolean | null
+          vrijwaring_bevestigd?: boolean | null
+          vrijwaring_datum?: string | null
+          vrijwaring_tijdstip?: string | null
+          wizard_stap?: number | null
+          wizard_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verkopen_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verkopen_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]

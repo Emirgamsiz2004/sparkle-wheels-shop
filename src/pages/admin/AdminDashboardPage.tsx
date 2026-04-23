@@ -135,7 +135,7 @@ const AdminDashboardPage = () => {
   const inkoopChartData = useMemo(() => inkoopAnalyse.inkoopPerPeriode, [inkoopAnalyse]);
 
   // Laatste 5 proefriten
-  const laatsteProefriten = useMemo(() => {
+  const laatsteProefritten = useMemo(() => {
     return [...testDrives]
       .sort((a, b) => new Date(b.start_tijd).getTime() - new Date(a.start_tijd).getTime())
       .slice(0, 5);
@@ -553,9 +553,9 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
-      {/* ═══ BLOK 8 — Proefriten ═══ */}
+      {/* ═══ BLOK 8 — Proefritten ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
-        <h2 className="text-[13px] font-semibold text-foreground mb-4">Proefriten</h2>
+        <h2 className="text-[13px] font-semibold text-foreground mb-4">Proefritten</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
           {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[72px] rounded-lg" />) : (
             <>
@@ -576,7 +576,7 @@ const AdminDashboardPage = () => {
         </div>
 
         {/* Laatste 5 proefriten */}
-        {loading ? <Skeleton className="h-[120px]" /> : laatsteProefriten.length === 0 ? (
+        {loading ? <Skeleton className="h-[120px]" /> : laatsteProefritten.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-4">Geen proefriten</p>
         ) : (
           <>
@@ -590,7 +590,7 @@ const AdminDashboardPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {laatsteProefriten.map(td => {
+                {laatsteProefritten.map(td => {
                   const statusColors: Record<string, string> = {
                     gestart: "bg-blue-500/15 text-blue-400",
                     afgesloten: "bg-emerald-500/15 text-emerald-400",

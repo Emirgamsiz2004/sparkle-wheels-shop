@@ -61,7 +61,7 @@ const AdminProefrittenPage = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-lg font-medium text-foreground">Proefriten</h1>
+          <h1 className="text-lg font-medium text-foreground">Proefritten</h1>
           <p className="text-sm text-muted-foreground">{testDrives.length} proefrit{testDrives.length !== 1 ? "ten" : ""}</p>
         </div>
         <button
