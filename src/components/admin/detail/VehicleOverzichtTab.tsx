@@ -225,13 +225,12 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
       )}
 
       {/* Notes - auto-save */}
-      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+      <div className="bg-card border border-border rounded-lg p-3 space-y-2">
         <label className="block text-xs text-muted-foreground uppercase tracking-wider font-medium">Notities</label>
         <textarea
           value={notes}
           onChange={(e) => handleNotesChange(e.target.value)}
-          rows={3}
-          className={cn(inputCls, "resize-none")}
+          className={cn(inputCls, "resize-none h-20")}
           placeholder="Notities voor jezelf... (wordt automatisch opgeslagen)"
         />
         <p className="text-[10px] text-muted-foreground">Auto-save na 2 seconden</p>
