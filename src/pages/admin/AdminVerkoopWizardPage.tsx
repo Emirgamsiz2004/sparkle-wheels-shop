@@ -779,8 +779,13 @@ const Stap1Voertuig = (p: Stap1Props) => {
           label="Inruil van toepassing"
         />
 
-        {p.inruil && (
-          <div className="mt-5 space-y-4 border-t border-border pt-5">
+        <div
+          className={`grid transition-all duration-300 ease-out ${
+            p.inruil ? "grid-rows-[1fr] opacity-100 mt-5" : "grid-rows-[0fr] opacity-0 mt-0"
+          }`}
+        >
+          <div className="overflow-hidden">
+          <div className="space-y-4 border-t border-border pt-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Kenteken inruil</label>
@@ -856,24 +861,31 @@ const Stap1Voertuig = (p: Stap1Props) => {
               </div>
             </div>
 
-            {p.inruilVerkoper === "zakelijk" && (
-              <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
-                <div className="col-span-2">
-                  <label className={labelCls}>Bedrijfsnaam</label>
-                  <input value={p.inruilBedrijfsnaam} onChange={(e) => p.setInruilBedrijfsnaam(e.target.value)} className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>KVK-nummer</label>
-                  <input value={p.inruilKvk} onChange={(e) => p.setInruilKvk(e.target.value)} className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>BTW-nummer</label>
-                  <input value={p.inruilBtw} onChange={(e) => p.setInruilBtw(e.target.value)} className={inputCls} />
+            <div
+              className={`grid transition-all duration-300 ease-out ${
+                p.inruilVerkoper === "zakelijk" ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
+                  <div className="col-span-2">
+                    <label className={labelCls}>Bedrijfsnaam</label>
+                    <input value={p.inruilBedrijfsnaam} onChange={(e) => p.setInruilBedrijfsnaam(e.target.value)} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>KVK-nummer</label>
+                    <input value={p.inruilKvk} onChange={(e) => p.setInruilKvk(e.target.value)} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>BTW-nummer</label>
+                    <input value={p.inruilBtw} onChange={(e) => p.setInruilBtw(e.target.value)} className={inputCls} />
+                  </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
