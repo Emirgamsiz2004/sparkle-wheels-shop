@@ -274,6 +274,17 @@ const AdminVerkoopWizardPage = () => {
           setRestBetaalwijze(bw);
         }
         setFinancieringMaatschappij((existing as any).financiering_maatschappij || "");
+        const det = (existing as any).betaalwijze_details;
+        if (Array.isArray(det)) {
+          setBetaalwijzeDetails(
+            det
+              .filter((d: any) => d && typeof d === "object")
+              .map((d: any) => ({
+                methode: ["cash", "pin", "ideal", "overboeking", "financiering"].includes(d.methode) ? d.methode : "overboeking",
+                bedrag: Number(d.bedrag) || 0,
+              }))
+          );
+        }
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -349,8 +360,10 @@ const AdminVerkoopWizardPage = () => {
       contract_getekend: contractGetekend,
       contract_getekend_datum: contractGetekend ? new Date().toISOString().slice(0, 10) : null,
       betaalwijze: restBetaalwijze,
-      financiering: restBetaalwijze === "financiering",
-      financiering_maatschappij: restBetaalwijze === "financiering" ? (financieringMaatschappij.trim() || null) : null,
+      financiering: restBetaalwijze === "financiering" || betaalwijzeDetails.some(d => d.methode === "financiering"),
+      financiering_maatschappij: (restBetaalwijze === "financiering" || betaalwijzeDetails.some(d => d.methode === "financiering"))
+        ? (financieringMaatschappij.trim() || null) : null,
+      betaalwijze_details: betaalwijzeDetails as any,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -361,7 +374,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
@@ -748,6 +761,8 @@ const AdminVerkoopWizardPage = () => {
                 setRestBetaalwijze={setRestBetaalwijze}
                 financieringMaatschappij={financieringMaatschappij}
                 setFinancieringMaatschappij={setFinancieringMaatschappij}
+                betaalwijzeDetails={betaalwijzeDetails}
+                setBetaalwijzeDetails={setBetaalwijzeDetails}
                 onAutoSave={() => saveCurrent()}
                 verkoopId={verkoopId}
               />
