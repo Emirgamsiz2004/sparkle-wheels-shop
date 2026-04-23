@@ -1757,7 +1757,8 @@ const Stap3Klant = (p: Stap3Props) => {
                 </PopoverContent>
               </Popover>
             </div>
-          )}
+            )}
+          </div>
 
           <div>
             <label className={labelCls}>Adres *</label>
