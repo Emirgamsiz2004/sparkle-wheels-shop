@@ -150,6 +150,7 @@ const AdminVerkoopWizardPage = () => {
   const [pdfGenereerd, setPdfGenereerd] = useState<boolean>(false);
   const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering">("overboeking");
   const [financieringMaatschappij, setFinancieringMaatschappij] = useState<string>("");
+  const [betaalwijzeDetails, setBetaalwijzeDetails] = useState<Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>>([]);
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
