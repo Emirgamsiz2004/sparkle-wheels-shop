@@ -24,6 +24,7 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
 
 const AdminVoertuigenPage = () => {
   const { vehicles, loading, refetch } = useVehicles();
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("alle");
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
@@ -174,7 +175,7 @@ const AdminVoertuigenPage = () => {
                     <span className="text-xs text-muted-foreground">({v.bouwjaar})</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border ${statusColors[v.status]}`}>
+                    <span className={`${BADGE_BASE} ${statusColors[v.status]}`}>
                       {statusLabels[v.status]}
                     </span>
                     {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
@@ -202,8 +203,8 @@ const AdminVoertuigenPage = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  {["Voertuig", "Kenteken", "APK", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive", ""].map((h, i) => (
-                    <th key={h || i} className={`${i >= 3 && i <= 5 ? "text-right" : i >= 6 ? "text-center" : "text-left"} px-4 py-2.5 text-xs font-medium text-muted-foreground`}>{h}</th>
+                  {["Voertuig", "Kenteken", "APK", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive"].map((h, i) => (
+                    <th key={h || i} className={`${i >= 3 && i <= 5 ? "text-right" : i >= 6 ? "text-center" : "text-left"} px-3 py-2 text-[11px] font-medium text-muted-foreground`}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -212,35 +213,32 @@ const AdminVoertuigenPage = () => {
                   const winst = calcWinst(v);
                   const marge = calcMarge(v);
                   return (
-                    <tr key={v.id} className="border-b border-border/50 hover:bg-accent/20 transition-colors">
-                      <td className="px-4 py-2.5">
-                        <Link to={`/admin/voertuigen/${v.id}`} className="text-foreground hover:underline">
-                          {v.merk} {v.model} <span className="text-muted-foreground">({v.bouwjaar})</span>
-                        </Link>
+                    <tr
+                      key={v.id}
+                      onClick={() => navigate(`/admin/voertuigen/${v.id}`)}
+                      className="border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer"
+                    >
+                      <td className="px-3 py-1.5 text-foreground">
+                        {v.merk} {v.model} <span className="text-muted-foreground text-xs">({v.bouwjaar})</span>
                       </td>
-                      <td className="px-4 py-2.5">
-                        <span className="text-muted-foreground text-xs font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
+                      <td className="px-3 py-1.5">
+                        <span className="text-muted-foreground text-[11px] font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
                       </td>
-                      <td className="px-4 py-2.5">
+                      <td className="px-3 py-1.5">
                         <ApkBadge apkVervaldatum={v.apkVervaldatum} />
                       </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums">
-                        {isConsignatie(v) ? <span className="text-muted-foreground text-xs">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
+                      <td className="px-3 py-1.5 text-right tabular-nums text-xs">
+                        {isConsignatie(v) ? <span className="text-muted-foreground">{v.consignatieCommissiePerc || 10}%</span> : formatEuro(v.inkoopprijs)}
                       </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums">{v.verkoopprijs > 0 ? formatEuro(v.verkoopprijs) : "—"}</td>
-                      <td className={`px-4 py-2.5 text-right font-medium tabular-nums ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                        {v.verkoopprijs > 0 ? <>{formatEuro(winst)} <span className="text-xs font-normal opacity-60">({marge.toFixed(0)}%)</span></> : "—"}
+                      <td className="px-3 py-1.5 text-right tabular-nums text-xs">{v.verkoopprijs > 0 ? formatEuro(v.verkoopprijs) : "—"}</td>
+                      <td className={`px-3 py-1.5 text-right font-medium tabular-nums text-xs ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                        {v.verkoopprijs > 0 ? <>{formatEuro(winst)} <span className="text-[10px] font-normal opacity-60">({marge.toFixed(0)}%)</span></> : "—"}
                       </td>
-                      <td className="px-4 py-2.5 text-center">
-                        <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded border ${statusColors[v.status]}`}>{statusLabels[v.status]}</span>
+                      <td className="px-3 py-1.5 text-center">
+                        <span className={`${BADGE_BASE} ${statusColors[v.status]}`}>{statusLabels[v.status]}</span>
                       </td>
-                      <td className="px-4 py-2.5 text-center">
+                      <td className="px-3 py-1.5 text-center" onClick={(e) => e.stopPropagation()}>
                         <GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} />
-                      </td>
-                      <td className="px-4 py-2.5 text-center">
-                        <Link to={`/admin/voertuigen/${v.id}`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                          <Eye className="w-3.5 h-3.5" />
-                        </Link>
                       </td>
                     </tr>
                   );
