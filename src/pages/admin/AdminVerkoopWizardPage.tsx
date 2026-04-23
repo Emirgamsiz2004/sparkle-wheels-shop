@@ -249,32 +249,9 @@ const AdminVerkoopWizardPage = () => {
 
   // ─────────────────────────────────────────────────────────
   return (
-    <div className="admin-theme min-h-screen bg-background text-foreground flex flex-col">
-      {/* Top bar + voortgang */}
-      <header className="border-b border-border bg-card/40 backdrop-blur sticky top-0 z-10">
-        <div className="px-6 h-14 flex items-center justify-between">
-          <button
-            onClick={handleTerug}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Terug naar voertuig
-          </button>
-          <div className="text-xs text-muted-foreground">
-            {doneCount}/{totalSteps} stappen voltooid
-          </div>
-        </div>
-        <div className="h-1 bg-muted/40">
-          <div
-            className="h-full bg-foreground/80 transition-all duration-500"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-      </header>
-
-      <div className="flex-1 flex">
-        {/* Sidebar */}
-        <aside className="w-[280px] shrink-0 border-r border-border bg-sidebar flex flex-col sticky top-[57px] self-start h-[calc(100vh-57px)]">
+    <div className="admin-theme min-h-screen bg-background text-foreground">
+      {/* Fixed sidebar */}
+      <aside className="fixed top-0 left-0 h-screen w-[280px] z-10 border-r border-border bg-sidebar flex flex-col overflow-y-auto">
           <div className="p-5 border-b border-sidebar-border">
             <img src={logo} alt="Platin Automotive" className="h-7 w-auto" />
           </div>
