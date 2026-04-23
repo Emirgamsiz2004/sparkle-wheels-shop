@@ -254,7 +254,7 @@ const AdminVerkopenPage = () => {
                         Klant: <span className="text-foreground/80">{row.klantNaam || "Klant nog niet ingevuld"}</span>
                       </p>
                       <p className="text-[11px] text-muted-foreground mt-0.5">
-                        Gestopt bij stap {stap} van 12 — {stapNaam}
+                        Bezig met stap {stap} van 12 — {stapNaam}
                       </p>
                       <p className="text-[11px] text-muted-foreground/70 mt-0.5">
                         Gestart op {startDatum}
@@ -264,7 +264,7 @@ const AdminVerkopenPage = () => {
                       to={`/admin/verkopen/nieuw/${v.id}`}
                       className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium rounded-md bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shrink-0"
                     >
-                      Wizard hervatten
+                      Verkoop hervatten
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
