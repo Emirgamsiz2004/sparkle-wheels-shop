@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, Lock, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Lock, Loader2, Pencil, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useVehicles } from "@/hooks/useVehicles";
-import { brandstofLabels } from "@/types/vehicle";
+import { brandstofLabels, Vehicle } from "@/types/vehicle";
 import logo from "@/assets/logo.svg";
 
 // ─────────────────────────────────────────────────────────────
