@@ -1604,7 +1604,7 @@ const Stap3Klant = (p: Stap3Props) => {
 
       {/* Existing klant zoeker */}
       {mode === "existing" && (
-        <div className="rounded-[14px] border border-border bg-card p-6 space-y-4">
+        <div className="w-full rounded-[14px] border border-border bg-card p-6 space-y-4">
           <InlineKlantTypeToggle zakelijk={p.zakelijk} onChange={switchKlantType} />
           <div>
             <label className={labelCls}>Zoek klant</label>
