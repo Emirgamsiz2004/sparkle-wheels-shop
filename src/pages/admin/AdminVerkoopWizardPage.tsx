@@ -148,6 +148,8 @@ const AdminVerkoopWizardPage = () => {
   const [opmerkingen, setOpmerkingen] = useState<string>("");
   const [contractGetekend, setContractGetekend] = useState<boolean>(false);
   const [pdfGenereerd, setPdfGenereerd] = useState<boolean>(false);
+  const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering">("overboeking");
+  const [financieringMaatschappij, setFinancieringMaatschappij] = useState<string>("");
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
