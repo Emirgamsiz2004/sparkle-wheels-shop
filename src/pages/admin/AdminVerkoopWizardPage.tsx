@@ -503,7 +503,7 @@ const AdminVerkoopWizardPage = () => {
         </aside>
 
       {/* Hoofdinhoud */}
-      <main className="ml-[280px] min-h-screen overflow-y-scroll" style={{ scrollbarGutter: "stable" }}>
+      <main className="ml-[280px] h-screen overflow-y-scroll wizard-content" style={{ scrollbarGutter: "stable" }}>
         <div className="px-8 pt-6 pb-32">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
