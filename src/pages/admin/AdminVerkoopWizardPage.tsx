@@ -332,8 +332,20 @@ const AdminVerkoopWizardPage = () => {
         setVerkoopprijs(vehicle.verkoopprijs || "");
         setVoertuigType((vehicle.btwMargeType as any) || "marge");
         if (vehicle.kilometerstand) setKmStand(vehicle.kilometerstand);
-      }
-
+        }
+        // Stap 6 hydration
+        const e: any = existing;
+        if (e.inruil_type === "particulier" || e.inruil_type === "zakelijk") setStap6DocType(e.inruil_type);
+        setInrVerkVoornaam(e.inruil_verkoper_voornaam || "");
+        setInrVerkAchternaam(e.inruil_verkoper_achternaam || "");
+        setInrVerkGeboortedatum(e.inruil_verkoper_geboortedatum || "");
+        setInrVerkAdres(e.inruil_verkoper_adres || "");
+        setInrVerkPostcode(e.inruil_verkoper_postcode || "");
+        setInrVerkWoonplaats(e.inruil_verkoper_woonplaats || "");
+        setInrVerkTelefoon(e.inruil_verkoper_telefoon || "");
+        setInrContactpersoon(e.inruil_contactpersoon || "");
+        if (["verrekend", "contant", "overboeking"].includes(e.inruil_betaalwijze)) setInrBetaalwijze(e.inruil_betaalwijze);
+        setInkoopverklaringId(e.inruil_inkoopverklaring_id || null);
       if (vehicle.kilometerstand && kmStand === "") setKmStand(vehicle.kilometerstand);
     })();
 
