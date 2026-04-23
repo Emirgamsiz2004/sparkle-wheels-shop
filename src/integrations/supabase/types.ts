@@ -2322,7 +2322,9 @@ export type Database = {
           aanbetaling_betaalwijze: string | null
           aanbetaling_datum: string | null
           aanbetaling_ontvangen: boolean | null
+          afleveradres: string | null
           afleverkosten: number | null
+          afleverwijze: string | null
           bedankbericht_gestuurd: boolean | null
           betaalwijze: string | null
           betaling_datum: string | null
@@ -2393,7 +2395,9 @@ export type Database = {
           aanbetaling_betaalwijze?: string | null
           aanbetaling_datum?: string | null
           aanbetaling_ontvangen?: boolean | null
+          afleveradres?: string | null
           afleverkosten?: number | null
+          afleverwijze?: string | null
           bedankbericht_gestuurd?: boolean | null
           betaalwijze?: string | null
           betaling_datum?: string | null
@@ -2464,7 +2468,9 @@ export type Database = {
           aanbetaling_betaalwijze?: string | null
           aanbetaling_datum?: string | null
           aanbetaling_ontvangen?: boolean | null
+          afleveradres?: string | null
           afleverkosten?: number | null
+          afleverwijze?: string | null
           bedankbericht_gestuurd?: boolean | null
           betaalwijze?: string | null
           betaling_datum?: string | null
