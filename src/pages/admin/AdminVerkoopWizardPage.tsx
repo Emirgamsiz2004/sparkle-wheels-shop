@@ -208,6 +208,10 @@ const AdminVerkoopWizardPage = () => {
       inruil_bedrijfsnaam: inruil && inruilVerkoper === "zakelijk" ? inruilBedrijfsnaam || null : null,
       inruil_kvk: inruil && inruilVerkoper === "zakelijk" ? inruilKvk || null : null,
       inruil_btw: inruil && inruilVerkoper === "zakelijk" ? inruilBtw || null : null,
+      later_ophalen: laterOphalen,
+      leverdatum: laterOphalen ? (leverdatum || null) : new Date().toISOString().slice(0, 10),
+      aanbetaling_bedrag: laterOphalen && aanbetalingBedrag !== "" ? Number(aanbetalingBedrag) : null,
+      aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -218,7 +222,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze]);
 
   const handleVolgende = async () => {
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
