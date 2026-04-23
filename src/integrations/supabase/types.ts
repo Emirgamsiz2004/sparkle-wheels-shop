@@ -2363,7 +2363,9 @@ export type Database = {
           leverdatum: string | null
           moneybird_factuur_id: string | null
           moneybird_factuur_url: string | null
+          opmerkingen: string | null
           overboeking_bedrag: number | null
+          overeenkomstnummer: string | null
           rdw_check_gedaan: boolean | null
           review_gevraagd: boolean | null
           sleutels_aantal: number | null
@@ -2437,7 +2439,9 @@ export type Database = {
           leverdatum?: string | null
           moneybird_factuur_id?: string | null
           moneybird_factuur_url?: string | null
+          opmerkingen?: string | null
           overboeking_bedrag?: number | null
+          overeenkomstnummer?: string | null
           rdw_check_gedaan?: boolean | null
           review_gevraagd?: boolean | null
           sleutels_aantal?: number | null
@@ -2511,7 +2515,9 @@ export type Database = {
           leverdatum?: string | null
           moneybird_factuur_id?: string | null
           moneybird_factuur_url?: string | null
+          opmerkingen?: string | null
           overboeking_bedrag?: number | null
+          overeenkomstnummer?: string | null
           rdw_check_gedaan?: boolean | null
           review_gevraagd?: boolean | null
           sleutels_aantal?: number | null

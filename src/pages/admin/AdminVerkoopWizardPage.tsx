@@ -143,6 +143,12 @@ const AdminVerkoopWizardPage = () => {
   const [garantieLooptijd, setGarantieLooptijd] = useState<number | "">("");
   const [garantiePrijs, setGarantiePrijs] = useState<number | "">("");
 
+  // Stap 5 state
+  const [overeenkomstnummer, setOvereenkomstnummer] = useState<string>("");
+  const [opmerkingen, setOpmerkingen] = useState<string>("");
+  const [contractGetekend, setContractGetekend] = useState<boolean>(false);
+  const [pdfGenereerd, setPdfGenereerd] = useState<boolean>(false);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
@@ -154,6 +160,21 @@ const AdminVerkoopWizardPage = () => {
       document.body.style.overflow = prevBody;
     };
   }, []);
+
+  // Auto-genereer overeenkomstnummer wanneer stap 5 voor het eerst actief is
+  useEffect(() => {
+    if (activeStap === 5 && !overeenkomstnummer && verkoopId) {
+      const year = new Date().getFullYear();
+      (async () => {
+        const { count } = await supabase
+          .from("verkopen")
+          .select("id", { count: "exact", head: true })
+          .not("overeenkomstnummer", "is", null);
+        const nextNum = String((count || 0) + 1).padStart(3, "0");
+        setOvereenkomstnummer(`PA-${year}-${nextNum}`);
+      })();
+    }
+  }, [activeStap, verkoopId, overeenkomstnummer]);
 
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
@@ -241,6 +262,10 @@ const AdminVerkoopWizardPage = () => {
         setGarantiePakket(existing.garantie_pakket || "");
         setGarantieLooptijd(existing.garantie_looptijd ?? "");
         setGarantiePrijs(existing.garantie_prijs ?? "");
+        // Stap 5 hydration
+        setOvereenkomstnummer((existing as any).overeenkomstnummer || "");
+        setOpmerkingen((existing as any).opmerkingen || "");
+        setContractGetekend(!!existing.contract_getekend);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -311,6 +336,10 @@ const AdminVerkoopWizardPage = () => {
       garantie_pakket: garantieType === "autotrust" ? (garantiePakket.trim() || null) : null,
       garantie_looptijd: garantieType === "autotrust" && garantieLooptijd !== "" ? Number(garantieLooptijd) : null,
       garantie_prijs: garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0,
+      overeenkomstnummer: overeenkomstnummer.trim() || null,
+      opmerkingen: opmerkingen.trim() || null,
+      contract_getekend: contractGetekend,
+      contract_getekend_datum: contractGetekend ? new Date().toISOString().slice(0, 10) : null,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -321,7 +350,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
@@ -425,6 +454,12 @@ const AdminVerkoopWizardPage = () => {
         if (!garantiePakket.trim()) { toast.error("Pakket naam is verplicht"); return; }
         if (garantieLooptijd === "" || Number(garantieLooptijd) <= 0) { toast.error("Looptijd is verplicht"); return; }
         if (garantiePrijs === "" || Number(garantiePrijs) < 0) { toast.error("Garantieprijs is verplicht"); return; }
+      }
+    }
+    if (activeStap === 5) {
+      if (!contractGetekend) {
+        toast.error("Bevestig eerst dat de koopovereenkomst getekend is voordat je verder gaat");
+        return;
       }
     }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
@@ -642,7 +677,68 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && activeStap !== 4 && (
+            {activeStap === 5 && (
+              <Stap5Koopovereenkomst
+                vehicle={vehicle}
+                kmStand={kmStand === "" ? (vehicle.kilometerstand || 0) : Number(kmStand)}
+                voertuigType={voertuigType}
+                verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
+                afleverkosten={afleverkosten === "" ? 0 : Number(afleverkosten)}
+                leges={leges === "" ? 0 : Number(leges)}
+                aanbetalingBedrag={aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag)}
+                aanbetalingBetaalwijze={aanbetalingBetaalwijze}
+                leverdatum={leverdatum}
+                klant={{
+                  voornaam: klantVoornaam,
+                  achternaam: klantAchternaam,
+                  adres: klantAdres,
+                  postcode: klantPostcode,
+                  woonplaats: klantWoonplaats,
+                  land: klantLand,
+                  telefoon: klantTelefoon,
+                  email: klantEmail,
+                  geboortedatum: klantGeboortedatum,
+                  zakelijk: klantZakelijk,
+                  bedrijfsnaam: klantBedrijfsnaam,
+                  kvk: klantKvk,
+                  btw: klantBtw,
+                }}
+                garantie={{
+                  type: garantieType,
+                  pakket: garantiePakket,
+                  looptijd: garantieLooptijd === "" ? 0 : Number(garantieLooptijd),
+                  prijs: garantiePrijs === "" ? 0 : Number(garantiePrijs),
+                }}
+                inruil={inruil ? {
+                  kenteken: inruilKenteken,
+                  merk: inruilMerk,
+                  model: inruilModel,
+                  km: inruilKm === "" ? 0 : Number(inruilKm),
+                  waarde: inruilWaarde === "" ? 0 : Number(inruilWaarde),
+                } : null}
+                overeenkomstnummer={overeenkomstnummer}
+                setOvereenkomstnummer={setOvereenkomstnummer}
+                opmerkingen={opmerkingen}
+                setOpmerkingen={setOpmerkingen}
+                contractGetekend={contractGetekend}
+                setContractGetekend={(v) => {
+                  setContractGetekend(v);
+                  // Direct opslaan zodat status persistent is
+                  if (verkoopId) {
+                    supabase.from("verkopen").update({
+                      contract_getekend: v,
+                      contract_getekend_datum: v ? new Date().toISOString().slice(0, 10) : null,
+                    }).eq("id", verkoopId);
+                  }
+                }}
+                pdfGenereerd={pdfGenereerd}
+                setPdfGenereerd={setPdfGenereerd}
+                onAutoSave={() => saveCurrent()}
+                verkoopId={verkoopId}
+              />
+            )}
+
+            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && activeStap !== 4 && activeStap !== 5 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
@@ -2184,6 +2280,285 @@ const Stap4Garantie = ({
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// Stap 5 — Koopovereenkomst
+// ─────────────────────────────────────────────────────────────
+interface Stap5Props {
+  vehicle: any;
+  kmStand: number;
+  voertuigType: "marge" | "btw" | "consignatie";
+  verkoopprijs: number;
+  afleverkosten: number;
+  leges: number;
+  aanbetalingBedrag: number;
+  aanbetalingBetaalwijze: Betaalwijze;
+  leverdatum: string;
+  klant: {
+    voornaam: string;
+    achternaam: string;
+    adres: string;
+    postcode: string;
+    woonplaats: string;
+    land: string;
+    telefoon: string;
+    email: string;
+    geboortedatum: string;
+    zakelijk: boolean;
+    bedrijfsnaam: string;
+    kvk: string;
+    btw: string;
+  };
+  garantie: {
+    type: "geen" | "autotrust";
+    pakket: string;
+    looptijd: number;
+    prijs: number;
+  };
+  inruil: { kenteken: string; merk: string; model: string; km: number; waarde: number } | null;
+  overeenkomstnummer: string;
+  setOvereenkomstnummer: (v: string) => void;
+  opmerkingen: string;
+  setOpmerkingen: (v: string) => void;
+  contractGetekend: boolean;
+  setContractGetekend: (v: boolean) => void;
+  pdfGenereerd: boolean;
+  setPdfGenereerd: (v: boolean) => void;
+  onAutoSave: () => Promise<any>;
+  verkoopId: string | null;
+}
+
+const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
+  const fmtEur = (n: number) =>
+    new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(n || 0);
+
+  const garantieKosten = p.garantie.type === "autotrust" ? (p.garantie.prijs || 0) : 0;
+  const totaal = p.verkoopprijs + (p.afleverkosten || 0) + (p.leges || 0) + garantieKosten;
+  const restbedrag = totaal - (p.aanbetalingBedrag || 0);
+
+  const klantNaam = p.klant.zakelijk && p.klant.bedrijfsnaam
+    ? p.klant.bedrijfsnaam
+    : `${p.klant.voornaam} ${p.klant.achternaam}`.trim();
+
+  const voertuigTypeLabel = p.voertuigType === "marge" ? "Marge" : p.voertuigType === "btw" ? "BTW" : "Consignatie";
+
+  const handleGenereerPdf = async () => {
+    try {
+      // Eerst opslaan
+      await p.onAutoSave();
+
+      const { buildKoopovereenkomstDoc } = await import("@/lib/koopovereenkomstPdf");
+      const doc = buildKoopovereenkomstDoc({
+        voertuig: {
+          merk: p.vehicle.merk,
+          model: p.vehicle.model,
+          bouwjaar: p.vehicle.bouwjaar || 0,
+          kenteken: p.vehicle.kenteken || "",
+          kilometerstand: p.kmStand,
+          vin: p.vehicle.chassisNummer || p.vehicle.chassis_nummer,
+          kleur: p.vehicle.kleur,
+          brandstof: p.vehicle.brandstof,
+          uitvoering: p.vehicle.uitvoering,
+        },
+        klant: {
+          voornaam: p.klant.voornaam,
+          achternaam: p.klant.achternaam,
+          adres: p.klant.adres,
+          postcode: p.klant.postcode,
+          woonplaats: p.klant.woonplaats,
+          telefoon: p.klant.telefoon,
+          email: p.klant.email,
+          geboortedatum: p.klant.geboortedatum,
+        },
+        financieel: {
+          verkoopprijs: p.verkoopprijs,
+          betaalwijze: p.aanbetalingBetaalwijze || "overboeking",
+          aanbetalingActief: (p.aanbetalingBedrag || 0) > 0,
+          aanbetalingsbedrag: p.aanbetalingBedrag,
+          restbedrag,
+        },
+        garantie: {
+          type: p.garantie.type,
+          maanden: p.garantie.looptijd,
+          kosten: garantieKosten,
+          betaler: garantieKosten > 0 ? "klant" : "geen",
+        },
+        wwftBevestigd: false,
+        datum: new Date().toISOString().slice(0, 10),
+        plaats: "Roelofarendsveen",
+        afleverDatum: p.leverdatum,
+        opmerkingen: p.opmerkingen,
+      });
+
+      // Open PDF in nieuw tabblad
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+
+      // Upload naar storage en koppel aan verkoop_documenten
+      if (p.verkoopId) {
+        try {
+          const fileName = `koopovereenkomst-${p.overeenkomstnummer || p.verkoopId}.pdf`;
+          const path = `verkopen/${p.verkoopId}/${fileName}`;
+          const { error: upErr } = await supabase.storage
+            .from("vehicle-documents")
+            .upload(path, blob, { contentType: "application/pdf", upsert: true });
+          if (!upErr) {
+            const { data: signed } = await supabase.storage
+              .from("vehicle-documents")
+              .createSignedUrl(path, 60 * 60 * 24 * 365);
+            await supabase.from("verkoop_documenten").insert({
+              verkoop_id: p.verkoopId,
+              type: "koopovereenkomst",
+              pdf_url: signed?.signedUrl || path,
+            });
+          }
+        } catch (err) {
+          console.warn("Upload koopovereenkomst mislukt", err);
+        }
+      }
+
+      p.setPdfGenereerd(true);
+      toast.success("Koopovereenkomst gegenereerd");
+    } catch (err) {
+      console.error(err);
+      toast.error("Genereren van PDF mislukt");
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Sectie 1 — Samenvatting */}
+      <div>
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-3">Samenvatting</div>
+        <div className="grid md:grid-cols-3 gap-4">
+          {/* Voertuig */}
+          <div className="rounded-[14px] border border-border bg-card p-5">
+            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Voertuig</div>
+            <div className="space-y-1.5 text-sm">
+              <div className="font-medium text-foreground">{p.vehicle.merk} {p.vehicle.model}</div>
+              <div className="text-muted-foreground">Bouwjaar {p.vehicle.bouwjaar || "—"}</div>
+              <div className="font-mono uppercase text-foreground">{p.vehicle.kenteken || "—"}</div>
+              <div className="text-muted-foreground">{p.kmStand.toLocaleString("nl-NL")} km</div>
+              <div className="pt-2">
+                <span className="inline-block px-2 py-0.5 rounded-full bg-foreground/10 text-foreground text-[11px] font-medium">{voertuigTypeLabel}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Klant */}
+          <div className="rounded-[14px] border border-border bg-card p-5">
+            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Klant</div>
+            <div className="space-y-1.5 text-sm">
+              <div className="font-medium text-foreground">{klantNaam || "—"}</div>
+              {p.klant.zakelijk && p.klant.bedrijfsnaam && (
+                <div className="text-muted-foreground">Contact: {p.klant.voornaam} {p.klant.achternaam}</div>
+              )}
+              <div className="text-muted-foreground">{p.klant.adres || "—"}</div>
+              <div className="text-muted-foreground">{p.klant.postcode} {p.klant.woonplaats}</div>
+              {p.klant.zakelijk ? (
+                <div className="text-muted-foreground">KVK: {p.klant.kvk || "—"}</div>
+              ) : (
+                <div className="text-muted-foreground">Geboren: {p.klant.geboortedatum ? new Date(p.klant.geboortedatum).toLocaleDateString("nl-NL") : "—"}</div>
+              )}
+            </div>
+          </div>
+
+          {/* Financieel */}
+          <div className="rounded-[14px] border border-border bg-card p-5">
+            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Financieel</div>
+            <div className="space-y-1.5 text-sm">
+              <div className="flex justify-between"><span className="text-muted-foreground">Verkoopprijs</span><span className="text-foreground">{fmtEur(p.verkoopprijs)}</span></div>
+              {p.afleverkosten > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Afleverkosten</span><span className="text-foreground">{fmtEur(p.afleverkosten)}</span></div>}
+              {p.leges > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Leges</span><span className="text-foreground">{fmtEur(p.leges)}</span></div>}
+              {garantieKosten > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Garantie</span><span className="text-foreground">{fmtEur(garantieKosten)}</span></div>}
+              {(p.aanbetalingBedrag || 0) > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Aanbetaling</span><span className="text-foreground">- {fmtEur(p.aanbetalingBedrag)}</span></div>}
+              <div className="border-t border-border pt-1.5 mt-1.5 flex justify-between font-medium"><span className="text-foreground">Restbedrag</span><span className="text-foreground">{fmtEur(restbedrag)}</span></div>
+              <div className="pt-2 text-xs text-muted-foreground">
+                Garantie: {p.garantie.type === "geen" ? "Geen" : `${p.garantie.pakket || "Autotrust"} — ${p.garantie.looptijd || 0} mnd`}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sectie 2 — Extra opties */}
+      <div className="rounded-[14px] border border-border bg-card p-6 space-y-4">
+        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Extra</div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Overeenkomstnummer</label>
+            <input
+              type="text"
+              value={p.overeenkomstnummer}
+              onChange={(e) => p.setOvereenkomstnummer(e.target.value)}
+              placeholder="PA-2026-001"
+              className={`${inputCls} font-mono`}
+            />
+          </div>
+        </div>
+        <div>
+          <label className={labelCls}>Opmerkingen / bijzonderheden (optioneel)</label>
+          <textarea
+            value={p.opmerkingen}
+            onChange={(e) => p.setOpmerkingen(e.target.value)}
+            rows={3}
+            placeholder="Vermeld bijzonderheden die op de koopovereenkomst moeten verschijnen…"
+            className={`${inputCls} resize-y min-h-[80px]`}
+          />
+        </div>
+      </div>
+
+      {/* Sectie 3 — Genereren */}
+      <div className="rounded-[14px] border border-border bg-card p-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="text-sm font-medium text-foreground mb-1">Koopovereenkomst genereren</div>
+            <p className="text-xs text-muted-foreground max-w-md">
+              Genereer een professionele PDF op basis van bovenstaande gegevens. De overeenkomst opent in een nieuw tabblad om te printen.
+            </p>
+          </div>
+          <button
+            onClick={handleGenereerPdf}
+            className="inline-flex items-center gap-2 px-5 py-3 bg-foreground text-background rounded-[10px] hover:bg-foreground/90 transition-colors text-sm font-medium"
+          >
+            <FileText className="w-4 h-4" />
+            Koopovereenkomst genereren (PDF)
+          </button>
+        </div>
+        {p.pdfGenereerd && (
+          <div className="mt-4 flex items-center gap-2 text-xs text-emerald-400">
+            <Check className="w-4 h-4" />
+            PDF is gegenereerd en geopend in nieuw tabblad
+          </div>
+        )}
+      </div>
+
+      {/* Sectie 4 — Bevestiging */}
+      <div className={cn(
+        "rounded-[14px] border p-6 transition-colors",
+        p.contractGetekend ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-card"
+      )}>
+        <label className="flex items-start gap-4 cursor-pointer">
+          <div className="pt-0.5">
+            <Switch
+              checked={p.contractGetekend}
+              onCheckedChange={p.setContractGetekend}
+            />
+          </div>
+          <div className="flex-1">
+            <div className="text-sm font-medium text-foreground">
+              Koopovereenkomst is uitgeprint en door beide partijen ondertekend
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Stap 6 en verder zijn pas beschikbaar zodra deze bevestiging is aangevinkt.
+            </p>
+          </div>
+        </label>
+      </div>
     </div>
   );
 };
