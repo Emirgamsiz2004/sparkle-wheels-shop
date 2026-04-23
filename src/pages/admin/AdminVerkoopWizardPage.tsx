@@ -1721,64 +1721,69 @@ const Stap3Klant = (p: Stap3Props) => {
             </div>
           </div>
 
-          {/* Geboortedatum alleen voor particulier — fade */}
+          {/* Geboortedatum alleen voor particulier — smooth height + fade + slide */}
           <div
             className={cn(
-              "transition-all duration-200 ease-out overflow-hidden",
-              !p.zakelijk ? "opacity-100 max-h-[120px] animate-fade-in" : "opacity-0 max-h-0 pointer-events-none",
+              "grid transition-all duration-[250ms] ease-out",
+              !p.zakelijk ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0 pointer-events-none",
             )}
           >
-            {!p.zakelijk && (
-            <div>
-              <label className={labelCls}>Geboortedatum *</label>
-              <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                      !p.geboortedatum && "text-muted-foreground",
-                    )}
-                  >
-                    <span>
-                      {p.geboortedatum
-                        ? format(parseISO(p.geboortedatum), "d MMMM yyyy", { locale: nl })
-                        : "Kies een datum"}
-                    </span>
-                    <CalendarIcon className="h-4 w-4 text-foreground/70" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={p.geboortedatum ? parseISO(p.geboortedatum) : undefined}
-                    onSelect={(d) => {
-                      if (d) {
-                        const yyyy = d.getFullYear();
-                        const mm = String(d.getMonth() + 1).padStart(2, "0");
-                        const dd = String(d.getDate()).padStart(2, "0");
-                        p.setGeboortedatum(`${yyyy}-${mm}-${dd}`);
-                        setDatePickerOpen(false);
-                      }
-                    }}
-                    captionLayout="dropdown-buttons"
-                    fromYear={1920}
-                    toYear={new Date().getFullYear()}
-                    defaultMonth={p.geboortedatum ? parseISO(p.geboortedatum) : new Date(1990, 0, 1)}
-                    disabled={(date) => date > new Date()}
-                    initialFocus
-                    locale={nl}
-                    className={cn("p-3 pointer-events-auto")}
-                    classNames={{
-                      day_selected:
-                        "bg-emerald-600 text-white rounded-full border-0 ring-0 hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white focus:ring-0 focus:outline-none",
-                      day_today: "bg-muted text-foreground font-semibold",
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
+            <div className="overflow-hidden min-h-0">
+              <div
+                className={cn(
+                  "transition-all duration-[250ms] ease-out",
+                  !p.zakelijk ? "translate-y-0" : "-translate-y-2",
+                )}
+              >
+                <label className={labelCls}>Geboortedatum *</label>
+                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        !p.geboortedatum && "text-muted-foreground",
+                      )}
+                    >
+                      <span>
+                        {p.geboortedatum
+                          ? format(parseISO(p.geboortedatum), "d MMMM yyyy", { locale: nl })
+                          : "Kies een datum"}
+                      </span>
+                      <CalendarIcon className="h-4 w-4 text-foreground/70" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={p.geboortedatum ? parseISO(p.geboortedatum) : undefined}
+                      onSelect={(d) => {
+                        if (d) {
+                          const yyyy = d.getFullYear();
+                          const mm = String(d.getMonth() + 1).padStart(2, "0");
+                          const dd = String(d.getDate()).padStart(2, "0");
+                          p.setGeboortedatum(`${yyyy}-${mm}-${dd}`);
+                          setDatePickerOpen(false);
+                        }
+                      }}
+                      captionLayout="dropdown-buttons"
+                      fromYear={1920}
+                      toYear={new Date().getFullYear()}
+                      defaultMonth={p.geboortedatum ? parseISO(p.geboortedatum) : new Date(1990, 0, 1)}
+                      disabled={(date) => date > new Date()}
+                      initialFocus
+                      locale={nl}
+                      className={cn("p-3 pointer-events-auto")}
+                      classNames={{
+                        day_selected:
+                          "bg-emerald-600 text-white rounded-full border-0 ring-0 hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white focus:ring-0 focus:outline-none",
+                        day_today: "bg-muted text-foreground font-semibold",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-            )}
           </div>
 
           <div>
