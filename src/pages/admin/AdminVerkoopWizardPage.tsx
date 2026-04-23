@@ -108,11 +108,14 @@ const AdminVerkoopWizardPage = () => {
   const [inruilBtw, setInruilBtw] = useState("");
 
   // Stap 2 state
-  const [laterOphalen, setLaterOphalen] = useState<boolean>(false);
+  const [afleverwijze, setAfleverwijze] = useState<"vandaag" | "later" | "aflevering">("vandaag");
+  const [afleveradres, setAfleveradres] = useState<string>("");
   const [leverdatum, setLeverdatum] = useState<string>("");
   const [aanbetalingBedrag, setAanbetalingBedrag] = useState<number | "">("");
   const [aanbetalingBetaalwijze, setAanbetalingBetaalwijze] = useState<Betaalwijze>("");
   const [aanbetalingBankrekening, setAanbetalingBankrekening] = useState<string>("");
+  // Compat: laterOphalen blijft afgeleid
+  const laterOphalen = afleverwijze !== "vandaag";
 
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
