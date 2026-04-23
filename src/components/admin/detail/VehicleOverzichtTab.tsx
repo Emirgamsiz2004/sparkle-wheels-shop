@@ -152,14 +152,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           )}
         </div>
 
-        {/* Right - Financial summary - simplified */}
+        {/* Right - Financial summary - simplified to 3 lines */}
         <div className="bg-card border border-border rounded-lg p-4 space-y-0">
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Financieel overzicht</h3>
           <table className="w-full text-sm">
             <tbody>
               <EditableEuroRow label="Inkoopprijs" value={vehicle.inkoopprijs} onSave={async (val) => { await onSave({ ...vehicle, inkoopprijs: val }); onLogActivity("inkoopprijs_gewijzigd", `Inkoopprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} />
               <EditableEuroRow label="Verkoopprijs" value={vehicle.verkoopprijs} onSave={async (val) => { await onSave({ ...vehicle, verkoopprijs: val }); onLogActivity("verkoopprijs_gewijzigd", `Verkoopprijs aangepast naar € ${val.toLocaleString("nl-NL")}`); }} />
-              <InfoRow label="Marge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(nettoMarge) : "—"} valueColor={nettoMarge >= 0 ? "text-emerald-500" : "text-red-500"} isLast />
+              <InfoRow label="Marge" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(winstSimple(vehicle)) : "—"} valueColor={winstSimple(vehicle) >= 0 ? "text-emerald-500" : "text-red-500"} isLast />
             </tbody>
           </table>
         </div>
