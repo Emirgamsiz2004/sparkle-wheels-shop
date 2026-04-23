@@ -274,7 +274,7 @@ const AdminVerkoopWizardPage = () => {
 
       <div className="flex-1 flex">
         {/* Sidebar */}
-        <aside className="w-[280px] shrink-0 border-r border-border bg-sidebar flex flex-col">
+        <aside className="w-[280px] shrink-0 border-r border-border bg-sidebar flex flex-col sticky top-[57px] self-start h-[calc(100vh-57px)]">
           <div className="p-5 border-b border-sidebar-border">
             <img src={logo} alt="Platin Automotive" className="h-7 w-auto" />
           </div>
