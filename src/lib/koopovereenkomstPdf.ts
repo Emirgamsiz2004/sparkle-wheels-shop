@@ -99,169 +99,208 @@ function buildHtml(data: KoopovereenkomstData): string {
     ? data.klant.bedrijfsnaam
     : `${data.klant.voornaam} ${data.klant.achternaam}`.trim();
 
-  const klantIdRow = data.klant.isZakelijk
-    ? `<div><span class="lbl">KVK:</span> ${escapeHtml(data.klant.kvk || "—")}</div>`
-    : `<div><span class="lbl">Geb.datum:</span> ${escapeHtml(formatDate(data.klant.geboortedatum))}</div>`;
+  const klantIdLine = data.klant.isZakelijk
+    ? `KVK: ${escapeHtml(data.klant.kvk || "—")}`
+    : `Geb.datum: ${escapeHtml(formatDate(data.klant.geboortedatum))}`;
+
+  const field = (label: string, value: string) =>
+    `<div class="field"><div class="f-lbl">${label}</div><div class="f-val">${value}</div></div>`;
 
   return `
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: Helvetica, Arial, sans-serif;
-    color: #000;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111;
     background: #fff;
     width: 794px;
-    padding: 36px 44px;
+    padding: 57px 57px;
     font-size: 9px;
-    line-height: 1.45;
+    line-height: 1.4;
   }
-  .hr { border: none; border-top: 0.5px solid #cccccc; margin: 10px 0; }
+
+  /* HEADER */
   .header { display: flex; justify-content: space-between; align-items: flex-start; }
-  .header .left { width: 60%; }
-  .header .right { width: 40%; text-align: right; }
-  .brand { font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #000; }
-  .meta { font-size: 9px; color: #000; margin-top: 4px; }
-  .meta div { margin-top: 1px; }
-  .doctitle { font-size: 14px; font-weight: 700; letter-spacing: 1.5px; color: #000; }
-  .docnum { font-size: 9px; margin-top: 6px; color: #000; }
-
-  .section-title {
-    font-size: 8px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    font-weight: 600;
-    margin-bottom: 6px;
+  .header .left { width: 55%; }
+  .header .right { width: 45%; text-align: right; }
+  .brand-platin { font-size: 22px; font-weight: 700; letter-spacing: 0; color: #000; line-height: 1; }
+  .brand-sub {
+    font-size: 9px; letter-spacing: 4px; color: #888; margin-top: 2px;
+    border-bottom: 1px solid #ddd; padding-bottom: 4px; display: inline-block; padding-right: 20px;
   }
-  .cols { display: flex; gap: 4%; }
-  .col { width: 48%; }
-  .col p { margin-top: 1px; font-size: 9px; }
-  .col .name { font-weight: 700; font-size: 10px; margin-bottom: 2px; }
+  .brand-meta { font-size: 8px; color: #777; margin-top: 5px; line-height: 1.5; }
+  .doctitle { font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #000; }
+  .docmeta { font-size: 9px; color: #777; margin-top: 4px; }
+  .thick-hr { border: none; border-top: 2px solid #000; margin: 8px 0 12px; }
 
-  .grid2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 32px;
-    row-gap: 4px;
-  }
-  .grid2 > div { font-size: 9px; }
-  .lbl { color: #555; display: inline-block; min-width: 78px; }
-
-  .fin-row {
+  /* PARTY BOX */
+  .party-box {
+    background: #f8f8f8;
+    border-radius: 4px;
+    padding: 10px;
     display: flex;
-    justify-content: space-between;
-    font-size: 9px;
-    padding: 2px 0;
+    gap: 4%;
   }
-  .fin-row.divider { border-top: 0.5px solid #cccccc; margin-top: 4px; padding-top: 4px; }
+  .party { width: 48%; }
+  .party-lbl { font-size: 7px; color: #888; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px; font-weight: 600; }
+  .party-name { font-size: 10px; font-weight: 700; color: #000; margin-bottom: 2px; }
+  .party p { font-size: 9px; line-height: 1.5; color: #222; }
+
+  /* SECTION TITLES */
+  .sec { margin-top: 12px; }
+  .sec-title {
+    font-size: 7px; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; font-weight: 600;
+    border-bottom: 0.5px solid #ddd; padding-bottom: 3px; margin-bottom: 8px;
+  }
+
+  /* VEHICLE GRID */
+  .v-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 16px; row-gap: 6px; }
+  .field .f-lbl { font-size: 7px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  .field .f-val { font-size: 9px; font-weight: 700; color: #000; margin-top: 1px; }
+
+  /* FINANCIEEL */
+  .fin-row { display: flex; justify-content: space-between; font-size: 9px; padding: 2px 0; }
+  .fin-row .desc { color: #222; }
+  .fin-row .amt { color: #000; font-variant-numeric: tabular-nums; }
+  .fin-divider { border-top: 0.5px solid #bbb; margin: 4px 0; }
   .fin-row.bold { font-weight: 700; }
-  .fin-meta { font-size: 9px; margin-top: 6px; }
+  .fin-row.rest { font-weight: 700; font-size: 11px; padding-top: 4px; }
+  .fin-meta { font-size: 8.5px; color: #333; margin-top: 6px; }
+  .fin-meta strong { color: #000; }
 
-  .small { font-size: 8px; color: #555; line-height: 1.5; }
+  /* GARANTIE BOX */
+  .garantie-box {
+    background: #fffbf0;
+    border-left: 3px solid #f0a500;
+    padding: 8px 10px;
+    margin-top: 12px;
+    font-size: 7.5px;
+    color: #555;
+    line-height: 1.5;
+  }
 
-  .signs { display: flex; gap: 4%; margin-top: 12px; }
-  .sign { width: 48%; }
-  .sign .role { font-weight: 700; font-size: 9px; }
-  .sign .who { font-size: 9px; margin-bottom: 14px; }
-  .sign .line { font-size: 9px; margin-top: 4px; }
-  .sign .siglabel { font-size: 9px; margin-top: 10px; }
-  .sign .sigbox { border-bottom: 0.5px solid #999; height: 28px; margin-top: 4px; }
+  /* OPMERKINGEN */
+  .opm { font-size: 8px; color: #555; margin-top: 8px; }
+  .opm strong { color: #000; }
 
-  .footer { font-size: 8px; color: #777; text-align: center; margin-top: 14px; }
+  /* HANDTEKENINGEN */
+  .signs { display: flex; gap: 8%; margin-top: 18px; }
+  .sign { width: 46%; }
+  .sign .role { font-size: 7px; color: #888; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; }
+  .sign .who { font-size: 10px; font-weight: 700; color: #000; margin-top: 2px; margin-bottom: 10px; }
+  .sign .row { font-size: 8.5px; color: #333; margin-top: 6px; }
+  .sign .siglabel { font-size: 8.5px; color: #333; margin-top: 10px; }
+  .sign .sigbox { border-bottom: 0.5px solid #888; height: 26px; margin-top: 4px; }
+
+  /* FOOTER */
+  .footer-hr { border: none; border-top: 0.5px solid #ddd; margin-top: 14px; }
+  .footer { font-size: 7px; color: #999; text-align: center; margin-top: 6px; }
 </style></head>
 <body>
+
+  <!-- HEADER -->
   <div class="header">
     <div class="left">
-      <div class="brand">PLATIN AUTOMOTIVE</div>
-      <div class="meta">
+      <div class="brand-platin">PLATIN</div>
+      <div class="brand-sub">AUTOMOTIVE</div>
+      <div class="brand-meta">
         <div>Cilinderweg 99 | 2371DZ Roelofarendsveen</div>
         <div>Tel: 06-12693825 | info@platinautomotive.nl</div>
         <div>IBAN: NL54 INGB 0117 0493 36</div>
-        <div>KVK: ${escapeHtml(data.bedrijf?.kvk || "99146193")}</div>
       </div>
     </div>
     <div class="right">
       <div class="doctitle">KOOPOVEREENKOMST</div>
-      <div class="docnum">Overeenkomstnummer: ${escapeHtml(data.overeenkomstnummer || "—")}</div>
-      <div class="docnum">Datum: ${escapeHtml(formatDate(data.datum))}</div>
+      <div class="docmeta">Nr: ${escapeHtml(data.overeenkomstnummer || "—")}</div>
+      <div class="docmeta">Datum: ${escapeHtml(formatDate(data.datum))}</div>
     </div>
   </div>
-  <hr class="hr"/>
+  <hr class="thick-hr"/>
 
-  <div class="cols">
-    <div class="col">
-      <div class="section-title">Verkoper</div>
-      <p class="name">Platin Automotive</p>
+  <!-- VERKOPER / KOPER -->
+  <div class="party-box">
+    <div class="party">
+      <div class="party-lbl">Verkoper</div>
+      <div class="party-name">Platin Automotive</div>
       <p>Cilinderweg 99</p>
       <p>2371DZ Roelofarendsveen</p>
       <p>Tel: 06-12693825</p>
-      <p>info@platinautomotive.nl</p>
     </div>
-    <div class="col">
-      <div class="section-title">Koper</div>
-      <p class="name">${escapeHtml(klantNaam)}</p>
+    <div class="party">
+      <div class="party-lbl">Koper</div>
+      <div class="party-name">${escapeHtml(klantNaam)}</div>
       <p>${escapeHtml(data.klant.adres || "—")}</p>
       <p>${escapeHtml(`${data.klant.postcode || ""} ${data.klant.woonplaats || ""}`.trim() || "—")}</p>
       <p>Tel: ${escapeHtml(data.klant.telefoon || "—")}</p>
-      <p>Email: ${escapeHtml(data.klant.email || "—")}</p>
-      <p>${data.klant.isZakelijk ? `KVK: ${escapeHtml(data.klant.kvk || "—")}` : `Geb.datum: ${escapeHtml(formatDate(data.klant.geboortedatum))}`}</p>
+      <p>${escapeHtml(data.klant.email || "—")}</p>
+      <p>${klantIdLine}</p>
     </div>
   </div>
-  <hr class="hr"/>
 
-  <div class="section-title">Voertuiggegevens</div>
-  <div class="grid2">
-    <div><span class="lbl">Merk:</span> ${escapeHtml(data.voertuig.merk)}</div>
-    <div><span class="lbl">Kleur:</span> ${escapeHtml(data.voertuig.kleur || "—")}</div>
-    <div><span class="lbl">Model:</span> ${escapeHtml(data.voertuig.model)}</div>
-    <div><span class="lbl">Brandstof:</span> ${escapeHtml(data.voertuig.brandstof || "—")}</div>
-    <div><span class="lbl">Uitvoering:</span> ${escapeHtml(data.voertuig.uitvoering || "—")}</div>
-    <div><span class="lbl">Bouwjaar:</span> ${escapeHtml(String(data.voertuig.bouwjaar || "—"))}</div>
-    <div><span class="lbl">Kenteken:</span> ${escapeHtml(data.voertuig.kenteken || "—")}</div>
-    <div><span class="lbl">NAP:</span> ${data.voertuig.nap === false ? "Nee" : "Ja"}</div>
-    <div><span class="lbl">Chassisnr:</span> ${escapeHtml(data.voertuig.vin || "—")}</div>
-    <div><span class="lbl">APK tot:</span> ${escapeHtml(formatDate(data.voertuig.apkTot))}</div>
-    <div><span class="lbl">KM-stand:</span> ${(data.voertuig.kilometerstand || 0).toLocaleString("nl-NL")}</div>
-    <div><span class="lbl">BTW:</span> ${escapeHtml(data.voertuig.btwType || "Marge")}</div>
+  <!-- VOERTUIG -->
+  <div class="sec">
+    <div class="sec-title">Voertuiggegevens</div>
+    <div class="v-grid">
+      ${field("Merk", escapeHtml(data.voertuig.merk || "—"))}
+      ${field("Kenteken", escapeHtml(data.voertuig.kenteken || "—"))}
+      ${field("Kleur", escapeHtml(data.voertuig.kleur || "—"))}
+      ${field("Model", escapeHtml(data.voertuig.model || "—"))}
+      ${field("Chassisnr", escapeHtml(data.voertuig.vin || "—"))}
+      ${field("Brandstof", escapeHtml(data.voertuig.brandstof || "—"))}
+      ${field("KM-stand", (data.voertuig.kilometerstand || 0).toLocaleString("nl-NL"))}
+      ${field("Bouwjaar", escapeHtml(String(data.voertuig.bouwjaar || "—")))}
+      ${field("APK tot", escapeHtml(formatDate(data.voertuig.apkTot)))}
+      ${field("Uitvoering", escapeHtml(data.voertuig.uitvoering || "—"))}
+      ${field("NAP", data.voertuig.nap === false ? "Nee" : "Ja")}
+      ${field("BTW", escapeHtml(data.voertuig.btwType || "Marge"))}
+    </div>
   </div>
-  <hr class="hr"/>
 
-  <div class="section-title">Financieel</div>
-  <div class="fin-row"><span>Voertuigprijs</span><span>${formatEur(data.financieel.verkoopprijs)}</span></div>
-  ${garantieKosten > 0 ? `<div class="fin-row"><span>Garantie ${data.garantie.type === "autotrust" ? "AutoTrust" : "Platin"} ${data.garantie.maanden || 12} mnd</span><span>${formatEur(garantieKosten)}</span></div>` : ""}
-  ${(data.financieel.afleverkosten || 0) > 0 ? `<div class="fin-row"><span>Afleverkosten</span><span>${formatEur(data.financieel.afleverkosten || 0)}</span></div>` : ""}
-  ${(data.financieel.leges || 0) > 0 ? `<div class="fin-row"><span>Leges</span><span>${formatEur(data.financieel.leges || 0)}</span></div>` : ""}
-  <div class="fin-row divider bold"><span>Totaalbedrag</span><span>${formatEur(totaal)}</span></div>
-  ${aanbetaling > 0 ? `<div class="fin-row"><span>Aanbetaling</span><span>- ${formatEur(aanbetaling)}</span></div>` : ""}
-  ${aanbetaling > 0 ? `<div class="fin-row bold"><span>Restbedrag</span><span>${formatEur(restbedrag)}</span></div>` : ""}
-  <div class="fin-meta"><strong>Betaalwijze:</strong> ${escapeHtml(data.financieel.betaalwijze || "—")}</div>
-  <div class="fin-meta"><strong>Verwachte leverdatum:</strong> ${escapeHtml(formatDate(data.afleverDatum))}</div>
-  <hr class="hr"/>
+  <!-- FINANCIEEL -->
+  <div class="sec">
+    <div class="sec-title">Financieel</div>
+    <div class="fin-row"><span class="desc">Voertuigprijs</span><span class="amt">${formatEur(data.financieel.verkoopprijs)}</span></div>
+    ${garantieKosten > 0 ? `<div class="fin-row"><span class="desc">Garantie ${data.garantie.type === "autotrust" ? "AutoTrust" : "Platin"} ${data.garantie.maanden || 12} mnd</span><span class="amt">${formatEur(garantieKosten)}</span></div>` : ""}
+    ${(data.financieel.afleverkosten || 0) > 0 ? `<div class="fin-row"><span class="desc">Afleverkosten</span><span class="amt">${formatEur(data.financieel.afleverkosten || 0)}</span></div>` : ""}
+    ${(data.financieel.leges || 0) > 0 ? `<div class="fin-row"><span class="desc">Leges</span><span class="amt">${formatEur(data.financieel.leges || 0)}</span></div>` : ""}
+    <div class="fin-divider"></div>
+    <div class="fin-row bold"><span class="desc">Totaalbedrag</span><span class="amt">${formatEur(totaal)}</span></div>
+    ${aanbetaling > 0 ? `<div class="fin-row"><span class="desc">Aanbetaling</span><span class="amt">- ${formatEur(aanbetaling)}</span></div>` : ""}
+    ${aanbetaling > 0 ? `<div class="fin-row rest"><span class="desc">Restbedrag</span><span class="amt">${formatEur(restbedrag)}</span></div>` : ""}
+    <div class="fin-meta"><strong>Betaalwijze:</strong> ${escapeHtml(data.financieel.betaalwijze || "—")}</div>
+    <div class="fin-meta"><strong>Verwachte leverdatum:</strong> ${escapeHtml(formatDate(data.afleverDatum))}</div>
+  </div>
 
-  <div class="small">${escapeHtml(garantieTekst)}</div>
-  ${data.opmerkingen ? `<div class="small" style="margin-top:6px;"><strong>Opmerkingen:</strong> ${escapeHtml(data.opmerkingen)}</div>` : ""}
+  <!-- GARANTIETEKST -->
+  <div class="garantie-box">${escapeHtml(garantieTekst)}</div>
 
+  ${data.opmerkingen ? `<div class="opm"><strong>Opmerkingen:</strong> ${escapeHtml(data.opmerkingen)}</div>` : ""}
+
+  <!-- HANDTEKENINGEN -->
   <div class="signs">
     <div class="sign">
       <div class="role">Verkoper</div>
       <div class="who">Platin Automotive</div>
-      <div class="line">Datum: ................</div>
+      <div class="row">Datum: _______________</div>
+      <div class="row">Plaats: _______________</div>
       <div class="siglabel">Handtekening:</div>
       <div class="sigbox"></div>
     </div>
     <div class="sign">
       <div class="role">Koper</div>
       <div class="who">${escapeHtml(klantNaam)}</div>
-      <div class="line">Datum: ................</div>
+      <div class="row">Datum: _______________</div>
+      <div class="row">Plaats: _______________</div>
       <div class="siglabel">Handtekening:</div>
       <div class="sigbox"></div>
     </div>
   </div>
 
-  <hr class="hr"/>
+  <hr class="footer-hr"/>
   <div class="footer">
-    Op deze overeenkomst zijn onze algemene voorwaarden van toepassing. Platin Automotive — platinautomotive.nl
+    Op deze overeenkomst zijn onze algemene voorwaarden van toepassing | Platin Automotive | platinautomotive.nl | KVK: ${escapeHtml(data.bedrijf?.kvk || "99146193")}
   </div>
 </body></html>`;
 }
