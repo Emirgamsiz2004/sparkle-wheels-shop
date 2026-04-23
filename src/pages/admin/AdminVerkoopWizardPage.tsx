@@ -302,18 +302,21 @@ const AdminVerkoopWizardPage = () => {
       }
     }
     if (activeStap === 3) {
-      if (!klantVoornaam.trim() || !klantAchternaam.trim()) { toast.error("Voor- en achternaam zijn verplicht"); return; }
-      if (!klantAdres.trim() || !klantPostcode.trim() || !klantWoonplaats.trim()) { toast.error("Adres, postcode en woonplaats zijn verplicht"); return; }
-      if (!klantTelefoon.trim()) { toast.error("Telefoonnummer is verplicht"); return; }
       if (klantZakelijk) {
         if (!klantBedrijfsnaam.trim()) { toast.error("Bedrijfsnaam is verplicht"); return; }
         if (!klantKvk.trim()) { toast.error("KVK-nummer is verplicht"); return; }
       }
+      if (!klantVoornaam.trim() || !klantAchternaam.trim()) {
+        toast.error(klantZakelijk ? "Contactpersoon voor- en achternaam zijn verplicht" : "Voor- en achternaam zijn verplicht");
+        return;
+      }
+      if (!klantAdres.trim() || !klantPostcode.trim() || !klantWoonplaats.trim()) { toast.error("Adres, postcode en woonplaats zijn verplicht"); return; }
+      if (!klantTelefoon.trim()) { toast.error("Telefoonnummer is verplicht"); return; }
       // Klant aanmaken of bijwerken
       const customerPayload: any = {
         voornaam: klantVoornaam.trim(),
         achternaam: klantAchternaam.trim(),
-        geboortedatum: klantGeboortedatum || null,
+        geboortedatum: !klantZakelijk ? (klantGeboortedatum || null) : null,
         adres: klantAdres.trim() || null,
         postcode: klantPostcode.trim() || null,
         woonplaats: klantWoonplaats.trim() || null,
