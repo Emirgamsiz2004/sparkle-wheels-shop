@@ -69,7 +69,7 @@ export function buildInkoopverklaringPdf(data: InkoopverklaringPdfData): jsPDF {
   setFont("normal", 9);
   setColor(LIGHT);
   doc.text("Platin Automotive", pw - mr, y - 4, { align: "right" });
-  doc.text("Herenweg 21, 2361 EA Warmond", pw - mr, y, { align: "right" });
+  doc.text("Cilinderweg 99, 2371 DZ Roelofarendsveen", pw - mr, y, { align: "right" });
   
   y += 4;
   doc.setDrawColor(LINE.r, LINE.g, LINE.b);
