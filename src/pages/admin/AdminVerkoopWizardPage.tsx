@@ -1099,81 +1099,99 @@ const Stap2Aflevering = (p: Stap2Props) => {
       {/* Sectie 1 — Aflevering */}
       <div className="rounded-[14px] border border-border bg-card p-5 space-y-4">
         <div className="text-xs uppercase tracking-wide text-muted-foreground">Aflevering</div>
-        <div className="flex gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
             type="button"
-            onClick={() => p.setLaterOphalen(false)}
-            className={optionCls(!p.laterOphalen)}
+            onClick={() => p.setAfleverwijze("vandaag")}
+            className={optionCls(p.afleverwijze === "vandaag")}
           >
             Vandaag afleveren
           </button>
           <button
             type="button"
-            onClick={() => p.setLaterOphalen(true)}
-            className={optionCls(p.laterOphalen)}
+            onClick={() => p.setAfleverwijze("later")}
+            className={optionCls(p.afleverwijze === "later")}
           >
             Wordt later opgehaald
+          </button>
+          <button
+            type="button"
+            onClick={() => p.setAfleverwijze("aflevering")}
+            className={optionCls(p.afleverwijze === "aflevering")}
+          >
+            Aflevering
           </button>
         </div>
 
         <div
           className={`grid transition-all duration-300 ease-out ${
-            p.laterOphalen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
+            laterOphalen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
           }`}
         >
           <div className="overflow-hidden">
-            <div className="border-t border-border pt-4">
-              <label className={labelCls}>Verwachte leverdatum *</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                      !p.leverdatum && "text-muted-foreground",
-                    )}
-                  >
-                    <span>
-                      {p.leverdatum
-                        ? format(parseISO(p.leverdatum), "d MMMM yyyy", { locale: nl })
-                        : "Kies een datum"}
-                    </span>
-                    <CalendarIcon className="h-4 w-4 text-foreground/70" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-0 bg-popover border-border"
-                  align="start"
-                >
-                  <Calendar
-                    mode="single"
-                    selected={p.leverdatum ? parseISO(p.leverdatum) : undefined}
-                    onSelect={(d) => {
-                      if (d) {
-                        // Local yyyy-mm-dd to avoid timezone shift
-                        const yyyy = d.getFullYear();
-                        const mm = String(d.getMonth() + 1).padStart(2, "0");
-                        const dd = String(d.getDate()).padStart(2, "0");
-                        p.setLeverdatum(`${yyyy}-${mm}-${dd}`);
-                      }
-                    }}
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                    initialFocus
-                    locale={nl}
-                    className={cn("p-3 pointer-events-auto")}
-                    classNames={{
-                      day_selected:
-                        "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white",
-                      day_today: "bg-accent/60 text-accent-foreground font-semibold",
-                    }}
+            <div className="border-t border-border pt-4 space-y-4">
+              <div>
+                <label className={labelCls}>Verwachte leverdatum *</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex h-10 w-full items-center justify-between rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        !p.leverdatum && "text-muted-foreground",
+                      )}
+                    >
+                      <span>
+                        {p.leverdatum
+                          ? format(parseISO(p.leverdatum), "d MMMM yyyy", { locale: nl })
+                          : "Kies een datum"}
+                      </span>
+                      <CalendarIcon className="h-4 w-4 text-foreground/70" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={p.leverdatum ? parseISO(p.leverdatum) : undefined}
+                      onSelect={(d) => {
+                        if (d) {
+                          const yyyy = d.getFullYear();
+                          const mm = String(d.getMonth() + 1).padStart(2, "0");
+                          const dd = String(d.getDate()).padStart(2, "0");
+                          p.setLeverdatum(`${yyyy}-${mm}-${dd}`);
+                        }
+                      }}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                      locale={nl}
+                      className={cn("p-3 pointer-events-auto")}
+                      classNames={{
+                        day_selected:
+                          "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white",
+                        day_today: "bg-accent/60 text-accent-foreground font-semibold",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {p.afleverwijze === "aflevering" && (
+                <div>
+                  <label className={labelCls}>Afleveradres *</label>
+                  <input
+                    type="text"
+                    value={p.afleveradres}
+                    onChange={(e) => p.setAfleveradres(e.target.value)}
+                    className={inputCls}
+                    placeholder="Straat 1, 1234 AB Plaats"
                   />
-                </PopoverContent>
-              </Popover>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {!p.laterOphalen && (
+        {p.afleverwijze === "vandaag" && (
           <div className="text-xs text-muted-foreground border-t border-border pt-4">
             Leverdatum wordt automatisch op vandaag ({formatDateNl(today)}) gezet. Geen aanbetaling vereist.
           </div>
