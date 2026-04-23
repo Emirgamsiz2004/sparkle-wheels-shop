@@ -383,8 +383,8 @@ async function renderToPdf(data: KoopovereenkomstData): Promise<jsPDF> {
   container.innerHTML = html;
   document.body.appendChild(container);
 
-  const target = container.querySelector("body") as HTMLElement | null;
-  const node = target || container;
+    const target = container.querySelector(".page") as HTMLElement | null;
+    const node = target || container;
 
   try {
     const canvas = await html2canvas(node, {
