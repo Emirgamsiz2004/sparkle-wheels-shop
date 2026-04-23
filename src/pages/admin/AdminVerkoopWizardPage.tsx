@@ -1496,6 +1496,18 @@ interface CustomerSuggestion {
   btw_nummer: string | null;
 }
 
+const InlineKlantTypeToggle = ({ zakelijk, onChange }: { zakelijk: boolean; onChange: (z: boolean) => void }) => (
+  <div className="flex items-center justify-end gap-3 pb-1">
+    <span className={cn("text-xs transition-colors", !zakelijk ? "text-foreground font-medium" : "text-muted-foreground")}>
+      Particulier
+    </span>
+    <Switch checked={zakelijk} onCheckedChange={onChange} aria-label="Klanttype" />
+    <span className={cn("text-xs transition-colors", zakelijk ? "text-foreground font-medium" : "text-muted-foreground")}>
+      Zakelijk
+    </span>
+  </div>
+);
+
 const Stap3Klant = (p: Stap3Props) => {
   const [mode, setMode] = useState<"existing" | "new">(p.customerId ? "existing" : "new");
   const [zoekterm, setZoekterm] = useState("");
