@@ -144,6 +144,13 @@ const AdminVerkoopWizardPage = () => {
         setInruilBedrijfsnaam(existing.inruil_bedrijfsnaam || "");
         setInruilKvk(existing.inruil_kvk || "");
         setInruilBtw(existing.inruil_btw || "");
+        // Stap 2 hydration
+        setLaterOphalen(!!existing.later_ophalen);
+        setLeverdatum(existing.leverdatum || "");
+        setAanbetalingBedrag(existing.aanbetaling_bedrag ?? "");
+        if (existing.aanbetaling_betaalwijze === "cash" || existing.aanbetaling_betaalwijze === "pin" || existing.aanbetaling_betaalwijze === "ideal") {
+          setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze);
+        }
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
