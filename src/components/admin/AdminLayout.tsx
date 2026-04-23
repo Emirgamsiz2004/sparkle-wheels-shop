@@ -104,24 +104,21 @@ const AdminLayout = () => {
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + "/");
 
   return (
-    <div className="admin-theme min-h-screen flex bg-background overflow-x-hidden">
+    <div className="admin-theme min-h-screen bg-background overflow-x-hidden">
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Spacer reserves the collapsed sidebar width on desktop */}
-      <div className="hidden lg:block w-[56px] flex-shrink-0" aria-hidden="true" />
-
-      {/* Sidebar — mobile drawer (240px). Desktop: fixed, collapsed 56px, hover expands to 220px over content */}
+      {/* Sidebar — mobile drawer (240px). Desktop: fixed, toggled via chevron click only */}
       <aside
         className={`group/sidebar fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex flex-col transition-[transform,width] duration-200 ease-out overflow-hidden
-          w-[240px] lg:w-[56px] lg:hover:w-[220px] lg:translate-x-0
+          w-[240px] lg:translate-x-0 ${desktopExpanded ? "lg:w-[220px]" : "lg:w-[56px]"}
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div className="h-14 px-4 lg:px-3 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
           <Link to="/admin/dashboard" className="flex items-center gap-2.5 min-w-0">
             <img src={logo} alt="Platin" className="h-7 w-auto object-contain flex-shrink-0" loading="eager" decoding="sync" />
-            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground whitespace-nowrap lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">Admin</span>
+            <span className={`text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground whitespace-nowrap transition-opacity duration-200 ${desktopExpanded ? "lg:opacity-100" : "lg:opacity-0"}`}>Admin</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground p-1">
             <X className="w-4 h-4" />
@@ -143,14 +140,14 @@ const AdminLayout = () => {
                 }`}
               >
                 <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
-                <span className="flex-1 lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">{item.label}</span>
+                <span className={`flex-1 transition-opacity duration-200 ${desktopExpanded ? "lg:opacity-100" : "lg:opacity-0"}`}>{item.label}</span>
                 {item.path === "/admin/leads" && overdueLeads > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">
+                  <span className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground transition-opacity duration-200 ${desktopExpanded ? "lg:opacity-100" : "lg:opacity-0"}`}>
                     {overdueLeads}
                   </span>
                 )}
                 {item.path === "/admin/planning" && upcomingAppts > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">
+                  <span className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground transition-opacity duration-200 ${desktopExpanded ? "lg:opacity-100" : "lg:opacity-0"}`}>
                     {upcomingAppts}
                   </span>
                 )}
@@ -171,24 +168,37 @@ const AdminLayout = () => {
             }`}
           >
             <Settings className="w-4 h-4 flex-shrink-0 opacity-70" />
-            <span className="lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">Instellingen</span>
+            <span className={`transition-opacity duration-200 ${desktopExpanded ? "lg:opacity-100" : "lg:opacity-0"}`}>Instellingen</span>
           </Link>
           <div className="mt-1.5 pt-1.5 border-t border-[hsl(var(--sidebar-border))]">
-            <p className="text-[11px] text-muted-foreground truncate mb-1 px-3 whitespace-nowrap lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">{user.email}</p>
+            <p className={`text-[11px] text-muted-foreground truncate mb-1 px-3 whitespace-nowrap transition-opacity duration-200 ${desktopExpanded ? "lg:opacity-100" : "lg:opacity-0"}`}>{user.email}</p>
             <button
               onClick={signOut}
               title="Uitloggen"
               className="flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] text-sm lg:text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors w-full min-h-[44px] lg:min-h-0 whitespace-nowrap"
             >
               <LogOut className="w-4 h-4 flex-shrink-0 opacity-70" />
-              <span className="lg:opacity-0 lg:group-hover/sidebar:opacity-100 transition-opacity duration-200">Uitloggen</span>
+              <span className={`transition-opacity duration-200 ${desktopExpanded ? "lg:opacity-100" : "lg:opacity-0"}`}>Uitloggen</span>
             </button>
           </div>
         </div>
+
+        {/* Desktop toggle chevron */}
+        <button
+          onClick={() => setDesktopExpanded((v) => !v)}
+          aria-label={desktopExpanded ? "Sidebar inklappen" : "Sidebar uitklappen"}
+          className="hidden lg:flex absolute top-1/2 -translate-y-1/2 -right-3 z-10 items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--sidebar-background))] border border-[hsl(var(--sidebar-border))] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shadow-sm"
+        >
+          {desktopExpanded ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+        </button>
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen min-w-0">
+      {/* Main content — margin shifts with sidebar width */}
+      <div
+        className={`flex flex-col min-h-screen min-w-0 transition-[margin] duration-200 ease-out ${
+          desktopExpanded ? "lg:ml-[220px]" : "lg:ml-[56px]"
+        }`}
+      >
         <header className="sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 bg-background border-b border-border gap-3">
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground p-2 -ml-1 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center">
             <Menu className="w-5 h-5" />
