@@ -161,6 +161,21 @@ const AdminVerkoopWizardPage = () => {
     };
   }, []);
 
+  // Auto-genereer overeenkomstnummer wanneer stap 5 voor het eerst actief is
+  useEffect(() => {
+    if (activeStap === 5 && !overeenkomstnummer && verkoopId) {
+      const year = new Date().getFullYear();
+      (async () => {
+        const { count } = await supabase
+          .from("verkopen")
+          .select("id", { count: "exact", head: true })
+          .not("overeenkomstnummer", "is", null);
+        const nextNum = String((count || 0) + 1).padStart(3, "0");
+        setOvereenkomstnummer(`PA-${year}-${nextNum}`);
+      })();
+    }
+  }, [activeStap, verkoopId, overeenkomstnummer]);
+
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
     if (!vehicleId || !vehicle) return;
