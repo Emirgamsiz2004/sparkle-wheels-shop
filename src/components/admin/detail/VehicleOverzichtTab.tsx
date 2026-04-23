@@ -94,7 +94,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
       {/* Two columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left - Vehicle info - inline editable */}
-        <div className="bg-card border border-border rounded-lg p-4 space-y-0">
+        <div className="bg-card border border-border rounded-lg p-3 space-y-0">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Voertuiggegevens</h3>
             {editMode ? (
