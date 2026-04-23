@@ -91,7 +91,7 @@ input[type="number"] {
     --input: 220 4% 14%;
     --ring: 220 4% 25%;
 
-    --radius: 3px;
+    --radius: 10px;
 
     --sidebar-background: 220 4% 5.5%;
     --sidebar-foreground: 40 4% 60%;
@@ -105,12 +105,61 @@ input[type="number"] {
     font-family: 'DM Sans', sans-serif;
   }
 
-  /* Admin — consistent 3px radius on ALL interactive elements */
+  /* Admin — global font; per-element radii defined below for consistency */
   .admin-theme *,
   body:has(.admin-theme) [data-radix-portal] *,
   body:has(.admin-theme) [vaul-drawer] * {
-    border-radius: 3px !important;
     font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Admin — design system radii */
+  .admin-theme button,
+  .admin-theme [role="button"],
+  body:has(.admin-theme) [data-radix-portal] button,
+  body:has(.admin-theme) [data-radix-portal] [role="button"] {
+    border-radius: 10px;
+  }
+  .admin-theme input,
+  .admin-theme textarea,
+  .admin-theme select,
+  body:has(.admin-theme) [data-radix-portal] input,
+  body:has(.admin-theme) [data-radix-portal] textarea {
+    border-radius: 10px;
+  }
+  .admin-theme [class*="rounded-"],
+  body:has(.admin-theme) [data-radix-portal] [class*="rounded-"] {
+    /* allow tailwind rounded-* utilities to win */
+  }
+  /* Cards */
+  .admin-theme .rounded-lg,
+  body:has(.admin-theme) [data-radix-portal] .rounded-lg {
+    border-radius: 14px;
+  }
+  /* Modals */
+  .admin-theme [role="dialog"],
+  body:has(.admin-theme) [data-radix-portal] [role="dialog"] {
+    border-radius: 16px;
+  }
+  /* Dropdown / select content */
+  body:has(.admin-theme) [data-radix-popper-content-wrapper] > [role="menu"],
+  body:has(.admin-theme) [data-radix-popper-content-wrapper] > [role="listbox"],
+  body:has(.admin-theme) [data-radix-menu-content],
+  body:has(.admin-theme) [data-radix-select-content] {
+    border-radius: 12px !important;
+  }
+  /* Badges keep 8px */
+  .admin-theme [class*="badge"],
+  .admin-theme .rounded-full {
+    border-radius: 8px;
+  }
+  /* Table rows stay rectangular */
+  .admin-theme table,
+  .admin-theme thead,
+  .admin-theme tbody,
+  .admin-theme tr,
+  .admin-theme th,
+  .admin-theme td {
+    border-radius: 0 !important;
   }
 
   /* Admin — smooth transitions on color/opacity/shadow only (not layout props) */

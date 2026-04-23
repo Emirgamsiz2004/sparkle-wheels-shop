@@ -18,6 +18,16 @@ const allStatuses: Vehicle["status"][] = [
   "inkoop", "in_behandeling", "te_koop", "consignatie", "gereserveerd", "verkocht", "reparatie_onderhoud",
 ];
 
+const statusDots: Record<Vehicle["status"], string> = {
+  inkoop: "bg-zinc-400",
+  in_behandeling: "bg-yellow-500",
+  te_koop: "bg-emerald-500",
+  consignatie: "bg-orange-500",
+  gereserveerd: "bg-blue-500",
+  verkocht: "bg-purple-500",
+  reparatie_onderhoud: "bg-red-500",
+};
+
 const btnCls = "inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium border border-border rounded-md hover:bg-accent hover:border-accent transition-colors active:scale-[0.97] text-foreground min-h-[36px]";
 
 const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenKosten, onOpenVerkoop, onOpenAfspraak }: Props) => {
@@ -68,7 +78,7 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenKo
                 <CalendarPlus className="w-3.5 h-3.5" /> Afspraak <ChevronDown className="w-3 h-3" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
+            <DropdownMenuContent align="start" className="p-1.5 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
               {[
                 { label: "Bezichtiging", type: "bezichtiging" },
                 { label: "Proefrit", type: "proefrit" },
@@ -91,13 +101,14 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenKo
               Status <ChevronDown className="w-3 h-3" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
+          <DropdownMenuContent align="start" className="p-1.5 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
             {allStatuses.map((s) => (
-              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className={`flex items-center gap-2 ${vehicle.status === s ? "bg-accent/50" : ""}`}>
-                <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded border ${statusColors[s]}`}>
-                  {statusLabels[s]}
-                </span>
-                {vehicle.status === s && <span className="text-[10px] text-muted-foreground ml-auto">✓</span>}
+              <DropdownMenuItem key={s} onClick={() => onStatusChange(s)} className="flex items-center gap-2.5">
+                <span className={`inline-block w-2 h-2 rounded-full ${statusDots[s]}`} />
+                <span className="text-foreground">{statusLabels[s]}</span>
+                {vehicle.status === s && (
+                  <span className="ml-auto pl-3" style={{ color: "hsl(152 55% 48%)" }}>✓</span>
+                )}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
