@@ -8,6 +8,8 @@ import { brandstofLabels, Vehicle } from "@/types/vehicle";
 import { fetchRdwData } from "@/lib/rdw";
 import { formatKenteken, isValidKenteken } from "@/lib/kenteken";
 import logo from "@/assets/logo.svg";
+import { openAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
+import { FileText } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────
 // Stappen definitie
@@ -98,6 +100,12 @@ const AdminVerkoopWizardPage = () => {
   const [inruilKvk, setInruilKvk] = useState("");
   const [inruilBtw, setInruilBtw] = useState("");
 
+  // Stap 2 state
+  const [laterOphalen, setLaterOphalen] = useState<boolean>(false);
+  const [leverdatum, setLeverdatum] = useState<string>("");
+  const [aanbetalingBedrag, setAanbetalingBedrag] = useState<number | "">("");
+  const [aanbetalingBetaalwijze, setAanbetalingBetaalwijze] = useState<"cash" | "pin" | "ideal" | "">("");
+
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
     if (!vehicleId || !vehicle) return;
@@ -136,6 +144,13 @@ const AdminVerkoopWizardPage = () => {
         setInruilBedrijfsnaam(existing.inruil_bedrijfsnaam || "");
         setInruilKvk(existing.inruil_kvk || "");
         setInruilBtw(existing.inruil_btw || "");
+        // Stap 2 hydration
+        setLaterOphalen(!!existing.later_ophalen);
+        setLeverdatum(existing.leverdatum || "");
+        setAanbetalingBedrag(existing.aanbetaling_bedrag ?? "");
+        if (existing.aanbetaling_betaalwijze === "cash" || existing.aanbetaling_betaalwijze === "pin" || existing.aanbetaling_betaalwijze === "ideal") {
+          setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze);
+        }
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -193,6 +208,10 @@ const AdminVerkoopWizardPage = () => {
       inruil_bedrijfsnaam: inruil && inruilVerkoper === "zakelijk" ? inruilBedrijfsnaam || null : null,
       inruil_kvk: inruil && inruilVerkoper === "zakelijk" ? inruilKvk || null : null,
       inruil_btw: inruil && inruilVerkoper === "zakelijk" ? inruilBtw || null : null,
+      later_ophalen: laterOphalen,
+      leverdatum: laterOphalen ? (leverdatum || null) : new Date().toISOString().slice(0, 10),
+      aanbetaling_bedrag: laterOphalen && aanbetalingBedrag !== "" ? Number(aanbetalingBedrag) : null,
+      aanbetaling_betaalwijze: laterOphalen && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
       ...extra,
     };
     const { error } = await supabase.from("verkopen").update(payload).eq("id", verkoopId);
@@ -203,9 +222,19 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze]);
 
   const handleVolgende = async () => {
+    // Stap-specifieke validatie
+    if (activeStap === 2) {
+      if (laterOphalen) {
+        if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
+        if (aanbetalingBedrag === "" || Number(aanbetalingBedrag) <= 0) {
+          toast.error("Aanbetalingsbedrag is verplicht"); return;
+        }
+        if (!aanbetalingBetaalwijze) { toast.error("Kies een betaalmethode"); return; }
+      }
+    }
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
     if (!ok) return;
     setCompleted((p) => ({ ...p, [activeStap]: true }));
@@ -367,7 +396,22 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap !== 1 && (
+            {activeStap === 2 && (
+              <Stap2Aflevering
+                vehicle={vehicle}
+                verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
+                laterOphalen={laterOphalen}
+                setLaterOphalen={setLaterOphalen}
+                leverdatum={leverdatum}
+                setLeverdatum={setLeverdatum}
+                aanbetalingBedrag={aanbetalingBedrag}
+                setAanbetalingBedrag={setAanbetalingBedrag}
+                aanbetalingBetaalwijze={aanbetalingBetaalwijze}
+                setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
+              />
+            )}
+
+            {activeStap !== 1 && activeStap !== 2 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
@@ -927,5 +971,186 @@ const TogglePill = ({
     </button>
   </label>
 );
+
+// ─────────────────────────────────────────────────────────────
+// Stap 2 — Aflevering & aanbetaling
+// ─────────────────────────────────────────────────────────────
+interface Stap2Props {
+  vehicle: any;
+  verkoopprijs: number;
+  laterOphalen: boolean;
+  setLaterOphalen: (v: boolean) => void;
+  leverdatum: string;
+  setLeverdatum: (v: string) => void;
+  aanbetalingBedrag: number | "";
+  setAanbetalingBedrag: (v: number | "") => void;
+  aanbetalingBetaalwijze: "cash" | "pin" | "ideal" | "";
+  setAanbetalingBetaalwijze: (v: "cash" | "pin" | "ideal" | "") => void;
+}
+
+const Stap2Aflevering = (p: Stap2Props) => {
+  const aanbetaling = p.aanbetalingBedrag === "" ? 0 : Number(p.aanbetalingBedrag);
+  const restbedrag = Math.max(0, (p.verkoopprijs || 0) - aanbetaling);
+  const today = new Date().toISOString().slice(0, 10);
+
+  const optionCls = (active: boolean) =>
+    `flex-1 px-4 py-3 text-sm rounded-[10px] border transition-colors cursor-pointer text-center font-medium ${
+      active
+        ? "bg-foreground/10 border-foreground/40 text-foreground"
+        : "border-border text-muted-foreground hover:bg-accent/50"
+    }`;
+
+  const payCls = (active: boolean) =>
+    `flex-1 px-4 py-2.5 text-sm rounded-[10px] border transition-colors cursor-pointer text-center ${
+      active
+        ? "bg-foreground/10 border-foreground/40 text-foreground"
+        : "border-border text-muted-foreground hover:bg-accent/50"
+    }`;
+
+  const handlePdf = () => {
+    if (aanbetaling <= 0) {
+      toast.error("Vul eerst een aanbetalingsbedrag in");
+      return;
+    }
+    openAanbetalingsbewijsPdf({
+      voertuig: {
+        merk: p.vehicle.merk,
+        model: p.vehicle.model,
+        bouwjaar: p.vehicle.bouwjaar,
+        kenteken: p.vehicle.kenteken,
+      },
+      verkoopprijs: p.verkoopprijs,
+      aanbetalingsbedrag: aanbetaling,
+      restbedrag,
+      betaalwijze:
+        p.aanbetalingBetaalwijze === "cash"
+          ? "Cash"
+          : p.aanbetalingBetaalwijze === "pin"
+          ? "Pin"
+          : p.aanbetalingBetaalwijze === "ideal"
+          ? "iDEAL"
+          : undefined,
+      leverdatum: p.leverdatum,
+      datum: today,
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Sectie 1 — Aflevering */}
+      <div className="rounded-[14px] border border-border bg-card p-5 space-y-4">
+        <div className="text-xs uppercase tracking-wide text-muted-foreground">Aflevering</div>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => p.setLaterOphalen(false)}
+            className={optionCls(!p.laterOphalen)}
+          >
+            Vandaag afleveren
+          </button>
+          <button
+            type="button"
+            onClick={() => p.setLaterOphalen(true)}
+            className={optionCls(p.laterOphalen)}
+          >
+            Wordt later opgehaald
+          </button>
+        </div>
+
+        <div
+          className={`grid transition-all duration-300 ease-out ${
+            p.laterOphalen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="border-t border-border pt-4">
+              <label className={labelCls}>Verwachte leverdatum *</label>
+              <input
+                type="date"
+                value={p.leverdatum}
+                min={today}
+                onChange={(e) => p.setLeverdatum(e.target.value)}
+                className={inputCls}
+              />
+            </div>
+          </div>
+        </div>
+
+        {!p.laterOphalen && (
+          <div className="text-xs text-muted-foreground border-t border-border pt-4">
+            Leverdatum wordt automatisch op vandaag ({formatDateNl(today)}) gezet. Geen aanbetaling vereist.
+          </div>
+        )}
+      </div>
+
+      {/* Sectie 2 — Aanbetaling */}
+      <div
+        className={`grid transition-all duration-300 ease-out ${
+          p.laterOphalen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="rounded-[14px] border border-border bg-card p-5 space-y-5">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Aanbetaling</div>
+
+            <div>
+              <label className={labelCls}>Aanbetalingsbedrag (€) *</label>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={p.aanbetalingBedrag}
+                onChange={(e) =>
+                  p.setAanbetalingBedrag(e.target.value === "" ? "" : Number(e.target.value))
+                }
+                className={inputCls}
+                placeholder="0"
+              />
+              <div className="mt-2 flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Restbedrag</span>
+                <span className="font-medium text-foreground">
+                  {new Intl.NumberFormat("nl-NL", {
+                    style: "currency",
+                    currency: "EUR",
+                  }).format(restbedrag)}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className={labelCls}>Betaalmethode *</label>
+              <div className="flex gap-2">
+                {(["cash", "pin", "ideal"] as const).map((m) => (
+                  <button
+                    type="button"
+                    key={m}
+                    onClick={() => p.setAanbetalingBetaalwijze(m)}
+                    className={payCls(p.aanbetalingBetaalwijze === m)}
+                  >
+                    {m === "cash" ? "Cash" : m === "pin" ? "Pin" : "iDEAL"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handlePdf}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              Aanbetalingsbewijs genereren
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const formatDateNl = (iso: string) => {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-");
+  return `${d}-${m}-${y}`;
+};
 
 export default AdminVerkoopWizardPage;
