@@ -36,7 +36,6 @@ import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
 import AdminBlogPage from "./pages/admin/AdminBlogPage";
 import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
 import AdminVerkopenPage from "./pages/admin/AdminVerkopenPage";
-import AdminVerkoopDetailPage from "./pages/admin/AdminVerkoopDetailPage";
 import AdminArchiefPage from "./pages/admin/AdminArchiefPage";
 import AdminKlantenPage from "./pages/admin/AdminKlantenPage";
 import AdminKlantDetailPage from "./pages/admin/AdminKlantDetailPage";
