@@ -303,6 +303,19 @@ const AdminVerkoopWizardPage = () => {
               }))
           );
         }
+        // Stap 6 hydration
+        const e: any = existing;
+        if (e.inruil_type === "particulier" || e.inruil_type === "zakelijk") setStap6DocType(e.inruil_type);
+        setInrVerkVoornaam(e.inruil_verkoper_voornaam || "");
+        setInrVerkAchternaam(e.inruil_verkoper_achternaam || "");
+        setInrVerkGeboortedatum(e.inruil_verkoper_geboortedatum || "");
+        setInrVerkAdres(e.inruil_verkoper_adres || "");
+        setInrVerkPostcode(e.inruil_verkoper_postcode || "");
+        setInrVerkWoonplaats(e.inruil_verkoper_woonplaats || "");
+        setInrVerkTelefoon(e.inruil_verkoper_telefoon || "");
+        setInrContactpersoon(e.inruil_contactpersoon || "");
+        if (["verrekend", "contant", "overboeking"].includes(e.inruil_betaalwijze)) setInrBetaalwijze(e.inruil_betaalwijze);
+        setInkoopverklaringId(e.inruil_inkoopverklaring_id || null);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -332,20 +345,7 @@ const AdminVerkoopWizardPage = () => {
         setVerkoopprijs(vehicle.verkoopprijs || "");
         setVoertuigType((vehicle.btwMargeType as any) || "marge");
         if (vehicle.kilometerstand) setKmStand(vehicle.kilometerstand);
-        }
-        // Stap 6 hydration
-        const e: any = existing;
-        if (e.inruil_type === "particulier" || e.inruil_type === "zakelijk") setStap6DocType(e.inruil_type);
-        setInrVerkVoornaam(e.inruil_verkoper_voornaam || "");
-        setInrVerkAchternaam(e.inruil_verkoper_achternaam || "");
-        setInrVerkGeboortedatum(e.inruil_verkoper_geboortedatum || "");
-        setInrVerkAdres(e.inruil_verkoper_adres || "");
-        setInrVerkPostcode(e.inruil_verkoper_postcode || "");
-        setInrVerkWoonplaats(e.inruil_verkoper_woonplaats || "");
-        setInrVerkTelefoon(e.inruil_verkoper_telefoon || "");
-        setInrContactpersoon(e.inruil_contactpersoon || "");
-        if (["verrekend", "contant", "overboeking"].includes(e.inruil_betaalwijze)) setInrBetaalwijze(e.inruil_betaalwijze);
-        setInkoopverklaringId(e.inruil_inkoopverklaring_id || null);
+      }
       if (vehicle.kilometerstand && kmStand === "") setKmStand(vehicle.kilometerstand);
     })();
 
@@ -416,7 +416,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
 
   const handleVolgende = async () => {
     // Stap-specifieke validatie
@@ -810,7 +810,41 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap !== 1 && activeStap !== 2 && activeStap !== 3 && activeStap !== 4 && activeStap !== 5 && (
+            {activeStap === 6 && (
+              <Stap6InruilDocument
+                verkoopId={verkoopId}
+                inruil={inruil}
+                inruilKenteken={inruilKenteken}
+                inruilMerk={inruilMerk}
+                inruilModel={inruilModel}
+                inruilKm={inruilKm}
+                inruilWaarde={inruilWaarde}
+                inruilType={inruilVerkoper}
+                docType={stap6DocType}
+                setDocType={setStap6DocType}
+                verkoperVoornaam={inrVerkVoornaam} setVerkoperVoornaam={setInrVerkVoornaam}
+                verkoperAchternaam={inrVerkAchternaam} setVerkoperAchternaam={setInrVerkAchternaam}
+                verkoperGeboortedatum={inrVerkGeboortedatum} setVerkoperGeboortedatum={setInrVerkGeboortedatum}
+                verkoperAdres={inrVerkAdres} setVerkoperAdres={setInrVerkAdres}
+                verkoperPostcode={inrVerkPostcode} setVerkoperPostcode={setInrVerkPostcode}
+                verkoperWoonplaats={inrVerkWoonplaats} setVerkoperWoonplaats={setInrVerkWoonplaats}
+                verkoperTelefoon={inrVerkTelefoon} setVerkoperTelefoon={setInrVerkTelefoon}
+                bedrijfsnaam={inruilBedrijfsnaam} setBedrijfsnaam={setInruilBedrijfsnaam}
+                kvk={inruilKvk} setKvk={setInruilKvk}
+                btw={inruilBtw} setBtw={setInruilBtw}
+                contactpersoon={inrContactpersoon} setContactpersoon={setInrContactpersoon}
+                bedrijfAdres={inrBedrijfAdres} setBedrijfAdres={setInrBedrijfAdres}
+                bedrijfPostcode={inrBedrijfPostcode} setBedrijfPostcode={setInrBedrijfPostcode}
+                bedrijfWoonplaats={inrBedrijfWoonplaats} setBedrijfWoonplaats={setInrBedrijfWoonplaats}
+                inruilBetaalwijze={inrBetaalwijze}
+                setInruilBetaalwijze={setInrBetaalwijze}
+                inkoopverklaringId={inkoopverklaringId}
+                setInkoopverklaringId={setInkoopverklaringId}
+                onAutoSave={() => saveCurrent()}
+              />
+            )}
+
+            {activeStap > 6 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
