@@ -20,9 +20,9 @@ import {
 import DashboardAppointmentsCard from "@/components/admin/DashboardAppointmentsCard";
 
 /* ─── Constants ─── */
-const periodOrder: PeriodKey[] = ["vandaag", "7dagen", "maand", "jaar"];
+const periodOrder: PeriodKey[] = ["7dagen", "30dagen", "kwartaal", "jaar"];
 const periodLabels: Record<PeriodKey, string> = {
-  vandaag: "Vandaag", gisteren: "Gisteren", "7dagen": "Deze week", "30dagen": "30 dagen",
+  vandaag: "Vandaag", gisteren: "Gisteren", "7dagen": "7 dagen", "30dagen": "30 dagen",
   maand: "Deze maand", kwartaal: "Dit kwartaal", jaar: "Dit jaar", custom: "Aangepast",
 };
 
@@ -67,7 +67,9 @@ const AdminDashboardPage = () => {
   const [compare, setCompare] = useState(true);
   const [customFrom, setCustomFrom] = useState<Date>();
   const [customTo, setCustomTo] = useState<Date>();
-  const [monthYearOpen, setMonthYearOpen] = useState(false);
+  const [monthOpen, setMonthOpen] = useState(false);
+  const [quarterOpen, setQuarterOpen] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
   const [customRangeOpen, setCustomRangeOpen] = useState(false);
   const [myYear, setMyYear] = useState(new Date().getFullYear());
 
@@ -75,13 +77,30 @@ const AdminDashboardPage = () => {
   const currentYear = new Date().getFullYear();
   const selectableYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
+  const closeAllDropdowns = () => {
+    setMonthOpen(false);
+    setQuarterOpen(false);
+    setYearOpen(false);
+    setCustomRangeOpen(false);
+  };
+
   const selectMonth = (monthIdx: number, year: number) => {
     const from = startOfM(new Date(year, monthIdx));
     const to = endOfMonth(new Date(year, monthIdx));
     setCustomFrom(from);
     setCustomTo(to > new Date() ? new Date() : to);
     setPeriod("custom");
-    setMonthYearOpen(false);
+    closeAllDropdowns();
+  };
+
+  const selectQuarter = (quarterIdx: number, year: number) => {
+    const startMonth = quarterIdx * 3;
+    const from = startOfM(new Date(year, startMonth));
+    const to = endOfMonth(new Date(year, startMonth + 2));
+    setCustomFrom(from);
+    setCustomTo(to > new Date() ? new Date() : to);
+    setPeriod("custom");
+    closeAllDropdowns();
   };
 
   const selectYear = (year: number) => {
@@ -90,7 +109,7 @@ const AdminDashboardPage = () => {
     setCustomFrom(from);
     setCustomTo(to > new Date() ? new Date() : to);
     setPeriod("custom");
-    setMonthYearOpen(false);
+    closeAllDropdowns();
   };
 
   const range = useMemo(() => getPeriodRange(period, customFrom, customTo), [period, customFrom, customTo]);
@@ -181,41 +200,41 @@ const AdminDashboardPage = () => {
 
             <div className="w-px h-5 bg-border mx-1" />
 
-            {/* Month/Year picker */}
+            {/* Maand picker */}
             <div className="relative">
               <button
-                onClick={() => { setMonthYearOpen(!monthYearOpen); setCustomRangeOpen(false); }}
+                onClick={() => { const next = !monthOpen; closeAllDropdowns(); setMonthOpen(next); }}
                 className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
-                  monthYearOpen || (period === 'custom' && !customRangeOpen) ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                  monthOpen ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <CalendarIcon className="w-3 h-3" />
-                Maand / Jaar
-                <ChevronDown className={`w-3 h-3 transition-transform ${monthYearOpen ? "rotate-180" : ""}`} />
+                Maand
+                <ChevronDown className={`w-3 h-3 transition-transform ${monthOpen ? "rotate-180" : ""}`} />
               </button>
-              {monthYearOpen && (
-                <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-[3px] shadow-lg p-3 min-w-[280px]">
+              {monthOpen && (
+                <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-[12px] shadow-lg p-3 min-w-[280px]">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground">Jaar selecteren</p>
-                    <button onClick={() => setMonthYearOpen(false)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
+                    <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground">Jaar</p>
+                    <button onClick={() => setMonthOpen(false)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
                   </div>
                   <div className="flex gap-1 mb-3 flex-wrap">
                     {selectableYears.map(y => (
-                      <button key={y} onClick={() => { setMyYear(y); selectYear(y); }}
-                        className={`flex-1 py-1.5 text-[11px] font-medium rounded-[3px] border transition-colors min-w-[48px] ${
+                      <button key={y} onClick={() => setMyYear(y)}
+                        className={`flex-1 py-1.5 text-[11px] font-medium rounded-[8px] border transition-colors min-w-[48px] ${
                           myYear === y ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:bg-muted"
                         }`}>
                         {y}
                       </button>
                     ))}
                   </div>
-                  <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground mb-2">Maand selecteren</p>
+                  <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground mb-2">Maand</p>
                   <div className="grid grid-cols-4 gap-1">
                     {monthNames.map((m, i) => {
                       const isFuture = myYear === currentYear && i > new Date().getMonth();
                       return (
                         <button key={m} disabled={isFuture} onClick={() => selectMonth(i, myYear)}
-                          className={`py-1.5 text-[11px] font-medium rounded-[3px] border transition-colors ${
+                          className={`py-1.5 text-[11px] font-medium rounded-[8px] border transition-colors ${
                             isFuture ? "text-muted-foreground/30 border-transparent cursor-not-allowed" : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                           }`}>
                           {m}
@@ -227,10 +246,82 @@ const AdminDashboardPage = () => {
               )}
             </div>
 
-            {/* Custom range (van / tot) */}
+            {/* Kwartaal picker */}
             <div className="relative">
               <button
-                onClick={() => { setCustomRangeOpen(!customRangeOpen); setMonthYearOpen(false); }}
+                onClick={() => { const next = !quarterOpen; closeAllDropdowns(); setQuarterOpen(next); }}
+                className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
+                  quarterOpen ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <CalendarIcon className="w-3 h-3" />
+                Kwartaal
+                <ChevronDown className={`w-3 h-3 transition-transform ${quarterOpen ? "rotate-180" : ""}`} />
+              </button>
+              {quarterOpen && (
+                <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-[12px] shadow-lg p-3 min-w-[240px]">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground">Jaar</p>
+                    <button onClick={() => setQuarterOpen(false)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
+                  </div>
+                  <div className="flex gap-1 mb-3 flex-wrap">
+                    {selectableYears.map(y => (
+                      <button key={y} onClick={() => setMyYear(y)}
+                        className={`flex-1 py-1.5 text-[11px] font-medium rounded-[8px] border transition-colors min-w-[48px] ${
+                          myYear === y ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:bg-muted"
+                        }`}>
+                        {y}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground mb-2">Kwartaal</p>
+                  <div className="grid grid-cols-2 gap-1">
+                    {[0, 1, 2, 3].map(q => {
+                      const isFuture = myYear === currentYear && q * 3 > new Date().getMonth();
+                      return (
+                        <button key={q} disabled={isFuture} onClick={() => selectQuarter(q, myYear)}
+                          className={`py-1.5 text-[11px] font-medium rounded-[8px] border transition-colors ${
+                            isFuture ? "text-muted-foreground/30 border-transparent cursor-not-allowed" : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
+                          }`}>
+                          Q{q + 1}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Jaar picker */}
+            <div className="relative">
+              <button
+                onClick={() => { const next = !yearOpen; closeAllDropdowns(); setYearOpen(next); }}
+                className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
+                  yearOpen ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <CalendarIcon className="w-3 h-3" />
+                Jaar
+                <ChevronDown className={`w-3 h-3 transition-transform ${yearOpen ? "rotate-180" : ""}`} />
+              </button>
+              {yearOpen && (
+                <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-[12px] shadow-lg p-2 min-w-[140px]">
+                  <div className="flex flex-col gap-0.5">
+                    {selectableYears.map(y => (
+                      <button key={y} onClick={() => selectYear(y)}
+                        className="flex items-center justify-between px-3 py-2 text-[12px] font-medium rounded-[8px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                        {y}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Aangepast (custom range) */}
+            <div className="relative">
+              <button
+                onClick={() => { const next = !customRangeOpen; closeAllDropdowns(); setCustomRangeOpen(next); }}
                 className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded border transition-colors whitespace-nowrap ${
                   customRangeOpen || (period === 'custom' && customFrom && customTo) ? "border-border bg-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
@@ -238,10 +329,10 @@ const AdminDashboardPage = () => {
                 <CalendarIcon className="w-3 h-3" />
                 {period === 'custom' && customFrom && customTo
                   ? `${format(customFrom, 'dd MMM', { locale: nl })} – ${format(customTo, 'dd MMM yyyy', { locale: nl })}`
-                  : "Van / Tot"}
+                  : "Aangepast"}
               </button>
               {customRangeOpen && (
-                <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-[3px] shadow-lg p-3 min-w-[300px]">
+                <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-[12px] shadow-lg p-3 min-w-[300px]">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground">Periode selecteren</p>
                     <button onClick={() => setCustomRangeOpen(false)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
