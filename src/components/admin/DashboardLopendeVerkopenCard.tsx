@@ -89,7 +89,7 @@ const DashboardLopendeVerkopenCard = () => {
                   )}
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                  Stap {stap}/12 — {stapNaam}
+                  Bezig met stap {stap} van 12 — {stapNaam}
                   {item.klantNaam && <span className="text-muted-foreground/70"> · {item.klantNaam}</span>}
                 </p>
               </div>
@@ -98,7 +98,7 @@ const DashboardLopendeVerkopenCard = () => {
                   to={`/admin/verkopen/nieuw/${item.vehicle_id}`}
                   className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium rounded-md bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shrink-0"
                 >
-                  Hervatten
+                  Verkoop hervatten
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               )}
