@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useVehicles } from "@/hooks/useVehicles";
 import { brandstofLabels, Vehicle } from "@/types/vehicle";
+import { fetchRdwData } from "@/lib/rdw";
+import { formatKenteken, isValidKenteken } from "@/lib/kenteken";
 import logo from "@/assets/logo.svg";
 
 // ─────────────────────────────────────────────────────────────
