@@ -20,6 +20,7 @@ import { useMoneybird } from "@/hooks/useMoneybird";
 import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
 import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
 import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
+import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
