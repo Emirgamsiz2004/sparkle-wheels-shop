@@ -291,7 +291,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         { id: CUSTOM_FIELD_IDS.bouwjaar, value: p.voertuigBouwjaar ? String(p.voertuigBouwjaar) : "" },
         { id: CUSTOM_FIELD_IDS.kilometerstand, value: p.voertuigKilometerstand ? String(p.voertuigKilometerstand) : "" },
         { id: CUSTOM_FIELD_IDS.merk_model, value: `${p.voertuigMerk || ""} ${p.voertuigModel || ""}`.trim() },
-        { id: CUSTOM_FIELD_IDS.garantie, value: garantieValue },
+        // Garantie custom field is verwijderd: bestaat niet in deze Moneybird-administratie.
+        // De garantie staat al als aparte factuurregel.
       ];
 
       const res = await invoke("create_wizard_invoice", {
