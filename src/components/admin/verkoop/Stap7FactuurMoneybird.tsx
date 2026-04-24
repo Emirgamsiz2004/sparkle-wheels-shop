@@ -190,6 +190,54 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     .filter(Boolean)
     .join(" · ");
 
+  // ─── Verificatie: bestaat factuur nog in Moneybird? ───
+  // Returns true als factuur nog bestaat, anders reset state en toont melding.
+  const verifyInvoiceExists = async (): Promise<boolean> => {
+    if (!factuurId) return false;
+    try {
+      const res = await invoke("check_invoice_exists", { invoice_id: factuurId });
+      if (res?.exists === false) {
+        // Reset DB
+        if (p.verkoopId) {
+          await supabase
+            .from("vehicle_sales")
+            .update({ moneybird_factuur_id: null })
+            .eq("id", p.verkoopId);
+        }
+        await p.onSaved({
+          moneybird_factuur_id: null,
+          moneybird_factuur_url: null,
+          moneybird_factuur_nummer: null,
+          factuur_verstuurd: false,
+          factuur_email_verzonden_op: null,
+          factuur_status: null,
+          stap7_afgerond: false,
+        });
+        // Reset lokale wizard state
+        setFactuurId(null);
+        setFactuurUrl(null);
+        setFactuurNummer(null);
+        setEmailVerzondenOp(null);
+        setFactuurVerstuurd(false);
+        setBevestigd(false);
+        toast.error("De factuur bestaat niet meer in Moneybird. Je kunt een nieuwe factuur aanmaken.");
+        return false;
+      }
+      return true;
+    } catch (e: any) {
+      console.error("Factuurcheck mislukt:", e);
+      // Bij netwerk-/serverfout: niet resetten, gewoon doorlaten zodat onderliggende actie de echte fout toont.
+      return true;
+    }
+  };
+
+  // Open factuur in Moneybird, maar verifieer eerst dat hij nog bestaat.
+  const handleOpenInMoneybird = async () => {
+    if (!factuurUrl) return;
+    if (!(await verifyInvoiceExists())) return;
+    window.open(factuurUrl, "_blank", "noopener,noreferrer");
+  };
+
   // ─── Acties ───
   const handleAanmaken = async () => {
     if (!p.verkoopId) {
@@ -304,6 +352,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   // Verzenden per e-mail (maakt factuur definitief via send_invoice)
   const handleEmailen = async () => {
     if (!factuurId) return;
+    if (!(await verifyInvoiceExists())) return;
     setSending(true);
     try {
       const res = await invoke("send_sales_invoice", {
@@ -338,6 +387,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   // Handmatig verzonden — maakt factuur definitief (Manual delivery)
   const handleManueel = async () => {
     if (!factuurId) return;
+    if (!(await verifyInvoiceExists())) return;
     setMarking(true);
     try {
       const res = await invoke("send_sales_invoice", {
@@ -536,15 +586,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
 
             {/* Controleren */}
             {factuurUrl && (
-              <a
-                href={factuurUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={handleOpenInMoneybird}
                 className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 Factuur bekijken in Moneybird
-              </a>
+              </button>
             )}
 
             {/* E-mailadres veld (vooraf gevuld) */}
@@ -606,15 +655,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
 
             <div className="flex flex-wrap gap-2">
               {factuurUrl && (
-                <a
-                  href={factuurUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={handleOpenInMoneybird}
                   className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
                 >
                   <ExternalLink className="h-4 w-4" />
                   Bekijken in Moneybird
-                </a>
+                </button>
               )}
               <button
                 type="button"
