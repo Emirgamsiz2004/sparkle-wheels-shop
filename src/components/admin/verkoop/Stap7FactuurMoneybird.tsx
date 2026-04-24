@@ -308,7 +308,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       toast.error("Klantgegevens ontbreken — vul stap 3 eerst in");
       return;
     }
-    if (factuurRegels.length === 0) {
+    if (regels.length === 0) {
       toast.error("Geen factuurregels");
       return;
     }
