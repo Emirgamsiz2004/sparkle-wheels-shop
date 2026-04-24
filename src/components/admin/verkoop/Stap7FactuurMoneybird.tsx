@@ -339,7 +339,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         tax_number: p.klantBtw || undefined,
       };
 
-      const isBtwWorkflow = BTW_WORKFLOW_IDS.has(workflowId);
+      // isBtwWorkflow al berekend op component-niveau
 
       // BTW-tarieven ophalen uit Moneybird (sales_invoice tarieven met percentage 0 en 21).
       // Cache binnen module-scope.
