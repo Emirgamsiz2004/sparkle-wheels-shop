@@ -190,6 +190,47 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     .filter(Boolean)
     .join(" · ");
 
+  // ─── Verificatie: bestaat factuur nog in Moneybird? ───
+  // Returns true als factuur nog bestaat, anders reset state en toont melding.
+  const verifyInvoiceExists = async (): Promise<boolean> => {
+    if (!factuurId) return false;
+    try {
+      const res = await invoke("check_invoice_exists", { invoice_id: factuurId });
+      if (res?.exists === false) {
+        // Reset DB
+        if (p.verkoopId) {
+          await supabase
+            .from("vehicle_sales")
+            .update({ moneybird_factuur_id: null })
+            .eq("id", p.verkoopId);
+        }
+        await p.onSaved({
+          moneybird_factuur_id: null,
+          moneybird_factuur_url: null,
+          moneybird_factuur_nummer: null,
+          factuur_verstuurd: false,
+          factuur_email_verzonden_op: null,
+          factuur_status: null,
+          stap7_afgerond: false,
+        });
+        // Reset lokale wizard state
+        setFactuurId(null);
+        setFactuurUrl(null);
+        setFactuurNummer(null);
+        setEmailVerzondenOp(null);
+        setFactuurVerstuurd(false);
+        setBevestigd(false);
+        toast.error("De factuur bestaat niet meer in Moneybird. Je kunt een nieuwe factuur aanmaken.");
+        return false;
+      }
+      return true;
+    } catch (e: any) {
+      console.error("Factuurcheck mislukt:", e);
+      // Bij netwerk-/serverfout: niet resetten, gewoon doorlaten zodat onderliggende actie de echte fout toont.
+      return true;
+    }
+  };
+
   // ─── Acties ───
   const handleAanmaken = async () => {
     if (!p.verkoopId) {
