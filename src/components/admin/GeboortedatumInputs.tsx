@@ -6,9 +6,11 @@ import { cn } from "@/lib/utils";
 export const GeboortedatumInputs = ({
   value,
   onChange,
+  showSegmentLabels = false,
 }: {
   value: string;
   onChange: (v: string) => void;
+  showSegmentLabels?: boolean;
 }) => {
   const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
   const initialDay = parts ? parts[3] : "";
@@ -92,45 +94,56 @@ export const GeboortedatumInputs = ({
 
   const baseCls =
     "h-10 rounded-[10px] border-[0.5px] border-input bg-transparent px-3 py-2 text-sm text-center tabular-nums focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors";
+  const segmentLabelCls = "text-[11px] uppercase tracking-wide text-muted-foreground";
+  const segmentWrapCls = showSegmentLabels ? "space-y-1.5" : "";
 
   return (
     <div>
-      <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-2 items-center">
-        <input
-          autoComplete="off"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          placeholder="DD"
-          value={dag}
-          onChange={(e) => handleDag(e.target.value)}
-          maxLength={2}
-          className={cn(baseCls, error && "border-destructive")}
-          aria-label="Dag"
-        />
-        <input
-          autoComplete="off"
-          ref={maandRef}
-          inputMode="numeric"
-          pattern="[0-9]*"
-          placeholder="MM"
-          value={maand}
-          onChange={(e) => handleMaand(e.target.value)}
-          maxLength={2}
-          className={cn(baseCls, error && "border-destructive")}
-          aria-label="Maand"
-        />
-        <input
-          autoComplete="off"
-          ref={jaarRef}
-          inputMode="numeric"
-          pattern="[0-9]*"
-          placeholder="JJJJ"
-          value={jaar}
-          onChange={(e) => handleJaar(e.target.value)}
-          maxLength={4}
-          className={cn(baseCls, error && "border-destructive")}
-          aria-label="Jaar"
-        />
+      <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-2 items-start">
+        <div className={segmentWrapCls}>
+          {showSegmentLabels && <div className={segmentLabelCls}>Dag</div>}
+          <input
+            autoComplete="off"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="DD"
+            value={dag}
+            onChange={(e) => handleDag(e.target.value)}
+            maxLength={2}
+            className={cn(baseCls, error && "border-destructive")}
+            aria-label="Dag"
+          />
+        </div>
+        <div className={segmentWrapCls}>
+          {showSegmentLabels && <div className={segmentLabelCls}>Maand</div>}
+          <input
+            autoComplete="off"
+            ref={maandRef}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="MM"
+            value={maand}
+            onChange={(e) => handleMaand(e.target.value)}
+            maxLength={2}
+            className={cn(baseCls, error && "border-destructive")}
+            aria-label="Maand"
+          />
+        </div>
+        <div className={segmentWrapCls}>
+          {showSegmentLabels && <div className={segmentLabelCls}>Jaar</div>}
+          <input
+            autoComplete="off"
+            ref={jaarRef}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="JJJJ"
+            value={jaar}
+            onChange={(e) => handleJaar(e.target.value)}
+            maxLength={4}
+            className={cn(baseCls, error && "border-destructive")}
+            aria-label="Jaar"
+          />
+        </div>
       </div>
       {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
     </div>
