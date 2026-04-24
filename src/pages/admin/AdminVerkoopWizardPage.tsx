@@ -325,6 +325,13 @@ const AdminVerkoopWizardPage = () => {
         setInrContactpersoon(e.inruil_contactpersoon || "");
         if (["verrekend", "contant", "overboeking"].includes(e.inruil_betaalwijze)) setInrBetaalwijze(e.inruil_betaalwijze);
         setInkoopverklaringId(e.inruil_inkoopverklaring_id || null);
+        // Stap 7 hydration — Factuur Moneybird
+        setFactuurMbId((e.moneybird_factuur_id as string) || null);
+        setFactuurMbUrl((e.moneybird_factuur_url as string) || null);
+        setFactuurMbNummer((e.moneybird_factuur_nummer as string) || null);
+        setFactuurDatum((e.factuurdatum as string) || null);
+        setFactuurReferentie((e.factuur_referentie as string) || null);
+        setFactuurEmailVerzondenOp((e.factuur_email_verzonden_op as string) || null);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
