@@ -88,6 +88,28 @@ export function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): jsP
   doc.text(`Kenteken: ${v.kenteken || "-"}`, ml, y);
   y += 10;
 
+  // Inruil sectie (optioneel)
+  if (data.inruil) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("Inruil voertuig", ml, y);
+    y += 6;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const inr = data.inruil;
+    const inrText = `${inr.merk || ""} ${inr.model || ""}`.trim();
+    if (inrText) {
+      doc.text(inrText, ml, y);
+      y += 5;
+    }
+    if (inr.kenteken) {
+      doc.text(`Kenteken: ${inr.kenteken}`, ml, y);
+      y += 5;
+    }
+    doc.text(`Inruilwaarde: ${formatEur(inr.waarde)}`, ml, y);
+    y += 10;
+  }
+
   // Bedragen
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
@@ -103,8 +125,12 @@ export function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): jsP
     y += 6;
   };
   drawRow("Verkoopprijs", formatEur(data.verkoopprijs));
-  drawRow("Aanbetalingsbedrag", formatEur(data.aanbetalingsbedrag), true);
+  if (data.inruil) drawRow("Inruilwaarde", `- ${formatEur(data.inruil.waarde)}`);
+  drawRow("Aanbetalingsbedrag", `- ${formatEur(data.aanbetalingsbedrag)}`, true);
   if (data.betaalwijze) drawRow("Betaalmethode", data.betaalwijze);
+  // Separator line
+  doc.setDrawColor(180);
+  doc.line(ml, y - 2, ml + cw, y - 2);
   drawRow("Restbedrag", formatEur(data.restbedrag), true);
   drawRow("Verwachte leverdatum", formatDate(data.leverdatum));
   y += 6;
