@@ -1506,8 +1506,13 @@ interface Stap2Props {
 
 const Stap2Aflevering = (p: Stap2Props) => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [inruilOpBewijs, setInruilOpBewijs] = useState(false);
+  const [inruilBewKenteken, setInruilBewKenteken] = useState("");
+  const [inruilBewMerkModel, setInruilBewMerkModel] = useState("");
+  const [inruilBewWaarde, setInruilBewWaarde] = useState<number | "">("");
   const aanbetaling = p.aanbetalingBedrag === "" ? 0 : Number(p.aanbetalingBedrag);
-  const restbedrag = Math.max(0, (p.verkoopprijs || 0) - aanbetaling);
+  const inruilWaardeNum = inruilOpBewijs && inruilBewWaarde !== "" ? Number(inruilBewWaarde) : 0;
+  const restbedrag = Math.max(0, (p.verkoopprijs || 0) - aanbetaling - inruilWaardeNum);
   const today = new Date().toISOString().slice(0, 10);
   const laterOphalen = p.afleverwijze !== "vandaag";
   const isAflevering = p.afleverwijze === "aflevering";
