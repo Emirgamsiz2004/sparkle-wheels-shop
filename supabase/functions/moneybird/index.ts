@@ -396,6 +396,7 @@ Deno.serve(async (req) => {
         }
 
         // 2) Verkoopfactuur opbouwen
+        const { custom_fields_attributes: wCustomFields } = params as any;
         const invoiceBody: Record<string, unknown> = {
           contact_id: contact.id,
           reference: reference || undefined,
@@ -409,6 +410,12 @@ Deno.serve(async (req) => {
           })),
         };
         if (workflow_id) invoiceBody.workflow_id = String(workflow_id);
+        if (Array.isArray(wCustomFields) && wCustomFields.length > 0) {
+          invoiceBody.custom_fields_attributes = wCustomFields.map((cf: any) => ({
+            id: String(cf.id),
+            value: cf.value == null ? "" : String(cf.value),
+          }));
+        }
 
         const invoice = await mbFetch("sales_invoices.json", {
           method: "POST",
