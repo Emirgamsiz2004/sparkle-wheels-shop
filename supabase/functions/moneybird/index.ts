@@ -210,14 +210,27 @@ Deno.serve(async (req) => {
 
       case "send_sales_invoice": {
         const { invoice_id, delivery_method } = params;
-        result = await mbFetch(`sales_invoices/${invoice_id}/send_invoice.json`, {
+        if (!invoice_id) throw new Error("invoice_id is required");
+        const method = delivery_method === "Email" ? "Email" : "Manual";
+        // Dit endpoint maakt de factuur automatisch definitief (state: open)
+        await mbFetch(`sales_invoices/${invoice_id}/send_invoice.json`, {
           method: "PATCH",
           body: JSON.stringify({
             sales_invoice_sending: {
-              delivery_method: delivery_method || "Manual",
+              delivery_method: method,
+              sending_scheduled_at: null,
             },
           }),
         });
+        // Haal bijgewerkte factuur op (met nieuwe state)
+        const updated = await mbFetch(`sales_invoices/${invoice_id}.json`);
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        result = {
+          invoice: updated,
+          state: updated?.state,
+          delivery_method: method,
+          moneybird_url: `https://moneybird.com/${adminId}/sales_invoices/${invoice_id}`,
+        };
         break;
       }
 
