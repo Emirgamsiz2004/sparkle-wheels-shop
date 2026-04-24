@@ -2347,6 +2347,9 @@ export type Database = {
           created_at: string | null
           customer_id: string | null
           factuur_betaald: boolean | null
+          factuur_email_verzonden_op: string | null
+          factuur_referentie: string | null
+          factuurdatum: string | null
           financiering: boolean | null
           financiering_maatschappij: string | null
           garantie_looptijd: number | null
@@ -2384,6 +2387,7 @@ export type Database = {
           leges: number | null
           leverdatum: string | null
           moneybird_factuur_id: string | null
+          moneybird_factuur_nummer: string | null
           moneybird_factuur_url: string | null
           opmerkingen: string | null
           overboeking_bedrag: number | null
@@ -2436,6 +2440,9 @@ export type Database = {
           created_at?: string | null
           customer_id?: string | null
           factuur_betaald?: boolean | null
+          factuur_email_verzonden_op?: string | null
+          factuur_referentie?: string | null
+          factuurdatum?: string | null
           financiering?: boolean | null
           financiering_maatschappij?: string | null
           garantie_looptijd?: number | null
@@ -2473,6 +2480,7 @@ export type Database = {
           leges?: number | null
           leverdatum?: string | null
           moneybird_factuur_id?: string | null
+          moneybird_factuur_nummer?: string | null
           moneybird_factuur_url?: string | null
           opmerkingen?: string | null
           overboeking_bedrag?: number | null
@@ -2525,6 +2533,9 @@ export type Database = {
           created_at?: string | null
           customer_id?: string | null
           factuur_betaald?: boolean | null
+          factuur_email_verzonden_op?: string | null
+          factuur_referentie?: string | null
+          factuurdatum?: string | null
           financiering?: boolean | null
           financiering_maatschappij?: string | null
           garantie_looptijd?: number | null
@@ -2562,6 +2573,7 @@ export type Database = {
           leges?: number | null
           leverdatum?: string | null
           moneybird_factuur_id?: string | null
+          moneybird_factuur_nummer?: string | null
           moneybird_factuur_url?: string | null
           opmerkingen?: string | null
           overboeking_bedrag?: number | null
