@@ -58,6 +58,8 @@ export interface Stap7Props {
   voertuigMerk: string;
   voertuigModel: string;
   voertuigBouwjaar?: number | null;
+  voertuigChassisnummer?: string | null;
+  voertuigKilometerstand?: number | null;
   voertuigType: VoertuigType;
 
   // Bedragen
