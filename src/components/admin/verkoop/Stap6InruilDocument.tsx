@@ -70,6 +70,39 @@ const formatEur = (n: number) =>
 export default function Stap6InruilDocument(p: Stap6Props) {
   const [generating, setGenerating] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+  const autoFilledRef = useRef(false);
+
+  // Auto-fill verkoper-velden (particulier) met klantgegevens uit stap 3 — slechts één keer,
+  // en alleen als de velden nog leeg zijn. Velden blijven daarna bewerkbaar.
+  useEffect(() => {
+    if (!p.inruil) return;
+    if (p.docType !== "particulier") return;
+    if (autoFilledRef.current) return;
+
+    const allEmpty =
+      !p.verkoperVoornaam &&
+      !p.verkoperAchternaam &&
+      !p.verkoperGeboortedatum &&
+      !p.verkoperAdres &&
+      !p.verkoperPostcode &&
+      !p.verkoperWoonplaats &&
+      !p.verkoperTelefoon;
+
+    const hasKlantData =
+      !!(p.klantVoornaam || p.klantAchternaam || p.klantAdres || p.klantPostcode || p.klantWoonplaats || p.klantTelefoon || p.klantGeboortedatum);
+
+    if (allEmpty && hasKlantData) {
+      if (p.klantVoornaam) p.setVerkoperVoornaam(p.klantVoornaam);
+      if (p.klantAchternaam) p.setVerkoperAchternaam(p.klantAchternaam);
+      if (p.klantGeboortedatum) p.setVerkoperGeboortedatum(p.klantGeboortedatum);
+      if (p.klantAdres) p.setVerkoperAdres(p.klantAdres);
+      if (p.klantPostcode) p.setVerkoperPostcode(p.klantPostcode);
+      if (p.klantWoonplaats) p.setVerkoperWoonplaats(p.klantWoonplaats);
+      if (p.klantTelefoon) p.setVerkoperTelefoon(p.klantTelefoon);
+      autoFilledRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.inruil, p.docType, p.klantVoornaam, p.klantAchternaam, p.klantGeboortedatum, p.klantAdres, p.klantPostcode, p.klantWoonplaats, p.klantTelefoon]);
 
   // Niet van toepassing
   if (!p.inruil) {
