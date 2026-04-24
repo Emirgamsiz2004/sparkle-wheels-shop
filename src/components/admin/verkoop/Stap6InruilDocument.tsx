@@ -300,18 +300,17 @@ export default function Stap6InruilDocument(p: Stap6Props) {
               <label className={labelCls}>Achternaam *</label>
               <input className={inputCls} value={p.verkoperAchternaam} onChange={(e) => p.setVerkoperAchternaam(e.target.value)} />
             </div>
-            <div className="col-span-2 grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Geboortedatum</label>
-                <GeboortedatumInputs
-                  value={p.verkoperGeboortedatum}
-                  onChange={p.setVerkoperGeboortedatum}
-                />
-              </div>
-              <div>
-                <label className={labelCls}>Telefoon</label>
-                <input className={inputCls} value={p.verkoperTelefoon} onChange={(e) => p.setVerkoperTelefoon(e.target.value)} />
-              </div>
+            <div className="col-span-2">
+              <label className={labelCls}>Geboortedatum</label>
+              <GeboortedatumInputs
+                value={p.verkoperGeboortedatum}
+                onChange={p.setVerkoperGeboortedatum}
+                showSegmentLabels
+              />
+            </div>
+            <div className="col-span-2">
+              <label className={labelCls}>Telefoon</label>
+              <input className={inputCls} value={p.verkoperTelefoon} onChange={(e) => p.setVerkoperTelefoon(e.target.value)} />
             </div>
             <div className="col-span-2">
               <label className={labelCls}>Adres *</label>
