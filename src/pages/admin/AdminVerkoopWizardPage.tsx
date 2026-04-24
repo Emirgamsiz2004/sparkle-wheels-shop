@@ -20,6 +20,7 @@ import { useMoneybird } from "@/hooks/useMoneybird";
 import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
 import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
 import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
+import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
@@ -439,28 +440,29 @@ const AdminVerkoopWizardPage = () => {
   }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
 
   const handleVolgende = async () => {
-    // Stap-specifieke validatie
-    if (activeStap === 2) {
-      if (afleverwijze === "later") {
-        if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
-        // Aanbetaling is optioneel
-      } else if (afleverwijze === "aflevering") {
-        if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
-        if (!afleveradres.trim()) { toast.error("Afleveradres is verplicht"); return; }
-      }
+    // Centrale validatie eerst
+    const errors = validateStap(activeStap, {
+      verkoopprijs, voertuigType, kmStand, inruil, inruilKenteken, inruilMerk, inruilModel,
+      inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk,
+      afleverwijze, leverdatum, afleveradres, aanbetalingBedrag, aanbetalingBetaalwijze,
+      klantVoornaam, klantAchternaam, klantGeboortedatum, klantAdres, klantPostcode,
+      klantWoonplaats, klantTelefoon, klantEmail, klantZakelijk, klantBedrijfsnaam, klantKvk,
+      garantieType, garantiePakket, garantieLooptijd, garantiePrijs,
+      pdfGenereerd, contractGetekend, restBetaalwijze, betaalwijzeDetails, restbedrag: restbedragGlobal,
+      inrVerkVoornaam, inrVerkAchternaam, inrVerkAdres, inrBetaalwijze, inkoopverklaringId,
+      factuurMbId, factuurVerstuurd,
+    });
+    if (errors.length > 0) {
+      setShowErrorsForStap((s) => new Set(s).add(activeStap));
+      // Scroll naar boven van content om foutenlijst te tonen
+      const main = document.querySelector(".wizard-content");
+      if (main) main.scrollTo({ top: 0, behavior: "smooth" });
+      toast.error(`${errors.length} ontbrekend${errors.length === 1 ? "" : "e"} veld${errors.length === 1 ? "" : "en"}`);
+      return;
     }
+
+    // Stap 3: klant aanmaken/bijwerken + Moneybird sync
     if (activeStap === 3) {
-      if (klantZakelijk) {
-        if (!klantBedrijfsnaam.trim()) { toast.error("Bedrijfsnaam is verplicht"); return; }
-        if (!klantKvk.trim()) { toast.error("KVK-nummer is verplicht"); return; }
-      }
-      if (!klantVoornaam.trim() || !klantAchternaam.trim()) {
-        toast.error(klantZakelijk ? "Contactpersoon voor- en achternaam zijn verplicht" : "Voor- en achternaam zijn verplicht");
-        return;
-      }
-      if (!klantAdres.trim() || !klantPostcode.trim() || !klantWoonplaats.trim()) { toast.error("Adres, postcode en woonplaats zijn verplicht"); return; }
-      if (!klantTelefoon.trim()) { toast.error("Telefoonnummer is verplicht"); return; }
-      // Klant aanmaken of bijwerken
       const customerPayload: any = {
         voornaam: klantVoornaam.trim(),
         achternaam: klantAchternaam.trim(),
@@ -528,6 +530,7 @@ const AdminVerkoopWizardPage = () => {
 
       const ok = await saveCurrent({ stap3_afgerond: true, customer_id: custId });
       if (!ok) return;
+      setShowErrorsForStap((s) => { const n = new Set(s); n.delete(activeStap); return n; });
       setCompleted((p) => ({ ...p, [activeStap]: true }));
       let next = activeStap + 1;
       const nextCompleted = { ...completed, [activeStap]: true };
@@ -535,21 +538,10 @@ const AdminVerkoopWizardPage = () => {
       if (next <= 12) setActiveStap(next);
       return;
     }
-    if (activeStap === 4) {
-      if (garantieType === "autotrust") {
-        if (!garantiePakket.trim()) { toast.error("Pakket naam is verplicht"); return; }
-        if (garantieLooptijd === "" || Number(garantieLooptijd) <= 0) { toast.error("Looptijd is verplicht"); return; }
-        if (garantiePrijs === "" || Number(garantiePrijs) < 0) { toast.error("Garantieprijs is verplicht"); return; }
-      }
-    }
-    if (activeStap === 5) {
-      if (!contractGetekend) {
-        toast.error("Bevestig eerst dat de koopovereenkomst getekend is voordat je verder gaat");
-        return;
-      }
-    }
+
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
     if (!ok) return;
+    setShowErrorsForStap((s) => { const n = new Set(s); n.delete(activeStap); return n; });
     setCompleted((p) => ({ ...p, [activeStap]: true }));
     // Volgende non-blocked stap zoeken
     let next = activeStap + 1;
@@ -581,6 +573,92 @@ const AdminVerkoopWizardPage = () => {
 
   const currentStep = STEPS.find((s) => s.num === activeStap)!;
 
+  // ───────────────────────────────────────────────────────────
+  // Centrale validatie
+  // ───────────────────────────────────────────────────────────
+  const verkoopprijsNum = verkoopprijs === "" ? 0 : Number(verkoopprijs);
+  const afleverkostenNum = afleverkosten === "" ? 0 : Number(afleverkosten);
+  const legesNum = leges === "" ? 0 : Number(leges);
+  const garantiePrijsNum = garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0;
+  const aanbetalingNum = aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag);
+  const restbedragGlobal = Math.max(
+    0,
+    verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum,
+  );
+
+  const wizardState: WizardState = useMemo(
+    () => ({
+      verkoopprijs,
+      voertuigType,
+      kmStand,
+      inruil,
+      inruilKenteken,
+      inruilMerk,
+      inruilModel,
+      inruilWaarde,
+      inruilVerkoper,
+      inruilBedrijfsnaam,
+      inruilKvk,
+      afleverwijze,
+      leverdatum,
+      afleveradres,
+      aanbetalingBedrag,
+      aanbetalingBetaalwijze,
+      klantVoornaam,
+      klantAchternaam,
+      klantGeboortedatum,
+      klantAdres,
+      klantPostcode,
+      klantWoonplaats,
+      klantTelefoon,
+      klantEmail,
+      klantZakelijk,
+      klantBedrijfsnaam,
+      klantKvk,
+      garantieType,
+      garantiePakket,
+      garantieLooptijd,
+      garantiePrijs,
+      pdfGenereerd,
+      contractGetekend,
+      restBetaalwijze,
+      betaalwijzeDetails,
+      restbedrag: restbedragGlobal,
+      inrVerkVoornaam,
+      inrVerkAchternaam,
+      inrVerkAdres,
+      inrBetaalwijze,
+      inkoopverklaringId,
+      factuurMbId,
+      factuurVerstuurd,
+    }),
+    [
+      verkoopprijs, voertuigType, kmStand, inruil, inruilKenteken, inruilMerk, inruilModel,
+      inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk,
+      afleverwijze, leverdatum, afleveradres, aanbetalingBedrag, aanbetalingBetaalwijze,
+      klantVoornaam, klantAchternaam, klantGeboortedatum, klantAdres, klantPostcode,
+      klantWoonplaats, klantTelefoon, klantEmail, klantZakelijk, klantBedrijfsnaam, klantKvk,
+      garantieType, garantiePakket, garantieLooptijd, garantiePrijs,
+      pdfGenereerd, contractGetekend, restBetaalwijze, betaalwijzeDetails, restbedragGlobal,
+      inrVerkVoornaam, inrVerkAchternaam, inrVerkAdres, inrBetaalwijze, inkoopverklaringId,
+      factuurMbId, factuurVerstuurd,
+    ],
+  );
+
+  // Welke stappen tonen hun foutenlijst (na klik op Volgende)
+  const [showErrorsForStap, setShowErrorsForStap] = useState<Set<number>>(new Set());
+
+  const currentErrors = useMemo(() => validateStap(activeStap, wizardState), [activeStap, wizardState]);
+  const currentWarnings = useMemo(() => getStapWarnings(activeStap, wizardState), [activeStap, wizardState]);
+  const showErrors = showErrorsForStap.has(activeStap) && currentErrors.length > 0;
+
+  // Bereken voor sidebar: per stap of er ontbrekende info is
+  const stepHasIssues = (stapNum: number): boolean => {
+    if (stapNum === 6 && !inruil) return false; // n.v.t.
+    return validateStap(stapNum, wizardState).length > 0;
+  };
+
+
   if (loadingVehicles || !vehicle) {
     return (
       <div className="admin-theme min-h-screen bg-background flex items-center justify-center">
@@ -605,6 +683,7 @@ const AdminVerkoopWizardPage = () => {
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               const nvt = step.optional && !inruil;
+              const hasIssues = !nvt && !blocked && stepHasIssues(step.num);
 
               return (
                 <button
@@ -621,16 +700,29 @@ const AdminVerkoopWizardPage = () => {
                   <span
                     className={[
                       "w-6 h-6 shrink-0 flex items-center justify-center rounded-full text-[11px] font-medium border",
-                      done ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400" : "",
-                      !done && active ? "bg-foreground/10 border-foreground/40 text-foreground" : "",
-                      !done && !active ? "border-sidebar-border text-sidebar-foreground/60" : "",
+                      done && !hasIssues ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400" : "",
+                      hasIssues && !active ? "bg-amber-500/15 border-amber-500/40 text-amber-400" : "",
+                      hasIssues && active ? "bg-amber-500/20 border-amber-500/60 text-amber-300" : "",
+                      !done && !hasIssues && active ? "bg-foreground/10 border-foreground/40 text-foreground" : "",
+                      !done && !hasIssues && !active ? "border-sidebar-border text-sidebar-foreground/60" : "",
                     ].join(" ")}
                   >
-                    {done ? <Check className="w-3.5 h-3.5" /> : nvt ? <Lock className="w-3 h-3" /> : step.num}
+                    {hasIssues ? (
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                    ) : done ? (
+                      <Check className="w-3.5 h-3.5" />
+                    ) : nvt ? (
+                      <Lock className="w-3 h-3" />
+                    ) : (
+                      step.num
+                    )}
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-[13px] font-medium truncate">{step.title}</span>
                     {nvt && <span className="block text-[10px] text-muted-foreground mt-0.5">Nvt</span>}
+                    {hasIssues && !nvt && (
+                      <span className="block text-[10px] text-amber-400/80 mt-0.5">Ontbrekende info</span>
+                    )}
                   </span>
                 </button>
               );
@@ -672,6 +764,42 @@ const AdminVerkoopWizardPage = () => {
               <h1 className="text-2xl font-semibold text-foreground mb-1">{currentStep.title}</h1>
               <p className="text-sm text-muted-foreground">{currentStep.description}</p>
             </div>
+
+            {/* Foutenlijst — verschijnt na klik op Volgende met ontbrekende info */}
+            {showErrors && (
+              <div className="mb-6 rounded-[10px] border border-destructive/40 bg-destructive/10 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-destructive mb-2">
+                      Let op — de volgende informatie ontbreekt:
+                    </div>
+                    <ul className="space-y-1">
+                      {currentErrors.map((err, i) => (
+                        <li key={i} className="text-[13px] text-destructive/90 flex items-start gap-2">
+                          <span className="text-destructive/60">•</span>
+                          <span>{err}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Optionele waarschuwingen */}
+            {currentWarnings.length > 0 && (
+              <div className="mb-6 rounded-[10px] border border-amber-500/40 bg-amber-500/10 p-4">
+                <div className="flex items-start gap-3">
+                  <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <ul className="space-y-1 flex-1">
+                    {currentWarnings.map((w, i) => (
+                      <li key={i} className="text-[13px] text-amber-200">{w}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
 
             {/* Stap inhoud */}
             {activeStap === 1 && (
