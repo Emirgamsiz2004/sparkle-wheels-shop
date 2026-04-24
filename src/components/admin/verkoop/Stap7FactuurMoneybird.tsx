@@ -111,6 +111,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const { invoke } = useMoneybird();
 
   const [factuurdatum, setFactuurdatum] = useState<string>(p.initialFactuurdatum || today());
+  const [vervaldatum, setVervaldatum] = useState<string>(p.initialFactuurdatum || today());
+  const [notitie, setNotitie] = useState<string>("");
   const [referentie, setReferentie] = useState<string>(
     p.initialReferentie || (p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "")
   );
@@ -121,7 +123,6 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const [emailVerzondenOp, setEmailVerzondenOp] = useState<string | null>(p.initialEmailVerzondenOp || null);
   const [factuurVerstuurd, setFactuurVerstuurd] = useState<boolean>(!!p.initialFactuurVerstuurd);
   const [emailAdres, setEmailAdres] = useState<string>(p.initialFactuurEmail || p.klantEmail || "");
-  // (verzendkeuze toggle vervangen door 2 directe knoppen)
 
   const [creating, setCreating] = useState(false);
   const [sending, setSending] = useState(false);
@@ -145,42 +146,101 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     return `${isBtw ? "BTW" : "Marge"} · ${hasAutotrust ? "met Autotrust" : "geen garantie"}`;
   }, [p.voertuigType, p.garantieType]);
 
+  const isBtwWorkflow = BTW_WORKFLOW_IDS.has(workflowId);
+
   const num = (v: number | "" | null | undefined) => (typeof v === "number" ? v : 0);
 
-  const factuurRegels = useMemo(() => {
-    type Kind = "voertuig" | "garantie" | "afleverkosten" | "leges" | "aanbetaling";
-    const regels: Array<{ kind: Kind; description: string; price: number; amount: string }> = [];
+  // ─── Bewerkbare factuurregels (preview) ───
+  type RegelKind = "voertuig" | "garantie" | "aanbetaling" | "extra";
+  type Regel = {
+    id: string;
+    kind: RegelKind;
+    description: string;
+    price: number; // incl. BTW (prijs zoals in wizard)
+    btwPercent: 0 | 21;
+    locked?: boolean; // bedrag niet aanpasbaar (aanbetaling)
+  };
+
+  const buildInitialRegels = (): Regel[] => {
+    const list: Regel[] = [];
     const kenteken = p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "";
     const bouwjaar = p.voertuigBouwjaar ? ` (${p.voertuigBouwjaar})` : "";
-    regels.push({
+    const voertuigPrijs =
+      num(p.verkoopprijs) + num(p.afleverkosten) + num(p.leges);
+    list.push({
+      id: "voertuig",
       kind: "voertuig",
       description: `Voertuig ${kenteken} ${p.voertuigMerk} ${p.voertuigModel}${bouwjaar}`.trim(),
-      price: num(p.verkoopprijs),
-      amount: "1 x",
+      price: voertuigPrijs,
+      btwPercent: isBtwWorkflow ? 21 : 0,
     });
     if (p.garantieType === "autotrust" && num(p.garantiePrijs) > 0) {
       const looptijd = num(p.garantieLooptijd);
       const pakket = p.garantiePakket || "Autotrust";
-      regels.push({
+      list.push({
+        id: "garantie",
         kind: "garantie",
         description: `Garantie ${pakket}${looptijd ? ` · ${looptijd} maanden` : ""} via Autotrust`,
         price: num(p.garantiePrijs),
-        amount: "1 x",
+        btwPercent: 0,
       });
     }
-    if (num(p.afleverkosten) > 0) {
-      regels.push({ kind: "afleverkosten", description: "Afleverkosten", price: num(p.afleverkosten), amount: "1 x" });
-    }
-    if (num(p.leges) > 0) {
-      regels.push({ kind: "leges", description: "Leges / tenaamstelling", price: num(p.leges), amount: "1 x" });
-    }
     if (num(p.aanbetalingBedrag) > 0) {
-      regels.push({ kind: "aanbetaling", description: "Aanbetaling (reeds voldaan)", price: -num(p.aanbetalingBedrag), amount: "1 x" });
+      list.push({
+        id: "aanbetaling",
+        kind: "aanbetaling",
+        description: "Aanbetaling (reeds voldaan)",
+        price: -num(p.aanbetalingBedrag),
+        btwPercent: 0,
+        locked: true,
+      });
     }
-    return regels;
-  }, [p]);
+    return list;
+  };
 
-  const totaal = useMemo(() => factuurRegels.reduce((s, r) => s + r.price, 0), [factuurRegels]);
+  const [regels, setRegels] = useState<Regel[]>(buildInitialRegels);
+
+  // Voertuig-BTW% volgt workflow live
+  useEffect(() => {
+    setRegels((prev) =>
+      prev.map((r) =>
+        r.kind === "voertuig" ? { ...r, btwPercent: isBtwWorkflow ? 21 : 0 } : r
+      )
+    );
+  }, [isBtwWorkflow]);
+
+  const updateRegel = (id: string, patch: Partial<Regel>) => {
+    setRegels((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  };
+  const removeRegel = (id: string) => {
+    setRegels((prev) => prev.filter((r) => r.id !== id));
+  };
+  const addExtraRegel = () => {
+    setRegels((prev) => [
+      ...prev,
+      {
+        id: `extra-${Date.now()}`,
+        kind: "extra",
+        description: "",
+        price: 0,
+        btwPercent: isBtwWorkflow ? 21 : 0,
+      },
+    ]);
+  };
+
+  // Totalen — prijzen zijn incl. BTW
+  const { subtotaal, btwTotaal, totaal } = useMemo(() => {
+    let sub = 0;
+    let btw = 0;
+    for (const r of regels) {
+      const factor = 1 + r.btwPercent / 100;
+      const excl = r.price / factor;
+      sub += excl;
+      btw += r.price - excl;
+    }
+    return { subtotaal: sub, btwTotaal: btw, totaal: sub + btw };
+  }, [regels]);
+
 
   // Klantnaam tonen
   const klantNaam = p.klantZakelijk && p.klantBedrijfsnaam
@@ -248,7 +308,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       toast.error("Klantgegevens ontbreken — vul stap 3 eerst in");
       return;
     }
-    if (factuurRegels.length === 0) {
+    if (regels.length === 0) {
       toast.error("Geen factuurregels");
       return;
     }
@@ -279,7 +339,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         tax_number: p.klantBtw || undefined,
       };
 
-      const isBtwWorkflow = BTW_WORKFLOW_IDS.has(workflowId);
+      // isBtwWorkflow al berekend op component-niveau
 
       // BTW-tarieven ophalen uit Moneybird (sales_invoice tarieven met percentage 0 en 21).
       // Cache binnen module-scope.
@@ -336,26 +396,22 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         workflow_id: workflowId,
         reference: referentie || undefined,
         invoice_date: factuurdatum,
+        due_date: vervaldatum || undefined,
         prices_are_incl_tax: true,
-        details_attributes: factuurRegels.map((r) => {
-          // Voertuigregel: 21% bij BTW-workflow, anders 0%. Garantie + aanbetaling: altijd 0%.
-          let taxRateId: string | null = null;
-          if (r.kind === "voertuig") {
-            taxRateId = isBtwWorkflow ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
-          } else if (r.kind === "garantie" || r.kind === "aanbetaling") {
-            taxRateId = TAX_RATE_ID_NULPROCENT;
-          } else {
-            // afleverkosten / leges: volg workflow (BTW of marge=0%)
-            taxRateId = isBtwWorkflow ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
-          }
-          return {
-            description: r.description,
-            price: r.price,
-            amount: "1",
-            ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
-          };
-        }),
+        details_attributes: regels
+          .filter((r) => (r.description || "").trim() !== "" || r.price !== 0)
+          .map((r) => {
+            // Gebruik BTW% per regel zoals ingesteld in de preview.
+            const taxRateId = r.btwPercent === 21 ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
+            return {
+              description: r.description,
+              price: r.price,
+              amount: "1",
+              ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
+            };
+          }),
         custom_fields_attributes: customFields,
+        ...(notitie.trim() ? { invoice_note: notitie.trim() } : {}),
       });
 
       const invoice = res?.invoice;
@@ -544,19 +600,103 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           </div>
         </div>
 
-        {/* Factuurregels */}
+        {/* Bewerkbare factuurregels */}
         <div className="rounded-[8px] border border-border overflow-hidden">
           <table className="w-full text-sm">
+            <thead className="bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left font-medium">Omschrijving</th>
+                <th className="px-3 py-2 text-right font-medium w-24">BTW</th>
+                <th className="px-3 py-2 text-right font-medium w-36">Bedrag (incl.)</th>
+                <th className="px-3 py-2 w-10" />
+              </tr>
+            </thead>
             <tbody>
-              {factuurRegels.map((r, i) => (
-                <tr key={i} className="border-b border-border last:border-b-0">
-                  <td className="px-3 py-2 text-foreground">{r.description}</td>
-                  <td className="px-3 py-2 text-right tabular-nums w-32">{formatEur(r.price)}</td>
+              {regels.map((r) => {
+                const btwLocked = r.kind === "garantie" || r.kind === "aanbetaling";
+                return (
+                  <tr key={r.id} className="border-t border-border">
+                    <td className="px-3 py-2">
+                      <input
+                        type="text"
+                        className="w-full bg-transparent border-0 px-0 py-1 text-sm text-foreground focus:outline-none focus:ring-0"
+                        value={r.description}
+                        onChange={(e) => updateRegel(r.id, { description: e.target.value })}
+                        disabled={!!factuurId}
+                        placeholder="Omschrijving"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <select
+                        className="bg-transparent text-sm text-foreground border-0 focus:outline-none focus:ring-0 disabled:opacity-60"
+                        value={r.btwPercent}
+                        onChange={(e) =>
+                          updateRegel(r.id, { btwPercent: Number(e.target.value) as 0 | 21 })
+                        }
+                        disabled={!!factuurId || btwLocked}
+                      >
+                        <option value={0}>0%</option>
+                        <option value={21}>21%</option>
+                      </select>
+                    </td>
+                    <td className="px-3 py-2 text-right tabular-nums">
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="w-32 bg-transparent border-0 px-0 py-1 text-sm text-right text-foreground focus:outline-none focus:ring-0 tabular-nums disabled:opacity-60"
+                        value={r.price}
+                        onChange={(e) => updateRegel(r.id, { price: Number(e.target.value) || 0 })}
+                        disabled={!!factuurId || r.locked}
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      {!factuurId && r.kind === "extra" && (
+                        <button
+                          type="button"
+                          onClick={() => removeRegel(r.id)}
+                          className="text-muted-foreground hover:text-destructive text-xs"
+                          aria-label="Regel verwijderen"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {!factuurId && (
+                <tr className="border-t border-border">
+                  <td colSpan={4} className="px-3 py-2">
+                    <button
+                      type="button"
+                      onClick={addExtraRegel}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      + Regel toevoegen
+                    </button>
+                  </td>
                 </tr>
-              ))}
-              <tr className="bg-muted/30">
-                <td className="px-3 py-2.5 font-semibold">Totaal incl. BTW</td>
+              )}
+              <tr className="border-t border-border bg-muted/20">
+                <td className="px-3 py-2 text-right text-xs text-muted-foreground" colSpan={2}>
+                  Subtotaal excl. BTW
+                </td>
+                <td className="px-3 py-2 text-right tabular-nums">{formatEur(subtotaal)}</td>
+                <td />
+              </tr>
+              <tr className="bg-muted/20">
+                <td className="px-3 py-2 text-right text-xs text-muted-foreground" colSpan={2}>
+                  BTW
+                </td>
+                <td className="px-3 py-2 text-right tabular-nums">{formatEur(btwTotaal)}</td>
+                <td />
+              </tr>
+              <tr className="bg-muted/40">
+                <td className="px-3 py-2.5 text-right font-semibold" colSpan={2}>
+                  Totaal incl. BTW
+                </td>
                 <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatEur(totaal)}</td>
+                <td />
               </tr>
             </tbody>
           </table>
@@ -569,7 +709,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           <FileText className="h-4 w-4 text-muted-foreground" />
           <h3 className="text-sm font-semibold tracking-tight">Factuurinstellingen</h3>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className={labelCls}>Factuurdatum</label>
             <input
@@ -581,7 +721,17 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             />
           </div>
           <div>
-            <label className={labelCls}>Referentie</label>
+            <label className={labelCls}>Vervaldatum</label>
+            <input
+              type="date"
+              className={inputCls}
+              value={vervaldatum}
+              onChange={(e) => setVervaldatum(e.target.value)}
+              disabled={!!factuurId}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Kenmerk / referentie</label>
             <input
               type="text"
               className={inputCls}
@@ -591,6 +741,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
               disabled={!!factuurId}
             />
           </div>
+        </div>
+        <div>
+          <label className={labelCls}>Notitie onderaan factuur</label>
+          <textarea
+            className={`${inputCls} h-24 py-2 resize-y`}
+            value={notitie}
+            onChange={(e) => setNotitie(e.target.value)}
+            placeholder="Optionele opmerking voor de klant. De wettelijke margeregelingstekst voegt Moneybird automatisch toe via de workflow."
+            disabled={!!factuurId}
+          />
         </div>
         <p className="text-[11px] text-muted-foreground flex items-start gap-1.5">
           <InfoIcon className="h-3 w-3 mt-0.5 flex-shrink-0" />
