@@ -1006,7 +1006,7 @@ const AdminVerkoopWizardPage = () => {
                 voertuigMerk={vehicle?.merk || ""}
                 voertuigModel={vehicle?.model || ""}
                 voertuigBouwjaar={vehicle?.bouwjaar ?? null}
-                voertuigChassisnummer={vehicle?.chassis_nummer ?? null}
+                voertuigChassisnummer={vehicle?.chassisNummer ?? null}
                 voertuigKilometerstand={vehicle?.kilometerstand ?? null}
                 voertuigType={voertuigType}
                 verkoopprijs={verkoopprijs}
