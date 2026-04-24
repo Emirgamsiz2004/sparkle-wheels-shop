@@ -457,7 +457,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           <h3 className="text-sm font-semibold tracking-tight">Acties</h3>
         </div>
 
-        {!factuurId ? (
+        {/* STAP A — Factuur aanmaken (concept) */}
+        {!factuurId && (
           <button
             type="button"
             onClick={handleAanmaken}
@@ -467,12 +468,104 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Receipt className="h-4 w-4" />}
             {creating ? "Aanmaken in Moneybird…" : "Factuur aanmaken in Moneybird"}
           </button>
-        ) : (
+        )}
+
+        {/* Concept aangemaakt — info-melding */}
+        {factuurId && !factuurVerstuurd && (
+          <div className="rounded-[8px] border border-amber-500/30 bg-amber-500/5 px-4 py-3 flex items-center gap-2.5 text-sm">
+            <AlertCircle className="h-4 w-4 text-amber-500" />
+            <span className="font-medium text-amber-700 dark:text-amber-400">
+              Concept aangemaakt{factuurNummer ? ` · ${factuurNummer}` : ""} — kies hieronder hoe te verzenden
+            </span>
+          </div>
+        )}
+
+        {/* STAP B — Verzendkeuze (alleen als factuur bestaat én nog niet verstuurd) */}
+        {factuurId && !factuurVerstuurd && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setVerzendKeuze("email")}
+                className={`inline-flex items-center justify-center gap-2 h-11 px-4 rounded-[10px] border text-sm font-medium transition-colors ${
+                  verzendKeuze === "email"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background hover:bg-muted/50"
+                }`}
+              >
+                <Mail className="h-4 w-4" />
+                E-mailen naar klant
+              </button>
+              <button
+                type="button"
+                onClick={() => setVerzendKeuze("manual")}
+                className={`inline-flex items-center justify-center gap-2 h-11 px-4 rounded-[10px] border text-sm font-medium transition-colors ${
+                  verzendKeuze === "manual"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background hover:bg-muted/50"
+                }`}
+              >
+                <HandCoins className="h-4 w-4" />
+                Handmatig afhandelen
+              </button>
+            </div>
+
+            {verzendKeuze === "email" && (
+              <div className="rounded-[8px] border border-border bg-muted/20 p-4 space-y-3">
+                <div>
+                  <label className={labelCls}>E-mailadres klant</label>
+                  <input
+                    type="email"
+                    className={inputCls}
+                    value={emailAdres}
+                    onChange={(e) => setEmailAdres(e.target.value)}
+                    placeholder="naam@voorbeeld.nl"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleEmailen}
+                  disabled={sending || !emailAdres.trim()}
+                  className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
+                >
+                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {sending ? "Versturen…" : "Factuur versturen"}
+                </button>
+                <p className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                  <InfoIcon className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                  Factuur wordt definitief gemaakt en gemaild via Moneybird (incl. betaallink).
+                </p>
+              </div>
+            )}
+
+            {verzendKeuze === "manual" && (
+              <div className="rounded-[8px] border border-border bg-muted/20 p-4 space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Factuur wordt definitief gemaakt in Moneybird en gemarkeerd als verzonden — je geeft hem zelf mee aan de klant.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleMarkAsSent}
+                  disabled={marking}
+                  className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
+                >
+                  {marking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                  {marking ? "Markeren…" : "Markeer als verzonden"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STAP C — Na verzending */}
+        {factuurId && factuurVerstuurd && (
           <>
             <div className="rounded-[8px] border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 flex items-center gap-2.5 text-sm">
               <Check className="h-4 w-4 text-emerald-500" />
               <span className="font-medium text-emerald-700 dark:text-emerald-400">
-                Factuur aangemaakt
+                {emailVerzondenOp
+                  ? `Factuur verstuurd naar ${p.initialFactuurEmail || emailAdres}`
+                  : "Factuur gemarkeerd als verzonden"}
                 {factuurNummer ? ` · ${factuurNummer}` : ""}
               </span>
             </div>
@@ -491,15 +584,6 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
               )}
               <button
                 type="button"
-                onClick={handleEmailen}
-                disabled={sending || !p.klantEmail}
-                className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors disabled:opacity-60"
-              >
-                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-                {emailVerzondenOp ? "Opnieuw e-mailen" : "Factuur e-mailen"}
-              </button>
-              <button
-                type="button"
                 onClick={handleDownload}
                 disabled={downloading}
                 className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors disabled:opacity-60"
@@ -507,16 +591,22 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
                 {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                 Downloaden als PDF
               </button>
+              {emailVerzondenOp && (
+                <button
+                  type="button"
+                  onClick={handleEmailen}
+                  disabled={sending}
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors disabled:opacity-60"
+                >
+                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                  Factuur opnieuw mailen
+                </button>
+              )}
             </div>
 
             {emailVerzondenOp && (
               <p className="text-[11px] text-muted-foreground">
-                Verstuurd naar {p.klantEmail} op {new Date(emailVerzondenOp).toLocaleString("nl-NL")}
-              </p>
-            )}
-            {!p.klantEmail && (
-              <p className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                <AlertCircle className="h-3 w-3" /> Geen e-mailadres bij klant — factuur kan alleen handmatig verstuurd worden.
+                Laatst verstuurd op {new Date(emailVerzondenOp).toLocaleString("nl-NL")}
               </p>
             )}
           </>
@@ -531,14 +621,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             className="mt-0.5 h-5 w-5 rounded-[4px] border-border accent-primary"
             checked={bevestigd}
             onChange={(e) => handleBevestig(e.target.checked)}
-            disabled={!factuurId}
+            disabled={!factuurVerstuurd}
           />
           <div>
             <div className="text-sm font-medium">
-              Factuur is aangemaakt en verstuurd of meegegeven aan klant
+              Factuur is verstuurd of meegegeven aan klant
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5">
-              Pas aanvinkbaar zodra de factuur in Moneybird is aangemaakt.
+              Wordt automatisch aangevinkt na verzending.
             </div>
           </div>
         </label>
