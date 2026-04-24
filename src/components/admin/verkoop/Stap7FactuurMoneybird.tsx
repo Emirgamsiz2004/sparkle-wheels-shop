@@ -111,6 +111,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const { invoke } = useMoneybird();
 
   const [factuurdatum, setFactuurdatum] = useState<string>(p.initialFactuurdatum || today());
+  const [vervaldatum, setVervaldatum] = useState<string>(p.initialFactuurdatum || today());
+  const [notitie, setNotitie] = useState<string>("");
   const [referentie, setReferentie] = useState<string>(
     p.initialReferentie || (p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "")
   );
@@ -121,7 +123,6 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const [emailVerzondenOp, setEmailVerzondenOp] = useState<string | null>(p.initialEmailVerzondenOp || null);
   const [factuurVerstuurd, setFactuurVerstuurd] = useState<boolean>(!!p.initialFactuurVerstuurd);
   const [emailAdres, setEmailAdres] = useState<string>(p.initialFactuurEmail || p.klantEmail || "");
-  // (verzendkeuze toggle vervangen door 2 directe knoppen)
 
   const [creating, setCreating] = useState(false);
   const [sending, setSending] = useState(false);
@@ -145,42 +146,101 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     return `${isBtw ? "BTW" : "Marge"} · ${hasAutotrust ? "met Autotrust" : "geen garantie"}`;
   }, [p.voertuigType, p.garantieType]);
 
+  const isBtwWorkflow = BTW_WORKFLOW_IDS.has(workflowId);
+
   const num = (v: number | "" | null | undefined) => (typeof v === "number" ? v : 0);
 
-  const factuurRegels = useMemo(() => {
-    type Kind = "voertuig" | "garantie" | "afleverkosten" | "leges" | "aanbetaling";
-    const regels: Array<{ kind: Kind; description: string; price: number; amount: string }> = [];
+  // ─── Bewerkbare factuurregels (preview) ───
+  type RegelKind = "voertuig" | "garantie" | "aanbetaling" | "extra";
+  type Regel = {
+    id: string;
+    kind: RegelKind;
+    description: string;
+    price: number; // incl. BTW (prijs zoals in wizard)
+    btwPercent: 0 | 21;
+    locked?: boolean; // bedrag niet aanpasbaar (aanbetaling)
+  };
+
+  const buildInitialRegels = (): Regel[] => {
+    const list: Regel[] = [];
     const kenteken = p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "";
     const bouwjaar = p.voertuigBouwjaar ? ` (${p.voertuigBouwjaar})` : "";
-    regels.push({
+    const voertuigPrijs =
+      num(p.verkoopprijs) + num(p.afleverkosten) + num(p.leges);
+    list.push({
+      id: "voertuig",
       kind: "voertuig",
       description: `Voertuig ${kenteken} ${p.voertuigMerk} ${p.voertuigModel}${bouwjaar}`.trim(),
-      price: num(p.verkoopprijs),
-      amount: "1 x",
+      price: voertuigPrijs,
+      btwPercent: isBtwWorkflow ? 21 : 0,
     });
     if (p.garantieType === "autotrust" && num(p.garantiePrijs) > 0) {
       const looptijd = num(p.garantieLooptijd);
       const pakket = p.garantiePakket || "Autotrust";
-      regels.push({
+      list.push({
+        id: "garantie",
         kind: "garantie",
         description: `Garantie ${pakket}${looptijd ? ` · ${looptijd} maanden` : ""} via Autotrust`,
         price: num(p.garantiePrijs),
-        amount: "1 x",
+        btwPercent: 0,
       });
     }
-    if (num(p.afleverkosten) > 0) {
-      regels.push({ kind: "afleverkosten", description: "Afleverkosten", price: num(p.afleverkosten), amount: "1 x" });
-    }
-    if (num(p.leges) > 0) {
-      regels.push({ kind: "leges", description: "Leges / tenaamstelling", price: num(p.leges), amount: "1 x" });
-    }
     if (num(p.aanbetalingBedrag) > 0) {
-      regels.push({ kind: "aanbetaling", description: "Aanbetaling (reeds voldaan)", price: -num(p.aanbetalingBedrag), amount: "1 x" });
+      list.push({
+        id: "aanbetaling",
+        kind: "aanbetaling",
+        description: "Aanbetaling (reeds voldaan)",
+        price: -num(p.aanbetalingBedrag),
+        btwPercent: 0,
+        locked: true,
+      });
     }
-    return regels;
-  }, [p]);
+    return list;
+  };
 
-  const totaal = useMemo(() => factuurRegels.reduce((s, r) => s + r.price, 0), [factuurRegels]);
+  const [regels, setRegels] = useState<Regel[]>(buildInitialRegels);
+
+  // Voertuig-BTW% volgt workflow live
+  useEffect(() => {
+    setRegels((prev) =>
+      prev.map((r) =>
+        r.kind === "voertuig" ? { ...r, btwPercent: isBtwWorkflow ? 21 : 0 } : r
+      )
+    );
+  }, [isBtwWorkflow]);
+
+  const updateRegel = (id: string, patch: Partial<Regel>) => {
+    setRegels((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  };
+  const removeRegel = (id: string) => {
+    setRegels((prev) => prev.filter((r) => r.id !== id));
+  };
+  const addExtraRegel = () => {
+    setRegels((prev) => [
+      ...prev,
+      {
+        id: `extra-${Date.now()}`,
+        kind: "extra",
+        description: "",
+        price: 0,
+        btwPercent: isBtwWorkflow ? 21 : 0,
+      },
+    ]);
+  };
+
+  // Totalen — prijzen zijn incl. BTW
+  const { subtotaal, btwTotaal, totaal } = useMemo(() => {
+    let sub = 0;
+    let btw = 0;
+    for (const r of regels) {
+      const factor = 1 + r.btwPercent / 100;
+      const excl = r.price / factor;
+      sub += excl;
+      btw += r.price - excl;
+    }
+    return { subtotaal: sub, btwTotaal: btw, totaal: sub + btw };
+  }, [regels]);
+
 
   // Klantnaam tonen
   const klantNaam = p.klantZakelijk && p.klantBedrijfsnaam
