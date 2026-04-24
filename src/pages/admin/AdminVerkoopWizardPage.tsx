@@ -178,6 +178,8 @@ const AdminVerkoopWizardPage = () => {
   const [factuurDatum, setFactuurDatum] = useState<string | null>(null);
   const [factuurReferentie, setFactuurReferentie] = useState<string | null>(null);
   const [factuurEmailVerzondenOp, setFactuurEmailVerzondenOp] = useState<string | null>(null);
+  const [factuurVerstuurd, setFactuurVerstuurd] = useState<boolean>(false);
+  const [factuurEmail, setFactuurEmail] = useState<string | null>(null);
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
