@@ -396,26 +396,22 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         workflow_id: workflowId,
         reference: referentie || undefined,
         invoice_date: factuurdatum,
+        due_date: vervaldatum || undefined,
         prices_are_incl_tax: true,
-        details_attributes: factuurRegels.map((r) => {
-          // Voertuigregel: 21% bij BTW-workflow, anders 0%. Garantie + aanbetaling: altijd 0%.
-          let taxRateId: string | null = null;
-          if (r.kind === "voertuig") {
-            taxRateId = isBtwWorkflow ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
-          } else if (r.kind === "garantie" || r.kind === "aanbetaling") {
-            taxRateId = TAX_RATE_ID_NULPROCENT;
-          } else {
-            // afleverkosten / leges: volg workflow (BTW of marge=0%)
-            taxRateId = isBtwWorkflow ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
-          }
-          return {
-            description: r.description,
-            price: r.price,
-            amount: "1",
-            ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
-          };
-        }),
+        details_attributes: regels
+          .filter((r) => (r.description || "").trim() !== "" || r.price !== 0)
+          .map((r) => {
+            // Gebruik BTW% per regel zoals ingesteld in de preview.
+            const taxRateId = r.btwPercent === 21 ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
+            return {
+              description: r.description,
+              price: r.price,
+              amount: "1",
+              ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
+            };
+          }),
         custom_fields_attributes: customFields,
+        ...(notitie.trim() ? { invoice_note: notitie.trim() } : {}),
       });
 
       const invoice = res?.invoice;
