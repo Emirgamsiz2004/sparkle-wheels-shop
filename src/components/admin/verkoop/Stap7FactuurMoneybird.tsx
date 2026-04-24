@@ -345,6 +345,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   // Verzenden per e-mail (maakt factuur definitief via send_invoice)
   const handleEmailen = async () => {
     if (!factuurId) return;
+    if (!(await verifyInvoiceExists())) return;
     setSending(true);
     try {
       const res = await invoke("send_sales_invoice", {
@@ -379,6 +380,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   // Handmatig verzonden — maakt factuur definitief (Manual delivery)
   const handleManueel = async () => {
     if (!factuurId) return;
+    if (!(await verifyInvoiceExists())) return;
     setMarking(true);
     try {
       const res = await invoke("send_sales_invoice", {
