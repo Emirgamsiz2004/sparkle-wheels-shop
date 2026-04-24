@@ -362,16 +362,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
 
   const handleBevestig = async (checked: boolean) => {
     setBevestigd(checked);
-    await p.onSaved({ stap7_afgerond: !!factuurId && checked });
+    await p.onSaved({ stap7_afgerond: factuurVerstuurd && checked });
   };
-
-  // Auto-bevestig stap zodra factuur is aangemaakt + checkbox gezet
-  useEffect(() => {
-    if (factuurId && bevestigd) {
-      p.onSaved({ stap7_afgerond: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [factuurId, bevestigd]);
 
   return (
     <div className="space-y-6">
