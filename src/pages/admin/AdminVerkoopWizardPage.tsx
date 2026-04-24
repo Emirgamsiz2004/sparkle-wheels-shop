@@ -683,6 +683,7 @@ const AdminVerkoopWizardPage = () => {
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               const nvt = step.optional && !inruil;
+              const hasIssues = !nvt && !blocked && stepHasIssues(step.num);
 
               return (
                 <button
@@ -699,16 +700,29 @@ const AdminVerkoopWizardPage = () => {
                   <span
                     className={[
                       "w-6 h-6 shrink-0 flex items-center justify-center rounded-full text-[11px] font-medium border",
-                      done ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400" : "",
-                      !done && active ? "bg-foreground/10 border-foreground/40 text-foreground" : "",
-                      !done && !active ? "border-sidebar-border text-sidebar-foreground/60" : "",
+                      done && !hasIssues ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400" : "",
+                      hasIssues && !active ? "bg-amber-500/15 border-amber-500/40 text-amber-400" : "",
+                      hasIssues && active ? "bg-amber-500/20 border-amber-500/60 text-amber-300" : "",
+                      !done && !hasIssues && active ? "bg-foreground/10 border-foreground/40 text-foreground" : "",
+                      !done && !hasIssues && !active ? "border-sidebar-border text-sidebar-foreground/60" : "",
                     ].join(" ")}
                   >
-                    {done ? <Check className="w-3.5 h-3.5" /> : nvt ? <Lock className="w-3 h-3" /> : step.num}
+                    {hasIssues ? (
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                    ) : done ? (
+                      <Check className="w-3.5 h-3.5" />
+                    ) : nvt ? (
+                      <Lock className="w-3 h-3" />
+                    ) : (
+                      step.num
+                    )}
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-[13px] font-medium truncate">{step.title}</span>
                     {nvt && <span className="block text-[10px] text-muted-foreground mt-0.5">Nvt</span>}
+                    {hasIssues && !nvt && (
+                      <span className="block text-[10px] text-amber-400/80 mt-0.5">Ontbrekende info</span>
+                    )}
                   </span>
                 </button>
               );
