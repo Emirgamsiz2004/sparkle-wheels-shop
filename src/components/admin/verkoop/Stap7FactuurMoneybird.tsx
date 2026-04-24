@@ -101,7 +101,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const [emailVerzondenOp, setEmailVerzondenOp] = useState<string | null>(p.initialEmailVerzondenOp || null);
   const [factuurVerstuurd, setFactuurVerstuurd] = useState<boolean>(!!p.initialFactuurVerstuurd);
   const [emailAdres, setEmailAdres] = useState<string>(p.initialFactuurEmail || p.klantEmail || "");
-  const [verzendKeuze, setVerzendKeuze] = useState<"email" | "manual" | null>(null);
+  // (verzendkeuze toggle vervangen door 2 directe knoppen)
 
   const [creating, setCreating] = useState(false);
   const [sending, setSending] = useState(false);
