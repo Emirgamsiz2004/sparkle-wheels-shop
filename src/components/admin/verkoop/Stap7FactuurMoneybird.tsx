@@ -280,19 +280,29 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       };
 
       const isBtwWorkflow = BTW_WORKFLOW_IDS.has(workflowId);
-      const garantieValue =
-        p.garantieType === "autotrust"
-          ? `${p.garantiePakket || "Autotrust"}${num(p.garantieLooptijd) ? ` · ${num(p.garantieLooptijd)} maanden` : ""} via Autotrust`
-          : "Geen garantie";
+
+      // Garantie waarde bepalen op basis van stap 4 keuze
+      let garantieValue = "";
+      if (p.garantieType === "geen") {
+        garantieValue = "Geen garantie";
+      } else if (p.garantieType === "autotrust") {
+        const looptijd = num(p.garantieLooptijd);
+        const pakket = (p.garantiePakket || "").trim();
+        if (pakket && looptijd > 0) {
+          garantieValue = `${pakket} · ${looptijd} maanden via Autotrust`;
+        }
+      }
+
+      // Chassisnummer ophalen uit voertuigdata (vehicles.chassis_nummer)
+      const chassisValue = (p.voertuigChassisnummer || "").trim();
 
       const customFields = [
         { id: CUSTOM_FIELD_IDS.kenteken, value: p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "" },
-        { id: CUSTOM_FIELD_IDS.chassisnummer, value: p.voertuigChassisnummer || "" },
+        { id: CUSTOM_FIELD_IDS.chassisnummer, value: chassisValue },
         { id: CUSTOM_FIELD_IDS.bouwjaar, value: p.voertuigBouwjaar ? String(p.voertuigBouwjaar) : "" },
         { id: CUSTOM_FIELD_IDS.kilometerstand, value: p.voertuigKilometerstand ? String(p.voertuigKilometerstand) : "" },
         { id: CUSTOM_FIELD_IDS.merk_model, value: `${p.voertuigMerk || ""} ${p.voertuigModel || ""}`.trim() },
-        // Garantie custom field is verwijderd: bestaat niet in deze Moneybird-administratie.
-        // De garantie staat al als aparte factuurregel.
+        { id: CUSTOM_FIELD_IDS.garantie, value: garantieValue },
       ];
 
       const res = await invoke("create_wizard_invoice", {
