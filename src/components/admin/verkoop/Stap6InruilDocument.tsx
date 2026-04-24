@@ -52,6 +52,15 @@ export interface Stap6Props {
   inkoopverklaringId: string | null;
   setInkoopverklaringId: (id: string | null) => void;
 
+  // Klantgegevens uit stap 3 (voor auto-fill van particuliere verkoper)
+  klantVoornaam?: string;
+  klantAchternaam?: string;
+  klantGeboortedatum?: string;
+  klantAdres?: string;
+  klantPostcode?: string;
+  klantWoonplaats?: string;
+  klantTelefoon?: string;
+
   onAutoSave: () => Promise<void> | void;
 }
 
