@@ -334,6 +334,8 @@ const AdminVerkoopWizardPage = () => {
         setFactuurDatum((e.factuurdatum as string) || null);
         setFactuurReferentie((e.factuur_referentie as string) || null);
         setFactuurEmailVerzondenOp((e.factuur_email_verzonden_op as string) || null);
+        setFactuurVerstuurd(!!(e as any).factuur_verstuurd);
+        setFactuurEmail(((e as any).factuur_email as string) || null);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
