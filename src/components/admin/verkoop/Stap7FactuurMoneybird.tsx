@@ -231,6 +231,13 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     }
   };
 
+  // Open factuur in Moneybird, maar verifieer eerst dat hij nog bestaat.
+  const handleOpenInMoneybird = async () => {
+    if (!factuurUrl) return;
+    if (!(await verifyInvoiceExists())) return;
+    window.open(factuurUrl, "_blank", "noopener,noreferrer");
+  };
+
   // ─── Acties ───
   const handleAanmaken = async () => {
     if (!p.verkoopId) {
