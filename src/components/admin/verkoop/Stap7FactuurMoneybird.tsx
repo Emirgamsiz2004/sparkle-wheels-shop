@@ -28,6 +28,24 @@ const WORKFLOW_IDS = {
   btw_geen: "482840757707736664",
   btw_autotrust: "482840705683686879",
 } as const;
+const BTW_WORKFLOW_IDS: ReadonlySet<string> = new Set([
+  WORKFLOW_IDS.btw_geen,
+  WORKFLOW_IDS.btw_autotrust,
+]);
+
+// BTW 21% (hoog) tax_rate_id voor administratie 481405116676573138.
+// Alleen toegepast op de voertuigregel bij BTW-workflows.
+const BTW_21_TAX_RATE_ID = "482047796720142370";
+
+// Custom field IDs (Moneybird)
+const CUSTOM_FIELD_IDS = {
+  kenteken: "482048786214946071",
+  chassisnummer: "483758257936008582",
+  bouwjaar: "482838097400169743",
+  kilometerstand: "482048832877627078",
+  merk_model: "482838073633146484",
+  garantie: "482848149761419699",
+} as const;
 
 type VoertuigType = "marge" | "btw" | "consignatie";
 type GarantieType = "geen" | "autotrust";
