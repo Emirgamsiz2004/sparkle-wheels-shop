@@ -75,7 +75,57 @@ Deno.serve(async (req) => {
   try {
     await checkAuth(req);
 
-    const { action, ...params } = await req.json();
+    const body = await req.json();
+    const { action, ...params } = body;
+
+    // ─── PDF download als binary blob (proxy) ───
+    if (action === "download_invoice_pdf_blob") {
+      const { invoice_id, kenteken, datum } = params;
+      if (!invoice_id) {
+        return new Response(JSON.stringify({ error: "invoice_id is required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const token = Deno.env.get("MONEYBIRD_API_TOKEN");
+      const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+      if (!token || !adminId) {
+        return new Response(JSON.stringify({ error: "Moneybird credentials missing" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const pdfRes = await fetch(
+        `${MB_BASE}/${adminId}/sales_invoices/${invoice_id}/download_pdf`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/pdf",
+          },
+        }
+      );
+      if (!pdfRes.ok) {
+        const errText = await pdfRes.text();
+        console.error("Moneybird PDF error", pdfRes.status, errText);
+        return new Response(
+          JSON.stringify({ error: `Moneybird PDF download mislukt: ${pdfRes.status}` }),
+          { status: pdfRes.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const safeKenteken = (kenteken || "factuur").toString().replace(/[^A-Za-z0-9-]/g, "");
+      const safeDatum = (datum || new Date().toISOString().slice(0, 10)).toString().replace(/[^0-9-]/g, "");
+      const filename = `Factuur-${safeKenteken}-${safeDatum}.pdf`;
+      const arrayBuffer = await pdfRes.arrayBuffer();
+      return new Response(arrayBuffer, {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="${filename}"`,
+        },
+      });
+    }
 
     let result: any;
 
