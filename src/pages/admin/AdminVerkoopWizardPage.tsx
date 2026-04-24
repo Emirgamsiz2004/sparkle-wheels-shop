@@ -906,6 +906,8 @@ const AdminVerkoopWizardPage = () => {
                 initialFactuurdatum={factuurDatum}
                 initialReferentie={factuurReferentie}
                 initialEmailVerzondenOp={factuurEmailVerzondenOp}
+                initialFactuurVerstuurd={factuurVerstuurd}
+                initialFactuurEmail={factuurEmail}
                 onSaved={async (extra) => {
                   if (extra.moneybird_factuur_id !== undefined) setFactuurMbId(extra.moneybird_factuur_id);
                   if (extra.moneybird_factuur_url !== undefined) setFactuurMbUrl(extra.moneybird_factuur_url);
@@ -913,6 +915,8 @@ const AdminVerkoopWizardPage = () => {
                   if (extra.factuurdatum !== undefined) setFactuurDatum(extra.factuurdatum);
                   if (extra.factuur_referentie !== undefined) setFactuurReferentie(extra.factuur_referentie);
                   if (extra.factuur_email_verzonden_op !== undefined) setFactuurEmailVerzondenOp(extra.factuur_email_verzonden_op);
+                  if (extra.factuur_verstuurd !== undefined) setFactuurVerstuurd(!!extra.factuur_verstuurd);
+                  if (extra.factuur_email !== undefined) setFactuurEmail(extra.factuur_email);
                   await saveCurrent(extra);
                 }}
               />
