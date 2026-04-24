@@ -582,6 +582,92 @@ const AdminVerkoopWizardPage = () => {
 
   const currentStep = STEPS.find((s) => s.num === activeStap)!;
 
+  // ───────────────────────────────────────────────────────────
+  // Centrale validatie
+  // ───────────────────────────────────────────────────────────
+  const verkoopprijsNum = verkoopprijs === "" ? 0 : Number(verkoopprijs);
+  const afleverkostenNum = afleverkosten === "" ? 0 : Number(afleverkosten);
+  const legesNum = leges === "" ? 0 : Number(leges);
+  const garantiePrijsNum = garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0;
+  const aanbetalingNum = aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag);
+  const restbedragGlobal = Math.max(
+    0,
+    verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum,
+  );
+
+  const wizardState: WizardState = useMemo(
+    () => ({
+      verkoopprijs,
+      voertuigType,
+      kmStand,
+      inruil,
+      inruilKenteken,
+      inruilMerk,
+      inruilModel,
+      inruilWaarde,
+      inruilVerkoper,
+      inruilBedrijfsnaam,
+      inruilKvk,
+      afleverwijze,
+      leverdatum,
+      afleveradres,
+      aanbetalingBedrag,
+      aanbetalingBetaalwijze,
+      klantVoornaam,
+      klantAchternaam,
+      klantGeboortedatum,
+      klantAdres,
+      klantPostcode,
+      klantWoonplaats,
+      klantTelefoon,
+      klantEmail,
+      klantZakelijk,
+      klantBedrijfsnaam,
+      klantKvk,
+      garantieType,
+      garantiePakket,
+      garantieLooptijd,
+      garantiePrijs,
+      pdfGenereerd,
+      contractGetekend,
+      restBetaalwijze,
+      betaalwijzeDetails,
+      restbedrag: restbedragGlobal,
+      inrVerkVoornaam,
+      inrVerkAchternaam,
+      inrVerkAdres,
+      inrBetaalwijze,
+      inkoopverklaringId,
+      factuurMbId,
+      factuurVerstuurd,
+    }),
+    [
+      verkoopprijs, voertuigType, kmStand, inruil, inruilKenteken, inruilMerk, inruilModel,
+      inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk,
+      afleverwijze, leverdatum, afleveradres, aanbetalingBedrag, aanbetalingBetaalwijze,
+      klantVoornaam, klantAchternaam, klantGeboortedatum, klantAdres, klantPostcode,
+      klantWoonplaats, klantTelefoon, klantEmail, klantZakelijk, klantBedrijfsnaam, klantKvk,
+      garantieType, garantiePakket, garantieLooptijd, garantiePrijs,
+      pdfGenereerd, contractGetekend, restBetaalwijze, betaalwijzeDetails, restbedragGlobal,
+      inrVerkVoornaam, inrVerkAchternaam, inrVerkAdres, inrBetaalwijze, inkoopverklaringId,
+      factuurMbId, factuurVerstuurd,
+    ],
+  );
+
+  // Welke stappen tonen hun foutenlijst (na klik op Volgende)
+  const [showErrorsForStap, setShowErrorsForStap] = useState<Set<number>>(new Set());
+
+  const currentErrors = useMemo(() => validateStap(activeStap, wizardState), [activeStap, wizardState]);
+  const currentWarnings = useMemo(() => getStapWarnings(activeStap, wizardState), [activeStap, wizardState]);
+  const showErrors = showErrorsForStap.has(activeStap) && currentErrors.length > 0;
+
+  // Bereken voor sidebar: per stap of er ontbrekende info is
+  const stepHasIssues = (stapNum: number): boolean => {
+    if (stapNum === 6 && !inruil) return false; // n.v.t.
+    return validateStap(stapNum, wizardState).length > 0;
+  };
+
+
   if (loadingVehicles || !vehicle) {
     return (
       <div className="admin-theme min-h-screen bg-background flex items-center justify-center">
