@@ -148,10 +148,12 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const num = (v: number | "" | null | undefined) => (typeof v === "number" ? v : 0);
 
   const factuurRegels = useMemo(() => {
-    const regels: Array<{ description: string; price: number; amount: string }> = [];
+    type Kind = "voertuig" | "garantie" | "afleverkosten" | "leges" | "aanbetaling";
+    const regels: Array<{ kind: Kind; description: string; price: number; amount: string }> = [];
     const kenteken = p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "";
     const bouwjaar = p.voertuigBouwjaar ? ` (${p.voertuigBouwjaar})` : "";
     regels.push({
+      kind: "voertuig",
       description: `Voertuig ${kenteken} ${p.voertuigMerk} ${p.voertuigModel}${bouwjaar}`.trim(),
       price: num(p.verkoopprijs),
       amount: "1 x",
@@ -160,19 +162,20 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       const looptijd = num(p.garantieLooptijd);
       const pakket = p.garantiePakket || "Autotrust";
       regels.push({
+        kind: "garantie",
         description: `Garantie ${pakket}${looptijd ? ` · ${looptijd} maanden` : ""} via Autotrust`,
         price: num(p.garantiePrijs),
         amount: "1 x",
       });
     }
     if (num(p.afleverkosten) > 0) {
-      regels.push({ description: "Afleverkosten", price: num(p.afleverkosten), amount: "1 x" });
+      regels.push({ kind: "afleverkosten", description: "Afleverkosten", price: num(p.afleverkosten), amount: "1 x" });
     }
     if (num(p.leges) > 0) {
-      regels.push({ description: "Leges / tenaamstelling", price: num(p.leges), amount: "1 x" });
+      regels.push({ kind: "leges", description: "Leges / tenaamstelling", price: num(p.leges), amount: "1 x" });
     }
     if (num(p.aanbetalingBedrag) > 0) {
-      regels.push({ description: "Aanbetaling (reeds voldaan)", price: -num(p.aanbetalingBedrag), amount: "1 x" });
+      regels.push({ kind: "aanbetaling", description: "Aanbetaling (reeds voldaan)", price: -num(p.aanbetalingBedrag), amount: "1 x" });
     }
     return regels;
   }, [p]);
