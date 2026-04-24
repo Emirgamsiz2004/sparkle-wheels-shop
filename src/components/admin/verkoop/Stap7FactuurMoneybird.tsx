@@ -480,90 +480,70 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           </button>
         )}
 
-        {/* Concept aangemaakt — info-melding */}
+        {/* Concept aangemaakt — controleren + verzendopties */}
         {factuurId && !factuurVerstuurd && (
-          <div className="rounded-[8px] border border-amber-500/30 bg-amber-500/5 px-4 py-3 flex items-center gap-2.5 text-sm">
-            <AlertCircle className="h-4 w-4 text-amber-500" />
-            <span className="font-medium text-amber-700 dark:text-amber-400">
-              Concept aangemaakt{factuurNummer ? ` · ${factuurNummer}` : ""} — kies hieronder hoe te verzenden
-            </span>
-          </div>
-        )}
-
-        {/* STAP B — Verzendkeuze (alleen als factuur bestaat én nog niet verstuurd) */}
-        {factuurId && !factuurVerstuurd && (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setVerzendKeuze("email")}
-                className={`inline-flex items-center justify-center gap-2 h-11 px-4 rounded-[10px] border text-sm font-medium transition-colors ${
-                  verzendKeuze === "email"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background hover:bg-muted/50"
-                }`}
-              >
-                <Mail className="h-4 w-4" />
-                E-mailen naar klant
-              </button>
-              <button
-                type="button"
-                onClick={() => setVerzendKeuze("manual")}
-                className={`inline-flex items-center justify-center gap-2 h-11 px-4 rounded-[10px] border text-sm font-medium transition-colors ${
-                  verzendKeuze === "manual"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background hover:bg-muted/50"
-                }`}
-              >
-                <HandCoins className="h-4 w-4" />
-                Handmatig afhandelen
-              </button>
+          <div className="space-y-4">
+            <div className="rounded-[8px] border border-amber-500/30 bg-amber-500/5 px-4 py-3 flex items-center gap-2.5 text-sm">
+              <AlertCircle className="h-4 w-4 text-amber-500" />
+              <span className="font-medium text-amber-700 dark:text-amber-400">
+                Concept aangemaakt{factuurNummer ? ` · ${factuurNummer}` : ""} — controleer en kies hoe te verzenden
+              </span>
             </div>
 
-            {verzendKeuze === "email" && (
-              <div className="rounded-[8px] border border-border bg-muted/20 p-4 space-y-3">
-                <div>
-                  <label className={labelCls}>E-mailadres klant</label>
-                  <input
-                    type="email"
-                    className={inputCls}
-                    value={emailAdres}
-                    onChange={(e) => setEmailAdres(e.target.value)}
-                    placeholder="naam@voorbeeld.nl"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleEmailen}
-                  disabled={sending || !emailAdres.trim()}
-                  className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
-                >
-                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  {sending ? "Versturen…" : "Factuur versturen"}
-                </button>
-                <p className="text-[11px] text-muted-foreground flex items-start gap-1.5">
-                  <InfoIcon className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                  Factuur wordt definitief gemaakt en gemaild via Moneybird (incl. betaallink).
-                </p>
-              </div>
+            {/* Controleren */}
+            {factuurUrl && (
+              <a
+                href={factuurUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Factuur bekijken in Moneybird
+              </a>
             )}
 
-            {verzendKeuze === "manual" && (
-              <div className="rounded-[8px] border border-border bg-muted/20 p-4 space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Factuur wordt definitief gemaakt in Moneybird en gemarkeerd als verzonden — je geeft hem zelf mee aan de klant.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleMarkAsSent}
-                  disabled={marking}
-                  className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
-                >
-                  {marking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                  {marking ? "Markeren…" : "Markeer als verzonden"}
-                </button>
-              </div>
-            )}
+            {/* E-mailadres veld (vooraf gevuld) */}
+            <div>
+              <label className={labelCls}>E-mailadres klant (Moneybird contact)</label>
+              <input
+                type="email"
+                className={inputCls}
+                value={emailAdres}
+                onChange={(e) => setEmailAdres(e.target.value)}
+                placeholder="naam@voorbeeld.nl"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1.5 flex items-start gap-1.5">
+                <InfoIcon className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                Moneybird verstuurt naar het e-mailadres dat aan het contact gekoppeld is. Pas dit eerst aan in het Moneybird-contact als het anders moet zijn.
+              </p>
+            </div>
+
+            {/* Twee verzendknoppen */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={handleEmailen}
+                disabled={sending || marking}
+                className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
+              >
+                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {sending ? "Versturen…" : "Verzenden per e-mail"}
+              </button>
+              <button
+                type="button"
+                onClick={handleManueel}
+                disabled={sending || marking}
+                className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors disabled:opacity-60"
+              >
+                {marking ? <Loader2 className="h-4 w-4 animate-spin" /> : <HandCoins className="h-4 w-4" />}
+                {marking ? "Verwerken…" : "Handmatig verzonden"}
+              </button>
+            </div>
+            <p className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+              <InfoIcon className="h-3 w-3 mt-0.5 flex-shrink-0" />
+              Beide opties maken de factuur definitief in Moneybird (geen concept meer).
+            </p>
           </div>
         )}
 
