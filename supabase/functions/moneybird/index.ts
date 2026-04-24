@@ -212,18 +212,46 @@ Deno.serve(async (req) => {
         const { invoice_id, delivery_method } = params;
         if (!invoice_id) throw new Error("invoice_id is required");
         const method = delivery_method === "Email" ? "Email" : "Manual";
-        // Dit endpoint maakt de factuur automatisch definitief (state: open)
-        await mbFetch(`sales_invoices/${invoice_id}/send_invoice.json`, {
-          method: "PATCH",
-          body: JSON.stringify({
-            sales_invoice_sending: {
-              delivery_method: method,
-              sending_scheduled_at: null,
-            },
-          }),
-        });
-        // Haal bijgewerkte factuur op (met nieuwe state)
-        const updated = await mbFetch(`sales_invoices/${invoice_id}.json`);
+
+        // Stap 1: send_invoice endpoint (verstuurt + zou definitief moeten maken)
+        try {
+          await mbFetch(`sales_invoices/${invoice_id}/send_invoice.json`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              sales_invoice_sending: {
+                delivery_method: method,
+                sending_scheduled_at: null,
+              },
+            }),
+          });
+        } catch (sendErr) {
+          console.error("send_invoice mislukt, probeer state-transitie:", sendErr);
+        }
+
+        // Stap 2: check de huidige state
+        let updated = await mbFetch(`sales_invoices/${invoice_id}.json`);
+        console.log("Factuur state na send_invoice:", updated?.state);
+
+        // Stap 3: als nog draft, forceer state-transitie naar 'open'
+        if (updated?.state === "draft") {
+          console.log("Factuur nog draft — forceer transitie naar open");
+          try {
+            await mbFetch(`sales_invoices/${invoice_id}/transitions.json`, {
+              method: "PATCH",
+              body: JSON.stringify({ transition: "open" }),
+            });
+          } catch (transErr) {
+            console.error("transitions endpoint mislukt:", transErr);
+            // Laatste poging: PATCH state direct
+            await mbFetch(`sales_invoices/${invoice_id}/mark_as_open.json`, {
+              method: "PATCH",
+              body: JSON.stringify({}),
+            }).catch((e) => console.error("mark_as_open mislukt:", e));
+          }
+          updated = await mbFetch(`sales_invoices/${invoice_id}.json`);
+          console.log("Factuur state na transitie:", updated?.state);
+        }
+
         const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
         result = {
           invoice: updated,
