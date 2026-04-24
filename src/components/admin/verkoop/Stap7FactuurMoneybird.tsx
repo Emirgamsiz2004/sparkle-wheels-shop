@@ -76,6 +76,8 @@ export interface Stap7Props {
   initialFactuurdatum?: string | null;
   initialReferentie?: string | null;
   initialEmailVerzondenOp?: string | null;
+  initialFactuurVerstuurd?: boolean | null;
+  initialFactuurEmail?: string | null;
 
   onSaved: (extra: Record<string, any>) => Promise<void> | void;
 }
