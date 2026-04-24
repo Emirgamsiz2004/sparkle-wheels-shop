@@ -274,13 +274,44 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     if (!factuurId) return;
     setDownloading(true);
     try {
-      const res = await invoke("get_sales_invoice", { invoice_id: factuurId });
-      const url = res?.invoice?.url || res?.moneybird_url || factuurUrl;
-      if (url) {
-        window.open(url, "_blank", "noopener,noreferrer");
-      } else {
-        toast.error("Geen download-URL gevonden");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Niet ingelogd");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/moneybird`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            action: "download_invoice_pdf_blob",
+            invoice_id: factuurId,
+            kenteken: p.voertuigKenteken || "factuur",
+            datum: factuurdatum || new Date().toISOString().slice(0, 10),
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        throw new Error(err.error || `HTTP ${res.status}`);
       }
+
+      const blob = await res.blob();
+      const safeKenteken = (p.voertuigKenteken || "factuur").replace(/[^A-Za-z0-9-]/g, "");
+      const filename = `Factuur-${safeKenteken}-${factuurdatum}.pdf`;
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+      toast.success("PDF gedownload");
     } catch (e: any) {
       console.error(e);
       toast.error(e.message || "Downloaden mislukt");
