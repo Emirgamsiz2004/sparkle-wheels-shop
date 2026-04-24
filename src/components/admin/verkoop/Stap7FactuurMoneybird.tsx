@@ -33,9 +33,9 @@ const BTW_WORKFLOW_IDS: ReadonlySet<string> = new Set([
   WORKFLOW_IDS.btw_autotrust,
 ]);
 
-// BTW 21% (hoog) tax_rate_id voor administratie 481405116676573138.
-// Alleen toegepast op de voertuigregel bij BTW-workflows.
-const BTW_21_TAX_RATE_ID = "482047796720142370";
+// BTW-tarieven worden runtime opgehaald uit Moneybird (zie fetchTaxRateIds).
+// Cache binnen module-scope zodat we niet bij elke factuur opnieuw moeten ophalen.
+let CACHED_TAX_RATES: { nul: string | null; eenentwintig: string | null } | null = null;
 
 // Custom field IDs (Moneybird)
 const CUSTOM_FIELD_IDS = {
@@ -281,6 +281,31 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
 
       const isBtwWorkflow = BTW_WORKFLOW_IDS.has(workflowId);
 
+      // BTW-tarieven ophalen uit Moneybird (sales_invoice tarieven met percentage 0 en 21).
+      // Cache binnen module-scope.
+      if (!CACHED_TAX_RATES) {
+        try {
+          const taxRes = await invoke("get_tax_rates", {});
+          const list: any[] = Array.isArray(taxRes) ? taxRes : (taxRes?.tax_rates || []);
+          const findRate = (perc: number) =>
+            list.find(
+              (t) =>
+                Number(t?.percentage) === perc &&
+                String(t?.tax_rate_type || "").toLowerCase() === "sales_invoice" &&
+                t?.active !== false
+            )?.id || null;
+          CACHED_TAX_RATES = {
+            nul: findRate(0) ? String(findRate(0)) : null,
+            eenentwintig: findRate(21) ? String(findRate(21)) : null,
+          };
+        } catch (e) {
+          console.error("Ophalen BTW-tarieven mislukt:", e);
+          CACHED_TAX_RATES = { nul: null, eenentwintig: null };
+        }
+      }
+      const TAX_RATE_ID_NULPROCENT = CACHED_TAX_RATES.nul;
+      const TAX_RATE_ID_21PROCENT = CACHED_TAX_RATES.eenentwintig;
+
       // Garantie waarde bepalen op basis van stap 4 keuze
       let garantieValue = "";
       if (p.garantieType === "geen") {
@@ -313,8 +338,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         invoice_date: factuurdatum,
         prices_are_incl_tax: true,
         details_attributes: factuurRegels.map((r) => {
-          // Voertuigregel: 21% BTW alleen bij BTW-workflow. Garantie + aanbetaling: nooit BTW.
-          const taxRateId = r.kind === "voertuig" && isBtwWorkflow ? BTW_21_TAX_RATE_ID : undefined;
+          // Voertuigregel: 21% bij BTW-workflow, anders 0%. Garantie + aanbetaling: altijd 0%.
+          let taxRateId: string | null = null;
+          if (r.kind === "voertuig") {
+            taxRateId = isBtwWorkflow ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
+          } else if (r.kind === "garantie" || r.kind === "aanbetaling") {
+            taxRateId = TAX_RATE_ID_NULPROCENT;
+          } else {
+            // afleverkosten / leges: volg workflow (BTW of marge=0%)
+            taxRateId = isBtwWorkflow ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
+          }
           return {
             description: r.description,
             price: r.price,
