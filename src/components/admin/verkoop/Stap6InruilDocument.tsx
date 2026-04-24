@@ -280,8 +280,16 @@ export default function Stap6InruilDocument(p: Stap6Props) {
       {/* Velden particulier */}
       {p.docType === "particulier" && (
         <div className="rounded-[14px] border border-border bg-card p-5 space-y-4">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            Verkoper (vorige eigenaar)
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Verkoper (vorige eigenaar)
+            </div>
+          </div>
+          <div className="flex items-start gap-2 rounded-[10px] border border-border/60 bg-muted/30 px-3 py-2">
+            <InfoIcon className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              Automatisch ingevuld vanuit klantgegevens — aanpasbaar indien de verkoper iemand anders is.
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -294,11 +302,9 @@ export default function Stap6InruilDocument(p: Stap6Props) {
             </div>
             <div>
               <label className={labelCls}>Geboortedatum</label>
-              <input
-                type="date"
-                className={inputCls}
+              <GeboortedatumInputs
                 value={p.verkoperGeboortedatum}
-                onChange={(e) => p.setVerkoperGeboortedatum(e.target.value)}
+                onChange={p.setVerkoperGeboortedatum}
               />
             </div>
             <div>
