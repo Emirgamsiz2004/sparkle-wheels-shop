@@ -253,7 +253,93 @@ Deno.serve(async (req) => {
         break;
       }
 
-      // ─── Verkoopfactuur voor voertuig ───
+      // ─── Verkoopfactuur via wizard (workflow + regels) ───
+      case "create_wizard_invoice": {
+        const {
+          contact_id: wContactId,
+          contact_payload,
+          workflow_id,
+          reference,
+          invoice_date,
+          details_attributes: wDetails,
+          prices_are_incl_tax: wIncl,
+        } = params;
+
+        // 1) Contact: gebruik bestaand of maak/zoek aan
+        let contact: any = null;
+        if (wContactId) {
+          contact = await mbFetch(`contacts/${wContactId}.json`);
+        } else if (contact_payload) {
+          const cp = contact_payload as Record<string, any>;
+          // Probeer eerst te zoeken op naam/email
+          const query = cp.email || cp.company_name || `${cp.firstname || ""} ${cp.lastname || ""}`.trim();
+          if (query) {
+            const found = await mbFetch(`contacts.json?query=${encodeURIComponent(query)}`);
+            if (Array.isArray(found) && found.length > 0) contact = found[0];
+          }
+          if (!contact) {
+            const isValidEmail = cp.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cp.email);
+            const payload: Record<string, unknown> = {
+              company_name: cp.company_name || `${cp.firstname || ""} ${cp.lastname || ""}`.trim() || "Klant",
+              firstname: cp.firstname || undefined,
+              lastname: cp.lastname || undefined,
+              phone: cp.phone || undefined,
+              address1: cp.address1 || undefined,
+              zipcode: cp.zipcode || undefined,
+              city: cp.city || undefined,
+              country: cp.country || "NL",
+              chamber_of_commerce: cp.chamber_of_commerce || undefined,
+              tax_number: cp.tax_number || undefined,
+            };
+            if (isValidEmail) {
+              payload.send_invoices_to_email = cp.email;
+              payload.send_estimates_to_email = cp.email;
+            }
+            contact = await mbFetch("contacts.json", {
+              method: "POST",
+              body: JSON.stringify({ contact: payload }),
+            });
+          }
+        } else {
+          throw new Error("contact_id of contact_payload is verplicht");
+        }
+
+        // 2) Verkoopfactuur opbouwen
+        const invoiceBody: Record<string, unknown> = {
+          contact_id: contact.id,
+          reference: reference || undefined,
+          invoice_date: invoice_date || new Date().toISOString().split("T")[0],
+          prices_are_incl_tax: wIncl ?? true,
+          details_attributes: (wDetails || []).map((d: any) => ({
+            description: String(d.description || ""),
+            price: String(d.price ?? 0),
+            amount: String(d.amount ?? "1"),
+            ...(d.tax_rate_id ? { tax_rate_id: String(d.tax_rate_id) } : {}),
+          })),
+        };
+        if (workflow_id) invoiceBody.workflow_id = String(workflow_id);
+
+        const invoice = await mbFetch("sales_invoices.json", {
+          method: "POST",
+          body: JSON.stringify({ sales_invoice: invoiceBody }),
+        });
+
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        const moneybirdUrl = `https://moneybird.com/${adminId}/sales_invoices/${invoice.id}`;
+        result = { invoice, contact, moneybird_url: moneybirdUrl };
+        break;
+      }
+
+      case "get_sales_invoice": {
+        const { invoice_id: gInvoiceId } = params;
+        if (!gInvoiceId) throw new Error("invoice_id is required");
+        const inv = await mbFetch(`sales_invoices/${gInvoiceId}.json`);
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        result = { invoice: inv, moneybird_url: `https://moneybird.com/${adminId}/sales_invoices/${gInvoiceId}` };
+        break;
+      }
+
+      // ─── Verkoopfactuur voor voertuig (legacy, kort) ───
       case "create_vehicle_invoice": {
         const { vehicle, buyer_name, buyer_email, buyer_phone } = params;
         

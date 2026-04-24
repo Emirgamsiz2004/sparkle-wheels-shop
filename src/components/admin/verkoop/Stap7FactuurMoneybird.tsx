@@ -1,0 +1,485 @@
+import { useEffect, useMemo, useState } from "react";
+import {
+  FileText,
+  Loader2,
+  Check,
+  ExternalLink,
+  Mail,
+  Download,
+  Info as InfoIcon,
+  Receipt,
+  AlertCircle,
+} from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useMoneybird } from "@/hooks/useMoneybird";
+import { formatKenteken } from "@/lib/kenteken";
+
+const inputCls =
+  "w-full h-10 px-3 bg-background border border-border rounded-[10px] text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors";
+const labelCls = "block text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5";
+
+const MB_ADMIN_ID = "481405116676573138";
+const WORKFLOW_IDS = {
+  marge_geen: "482837428008126425",
+  marge_autotrust: "482840482335950088",
+  btw_geen: "482840757707736664",
+  btw_autotrust: "482840705683686879",
+} as const;
+
+type VoertuigType = "marge" | "btw" | "consignatie";
+type GarantieType = "geen" | "autotrust";
+
+export interface Stap7Props {
+  verkoopId: string | null;
+
+  // Voertuig (uit stap 1)
+  voertuigKenteken: string;
+  voertuigMerk: string;
+  voertuigModel: string;
+  voertuigBouwjaar?: number | null;
+  voertuigType: VoertuigType;
+
+  // Bedragen
+  verkoopprijs: number | "";
+  afleverkosten: number | "";
+  leges: number | "";
+  aanbetalingBedrag: number | "";
+
+  // Garantie (uit stap 4)
+  garantieType: GarantieType;
+  garantiePakket: string;
+  garantieLooptijd: number | "";
+  garantiePrijs: number | "";
+
+  // Klant (uit stap 3)
+  klantVoornaam: string;
+  klantAchternaam: string;
+  klantBedrijfsnaam?: string;
+  klantZakelijk: boolean;
+  klantAdres: string;
+  klantPostcode: string;
+  klantWoonplaats: string;
+  klantLand?: string;
+  klantTelefoon: string;
+  klantEmail: string;
+  klantKvk?: string;
+  klantBtw?: string;
+  customerId: string | null;
+
+  // Reeds opgeslagen factuur (hydration)
+  initialFactuurId?: string | null;
+  initialFactuurUrl?: string | null;
+  initialFactuurNummer?: string | null;
+  initialFactuurdatum?: string | null;
+  initialReferentie?: string | null;
+  initialEmailVerzondenOp?: string | null;
+
+  onSaved: (extra: Record<string, any>) => Promise<void> | void;
+}
+
+const formatEur = (n: number) =>
+  new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(n);
+
+const today = () => new Date().toISOString().slice(0, 10);
+
+export default function Stap7FactuurMoneybird(p: Stap7Props) {
+  const { invoke } = useMoneybird();
+
+  const [factuurdatum, setFactuurdatum] = useState<string>(p.initialFactuurdatum || today());
+  const [referentie, setReferentie] = useState<string>(
+    p.initialReferentie || (p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "")
+  );
+
+  const [factuurId, setFactuurId] = useState<string | null>(p.initialFactuurId || null);
+  const [factuurUrl, setFactuurUrl] = useState<string | null>(p.initialFactuurUrl || null);
+  const [factuurNummer, setFactuurNummer] = useState<string | null>(p.initialFactuurNummer || null);
+  const [emailVerzondenOp, setEmailVerzondenOp] = useState<string | null>(p.initialEmailVerzondenOp || null);
+
+  const [creating, setCreating] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [bevestigd, setBevestigd] = useState(!!p.initialFactuurId);
+
+  // Workflow automatisch bepalen
+  const workflowId = useMemo<string>(() => {
+    const isBtw = p.voertuigType === "btw";
+    const hasAutotrust = p.garantieType === "autotrust";
+    if (isBtw && hasAutotrust) return WORKFLOW_IDS.btw_autotrust;
+    if (isBtw) return WORKFLOW_IDS.btw_geen;
+    if (hasAutotrust) return WORKFLOW_IDS.marge_autotrust;
+    return WORKFLOW_IDS.marge_geen;
+  }, [p.voertuigType, p.garantieType]);
+
+  const workflowLabel = useMemo<string>(() => {
+    const isBtw = p.voertuigType === "btw";
+    const hasAutotrust = p.garantieType === "autotrust";
+    return `${isBtw ? "BTW" : "Marge"} · ${hasAutotrust ? "met Autotrust" : "geen garantie"}`;
+  }, [p.voertuigType, p.garantieType]);
+
+  const num = (v: number | "" | null | undefined) => (typeof v === "number" ? v : 0);
+
+  const factuurRegels = useMemo(() => {
+    const regels: Array<{ description: string; price: number; amount: string }> = [];
+    const kenteken = p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "";
+    const bouwjaar = p.voertuigBouwjaar ? ` (${p.voertuigBouwjaar})` : "";
+    regels.push({
+      description: `Voertuig ${kenteken} ${p.voertuigMerk} ${p.voertuigModel}${bouwjaar}`.trim(),
+      price: num(p.verkoopprijs),
+      amount: "1 x",
+    });
+    if (p.garantieType === "autotrust" && num(p.garantiePrijs) > 0) {
+      const looptijd = num(p.garantieLooptijd);
+      const pakket = p.garantiePakket || "Autotrust";
+      regels.push({
+        description: `Garantie ${pakket}${looptijd ? ` · ${looptijd} maanden` : ""} via Autotrust`,
+        price: num(p.garantiePrijs),
+        amount: "1 x",
+      });
+    }
+    if (num(p.afleverkosten) > 0) {
+      regels.push({ description: "Afleverkosten", price: num(p.afleverkosten), amount: "1 x" });
+    }
+    if (num(p.leges) > 0) {
+      regels.push({ description: "Leges / tenaamstelling", price: num(p.leges), amount: "1 x" });
+    }
+    if (num(p.aanbetalingBedrag) > 0) {
+      regels.push({ description: "Aanbetaling (reeds voldaan)", price: -num(p.aanbetalingBedrag), amount: "1 x" });
+    }
+    return regels;
+  }, [p]);
+
+  const totaal = useMemo(() => factuurRegels.reduce((s, r) => s + r.price, 0), [factuurRegels]);
+
+  // Klantnaam tonen
+  const klantNaam = p.klantZakelijk && p.klantBedrijfsnaam
+    ? p.klantBedrijfsnaam
+    : `${p.klantVoornaam} ${p.klantAchternaam}`.trim() || "—";
+  const klantAdresRegel = [p.klantAdres, [p.klantPostcode, p.klantWoonplaats].filter(Boolean).join("  ")]
+    .filter(Boolean)
+    .join(" · ");
+
+  // ─── Acties ───
+  const handleAanmaken = async () => {
+    if (!p.verkoopId) {
+      toast.error("Geen verkoop-id beschikbaar");
+      return;
+    }
+    if (!klantNaam || klantNaam === "—") {
+      toast.error("Klantgegevens ontbreken — vul stap 3 eerst in");
+      return;
+    }
+    if (factuurRegels.length === 0) {
+      toast.error("Geen factuurregels");
+      return;
+    }
+    setCreating(true);
+    try {
+      // Haal evt. bestaande moneybird_contact_id op
+      let moneybirdContactId: string | null = null;
+      if (p.customerId) {
+        const { data: cust } = await supabase
+          .from("customers")
+          .select("moneybird_contact_id")
+          .eq("id", p.customerId)
+          .maybeSingle();
+        moneybirdContactId = cust?.moneybird_contact_id || null;
+      }
+
+      const contactPayload = {
+        company_name: p.klantZakelijk ? p.klantBedrijfsnaam : `${p.klantVoornaam} ${p.klantAchternaam}`.trim(),
+        firstname: p.klantZakelijk ? undefined : p.klantVoornaam,
+        lastname: p.klantZakelijk ? undefined : p.klantAchternaam,
+        email: p.klantEmail,
+        phone: p.klantTelefoon,
+        address1: p.klantAdres,
+        zipcode: p.klantPostcode,
+        city: p.klantWoonplaats,
+        country: p.klantLand || "NL",
+        chamber_of_commerce: p.klantKvk || undefined,
+        tax_number: p.klantBtw || undefined,
+      };
+
+      const res = await invoke("create_wizard_invoice", {
+        contact_id: moneybirdContactId || undefined,
+        contact_payload: moneybirdContactId ? undefined : contactPayload,
+        workflow_id: workflowId,
+        reference: referentie || undefined,
+        invoice_date: factuurdatum,
+        prices_are_incl_tax: true,
+        details_attributes: factuurRegels.map((r) => ({
+          description: r.description,
+          price: r.price,
+          amount: "1",
+        })),
+      });
+
+      const invoice = res?.invoice;
+      const url = res?.moneybird_url;
+      const contact = res?.contact;
+      if (!invoice?.id) throw new Error("Geen factuur-id ontvangen");
+
+      // Sla moneybird_contact_id op klant op (indien nieuw)
+      if (p.customerId && contact?.id && !moneybirdContactId) {
+        await supabase
+          .from("customers")
+          .update({ moneybird_contact_id: String(contact.id) })
+          .eq("id", p.customerId);
+      }
+
+      const nummer = invoice.invoice_id || invoice.reference || null;
+      setFactuurId(String(invoice.id));
+      setFactuurUrl(url);
+      setFactuurNummer(nummer);
+
+      await p.onSaved({
+        moneybird_factuur_id: String(invoice.id),
+        moneybird_factuur_url: url,
+        moneybird_factuur_nummer: nummer,
+        factuurdatum,
+        factuur_referentie: referentie || null,
+      });
+
+      toast.success("Factuur aangemaakt in Moneybird");
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Aanmaken factuur mislukt");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleEmailen = async () => {
+    if (!factuurId) return;
+    if (!p.klantEmail) {
+      toast.error("Klant heeft geen e-mailadres");
+      return;
+    }
+    setSending(true);
+    try {
+      await invoke("send_sales_invoice", { invoice_id: factuurId, delivery_method: "Email" });
+      const ts = new Date().toISOString();
+      setEmailVerzondenOp(ts);
+      await p.onSaved({ factuur_email_verzonden_op: ts });
+      toast.success(`Factuur verstuurd naar ${p.klantEmail}`);
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "E-mailen mislukt");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!factuurId) return;
+    setDownloading(true);
+    try {
+      const res = await invoke("get_sales_invoice", { invoice_id: factuurId });
+      const url = res?.invoice?.url || res?.moneybird_url || factuurUrl;
+      if (url) {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else {
+        toast.error("Geen download-URL gevonden");
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Downloaden mislukt");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleBevestig = async (checked: boolean) => {
+    setBevestigd(checked);
+    await p.onSaved({ stap7_afgerond: !!factuurId && checked });
+  };
+
+  // Auto-bevestig stap zodra factuur is aangemaakt + checkbox gezet
+  useEffect(() => {
+    if (factuurId && bevestigd) {
+      p.onSaved({ stap7_afgerond: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [factuurId, bevestigd]);
+
+  return (
+    <div className="space-y-6">
+      {/* Sectie 1 — Factuuroverzicht */}
+      <section className="rounded-[10px] border border-border bg-card p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Receipt className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-semibold tracking-tight">Factuuroverzicht</h3>
+          <span className="ml-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-primary/10 text-primary text-[11px] font-medium uppercase tracking-wide">
+            {workflowLabel}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <div className={labelCls}>Klant</div>
+            <div className="font-medium">{klantNaam}</div>
+            {klantAdresRegel && <div className="text-xs text-muted-foreground mt-0.5">{klantAdresRegel}</div>}
+            {p.klantEmail && <div className="text-xs text-muted-foreground">{p.klantEmail}</div>}
+          </div>
+          <div>
+            <div className={labelCls}>Voertuig</div>
+            <div className="font-medium">
+              {p.voertuigMerk} {p.voertuigModel}
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "—"}
+              {p.voertuigBouwjaar ? ` · ${p.voertuigBouwjaar}` : ""}
+            </div>
+          </div>
+        </div>
+
+        {/* Factuurregels */}
+        <div className="rounded-[8px] border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <tbody>
+              {factuurRegels.map((r, i) => (
+                <tr key={i} className="border-b border-border last:border-b-0">
+                  <td className="px-3 py-2 text-foreground">{r.description}</td>
+                  <td className="px-3 py-2 text-right tabular-nums w-32">{formatEur(r.price)}</td>
+                </tr>
+              ))}
+              <tr className="bg-muted/30">
+                <td className="px-3 py-2.5 font-semibold">Totaal incl. BTW</td>
+                <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatEur(totaal)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Sectie 2 — Factuurinstellingen */}
+      <section className="rounded-[10px] border border-border bg-card p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <FileText className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-semibold tracking-tight">Factuurinstellingen</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Factuurdatum</label>
+            <input
+              type="date"
+              className={inputCls}
+              value={factuurdatum}
+              onChange={(e) => setFactuurdatum(e.target.value)}
+              disabled={!!factuurId}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Referentie</label>
+            <input
+              type="text"
+              className={inputCls}
+              value={referentie}
+              onChange={(e) => setReferentie(e.target.value)}
+              placeholder={p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "Kenteken"}
+              disabled={!!factuurId}
+            />
+          </div>
+        </div>
+        <p className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+          <InfoIcon className="h-3 w-3 mt-0.5 flex-shrink-0" />
+          Workflow wordt automatisch gekozen op basis van voertuigtype en garantie.
+        </p>
+      </section>
+
+      {/* Sectie 3 — Acties */}
+      <section className="rounded-[10px] border border-border bg-card p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Check className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-semibold tracking-tight">Acties</h3>
+        </div>
+
+        {!factuurId ? (
+          <button
+            type="button"
+            onClick={handleAanmaken}
+            disabled={creating}
+            className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
+          >
+            {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Receipt className="h-4 w-4" />}
+            {creating ? "Aanmaken in Moneybird…" : "Factuur aanmaken in Moneybird"}
+          </button>
+        ) : (
+          <>
+            <div className="rounded-[8px] border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 flex items-center gap-2.5 text-sm">
+              <Check className="h-4 w-4 text-emerald-500" />
+              <span className="font-medium text-emerald-700 dark:text-emerald-400">
+                Factuur aangemaakt
+                {factuurNummer ? ` · ${factuurNummer}` : ""}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {factuurUrl && (
+                <a
+                  href={factuurUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Bekijken in Moneybird
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={handleEmailen}
+                disabled={sending || !p.klantEmail}
+                className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors disabled:opacity-60"
+              >
+                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                {emailVerzondenOp ? "Opnieuw e-mailen" : "Factuur e-mailen"}
+              </button>
+              <button
+                type="button"
+                onClick={handleDownload}
+                disabled={downloading}
+                className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors disabled:opacity-60"
+              >
+                {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                Downloaden als PDF
+              </button>
+            </div>
+
+            {emailVerzondenOp && (
+              <p className="text-[11px] text-muted-foreground">
+                Verstuurd naar {p.klantEmail} op {new Date(emailVerzondenOp).toLocaleString("nl-NL")}
+              </p>
+            )}
+            {!p.klantEmail && (
+              <p className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                <AlertCircle className="h-3 w-3" /> Geen e-mailadres bij klant — factuur kan alleen handmatig verstuurd worden.
+              </p>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* Sectie 4 — Bevestiging */}
+      <section className="rounded-[10px] border border-border bg-card p-5">
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="mt-0.5 h-5 w-5 rounded-[4px] border-border accent-primary"
+            checked={bevestigd}
+            onChange={(e) => handleBevestig(e.target.checked)}
+            disabled={!factuurId}
+          />
+          <div>
+            <div className="text-sm font-medium">
+              Factuur is aangemaakt en verstuurd of meegegeven aan klant
+            </div>
+            <div className="text-[11px] text-muted-foreground mt-0.5">
+              Pas aanvinkbaar zodra de factuur in Moneybird is aangemaakt.
+            </div>
+          </div>
+        </label>
+      </section>
+    </div>
+  );
+}
