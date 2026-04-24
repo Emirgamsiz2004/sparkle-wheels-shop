@@ -437,6 +437,33 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── Bestaat factuur nog in Moneybird? (404-safe) ───
+      case "check_invoice_exists": {
+        const { invoice_id: cInvoiceId } = params;
+        if (!cInvoiceId) throw new Error("invoice_id is required");
+        const token = Deno.env.get("MONEYBIRD_API_TOKEN");
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        const checkRes = await fetch(
+          `${MB_BASE}/${adminId}/sales_invoices/${cInvoiceId}.json`,
+          { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+        );
+        if (checkRes.status === 404) {
+          result = { exists: false };
+        } else if (!checkRes.ok) {
+          const txt = await checkRes.text();
+          // Behandel 4xx als "bestaat niet meer"; 5xx als echte fout
+          if (checkRes.status >= 400 && checkRes.status < 500) {
+            result = { exists: false, status: checkRes.status, body: txt };
+          } else {
+            throw new Error(`Moneybird API error [${checkRes.status}]: ${txt}`);
+          }
+        } else {
+          const inv = await checkRes.json();
+          result = { exists: true, invoice: inv };
+        }
+        break;
+      }
+
       // ─── Verkoopfactuur voor voertuig (legacy, kort) ───
       case "create_vehicle_invoice": {
         const { vehicle, buyer_name, buyer_email, buyer_phone } = params;
