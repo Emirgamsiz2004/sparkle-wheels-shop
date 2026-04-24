@@ -14,6 +14,12 @@ export interface AanbetalingsbewijsData {
   betaalwijze?: string;
   leverdatum?: string; // ISO yyyy-mm-dd
   datum: string; // ISO yyyy-mm-dd
+  inruil?: {
+    merk?: string;
+    model?: string;
+    kenteken?: string;
+    waarde: number;
+  };
 }
 
 const formatEur = (n: number) =>
