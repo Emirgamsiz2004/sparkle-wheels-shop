@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { User, Building2, FileText, Loader2, Check, Download } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { User, Building2, FileText, Loader2, Check, Download, Info as InfoIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { buildInkoopverklaringPdf } from "@/lib/inkoopverklaringPdf";
 import { buildInkoopfactuurPdf } from "@/lib/inkoopfactuurPdf";
 import { formatKenteken } from "@/lib/kenteken";
+import { GeboortedatumInputs } from "@/components/admin/GeboortedatumInputs";
 
 const inputCls =
   "w-full h-10 px-3 bg-background border border-border rounded-[10px] text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors";
