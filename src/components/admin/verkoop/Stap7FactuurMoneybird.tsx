@@ -600,19 +600,103 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           </div>
         </div>
 
-        {/* Factuurregels */}
+        {/* Bewerkbare factuurregels */}
         <div className="rounded-[8px] border border-border overflow-hidden">
           <table className="w-full text-sm">
+            <thead className="bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left font-medium">Omschrijving</th>
+                <th className="px-3 py-2 text-right font-medium w-24">BTW</th>
+                <th className="px-3 py-2 text-right font-medium w-36">Bedrag (incl.)</th>
+                <th className="px-3 py-2 w-10" />
+              </tr>
+            </thead>
             <tbody>
-              {factuurRegels.map((r, i) => (
-                <tr key={i} className="border-b border-border last:border-b-0">
-                  <td className="px-3 py-2 text-foreground">{r.description}</td>
-                  <td className="px-3 py-2 text-right tabular-nums w-32">{formatEur(r.price)}</td>
+              {regels.map((r) => {
+                const btwLocked = r.kind === "garantie" || r.kind === "aanbetaling";
+                return (
+                  <tr key={r.id} className="border-t border-border">
+                    <td className="px-3 py-2">
+                      <input
+                        type="text"
+                        className="w-full bg-transparent border-0 px-0 py-1 text-sm text-foreground focus:outline-none focus:ring-0"
+                        value={r.description}
+                        onChange={(e) => updateRegel(r.id, { description: e.target.value })}
+                        disabled={!!factuurId}
+                        placeholder="Omschrijving"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <select
+                        className="bg-transparent text-sm text-foreground border-0 focus:outline-none focus:ring-0 disabled:opacity-60"
+                        value={r.btwPercent}
+                        onChange={(e) =>
+                          updateRegel(r.id, { btwPercent: Number(e.target.value) as 0 | 21 })
+                        }
+                        disabled={!!factuurId || btwLocked}
+                      >
+                        <option value={0}>0%</option>
+                        <option value={21}>21%</option>
+                      </select>
+                    </td>
+                    <td className="px-3 py-2 text-right tabular-nums">
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="w-32 bg-transparent border-0 px-0 py-1 text-sm text-right text-foreground focus:outline-none focus:ring-0 tabular-nums disabled:opacity-60"
+                        value={r.price}
+                        onChange={(e) => updateRegel(r.id, { price: Number(e.target.value) || 0 })}
+                        disabled={!!factuurId || r.locked}
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      {!factuurId && r.kind === "extra" && (
+                        <button
+                          type="button"
+                          onClick={() => removeRegel(r.id)}
+                          className="text-muted-foreground hover:text-destructive text-xs"
+                          aria-label="Regel verwijderen"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {!factuurId && (
+                <tr className="border-t border-border">
+                  <td colSpan={4} className="px-3 py-2">
+                    <button
+                      type="button"
+                      onClick={addExtraRegel}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      + Regel toevoegen
+                    </button>
+                  </td>
                 </tr>
-              ))}
-              <tr className="bg-muted/30">
-                <td className="px-3 py-2.5 font-semibold">Totaal incl. BTW</td>
+              )}
+              <tr className="border-t border-border bg-muted/20">
+                <td className="px-3 py-2 text-right text-xs text-muted-foreground" colSpan={2}>
+                  Subtotaal excl. BTW
+                </td>
+                <td className="px-3 py-2 text-right tabular-nums">{formatEur(subtotaal)}</td>
+                <td />
+              </tr>
+              <tr className="bg-muted/20">
+                <td className="px-3 py-2 text-right text-xs text-muted-foreground" colSpan={2}>
+                  BTW
+                </td>
+                <td className="px-3 py-2 text-right tabular-nums">{formatEur(btwTotaal)}</td>
+                <td />
+              </tr>
+              <tr className="bg-muted/40">
+                <td className="px-3 py-2.5 text-right font-semibold" colSpan={2}>
+                  Totaal incl. BTW
+                </td>
                 <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatEur(totaal)}</td>
+                <td />
               </tr>
             </tbody>
           </table>
@@ -625,7 +709,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           <FileText className="h-4 w-4 text-muted-foreground" />
           <h3 className="text-sm font-semibold tracking-tight">Factuurinstellingen</h3>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className={labelCls}>Factuurdatum</label>
             <input
@@ -637,7 +721,17 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             />
           </div>
           <div>
-            <label className={labelCls}>Referentie</label>
+            <label className={labelCls}>Vervaldatum</label>
+            <input
+              type="date"
+              className={inputCls}
+              value={vervaldatum}
+              onChange={(e) => setVervaldatum(e.target.value)}
+              disabled={!!factuurId}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Kenmerk / referentie</label>
             <input
               type="text"
               className={inputCls}
@@ -647,6 +741,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
               disabled={!!factuurId}
             />
           </div>
+        </div>
+        <div>
+          <label className={labelCls}>Notitie onderaan factuur</label>
+          <textarea
+            className={`${inputCls} h-24 py-2 resize-y`}
+            value={notitie}
+            onChange={(e) => setNotitie(e.target.value)}
+            placeholder="Optionele opmerking voor de klant. De wettelijke margeregelingstekst voegt Moneybird automatisch toe via de workflow."
+            disabled={!!factuurId}
+          />
         </div>
         <p className="text-[11px] text-muted-foreground flex items-start gap-1.5">
           <InfoIcon className="h-3 w-3 mt-0.5 flex-shrink-0" />
