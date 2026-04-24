@@ -231,6 +231,21 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         tax_number: p.klantBtw || undefined,
       };
 
+      const isBtwWorkflow = BTW_WORKFLOW_IDS.has(workflowId);
+      const garantieValue =
+        p.garantieType === "autotrust"
+          ? `${p.garantiePakket || "Autotrust"}${num(p.garantieLooptijd) ? ` · ${num(p.garantieLooptijd)} maanden` : ""} via Autotrust`
+          : "Geen garantie";
+
+      const customFields = [
+        { id: CUSTOM_FIELD_IDS.kenteken, value: p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "" },
+        { id: CUSTOM_FIELD_IDS.chassisnummer, value: p.voertuigChassisnummer || "" },
+        { id: CUSTOM_FIELD_IDS.bouwjaar, value: p.voertuigBouwjaar ? String(p.voertuigBouwjaar) : "" },
+        { id: CUSTOM_FIELD_IDS.kilometerstand, value: p.voertuigKilometerstand ? String(p.voertuigKilometerstand) : "" },
+        { id: CUSTOM_FIELD_IDS.merk_model, value: `${p.voertuigMerk || ""} ${p.voertuigModel || ""}`.trim() },
+        { id: CUSTOM_FIELD_IDS.garantie, value: garantieValue },
+      ];
+
       const res = await invoke("create_wizard_invoice", {
         contact_id: moneybirdContactId || undefined,
         contact_payload: moneybirdContactId ? undefined : contactPayload,
@@ -238,11 +253,17 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         reference: referentie || undefined,
         invoice_date: factuurdatum,
         prices_are_incl_tax: true,
-        details_attributes: factuurRegels.map((r) => ({
-          description: r.description,
-          price: r.price,
-          amount: "1",
-        })),
+        details_attributes: factuurRegels.map((r) => {
+          // Voertuigregel: 21% BTW alleen bij BTW-workflow. Garantie + aanbetaling: nooit BTW.
+          const taxRateId = r.kind === "voertuig" && isBtwWorkflow ? BTW_21_TAX_RATE_ID : undefined;
+          return {
+            description: r.description,
+            price: r.price,
+            amount: "1",
+            ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
+          };
+        }),
+        custom_fields_attributes: customFields,
       });
 
       const invoice = res?.invoice;
