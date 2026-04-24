@@ -33,9 +33,9 @@ const BTW_WORKFLOW_IDS: ReadonlySet<string> = new Set([
   WORKFLOW_IDS.btw_autotrust,
 ]);
 
-// BTW 21% (hoog) tax_rate_id voor administratie 481405116676573138.
-// Alleen toegepast op de voertuigregel bij BTW-workflows.
-const BTW_21_TAX_RATE_ID = "482047796720142370";
+// BTW-tarieven worden runtime opgehaald uit Moneybird (zie fetchTaxRateIds).
+// Cache binnen module-scope zodat we niet bij elke factuur opnieuw moeten ophalen.
+let CACHED_TAX_RATES: { nul: string | null; eenentwintig: string | null } | null = null;
 
 // Custom field IDs (Moneybird)
 const CUSTOM_FIELD_IDS = {
