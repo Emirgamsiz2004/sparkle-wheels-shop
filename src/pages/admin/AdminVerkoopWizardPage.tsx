@@ -19,6 +19,7 @@ import { nl } from "date-fns/locale";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
 import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
+import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
 
@@ -169,6 +170,14 @@ const AdminVerkoopWizardPage = () => {
   const [inrBedrijfWoonplaats, setInrBedrijfWoonplaats] = useState("");
   const [inrBetaalwijze, setInrBetaalwijze] = useState<"verrekend" | "contant" | "overboeking" | "">("");
   const [inkoopverklaringId, setInkoopverklaringId] = useState<string | null>(null);
+
+  // Stap 7 state — Factuur Moneybird
+  const [factuurMbId, setFactuurMbId] = useState<string | null>(null);
+  const [factuurMbUrl, setFactuurMbUrl] = useState<string | null>(null);
+  const [factuurMbNummer, setFactuurMbNummer] = useState<string | null>(null);
+  const [factuurDatum, setFactuurDatum] = useState<string | null>(null);
+  const [factuurReferentie, setFactuurReferentie] = useState<string | null>(null);
+  const [factuurEmailVerzondenOp, setFactuurEmailVerzondenOp] = useState<string | null>(null);
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
@@ -851,7 +860,54 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 6 && (
+            {activeStap === 7 && (
+              <Stap7FactuurMoneybird
+                verkoopId={verkoopId}
+                voertuigKenteken={vehicle?.kenteken || ""}
+                voertuigMerk={vehicle?.merk || ""}
+                voertuigModel={vehicle?.model || ""}
+                voertuigBouwjaar={vehicle?.bouwjaar ?? null}
+                voertuigType={voertuigType}
+                verkoopprijs={verkoopprijs}
+                afleverkosten={afleverkosten}
+                leges={leges}
+                aanbetalingBedrag={aanbetalingBedrag}
+                garantieType={garantieType}
+                garantiePakket={garantiePakket}
+                garantieLooptijd={garantieLooptijd}
+                garantiePrijs={garantiePrijs}
+                klantVoornaam={klantVoornaam}
+                klantAchternaam={klantAchternaam}
+                klantBedrijfsnaam={klantBedrijfsnaam}
+                klantZakelijk={klantZakelijk}
+                klantAdres={klantAdres}
+                klantPostcode={klantPostcode}
+                klantWoonplaats={klantWoonplaats}
+                klantLand={klantLand}
+                klantTelefoon={klantTelefoon}
+                klantEmail={klantEmail}
+                klantKvk={klantKvk}
+                klantBtw={klantBtw}
+                customerId={customerId}
+                initialFactuurId={factuurMbId}
+                initialFactuurUrl={factuurMbUrl}
+                initialFactuurNummer={factuurMbNummer}
+                initialFactuurdatum={factuurDatum}
+                initialReferentie={factuurReferentie}
+                initialEmailVerzondenOp={factuurEmailVerzondenOp}
+                onSaved={async (extra) => {
+                  if (extra.moneybird_factuur_id !== undefined) setFactuurMbId(extra.moneybird_factuur_id);
+                  if (extra.moneybird_factuur_url !== undefined) setFactuurMbUrl(extra.moneybird_factuur_url);
+                  if (extra.moneybird_factuur_nummer !== undefined) setFactuurMbNummer(extra.moneybird_factuur_nummer);
+                  if (extra.factuurdatum !== undefined) setFactuurDatum(extra.factuurdatum);
+                  if (extra.factuur_referentie !== undefined) setFactuurReferentie(extra.factuur_referentie);
+                  if (extra.factuur_email_verzonden_op !== undefined) setFactuurEmailVerzondenOp(extra.factuur_email_verzonden_op);
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 7 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
