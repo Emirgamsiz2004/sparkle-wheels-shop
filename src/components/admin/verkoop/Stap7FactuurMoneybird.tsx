@@ -99,11 +99,15 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const [factuurUrl, setFactuurUrl] = useState<string | null>(p.initialFactuurUrl || null);
   const [factuurNummer, setFactuurNummer] = useState<string | null>(p.initialFactuurNummer || null);
   const [emailVerzondenOp, setEmailVerzondenOp] = useState<string | null>(p.initialEmailVerzondenOp || null);
+  const [factuurVerstuurd, setFactuurVerstuurd] = useState<boolean>(!!p.initialFactuurVerstuurd);
+  const [emailAdres, setEmailAdres] = useState<string>(p.initialFactuurEmail || p.klantEmail || "");
+  const [verzendKeuze, setVerzendKeuze] = useState<"email" | "manual" | null>(null);
 
   const [creating, setCreating] = useState(false);
   const [sending, setSending] = useState(false);
+  const [marking, setMarking] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [bevestigd, setBevestigd] = useState(!!p.initialFactuurId);
+  const [bevestigd, setBevestigd] = useState(!!p.initialFactuurVerstuurd);
 
   // Workflow automatisch bepalen
   const workflowId = useMemo<string>(() => {
