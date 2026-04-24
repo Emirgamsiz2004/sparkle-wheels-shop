@@ -1788,6 +1788,65 @@ const Stap2Aflevering = (p: Stap2Props) => {
                   </div>
                 </div>
 
+                {/* Optionele inruil op aanbetalingsbewijs */}
+                <div className="border-t border-border pt-4 space-y-3">
+                  <label className="flex items-center justify-between gap-3 cursor-pointer">
+                    <span className="text-sm text-foreground">Inruil vermelden op aanbetalingsbewijs</span>
+                    <Switch
+                      checked={inruilOpBewijs}
+                      onCheckedChange={setInruilOpBewijs}
+                      className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-muted [&>span]:data-[state=checked]:bg-background [&>span]:data-[state=unchecked]:bg-foreground/60"
+                    />
+                  </label>
+
+                  <div
+                    className={`grid transition-all duration-300 ease-out ${
+                      inruilOpBewijs ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                        <div>
+                          <label className={labelCls}>Kenteken inruil</label>
+                          <input
+                            autoComplete="off"
+                            type="text"
+                            value={inruilBewKenteken}
+                            onChange={(e) => setInruilBewKenteken(e.target.value.toUpperCase())}
+                            className={inputCls}
+                            placeholder="XX-000-X"
+                          />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Merk + model</label>
+                          <input
+                            autoComplete="off"
+                            type="text"
+                            value={inruilBewMerkModel}
+                            onChange={(e) => setInruilBewMerkModel(e.target.value)}
+                            className={inputCls}
+                            placeholder="Bijv. Volkswagen Golf"
+                          />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Inruilwaarde (€) *</label>
+                          <input
+                            autoComplete="off"
+                            type="number"
+                            inputMode="numeric"
+                            value={inruilBewWaarde}
+                            onChange={(e) =>
+                              setInruilBewWaarde(e.target.value === "" ? "" : Number(e.target.value))
+                            }
+                            className={inputCls}
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <button
                   type="button"
                   onClick={handlePdf}
