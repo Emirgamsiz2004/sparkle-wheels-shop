@@ -440,28 +440,29 @@ const AdminVerkoopWizardPage = () => {
   }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
 
   const handleVolgende = async () => {
-    // Stap-specifieke validatie
-    if (activeStap === 2) {
-      if (afleverwijze === "later") {
-        if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
-        // Aanbetaling is optioneel
-      } else if (afleverwijze === "aflevering") {
-        if (!leverdatum) { toast.error("Verwachte leverdatum is verplicht"); return; }
-        if (!afleveradres.trim()) { toast.error("Afleveradres is verplicht"); return; }
-      }
+    // Centrale validatie eerst
+    const errors = validateStap(activeStap, {
+      verkoopprijs, voertuigType, kmStand, inruil, inruilKenteken, inruilMerk, inruilModel,
+      inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk,
+      afleverwijze, leverdatum, afleveradres, aanbetalingBedrag, aanbetalingBetaalwijze,
+      klantVoornaam, klantAchternaam, klantGeboortedatum, klantAdres, klantPostcode,
+      klantWoonplaats, klantTelefoon, klantEmail, klantZakelijk, klantBedrijfsnaam, klantKvk,
+      garantieType, garantiePakket, garantieLooptijd, garantiePrijs,
+      pdfGenereerd, contractGetekend, restBetaalwijze, betaalwijzeDetails, restbedrag: restbedragGlobal,
+      inrVerkVoornaam, inrVerkAchternaam, inrVerkAdres, inrBetaalwijze, inkoopverklaringId,
+      factuurMbId, factuurVerstuurd,
+    });
+    if (errors.length > 0) {
+      setShowErrorsForStap((s) => new Set(s).add(activeStap));
+      // Scroll naar boven van content om foutenlijst te tonen
+      const main = document.querySelector(".wizard-content");
+      if (main) main.scrollTo({ top: 0, behavior: "smooth" });
+      toast.error(`${errors.length} ontbrekend${errors.length === 1 ? "" : "e"} veld${errors.length === 1 ? "" : "en"}`);
+      return;
     }
+
+    // Stap 3: klant aanmaken/bijwerken + Moneybird sync
     if (activeStap === 3) {
-      if (klantZakelijk) {
-        if (!klantBedrijfsnaam.trim()) { toast.error("Bedrijfsnaam is verplicht"); return; }
-        if (!klantKvk.trim()) { toast.error("KVK-nummer is verplicht"); return; }
-      }
-      if (!klantVoornaam.trim() || !klantAchternaam.trim()) {
-        toast.error(klantZakelijk ? "Contactpersoon voor- en achternaam zijn verplicht" : "Voor- en achternaam zijn verplicht");
-        return;
-      }
-      if (!klantAdres.trim() || !klantPostcode.trim() || !klantWoonplaats.trim()) { toast.error("Adres, postcode en woonplaats zijn verplicht"); return; }
-      if (!klantTelefoon.trim()) { toast.error("Telefoonnummer is verplicht"); return; }
-      // Klant aanmaken of bijwerken
       const customerPayload: any = {
         voornaam: klantVoornaam.trim(),
         achternaam: klantAchternaam.trim(),
@@ -529,6 +530,7 @@ const AdminVerkoopWizardPage = () => {
 
       const ok = await saveCurrent({ stap3_afgerond: true, customer_id: custId });
       if (!ok) return;
+      setShowErrorsForStap((s) => { const n = new Set(s); n.delete(activeStap); return n; });
       setCompleted((p) => ({ ...p, [activeStap]: true }));
       let next = activeStap + 1;
       const nextCompleted = { ...completed, [activeStap]: true };
@@ -536,21 +538,10 @@ const AdminVerkoopWizardPage = () => {
       if (next <= 12) setActiveStap(next);
       return;
     }
-    if (activeStap === 4) {
-      if (garantieType === "autotrust") {
-        if (!garantiePakket.trim()) { toast.error("Pakket naam is verplicht"); return; }
-        if (garantieLooptijd === "" || Number(garantieLooptijd) <= 0) { toast.error("Looptijd is verplicht"); return; }
-        if (garantiePrijs === "" || Number(garantiePrijs) < 0) { toast.error("Garantieprijs is verplicht"); return; }
-      }
-    }
-    if (activeStap === 5) {
-      if (!contractGetekend) {
-        toast.error("Bevestig eerst dat de koopovereenkomst getekend is voordat je verder gaat");
-        return;
-      }
-    }
+
     const ok = await saveCurrent({ [`stap${activeStap}_afgerond`]: true });
     if (!ok) return;
+    setShowErrorsForStap((s) => { const n = new Set(s); n.delete(activeStap); return n; });
     setCompleted((p) => ({ ...p, [activeStap]: true }));
     // Volgende non-blocked stap zoeken
     let next = activeStap + 1;
