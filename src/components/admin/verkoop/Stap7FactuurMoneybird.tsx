@@ -586,15 +586,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
 
             {/* Controleren */}
             {factuurUrl && (
-              <a
-                href={factuurUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={handleOpenInMoneybird}
                 className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 Factuur bekijken in Moneybird
-              </a>
+              </button>
             )}
 
             {/* E-mailadres veld (vooraf gevuld) */}
@@ -656,15 +655,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
 
             <div className="flex flex-wrap gap-2">
               {factuurUrl && (
-                <a
-                  href={factuurUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={handleOpenInMoneybird}
                   className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
                 >
                   <ExternalLink className="h-4 w-4" />
                   Bekijken in Moneybird
-                </a>
+                </button>
               )}
               <button
                 type="button"
