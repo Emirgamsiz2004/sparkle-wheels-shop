@@ -765,6 +765,42 @@ const AdminVerkoopWizardPage = () => {
               <p className="text-sm text-muted-foreground">{currentStep.description}</p>
             </div>
 
+            {/* Foutenlijst — verschijnt na klik op Volgende met ontbrekende info */}
+            {showErrors && (
+              <div className="mb-6 rounded-[10px] border border-destructive/40 bg-destructive/10 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-destructive mb-2">
+                      Let op — de volgende informatie ontbreekt:
+                    </div>
+                    <ul className="space-y-1">
+                      {currentErrors.map((err, i) => (
+                        <li key={i} className="text-[13px] text-destructive/90 flex items-start gap-2">
+                          <span className="text-destructive/60">•</span>
+                          <span>{err}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Optionele waarschuwingen */}
+            {currentWarnings.length > 0 && (
+              <div className="mb-6 rounded-[10px] border border-amber-500/40 bg-amber-500/10 p-4">
+                <div className="flex items-start gap-3">
+                  <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <ul className="space-y-1 flex-1">
+                    {currentWarnings.map((w, i) => (
+                      <li key={i} className="text-[13px] text-amber-200">{w}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
             {/* Stap inhoud */}
             {activeStap === 1 && (
               <Stap1Voertuig
