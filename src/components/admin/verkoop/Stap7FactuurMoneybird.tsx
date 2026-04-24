@@ -257,29 +257,32 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     }
   };
 
-  // E-mail factuur via Moneybird (finaliseert automatisch)
+  // Verzenden per e-mail (maakt factuur definitief via send_invoice)
   const handleEmailen = async () => {
     if (!factuurId) return;
-    const targetEmail = emailAdres.trim();
-    if (!targetEmail) {
-      toast.error("Vul een e-mailadres in");
-      return;
-    }
     setSending(true);
     try {
-      // send_invoice maakt factuur automatisch definitief (state: open)
-      await invoke("send_sales_invoice", { invoice_id: factuurId, delivery_method: "Email" });
+      const res = await invoke("send_sales_invoice", {
+        invoice_id: factuurId,
+        delivery_method: "Email",
+      });
+      const newState = res?.state || res?.invoice?.state;
+      if (newState && newState === "draft") {
+        throw new Error("Factuur is niet definitief gemaakt door Moneybird");
+      }
       const ts = new Date().toISOString();
+      const targetEmail = emailAdres.trim() || p.klantEmail || "";
       setEmailVerzondenOp(ts);
       setFactuurVerstuurd(true);
       setBevestigd(true);
       await p.onSaved({
         factuur_email_verzonden_op: ts,
         factuur_verstuurd: true,
-        factuur_email: targetEmail,
+        factuur_email: targetEmail || null,
+        factuur_status: newState || "open",
         stap7_afgerond: true,
       });
-      toast.success(`Factuur verstuurd naar ${targetEmail}`);
+      toast.success("Factuur verstuurd per e-mail ✓");
     } catch (e: any) {
       console.error(e);
       toast.error(e.message || "E-mailen mislukt");
@@ -288,20 +291,27 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     }
   };
 
-  // Handmatig: factuur definitief maken zonder mail
-  const handleMarkAsSent = async () => {
+  // Handmatig verzonden — maakt factuur definitief (Manual delivery)
+  const handleManueel = async () => {
     if (!factuurId) return;
     setMarking(true);
     try {
-      await invoke("finalize_sales_invoice", { invoice_id: factuurId });
+      const res = await invoke("send_sales_invoice", {
+        invoice_id: factuurId,
+        delivery_method: "Manual",
+      });
+      const newState = res?.state || res?.invoice?.state;
+      if (newState && newState === "draft") {
+        throw new Error("Factuur is niet definitief gemaakt door Moneybird");
+      }
       setFactuurVerstuurd(true);
       setBevestigd(true);
       await p.onSaved({
         factuur_verstuurd: true,
-        factuur_email: null,
+        factuur_status: newState || "open",
         stap7_afgerond: true,
       });
-      toast.success("Factuur gemarkeerd als verzonden");
+      toast.success("Factuur gemarkeerd als verzonden ✓");
     } catch (e: any) {
       console.error(e);
       toast.error(e.message || "Markeren mislukt");
