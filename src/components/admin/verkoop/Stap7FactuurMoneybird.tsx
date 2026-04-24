@@ -28,6 +28,24 @@ const WORKFLOW_IDS = {
   btw_geen: "482840757707736664",
   btw_autotrust: "482840705683686879",
 } as const;
+const BTW_WORKFLOW_IDS: ReadonlySet<string> = new Set([
+  WORKFLOW_IDS.btw_geen,
+  WORKFLOW_IDS.btw_autotrust,
+]);
+
+// BTW 21% (hoog) tax_rate_id voor administratie 481405116676573138.
+// Alleen toegepast op de voertuigregel bij BTW-workflows.
+const BTW_21_TAX_RATE_ID = "482047796720142370";
+
+// Custom field IDs (Moneybird)
+const CUSTOM_FIELD_IDS = {
+  kenteken: "482048786214946071",
+  chassisnummer: "483758257936008582",
+  bouwjaar: "482838097400169743",
+  kilometerstand: "482048832877627078",
+  merk_model: "482838073633146484",
+  garantie: "482848149761419699",
+} as const;
 
 type VoertuigType = "marge" | "btw" | "consignatie";
 type GarantieType = "geen" | "autotrust";
@@ -40,6 +58,8 @@ export interface Stap7Props {
   voertuigMerk: string;
   voertuigModel: string;
   voertuigBouwjaar?: number | null;
+  voertuigChassisnummer?: string | null;
+  voertuigKilometerstand?: number | null;
   voertuigType: VoertuigType;
 
   // Bedragen
@@ -128,10 +148,12 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const num = (v: number | "" | null | undefined) => (typeof v === "number" ? v : 0);
 
   const factuurRegels = useMemo(() => {
-    const regels: Array<{ description: string; price: number; amount: string }> = [];
+    type Kind = "voertuig" | "garantie" | "afleverkosten" | "leges" | "aanbetaling";
+    const regels: Array<{ kind: Kind; description: string; price: number; amount: string }> = [];
     const kenteken = p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "";
     const bouwjaar = p.voertuigBouwjaar ? ` (${p.voertuigBouwjaar})` : "";
     regels.push({
+      kind: "voertuig",
       description: `Voertuig ${kenteken} ${p.voertuigMerk} ${p.voertuigModel}${bouwjaar}`.trim(),
       price: num(p.verkoopprijs),
       amount: "1 x",
@@ -140,19 +162,20 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       const looptijd = num(p.garantieLooptijd);
       const pakket = p.garantiePakket || "Autotrust";
       regels.push({
+        kind: "garantie",
         description: `Garantie ${pakket}${looptijd ? ` · ${looptijd} maanden` : ""} via Autotrust`,
         price: num(p.garantiePrijs),
         amount: "1 x",
       });
     }
     if (num(p.afleverkosten) > 0) {
-      regels.push({ description: "Afleverkosten", price: num(p.afleverkosten), amount: "1 x" });
+      regels.push({ kind: "afleverkosten", description: "Afleverkosten", price: num(p.afleverkosten), amount: "1 x" });
     }
     if (num(p.leges) > 0) {
-      regels.push({ description: "Leges / tenaamstelling", price: num(p.leges), amount: "1 x" });
+      regels.push({ kind: "leges", description: "Leges / tenaamstelling", price: num(p.leges), amount: "1 x" });
     }
     if (num(p.aanbetalingBedrag) > 0) {
-      regels.push({ description: "Aanbetaling (reeds voldaan)", price: -num(p.aanbetalingBedrag), amount: "1 x" });
+      regels.push({ kind: "aanbetaling", description: "Aanbetaling (reeds voldaan)", price: -num(p.aanbetalingBedrag), amount: "1 x" });
     }
     return regels;
   }, [p]);
@@ -208,6 +231,21 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         tax_number: p.klantBtw || undefined,
       };
 
+      const isBtwWorkflow = BTW_WORKFLOW_IDS.has(workflowId);
+      const garantieValue =
+        p.garantieType === "autotrust"
+          ? `${p.garantiePakket || "Autotrust"}${num(p.garantieLooptijd) ? ` · ${num(p.garantieLooptijd)} maanden` : ""} via Autotrust`
+          : "Geen garantie";
+
+      const customFields = [
+        { id: CUSTOM_FIELD_IDS.kenteken, value: p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "" },
+        { id: CUSTOM_FIELD_IDS.chassisnummer, value: p.voertuigChassisnummer || "" },
+        { id: CUSTOM_FIELD_IDS.bouwjaar, value: p.voertuigBouwjaar ? String(p.voertuigBouwjaar) : "" },
+        { id: CUSTOM_FIELD_IDS.kilometerstand, value: p.voertuigKilometerstand ? String(p.voertuigKilometerstand) : "" },
+        { id: CUSTOM_FIELD_IDS.merk_model, value: `${p.voertuigMerk || ""} ${p.voertuigModel || ""}`.trim() },
+        { id: CUSTOM_FIELD_IDS.garantie, value: garantieValue },
+      ];
+
       const res = await invoke("create_wizard_invoice", {
         contact_id: moneybirdContactId || undefined,
         contact_payload: moneybirdContactId ? undefined : contactPayload,
@@ -215,11 +253,17 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         reference: referentie || undefined,
         invoice_date: factuurdatum,
         prices_are_incl_tax: true,
-        details_attributes: factuurRegels.map((r) => ({
-          description: r.description,
-          price: r.price,
-          amount: "1",
-        })),
+        details_attributes: factuurRegels.map((r) => {
+          // Voertuigregel: 21% BTW alleen bij BTW-workflow. Garantie + aanbetaling: nooit BTW.
+          const taxRateId = r.kind === "voertuig" && isBtwWorkflow ? BTW_21_TAX_RATE_ID : undefined;
+          return {
+            description: r.description,
+            price: r.price,
+            amount: "1",
+            ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
+          };
+        }),
+        custom_fields_attributes: customFields,
       });
 
       const invoice = res?.invoice;
