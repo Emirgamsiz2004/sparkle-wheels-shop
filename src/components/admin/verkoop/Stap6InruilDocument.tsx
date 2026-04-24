@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { User, Building2, FileText, Loader2, Check, Download } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { User, Building2, FileText, Loader2, Check, Download, Info as InfoIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { buildInkoopverklaringPdf } from "@/lib/inkoopverklaringPdf";
 import { buildInkoopfactuurPdf } from "@/lib/inkoopfactuurPdf";
 import { formatKenteken } from "@/lib/kenteken";
+import { GeboortedatumInputs } from "@/components/admin/GeboortedatumInputs";
 
 const inputCls =
   "w-full h-10 px-3 bg-background border border-border rounded-[10px] text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors";
@@ -51,6 +52,15 @@ export interface Stap6Props {
   inkoopverklaringId: string | null;
   setInkoopverklaringId: (id: string | null) => void;
 
+  // Klantgegevens uit stap 3 (voor auto-fill van particuliere verkoper)
+  klantVoornaam?: string;
+  klantAchternaam?: string;
+  klantGeboortedatum?: string;
+  klantAdres?: string;
+  klantPostcode?: string;
+  klantWoonplaats?: string;
+  klantTelefoon?: string;
+
   onAutoSave: () => Promise<void> | void;
 }
 
@@ -60,6 +70,39 @@ const formatEur = (n: number) =>
 export default function Stap6InruilDocument(p: Stap6Props) {
   const [generating, setGenerating] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+  const autoFilledRef = useRef(false);
+
+  // Auto-fill verkoper-velden (particulier) met klantgegevens uit stap 3 — slechts één keer,
+  // en alleen als de velden nog leeg zijn. Velden blijven daarna bewerkbaar.
+  useEffect(() => {
+    if (!p.inruil) return;
+    if (p.docType !== "particulier") return;
+    if (autoFilledRef.current) return;
+
+    const allEmpty =
+      !p.verkoperVoornaam &&
+      !p.verkoperAchternaam &&
+      !p.verkoperGeboortedatum &&
+      !p.verkoperAdres &&
+      !p.verkoperPostcode &&
+      !p.verkoperWoonplaats &&
+      !p.verkoperTelefoon;
+
+    const hasKlantData =
+      !!(p.klantVoornaam || p.klantAchternaam || p.klantAdres || p.klantPostcode || p.klantWoonplaats || p.klantTelefoon || p.klantGeboortedatum);
+
+    if (allEmpty && hasKlantData) {
+      if (p.klantVoornaam) p.setVerkoperVoornaam(p.klantVoornaam);
+      if (p.klantAchternaam) p.setVerkoperAchternaam(p.klantAchternaam);
+      if (p.klantGeboortedatum) p.setVerkoperGeboortedatum(p.klantGeboortedatum);
+      if (p.klantAdres) p.setVerkoperAdres(p.klantAdres);
+      if (p.klantPostcode) p.setVerkoperPostcode(p.klantPostcode);
+      if (p.klantWoonplaats) p.setVerkoperWoonplaats(p.klantWoonplaats);
+      if (p.klantTelefoon) p.setVerkoperTelefoon(p.klantTelefoon);
+      autoFilledRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.inruil, p.docType, p.klantVoornaam, p.klantAchternaam, p.klantGeboortedatum, p.klantAdres, p.klantPostcode, p.klantWoonplaats, p.klantTelefoon]);
 
   // Niet van toepassing
   if (!p.inruil) {
@@ -237,8 +280,16 @@ export default function Stap6InruilDocument(p: Stap6Props) {
       {/* Velden particulier */}
       {p.docType === "particulier" && (
         <div className="rounded-[14px] border border-border bg-card p-5 space-y-4">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            Verkoper (vorige eigenaar)
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Verkoper (vorige eigenaar)
+            </div>
+          </div>
+          <div className="flex items-start gap-2 rounded-[10px] border border-border/60 bg-muted/30 px-3 py-2">
+            <InfoIcon className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              Automatisch ingevuld vanuit klantgegevens — aanpasbaar indien de verkoper iemand anders is.
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -251,11 +302,9 @@ export default function Stap6InruilDocument(p: Stap6Props) {
             </div>
             <div>
               <label className={labelCls}>Geboortedatum</label>
-              <input
-                type="date"
-                className={inputCls}
+              <GeboortedatumInputs
                 value={p.verkoperGeboortedatum}
-                onChange={(e) => p.setVerkoperGeboortedatum(e.target.value)}
+                onChange={p.setVerkoperGeboortedatum}
               />
             </div>
             <div>
