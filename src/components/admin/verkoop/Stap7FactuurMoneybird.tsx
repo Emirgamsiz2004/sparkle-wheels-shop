@@ -257,24 +257,56 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     }
   };
 
+  // E-mail factuur via Moneybird (finaliseert automatisch)
   const handleEmailen = async () => {
     if (!factuurId) return;
-    if (!p.klantEmail) {
-      toast.error("Klant heeft geen e-mailadres");
+    const targetEmail = emailAdres.trim();
+    if (!targetEmail) {
+      toast.error("Vul een e-mailadres in");
       return;
     }
     setSending(true);
     try {
+      // send_invoice maakt factuur automatisch definitief (state: open)
       await invoke("send_sales_invoice", { invoice_id: factuurId, delivery_method: "Email" });
       const ts = new Date().toISOString();
       setEmailVerzondenOp(ts);
-      await p.onSaved({ factuur_email_verzonden_op: ts });
-      toast.success(`Factuur verstuurd naar ${p.klantEmail}`);
+      setFactuurVerstuurd(true);
+      setBevestigd(true);
+      await p.onSaved({
+        factuur_email_verzonden_op: ts,
+        factuur_verstuurd: true,
+        factuur_email: targetEmail,
+        stap7_afgerond: true,
+      });
+      toast.success(`Factuur verstuurd naar ${targetEmail}`);
     } catch (e: any) {
       console.error(e);
       toast.error(e.message || "E-mailen mislukt");
     } finally {
       setSending(false);
+    }
+  };
+
+  // Handmatig: factuur definitief maken zonder mail
+  const handleMarkAsSent = async () => {
+    if (!factuurId) return;
+    setMarking(true);
+    try {
+      await invoke("finalize_sales_invoice", { invoice_id: factuurId });
+      setFactuurVerstuurd(true);
+      setBevestigd(true);
+      await p.onSaved({
+        factuur_verstuurd: true,
+        factuur_email: null,
+        stap7_afgerond: true,
+      });
+      toast.success("Factuur gemarkeerd als verzonden");
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Markeren mislukt");
+    } finally {
+      setMarking(false);
     }
   };
 
