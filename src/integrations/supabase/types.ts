@@ -1981,6 +1981,8 @@ export type Database = {
           contant_bedrag: number | null
           created_at: string
           customer_id: string | null
+          factuur_email: string | null
+          factuur_verstuurd: boolean
           financiering: boolean
           financiering_maatschappij: string | null
           garantie_betaler: string | null
@@ -2011,6 +2013,8 @@ export type Database = {
           contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
+          factuur_email?: string | null
+          factuur_verstuurd?: boolean
           financiering?: boolean
           financiering_maatschappij?: string | null
           garantie_betaler?: string | null
@@ -2041,6 +2045,8 @@ export type Database = {
           contant_bedrag?: number | null
           created_at?: string
           customer_id?: string | null
+          factuur_email?: string | null
+          factuur_verstuurd?: boolean
           financiering?: boolean
           financiering_maatschappij?: string | null
           garantie_betaler?: string | null

@@ -481,6 +481,23 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── Factuur definitief maken (state: open) ───
+      case "finalize_sales_invoice": {
+        const { invoice_id: finId } = params;
+        if (!finId) throw new Error("invoice_id is required");
+        // Eerst huidige state checken — alleen patchen als nog draft
+        const current = await mbFetch(`sales_invoices/${finId}.json`);
+        if (current?.state && current.state !== "draft") {
+          result = { invoice: current, already_open: true };
+          break;
+        }
+        result = await mbFetch(`sales_invoices/${finId}.json`, {
+          method: "PATCH",
+          body: JSON.stringify({ sales_invoice: { state: "open" } }),
+        });
+        break;
+      }
+
       // ─── Factuur PDF downloaden ───
       case "download_invoice_pdf": {
         const { invoice_id: pdfInvoiceId } = params;

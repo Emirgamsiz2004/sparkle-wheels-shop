@@ -178,6 +178,8 @@ const AdminVerkoopWizardPage = () => {
   const [factuurDatum, setFactuurDatum] = useState<string | null>(null);
   const [factuurReferentie, setFactuurReferentie] = useState<string | null>(null);
   const [factuurEmailVerzondenOp, setFactuurEmailVerzondenOp] = useState<string | null>(null);
+  const [factuurVerstuurd, setFactuurVerstuurd] = useState<boolean>(false);
+  const [factuurEmail, setFactuurEmail] = useState<string | null>(null);
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
@@ -332,6 +334,8 @@ const AdminVerkoopWizardPage = () => {
         setFactuurDatum((e.factuurdatum as string) || null);
         setFactuurReferentie((e.factuur_referentie as string) || null);
         setFactuurEmailVerzondenOp((e.factuur_email_verzonden_op as string) || null);
+        setFactuurVerstuurd(!!(e as any).factuur_verstuurd);
+        setFactuurEmail(((e as any).factuur_email as string) || null);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -902,6 +906,8 @@ const AdminVerkoopWizardPage = () => {
                 initialFactuurdatum={factuurDatum}
                 initialReferentie={factuurReferentie}
                 initialEmailVerzondenOp={factuurEmailVerzondenOp}
+                initialFactuurVerstuurd={factuurVerstuurd}
+                initialFactuurEmail={factuurEmail}
                 onSaved={async (extra) => {
                   if (extra.moneybird_factuur_id !== undefined) setFactuurMbId(extra.moneybird_factuur_id);
                   if (extra.moneybird_factuur_url !== undefined) setFactuurMbUrl(extra.moneybird_factuur_url);
@@ -909,6 +915,8 @@ const AdminVerkoopWizardPage = () => {
                   if (extra.factuurdatum !== undefined) setFactuurDatum(extra.factuurdatum);
                   if (extra.factuur_referentie !== undefined) setFactuurReferentie(extra.factuur_referentie);
                   if (extra.factuur_email_verzonden_op !== undefined) setFactuurEmailVerzondenOp(extra.factuur_email_verzonden_op);
+                  if (extra.factuur_verstuurd !== undefined) setFactuurVerstuurd(!!extra.factuur_verstuurd);
+                  if (extra.factuur_email !== undefined) setFactuurEmail(extra.factuur_email);
                   await saveCurrent(extra);
                 }}
               />
