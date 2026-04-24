@@ -1567,6 +1567,10 @@ const Stap2Aflevering = (p: Stap2Props) => {
       toast.error("Vul eerst een aanbetalingsbedrag in");
       return;
     }
+    if (inruilOpBewijs && (inruilBewWaarde === "" || Number(inruilBewWaarde) <= 0)) {
+      toast.error("Vul de inruilwaarde in");
+      return;
+    }
     openAanbetalingsbewijsPdf({
       voertuig: {
         merk: p.vehicle.merk,
@@ -1589,6 +1593,14 @@ const Stap2Aflevering = (p: Stap2Props) => {
           : undefined,
       leverdatum: p.leverdatum,
       datum: today,
+      inruil: inruilOpBewijs
+        ? {
+            merk: inruilBewMerkModel.split(" ")[0] || inruilBewMerkModel,
+            model: inruilBewMerkModel.split(" ").slice(1).join(" "),
+            kenteken: inruilBewKenteken || undefined,
+            waarde: Number(inruilBewWaarde) || 0,
+          }
+        : undefined,
     });
   };
 
