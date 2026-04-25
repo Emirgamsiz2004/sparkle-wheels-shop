@@ -56,7 +56,7 @@ const InventorySection = () => {
             )}
             <Link
               to="/voorraad"
-              className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase text-foreground hover:text-primary transition-colors"
+              className="btn-public btn-secondary-public"
             >
               Bekijk alles
               <ArrowRight className="w-3.5 h-3.5" />
@@ -105,7 +105,7 @@ const InventorySection = () => {
             </p>
             <Link
               to="/voorraad"
-              className="inline-flex items-center gap-2 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+              className="btn-public btn-primary-public"
             >
               Bekijk Voorraad
               <ArrowRight className="w-3.5 h-3.5" />

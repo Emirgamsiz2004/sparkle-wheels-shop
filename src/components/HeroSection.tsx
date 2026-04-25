@@ -111,17 +111,10 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.7 }}
           className="flex flex-wrap gap-4"
         >
-          <Link
-            to="/voorraad"
-            className="group/cta relative bg-muted border border-border text-foreground px-8 py-3.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.25em] uppercase overflow-hidden transition-all duration-500 hover:border-accent hover:text-accent"
-          >
-            <span className="absolute inset-0 bg-accent/10 origin-left scale-x-0 group-hover/cta:scale-x-100 transition-transform duration-500 ease-out" />
-            <span className="relative z-10">Bekijk ons aanbod</span>
+          <Link to="/voorraad" className="btn-public btn-primary-public">
+            Bekijk ons aanbod
           </Link>
-          <Link
-            to="/consignatie"
-            className="relative border-b border-foreground/25 hover:border-accent pb-1 self-end text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-foreground/50 hover:text-accent transition-all duration-500"
-          >
+          <Link to="/consignatie" className="btn-public btn-secondary-public">
             Consignatie verkoop
           </Link>
         </motion.div>

@@ -157,7 +157,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
         {errors.omschrijving && <p className="text-xs text-red-400 mt-1 font-body">{errors.omschrijving}</p>}
       </div>
 
-      <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
+      <button type="submit" className="btn-public btn-primary-public group">
         <Send className="w-3.5 h-3.5" />
         Afspraak Maken
         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

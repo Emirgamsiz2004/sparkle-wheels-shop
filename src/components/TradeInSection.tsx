@@ -160,7 +160,7 @@ const TradeInSection = () => {
           <button
             onClick={handleCalculate}
             disabled={calculating || !rdwData}
-            className="w-full bg-foreground text-background py-3 text-xs font-body font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="btn-public btn-primary-public w-full"
           >
             {calculating && <Loader2 className="w-4 h-4 animate-spin" />}
             {calculating ? "Waarde wordt berekend..." : "Bereken inruilwaarde"}

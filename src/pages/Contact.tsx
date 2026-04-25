@@ -156,7 +156,7 @@ const ContactForm = () => {
         <textarea name="bericht" value={formData.bericht} onChange={handleChange} rows={5} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Waar kunnen wij u mee helpen?" />
         {errors.bericht && <p className="text-xs text-red-400 mt-1 font-body">{errors.bericht}</p>}
       </div>
-      <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
+      <button type="submit" className="btn-public btn-primary-public group">
         <Send className="w-3.5 h-3.5" />
         Verstuur Bericht
         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
