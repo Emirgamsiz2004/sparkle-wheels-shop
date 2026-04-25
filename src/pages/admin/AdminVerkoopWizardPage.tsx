@@ -44,7 +44,6 @@ type StepKey =
   | "betaling"
   | "inruil_naam"
   | "tenaamstelling"
-  | "uitlevering"
   | "afsluiting";
 
 interface StepDef {
