@@ -1280,52 +1280,6 @@ const AdminVerkoopWizardPage = () => {
             )}
 
             {activeStap === 11 && (
-              <Stap11Uitlevering
-                verkoopId={verkoopId}
-                voertuigKenteken={vehicle?.kenteken || ""}
-                voertuigMerk={vehicle?.merk || ""}
-                voertuigModel={vehicle?.model || ""}
-                voertuigBouwjaar={vehicle?.bouwjaar || null}
-                voertuigApkVervaldatum={(vehicle as any)?.apkVervaldatum || null}
-                initialAutoSchoongemaakt={autoSchoongemaakt}
-                initialApkGecommuniceerd={apkGecommuniceerd}
-                initialSleutelsOverhandigd={sleutelsOverhandigd}
-                initialSleutelsAantal={sleutelsAantal}
-                initialGebrekenBesproken={gebrekenBesproken}
-                initialGebrekenOmschrijving={gebrekenOmschrijving}
-                initialTenaamstellingsbewijsMeegegeven={tenaamstellingsbewijsMeegegeven}
-                initialUitleveringFotos={uitleveringFotos}
-                initialUitleveringDatum={uitleveringDatum}
-                initialUitleveringVoltooid={uitleveringVoltooid}
-                onSaved={async (extra) => {
-                  if (extra.auto_schoongemaakt !== undefined)
-                    setAutoSchoongemaakt(!!extra.auto_schoongemaakt);
-                  if (extra.apk_gecommuniceerd !== undefined)
-                    setApkGecommuniceerd(!!extra.apk_gecommuniceerd);
-                  if (extra.sleutels_overhandigd !== undefined)
-                    setSleutelsOverhandigd(!!extra.sleutels_overhandigd);
-                  if (extra.sleutels_aantal !== undefined)
-                    setSleutelsAantal(extra.sleutels_aantal);
-                  if (extra.gebreken_besproken !== undefined)
-                    setGebrekenBesproken(!!extra.gebreken_besproken);
-                  if (extra.gebreken_omschrijving !== undefined)
-                    setGebrekenOmschrijving(extra.gebreken_omschrijving);
-                  if (extra.tenaamstellingsbewijs_meegegeven !== undefined)
-                    setTenaamstellingsbewijsMeegegeven(!!extra.tenaamstellingsbewijs_meegegeven);
-                  if (extra.uitlevering_fotos !== undefined)
-                    setUitleveringFotos(extra.uitlevering_fotos || []);
-                  if (extra.uitlevering_datum !== undefined)
-                    setUitleveringDatum(extra.uitlevering_datum);
-                  if (extra.uitlevering_voltooid !== undefined)
-                    setUitleveringVoltooid(!!extra.uitlevering_voltooid);
-                  if (extra.stap11_afgerond !== undefined)
-                    setCompleted((p) => ({ ...p, 11: !!extra.stap11_afgerond }));
-                  await saveCurrent(extra);
-                }}
-              />
-            )}
-
-            {activeStap === 12 && (
               <Stap12Afsluiting
                 verkoopId={verkoopId}
                 vehicleId={vehicleId}
@@ -1334,6 +1288,7 @@ const AdminVerkoopWizardPage = () => {
                 voertuigKenteken={vehicle?.kenteken || null}
                 voertuigMerk={vehicle?.merk || null}
                 voertuigModel={vehicle?.model || null}
+                voertuigApkVervaldatum={(vehicle as any)?.apkVervaldatum || null}
                 afleverwijze={afleverwijze}
                 aanbetalingBedrag={aanbetalingBedrag}
                 klantVoornaam={klantVoornaam}
@@ -1348,7 +1303,20 @@ const AdminVerkoopWizardPage = () => {
                 restbedragBedrag={openstaandRestbedrag}
                 machtigingsnummer={machtigingsnummer}
                 machtigingDatum={machtigingDatum}
-                uitleveringDatum={uitleveringDatum}
+                initialUitleveringDatum={uitleveringDatum}
+                initialApkGecommuniceerd={apkGecommuniceerd}
+                initialGebrekenBesproken={gebrekenBesproken}
+                initialGebrekenOmschrijving={gebrekenOmschrijving}
+                initialTenaamstellingsbewijsMeegegeven={tenaamstellingsbewijsMeegegeven}
+                onUitleveringChange={async (extra) => {
+                  if (extra.uitlevering_datum !== undefined) setUitleveringDatum(extra.uitlevering_datum);
+                  if (extra.apk_gecommuniceerd !== undefined) setApkGecommuniceerd(!!extra.apk_gecommuniceerd);
+                  if (extra.gebreken_besproken !== undefined) setGebrekenBesproken(!!extra.gebreken_besproken);
+                  if (extra.gebreken_omschrijving !== undefined) setGebrekenOmschrijving(extra.gebreken_omschrijving);
+                  if (extra.tenaamstellingsbewijs_meegegeven !== undefined)
+                    setTenaamstellingsbewijsMeegegeven(!!extra.tenaamstellingsbewijs_meegegeven);
+                  await saveCurrent(extra);
+                }}
                 onNavigateToStap={(s) => handleStepClick(s)}
               />
             )}
