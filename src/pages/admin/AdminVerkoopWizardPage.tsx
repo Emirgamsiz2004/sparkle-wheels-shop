@@ -847,8 +847,26 @@ const AdminVerkoopWizardPage = () => {
             {vehicle.kenteken && (
               <div className="text-[11px] font-mono text-muted-foreground uppercase mt-0.5">{vehicle.kenteken}</div>
             )}
+            <button
+              type="button"
+              onClick={() => setCancelOpen(true)}
+              className="mt-3 text-[11px] text-muted-foreground hover:text-destructive transition-colors underline-offset-2 hover:underline"
+            >
+              Verkoop annuleren
+            </button>
           </div>
         </aside>
+
+        <CancelVerkoopDialog
+          open={cancelOpen}
+          onOpenChange={setCancelOpen}
+          verkoopId={verkoopId}
+          vehicleId={vehicle.id}
+          kenteken={vehicle.kenteken || ""}
+          merk={vehicle.merk || ""}
+          model={vehicle.model || ""}
+          bouwjaar={vehicle.bouwjaar}
+        />
 
       {/* Hoofdinhoud */}
       <main className="ml-[280px] h-screen overflow-y-scroll wizard-content" style={{ scrollbarGutter: "stable" }}>
