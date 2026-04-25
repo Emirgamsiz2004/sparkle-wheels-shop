@@ -116,6 +116,11 @@ const Stap8Betaling = ({
   );
   const [bevestigd, setBevestigd] = useState<boolean>(!!initialBetalingOntvangen);
   const [savingMb, setSavingMb] = useState(false);
+  const [restbedragLater, setRestbedragLater] = useState<boolean>(!!initialRestbedragLater);
+  const [verwachteDatum, setVerwachteDatum] = useState<string>(
+    initialRestbedragVerwachteDatum || "",
+  );
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   // ─── Auto-fill laatste rij met restbedrag (alleen als niet handmatig bewerkt) ───
   const totaalIngevuld = rijen
