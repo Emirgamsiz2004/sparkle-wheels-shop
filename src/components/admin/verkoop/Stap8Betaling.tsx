@@ -568,6 +568,74 @@ const Stap8Betaling = ({
         )}
       </div>
 
+      {/* ─── Restbedrag wordt later ontvangen ─── */}
+      <div className="rounded-[14px] border border-border bg-card p-6 space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-sm text-foreground font-medium">
+              Restbedrag wordt later ontvangen
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              Leg een betalingsafspraak vast met een uiterlijke betaaldatum.
+            </div>
+          </div>
+          <Switch
+            checked={restbedragLater}
+            onCheckedChange={handleToggleRestbedragLater}
+            className="data-[state=unchecked]:bg-white/10 data-[state=unchecked]:border-white/30 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500 [&>span]:bg-white"
+          />
+        </div>
+
+        {restbedragLater && (
+          <>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
+                Uiterlijk te voldoen op
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="w-full sm:w-auto inline-flex items-center justify-between gap-2 px-3 py-2 text-sm border border-border rounded-[10px] bg-background hover:bg-accent/50 transition-colors min-w-[220px]"
+                  >
+                    <span>
+                      {verwachteDatum
+                        ? format(parseISO(verwachteDatum), "d MMMM yyyy", { locale: nl })
+                        : "Kies datum"}
+                    </span>
+                    <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={verwachteDatum ? parseISO(verwachteDatum) : undefined}
+                    onSelect={(d) => {
+                      if (d) handleVerwachteDatumChange(format(d, "yyyy-MM-dd"));
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGenerateRestbetalingPdf}
+              disabled={generatingPdf || !verwachteDatum || nogTeOntvangen <= 0}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              {generatingPdf ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <FileText className="w-4 h-4" />
+              )}
+              Restbetalingsafspraak genereren als PDF
+            </button>
+          </>
+        )}
+      </div>
+
       {/* ─── Bevestiging ─── */}
       <div className="flex items-center justify-between gap-4 py-2">
         <span className="text-sm text-foreground">Betaling volledig ontvangen</span>
