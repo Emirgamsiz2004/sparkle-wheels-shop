@@ -102,6 +102,8 @@ const AdminVoertuigenPage = () => {
     toast.success(`APK vernieuwd: ${updated} voertuig${updated !== 1 ? "en" : ""} bijgewerkt`);
     if (updated > 0) refetch();
   };
+
+  const filtered = vehicles.filter((v) => {
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
