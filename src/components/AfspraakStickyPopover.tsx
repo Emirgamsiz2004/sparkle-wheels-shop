@@ -225,7 +225,7 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
     : "fixed z-[60] right-8 bottom-8 w-[340px] max-h-[85vh] overflow-y-auto rounded-[16px] border border-white/10 bg-[#111111] shadow-[0_12px_40px_rgba(0,0,0,0.5)]";
 
   return createPortal(
-    <LayoutGroup id="afspraak-popover">
+    <>
       <motion.div
         ref={containerRef}
         layoutId="afspraak-cta"
