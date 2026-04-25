@@ -182,21 +182,21 @@ const AdminVoertuigenPage = () => {
       </div>
 
       {/* Search + status filter */}
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-row gap-2">
         <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <input
             type="text"
             placeholder="Zoek op merk, model, kenteken..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+            className="w-full pl-7 pr-2 h-9 text-[14px] sm:text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full sm:w-auto px-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
+          className="shrink-0 sm:w-auto px-2 h-9 text-[14px] sm:text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
         >
           {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
@@ -209,7 +209,7 @@ const AdminVoertuigenPage = () => {
           ) : "Geen voertuigen gevonden."}
         </div>
       ) : isMobile ? (
-        <div className="bg-card rounded-lg border border-border overflow-hidden divide-y divide-border">
+        <div className="flex flex-col gap-2">
           {filtered.map((v) => {
             const consignatie = isConsignatie(v);
             const apkInfo = getMobileApkInfo(v.apkVervaldatum);
@@ -217,7 +217,7 @@ const AdminVoertuigenPage = () => {
               <Link
                 key={v.id}
                 to={`/admin/voertuigen/${v.id}`}
-                className="block active:bg-accent/30 transition-colors"
+                className="block bg-card border border-border rounded-[14px] active:bg-accent/30 transition-colors"
                 style={{ padding: "14px" }}
               >
                 {/* Rij 1: merk/model | bouwjaar */}
