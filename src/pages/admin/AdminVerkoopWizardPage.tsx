@@ -2746,6 +2746,44 @@ const Stap3Klant = (p: Stap3Props) => {
           </div>
         </div>
       )}
+
+      {/* Lead source — hoe heeft de klant ons gevonden */}
+      <div className="pt-5 mt-5 border-t border-border space-y-3">
+        <label className={labelCls}>Hoe heeft u ons gevonden? (optioneel)</label>
+        <div className="flex flex-wrap gap-2">
+          {["Marktplaats", "AutoScout24", "Facebook", "Instagram", "Google", "Via via / aanbeveling", "Anders"].map((opt) => {
+            const active = p.leadSource === opt;
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => p.setLeadSource(active ? "" : opt)}
+                className={cn(
+                  "px-3 py-2 rounded-[8px] text-sm border transition-colors",
+                  active
+                    ? "bg-foreground/10 border-foreground/40 text-foreground"
+                    : "bg-background border-border text-foreground/80 hover:bg-accent hover:text-foreground",
+                )}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+        {p.leadSource === "Anders" && (
+          <div>
+            <label className={labelCls}>Namelijk...</label>
+            <input
+              type="text"
+              value={p.leadSourceAnders}
+              onChange={(e) => p.setLeadSourceAnders(e.target.value)}
+              className={inputCls}
+              placeholder="Specificeer hoe u ons heeft gevonden"
+              maxLength={200}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
