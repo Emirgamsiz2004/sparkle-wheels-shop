@@ -416,10 +416,30 @@ Deno.serve(async (req) => {
         };
         if (workflow_id) invoiceBody.workflow_id = String(workflow_id);
         if (Array.isArray(wCustomFields) && wCustomFields.length > 0) {
-          invoiceBody.custom_fields_attributes = wCustomFields.map((cf: any) => ({
-            id: String(cf.id),
-            value: cf.value == null ? "" : String(cf.value),
-          }));
+          // Haal bestaande custom fields op om ongeldige IDs te filteren (voorkomt 404)
+          let validIds = new Set<string>();
+          try {
+            const cfs = await mbFetch("custom_fields.json");
+            if (Array.isArray(cfs)) {
+              for (const cf of cfs) validIds.add(String(cf.id));
+            }
+          } catch (e) {
+            console.warn("Kon custom_fields niet ophalen, stuur alle mee:", e);
+            validIds = new Set(wCustomFields.map((cf: any) => String(cf.id)));
+          }
+          const filtered = wCustomFields
+            .filter((cf: any) => validIds.has(String(cf.id)))
+            .map((cf: any) => ({
+              id: String(cf.id),
+              value: cf.value == null ? "" : String(cf.value),
+            }));
+          if (filtered.length > 0) {
+            invoiceBody.custom_fields_attributes = filtered;
+          }
+          const skipped = wCustomFields.length - filtered.length;
+          if (skipped > 0) {
+            console.warn(`${skipped} custom field(s) overgeslagen omdat ze niet bestaan in Moneybird`);
+          }
         }
 
         const invoice = await mbFetch("sales_invoices.json", {
