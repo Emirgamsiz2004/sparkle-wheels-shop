@@ -32,7 +32,6 @@ interface Props {
   onSubmit: (data: any) => Promise<void>;
   defaultType?: string;
   anchorRect?: DOMRect | null;
-  onBackToTypePicker?: () => void;
 }
 
 const typeOptions: { value: AppointmentType; label: string; icon: typeof Eye }[] = [
@@ -50,7 +49,7 @@ const timeSlots = Array.from({ length: 20 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${m}`;
 });
 
-const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType, anchorRect, onBackToTypePicker }: Props) => {
+const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType, anchorRect }: Props) => {
   const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
   const [type, setType] = useState<AppointmentType | null>((defaultType as AppointmentType) || null);
   const [saving, setSaving] = useState(false);
@@ -231,14 +230,39 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
         <X className="w-4 h-4" />
       </button>
       <div style={{ padding: 18 }}>
-
-        <AnimatePresence mode="wait">
-          {step === "form" && (
+        <motion.div layout transition={{ duration: 0.25, ease: "easeOut" }}>
+        <AnimatePresence mode="wait" initial={false}>
+          {step === "type" ? (
+            <motion.div
+              key="type-step"
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.18 }}
+            >
+              <div className="text-[11px] uppercase tracking-wide text-muted-foreground px-1 mb-2">
+                Wat voor afspraak?
+              </div>
+              <ul className="flex flex-col">
+                {typeOptions.map((opt) => (
+                  <li key={opt.value}>
+                    <button
+                      onClick={() => { setType(opt.value); setStep("form"); }}
+                      className="w-full flex items-center gap-3 rounded-[8px] px-2.5 py-2.5 text-left text-sm text-foreground hover:bg-accent/40 transition-colors"
+                    >
+                      <opt.icon className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span>{opt.label}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ) : (
             <motion.div
               key="form-step"
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 8 }}
               transition={{ duration: 0.18 }}
               className="space-y-4"
             >
@@ -246,10 +270,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
               {type && (
                 <button
                   type="button"
-                  onClick={() => {
-                    handleOpenChange(false);
-                    onBackToTypePicker?.();
-                  }}
+                  onClick={() => setStep("type")}
                   className="inline-flex items-center gap-1.5 group mb-1"
                   title="Wijzig type"
                 >
@@ -431,6 +452,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
             </motion.div>
           )}
         </AnimatePresence>
+        </motion.div>
       </div>
     </div>,
     document.body

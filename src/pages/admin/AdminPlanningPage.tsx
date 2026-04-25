@@ -9,7 +9,6 @@ import { useCustomers } from "@/hooks/useCustomers";
 import { useVehicles } from "@/hooks/useVehicles";
 import { useIsMobile } from "@/hooks/use-mobile";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
-import AppointmentTypePicker from "@/components/admin/planning/AppointmentTypePicker";
 import AppointmentDetailDialog from "@/components/admin/planning/AppointmentDetailDialog";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
@@ -49,9 +48,7 @@ const AdminPlanningPage = () => {
   const isMobile = useIsMobile();
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [formOpen, setFormOpen] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerRect, setPickerRect] = useState<DOMRect | null>(null);
-  const [pickedType, setPickedType] = useState<string | undefined>(undefined);
+  const [formAnchorRect, setFormAnchorRect] = useState<DOMRect | null>(null);
   const addBtnRef = useRef<HTMLButtonElement>(null);
   const [detailAppointment, setDetailAppointment] = useState<Appointment | null>(null);
   const [detailRect, setDetailRect] = useState<DOMRect | null>(null);
@@ -142,8 +139,8 @@ const AdminPlanningPage = () => {
           <button
             ref={addBtnRef}
             onClick={() => {
-              setPickerRect(addBtnRef.current?.getBoundingClientRect() || null);
-              setPickerOpen(true);
+              setFormAnchorRect(addBtnRef.current?.getBoundingClientRect() || null);
+              setFormOpen(true);
             }}
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97]"
           >
@@ -409,25 +406,14 @@ const AdminPlanningPage = () => {
       )}
 
       {/* Dialogs */}
-      <AppointmentTypePicker
-        open={pickerOpen}
-        anchorRect={pickerRect}
-        onOpenChange={setPickerOpen}
-        onSelect={(t) => { setPickedType(t); setFormOpen(true); }}
-      />
       <AppointmentFormDialog
         open={formOpen}
-        onOpenChange={(v) => { setFormOpen(v); if (!v) setPickedType(undefined); }}
+        onOpenChange={setFormOpen}
         customers={customers}
         vehicles={activeVehicles}
         allVehicles={allSelectableVehicles}
         onSubmit={addAppointment}
-        defaultType={pickedType}
-        anchorRect={pickerRect}
-        onBackToTypePicker={() => {
-          setPickerRect(addBtnRef.current?.getBoundingClientRect() || null);
-          setPickerOpen(true);
-        }}
+        anchorRect={formAnchorRect}
       />
       <AppointmentDetailDialog appointment={detailAppointment} anchorRect={detailRect} open={!!detailAppointment} onOpenChange={(v) => { if (!v) setDetailAppointment(null); }} onUpdate={updateAppointment} onDelete={deleteAppointment} onCreate={addAppointment} />
     </div>
