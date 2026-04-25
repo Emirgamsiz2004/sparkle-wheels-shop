@@ -193,7 +193,7 @@ const Stap8Betaling = ({
       // Optioneel: financial account uit app_settings ophalen op basis van methode
       let financialAccountId: string | null = null;
       try {
-        const primaryMethod = rijen[0]?.methode || "pin";
+        const primaryMethod: Methode = rijen[0]?.methode || "bank";
         const settingsKey =
           primaryMethod === "cash"
             ? "moneybird_financial_account_cash"
