@@ -646,8 +646,7 @@ const AdminVerkoopWizardPage = () => {
         const missing: string[] = [];
         if (!completed[8]) missing.push("stap 8 (betaling bevestigen)");
         if (stap >= 10 && inruil && !completed[9]) missing.push("stap 9 (inruil op naam zetten)");
-        if (stap >= 11 && !completed[10]) missing.push("stap 10 (vrijwaring)");
-        if (stap === 12 && !completed[11]) missing.push("stap 11 (uitlevering)");
+        if (stap === 11 && !completed[10]) missing.push("stap 10 (tenaamstelling)");
         if (missing.length > 0) {
           toast.error(`Rond eerst ${missing.join(" en ")} af.`);
         }
