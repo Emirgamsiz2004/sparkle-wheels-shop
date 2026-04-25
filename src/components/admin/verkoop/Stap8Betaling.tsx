@@ -297,6 +297,7 @@ const Stap8Betaling = ({
         <div className="space-y-3">
           {rijen.map((rij, idx) => {
             const isLast = idx === rijen.length - 1;
+            const isAuto = isLast && !rij.manueel;
             return (
               <div
                 key={idx}
@@ -327,11 +328,20 @@ const Stap8Betaling = ({
                     step="0.01"
                     value={rij.bedrag === "" ? "" : rij.bedrag}
                     onChange={(e) => handleChangeBedrag(idx, e.target.value)}
+                    onFocus={() => isAuto && handleUnlockLast(idx)}
+                    onClick={() => isAuto && handleUnlockLast(idx)}
                     onBlur={triggerSave}
-                    className="w-28 bg-background border border-border rounded-[8px] px-2 py-1.5 text-sm text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
+                    readOnly={isAuto}
+                    title={isAuto ? "Klik om handmatig te bewerken" : undefined}
+                    className={cn(
+                      "w-28 border border-border rounded-[8px] px-2 py-1.5 text-sm text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring",
+                      isAuto
+                        ? "bg-muted/40 text-muted-foreground cursor-pointer"
+                        : "bg-background",
+                    )}
                     placeholder="0,00"
                   />
-                  {rijen.length > 1 && !isLast && (
+                  {rijen.length > 1 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveRij(idx)}
