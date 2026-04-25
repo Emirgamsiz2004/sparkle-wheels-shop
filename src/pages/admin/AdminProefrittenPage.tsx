@@ -31,6 +31,12 @@ const AdminProefrittenPage = () => {
   const [selected, setSelected] = useState<TestDrive | null>(null);
   const [ending, setEnding] = useState<TestDrive | null>(null);
   const [newOpen, setNewOpen] = useState(false);
+  const [newAnchor, setNewAnchor] = useState<DOMRect | null>(null);
+  const newBtnRef = useRef<HTMLButtonElement>(null);
+  const openNew = (el?: HTMLElement | null) => {
+    setNewAnchor((el ?? newBtnRef.current)?.getBoundingClientRect() ?? null);
+    setNewOpen(true);
+  };
   const [startFromAppointment, setStartFromAppointment] = useState<{ id: string; merk: string; model: string; kenteken?: string; bouwjaar?: number; kilometerstand?: number } | null>(null);
 
   // Upcoming proefrit appointments (scheduled, future or today)
