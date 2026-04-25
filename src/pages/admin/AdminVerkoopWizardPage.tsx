@@ -787,9 +787,11 @@ const AdminVerkoopWizardPage = () => {
             {STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9)).map((step, visibleIdx) => {
               const displayNum = visibleIdx + 1;
               const blocked = isStepBlocked(step.num, completed, inruil);
-              const done = isStepDone(step.num, completed);
+              const doneRaw = isStepDone(step.num, completed);
               const active = step.num === activeStap;
-              const hasIssues = !blocked && stepHasIssues(step.num);
+              const isTouched = touchedSteps.has(step.num) || doneRaw;
+              const done = doneRaw; // green only when stap{N}_afgerond = true
+              const hasIssues = !blocked && isTouched && !done && stepHasIssues(step.num);
               // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/tenaamstelling)
               const lockedByPrereq =
                 blocked &&
