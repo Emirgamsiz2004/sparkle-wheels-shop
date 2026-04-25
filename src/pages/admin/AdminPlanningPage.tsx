@@ -49,6 +49,10 @@ const AdminPlanningPage = () => {
   const isMobile = useIsMobile();
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [formOpen, setFormOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerRect, setPickerRect] = useState<DOMRect | null>(null);
+  const [pickedType, setPickedType] = useState<string | undefined>(undefined);
+  const addBtnRef = useRef<HTMLButtonElement>(null);
   const [detailAppointment, setDetailAppointment] = useState<Appointment | null>(null);
   const [detailRect, setDetailRect] = useState<DOMRect | null>(null);
   const openDetail = (a: Appointment, e: React.MouseEvent) => {
