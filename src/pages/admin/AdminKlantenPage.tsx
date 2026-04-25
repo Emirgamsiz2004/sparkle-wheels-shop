@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useCustomers, Customer, statusLabels, statusColors } from "@/hooks/useCustomers";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Loader2, ChevronRight } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SlidingTabs from "@/components/admin/SlidingTabs";
@@ -22,8 +22,8 @@ const AdminKlantenPage = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [addOpen, setAddOpen] = useState(false);
-  const [form, setForm] = useState({ voornaam: "", achternaam: "", email: "", telefoon: "" });
-  const [saving, setSaving] = useState(false);
+  const [addAnchor, setAddAnchor] = useState<DOMRect | null>(null);
+  const addBtnRef = useRef<HTMLButtonElement>(null);
 
   const filtered = useMemo(() => {
     let list = customers;
@@ -40,18 +40,13 @@ const AdminKlantenPage = () => {
     return list;
   }, [customers, search, statusFilter]);
 
-  const handleAdd = async () => {
-    if (!form.voornaam || !form.achternaam || !form.email) {
-      toast.error("Vul naam en e-mail in");
-      return;
-    }
-    setSaving(true);
-    try {
-      await addCustomer({ ...form, status: "prospect" } as any);
-      setForm({ voornaam: "", achternaam: "", email: "", telefoon: "" });
-      setAddOpen(false);
-    } catch {}
-    setSaving(false);
+  const handleAdd = async (data: { voornaam: string; achternaam: string; email: string; telefoon: string }) => {
+    await addCustomer({ ...data, status: "prospect" } as any);
+  };
+
+  const openAdd = () => {
+    setAddAnchor(addBtnRef.current?.getBoundingClientRect() ?? null);
+    setAddOpen(true);
   };
 
   const formatDate = (d?: string) => {
@@ -67,7 +62,8 @@ const AdminKlantenPage = () => {
           <p className="text-sm text-muted-foreground">{customers.length} klant{customers.length !== 1 ? "en" : ""}</p>
         </div>
         <button
-          onClick={() => setAddOpen(true)}
+          ref={addBtnRef}
+          onClick={openAdd}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97] shrink-0"
         >
           <Plus className="w-3.5 h-3.5" /> Nieuw
@@ -160,41 +156,13 @@ const AdminKlantenPage = () => {
         </div>
       )}
 
-      {/* Add dialog */}
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-base font-medium">Klant toevoegen</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 pt-2">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">Voornaam</label>
-                <input value={form.voornaam} onChange={(e) => setForm({ ...form, voornaam: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring" />
-              </div>
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">Achternaam</label>
-                <input value={form.achternaam} onChange={(e) => setForm({ ...form, achternaam: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">E-mailadres</label>
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring" />
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Telefoonnummer</label>
-              <input value={form.telefoon} onChange={(e) => setForm({ ...form, telefoon: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring" />
-            </div>
-            <button
-              onClick={handleAdd}
-              disabled={saving}
-              className="w-full py-2.5 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.98] disabled:opacity-50"
-            >
-              {saving ? "Opslaan..." : "Klant toevoegen"}
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Add popover */}
+      <AddCustomerPopover
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        anchorRect={addAnchor}
+        onSubmit={handleAdd}
+      />
     </div>
   );
 };
