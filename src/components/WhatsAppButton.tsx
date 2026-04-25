@@ -6,6 +6,11 @@ import AfspraakStickyPopover from "./AfspraakStickyPopover";
 
 const HIDE_PATHS = ["/afspraak", "/admin", "/proefrit/"];
 
+/**
+ * Sticky "Afspraak maken" knop op de publieke website.
+ * Bij klikken morpht de pill-knop vloeiend naar de afspraak-popover
+ * (gedeelde layoutId "afspraak-cta").
+ */
 const WhatsAppButton = () => {
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
@@ -31,16 +36,27 @@ const WhatsAppButton = () => {
             key="cta-btn"
             layoutId="afspraak-cta"
             onClick={() => setOpen(true)}
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
             style={{
-              borderRadius: 0,
+              borderRadius: 50,
+              backgroundColor: "rgba(0,0,0,0.85)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+              padding: "14px 24px",
+              letterSpacing: "0.1em",
+              fontFamily: "Orbitron, sans-serif",
             }}
-            className="btn-public btn-sticky-public fixed z-50
+            whileHover={{
+              scale: 1.02,
+              borderColor: "rgba(255,255,255,0.3)",
+            }}
+            className="fixed z-50 inline-flex items-center justify-center gap-2
               bottom-4 left-1/2 -translate-x-1/2 w-auto
-              md:left-auto md:translate-x-0 md:right-5 md:bottom-5"
+              md:left-auto md:translate-x-0 md:right-5 md:bottom-5
+              text-white text-xs font-semibold uppercase backdrop-blur-sm"
             aria-label="Afspraak maken"
           >
             <motion.span
