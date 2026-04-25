@@ -29,6 +29,8 @@ const AdminVoertuigenPage = () => {
   const [statusFilter, setStatusFilter] = useState("alle");
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
+  const [apkRefreshing, setApkRefreshing] = useState(false);
+  const [apkProgress, setApkProgress] = useState({ done: 0, total: 0 });
   const isMobile = useIsMobile();
   const [consignatieWarningCount, setConsignatieWarningCount] = useState(0);
 
