@@ -192,8 +192,19 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   );
 
   const setStatus = async (s: AppointmentStatus) => {
-    if (appointment.status === s) return;
-    await onUpdate(appointment.id, { status: s });
+    if (!appointment || statusSaving) return;
+    if (localStatus === s) return;
+    const previous = localStatus;
+    setLocalStatus(s);
+    setStatusSaving(true);
+    try {
+      await onUpdate(appointment.id, { status: s });
+      toast.success("Status bijgewerkt");
+    } catch (e) {
+      setLocalStatus(previous);
+    } finally {
+      setStatusSaving(false);
+    }
   };
 
   const goToVehicle = () => {
