@@ -11,7 +11,7 @@ import { useMoneybird } from "@/hooks/useMoneybird";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKenteken } from "@/lib/kenteken";
 
-type Methode = "cash" | "pin" | "ideal" | "overboeking";
+type Methode = "cash" | "bank";
 
 interface Rij {
   methode: Methode;
@@ -21,9 +21,7 @@ interface Rij {
 
 const METHODEN: { id: Methode; label: string }[] = [
   { id: "cash", label: "Cash" },
-  { id: "pin", label: "Pin" },
-  { id: "ideal", label: "iDEAL" },
-  { id: "overboeking", label: "Overboeking" },
+  { id: "bank", label: "Bank" },
 ];
 
 const fmtEur = (n: number) =>
