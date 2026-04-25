@@ -246,6 +246,9 @@ const AdminPlanningPage = () => {
             </div>
           )}
 
+          {/* Open requests from website */}
+          <OpenstaandeAanvragen aanvragen={aanvragen} onUpdate={updateAppointment} />
+
           {/* Today's prep */}
           {todayPrep.length > 0 && (
             <div className="bg-card border border-border rounded-md p-3 sm:p-4">
