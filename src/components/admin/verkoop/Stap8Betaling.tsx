@@ -297,9 +297,14 @@ const Stap8Betaling = ({
   // ─── Restbedrag later toggle ───
   const handleToggleRestbedragLater = async (val: boolean) => {
     setRestbedragLater(val);
+    if (!val) {
+      setOpenstaandManueel(false);
+      setOpenstaandRestbedrag("");
+    }
     await persist({
       restbedrag_later: val,
       restbedrag_verwachte_datum: val ? verwachteDatum || null : null,
+      restbedrag: val ? (typeof openstaandRestbedrag === "number" ? openstaandRestbedrag : 0) : 0,
     });
   };
 
@@ -308,6 +313,18 @@ const Stap8Betaling = ({
     if (restbedragLater) {
       await persist({ restbedrag_later: true, restbedrag_verwachte_datum: iso || null });
     }
+  };
+
+  const handleChangeOpenstaand = (v: string) => {
+    setOpenstaandManueel(true);
+    setOpenstaandRestbedrag(v === "" ? "" : Number(v));
+  };
+
+  const handleBlurOpenstaand = async () => {
+    if (!restbedragLater) return;
+    await persist({
+      restbedrag: typeof openstaandRestbedrag === "number" ? openstaandRestbedrag : 0,
+    });
   };
 
   // ─── Restbetalingsafspraak PDF ───
