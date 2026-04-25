@@ -166,7 +166,7 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
       onClick={onClick}
       className={cn(
         "w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-[13px] transition-colors text-left",
-        active ? "bg-accent text-foreground" : "text-foreground/80 hover:bg-accent/60 hover:text-foreground",
+        active ? "bg-white/[0.08] text-white" : "text-foreground/80 hover:bg-white/[0.04] hover:text-foreground",
       )}
     >
       <span>{label}</span>
