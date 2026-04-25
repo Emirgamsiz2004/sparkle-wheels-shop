@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, AlertCircle, MessageCircle, Star, Lock, Loader2 } from "lucide-react";
+import { Check, AlertCircle, MessageCircle, Lock, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -199,13 +199,12 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
   const openItems = visibleSteps.filter((s) => !s.done);
   const allDone = openItems.length === 0;
 
-  const waMessage = `Bedankt voor uw aankoop bij Platin Automotive! We hopen dat u veel plezier beleeft aan uw ${merkModel || "nieuwe auto"}. Heeft u vragen, neem dan gerust contact op.`;
-  const waPhone = (p.klantTelefoon || "").replace(/[^\d]/g, "").replace(/^0/, "31");
-  const waUrl = waPhone
-    ? `https://wa.me/${waPhone}?text=${encodeURIComponent(waMessage)}`
-    : `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
-
-  const googleReviewUrl = "https://g.page/r/platinautomotive/review";
+  const voornaam = (p.klantVoornaam || "").trim() || "klant";
+  const merkModelText = merkModel || "nieuwe auto";
+  const waMessage = `Beste ${voornaam}, hartelijk bedankt voor uw aankoop bij Platin Automotive! 🚗 We hopen dat u veel rijplezier beleeft aan uw ${merkModelText}. Bent u tevreden? We zouden het heel fijn vinden als u een review wilt achterlaten — dat helpt ons enorm! 👉 https://g.page/r/CT1_sFLfuDgAEBM/review Heeft u vragen, dan staan we altijd voor u klaar. Met vriendelijke groet, Platin Automotive`;
+  const rawPhone = (p.klantTelefoon || "").replace(/[^\d]/g, "").replace(/^0/, "");
+  const waPhone = rawPhone ? `31${rawPhone}` : "";
+  const waUrl = waPhone ? `https://wa.me/${waPhone}?text=${encodeURIComponent(waMessage)}` : "";
 
   const handleAfsluiten = async () => {
     if (!p.verkoopId || !p.vehicleId) {
@@ -377,7 +376,7 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
       {/* Acties */}
       <div className="rounded-[14px] border border-border bg-card p-6">
         <h2 className="text-lg font-semibold text-foreground mb-4">Acties</h2>
-        <div className="grid sm:grid-cols-2 gap-3">
+        {waUrl ? (
           <a
             href={waUrl}
             target="_blank"
@@ -385,18 +384,23 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
             className="flex items-center justify-center gap-2 px-4 py-3 rounded-[10px] border border-border bg-background hover:bg-accent text-sm font-medium transition-colors"
           >
             <MessageCircle className="w-4 h-4" />
-            Stuur bedankbericht via WhatsApp
+            Stuur bedankbericht + review verzoek via WhatsApp
           </a>
-          <a
-            href={googleReviewUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-4 py-3 rounded-[10px] border border-border bg-background hover:bg-accent text-sm font-medium transition-colors"
-          >
-            <Star className="w-4 h-4" />
-            Stuur Google review verzoek
-          </a>
-        </div>
+        ) : (
+          <div className="space-y-2">
+            <button
+              type="button"
+              disabled
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-[10px] border border-border bg-background text-sm font-medium opacity-50 cursor-not-allowed"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Stuur bedankbericht + review verzoek via WhatsApp
+            </button>
+            <p className="text-xs text-orange-500">
+              Geen telefoonnummer bekend — voeg dit toe in stap 3
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Verkoop afsluiten */}
