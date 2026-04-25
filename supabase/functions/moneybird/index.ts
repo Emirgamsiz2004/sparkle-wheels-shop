@@ -301,6 +301,11 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "get_custom_fields": {
+        result = await mbFetch("custom_fields.json");
+        break;
+      }
+
       // ─── Financieel overzicht (BTW) ───
       case "get_financial_statements": {
         const { year, filter } = params;
