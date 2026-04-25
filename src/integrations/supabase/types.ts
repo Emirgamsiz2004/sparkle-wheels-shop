@@ -2354,8 +2354,10 @@ export type Database = {
           created_at: string | null
           customer_id: string | null
           factuur_betaald: boolean | null
+          factuur_email: string | null
           factuur_email_verzonden_op: string | null
           factuur_referentie: string | null
+          factuur_verstuurd: boolean
           factuurdatum: string | null
           financiering: boolean | null
           financiering_maatschappij: string | null
@@ -2456,8 +2458,10 @@ export type Database = {
           created_at?: string | null
           customer_id?: string | null
           factuur_betaald?: boolean | null
+          factuur_email?: string | null
           factuur_email_verzonden_op?: string | null
           factuur_referentie?: string | null
+          factuur_verstuurd?: boolean
           factuurdatum?: string | null
           financiering?: boolean | null
           financiering_maatschappij?: string | null
@@ -2558,8 +2562,10 @@ export type Database = {
           created_at?: string | null
           customer_id?: string | null
           factuur_betaald?: boolean | null
+          factuur_email?: string | null
           factuur_email_verzonden_op?: string | null
           factuur_referentie?: string | null
+          factuur_verstuurd?: boolean
           factuurdatum?: string | null
           financiering?: boolean | null
           financiering_maatschappij?: string | null
