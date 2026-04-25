@@ -134,13 +134,14 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
     });
   };
 
-  // Measure active slide height for smooth height transitions
+  // Measure ONLY the active slide's natural height for smooth height transitions.
+  // We render just the active slide so the popover never reserves space for other steps.
   useLayoutEffect(() => {
     const el = slidesRef.current[stepIndex];
     if (!el) return;
     const update = () => {
-      const h = el.scrollHeight;
-      setPagerHeight(h);
+      // Use offsetHeight (layout box) — content is rendered with natural height.
+      setPagerHeight(el.offsetHeight);
     };
     update();
     const ro = new ResizeObserver(update);
