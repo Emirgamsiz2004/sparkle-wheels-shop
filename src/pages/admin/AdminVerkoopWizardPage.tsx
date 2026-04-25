@@ -1185,19 +1185,22 @@ const AdminVerkoopWizardPage = () => {
                 voertuigMerk={vehicle?.merk || ""}
                 voertuigModel={vehicle?.model || ""}
                 voertuigBouwjaar={vehicle?.bouwjaar || null}
-                initialVrijwaringBevestigd={vrijwaringBevestigd}
-                initialVrijwaringDatum={vrijwaringDatum}
-                initialVrijwaringTijdstip={vrijwaringTijdstip}
-                initialTenaamstellingsbewijsKlaargelegd={tenaamstellingsbewijsKlaargelegd}
+                initialMachtigingsnummer={machtigingsnummer}
+                initialMachtigingDatum={machtigingDatum}
+                initialMachtigingOntvangen={machtigingOntvangen}
+                initialTenaamstellingBevestigd={tenaamstellingBevestigd}
+                initialTenaamstellingDatum={tenaamstellingDatum}
                 onSaved={async (extra) => {
-                  if (extra.vrijwaring_bevestigd !== undefined)
-                    setVrijwaringBevestigd(!!extra.vrijwaring_bevestigd);
-                  if (extra.vrijwaring_datum !== undefined)
-                    setVrijwaringDatum(extra.vrijwaring_datum);
-                  if (extra.vrijwaring_tijdstip !== undefined)
-                    setVrijwaringTijdstip(extra.vrijwaring_tijdstip);
-                  if (extra.tenaamstellingsbewijs_klaargelegd !== undefined)
-                    setTenaamstellingsbewijsKlaargelegd(!!extra.tenaamstellingsbewijs_klaargelegd);
+                  if (extra.machtigingsnummer !== undefined)
+                    setMachtigingsnummer(extra.machtigingsnummer);
+                  if (extra.machtiging_datum !== undefined)
+                    setMachtigingDatum(extra.machtiging_datum);
+                  if (extra.machtiging_ontvangen !== undefined)
+                    setMachtigingOntvangen(!!extra.machtiging_ontvangen);
+                  if (extra.tenaamstelling_bevestigd !== undefined)
+                    setTenaamstellingBevestigd(!!extra.tenaamstelling_bevestigd);
+                  if (extra.tenaamstelling_datum !== undefined)
+                    setTenaamstellingDatum(extra.tenaamstelling_datum);
                   if (extra.stap10_afgerond !== undefined)
                     setCompleted((p) => ({ ...p, 10: !!extra.stap10_afgerond }));
                   await saveCurrent(extra);
