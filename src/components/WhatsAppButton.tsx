@@ -6,11 +6,6 @@ import AfspraakStickyPopover from "./AfspraakStickyPopover";
 
 const HIDE_PATHS = ["/afspraak", "/admin", "/proefrit/"];
 
-/**
- * Sticky "Afspraak maken" knop op de publieke website.
- * Bij klikken morpht de pill-knop vloeiend naar de afspraak-popover
- * (gedeelde layoutId "afspraak-cta").
- */
 const WhatsAppButton = () => {
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
@@ -59,6 +54,8 @@ const WhatsAppButton = () => {
               Afspraak maken
             </motion.span>
           </motion.button>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {open && <AfspraakStickyPopover open={open} onClose={() => setOpen(false)} />}
