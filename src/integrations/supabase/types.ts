@@ -2394,6 +2394,9 @@ export type Database = {
           later_ophalen: boolean | null
           leges: number | null
           leverdatum: string | null
+          machtiging_datum: string | null
+          machtiging_ontvangen: boolean
+          machtigingsnummer: string | null
           moneybird_factuur_id: string | null
           moneybird_factuur_nummer: string | null
           moneybird_factuur_url: string | null
@@ -2416,6 +2419,8 @@ export type Database = {
           stap7_afgerond: boolean | null
           stap8_afgerond: boolean | null
           stap9_afgerond: boolean | null
+          tenaamstelling_bevestigd: boolean
+          tenaamstelling_datum: string | null
           tenaamstellingsbewijs_klaargelegd: boolean
           uitlevering_datum: string | null
           uitlevering_foto: boolean | null
@@ -2491,6 +2496,9 @@ export type Database = {
           later_ophalen?: boolean | null
           leges?: number | null
           leverdatum?: string | null
+          machtiging_datum?: string | null
+          machtiging_ontvangen?: boolean
+          machtigingsnummer?: string | null
           moneybird_factuur_id?: string | null
           moneybird_factuur_nummer?: string | null
           moneybird_factuur_url?: string | null
@@ -2513,6 +2521,8 @@ export type Database = {
           stap7_afgerond?: boolean | null
           stap8_afgerond?: boolean | null
           stap9_afgerond?: boolean | null
+          tenaamstelling_bevestigd?: boolean
+          tenaamstelling_datum?: string | null
           tenaamstellingsbewijs_klaargelegd?: boolean
           uitlevering_datum?: string | null
           uitlevering_foto?: boolean | null
@@ -2588,6 +2598,9 @@ export type Database = {
           later_ophalen?: boolean | null
           leges?: number | null
           leverdatum?: string | null
+          machtiging_datum?: string | null
+          machtiging_ontvangen?: boolean
+          machtigingsnummer?: string | null
           moneybird_factuur_id?: string | null
           moneybird_factuur_nummer?: string | null
           moneybird_factuur_url?: string | null
@@ -2610,6 +2623,8 @@ export type Database = {
           stap7_afgerond?: boolean | null
           stap8_afgerond?: boolean | null
           stap9_afgerond?: boolean | null
+          tenaamstelling_bevestigd?: boolean
+          tenaamstelling_datum?: string | null
           tenaamstellingsbewijs_klaargelegd?: boolean
           uitlevering_datum?: string | null
           uitlevering_foto?: boolean | null
