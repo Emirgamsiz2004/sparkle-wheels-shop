@@ -344,6 +344,11 @@ const AdminVerkoopWizardPage = () => {
         setFactuurEmailVerzondenOp((e.factuur_email_verzonden_op as string) || null);
         setFactuurVerstuurd(!!(e as any).factuur_verstuurd);
         setFactuurEmail(((e as any).factuur_email as string) || null);
+        // Stap 8 hydration — Betaling
+        setBetalingDatum((e.betaling_datum as string) || null);
+        setBetalingOpmerking(((e as any).betaling_opmerking as string) || null);
+        setMoneybirdPaymentId(((e as any).moneybird_payment_id as string) || null);
+        setBetalingOntvangen(!!(e as any).betaling_ontvangen);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
