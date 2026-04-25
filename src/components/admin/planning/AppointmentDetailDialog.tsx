@@ -187,9 +187,57 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
     navigate(`/admin/klanten/${appointment.customer.id}`);
   };
 
-  return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="p-0 gap-0 w-[calc(100vw-2rem)] sm:w-[300px] sm:max-w-[300px] rounded-[14px] border border-border bg-card shadow-lg overflow-hidden">
+  const containerClass = isMobile
+    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-[14px] border-t border-x border-border bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
+    : "fixed z-50 w-[280px] rounded-[14px] border border-border bg-card shadow-lg animate-in fade-in-0 zoom-in-95 duration-150";
+
+  const containerStyle: React.CSSProperties = isMobile
+    ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" }
+    : pos
+      ? { top: pos.top, left: pos.left }
+      : { top: -9999, left: -9999 };
+
+  if (!open) {
+    return (
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Afspraak verwijderen?</AlertDialogTitle>
+            <AlertDialogDescription>Deze actie kan niet ongedaan worden gemaakt.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-500 text-white hover:bg-red-600"
+              onClick={async () => {
+                setConfirmDelete(false);
+                await onDelete(appointment.id);
+                handleClose(false);
+              }}
+            >
+              Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
+  return createPortal(
+    <div ref={containerRef} className={containerClass} style={containerStyle} role="dialog">
+      {isMobile && (
+        <div className="pt-2 pb-1 flex justify-center">
+          <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+        </div>
+      )}
+      <button
+        onClick={() => onOpenChange(false)}
+        className="absolute top-2 right-2 z-10 h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors"
+        aria-label="Sluiten"
+      >
+        <X className="w-4 h-4" />
+      </button>
+      <div>
         {!editing ? (
           <AnimatePresence mode="wait">
             <motion.div
