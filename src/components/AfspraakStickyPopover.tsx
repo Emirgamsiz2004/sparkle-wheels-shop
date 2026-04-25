@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion } from "framer-motion";
 import { Calendar as CalIcon, Car, Check, Eye, MessageSquare, Search, Sparkles, Wrench, X, ArrowLeft } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -50,9 +50,11 @@ interface Props {
 
 const AfspraakStickyPopover = ({ open, onClose }: Props) => {
   const isMobile = useIsMobile();
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  const [step, setStep] = useState<"type" | "form" | "done">("type");
+  // Step index drives the horizontal pager.
+  // Flow A pages: 0=type, 1=voertuig, 2=datum, 3=tijd, 4=gegevens, 5=done
+  // Flow B pages: 0=type, 1=gegevens, 2=done
+  const [stepIndex, setStepIndex] = useState(0);
   const [type, setType] = useState<AppType | null>(null);
   const isFlowA = type === "bezichtiging" || type === "proefrit";
 
@@ -71,6 +73,13 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [doneInfo, setDoneInfo] = useState<{ naam: string; datum?: string; tijd?: string; email: string } | null>(null);
 
+  // Pager refs for height measurement
+  const slidesRef = useRef<Array<HTMLDivElement | null>>([]);
+  const [pagerHeight, setPagerHeight] = useState<number | "auto">("auto");
+
+  const totalSteps = isFlowA ? 6 : 3;
+  const doneIndex = totalSteps - 1;
+
   // ESC + reset on close
   useEffect(() => {
     if (!open) return;
@@ -81,9 +90,8 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
 
   useEffect(() => {
     if (!open) {
-      // small delay so exit animation finishes
       const t = setTimeout(() => {
-        setStep("type"); setType(null); setSelectedVehicle(null); setDate(undefined);
+        setStepIndex(0); setType(null); setSelectedVehicle(null); setDate(undefined);
         setTime(null); setVehicleSearch(""); setSubmitting(false); setErrMsg(null); setDoneInfo(null);
         setForm({ voornaam: "", achternaam: "", telefoon: "", email: "", kenteken: "", omschrijving: "", voorkeursdatum: "" });
       }, 250);
@@ -126,7 +134,35 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
     });
   };
 
-  const pickType = (t: AppType) => { setType(t); setStep("form"); };
+  // Measure active slide height for smooth height transitions
+  useLayoutEffect(() => {
+    const el = slidesRef.current[stepIndex];
+    if (!el) return;
+    const update = () => {
+      const h = el.scrollHeight;
+      setPagerHeight(h);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [stepIndex, type, selectedVehicle, date, time, errMsg, vehicles, filteredVehicles, form, doneInfo, isFlowA]);
+
+  const pickType = (t: AppType) => {
+    setType(t);
+    // For flow A go to vehicle (1), for flow B go to details (1)
+    setStepIndex(1);
+  };
+
+  const goNext = () => setStepIndex((i) => Math.min(i + 1, totalSteps - 1));
+  const goBack = () => {
+    setErrMsg(null);
+    setStepIndex((i) => {
+      const next = Math.max(i - 1, 0);
+      if (next === 0) setType(null);
+      return next;
+    });
+  };
 
   const submit = async () => {
     setErrMsg(null);
@@ -199,7 +235,7 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
         ]);
         setDoneInfo({ naam: form.voornaam, email: form.email });
       }
-      setStep("done");
+      setStepIndex(doneIndex);
     } catch (e: any) {
       setErrMsg(e?.message || "Er ging iets mis. Probeer opnieuw.");
     } finally {
@@ -209,10 +245,10 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
 
   // Auto-close after 5s on done
   useEffect(() => {
-    if (step !== "done") return;
+    if (stepIndex !== doneIndex || !doneInfo) return;
     const t = setTimeout(() => onClose(), 5000);
     return () => clearTimeout(t);
-  }, [step, onClose]);
+  }, [stepIndex, doneIndex, doneInfo, onClose]);
 
   if (!open) return null;
 
@@ -221,248 +257,334 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
   const labelCls = "block text-[10px] tracking-[0.12em] uppercase text-white/50 mb-1 font-semibold";
 
   const containerClass = isMobile
-    ? "fixed left-0 right-0 bottom-0 z-[60] max-h-[90vh] overflow-y-auto rounded-t-[16px] border-t border-x border-white/10 bg-[#111111] shadow-2xl"
-    : "fixed z-[60] right-8 bottom-8 w-[340px] max-h-[85vh] overflow-y-auto rounded-[16px] border border-white/10 bg-[#111111] shadow-[0_12px_40px_rgba(0,0,0,0.5)]";
+    ? "fixed left-0 right-0 bottom-0 z-[60] rounded-t-[16px] border-t border-x border-white/10 bg-[#111111] shadow-2xl overflow-hidden"
+    : "fixed z-[60] right-8 bottom-8 w-[340px] rounded-[16px] border border-white/10 bg-[#111111] shadow-[0_12px_40px_rgba(0,0,0,0.5)] overflow-hidden";
+
+  const BackChip = ({ label }: { label: string }) => (
+    <button
+      type="button"
+      onClick={goBack}
+      className="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors mb-3"
+    >
+      <ArrowLeft className="w-3.5 h-3.5" />
+      <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">{label}</span>
+    </button>
+  );
+
+  // Build step contents
+  const slides: React.ReactNode[] = [];
+
+  // Step 0 — Type
+  slides.push(
+    <div key="type" className="p-5">
+      <h3 className="text-base font-semibold text-white mb-1" style={{ fontFamily: "Orbitron, sans-serif" }}>Afspraak maken</h3>
+      <p className="text-xs text-white/50 mb-4">Waar kunnen we u mee helpen?</p>
+      <ul className="flex flex-col gap-1">
+        {typeOptions.map((opt) => (
+          <li key={opt.type}>
+            <button
+              onClick={() => pickType(opt.type)}
+              className="w-full flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-left text-sm text-white transition-colors hover:bg-white/[0.06]"
+            >
+              <opt.icon className="w-4 h-4 text-primary shrink-0" />
+              <span>{TYPE_LABELS[opt.type]}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
+  if (isFlowA && type) {
+    // Step 1 — Voertuig
+    slides.push(
+      <div key="voertuig" className="p-5">
+        <BackChip label={TYPE_LABELS[type]} />
+        <label className={labelCls}>Voertuig</label>
+        <div className="relative mb-2">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+          <input
+            className="w-full bg-[#0f0f0f] border border-white/10 rounded-[10px] pl-9 pr-3 text-[14px] text-white placeholder:text-white/30 outline-none focus:border-primary/60 transition-colors"
+            style={{ height: 44 }}
+            placeholder="Zoek voertuig..."
+            value={vehicleSearch}
+            onChange={(e) => setVehicleSearch(e.target.value)}
+          />
+        </div>
+        <div className="rounded-[10px] border border-white/10 bg-[#0f0f0f] overflow-hidden">
+          {filteredVehicles.length === 0 && (
+            <p className="text-white/40 text-xs text-center py-5">Geen voertuigen.</p>
+          )}
+          {filteredVehicles.map((v) => {
+            const active = selectedVehicle?.id === v.id;
+            return (
+              <button
+                key={v.id}
+                onClick={() => { setSelectedVehicle(v); goNext(); }}
+                className={cn(
+                  "w-full flex items-center gap-3 text-left border-b border-white/5 last:border-b-0 transition-colors",
+                  active ? "bg-primary/15" : "hover:bg-white/[0.06]"
+                )}
+                style={{ minHeight: 52, padding: "14px 16px" }}
+              >
+                <Car className="w-4 h-4 text-white/40 shrink-0" />
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[15px] text-white truncate leading-tight">
+                    {v.merk} {v.model}
+                  </span>
+                  {v.kenteken && (
+                    <span className="block text-[13px] text-white/50 truncate leading-tight mt-0.5">
+                      {v.kenteken}
+                    </span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+
+    // Step 2 — Datum
+    slides.push(
+      <div key="datum" className="p-5">
+        <BackChip label={selectedVehicle ? `${selectedVehicle.merk} ${selectedVehicle.model}` : TYPE_LABELS[type]} />
+        <label className={labelCls}>Kies een datum</label>
+        <div className="rounded-[10px] border border-white/10 bg-[#0f0f0f] flex justify-center">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(d) => { setDate(d); if (d) goNext(); }}
+            locale={nl}
+            className="p-2 pointer-events-auto"
+            disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0)) || d.getDay() === 0}
+          />
+        </div>
+      </div>
+    );
+
+    // Step 3 — Tijd
+    slides.push(
+      <div key="tijd" className="p-5">
+        <BackChip label={date ? format(date, "EEEE d MMMM", { locale: nl }) : "Datum"} />
+        <label className={labelCls}>Kies een tijdstip</label>
+        <div className="grid grid-cols-3 gap-2">
+          {TIMESLOTS.map((s) => {
+            const taken = slotTaken(s);
+            const active = time === s;
+            return (
+              <button
+                key={s}
+                disabled={taken}
+                onClick={() => { setTime(s); goNext(); }}
+                className={cn(
+                  "px-2 py-3 rounded-[10px] text-sm font-medium border transition-colors",
+                  active
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : taken
+                    ? "bg-white/[0.03] text-white/25 border-white/5 cursor-not-allowed line-through"
+                    : "bg-[#0f0f0f] text-white border-white/10 hover:border-primary/40"
+                )}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+
+    // Step 4 — Gegevens
+    slides.push(
+      <div key="gegevens" className="p-5 space-y-3">
+        <BackChip label={time || "Tijd"} />
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className={labelCls}>Voornaam</label>
+            <input className={fieldCls} value={form.voornaam} onChange={(e) => setForm({ ...form, voornaam: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelCls}>Achternaam</label>
+            <input className={fieldCls} value={form.achternaam} onChange={(e) => setForm({ ...form, achternaam: e.target.value })} />
+          </div>
+        </div>
+        <div>
+          <label className={labelCls}>Telefoon</label>
+          <input type="tel" className={fieldCls} value={form.telefoon} onChange={(e) => setForm({ ...form, telefoon: e.target.value })} />
+        </div>
+        <div>
+          <label className={labelCls}>E-mail</label>
+          <input type="email" className={fieldCls} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        </div>
+
+        {errMsg && <p className="text-xs text-red-400">{errMsg}</p>}
+
+        <button
+          onClick={submit}
+          disabled={submitting}
+          className={cn(
+            "w-full mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] text-sm font-semibold transition-all",
+            "bg-primary text-primary-foreground hover:opacity-90",
+            submitting && "opacity-60 cursor-not-allowed"
+          )}
+        >
+          {submitting ? "Bezig..." : "Bevestig afspraak"}
+        </button>
+      </div>
+    );
+  }
+
+  if (!isFlowA && type) {
+    // Step 1 — Aanvraag gegevens
+    slides.push(
+      <div key="aanvraag" className="p-5 space-y-3">
+        <BackChip label={TYPE_LABELS[type]} />
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className={labelCls}>Voornaam</label>
+            <input className={fieldCls} value={form.voornaam} onChange={(e) => setForm({ ...form, voornaam: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelCls}>Achternaam</label>
+            <input className={fieldCls} value={form.achternaam} onChange={(e) => setForm({ ...form, achternaam: e.target.value })} />
+          </div>
+        </div>
+        <div>
+          <label className={labelCls}>Telefoon</label>
+          <input type="tel" className={fieldCls} value={form.telefoon} onChange={(e) => setForm({ ...form, telefoon: e.target.value })} />
+        </div>
+        <div>
+          <label className={labelCls}>E-mail</label>
+          <input type="email" className={fieldCls} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        </div>
+        <div>
+          <label className={labelCls}>Kenteken (optioneel)</label>
+          <input className={fieldCls} value={form.kenteken} onChange={(e) => setForm({ ...form, kenteken: e.target.value.toUpperCase() })} />
+        </div>
+        <div>
+          <label className={labelCls}>Omschrijving *</label>
+          <textarea
+            rows={3}
+            className={cn(fieldCls, "resize-none")}
+            value={form.omschrijving}
+            onChange={(e) => setForm({ ...form, omschrijving: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Voorkeursdatum (optioneel)</label>
+          <input type="date" className={fieldCls} value={form.voorkeursdatum} onChange={(e) => setForm({ ...form, voorkeursdatum: e.target.value })} />
+        </div>
+
+        {errMsg && <p className="text-xs text-red-400">{errMsg}</p>}
+
+        <button
+          onClick={submit}
+          disabled={submitting}
+          className={cn(
+            "w-full mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] text-sm font-semibold transition-all",
+            "bg-primary text-primary-foreground hover:opacity-90",
+            submitting && "opacity-60 cursor-not-allowed"
+          )}
+        >
+          {submitting ? "Bezig..." : "Verstuur aanvraag"}
+        </button>
+      </div>
+    );
+  }
+
+  // Final step — Done
+  slides.push(
+    <div key="done" className="p-5 text-center py-6">
+      <div className="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 mx-auto flex items-center justify-center mb-3">
+        <Check className="w-7 h-7" />
+      </div>
+      {doneInfo ? (
+        <>
+          <h3 className="text-base font-semibold text-white mb-2">Bedankt {doneInfo.naam}!</h3>
+          <p className="text-sm text-white/60 mb-5 leading-relaxed">
+            {isFlowA
+              ? <>Uw afspraak op <span className="text-white">{doneInfo.datum}</span> om <span className="text-white">{doneInfo.tijd}</span> is bevestigd. U ontvangt een bevestigingsmail op <span className="text-white">{doneInfo.email}</span>.</>
+              : <>We hebben uw aanvraag ontvangen en nemen binnen 1 uur contact met u op.</>}
+          </p>
+          <button
+            onClick={onClose}
+            className="inline-flex items-center justify-center px-5 py-2 rounded-[10px] text-sm font-medium bg-white/5 text-white hover:bg-white/10 transition-colors"
+          >
+            Sluiten
+          </button>
+        </>
+      ) : (
+        <p className="text-sm text-white/50">Even geduld...</p>
+      )}
+    </div>
+  );
+
+  // Pad slides array to totalSteps to keep index math stable while type unset
+  while (slides.length < totalSteps) {
+    slides.push(<div key={`empty-${slides.length}`} className="p-5" />);
+  }
 
   return createPortal(
-    <>
-      <motion.div
-        ref={containerRef}
-        layoutId="afspraak-cta"
-        initial={isMobile ? { y: "100%", opacity: 0 } : false}
-        animate={isMobile ? { y: 0, opacity: 1 } : undefined}
-        exit={isMobile ? { y: "100%", opacity: 0 } : undefined}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className={containerClass}
-        style={{
-          ...(isMobile ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" } : null),
-          borderRadius: 16,
-        }}
-        role="dialog"
-        aria-label="Afspraak maken"
+    <motion.div
+      layoutId="afspraak-cta"
+      initial={isMobile ? { y: "100%", opacity: 0 } : false}
+      animate={isMobile ? { y: 0, opacity: 1 } : undefined}
+      exit={isMobile ? { y: "100%", opacity: 0 } : undefined}
+      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+      className={containerClass}
+      style={{
+        ...(isMobile ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" } : null),
+        borderRadius: 16,
+        willChange: "transform",
+      }}
+      role="dialog"
+      aria-label="Afspraak maken"
+    >
+      {isMobile && (
+        <div className="pt-2 pb-1 flex justify-center">
+          <div className="h-1 w-10 rounded-full bg-white/20" />
+        </div>
+      )}
+      <button
+        onClick={onClose}
+        className="absolute top-3 right-3 z-10 h-8 w-8 inline-flex items-center justify-center rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+        aria-label="Sluiten"
       >
-        {isMobile && (
-          <div className="pt-2 pb-1 flex justify-center">
-            <div className="h-1 w-10 rounded-full bg-white/20" />
-          </div>
-        )}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 z-10 h-8 w-8 inline-flex items-center justify-center rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-          aria-label="Sluiten"
+        <X className="w-4 h-4" />
+      </button>
+
+      {/* Pager viewport — animates height, hides overflow */}
+      <div
+        style={{
+          height: pagerHeight === "auto" ? "auto" : pagerHeight,
+          transition: "height 350ms cubic-bezier(0.4, 0, 0.2, 1)",
+          overflow: "hidden",
+          willChange: "height",
+        }}
+      >
+        {/* Track */}
+        <div
+          style={{
+            display: "flex",
+            width: `${totalSteps * 100}%`,
+            transform: `translateX(-${(stepIndex * 100) / totalSteps}%)`,
+            transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+            willChange: "transform",
+          }}
         >
-          <X className="w-4 h-4" />
-        </button>
-
-        <motion.div
-          layout
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="p-5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { duration: 0.2, delay: 0.15 } }}
-          exit={{ opacity: 0, transition: { duration: 0.1 } }}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {step === "type" && (
-              <motion.div key="type" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.2 }}>
-                <h3 className="text-base font-semibold text-white mb-1" style={{ fontFamily: "Orbitron, sans-serif" }}>Afspraak maken</h3>
-                <p className="text-xs text-white/50 mb-4">Waar kunnen we u mee helpen?</p>
-                <ul className="flex flex-col gap-1">
-                  {typeOptions.map((opt) => (
-                    <li key={opt.type}>
-                      <button
-                        onClick={() => pickType(opt.type)}
-                        className="w-full flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-left text-sm text-white transition-colors hover:bg-white/[0.06]"
-                      >
-                        <opt.icon className="w-4 h-4 text-primary shrink-0" />
-                        <span>{TYPE_LABELS[opt.type]}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            )}
-
-            {step === "form" && type && (
-              <motion.div key="form" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} transition={{ duration: 0.2 }} className="space-y-3">
-                <button
-                  type="button"
-                  onClick={() => { setStep("type"); setType(null); }}
-                  className="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors mb-1"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">{TYPE_LABELS[type]}</span>
-                </button>
-
-                {isFlowA ? (
-                  <>
-                    {/* Vehicle */}
-                    <div>
-                      <label className={labelCls}>Voertuig</label>
-                      <div className="relative mb-1.5">
-                        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-white/40" />
-                        <input
-                          className={cn(fieldCls, "pl-8")}
-                          placeholder="Zoek voertuig..."
-                          value={vehicleSearch}
-                          onChange={(e) => setVehicleSearch(e.target.value)}
-                        />
-                      </div>
-                      <div className="max-h-[140px] overflow-y-auto rounded-[10px] border border-white/10 bg-[#0f0f0f]">
-                        {filteredVehicles.length === 0 && (
-                          <p className="text-white/40 text-xs text-center py-4">Geen voertuigen.</p>
-                        )}
-                        {filteredVehicles.map((v) => {
-                          const active = selectedVehicle?.id === v.id;
-                          return (
-                            <button
-                              key={v.id}
-                              onClick={() => setSelectedVehicle(v)}
-                              className={cn(
-                                "w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs border-b border-white/5 last:border-b-0 transition-colors",
-                                active ? "bg-primary/15 text-white" : "hover:bg-white/[0.06] text-white/80"
-                              )}
-                            >
-                              <Car className="w-3.5 h-3.5 text-white/40 shrink-0" />
-                              <span className="truncate">
-                                {v.merk} {v.model}{v.kenteken ? ` · ${v.kenteken}` : ""}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Date */}
-                    {selectedVehicle && (
-                      <div>
-                        <label className={labelCls}>Datum</label>
-                        <div className="rounded-[10px] border border-white/10 bg-[#0f0f0f] flex justify-center">
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            locale={nl}
-                            className="p-2 pointer-events-auto"
-                            disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0)) || d.getDay() === 0}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Time */}
-                    {date && (
-                      <div>
-                        <label className={labelCls}>Tijdstip</label>
-                        <div className="grid grid-cols-4 gap-1.5">
-                          {TIMESLOTS.map((s) => {
-                            const taken = slotTaken(s);
-                            const active = time === s;
-                            return (
-                              <button
-                                key={s}
-                                disabled={taken}
-                                onClick={() => setTime(s)}
-                                className={cn(
-                                  "px-2 py-1.5 rounded-[8px] text-xs font-medium border transition-colors",
-                                  active
-                                    ? "bg-primary text-primary-foreground border-primary"
-                                    : taken
-                                    ? "bg-white/[0.03] text-white/25 border-white/5 cursor-not-allowed line-through"
-                                    : "bg-[#0f0f0f] text-white border-white/10 hover:border-primary/40"
-                                )}
-                              >
-                                {s}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                ) : null}
-
-                {/* Persoonlijke gegevens */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className={labelCls}>Voornaam</label>
-                    <input className={fieldCls} value={form.voornaam} onChange={(e) => setForm({ ...form, voornaam: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Achternaam</label>
-                    <input className={fieldCls} value={form.achternaam} onChange={(e) => setForm({ ...form, achternaam: e.target.value })} />
-                  </div>
-                </div>
-                <div>
-                  <label className={labelCls}>Telefoon</label>
-                  <input type="tel" className={fieldCls} value={form.telefoon} onChange={(e) => setForm({ ...form, telefoon: e.target.value })} />
-                </div>
-                <div>
-                  <label className={labelCls}>E-mail</label>
-                  <input type="email" className={fieldCls} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                </div>
-
-                {!isFlowA && (
-                  <>
-                    <div>
-                      <label className={labelCls}>Kenteken (optioneel)</label>
-                      <input className={fieldCls} value={form.kenteken} onChange={(e) => setForm({ ...form, kenteken: e.target.value.toUpperCase() })} />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Omschrijving *</label>
-                      <textarea
-                        rows={3}
-                        className={cn(fieldCls, "resize-none")}
-                        value={form.omschrijving}
-                        onChange={(e) => setForm({ ...form, omschrijving: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Voorkeursdatum (optioneel)</label>
-                      <input type="date" className={fieldCls} value={form.voorkeursdatum} onChange={(e) => setForm({ ...form, voorkeursdatum: e.target.value })} />
-                    </div>
-                  </>
-                )}
-
-                {errMsg && <p className="text-xs text-red-400">{errMsg}</p>}
-
-                <button
-                  onClick={submit}
-                  disabled={submitting}
-                  className={cn(
-                    "w-full mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] text-sm font-semibold transition-all",
-                    "bg-primary text-primary-foreground hover:opacity-90",
-                    submitting && "opacity-60 cursor-not-allowed"
-                  )}
-                >
-                  {submitting ? "Bezig..." : isFlowA ? "Bevestig afspraak" : "Verstuur aanvraag"}
-                </button>
-              </motion.div>
-            )}
-
-            {step === "done" && doneInfo && (
-              <motion.div key="done" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="text-center py-2">
-                <div className="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 mx-auto flex items-center justify-center mb-3">
-                  <Check className="w-7 h-7" />
-                </div>
-                <h3 className="text-base font-semibold text-white mb-2">Bedankt {doneInfo.naam}!</h3>
-                <p className="text-sm text-white/60 mb-5 leading-relaxed">
-                  {isFlowA
-                    ? <>Uw afspraak op <span className="text-white">{doneInfo.datum}</span> om <span className="text-white">{doneInfo.tijd}</span> is bevestigd. U ontvangt een bevestigingsmail op <span className="text-white">{doneInfo.email}</span>.</>
-                    : <>We hebben uw aanvraag ontvangen en nemen binnen 1 uur contact met u op.</>}
-                </p>
-                <button
-                  onClick={onClose}
-                  className="inline-flex items-center justify-center px-5 py-2 rounded-[10px] text-sm font-medium bg-white/5 text-white hover:bg-white/10 transition-colors"
-                >
-                  Sluiten
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </motion.div>
-    </>,
+          {slides.map((slide, i) => (
+            <div
+              key={i}
+              ref={(el) => { slidesRef.current[i] = el; }}
+              style={{ width: `${100 / totalSteps}%`, flexShrink: 0 }}
+              aria-hidden={i !== stepIndex}
+            >
+              {slide}
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>,
     document.body
   );
 };
