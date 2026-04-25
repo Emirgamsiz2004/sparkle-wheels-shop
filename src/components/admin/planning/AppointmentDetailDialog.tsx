@@ -439,7 +439,6 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                   <Trash2 className="w-4 h-4 mr-1.5" /> Afspraak verwijderen
                 </Button>
               </div>
-            </motion.div>
           </div>
         )}
       </div>
