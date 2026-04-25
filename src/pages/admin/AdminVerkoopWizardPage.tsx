@@ -500,6 +500,8 @@ const AdminVerkoopWizardPage = () => {
       aanbetaling_bankrekening: laterOphalen && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
       customer_id: customerId,
       klant_type: klantZakelijk ? "zakelijk" : "particulier",
+      lead_source: leadSource || null,
+      lead_source_anders: leadSource === "Anders" ? (leadSourceAnders.trim() || null) : null,
       garantie_type: garantieType,
       garantie_pakket: garantieType === "autotrust" ? (garantiePakket.trim() || null) : null,
       garantie_looptijd: garantieType === "autotrust" && garantieLooptijd !== "" ? Number(garantieLooptijd) : null,
