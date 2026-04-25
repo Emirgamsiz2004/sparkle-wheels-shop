@@ -292,7 +292,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs text-muted-foreground mb-1.5 block">Datum *</Label>
-                  <Popover>
+                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -309,7 +309,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                       <Calendar
                         mode="single"
                         selected={selectedDate}
-                        onSelect={setSelectedDate}
+                        onSelect={(d) => { setSelectedDate(d); setDatePickerOpen(false); }}
                         locale={nl}
                         className="p-3 pointer-events-auto"
                         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
