@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKenteken } from "@/lib/kenteken";
 
 import RelatedVehicles from "@/components/RelatedVehicles";
+import InlineAfspraakWidget from "@/components/InlineAfspraakWidget";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
@@ -253,6 +254,13 @@ const VoorraadDetailPage = () => {
                     <MessageCircle className="w-4 h-4" />
                     Stuur WhatsApp
                   </a>
+                  <Link
+                    to={`/afspraak?vehicle=${vehicle.id}`}
+                    className="btn-public btn-secondary-public w-full"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Afspraak maken
+                  </Link>
                 </div>
 
                 {dbMarktplaatsUrl && (
@@ -373,6 +381,15 @@ const VoorraadDetailPage = () => {
                     <MessageCircle className="w-4 h-4" />
                     Stuur WhatsApp
                   </a>
+                </div>
+
+                {/* Inline afspraak widget — desktop only */}
+                <div className="hidden lg:block">
+                  <InlineAfspraakWidget
+                    vehicleId={vehicle.id}
+                    merk={vehicle.merk}
+                    model={vehicle.model}
+                  />
                 </div>
 
                 {dbMarktplaatsUrl && (
