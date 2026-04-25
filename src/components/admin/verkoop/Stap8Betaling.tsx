@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarIcon, CheckCircle2, CreditCard, Loader2, Plus, Trash2 } from "lucide-react";
+import { CalendarIcon, CheckCircle2, CreditCard, FileText, Loader2, Plus, Trash2 } from "lucide-react";
+import { generateRestbetalingPDF } from "@/lib/restbetalingsafspraakPdf";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { toast } from "sonner";
