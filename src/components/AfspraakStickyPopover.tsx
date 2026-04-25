@@ -225,16 +225,19 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
     : "fixed z-[60] right-8 bottom-8 w-[340px] max-h-[85vh] overflow-y-auto rounded-[16px] border border-white/10 bg-[#111111] shadow-[0_12px_40px_rgba(0,0,0,0.5)]";
 
   return createPortal(
-    <LayoutGroup id="afspraak-popover">
+    <>
       <motion.div
         ref={containerRef}
         layoutId="afspraak-cta"
-        initial={isMobile ? { y: "100%", opacity: 0 } : { opacity: 0, scale: 0.9 }}
-        animate={isMobile ? { y: 0, opacity: 1 } : { opacity: 1, scale: 1 }}
-        exit={isMobile ? { y: "100%", opacity: 0 } : { opacity: 0, scale: 0.9 }}
+        initial={isMobile ? { y: "100%", opacity: 0 } : false}
+        animate={isMobile ? { y: 0, opacity: 1 } : undefined}
+        exit={isMobile ? { y: "100%", opacity: 0 } : undefined}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         className={containerClass}
-        style={isMobile ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" } : undefined}
+        style={{
+          ...(isMobile ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" } : null),
+          borderRadius: 16,
+        }}
         role="dialog"
         aria-label="Afspraak maken"
       >
@@ -251,7 +254,14 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
           <X className="w-4 h-4" />
         </button>
 
-        <motion.div layout transition={{ duration: 0.3, ease: "easeOut" }} className="p-5">
+        <motion.div
+          layout
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="p-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { duration: 0.2, delay: 0.15 } }}
+          exit={{ opacity: 0, transition: { duration: 0.1 } }}
+        >
           <AnimatePresence mode="wait" initial={false}>
             {step === "type" && (
               <motion.div key="type" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.2 }}>
@@ -452,7 +462,7 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
           </AnimatePresence>
         </motion.div>
       </motion.div>
-    </LayoutGroup>,
+    </>,
     document.body
   );
 };
