@@ -199,13 +199,12 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
   const openItems = visibleSteps.filter((s) => !s.done);
   const allDone = openItems.length === 0;
 
-  const waMessage = `Bedankt voor uw aankoop bij Platin Automotive! We hopen dat u veel plezier beleeft aan uw ${merkModel || "nieuwe auto"}. Heeft u vragen, neem dan gerust contact op.`;
-  const waPhone = (p.klantTelefoon || "").replace(/[^\d]/g, "").replace(/^0/, "31");
-  const waUrl = waPhone
-    ? `https://wa.me/${waPhone}?text=${encodeURIComponent(waMessage)}`
-    : `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
-
-  const googleReviewUrl = "https://g.page/r/platinautomotive/review";
+  const voornaam = (p.klantVoornaam || "").trim() || "klant";
+  const merkModelText = merkModel || "nieuwe auto";
+  const waMessage = `Beste ${voornaam}, hartelijk bedankt voor uw aankoop bij Platin Automotive! 🚗 We hopen dat u veel rijplezier beleeft aan uw ${merkModelText}. Bent u tevreden? We zouden het heel fijn vinden als u een review wilt achterlaten — dat helpt ons enorm! 👉 https://g.page/r/CT1_sFLfuDgAEBM/review Heeft u vragen, dan staan we altijd voor u klaar. Met vriendelijke groet, Platin Automotive`;
+  const rawPhone = (p.klantTelefoon || "").replace(/[^\d]/g, "").replace(/^0/, "");
+  const waPhone = rawPhone ? `31${rawPhone}` : "";
+  const waUrl = waPhone ? `https://wa.me/${waPhone}?text=${encodeURIComponent(waMessage)}` : "";
 
   const handleAfsluiten = async () => {
     if (!p.verkoopId || !p.vehicleId) {
