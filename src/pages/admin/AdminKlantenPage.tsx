@@ -22,8 +22,8 @@ const AdminKlantenPage = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("alle");
   const [addOpen, setAddOpen] = useState(false);
-  const [form, setForm] = useState({ voornaam: "", achternaam: "", email: "", telefoon: "" });
-  const [saving, setSaving] = useState(false);
+  const [addAnchor, setAddAnchor] = useState<DOMRect | null>(null);
+  const addBtnRef = useRef<HTMLButtonElement>(null);
 
   const filtered = useMemo(() => {
     let list = customers;
