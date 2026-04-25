@@ -62,7 +62,7 @@ const STEPS: StepDef[] = [
   { num: 7, key: "factuur", title: "Factuur", description: "Factuur opmaken en versturen" },
   { num: 8, key: "betaling", title: "Betaling", description: "Bevestig betaling van de koper" },
   { num: 9, key: "inruil_naam", title: "Inruil op naam", description: "Inruil overzetten op eigen naam (alleen bij inruil)", optional: true },
-  { num: 10, key: "vrijwaring", title: "Vrijwaring & overschrijving", description: "RDW vrijwaring en tenaamstelling koper" },
+  { num: 10, key: "tenaamstelling", title: "Tenaamstelling", description: "Machtiging aanvragen en voertuig overschrijven via VWE" },
   { num: 11, key: "uitlevering", title: "Uitlevering", description: "Voertuig overhandigen aan koper" },
   { num: 12, key: "afsluiting", title: "Afsluiting", description: "Verkoop afronden en archiveren" },
 ];
