@@ -66,8 +66,7 @@ const STEPS: StepDef[] = [
   { num: 8, key: "betaling", title: "Betaling", description: "Bevestig betaling van de koper" },
   { num: 9, key: "inruil_naam", title: "Inruil op naam", description: "Inruil overzetten op eigen naam (alleen bij inruil)", optional: true },
   { num: 10, key: "tenaamstelling", title: "Tenaamstelling", description: "Machtiging aanvragen en voertuig overschrijven via VWE" },
-  { num: 11, key: "uitlevering", title: "Uitlevering", description: "Voertuig overhandigen aan koper" },
-  { num: 12, key: "afsluiting", title: "Afsluiting", description: "Verkoop afronden en archiveren" },
+  { num: 11, key: "afsluiting", title: "Afsluiting", description: "Uitlevering en verkoop afronden" },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -78,16 +77,14 @@ const isStepDone = (stap: number, completed: Record<number, boolean>) => complet
 const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean): boolean => {
   // Stap 6 (inruil document) en 9 (inruil op naam) volledig verbergen zonder inruil
   if ((stap === 6 || stap === 9) && !inruil) return true;
-  // Stappen 6-12 vereisen 5
-  if (stap >= 6 && stap <= 12 && !completed[5]) return true;
-  // Stappen 9-12 vereisen 8 (betaling bevestigd)
-  if (stap >= 9 && stap <= 12 && !completed[8]) return true;
+  // Stappen 6-11 vereisen 5
+  if (stap >= 6 && stap <= 11 && !completed[5]) return true;
+  // Stappen 9-11 vereisen 8 (betaling bevestigd)
+  if (stap >= 9 && stap <= 11 && !completed[8]) return true;
   // Stap 10+ vereist 9 (inruil op naam) — alleen relevant bij inruil
-  if (stap >= 10 && stap <= 12 && inruil && !completed[9]) return true;
-  // Stappen 11-12 vereisen 10
-  if (stap >= 11 && stap <= 12 && !completed[10]) return true;
-  // Stap 12 vereist 11 (uitlevering)
-  if (stap === 12 && !completed[11]) return true;
+  if (stap >= 10 && stap <= 11 && inruil && !completed[9]) return true;
+  // Stap 11 (afsluiting) vereist 10 (tenaamstelling)
+  if (stap === 11 && !completed[10]) return true;
   return false;
 };
 
