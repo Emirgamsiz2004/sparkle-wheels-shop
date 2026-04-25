@@ -10,6 +10,7 @@ import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
+import MobileBottomBar, { getMobilePageTitle } from "@/components/admin/MobileBottomBar";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
