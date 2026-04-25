@@ -23,7 +23,6 @@ import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneyb
 import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
 import Stap9InruilOpNaam from "@/components/admin/verkoop/Stap9InruilOpNaam";
 import Stap10Vrijwaring from "@/components/admin/verkoop/Stap10Vrijwaring";
-import Stap11Uitlevering from "@/components/admin/verkoop/Stap11Uitlevering";
 import Stap12Afsluiting from "@/components/admin/verkoop/Stap12Afsluiting";
 import CancelVerkoopDialog from "@/components/admin/verkoop/CancelVerkoopDialog";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
@@ -44,7 +43,6 @@ type StepKey =
   | "betaling"
   | "inruil_naam"
   | "tenaamstelling"
-  | "uitlevering"
   | "afsluiting";
 
 interface StepDef {
@@ -66,8 +64,7 @@ const STEPS: StepDef[] = [
   { num: 8, key: "betaling", title: "Betaling", description: "Bevestig betaling van de koper" },
   { num: 9, key: "inruil_naam", title: "Inruil op naam", description: "Inruil overzetten op eigen naam (alleen bij inruil)", optional: true },
   { num: 10, key: "tenaamstelling", title: "Tenaamstelling", description: "Machtiging aanvragen en voertuig overschrijven via VWE" },
-  { num: 11, key: "uitlevering", title: "Uitlevering", description: "Voertuig overhandigen aan koper" },
-  { num: 12, key: "afsluiting", title: "Afsluiting", description: "Verkoop afronden en archiveren" },
+  { num: 11, key: "afsluiting", title: "Afsluiting", description: "Uitlevering en verkoop afronden" },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -78,16 +75,14 @@ const isStepDone = (stap: number, completed: Record<number, boolean>) => complet
 const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean): boolean => {
   // Stap 6 (inruil document) en 9 (inruil op naam) volledig verbergen zonder inruil
   if ((stap === 6 || stap === 9) && !inruil) return true;
-  // Stappen 6-12 vereisen 5
-  if (stap >= 6 && stap <= 12 && !completed[5]) return true;
-  // Stappen 9-12 vereisen 8 (betaling bevestigd)
-  if (stap >= 9 && stap <= 12 && !completed[8]) return true;
+  // Stappen 6-11 vereisen 5
+  if (stap >= 6 && stap <= 11 && !completed[5]) return true;
+  // Stappen 9-11 vereisen 8 (betaling bevestigd)
+  if (stap >= 9 && stap <= 11 && !completed[8]) return true;
   // Stap 10+ vereist 9 (inruil op naam) — alleen relevant bij inruil
-  if (stap >= 10 && stap <= 12 && inruil && !completed[9]) return true;
-  // Stappen 11-12 vereisen 10
-  if (stap >= 11 && stap <= 12 && !completed[10]) return true;
-  // Stap 12 vereist 11 (uitlevering)
-  if (stap === 12 && !completed[11]) return true;
+  if (stap >= 10 && stap <= 11 && inruil && !completed[9]) return true;
+  // Stap 11 (afsluiting) vereist 10 (tenaamstelling)
+  if (stap === 11 && !completed[10]) return true;
   return false;
 };
 
@@ -621,8 +616,8 @@ const AdminVerkoopWizardPage = () => {
       setCompleted((p) => ({ ...p, [activeStap]: true }));
       let next = activeStap + 1;
       const nextCompleted = { ...completed, [activeStap]: true };
-      while (next <= 12 && isStepBlocked(next, nextCompleted, inruil)) next++;
-      if (next <= 12) setActiveStap(next);
+      while (next <= 11 && isStepBlocked(next, nextCompleted, inruil)) next++;
+      if (next <= 11) setActiveStap(next);
       return;
     }
 
@@ -633,8 +628,8 @@ const AdminVerkoopWizardPage = () => {
     // Volgende non-blocked stap zoeken
     let next = activeStap + 1;
     const nextCompleted = { ...completed, [activeStap]: true };
-    while (next <= 12 && isStepBlocked(next, nextCompleted, inruil)) next++;
-    if (next <= 12) setActiveStap(next);
+    while (next <= 11 && isStepBlocked(next, nextCompleted, inruil)) next++;
+    if (next <= 11) setActiveStap(next);
     toast.success("Stap opgeslagen");
   };
 
@@ -650,8 +645,7 @@ const AdminVerkoopWizardPage = () => {
         const missing: string[] = [];
         if (!completed[8]) missing.push("stap 8 (betaling bevestigen)");
         if (stap >= 10 && inruil && !completed[9]) missing.push("stap 9 (inruil op naam zetten)");
-        if (stap >= 11 && !completed[10]) missing.push("stap 10 (vrijwaring)");
-        if (stap === 12 && !completed[11]) missing.push("stap 11 (uitlevering)");
+        if (stap === 11 && !completed[10]) missing.push("stap 10 (tenaamstelling)");
         if (missing.length > 0) {
           toast.error(`Rond eerst ${missing.join(" en ")} af.`);
         }
@@ -785,16 +779,15 @@ const AdminVerkoopWizardPage = () => {
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               const hasIssues = !blocked && stepHasIssues(step.num);
-              // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/vrijwaring)
+              // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/tenaamstelling)
               const lockedByPrereq =
                 blocked &&
                 step.num >= 9 &&
-                step.num <= 12 &&
+                step.num <= 11 &&
                 !!completed[5] &&
                 ((!completed[8]) ||
                   (step.num >= 10 && inruil && !completed[9]) ||
-                  (step.num >= 11 && !completed[10]) ||
-                  (step.num === 12 && !completed[11]));
+                  (step.num === 11 && !completed[10]));
 
               return (
                 <button
@@ -1286,52 +1279,6 @@ const AdminVerkoopWizardPage = () => {
             )}
 
             {activeStap === 11 && (
-              <Stap11Uitlevering
-                verkoopId={verkoopId}
-                voertuigKenteken={vehicle?.kenteken || ""}
-                voertuigMerk={vehicle?.merk || ""}
-                voertuigModel={vehicle?.model || ""}
-                voertuigBouwjaar={vehicle?.bouwjaar || null}
-                voertuigApkVervaldatum={(vehicle as any)?.apkVervaldatum || null}
-                initialAutoSchoongemaakt={autoSchoongemaakt}
-                initialApkGecommuniceerd={apkGecommuniceerd}
-                initialSleutelsOverhandigd={sleutelsOverhandigd}
-                initialSleutelsAantal={sleutelsAantal}
-                initialGebrekenBesproken={gebrekenBesproken}
-                initialGebrekenOmschrijving={gebrekenOmschrijving}
-                initialTenaamstellingsbewijsMeegegeven={tenaamstellingsbewijsMeegegeven}
-                initialUitleveringFotos={uitleveringFotos}
-                initialUitleveringDatum={uitleveringDatum}
-                initialUitleveringVoltooid={uitleveringVoltooid}
-                onSaved={async (extra) => {
-                  if (extra.auto_schoongemaakt !== undefined)
-                    setAutoSchoongemaakt(!!extra.auto_schoongemaakt);
-                  if (extra.apk_gecommuniceerd !== undefined)
-                    setApkGecommuniceerd(!!extra.apk_gecommuniceerd);
-                  if (extra.sleutels_overhandigd !== undefined)
-                    setSleutelsOverhandigd(!!extra.sleutels_overhandigd);
-                  if (extra.sleutels_aantal !== undefined)
-                    setSleutelsAantal(extra.sleutels_aantal);
-                  if (extra.gebreken_besproken !== undefined)
-                    setGebrekenBesproken(!!extra.gebreken_besproken);
-                  if (extra.gebreken_omschrijving !== undefined)
-                    setGebrekenOmschrijving(extra.gebreken_omschrijving);
-                  if (extra.tenaamstellingsbewijs_meegegeven !== undefined)
-                    setTenaamstellingsbewijsMeegegeven(!!extra.tenaamstellingsbewijs_meegegeven);
-                  if (extra.uitlevering_fotos !== undefined)
-                    setUitleveringFotos(extra.uitlevering_fotos || []);
-                  if (extra.uitlevering_datum !== undefined)
-                    setUitleveringDatum(extra.uitlevering_datum);
-                  if (extra.uitlevering_voltooid !== undefined)
-                    setUitleveringVoltooid(!!extra.uitlevering_voltooid);
-                  if (extra.stap11_afgerond !== undefined)
-                    setCompleted((p) => ({ ...p, 11: !!extra.stap11_afgerond }));
-                  await saveCurrent(extra);
-                }}
-              />
-            )}
-
-            {activeStap === 12 && (
               <Stap12Afsluiting
                 verkoopId={verkoopId}
                 vehicleId={vehicleId}
@@ -1340,6 +1287,7 @@ const AdminVerkoopWizardPage = () => {
                 voertuigKenteken={vehicle?.kenteken || null}
                 voertuigMerk={vehicle?.merk || null}
                 voertuigModel={vehicle?.model || null}
+                voertuigApkVervaldatum={(vehicle as any)?.apkVervaldatum || null}
                 afleverwijze={afleverwijze}
                 aanbetalingBedrag={aanbetalingBedrag}
                 klantVoornaam={klantVoornaam}
@@ -1354,7 +1302,20 @@ const AdminVerkoopWizardPage = () => {
                 restbedragBedrag={openstaandRestbedrag}
                 machtigingsnummer={machtigingsnummer}
                 machtigingDatum={machtigingDatum}
-                uitleveringDatum={uitleveringDatum}
+                initialUitleveringDatum={uitleveringDatum}
+                initialApkGecommuniceerd={apkGecommuniceerd}
+                initialGebrekenBesproken={gebrekenBesproken}
+                initialGebrekenOmschrijving={gebrekenOmschrijving}
+                initialTenaamstellingsbewijsMeegegeven={tenaamstellingsbewijsMeegegeven}
+                onUitleveringChange={async (extra) => {
+                  if (extra.uitlevering_datum !== undefined) setUitleveringDatum(extra.uitlevering_datum);
+                  if (extra.apk_gecommuniceerd !== undefined) setApkGecommuniceerd(!!extra.apk_gecommuniceerd);
+                  if (extra.gebreken_besproken !== undefined) setGebrekenBesproken(!!extra.gebreken_besproken);
+                  if (extra.gebreken_omschrijving !== undefined) setGebrekenOmschrijving(extra.gebreken_omschrijving);
+                  if (extra.tenaamstellingsbewijs_meegegeven !== undefined)
+                    setTenaamstellingsbewijsMeegegeven(!!extra.tenaamstellingsbewijs_meegegeven);
+                  await saveCurrent(extra);
+                }}
                 onNavigateToStap={(s) => handleStepClick(s)}
               />
             )}
@@ -1374,7 +1335,7 @@ const AdminVerkoopWizardPage = () => {
         <div className="text-[11px] text-muted-foreground">
           {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
         </div>
-        {activeStap < 12 ? (
+        {activeStap < 11 ? (
           <button
             onClick={handleVolgende}
             disabled={saving}

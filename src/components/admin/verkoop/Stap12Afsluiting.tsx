@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, AlertCircle, MessageCircle, Star, Lock, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,54 +30,82 @@ export interface Stap12AfsluitingProps {
   completed: Record<number, boolean>;
   inruil: boolean;
 
-  // Voertuig
   voertuigKenteken?: string | null;
   voertuigMerk?: string | null;
   voertuigModel?: string | null;
+  voertuigApkVervaldatum?: string | null;
 
-  // Stap 2
   afleverwijze?: string | null;
   aanbetalingBedrag?: number | "" | null;
 
-  // Stap 3
   klantVoornaam?: string;
   klantAchternaam?: string;
   klantTelefoon?: string;
 
-  // Stap 4
   garantieType?: string | null;
-
-  // Stap 5
   contractGetekend?: boolean;
 
-  // Stap 7
   factuurMbNummer?: string | null;
   factuurVerstuurd?: boolean;
 
-  // Stap 8
   ontvangenBedrag?: number | null;
   restbedragLater?: boolean;
   restbedragBedrag?: number | null;
 
-  // Stap 10
   machtigingsnummer?: string | null;
   machtigingDatum?: string | null;
 
-  // Stap 11
-  uitleveringDatum?: string | null;
+  // Uitlevering (verplaatst naar deze stap)
+  initialUitleveringDatum?: string | null;
+  initialApkGecommuniceerd?: boolean;
+  initialGebrekenBesproken?: boolean;
+  initialGebrekenOmschrijving?: string | null;
+  initialTenaamstellingsbewijsMeegegeven?: boolean;
+  onUitleveringChange?: (extra: Record<string, any>) => void | Promise<void>;
 
   onNavigateToStap: (stap: number) => void;
 }
+
+// ISO -> "yyyy-MM-ddTHH:mm" voor <input type="datetime-local">
+const isoToLocalInput = (iso: string | null | undefined): string => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+const localInputToIso = (local: string): string | null => {
+  if (!local) return null;
+  const d = new Date(local);
+  return isNaN(d.getTime()) ? null : d.toISOString();
+};
 
 const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [closing, setClosing] = useState(false);
 
-  const merkModel = `${p.voertuigMerk || ""} ${p.voertuigModel || ""}`.trim();
+  // Uitlevering local state — standaard nu indien leeg
+  const [uitleveringDatum, setUitleveringDatum] = useState<string>(
+    isoToLocalInput(p.initialUitleveringDatum) || isoToLocalInput(new Date().toISOString()),
+  );
+  const [apkGecommuniceerd, setApkGecommuniceerd] = useState<boolean>(!!p.initialApkGecommuniceerd);
+  const [gebrekenBesproken, setGebrekenBesproken] = useState<boolean>(!!p.initialGebrekenBesproken);
+  const [gebrekenOmschrijving, setGebrekenOmschrijving] = useState<string>(p.initialGebrekenOmschrijving || "");
+  const [tenaamstellingsbewijsMeegegeven, setTenaamstellingsbewijsMeegegeven] = useState<boolean>(
+    !!p.initialTenaamstellingsbewijsMeegegeven,
+  );
 
-  const aanbetalingNum =
-    typeof p.aanbetalingBedrag === "number" ? p.aanbetalingBedrag : 0;
+  // Init uitlevering_datum naar nu in de DB als nog niet gezet
+  useEffect(() => {
+    if (!p.initialUitleveringDatum) {
+      p.onUitleveringChange?.({ uitlevering_datum: localInputToIso(uitleveringDatum) });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const merkModel = `${p.voertuigMerk || ""} ${p.voertuigModel || ""}`.trim();
+  const aanbetalingNum = typeof p.aanbetalingBedrag === "number" ? p.aanbetalingBedrag : 0;
 
   const summary: SummaryStep[] = useMemo(() => {
     return [
@@ -91,17 +121,14 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
         title: "Aflevering & aanbetaling",
         detail:
           (p.afleverwijze || "—") +
-          (aanbetalingNum > 0
-            ? ` · aanbetaling €${aanbetalingNum.toLocaleString("nl-NL")}`
-            : ""),
+          (aanbetalingNum > 0 ? ` · aanbetaling €${aanbetalingNum.toLocaleString("nl-NL")}` : ""),
         done: !!p.completed[2],
         visible: true,
       },
       {
         num: 3,
         title: "Klantgegevens",
-        detail:
-          `${p.klantVoornaam || ""} ${p.klantAchternaam || ""}`.trim() || "—",
+        detail: `${p.klantVoornaam || ""} ${p.klantAchternaam || ""}`.trim() || "—",
         done: !!p.completed[3],
         visible: true,
       },
@@ -158,22 +185,11 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
       {
         num: 10,
         title: "Tenaamstelling",
-        detail: [
-          p.machtigingsnummer ? `Nr. ${p.machtigingsnummer}` : null,
-          p.machtigingDatum || null,
-        ]
-          .filter(Boolean)
-          .join(" · ") || "—",
+        detail:
+          [p.machtigingsnummer ? `Nr. ${p.machtigingsnummer}` : null, p.machtigingDatum || null]
+            .filter(Boolean)
+            .join(" · ") || "—",
         done: !!p.completed[10],
-        visible: true,
-      },
-      {
-        num: 11,
-        title: "Uitlevering",
-        detail: p.uitleveringDatum
-          ? new Date(p.uitleveringDatum).toLocaleString("nl-NL")
-          : "—",
-        done: !!p.completed[11],
         visible: true,
       },
     ];
@@ -189,7 +205,6 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
     ? `https://wa.me/${waPhone}?text=${encodeURIComponent(waMessage)}`
     : `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
 
-  // Placeholder Google review link
   const googleReviewUrl = "https://g.page/r/platinautomotive/review";
 
   const handleAfsluiten = async () => {
@@ -203,7 +218,13 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
         .from("verkopen")
         .update({
           wizard_status: "afgerond",
-          stap12_afgerond: true,
+          stap11_afgerond: true,
+          uitlevering_datum: localInputToIso(uitleveringDatum),
+          apk_gecommuniceerd: apkGecommuniceerd,
+          gebreken_besproken: gebrekenBesproken,
+          gebreken_omschrijving: gebrekenBesproken ? gebrekenOmschrijving || null : null,
+          tenaamstellingsbewijs_meegegeven: tenaamstellingsbewijsMeegegeven,
+          uitlevering_voltooid: true,
         } as any)
         .eq("id", p.verkoopId);
       if (e1) throw e1;
@@ -227,6 +248,100 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
 
   return (
     <div className="space-y-6">
+      {/* Uitlevering — compacte kaart */}
+      <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Uitlevering</h2>
+          <p className="text-sm text-muted-foreground">
+            Leg het uitlevermoment vast. Niet verplicht voor afsluiten, wel opgeslagen.
+          </p>
+        </div>
+
+        {/* Datum & tijdstip */}
+        <div>
+          <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+            Datum & tijdstip uitlevering
+          </label>
+          <input
+            type="datetime-local"
+            value={uitleveringDatum}
+            onChange={(e) => {
+              setUitleveringDatum(e.target.value);
+              p.onUitleveringChange?.({ uitlevering_datum: localInputToIso(e.target.value) });
+            }}
+            className="w-full sm:w-auto px-3 py-2 text-sm bg-background border border-border rounded-[10px] focus:outline-none focus:ring-1 focus:ring-foreground/30"
+          />
+        </div>
+
+        {/* APK gecommuniceerd */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-sm font-medium text-foreground">
+              APK-vervaldatum gecommuniceerd aan koper
+            </div>
+            {p.voertuigApkVervaldatum && (
+              <div className="text-xs text-muted-foreground mt-0.5">
+                APK geldig tot: {p.voertuigApkVervaldatum}
+              </div>
+            )}
+          </div>
+          <Switch
+            checked={apkGecommuniceerd}
+            onCheckedChange={(v) => {
+              setApkGecommuniceerd(v);
+              p.onUitleveringChange?.({ apk_gecommuniceerd: v });
+            }}
+          />
+        </div>
+
+        {/* Bekende gebreken */}
+        <div className="space-y-2">
+          <div className="flex items-start justify-between gap-4">
+            <div className="text-sm font-medium text-foreground">
+              Bekende gebreken besproken en vastgelegd
+            </div>
+            <Switch
+              checked={gebrekenBesproken}
+              onCheckedChange={(v) => {
+                setGebrekenBesproken(v);
+                p.onUitleveringChange?.({
+                  gebreken_besproken: v,
+                  gebreken_omschrijving: v ? gebrekenOmschrijving || null : null,
+                });
+              }}
+            />
+          </div>
+          {gebrekenBesproken && (
+            <Textarea
+              value={gebrekenOmschrijving}
+              onChange={(e) => setGebrekenOmschrijving(e.target.value)}
+              onBlur={() =>
+                p.onUitleveringChange?.({
+                  gebreken_omschrijving: gebrekenOmschrijving || null,
+                })
+              }
+              placeholder="Omschrijving van besproken gebreken (optioneel)"
+              className="text-sm"
+              rows={3}
+            />
+          )}
+        </div>
+
+        {/* Tenaamstellingsbewijs */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="text-sm font-medium text-foreground">
+            Tenaamstellingsbewijs meegegeven aan koper
+          </div>
+          <Switch
+            checked={tenaamstellingsbewijsMeegegeven}
+            onCheckedChange={(v) => {
+              setTenaamstellingsbewijsMeegegeven(v);
+              p.onUitleveringChange?.({ tenaamstellingsbewijs_meegegeven: v });
+            }}
+          />
+        </div>
+      </div>
+
       {/* Dossieroverzicht */}
       <div className="rounded-[14px] border border-border bg-card p-6">
         <h2 className="text-lg font-semibold text-foreground mb-1">Dossieroverzicht</h2>
@@ -243,9 +358,7 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
             >
               <div
                 className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                  s.done
-                    ? "bg-green-600/20 text-green-600"
-                    : "bg-orange-500/20 text-orange-500"
+                  s.done ? "bg-green-600/20 text-green-600" : "bg-orange-500/20 text-orange-500"
                 }`}
               >
                 {s.done ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
