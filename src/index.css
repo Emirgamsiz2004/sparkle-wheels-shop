@@ -401,7 +401,7 @@ input[type="number"] {
     justify-content: center;
     gap: 0.5rem;
     padding: 13px 24px;
-    border-radius: 6px;
+    border-radius: 0;
     font-weight: 500;
     font-size: 0.8125rem;
     line-height: 1;
