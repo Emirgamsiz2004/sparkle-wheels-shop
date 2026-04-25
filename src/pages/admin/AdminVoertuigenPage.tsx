@@ -109,14 +109,30 @@ const AdminVoertuigenPage = () => {
     [vehicles]
   );
 
+  const normalizePlate = (s: string) => s.replace(/[-\s]/g, "").toUpperCase();
+
   const filtered = visibleVehicles.filter((v) => {
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
-      return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || v.kenteken?.toLowerCase().includes(q);
+      const qPlate = normalizePlate(search);
+      const plateMatch = v.kenteken ? normalizePlate(v.kenteken).includes(qPlate) : false;
+      return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || plateMatch;
     }
     return true;
   });
+
+  const suggestions = useMemo(() => {
+    if (!search.trim()) return [];
+    return filtered.slice(0, 5);
+  }, [search, filtered]);
+
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setShowSuggestions(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   if (loading) {
     return <div className="flex items-center justify-center py-20"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
