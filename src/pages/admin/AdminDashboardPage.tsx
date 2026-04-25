@@ -56,56 +56,22 @@ const euroFormatter = (val: number) => formatEuro(val);
 const AdminDashboardPage = () => {
   const { vehicles, loading: vLoading } = useVehicles();
   const { testDrives, loading: tdLoading } = useTestDrives();
-  const [period, setPeriod] = useState<PeriodKey>("maand");
   const [compare, setCompare] = useState(true);
-  const [customFrom, setCustomFrom] = useState<Date>();
-  const [customTo, setCustomTo] = useState<Date>();
-  const [monthOpen, setMonthOpen] = useState(false);
-  const [quarterOpen, setQuarterOpen] = useState(false);
-  const [yearOpen, setYearOpen] = useState(false);
-  const [customRangeOpen, setCustomRangeOpen] = useState(false);
-  const [myYear, setMyYear] = useState(new Date().getFullYear());
 
-  const monthNames = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
-  const currentYear = new Date().getFullYear();
-  const selectableYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
+  // Default: deze maand tot nu
+  const [periodRange, setPeriodRange] = useState<ShopifyRange>(() => {
+    const now = new Date();
+    return {
+      from: startOfM(now),
+      to: endOfDay(now),
+      label: "Maand tot nu",
+    };
+  });
 
-  const closeAllDropdowns = () => {
-    setMonthOpen(false);
-    setQuarterOpen(false);
-    setYearOpen(false);
-    setCustomRangeOpen(false);
-  };
-
-  const selectMonth = (monthIdx: number, year: number) => {
-    const from = startOfM(new Date(year, monthIdx));
-    const to = endOfMonth(new Date(year, monthIdx));
-    setCustomFrom(from);
-    setCustomTo(to > new Date() ? new Date() : to);
-    setPeriod("custom");
-    closeAllDropdowns();
-  };
-
-  const selectQuarter = (quarterIdx: number, year: number) => {
-    const startMonth = quarterIdx * 3;
-    const from = startOfM(new Date(year, startMonth));
-    const to = endOfMonth(new Date(year, startMonth + 2));
-    setCustomFrom(from);
-    setCustomTo(to > new Date() ? new Date() : to);
-    setPeriod("custom");
-    closeAllDropdowns();
-  };
-
-  const selectYear = (year: number) => {
-    const from = startOfY(new Date(year, 0));
-    const to = endOfYear(new Date(year, 0));
-    setCustomFrom(from);
-    setCustomTo(to > new Date() ? new Date() : to);
-    setPeriod("custom");
-    closeAllDropdowns();
-  };
-
-  const range = useMemo(() => getPeriodRange(period, customFrom, customTo), [period, customFrom, customTo]);
+  const range = useMemo(
+    () => getPeriodRange("custom" as PeriodKey, periodRange.from, periodRange.to),
+    [periodRange]
+  );
   const data = useDashboardData(vehicles, testDrives, range, compare);
   const loading = vLoading || tdLoading;
 
