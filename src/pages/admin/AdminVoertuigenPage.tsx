@@ -146,9 +146,16 @@ const AdminVoertuigenPage = () => {
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-medium text-foreground">Voertuigen</h1>
-          <p className="text-sm text-muted-foreground">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
+          <p className="text-sm text-muted-foreground">{visibleVehicles.length} voertuig{visibleVehicles.length !== 1 ? "en" : ""}</p>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            to="/admin/verkopen"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors text-muted-foreground"
+            title="Verkochte voertuigen bekijken"
+          >
+            Verkochte voertuigen
+          </Link>
           <button
             onClick={handleApkRefresh}
             disabled={apkRefreshing}
