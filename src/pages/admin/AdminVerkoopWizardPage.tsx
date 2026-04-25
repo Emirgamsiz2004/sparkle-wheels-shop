@@ -1017,6 +1017,8 @@ const AdminVerkoopWizardPage = () => {
                 bedrijfsnaam={klantBedrijfsnaam} setBedrijfsnaam={setKlantBedrijfsnaam}
                 kvk={klantKvk} setKvk={setKlantKvk}
                 btw={klantBtw} setBtw={setKlantBtw}
+                leadSource={leadSource} setLeadSource={setLeadSource}
+                leadSourceAnders={leadSourceAnders} setLeadSourceAnders={setLeadSourceAnders}
               />
             )}
 
