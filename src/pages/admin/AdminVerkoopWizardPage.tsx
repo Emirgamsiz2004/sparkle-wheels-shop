@@ -84,6 +84,8 @@ const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil:
   if (stap >= 10 && stap <= 12 && inruil && !completed[9]) return true;
   // Stappen 11-12 vereisen 10
   if (stap >= 11 && stap <= 12 && !completed[10]) return true;
+  // Stap 12 vereist 11 (uitlevering)
+  if (stap === 12 && !completed[11]) return true;
   return false;
 };
 
