@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Calendar as CalIcon, Car, Check, Eye, MessageSquare, Search, Sparkles, Wrench, X, ArrowLeft } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
