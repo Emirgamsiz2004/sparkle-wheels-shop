@@ -392,26 +392,27 @@ input[type="number"] {
   }
 
   /* ===========================================================
-     Public website — button styles aligned to shadcn Button variants
-     .btn-public          → base (matches shadcn default sizing)
-     .btn-primary-public  → primary (filled, foreground bg)
-     .btn-secondary-public→ outline / secondary (transparent + border)
-     .btn-sticky-public   → sticky CTA (matches primary, light on dark site)
+     Public website — original editorial button styles
+     .btn-public          → uppercase, wide tracking, squared automotive style
+     .btn-primary-public  → filled block CTA
+     .btn-secondary-public→ transparent text link with underline
+     .btn-sticky-public   → sticky appointment CTA matching primary
      =========================================================== */
   .btn-public {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    height: 2.75rem;
-    padding: 0 1.5rem;
-    border-radius: 10px;
-    font-weight: 500;
-    font-size: 0.875rem;
+    min-height: 3.5rem;
+    padding: 0 2.25rem;
+    border-radius: 0;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
     line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    transition: background-color 200ms ease-out, border-color 200ms ease-out, color 200ms ease-out, transform 200ms ease-out;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    transition: background-color 500ms ease-out, border-color 500ms ease-out, color 500ms ease-out, opacity 500ms ease-out;
     cursor: pointer;
     white-space: nowrap;
     text-decoration: none;
@@ -422,31 +423,38 @@ input[type="number"] {
   }
 
   .btn-primary-public {
-    background-color: hsl(var(--foreground));
-    color: hsl(var(--background));
-    border: 0.5px solid hsl(var(--foreground));
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--foreground));
+    border: 0.5px solid hsl(var(--border));
   }
   .btn-primary-public:hover {
-    background-color: hsl(var(--foreground) / 0.9);
+    background-color: hsl(var(--muted));
+    color: hsl(var(--accent));
   }
 
   .btn-secondary-public {
     background-color: transparent;
     color: hsl(var(--foreground));
-    border: 0.5px solid hsl(var(--border));
+    border: 0;
+    border-bottom: 1px solid hsl(var(--foreground) / 0.45);
+    min-height: 3.5rem;
+    padding-inline: 0;
   }
   .btn-secondary-public:hover {
-    background-color: hsl(var(--accent) / 0.4);
+    color: hsl(var(--accent));
+    border-bottom-color: hsl(var(--accent));
   }
 
-  /* Sticky CTA — same look as primary button */
+  /* Sticky CTA — same look as the original filled CTA */
   .btn-sticky-public {
-    background-color: hsl(var(--foreground));
-    color: hsl(var(--background));
-    border: 0.5px solid hsl(var(--foreground));
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--foreground));
+    border: 0.5px solid hsl(var(--border));
+    box-shadow: 0 0.75rem 2.5rem hsl(var(--background) / 0.55);
   }
   .btn-sticky-public:hover {
-    background-color: hsl(var(--foreground) / 0.9);
+    background-color: hsl(var(--muted));
+    color: hsl(var(--accent));
   }
 }
 
