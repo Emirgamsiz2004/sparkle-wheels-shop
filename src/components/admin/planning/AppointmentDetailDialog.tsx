@@ -309,33 +309,10 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
               {/* 4. Klant */}
               <div className="mb-1">
                 {customerName ? (
-                  <>
-                    <div className="flex items-center gap-2 text-sm text-foreground mb-1.5">
-                      <User className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <span className="font-medium truncate">{customerName}</span>
-                    </div>
-                    {appointment.customer?.telefoon && (
-                      <div className="flex items-center gap-2 pl-6">
-                        <a
-                          href={`tel:${appointment.customer.telefoon}`}
-                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          {appointment.customer.telefoon}
-                        </a>
-                        {waNumber && (
-                          <a
-                            href={`https://wa.me/${waNumber}?text=${waMessage}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition-colors"
-                            aria-label="WhatsApp"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <User className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="font-medium truncate">{customerName}</span>
+                  </div>
                 ) : (
                   <div className="text-sm text-muted-foreground/70">Geen klant gekoppeld</div>
                 )}
