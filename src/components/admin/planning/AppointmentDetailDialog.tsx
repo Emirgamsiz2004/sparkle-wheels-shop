@@ -168,8 +168,20 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
     if (n.startsWith("0")) n = "31" + n.slice(1);
     return n;
   })();
+  const dateStr = format(dt, "d MMMM yyyy", { locale: nl });
+  const timeStr = format(dt, "HH:mm", { locale: nl });
+  const naam = appointment.customer?.voornaam?.trim() || "u";
+  const merkModel = appointment.vehicle ? `${appointment.vehicle.merk} ${appointment.vehicle.model}` : "";
+  const waMessageByType: Record<string, string> = {
+    bezichtiging: `Goedendag ${naam}, we willen u herinneren aan uw bezichtiging op ${dateStr} om ${timeStr} bij Platin Automotive${merkModel ? ` voor de ${merkModel}` : ""}. Tot dan!`,
+    proefrit: `Goedendag ${naam}, we willen u herinneren aan uw proefrit op ${dateStr} om ${timeStr} bij Platin Automotive${merkModel ? ` met de ${merkModel}` : ""}. Tot dan!`,
+    ophalen: `Goedendag ${naam},${merkModel ? ` uw ${merkModel} staat` : " uw voertuig staat"} klaar om opgehaald te worden op ${dateStr} om ${timeStr}. We zien u graag!`,
+    aflevering: `Goedendag ${naam},${merkModel ? ` uw ${merkModel} wordt` : " uw voertuig wordt"} op ${dateStr} om ${timeStr} afgeleverd. Heeft u nog vragen, neem dan contact op.`,
+    onderhoud: `Goedendag ${naam}, we willen u herinneren aan uw onderhoudsafspraak op ${dateStr} om ${timeStr} bij Platin Automotive. Tot dan!`,
+  };
   const waMessage = encodeURIComponent(
-    `Goedendag, we willen u herinneren aan uw afspraak op ${format(dt, "d MMMM yyyy", { locale: nl })} om ${format(dt, "HH:mm", { locale: nl })} bij Platin Automotive${appointment.vehicle ? ` voor de ${appointment.vehicle.merk} ${appointment.vehicle.model}` : ""}. Tot dan!`
+    waMessageByType[appointment.type] ||
+    `Goedendag ${naam}, we willen u herinneren aan uw afspraak op ${dateStr} om ${timeStr} bij Platin Automotive${merkModel ? ` voor de ${merkModel}` : ""}. Tot dan!`
   );
 
   const setStatus = async (s: AppointmentStatus) => {
