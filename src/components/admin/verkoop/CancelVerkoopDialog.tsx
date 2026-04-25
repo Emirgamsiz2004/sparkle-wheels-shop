@@ -76,28 +76,15 @@ export default function CancelVerkoopDialog({
     onOpenChange(next);
   };
 
-  // Moneybird factuur opruimen — niet-blokkerend bij fouten
+  // Moneybird factuur opruimen — altijd verwijderen, niet crediteren
   const cleanupMoneybird = async (): Promise<void> => {
     if (!moneybirdInvoiceId) return;
     try {
-      const { invoice } = await invokeMoneybird("get_sales_invoice", {
-        invoice_id: moneybirdInvoiceId,
-      });
-      const status = (invoice?.state || invoice?.status || "").toLowerCase();
-      const isDraft = status === "draft" || status === "concept" || status === "new";
-
-      if (isDraft) {
-        await invokeMoneybird("delete_sales_invoice", { invoice_id: moneybirdInvoiceId });
-      } else {
-        await invokeMoneybird("create_credit_invoice", { invoice_id: moneybirdInvoiceId });
-        toast.message(
-          "De factuur was al verzonden. Er is automatisch een creditnota aangemaakt in Moneybird.",
-        );
-      }
+      await invokeMoneybird("delete_sales_invoice", { invoice_id: moneybirdInvoiceId });
     } catch (err) {
       console.error("Moneybird cleanup mislukt:", err);
       toast.warning(
-        "Factuur kon niet automatisch worden verwijderd in Moneybird. Verwijder of crediteer deze handmatig.",
+        "Factuur kon niet automatisch worden verwijderd in Moneybird. Verwijder deze handmatig.",
       );
     }
   };
