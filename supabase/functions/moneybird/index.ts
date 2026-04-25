@@ -490,6 +490,27 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "delete_test_sales_invoice": {
+        const { invoice_id: dInvoiceId } = params;
+        if (!dInvoiceId) throw new Error("invoice_id is required");
+        const current = await mbFetch(`sales_invoices/${dInvoiceId}.json`);
+        if (!String(current?.reference || "").startsWith("TEST-")) {
+          throw new Error("Alleen testfacturen mogen via deze actie verwijderd worden");
+        }
+        const token = Deno.env.get("MONEYBIRD_API_TOKEN");
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        const deleteRes = await fetch(`${MB_BASE}/${adminId}/sales_invoices/${dInvoiceId}.json`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        });
+        if (!deleteRes.ok) {
+          const txt = await deleteRes.text();
+          throw new Error(`Moneybird API error [${deleteRes.status}]: ${txt}`);
+        }
+        result = { deleted: true };
+        break;
+      }
+
       // ─── Verkoopfactuur voor voertuig (legacy, kort) ───
       case "create_vehicle_invoice": {
         const { vehicle, buyer_name, buyer_email, buyer_phone } = params;
