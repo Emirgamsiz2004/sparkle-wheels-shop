@@ -69,10 +69,16 @@ const AdminPlanningPage = () => {
     const map = new Map<string, Appointment[]>();
     weekDays.forEach((d) => {
       const key = format(d, "yyyy-MM-dd");
-      map.set(key, appointments.filter((a) => a.status !== "geannuleerd" && isSameDay(new Date(a.datum_tijd), d)).sort((a, b) => new Date(a.datum_tijd).getTime() - new Date(b.datum_tijd).getTime()));
+      map.set(key, appointments.filter((a) => a.status !== "geannuleerd" && !a.is_aanvraag && isSameDay(new Date(a.datum_tijd), d)).sort((a, b) => new Date(a.datum_tijd).getTime() - new Date(b.datum_tijd).getTime()));
     });
     return map;
   }, [appointments, weekDays]);
+
+  const aanvragen = useMemo(() =>
+    appointments.filter((a) => a.is_aanvraag && a.status === "gepland")
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+    [appointments]
+  );
 
   const todayPrep = useMemo(() =>
     appointments.filter((a) => a.status === "gepland" && isSameDay(new Date(a.datum_tijd), new Date()) && (a.type === "bezichtiging" || a.type === "proefrit") && a.vehicle_id && !a.voertuig_klaargemaakt),
@@ -93,7 +99,7 @@ const AdminPlanningPage = () => {
     const monthEnd = addMonths(startOfDay(new Date(now.getFullYear(), now.getMonth(), 1)), 1);
 
     return appointments
-      .filter((a) => a.status !== "geannuleerd")
+      .filter((a) => a.status !== "geannuleerd" && !a.is_aanvraag)
       .filter((a) => {
         const d = new Date(a.datum_tijd);
         switch (periodFilter) {
