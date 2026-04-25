@@ -392,69 +392,60 @@ input[type="number"] {
   }
 
   /* ===========================================================
-     Public website — original editorial button styles
-     .btn-public          → uppercase, wide tracking, squared automotive style
-     .btn-primary-public  → filled block CTA
-     .btn-secondary-public→ transparent text link with underline
-     .btn-sticky-public   → sticky appointment CTA matching primary
+     Public website — uniform button styles
+     Apply .btn-public + .btn-primary-public OR .btn-secondary-public
      =========================================================== */
   .btn-public {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-height: 3.5rem;
-    padding: 0 2.25rem;
-    border-radius: 0;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 0.78rem;
+    padding: 13px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.8125rem;
     line-height: 1;
-    letter-spacing: 0.34em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    transition: background-color 500ms ease-out, border-color 500ms ease-out, color 500ms ease-out, opacity 500ms ease-out;
+    transition: background-color 250ms ease, border-color 250ms ease, color 250ms ease, transform 250ms ease;
     cursor: pointer;
     white-space: nowrap;
     text-decoration: none;
   }
   .btn-public:disabled {
-    opacity: 0.5;
+    opacity: 0.55;
     cursor: not-allowed;
   }
 
   .btn-primary-public {
-    background-color: hsl(var(--secondary));
-    color: hsl(var(--foreground));
-    border: 0.5px solid hsl(var(--border));
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
   .btn-primary-public:hover {
-    background-color: hsl(var(--muted));
-    color: hsl(var(--accent));
+    background-color: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 
   .btn-secondary-public {
     background-color: transparent;
-    color: hsl(var(--foreground));
-    border: 0;
-    border-bottom: 1px solid hsl(var(--foreground) / 0.45);
-    min-height: 3.5rem;
-    padding-inline: 0;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   .btn-secondary-public:hover {
-    color: hsl(var(--accent));
-    border-bottom-color: hsl(var(--accent));
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.35);
   }
 
-  /* Sticky CTA — same look as the original filled CTA */
+  /* Sticky CTA — light button on dark site */
   .btn-sticky-public {
-    background-color: hsl(var(--secondary));
-    color: hsl(var(--foreground));
-    border: 0.5px solid hsl(var(--border));
-    box-shadow: 0 0.75rem 2.5rem hsl(var(--background) / 0.55);
+    background-color: rgba(255, 255, 255, 0.92);
+    color: #111111;
+    border: none;
   }
   .btn-sticky-public:hover {
-    background-color: hsl(var(--muted));
-    color: hsl(var(--accent));
+    background-color: #ffffff;
+    transform: scale(1.02);
   }
 }
 
