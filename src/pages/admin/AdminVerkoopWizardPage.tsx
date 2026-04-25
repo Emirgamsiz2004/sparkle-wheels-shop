@@ -193,6 +193,7 @@ const AdminVerkoopWizardPage = () => {
   const [betalingOntvangen, setBetalingOntvangen] = useState<boolean>(false);
   const [restbedragLater, setRestbedragLater] = useState<boolean>(false);
   const [restbedragVerwachteDatum, setRestbedragVerwachteDatum] = useState<string | null>(null);
+  const [openstaandRestbedrag, setOpenstaandRestbedrag] = useState<number | null>(null);
 
   // Stap 9 state — Inruil op naam
   const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
@@ -379,6 +380,10 @@ const AdminVerkoopWizardPage = () => {
         setBetalingOntvangen(!!(e as any).betaling_ontvangen);
         setRestbedragLater(!!(e as any).restbedrag_later);
         setRestbedragVerwachteDatum(((e as any).restbedrag_verwachte_datum as string) || null);
+        if ((e as any).restbedrag_later) {
+          const r = (e as any).restbedrag;
+          setOpenstaandRestbedrag(typeof r === "number" ? r : r ? Number(r) : null);
+        }
         // Stap 9 hydration — Inruil op naam
         setInruilOpNaam(!!(e as any).inruil_op_naam);
         setInruilOpNaamAt(((e as any).inruil_op_naam_at as string) || null);
@@ -1151,6 +1156,7 @@ const AdminVerkoopWizardPage = () => {
                 initialBetalingOntvangen={betalingOntvangen}
                 initialRestbedragLater={restbedragLater}
                 initialRestbedragVerwachteDatum={restbedragVerwachteDatum}
+                initialOpenstaandRestbedrag={openstaandRestbedrag}
                 onSaved={async (extra) => {
                   if (extra.betaling_datum !== undefined) setBetalingDatum(extra.betaling_datum);
                   if (extra.betaling_opmerking !== undefined)
@@ -1161,6 +1167,14 @@ const AdminVerkoopWizardPage = () => {
                     setBetalingOntvangen(!!extra.betaling_ontvangen);
                   if (extra.betaalwijze_details !== undefined)
                     setBetaalwijzeDetails(extra.betaalwijze_details || []);
+                  if (extra.restbedrag_later !== undefined)
+                    setRestbedragLater(!!extra.restbedrag_later);
+                  if (extra.restbedrag_verwachte_datum !== undefined)
+                    setRestbedragVerwachteDatum(extra.restbedrag_verwachte_datum);
+                  if (extra.restbedrag !== undefined)
+                    setOpenstaandRestbedrag(
+                      typeof extra.restbedrag === "number" ? extra.restbedrag : null,
+                    );
                   if (extra.stap8_afgerond !== undefined) {
                     setCompleted((p) => ({ ...p, 8: !!extra.stap8_afgerond }));
                   }

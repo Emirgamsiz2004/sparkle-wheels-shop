@@ -51,6 +51,7 @@ interface Props {
   initialBetalingOntvangen: boolean;
   initialRestbedragLater: boolean;
   initialRestbedragVerwachteDatum: string | null;
+  initialOpenstaandRestbedrag?: number | null;
   onSaved: (extra: Record<string, any>) => Promise<void>;
 }
 
@@ -77,6 +78,7 @@ const Stap8Betaling = ({
   initialBetalingOntvangen,
   initialRestbedragLater,
   initialRestbedragVerwachteDatum,
+  initialOpenstaandRestbedrag,
   onSaved,
 }: Props) => {
   const { invoke, loading: mbLoading } = useMoneybird();
@@ -120,6 +122,12 @@ const Stap8Betaling = ({
   const [verwachteDatum, setVerwachteDatum] = useState<string>(
     initialRestbedragVerwachteDatum || "",
   );
+  const [openstaandRestbedrag, setOpenstaandRestbedrag] = useState<number | "">(
+    typeof initialOpenstaandRestbedrag === "number" ? initialOpenstaandRestbedrag : "",
+  );
+  const [openstaandManueel, setOpenstaandManueel] = useState<boolean>(
+    typeof initialOpenstaandRestbedrag === "number" && initialOpenstaandRestbedrag > 0,
+  );
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
   // ─── Auto-fill laatste rij met restbedrag (alleen als niet handmatig bewerkt) ───
@@ -146,10 +154,20 @@ const Stap8Betaling = ({
     (sum, r) => sum + (typeof r.bedrag === "number" ? r.bedrag : 0),
     0,
   );
-  const verschil = totaalRijen - nogTeOntvangen;
+  const openstaandNum = typeof openstaandRestbedrag === "number" ? openstaandRestbedrag : 0;
+  const verschil = restbedragLater
+    ? totaalRijen + openstaandNum - nogTeOntvangen
+    : totaalRijen - nogTeOntvangen;
   const klopt = Math.abs(verschil) <= 0.01 && nogTeOntvangen > 0;
 
-  // ─── Persisteren ───
+  // Auto-fill openstaand restbedrag wanneer toggle aan staat en niet handmatig bewerkt
+  useEffect(() => {
+    if (!restbedragLater) return;
+    if (openstaandManueel) return;
+    const auto = Math.max(0, nogTeOntvangen - totaalRijen);
+    setOpenstaandRestbedrag(auto);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restbedragLater, totaalRijen, nogTeOntvangen, openstaandManueel]);
   const persist = async (overrides: Record<string, any> = {}) => {
     if (!verkoopId) return;
     const primaryMethod: Methode = rijen[0]?.methode || "bank";
@@ -206,7 +224,17 @@ const Stap8Betaling = ({
       return;
     }
     if (Math.abs(verschil) > 0.01) {
-      toast.error("Totaal van betaalrijen moet gelijk zijn aan nog te ontvangen bedrag");
+      toast.error(
+        restbedragLater
+          ? "Som van betaalrijen + openstaand restbedrag moet gelijk zijn aan nog te ontvangen bedrag"
+          : "Totaal van betaalrijen moet gelijk zijn aan nog te ontvangen bedrag",
+      );
+      return;
+    }
+
+    const teRegistreren = restbedragLater ? totaalRijen : nogTeOntvangen;
+    if (teRegistreren <= 0) {
+      toast.error("Geen bedrag om te registreren");
       return;
     }
 
@@ -233,18 +261,20 @@ const Stap8Betaling = ({
       const result = await invoke("register_payment_invoice", {
         invoice_id: factuurMbId,
         payment_date: datum,
-        price: nogTeOntvangen.toFixed(2),
+        price: teRegistreren.toFixed(2),
         ...(financialAccountId ? { financial_account_id: financialAccountId } : {}),
       });
 
       const paymentId = result?.id ? String(result.id) : null;
       setMoneybirdPaymentId(paymentId);
-      setBevestigd(true);
+      // Alleen volledig bevestigen als er geen restbedrag meer openstaat
+      const volledig = !restbedragLater;
+      setBevestigd(volledig);
       await persist({
         moneybird_payment_id: paymentId,
-        betaling_ontvangen: true,
-        stap8_afgerond: true,
-        factuur_betaald: true,
+        betaling_ontvangen: volledig,
+        stap8_afgerond: volledig,
+        factuur_betaald: volledig,
       });
       toast.success("Betaling geregistreerd in Moneybird");
     } catch {
@@ -267,9 +297,14 @@ const Stap8Betaling = ({
   // ─── Restbedrag later toggle ───
   const handleToggleRestbedragLater = async (val: boolean) => {
     setRestbedragLater(val);
+    if (!val) {
+      setOpenstaandManueel(false);
+      setOpenstaandRestbedrag("");
+    }
     await persist({
       restbedrag_later: val,
       restbedrag_verwachte_datum: val ? verwachteDatum || null : null,
+      restbedrag: val ? (typeof openstaandRestbedrag === "number" ? openstaandRestbedrag : 0) : 0,
     });
   };
 
@@ -278,6 +313,18 @@ const Stap8Betaling = ({
     if (restbedragLater) {
       await persist({ restbedrag_later: true, restbedrag_verwachte_datum: iso || null });
     }
+  };
+
+  const handleChangeOpenstaand = (v: string) => {
+    setOpenstaandManueel(true);
+    setOpenstaandRestbedrag(v === "" ? "" : Number(v));
+  };
+
+  const handleBlurOpenstaand = async () => {
+    if (!restbedragLater) return;
+    await persist({
+      restbedrag: typeof openstaandRestbedrag === "number" ? openstaandRestbedrag : 0,
+    });
   };
 
   // ─── Restbetalingsafspraak PDF ───
@@ -552,19 +599,26 @@ const Stap8Betaling = ({
             <span>Betaling geregistreerd in Moneybird</span>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={handleRegisterPayment}
-            disabled={savingMb || mbLoading || nogTeOntvangen <= 0}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-          >
-            {savingMb ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <CreditCard className="w-4 h-4" />
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={handleRegisterPayment}
+              disabled={savingMb || mbLoading || (restbedragLater ? totaalRijen <= 0 : nogTeOntvangen <= 0)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              {savingMb ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CreditCard className="w-4 h-4" />
+              )}
+              Registreer betaling in Moneybird
+            </button>
+            {restbedragLater && (
+              <div className="text-[12px] text-muted-foreground">
+                Registreert {fmtEur(totaalRijen)} — restbedrag {fmtEur(openstaandNum)} volgt later
+              </div>
             )}
-            Registreer betaling in Moneybird
-          </button>
+          </div>
         )}
       </div>
 
@@ -588,6 +642,24 @@ const Stap8Betaling = ({
 
         {restbedragLater && (
           <>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
+                Openstaand restbedrag
+              </label>
+              <div className="inline-flex items-center gap-2">
+                <span className="text-muted-foreground text-sm">€</span>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  value={openstaandRestbedrag === "" ? "" : openstaandRestbedrag}
+                  onChange={(e) => handleChangeOpenstaand(e.target.value)}
+                  onBlur={handleBlurOpenstaand}
+                  className="w-40 bg-background border border-border rounded-[8px] px-2 py-1.5 text-sm text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
             <div>
               <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
                 Uiterlijk te voldoen op
