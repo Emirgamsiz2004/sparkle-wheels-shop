@@ -81,7 +81,27 @@ const AdminVoertuigenPage = () => {
     setSyncing(false);
   };
 
-  const filtered = vehicles.filter((v) => {
+  const handleApkRefresh = async () => {
+    const targets = vehicles.filter((v) => v.status !== "verkocht" && !!v.kenteken);
+    if (targets.length === 0) {
+      toast.info("Geen voertuigen om te vernieuwen");
+      return;
+    }
+    setApkRefreshing(true);
+    setApkProgress({ done: 0, total: targets.length });
+    let updated = 0;
+    for (let i = 0; i < targets.length; i++) {
+      const v = targets[i];
+      try {
+        const result = await recheckApk(v.id, v.kenteken, v.apkVervaldatum);
+        if (result) updated++;
+      } catch { /* skip */ }
+      setApkProgress({ done: i + 1, total: targets.length });
+    }
+    setApkRefreshing(false);
+    toast.success(`APK vernieuwd: ${updated} voertuig${updated !== 1 ? "en" : ""} bijgewerkt`);
+    if (updated > 0) refetch();
+  };
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
