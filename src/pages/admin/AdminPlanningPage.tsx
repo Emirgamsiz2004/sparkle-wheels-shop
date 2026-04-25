@@ -139,8 +139,8 @@ const AdminPlanningPage = () => {
           <button
             ref={addBtnRef}
             onClick={() => {
-              setPickerRect(addBtnRef.current?.getBoundingClientRect() || null);
-              setPickerOpen(true);
+              setFormAnchorRect(addBtnRef.current?.getBoundingClientRect() || null);
+              setFormOpen(true);
             }}
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97]"
           >
