@@ -43,6 +43,7 @@ export const typeLabels: Record<AppointmentType, string> = {
   ophalen: "Ophalen",
   onderhoud: "Onderhoud / reparatie",
   anders: "Anders",
+  poetsbeurt: "Poetsbeurt",
 };
 
 export const typeColors: Record<AppointmentType, string> = {
@@ -53,6 +54,7 @@ export const typeColors: Record<AppointmentType, string> = {
   ophalen: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
   onderhoud: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
   anders: "bg-slate-500/15 text-slate-300 border-slate-500/30",
+  poetsbeurt: "bg-pink-500/15 text-pink-400 border-pink-500/30",
 };
 
 export const typeDotColors: Record<AppointmentType, string> = {
@@ -63,6 +65,7 @@ export const typeDotColors: Record<AppointmentType, string> = {
   ophalen: "bg-cyan-400",
   onderhoud: "bg-yellow-400",
   anders: "bg-slate-400",
+  poetsbeurt: "bg-pink-400",
 };
 
 const SELECT = "*, customer:customers(id, voornaam, achternaam, telefoon, email), vehicle:vehicles(id, merk, model, kenteken)";
