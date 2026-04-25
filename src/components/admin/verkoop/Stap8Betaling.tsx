@@ -224,7 +224,17 @@ const Stap8Betaling = ({
       return;
     }
     if (Math.abs(verschil) > 0.01) {
-      toast.error("Totaal van betaalrijen moet gelijk zijn aan nog te ontvangen bedrag");
+      toast.error(
+        restbedragLater
+          ? "Som van betaalrijen + openstaand restbedrag moet gelijk zijn aan nog te ontvangen bedrag"
+          : "Totaal van betaalrijen moet gelijk zijn aan nog te ontvangen bedrag",
+      );
+      return;
+    }
+
+    const teRegistreren = restbedragLater ? totaalRijen : nogTeOntvangen;
+    if (teRegistreren <= 0) {
+      toast.error("Geen bedrag om te registreren");
       return;
     }
 
@@ -251,18 +261,20 @@ const Stap8Betaling = ({
       const result = await invoke("register_payment_invoice", {
         invoice_id: factuurMbId,
         payment_date: datum,
-        price: nogTeOntvangen.toFixed(2),
+        price: teRegistreren.toFixed(2),
         ...(financialAccountId ? { financial_account_id: financialAccountId } : {}),
       });
 
       const paymentId = result?.id ? String(result.id) : null;
       setMoneybirdPaymentId(paymentId);
-      setBevestigd(true);
+      // Alleen volledig bevestigen als er geen restbedrag meer openstaat
+      const volledig = !restbedragLater;
+      setBevestigd(volledig);
       await persist({
         moneybird_payment_id: paymentId,
-        betaling_ontvangen: true,
-        stap8_afgerond: true,
-        factuur_betaald: true,
+        betaling_ontvangen: volledig,
+        stap8_afgerond: volledig,
+        factuur_betaald: volledig,
       });
       toast.success("Betaling geregistreerd in Moneybird");
     } catch {
