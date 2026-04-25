@@ -50,7 +50,7 @@ const timeSlots = Array.from({ length: 20 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${m}`;
 });
 
-const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType }: Props) => {
+const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType, anchorRect, onBackToTypePicker }: Props) => {
   const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
   const [type, setType] = useState<AppointmentType | null>((defaultType as AppointmentType) || null);
   const [saving, setSaving] = useState(false);
