@@ -15,6 +15,10 @@ import { template as vehicleLongStock } from './vehicle-long-stock.tsx'
 import { template as proefritFormCompleted } from './proefrit-form-completed.tsx'
 import { template as tasksOverdueOverview } from './tasks-overdue-overview.tsx'
 import { template as nieuweContactAanmelding } from './nieuwe-contact-aanmelding.tsx'
+import { template as afspraakBevestiging } from './afspraak-bevestiging.tsx'
+import { template as afspraakAanvraagOntvangen } from './afspraak-aanvraag-ontvangen.tsx'
+import { template as afspraakNotificatieAdmin } from './afspraak-notificatie-admin.tsx'
+import { template as afspraakAfwijzing } from './afspraak-afwijzing.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'proefrit-overeenkomst': proefritOvereenkomst,
@@ -23,4 +27,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'proefrit-form-completed': proefritFormCompleted,
   'tasks-overdue-overview': tasksOverdueOverview,
   'nieuwe-contact-aanmelding': nieuweContactAanmelding,
+  'afspraak-bevestiging': afspraakBevestiging,
+  'afspraak-aanvraag-ontvangen': afspraakAanvraagOntvangen,
+  'afspraak-notificatie-admin': afspraakNotificatieAdmin,
+  'afspraak-afwijzing': afspraakAfwijzing,
 }
