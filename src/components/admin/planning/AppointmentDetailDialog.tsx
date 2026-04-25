@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Phone, Car, Clock, User, FileText, Trash2, CheckCircle2, Pencil, CalendarIcon, X, MessageCircle, Check, XCircle } from "lucide-react";
+import { Phone, Car, Clock, User, FileText, Trash2, CheckCircle2, Pencil, CalendarIcon, X, MessageCircle, Check, XCircle, Repeat, ShoppingCart, Wrench, Receipt } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +34,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onUpdate: (id: string, updates: Partial<Appointment>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  onCreate?: (data: any) => Promise<void>;
 }
 
 const timeSlots = Array.from({ length: 20 }, (_, i) => {
@@ -48,7 +49,7 @@ const statusOptions: { value: AppointmentStatus; label: string }[] = [
   { value: "geannuleerd", label: "Geannuleerd" },
 ];
 
-const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, onUpdate, onDelete }: Props) => {
+const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, onUpdate, onDelete, onCreate }: Props) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -167,8 +168,20 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
     if (n.startsWith("0")) n = "31" + n.slice(1);
     return n;
   })();
+  const dateStr = format(dt, "d MMMM yyyy", { locale: nl });
+  const timeStr = format(dt, "HH:mm", { locale: nl });
+  const naam = appointment.customer?.voornaam?.trim() || "u";
+  const merkModel = appointment.vehicle ? `${appointment.vehicle.merk} ${appointment.vehicle.model}` : "";
+  const waMessageByType: Record<string, string> = {
+    bezichtiging: `Goedendag ${naam}, we willen u herinneren aan uw bezichtiging op ${dateStr} om ${timeStr} bij Platin Automotive${merkModel ? ` voor de ${merkModel}` : ""}. Tot dan!`,
+    proefrit: `Goedendag ${naam}, we willen u herinneren aan uw proefrit op ${dateStr} om ${timeStr} bij Platin Automotive${merkModel ? ` met de ${merkModel}` : ""}. Tot dan!`,
+    ophalen: `Goedendag ${naam},${merkModel ? ` uw ${merkModel} staat` : " uw voertuig staat"} klaar om opgehaald te worden op ${dateStr} om ${timeStr}. We zien u graag!`,
+    aflevering: `Goedendag ${naam},${merkModel ? ` uw ${merkModel} wordt` : " uw voertuig wordt"} op ${dateStr} om ${timeStr} afgeleverd. Heeft u nog vragen, neem dan contact op.`,
+    onderhoud: `Goedendag ${naam}, we willen u herinneren aan uw onderhoudsafspraak op ${dateStr} om ${timeStr} bij Platin Automotive. Tot dan!`,
+  };
   const waMessage = encodeURIComponent(
-    `Goedendag, we willen u herinneren aan uw afspraak op ${format(dt, "d MMMM yyyy", { locale: nl })} om ${format(dt, "HH:mm", { locale: nl })} bij Platin Automotive${appointment.vehicle ? ` voor de ${appointment.vehicle.merk} ${appointment.vehicle.model}` : ""}. Tot dan!`
+    waMessageByType[appointment.type] ||
+    `Goedendag ${naam}, we willen u herinneren aan uw afspraak op ${dateStr} om ${timeStr} bij Platin Automotive${merkModel ? ` voor de ${merkModel}` : ""}. Tot dan!`
   );
 
   const setStatus = async (s: AppointmentStatus) => {
@@ -185,6 +198,44 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
     if (!appointment.customer) return;
     handleClose(false);
     navigate(`/admin/klanten/${appointment.customer.id}`);
+  };
+
+  const startVerkoop = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/verkopen/nieuw/${appointment.vehicle.id}`);
+  };
+  const goToProefritDoc = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/proefriten?vehicle=${appointment.vehicle.id}`);
+  };
+  const goToVerkoopList = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/verkopen?vehicle=${appointment.vehicle.id}`);
+  };
+  const goToKosten = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/voertuigen/${appointment.vehicle.id}?tab=kosten`);
+  };
+  const convertToProefrit = async () => {
+    if (!onCreate || !appointment.vehicle) return;
+    await onCreate({
+      type: "proefrit",
+      datum_tijd: appointment.datum_tijd,
+      eind_datum_tijd: null,
+      customer_id: appointment.customer?.id || null,
+      vehicle_id: appointment.vehicle.id,
+      medewerker: null,
+      notities: appointment.notities || null,
+      onderwerp: null,
+      betalingsstatus: null,
+      voertuig_klaargemaakt: false,
+      status: "gepland",
+    });
+    handleClose(false);
   };
 
   const containerClass = isMobile
@@ -258,33 +309,10 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
               {/* 4. Klant */}
               <div className="mb-1">
                 {customerName ? (
-                  <>
-                    <div className="flex items-center gap-2 text-sm text-foreground mb-1.5">
-                      <User className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <span className="font-medium truncate">{customerName}</span>
-                    </div>
-                    {appointment.customer?.telefoon && (
-                      <div className="flex items-center gap-2 pl-6">
-                        <a
-                          href={`tel:${appointment.customer.telefoon}`}
-                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          {appointment.customer.telefoon}
-                        </a>
-                        {waNumber && (
-                          <a
-                            href={`https://wa.me/${waNumber}?text=${waMessage}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition-colors"
-                            aria-label="WhatsApp"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <User className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="font-medium truncate">{customerName}</span>
+                  </div>
                 ) : (
                   <div className="text-sm text-muted-foreground/70">Geen klant gekoppeld</div>
                 )}
@@ -320,23 +348,86 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
               <div className="my-4 h-px bg-border/40" />
 
               {/* 8. Acties */}
-              <div className="flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <button onClick={startEdit} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                    <Pencil className="w-3.5 h-3.5" /> Bewerken
-                  </button>
-                  {appointment.vehicle && (
-                    <button onClick={goToVehicle} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                      <Car className="w-3.5 h-3.5" /> Naar voertuig
+              <div className="space-y-2.5">
+                {/* Bellen + WhatsApp */}
+                {appointment.customer?.telefoon && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <a
+                      href={`tel:${appointment.customer.telefoon}`}
+                      className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-[10px] border border-border/60 text-xs text-foreground hover:bg-accent/40 transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5" /> Bellen
+                    </a>
+                    {waNumber ? (
+                      <a
+                        href={`https://wa.me/${waNumber}?text=${waMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-[10px] border border-emerald-500/40 text-xs text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                      </a>
+                    ) : <span />}
+                  </div>
+                )}
+
+                {/* Type-specifieke extra acties */}
+                {appointment.type === "bezichtiging" && appointment.vehicle && (
+                  <div className="flex flex-col gap-1.5 text-xs">
+                    {onCreate && (
+                      <button onClick={convertToProefrit} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                        <Repeat className="w-3.5 h-3.5" /> Omzetten naar proefrit
+                      </button>
+                    )}
+                    <button onClick={startVerkoop} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <ShoppingCart className="w-3.5 h-3.5" /> Verkoop starten
                     </button>
-                  )}
+                  </div>
+                )}
+                {appointment.type === "proefrit" && appointment.vehicle && (
+                  <div className="flex flex-col gap-1.5 text-xs">
+                    <button onClick={goToProefritDoc} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <FileText className="w-3.5 h-3.5" /> Proefrit document
+                    </button>
+                    <button onClick={startVerkoop} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <ShoppingCart className="w-3.5 h-3.5" /> Verkoop starten
+                    </button>
+                  </div>
+                )}
+                {(appointment.type === "ophalen" || appointment.type === "aflevering") && appointment.vehicle && (
+                  <div className="flex flex-col gap-1.5 text-xs">
+                    <button onClick={goToVerkoopList} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <ShoppingCart className="w-3.5 h-3.5" /> Naar verkoop
+                    </button>
+                  </div>
+                )}
+                {appointment.type === "onderhoud" && appointment.vehicle && (
+                  <div className="flex flex-col gap-1.5 text-xs">
+                    <button onClick={goToKosten} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <Receipt className="w-3.5 h-3.5" /> Kosten toevoegen
+                    </button>
+                  </div>
+                )}
+
+                {/* Onderste rij: Bewerken/Naar voertuig links — Verwijderen rechts */}
+                <div className="flex items-center justify-between gap-3 text-xs pt-1">
+                  <div className="flex items-center gap-3">
+                    <button onClick={startEdit} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                      <Pencil className="w-3.5 h-3.5" /> Bewerken
+                    </button>
+                    {appointment.vehicle && (
+                      <button onClick={goToVehicle} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                        <Car className="w-3.5 h-3.5" /> Naar voertuig
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setConfirmDelete(true)}
+                    className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Verwijderen
+                  </button>
                 </div>
-                <button
-                  onClick={() => setConfirmDelete(true)}
-                  className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> Verwijderen
-                </button>
               </div>
             </motion.div>
           </AnimatePresence>
