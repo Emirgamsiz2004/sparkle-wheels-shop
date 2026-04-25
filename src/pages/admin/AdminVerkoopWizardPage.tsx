@@ -1381,27 +1381,30 @@ const AdminVerkoopWizardPage = () => {
       </main>
 
       {/* Fixed footer met navigatie */}
-      <div className="fixed bottom-0 left-[280px] right-0 z-10 border-t border-border bg-card/95 backdrop-blur px-8 py-4 flex items-center justify-between">
+      <div
+        className="fixed bottom-0 left-0 lg:left-[280px] right-0 z-10 border-t border-border bg-card/95 backdrop-blur px-4 lg:px-8 py-3 lg:py-4 flex items-center gap-2 lg:gap-4 max-w-full"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
+      >
         <button
           onClick={handleVorige}
           disabled={activeStap === 1}
-          className="px-5 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="w-[30%] lg:w-auto px-3 lg:px-5 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Vorige
         </button>
-        <div className="text-[11px] text-muted-foreground">
+        <div className="hidden lg:block text-[11px] text-muted-foreground flex-1 text-center">
           {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
         </div>
         {activeStap < 11 ? (
           <button
             onClick={handleVolgende}
             disabled={saving}
-            className="px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
+            className="w-[70%] lg:w-auto lg:ml-auto px-3 lg:px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
           >
             Volgende
           </button>
         ) : (
-          <div />
+          <div className="w-[70%] lg:w-auto" />
         )}
       </div>
     </div>
