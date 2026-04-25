@@ -1118,7 +1118,29 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 8 && (
+            {activeStap === 9 && (
+              <Stap9InruilOpNaam
+                inruil={inruil}
+                inruilKenteken={inruilKenteken}
+                inruilMerk={inruilMerk}
+                inruilModel={inruilModel}
+                inruilKm={inruilKm}
+                inruilWaarde={inruilWaarde}
+                initialInruilOpNaam={inruilOpNaam}
+                initialInruilOpNaamAt={inruilOpNaamAt}
+                onSaved={async (extra) => {
+                  if (extra.inruil_op_naam !== undefined)
+                    setInruilOpNaam(!!extra.inruil_op_naam);
+                  if (extra.inruil_op_naam_at !== undefined)
+                    setInruilOpNaamAt(extra.inruil_op_naam_at);
+                  if (extra.stap9_afgerond !== undefined)
+                    setCompleted((p) => ({ ...p, 9: !!extra.stap9_afgerond }));
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 9 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
