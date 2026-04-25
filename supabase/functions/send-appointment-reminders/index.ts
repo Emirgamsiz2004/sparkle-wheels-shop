@@ -62,13 +62,15 @@ Deno.serve(async (req) => {
   }
 
   let sent = 0
-  for (const a of (appts || [])) {
-    const naam = a.customer?.voornaam || a.aanvrager_voornaam || ''
-    const email = a.customer?.email || a.aanvrager_email || ''
+  for (const a of ((appts || []) as any[])) {
+    const customer: any = Array.isArray(a.customer) ? a.customer[0] : a.customer
+    const vehicle: any = Array.isArray(a.vehicle) ? a.vehicle[0] : a.vehicle
+    const naam = customer?.voornaam || a.aanvrager_voornaam || ''
+    const email = customer?.email || a.aanvrager_email || ''
     if (!email) continue
 
     const dt = new Date(a.datum_tijd)
-    const voertuig = a.vehicle ? `${a.vehicle.merk} ${a.vehicle.model}${a.vehicle.kenteken ? ` (${a.vehicle.kenteken})` : ''}` : ''
+    const voertuig = vehicle ? `${vehicle.merk} ${vehicle.model}${vehicle.kenteken ? ` (${vehicle.kenteken})` : ''}` : ''
 
     await supabase.functions.invoke('send-transactional-email', {
       body: {
