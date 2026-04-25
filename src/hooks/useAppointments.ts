@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export type AppointmentType = "bezichtiging" | "proefrit" | "terugbelafspraak" | "aflevering" | "ophalen" | "onderhoud" | "anders";
+export type AppointmentType = "bezichtiging" | "proefrit" | "terugbelafspraak" | "aflevering" | "ophalen" | "onderhoud" | "anders" | "poetsbeurt";
 export type AppointmentStatus = "gepland" | "voltooid" | "geannuleerd";
 
 export interface Appointment {
@@ -21,6 +21,15 @@ export interface Appointment {
   google_event_id: string | null;
   created_at: string;
   updated_at: string;
+  bron?: string | null;
+  is_aanvraag?: boolean;
+  aanvraag_omschrijving?: string | null;
+  voorkeursdatum?: string | null;
+  aanvrager_voornaam?: string | null;
+  aanvrager_achternaam?: string | null;
+  aanvrager_telefoon?: string | null;
+  aanvrager_email?: string | null;
+  aanvrager_kenteken?: string | null;
   // Joined
   customer?: { id: string; voornaam: string; achternaam: string; telefoon: string; email: string } | null;
   vehicle?: { id: string; merk: string; model: string; kenteken: string | null } | null;
