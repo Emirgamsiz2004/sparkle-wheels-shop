@@ -715,12 +715,12 @@ const AdminVerkoopWizardPage = () => {
           </div>
 
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            {STEPS.map((step) => {
+            {STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9)).map((step, visibleIdx) => {
+              const displayNum = visibleIdx + 1;
               const blocked = isStepBlocked(step.num, completed, inruil);
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
-              const nvt = step.optional && !inruil;
-              const hasIssues = !nvt && !blocked && stepHasIssues(step.num);
+              const hasIssues = !blocked && stepHasIssues(step.num);
               // Slot tonen bij betalingsblokkade (stap 9-12, betaling niet bevestigd)
               const lockedByPayment =
                 blocked && step.num >= 9 && step.num <= 12 && !completed[8] && !!completed[5];
@@ -752,16 +752,15 @@ const AdminVerkoopWizardPage = () => {
                       <AlertTriangle className="w-3.5 h-3.5" />
                     ) : done ? (
                       <Check className="w-3.5 h-3.5" />
-                    ) : nvt || lockedByPayment ? (
+                    ) : lockedByPayment ? (
                       <Lock className="w-3 h-3" />
                     ) : (
-                      step.num
+                      displayNum
                     )}
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-[13px] font-medium truncate">{step.title}</span>
-                    {nvt && <span className="block text-[10px] text-muted-foreground mt-0.5">Nvt</span>}
-                    {hasIssues && !nvt && (
+                    {hasIssues && (
                       <span className="block text-[10px] text-amber-400/80 mt-0.5">Ontbrekende info</span>
                     )}
                   </span>
