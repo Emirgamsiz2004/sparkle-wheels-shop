@@ -20,6 +20,7 @@ import { useMoneybird } from "@/hooks/useMoneybird";
 import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
 import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
 import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
+import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
@@ -182,6 +183,12 @@ const AdminVerkoopWizardPage = () => {
   const [factuurVerstuurd, setFactuurVerstuurd] = useState<boolean>(false);
   const [factuurEmail, setFactuurEmail] = useState<string | null>(null);
 
+  // Stap 8 state — Betaling
+  const [betalingDatum, setBetalingDatum] = useState<string | null>(null);
+  const [betalingOpmerking, setBetalingOpmerking] = useState<string | null>(null);
+  const [moneybirdPaymentId, setMoneybirdPaymentId] = useState<string | null>(null);
+  const [betalingOntvangen, setBetalingOntvangen] = useState<boolean>(false);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
@@ -337,6 +344,11 @@ const AdminVerkoopWizardPage = () => {
         setFactuurEmailVerzondenOp((e.factuur_email_verzonden_op as string) || null);
         setFactuurVerstuurd(!!(e as any).factuur_verstuurd);
         setFactuurEmail(((e as any).factuur_email as string) || null);
+        // Stap 8 hydration — Betaling
+        setBetalingDatum((e.betaling_datum as string) || null);
+        setBetalingOpmerking(((e as any).betaling_opmerking as string) || null);
+        setMoneybirdPaymentId(((e as any).moneybird_payment_id as string) || null);
+        setBetalingOntvangen(!!(e as any).betaling_ontvangen);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -558,7 +570,13 @@ const AdminVerkoopWizardPage = () => {
   };
 
   const handleStepClick = (stap: number) => {
-    if (isStepBlocked(stap, completed, inruil)) return;
+    if (isStepBlocked(stap, completed, inruil)) {
+      // Specifieke melding bij betalingsblokkade
+      if (stap >= 9 && stap <= 12 && !completed[8] && completed[5]) {
+        toast.error("Betaling moet eerst bevestigd worden.");
+      }
+      return;
+    }
     setActiveStap(stap);
   };
 
@@ -684,17 +702,20 @@ const AdminVerkoopWizardPage = () => {
               const active = step.num === activeStap;
               const nvt = step.optional && !inruil;
               const hasIssues = !nvt && !blocked && stepHasIssues(step.num);
+              // Slot tonen bij betalingsblokkade (stap 9-12, betaling niet bevestigd)
+              const lockedByPayment =
+                blocked && step.num >= 9 && step.num <= 12 && !completed[8] && !!completed[5];
 
               return (
                 <button
                   key={step.key}
                   onClick={() => handleStepClick(step.num)}
-                  disabled={blocked}
                   className={[
                     "w-full text-left px-3 py-2.5 flex items-center gap-3 rounded-[10px] transition-colors",
                     active && !blocked ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
                     !active && !blocked ? "hover:bg-sidebar-accent/50 text-sidebar-foreground" : "",
-                    blocked ? "opacity-40 cursor-not-allowed text-sidebar-foreground" : "",
+                    blocked && !lockedByPayment ? "opacity-40 cursor-not-allowed text-sidebar-foreground" : "",
+                    lockedByPayment ? "opacity-60 cursor-not-allowed text-sidebar-foreground hover:bg-sidebar-accent/30" : "",
                   ].join(" ")}
                 >
                   <span
@@ -704,14 +725,15 @@ const AdminVerkoopWizardPage = () => {
                       hasIssues && !active ? "bg-amber-500/15 border-amber-500/40 text-amber-400" : "",
                       hasIssues && active ? "bg-amber-500/20 border-amber-500/60 text-amber-300" : "",
                       !done && !hasIssues && active ? "bg-foreground/10 border-foreground/40 text-foreground" : "",
-                      !done && !hasIssues && !active ? "border-sidebar-border text-sidebar-foreground/60" : "",
+                      !done && !hasIssues && !active && !lockedByPayment ? "border-sidebar-border text-sidebar-foreground/60" : "",
+                      lockedByPayment ? "border-sidebar-border text-sidebar-foreground/60" : "",
                     ].join(" ")}
                   >
                     {hasIssues ? (
                       <AlertTriangle className="w-3.5 h-3.5" />
                     ) : done ? (
                       <Check className="w-3.5 h-3.5" />
-                    ) : nvt ? (
+                    ) : nvt || lockedByPayment ? (
                       <Lock className="w-3 h-3" />
                     ) : (
                       step.num
@@ -1052,7 +1074,43 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 7 && (
+            {activeStap === 8 && (
+              <Stap8Betaling
+                verkoopId={verkoopId}
+                voertuigKenteken={vehicle?.kenteken || ""}
+                voertuigMerk={vehicle?.merk || ""}
+                voertuigModel={vehicle?.model || ""}
+                factuurMbId={factuurMbId}
+                factuurMbNummer={factuurMbNummer}
+                factuurTotaal={
+                  verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum
+                }
+                aanbetalingBedrag={aanbetalingNum}
+                initialBetaaldatum={betalingDatum}
+                initialBetaalwijze={restBetaalwijze}
+                initialBetaalwijzeDetails={betaalwijzeDetails as any}
+                initialBetalingOpmerking={betalingOpmerking}
+                initialMoneybirdPaymentId={moneybirdPaymentId}
+                initialBetalingOntvangen={betalingOntvangen}
+                onSaved={async (extra) => {
+                  if (extra.betaling_datum !== undefined) setBetalingDatum(extra.betaling_datum);
+                  if (extra.betaling_opmerking !== undefined)
+                    setBetalingOpmerking(extra.betaling_opmerking);
+                  if (extra.moneybird_payment_id !== undefined)
+                    setMoneybirdPaymentId(extra.moneybird_payment_id);
+                  if (extra.betaling_ontvangen !== undefined)
+                    setBetalingOntvangen(!!extra.betaling_ontvangen);
+                  if (extra.betaalwijze_details !== undefined)
+                    setBetaalwijzeDetails(extra.betaalwijze_details || []);
+                  if (extra.stap8_afgerond) {
+                    setCompleted((p) => ({ ...p, 8: true }));
+                  }
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 8 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.

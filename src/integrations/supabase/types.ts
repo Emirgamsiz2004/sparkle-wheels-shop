@@ -2348,6 +2348,7 @@ export type Database = {
           betaalwijze_details: Json | null
           betaling_datum: string | null
           betaling_ontvangen: boolean | null
+          betaling_opmerking: string | null
           contract_getekend: boolean | null
           contract_getekend_datum: string | null
           created_at: string | null
@@ -2395,6 +2396,7 @@ export type Database = {
           moneybird_factuur_id: string | null
           moneybird_factuur_nummer: string | null
           moneybird_factuur_url: string | null
+          moneybird_payment_id: string | null
           opmerkingen: string | null
           overboeking_bedrag: number | null
           overeenkomstnummer: string | null
@@ -2441,6 +2443,7 @@ export type Database = {
           betaalwijze_details?: Json | null
           betaling_datum?: string | null
           betaling_ontvangen?: boolean | null
+          betaling_opmerking?: string | null
           contract_getekend?: boolean | null
           contract_getekend_datum?: string | null
           created_at?: string | null
@@ -2488,6 +2491,7 @@ export type Database = {
           moneybird_factuur_id?: string | null
           moneybird_factuur_nummer?: string | null
           moneybird_factuur_url?: string | null
+          moneybird_payment_id?: string | null
           opmerkingen?: string | null
           overboeking_bedrag?: number | null
           overeenkomstnummer?: string | null
@@ -2534,6 +2538,7 @@ export type Database = {
           betaalwijze_details?: Json | null
           betaling_datum?: string | null
           betaling_ontvangen?: boolean | null
+          betaling_opmerking?: string | null
           contract_getekend?: boolean | null
           contract_getekend_datum?: string | null
           created_at?: string | null
@@ -2581,6 +2586,7 @@ export type Database = {
           moneybird_factuur_id?: string | null
           moneybird_factuur_nummer?: string | null
           moneybird_factuur_url?: string | null
+          moneybird_payment_id?: string | null
           opmerkingen?: string | null
           overboeking_bedrag?: number | null
           overeenkomstnummer?: string | null

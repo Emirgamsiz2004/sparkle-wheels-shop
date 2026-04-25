@@ -588,6 +588,43 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── Betaling registreren op een verkoopfactuur ───
+      case "register_payment_invoice": {
+        const {
+          invoice_id: payInvoiceId,
+          payment_date,
+          price,
+          financial_account_id,
+          financial_mutation_id,
+          payment_method,
+        } = params;
+        if (!payInvoiceId) throw new Error("invoice_id is required");
+        if (price == null) throw new Error("price is required");
+
+        const payment: Record<string, unknown> = {
+          payment_date: payment_date || new Date().toISOString().slice(0, 10),
+          price: String(price),
+        };
+        if (financial_account_id) payment.financial_account_id = String(financial_account_id);
+        if (financial_mutation_id) payment.financial_mutation_id = String(financial_mutation_id);
+        if (payment_method) payment.payment_method = String(payment_method);
+
+        result = await mbFetch(
+          `sales_invoices/${payInvoiceId}/payments.json`,
+          {
+            method: "POST",
+            body: JSON.stringify({ payment }),
+          },
+        );
+        break;
+      }
+
+      // ─── Lijst van financial accounts (kas / bank) ───
+      case "get_financial_accounts": {
+        result = await mbFetch("financial_accounts.json");
+        break;
+      }
+
       // ─── Factuur PDF downloaden ───
       case "download_invoice_pdf": {
         const { invoice_id: pdfInvoiceId } = params;
