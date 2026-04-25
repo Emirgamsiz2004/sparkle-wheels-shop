@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 
 import { useNavigate, Link } from "react-router-dom";
-import { Plus, Search, Loader2, ChevronRight, RefreshCw, AlertTriangle, FileWarning } from "lucide-react";
+import { Plus, Search, Loader2, ChevronRight, RefreshCw, AlertTriangle, FileWarning, ShieldCheck } from "lucide-react";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
 import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors, Vehicle } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -10,6 +10,7 @@ import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { getApkStatus } from "@/components/admin/detail/VehicleOverzichtTab";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { recheckApk } from "@/lib/apkRecheck";
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "alle", label: "Alle statussen" },
@@ -28,6 +29,8 @@ const AdminVoertuigenPage = () => {
   const [statusFilter, setStatusFilter] = useState("alle");
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
+  const [apkRefreshing, setApkRefreshing] = useState(false);
+  const [apkProgress, setApkProgress] = useState({ done: 0, total: 0 });
   const isMobile = useIsMobile();
   const [consignatieWarningCount, setConsignatieWarningCount] = useState(0);
 
@@ -78,6 +81,28 @@ const AdminVoertuigenPage = () => {
     setSyncing(false);
   };
 
+  const handleApkRefresh = async () => {
+    const targets = vehicles.filter((v) => v.status !== "verkocht" && !!v.kenteken);
+    if (targets.length === 0) {
+      toast.info("Geen voertuigen om te vernieuwen");
+      return;
+    }
+    setApkRefreshing(true);
+    setApkProgress({ done: 0, total: targets.length });
+    let updated = 0;
+    for (let i = 0; i < targets.length; i++) {
+      const v = targets[i];
+      try {
+        const result = await recheckApk(v.id, v.kenteken, v.apkVervaldatum);
+        if (result) updated++;
+      } catch { /* skip */ }
+      setApkProgress({ done: i + 1, total: targets.length });
+    }
+    setApkRefreshing(false);
+    toast.success(`APK vernieuwd: ${updated} voertuig${updated !== 1 ? "en" : ""} bijgewerkt`);
+    if (updated > 0) refetch();
+  };
+
   const filtered = vehicles.filter((v) => {
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
     if (search) {
@@ -118,6 +143,17 @@ const AdminVoertuigenPage = () => {
           <p className="text-sm text-muted-foreground">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleApkRefresh}
+            disabled={apkRefreshing}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
+            title="APK data vernieuwen via RDW"
+          >
+            <ShieldCheck className={`w-3.5 h-3.5 ${apkRefreshing ? "animate-pulse" : ""}`} />
+            <span className="hidden sm:inline">
+              {apkRefreshing ? `APK ${apkProgress.done}/${apkProgress.total}` : "APK vernieuwen"}
+            </span>
+          </button>
           <button
             onClick={handleSync}
             disabled={syncing}
