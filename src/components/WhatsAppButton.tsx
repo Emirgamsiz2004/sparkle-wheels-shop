@@ -1,42 +1,70 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle } from "lucide-react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { Calendar } from "lucide-react";
+import AfspraakStickyPopover from "./AfspraakStickyPopover";
 
+const HIDE_PATHS = ["/afspraak", "/admin", "/proefrit/"];
+
+/**
+ * Sticky "Afspraak maken" knop op de publieke website.
+ * Bij klikken morpht de pill-knop vloeiend naar de afspraak-popover
+ * (gedeelde layoutId "afspraak-cta").
+ */
 const WhatsAppButton = () => {
   const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
   const location = useLocation();
 
-  const isAdmin = location.pathname.startsWith("/admin");
+  const hidden = HIDE_PATHS.some((p) => location.pathname.startsWith(p));
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 800);
-    return () => clearTimeout(timer);
-  }, []);
+    if (hidden) { setVisible(false); return; }
+    const t = setTimeout(() => setVisible(true), 600);
+    return () => clearTimeout(t);
+  }, [hidden]);
 
-  if (isAdmin) return null;
+  useEffect(() => { setOpen(false); }, [location.pathname]);
+
+  if (hidden) return null;
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.a
-          href="https://wa.me/31612693825"
-          target="_blank"
-          rel="noopener noreferrer"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="fixed bottom-5 right-5 z-50 group h-10 rounded-full bg-foreground text-background flex items-center gap-0 hover:gap-2 px-3 hover:px-4 hover:bg-primary hover:text-primary-foreground transition-all duration-300 ease-out shadow-lg shadow-foreground/20 overflow-hidden"
-          aria-label="WhatsApp"
-        >
-          <MessageCircle className="w-4 h-4 shrink-0" />
-          <span className="max-w-0 group-hover:max-w-[120px] overflow-hidden whitespace-nowrap text-[10px] font-semibold tracking-[0.1em] uppercase transition-all duration-300 ease-out opacity-0 group-hover:opacity-100">
-            Stel een vraag
-          </span>
-        </motion.a>
-      )}
-    </AnimatePresence>
+    <LayoutGroup>
+      <AnimatePresence mode="popLayout">
+        {visible && !open && (
+          <motion.button
+            key="cta-btn"
+            layoutId="afspraak-cta"
+            onClick={() => setOpen(true)}
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{ borderRadius: 9999 }}
+            className="fixed z-50 inline-flex items-center justify-center gap-2
+              bottom-4 left-1/2 -translate-x-1/2 w-auto
+              md:left-auto md:translate-x-0 md:right-5 md:bottom-5
+              px-5 py-3 bg-primary text-primary-foreground font-semibold text-sm
+              shadow-lg shadow-primary/30 hover:scale-[1.03] transition-transform"
+            aria-label="Afspraak maken"
+          >
+            <motion.span
+              layout="position"
+              className="inline-flex items-center gap-2"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            >
+              <Calendar className="w-4 h-4" />
+              Afspraak maken
+            </motion.span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {open && <AfspraakStickyPopover open={open} onClose={() => setOpen(false)} />}
+      </AnimatePresence>
+    </LayoutGroup>
   );
 };
 
