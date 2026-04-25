@@ -4,13 +4,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet,
-  Settings, LogOut, Users, Clock, CalendarDays, BadgeDollarSign, Inbox, ClipboardCheck,
+  Settings, LogOut, Users, Clock, CalendarDays, BadgeDollarSign, Inbox, ClipboardCheck, Menu,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
-import MobileBottomBar, { getMobilePageTitle } from "@/components/admin/MobileBottomBar";
+import MobileSidebar, { getMobilePageTitle } from "@/components/admin/MobileSidebar";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
