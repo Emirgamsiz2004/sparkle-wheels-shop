@@ -59,6 +59,12 @@ const Stap8Betaling = ({
   voertuigKenteken,
   voertuigMerk,
   voertuigModel,
+  voertuigBouwjaar,
+  klantVoornaam,
+  klantAchternaam,
+  klantAdres,
+  klantPostcode,
+  klantWoonplaats,
   factuurMbId,
   factuurMbNummer,
   factuurTotaal,
@@ -69,6 +75,8 @@ const Stap8Betaling = ({
   initialBetalingOpmerking,
   initialMoneybirdPaymentId,
   initialBetalingOntvangen,
+  initialRestbedragLater,
+  initialRestbedragVerwachteDatum,
   onSaved,
 }: Props) => {
   const { invoke, loading: mbLoading } = useMoneybird();
