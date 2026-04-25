@@ -208,7 +208,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
       )}
       <button
         onClick={() => onOpenChange(false)}
-        className="absolute top-2 right-2 z-10 h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors"
+        className="absolute top-3 right-3 z-10 h-7 w-7 inline-flex items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground hover:bg-accent/40 transition-colors"
         aria-label="Sluiten"
       >
         <X className="w-4 h-4" />
@@ -222,229 +222,124 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="p-4"
+              style={{ padding: 18 }}
             >
-              {/* Section 1 — Afspraakinfo */}
-              <div className="space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
-                </div>
-                <div className="text-base font-semibold leading-tight">
-                  {format(dt, "EEEE d MMMM", { locale: nl })}
-                  <span className="text-muted-foreground font-normal"> · </span>
-                  {format(dt, "HH:mm", { locale: nl })}
-                  {appointment.eind_datum_tijd && <span className="text-muted-foreground font-normal"> – {format(new Date(appointment.eind_datum_tijd), "HH:mm")}</span>}
-                </div>
-                {appointment.vehicle && (
-                  <button
-                    onClick={goToVehicle}
-                    className="flex items-center gap-1.5 text-sm text-foreground hover:text-primary transition-colors text-left"
-                  >
-                    <Car className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <span className="truncate">
-                      {appointment.vehicle.merk} {appointment.vehicle.model}
-                      {appointment.vehicle.kenteken && <span className="text-muted-foreground"> · {appointment.vehicle.kenteken}</span>}
-                    </span>
-                  </button>
-                )}
-                {appointment.notities && (
-                  <p className="text-xs text-muted-foreground bg-muted/40 rounded-md p-2 leading-snug">{appointment.notities}</p>
+              {/* 1. Header — type badge */}
+              <div className="flex items-center justify-between gap-2 mb-3 pr-7">
+                <span className={cn("inline-flex items-center px-2.5 py-1 rounded-[8px] border text-[11px] font-medium", typeColors[appointment.type])}>
+                  {typeLabels[appointment.type]}
+                </span>
+              </div>
+
+              {/* 2. Datum + tijd */}
+              <div className="text-[15px] font-semibold text-foreground leading-tight mb-3">
+                {format(dt, "EEEE d MMMM", { locale: nl })}
+                <span className="text-muted-foreground font-normal"> · </span>
+                {format(dt, "HH:mm", { locale: nl })}
+                {appointment.eind_datum_tijd && (
+                  <span className="text-muted-foreground font-normal"> – {format(new Date(appointment.eind_datum_tijd), "HH:mm")}</span>
                 )}
               </div>
 
-              <div className="my-3 border-t border-border/60" />
+              {/* 3. Voertuig */}
+              {appointment.vehicle && (
+                <button
+                  onClick={goToVehicle}
+                  className="group flex items-center gap-2 text-sm text-foreground hover:text-emerald-400 transition-colors text-left mb-3 w-full"
+                >
+                  <Car className="w-4 h-4 text-muted-foreground group-hover:text-emerald-400 shrink-0 transition-colors" />
+                  <span className="truncate">
+                    {appointment.vehicle.merk} {appointment.vehicle.model}
+                    {appointment.vehicle.kenteken && <span className="text-muted-foreground group-hover:text-emerald-400/80"> · {appointment.vehicle.kenteken}</span>}
+                  </span>
+                </button>
+              )}
 
-              {/* Section 2 — Klantinfo */}
-              <div className="space-y-2">
+              {/* 4. Klant */}
+              <div className="mb-1">
                 {customerName ? (
                   <>
-                    <div className="flex items-center gap-1.5 text-sm">
-                      <User className="w-3.5 h-3.5 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-sm text-foreground mb-1.5">
+                      <User className="w-4 h-4 text-muted-foreground shrink-0" />
                       <span className="font-medium truncate">{customerName}</span>
                     </div>
                     {appointment.customer?.telefoon && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 pl-6">
                         <a
                           href={`tel:${appointment.customer.telefoon}`}
-                          className="flex-1 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border text-xs hover:bg-accent/40 transition-colors"
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                         >
-                          <Phone className="w-3.5 h-3.5" />
-                          <span className="truncate">{appointment.customer.telefoon}</span>
+                          {appointment.customer.telefoon}
                         </a>
                         {waNumber && (
                           <a
                             href={`https://wa.me/${waNumber}?text=${waMessage}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center h-[30px] w-[30px] rounded-md border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                            className="inline-flex items-center justify-center text-emerald-400 hover:text-emerald-300 transition-colors"
                             aria-label="WhatsApp"
                           >
-                            <MessageCircle className="w-3.5 h-3.5" />
+                            <MessageCircle className="w-4 h-4" />
                           </a>
                         )}
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="text-xs text-muted-foreground">Geen klant gekoppeld</div>
+                  <div className="text-sm text-muted-foreground/70">Geen klant gekoppeld</div>
                 )}
               </div>
 
-              <div className="my-3 border-t border-border/60" />
+              {/* divider */}
+              <div className="my-4 h-px bg-border/40" />
 
-              {/* Section 3 — Status */}
-              <div className="grid grid-cols-3 gap-1.5">
+              {/* 6. Status knoppen */}
+              <div className="grid grid-cols-3 gap-2">
                 {[
-                  { v: "gepland" as AppointmentStatus, label: "Bevestigd", icon: Check, active: "bg-emerald-500/15 text-emerald-400 border-emerald-500/40", base: "text-muted-foreground border-border" },
-                  { v: "voltooid" as AppointmentStatus, label: "Afgerond", icon: CheckCircle2, active: "bg-muted text-foreground border-border", base: "text-muted-foreground border-border" },
-                  { v: "geannuleerd" as AppointmentStatus, label: "No-show", icon: XCircle, active: "bg-orange-500/15 text-orange-400 border-orange-500/40", base: "text-muted-foreground border-border" },
-                ].map(({ v, label, icon: Icon, active, base }) => {
+                  { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40" },
+                  { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/15 text-foreground border-muted-foreground/40" },
+                  { v: "geannuleerd" as AppointmentStatus, label: "No-show", active: "bg-orange-500/15 text-orange-300 border-orange-500/40" },
+                ].map(({ v, label, active }) => {
                   const isActive = appointment.status === v;
                   return (
                     <button
                       key={v}
                       onClick={() => setStatus(v)}
                       className={cn(
-                        "flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-md border text-[10px] font-medium transition-colors hover:bg-accent/30",
-                        isActive ? active : base
+                        "py-2 rounded-[10px] border text-[11px] font-medium transition-colors",
+                        isActive ? active : "bg-transparent text-foreground border-border/60 hover:bg-accent/30"
                       )}
                     >
-                      <Icon className="w-3 h-3" />
                       {label}
                     </button>
                   );
                 })}
               </div>
 
-              <div className="my-3 border-t border-border/60" />
+              {/* divider */}
+              <div className="my-4 h-px bg-border/40" />
 
-              {/* Section 4 — Acties */}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
-                <button onClick={startEdit} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                  <Pencil className="w-3 h-3" /> Bewerken
-                </button>
-                {appointment.vehicle && (
-                  <button onClick={goToVehicle} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                    <Car className="w-3 h-3" /> Naar voertuig
+              {/* 8. Acties */}
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3">
+                  <button onClick={startEdit} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                    <Pencil className="w-3.5 h-3.5" /> Bewerken
                   </button>
-                )}
-                {appointment.customer && (
-                  <button onClick={goToCustomer} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                    <User className="w-3 h-3" /> Naar klant
-                  </button>
-                )}
+                  {appointment.vehicle && (
+                    <button onClick={goToVehicle} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                      <Car className="w-3.5 h-3.5" /> Naar voertuig
+                    </button>
+                  )}
+                </div>
                 <button
                   onClick={() => setConfirmDelete(true)}
-                  className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1 ml-auto"
+                  className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1"
                 >
-                  <Trash2 className="w-3 h-3" /> Verwijderen
+                  <Trash2 className="w-3.5 h-3.5" /> Verwijderen
                 </button>
               </div>
             </motion.div>
           </AnimatePresence>
-        ) : (
-          <div className="p-4">
-            <div className="mb-2 flex items-center gap-2 text-sm">
-              <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
-              <span className="text-muted-foreground font-normal">Bewerken</span>
-            </div>
-
-            <motion.div
-              key="edit"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-4 pt-1"
-            >
-              {/* Status */}
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">Status</Label>
-                <Select value={editStatus} onValueChange={(v) => setEditStatus(v as AppointmentStatus)}>
-                  <SelectTrigger className="rounded-[3px] h-10"><SelectValue /></SelectTrigger>
-                  <SelectContent className="rounded-[3px]">
-                    {statusOptions.map((s) => (
-                      <SelectItem key={s.value} value={s.value} className="rounded-[3px]">{s.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Date & Time */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">Datum</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn("w-full justify-start text-left font-normal rounded-[3px] h-10", !editDate && "text-muted-foreground")}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4 opacity-60" />
-                        {editDate ? format(editDate, "d MMM yyyy", { locale: nl }) : "Kies datum"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 rounded-[3px]" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={editDate}
-                        onSelect={setEditDate}
-                        locale={nl}
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">{editTijdvenster ? "Van" : "Tijdstip"}</Label>
-                  <Select value={editTime} onValueChange={setEditTime}>
-                    <SelectTrigger className="rounded-[3px] h-10">
-                      <Clock className="mr-2 h-4 w-4 opacity-60" />
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-[3px] max-h-[240px]">
-                      {timeSlots.map((t) => (
-                        <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Tijdvenster toggle */}
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setEditTijdvenster(!editTijdvenster)}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
-                >
-                  {editTijdvenster ? "Exact tijdstip" : "Tijdsvenster (van-tot)"}
-                </button>
-              </div>
-
-              <AnimatePresence>
-                {editTijdvenster && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Label className="text-xs text-muted-foreground mb-1.5 block">Tot</Label>
-                    <Select value={editEindTime || timeSlots.find(t => t > editTime) || "17:00"} onValueChange={setEditEindTime}>
-                      <SelectTrigger className="rounded-[3px] h-10">
-                        <Clock className="mr-2 h-4 w-4 opacity-60" />
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-[3px] max-h-[240px]">
-                        {timeSlots.filter(t => t > editTime).map((t) => (
-                          <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
               {/* Onderwerp (terugbelafspraak) */}
               <AnimatePresence>
