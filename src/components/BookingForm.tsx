@@ -34,6 +34,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [date, setDate] = useState<Date>();
   const [tijd, setTijd] = useState("");
+  const [dateOpen, setDateOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
 
@@ -106,7 +107,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
       <div className="grid sm:grid-cols-2 gap-5">
         <div>
           <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Voorkeursdatum</label>
-          <Popover>
+          <Popover open={dateOpen} onOpenChange={setDateOpen}>
             <PopoverTrigger asChild>
               <button
                 type="button"
@@ -123,7 +124,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={setDate}
+                onSelect={(d) => { setDate(d); setDateOpen(false); }}
                 disabled={(d) => d < new Date() || d.getDay() === 0}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}

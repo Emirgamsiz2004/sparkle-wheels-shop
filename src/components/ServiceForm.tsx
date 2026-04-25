@@ -36,6 +36,7 @@ const ServiceForm = ({ dienst }: ServiceFormProps) => {
   const [formData, setFormData] = useState({ naam: "", telefoon: "", auto: "", omschrijving: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [date, setDate] = useState<Date>();
+  const [dateOpen, setDateOpen] = useState(false);
   const [tijd, setTijd] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
@@ -159,7 +160,7 @@ const ServiceForm = ({ dienst }: ServiceFormProps) => {
           <div className="grid sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Voorkeursdatum</label>
-              <Popover>
+              <Popover open={dateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
@@ -176,7 +177,7 @@ const ServiceForm = ({ dienst }: ServiceFormProps) => {
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={(d) => { setDate(d); setDateOpen(false); }}
                     disabled={(d) => d < new Date() || d.getDay() === 0}
                     initialFocus
                     className={cn("p-3 pointer-events-auto")}
