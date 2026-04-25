@@ -206,6 +206,18 @@ const AdminVerkoopWizardPage = () => {
   const [tenaamstellingBevestigd, setTenaamstellingBevestigd] = useState<boolean>(false);
   const [tenaamstellingDatum, setTenaamstellingDatum] = useState<string | null>(null);
 
+  // Stap 11 state — Uitlevering
+  const [autoSchoongemaakt, setAutoSchoongemaakt] = useState<boolean>(false);
+  const [apkGecommuniceerd, setApkGecommuniceerd] = useState<boolean>(false);
+  const [sleutelsOverhandigd, setSleutelsOverhandigd] = useState<boolean>(false);
+  const [sleutelsAantal, setSleutelsAantal] = useState<number | null>(null);
+  const [gebrekenBesproken, setGebrekenBesproken] = useState<boolean>(false);
+  const [gebrekenOmschrijving, setGebrekenOmschrijving] = useState<string | null>(null);
+  const [tenaamstellingsbewijsMeegegeven, setTenaamstellingsbewijsMeegegeven] = useState<boolean>(false);
+  const [uitleveringFotos, setUitleveringFotos] = useState<string[]>([]);
+  const [uitleveringDatum, setUitleveringDatum] = useState<string | null>(null);
+  const [uitleveringVoltooid, setUitleveringVoltooid] = useState<boolean>(false);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
