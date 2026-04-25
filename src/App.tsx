@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import AfspraakStickyButton from "@/components/AfspraakStickyButton";
+
 import Afspraak from "./pages/Afspraak";
 import Index from "./pages/Index";
 import Blog from "./pages/Blog";
