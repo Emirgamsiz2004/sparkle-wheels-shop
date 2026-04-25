@@ -667,7 +667,7 @@ const Stap8Betaling = ({
               <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
                 Uiterlijk te voldoen op
               </label>
-              <Popover>
+              <Popover open={verwachteDatumOpen} onOpenChange={setVerwachteDatumOpen}>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
@@ -686,7 +686,10 @@ const Stap8Betaling = ({
                     mode="single"
                     selected={verwachteDatum ? parseISO(verwachteDatum) : undefined}
                     onSelect={(d) => {
-                      if (d) handleVerwachteDatumChange(format(d, "yyyy-MM-dd"));
+                      if (d) {
+                        handleVerwachteDatumChange(format(d, "yyyy-MM-dd"));
+                        setVerwachteDatumOpen(false);
+                      }
                     }}
                     initialFocus
                   />
