@@ -405,20 +405,21 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                 )}
               </AnimatePresence>
 
-              {/* Notities */}
+              {/* Notities — autosize */}
               <div>
                 <Label className="text-xs text-muted-foreground mb-1.5 block">Notities <span className="opacity-50">(optioneel)</span></Label>
                 <Textarea
+                  ref={notitiesRef}
                   value={form.notities}
                   onChange={(e) => setForm({ ...form, notities: e.target.value })}
                   placeholder="Eventuele opmerkingen"
                   rows={2}
-                  className="rounded-[3px]"
+                  className="rounded-[3px] resize-none overflow-hidden min-h-[60px] transition-[height] duration-150"
                 />
               </div>
 
               {/* Submit */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <Button
                   className="w-full rounded-[3px] bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
                   onClick={handleSubmit}
@@ -430,8 +431,9 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
             </motion.div>
           )}
         </AnimatePresence>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>,
+    document.body
   );
 };
 
