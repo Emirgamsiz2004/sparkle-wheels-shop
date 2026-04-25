@@ -380,6 +380,10 @@ const AdminVerkoopWizardPage = () => {
         setBetalingOntvangen(!!(e as any).betaling_ontvangen);
         setRestbedragLater(!!(e as any).restbedrag_later);
         setRestbedragVerwachteDatum(((e as any).restbedrag_verwachte_datum as string) || null);
+        if ((e as any).restbedrag_later) {
+          const r = (e as any).restbedrag;
+          setOpenstaandRestbedrag(typeof r === "number" ? r : r ? Number(r) : null);
+        }
         // Stap 9 hydration — Inruil op naam
         setInruilOpNaam(!!(e as any).inruil_op_naam);
         setInruilOpNaamAt(((e as any).inruil_op_naam_at as string) || null);
