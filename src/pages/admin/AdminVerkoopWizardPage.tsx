@@ -1131,6 +1131,12 @@ const AdminVerkoopWizardPage = () => {
                 voertuigKenteken={vehicle?.kenteken || ""}
                 voertuigMerk={vehicle?.merk || ""}
                 voertuigModel={vehicle?.model || ""}
+                voertuigBouwjaar={vehicle?.bouwjaar ?? null}
+                klantVoornaam={klantVoornaam}
+                klantAchternaam={klantAchternaam}
+                klantAdres={klantAdres}
+                klantPostcode={klantPostcode}
+                klantWoonplaats={klantWoonplaats}
                 factuurMbId={factuurMbId}
                 factuurMbNummer={factuurMbNummer}
                 factuurTotaal={
@@ -1143,6 +1149,8 @@ const AdminVerkoopWizardPage = () => {
                 initialBetalingOpmerking={betalingOpmerking}
                 initialMoneybirdPaymentId={moneybirdPaymentId}
                 initialBetalingOntvangen={betalingOntvangen}
+                initialRestbedragLater={restbedragLater}
+                initialRestbedragVerwachteDatum={restbedragVerwachteDatum}
                 onSaved={async (extra) => {
                   if (extra.betaling_datum !== undefined) setBetalingDatum(extra.betaling_datum);
                   if (extra.betaling_opmerking !== undefined)
