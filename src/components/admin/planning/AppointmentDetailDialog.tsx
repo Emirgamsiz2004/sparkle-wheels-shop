@@ -348,23 +348,86 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
               <div className="my-4 h-px bg-border/40" />
 
               {/* 8. Acties */}
-              <div className="flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <button onClick={startEdit} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                    <Pencil className="w-3.5 h-3.5" /> Bewerken
-                  </button>
-                  {appointment.vehicle && (
-                    <button onClick={goToVehicle} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                      <Car className="w-3.5 h-3.5" /> Naar voertuig
+              <div className="space-y-2.5">
+                {/* Bellen + WhatsApp */}
+                {appointment.customer?.telefoon && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <a
+                      href={`tel:${appointment.customer.telefoon}`}
+                      className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-[10px] border border-border/60 text-xs text-foreground hover:bg-accent/40 transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5" /> Bellen
+                    </a>
+                    {waNumber ? (
+                      <a
+                        href={`https://wa.me/${waNumber}?text=${waMessage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-[10px] border border-emerald-500/40 text-xs text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                      </a>
+                    ) : <span />}
+                  </div>
+                )}
+
+                {/* Type-specifieke extra acties */}
+                {appointment.type === "bezichtiging" && appointment.vehicle && (
+                  <div className="flex flex-col gap-1.5 text-xs">
+                    {onCreate && (
+                      <button onClick={convertToProefrit} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                        <Repeat className="w-3.5 h-3.5" /> Omzetten naar proefrit
+                      </button>
+                    )}
+                    <button onClick={startVerkoop} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <ShoppingCart className="w-3.5 h-3.5" /> Verkoop starten
                     </button>
-                  )}
+                  </div>
+                )}
+                {appointment.type === "proefrit" && appointment.vehicle && (
+                  <div className="flex flex-col gap-1.5 text-xs">
+                    <button onClick={goToProefritDoc} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <FileText className="w-3.5 h-3.5" /> Proefrit document
+                    </button>
+                    <button onClick={startVerkoop} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <ShoppingCart className="w-3.5 h-3.5" /> Verkoop starten
+                    </button>
+                  </div>
+                )}
+                {(appointment.type === "ophalen" || appointment.type === "aflevering") && appointment.vehicle && (
+                  <div className="flex flex-col gap-1.5 text-xs">
+                    <button onClick={goToVerkoopList} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <ShoppingCart className="w-3.5 h-3.5" /> Naar verkoop
+                    </button>
+                  </div>
+                )}
+                {appointment.type === "onderhoud" && appointment.vehicle && (
+                  <div className="flex flex-col gap-1.5 text-xs">
+                    <button onClick={goToKosten} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <Receipt className="w-3.5 h-3.5" /> Kosten toevoegen
+                    </button>
+                  </div>
+                )}
+
+                {/* Onderste rij: Bewerken/Naar voertuig links — Verwijderen rechts */}
+                <div className="flex items-center justify-between gap-3 text-xs pt-1">
+                  <div className="flex items-center gap-3">
+                    <button onClick={startEdit} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                      <Pencil className="w-3.5 h-3.5" /> Bewerken
+                    </button>
+                    {appointment.vehicle && (
+                      <button onClick={goToVehicle} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                        <Car className="w-3.5 h-3.5" /> Naar voertuig
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setConfirmDelete(true)}
+                    className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Verwijderen
+                  </button>
                 </div>
-                <button
-                  onClick={() => setConfirmDelete(true)}
-                  className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> Verwijderen
-                </button>
               </div>
             </motion.div>
           </AnimatePresence>
