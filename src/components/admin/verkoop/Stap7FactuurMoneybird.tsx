@@ -953,6 +953,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           checked={bevestigd}
           onCheckedChange={handleBevestig}
           disabled={!factuurVerstuurd}
+          className="data-[state=unchecked]:bg-white/10 data-[state=unchecked]:border-white/30 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 [&>span]:bg-white"
         />
       </div>
     </div>
