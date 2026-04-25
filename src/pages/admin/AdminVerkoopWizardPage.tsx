@@ -24,6 +24,7 @@ import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
 import Stap9InruilOpNaam from "@/components/admin/verkoop/Stap9InruilOpNaam";
 import Stap10Vrijwaring from "@/components/admin/verkoop/Stap10Vrijwaring";
 import Stap11Uitlevering from "@/components/admin/verkoop/Stap11Uitlevering";
+import CancelVerkoopDialog from "@/components/admin/verkoop/CancelVerkoopDialog";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
@@ -101,6 +102,7 @@ const AdminVerkoopWizardPage = () => {
   const vehicle = vehicles.find((v) => v.id === vehicleId);
 
   const [verkoopId, setVerkoopId] = useState<string | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const [activeStap, setActiveStap] = useState<number>(1);
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [saving, setSaving] = useState(false);
@@ -845,8 +847,26 @@ const AdminVerkoopWizardPage = () => {
             {vehicle.kenteken && (
               <div className="text-[11px] font-mono text-muted-foreground uppercase mt-0.5">{vehicle.kenteken}</div>
             )}
+            <button
+              type="button"
+              onClick={() => setCancelOpen(true)}
+              className="mt-3 text-[11px] text-muted-foreground hover:text-destructive transition-colors underline-offset-2 hover:underline"
+            >
+              Verkoop annuleren
+            </button>
           </div>
         </aside>
+
+        <CancelVerkoopDialog
+          open={cancelOpen}
+          onOpenChange={setCancelOpen}
+          verkoopId={verkoopId}
+          vehicleId={vehicle.id}
+          kenteken={vehicle.kenteken || ""}
+          merk={vehicle.merk || ""}
+          model={vehicle.model || ""}
+          bouwjaar={vehicle.bouwjaar}
+        />
 
       {/* Hoofdinhoud */}
       <main className="ml-[280px] h-screen overflow-y-scroll wizard-content" style={{ scrollbarGutter: "stable" }}>
