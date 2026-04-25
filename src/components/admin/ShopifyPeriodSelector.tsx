@@ -322,17 +322,17 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
                 caption_label: "text-[12px] font-medium text-foreground",
                 nav: "hidden",
                 head_cell: "text-muted-foreground/70 rounded-md w-9 font-normal text-[0.7rem] uppercase",
-                cell: "h-9 w-9 text-center text-sm p-0 relative bg-transparent [&:has([aria-selected])]:bg-transparent first:[&:has([aria-selected])]:rounded-none last:[&:has([aria-selected])]:rounded-none focus-within:relative focus-within:z-20",
-                day: "h-9 w-9 p-0 font-normal text-foreground bg-transparent hover:bg-white/[0.08] hover:text-white rounded-full transition-colors aria-selected:opacity-100",
+                cell: "h-9 w-9 text-center text-sm p-0 relative bg-transparent [&:has([aria-selected])]:bg-white/[0.10] [&:has([aria-selected].day-range-start)]:rounded-l-full [&:has([aria-selected].day-range-end)]:rounded-r-full [&:has([aria-selected].day-outside)]:bg-transparent first:[&:has([aria-selected])]:rounded-l-full last:[&:has([aria-selected])]:rounded-r-full focus-within:relative focus-within:z-20",
+                day: "h-9 w-9 p-0 font-normal text-white bg-transparent hover:bg-white/[0.06] hover:text-white rounded-[8px] transition-colors aria-selected:opacity-100",
                 day_selected:
-                  "!bg-green-600 !text-white hover:!bg-green-600 focus:!bg-green-600 rounded-full",
+                  "!bg-white/[0.25] !text-white hover:!bg-white/[0.30] focus:!bg-white/[0.25] rounded-full",
                 day_range_start:
-                  "!bg-green-600 !text-white rounded-full hover:!bg-green-600",
+                  "day-range-start !bg-white/[0.25] !text-white rounded-full hover:!bg-white/[0.30]",
                 day_range_end:
-                  "!bg-green-600 !text-white rounded-full hover:!bg-green-600",
+                  "day-range-end !bg-white/[0.25] !text-white rounded-full hover:!bg-white/[0.30]",
                 day_range_middle:
-                  "!bg-green-600/15 !text-white !rounded-none hover:!bg-green-600/25",
-                day_today: "text-green-500 font-semibold",
+                  "!bg-transparent !text-white !rounded-none hover:!bg-white/[0.06]",
+                day_today: "text-white font-semibold underline underline-offset-4",
                 day_outside: "text-muted-foreground/40 opacity-100",
                 day_disabled: "text-muted-foreground/30 opacity-50 hover:bg-transparent",
               }}
