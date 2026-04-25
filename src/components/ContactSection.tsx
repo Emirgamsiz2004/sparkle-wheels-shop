@@ -31,10 +31,7 @@ const ContactSection = () => {
               Heeft u vragen of wilt u een afspraak maken? Wij helpen u graag verder.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a
-                href="tel:+31612693825"
-                className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-              >
+              <a href="tel:+31612693825" className="btn-public btn-primary-public group">
                 <Phone className="w-3.5 h-3.5" />
                 Bel Direct
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -43,7 +40,7 @@ const ContactSection = () => {
                 href="https://wa.me/31612693825"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 border border-border text-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                className="btn-public btn-secondary-public group"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
                 WhatsApp
