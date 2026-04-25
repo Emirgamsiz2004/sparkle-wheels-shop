@@ -189,6 +189,10 @@ const AdminVerkoopWizardPage = () => {
   const [moneybirdPaymentId, setMoneybirdPaymentId] = useState<string | null>(null);
   const [betalingOntvangen, setBetalingOntvangen] = useState<boolean>(false);
 
+  // Stap 9 state — Inruil op naam
+  const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
+  const [inruilOpNaamAt, setInruilOpNaamAt] = useState<string | null>(null);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
