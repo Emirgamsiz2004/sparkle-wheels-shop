@@ -102,6 +102,7 @@ const AdminVerkoopWizardPage = () => {
   const vehicle = vehicles.find((v) => v.id === vehicleId);
 
   const [verkoopId, setVerkoopId] = useState<string | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const [activeStap, setActiveStap] = useState<number>(1);
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [saving, setSaving] = useState(false);
