@@ -789,7 +789,8 @@ const AdminVerkoopWizardPage = () => {
                 !!completed[5] &&
                 ((!completed[8]) ||
                   (step.num >= 10 && inruil && !completed[9]) ||
-                  (step.num >= 11 && !completed[10]));
+                  (step.num >= 11 && !completed[10]) ||
+                  (step.num === 12 && !completed[11]));
 
               return (
                 <button
