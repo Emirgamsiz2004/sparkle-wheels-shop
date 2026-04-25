@@ -100,7 +100,18 @@ const AdminVerkoopWizardPage = () => {
   const [verkoopId, setVerkoopId] = useState<string | null>(null);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [activeStap, setActiveStap] = useState<number>(1);
+  const [touchedSteps, setTouchedSteps] = useState<Set<number>>(new Set([1]));
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
+
+  // Mark step as touched whenever the user navigates to it
+  useEffect(() => {
+    setTouchedSteps((prev) => {
+      if (prev.has(activeStap)) return prev;
+      const n = new Set(prev);
+      n.add(activeStap);
+      return n;
+    });
+  }, [activeStap]);
   const [saving, setSaving] = useState(false);
 
   // Stap 1 state
