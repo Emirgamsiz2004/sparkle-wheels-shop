@@ -48,13 +48,13 @@ const AfleveringSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-2">
+            <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-1.5">
               Extra Service
             </p>
-            <h2 className="text-xl md:text-2xl font-display font-bold text-foreground tracking-tight mb-3">
+            <h2 className="text-xl md:text-2xl font-display font-bold text-foreground tracking-tight mb-2">
               Aflevering op locatie.
             </h2>
-            <p className="text-sm font-body font-light text-muted-foreground leading-relaxed max-w-2xl mb-5">
+            <p className="text-sm font-body font-light text-muted-foreground leading-relaxed max-w-2xl mb-3">
               Geen tijd om uw nieuwe auto op te halen? Wij leveren uw aankoop
               persoonlijk af op de gewenste locatie — overal in Nederland.
             </p>
@@ -67,14 +67,14 @@ const AfleveringSection = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: idx * 0.08 }}
-                  className="bg-card p-3 md:p-4 flex gap-3 items-start"
+                  className="bg-card p-2.5 md:p-3 flex gap-2.5 items-start"
                 >
                   <feature.icon className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" strokeWidth={1.5} />
                   <div>
-                    <h3 className="text-xs md:text-sm font-display font-semibold text-foreground mb-1">
+                    <h3 className="text-xs md:text-sm font-display font-semibold text-foreground mb-0.5">
                       {feature.title}
                     </h3>
-                    <p className="text-[11px] md:text-xs font-body font-light text-muted-foreground leading-relaxed">
+                    <p className="text-[11px] md:text-xs font-body font-light text-muted-foreground leading-snug">
                       {feature.description}
                     </p>
                   </div>
@@ -82,7 +82,7 @@ const AfleveringSection = () => {
               ))}
             </div>
 
-            <p className="mt-5 text-xs font-body text-muted-foreground/80">
+            <p className="mt-3 text-xs font-body text-muted-foreground/80">
               Aflevering op locatie is beschikbaar bij aankoop van een voertuig. Vraag ernaar tijdens uw afspraak.
             </p>
           </motion.div>
