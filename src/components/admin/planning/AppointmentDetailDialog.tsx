@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   appointment: Appointment | null;
+  anchorRect?: DOMRect | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate: (id: string, updates: Partial<Appointment>) => Promise<void>;
