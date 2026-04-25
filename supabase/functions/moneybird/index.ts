@@ -463,6 +463,35 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── Verwijder concept verkoopfactuur ───
+      case "delete_sales_invoice": {
+        const { invoice_id: dInvoiceId } = params;
+        if (!dInvoiceId) throw new Error("invoice_id is required");
+        const token = Deno.env.get("MONEYBIRD_API_TOKEN");
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        const delRes = await fetch(
+          `${MB_BASE}/${adminId}/sales_invoices/${dInvoiceId}.json`,
+          { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (!delRes.ok && delRes.status !== 404) {
+          const txt = await delRes.text();
+          throw new Error(`Moneybird delete error [${delRes.status}]: ${txt}`);
+        }
+        result = { deleted: true };
+        break;
+      }
+
+      // ─── Maak creditfactuur op basis van bestaande factuur ───
+      case "create_credit_invoice": {
+        const { invoice_id: ccInvoiceId } = params;
+        if (!ccInvoiceId) throw new Error("invoice_id is required");
+        result = await mbFetch(
+          `sales_invoices/${ccInvoiceId}/create_credit_invoice.json`,
+          { method: "POST", body: JSON.stringify({}) }
+        );
+        break;
+      }
+
       // ─── Bestaat factuur nog in Moneybird? (404-safe) ───
       case "check_invoice_exists": {
         const { invoice_id: cInvoiceId } = params;

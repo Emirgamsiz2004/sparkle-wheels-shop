@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useMoneybird } from "@/hooks/useMoneybird";
 
 interface Props {
   open: boolean;
@@ -37,11 +38,37 @@ export default function CancelVerkoopDialog({
   bouwjaar,
 }: Props) {
   const navigate = useNavigate();
+  const { invoke: invokeMoneybird } = useMoneybird();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [moneybirdInvoiceId, setMoneybirdInvoiceId] = useState<string | null>(null);
+  const [documentenAanwezig, setDocumentenAanwezig] = useState<boolean>(false);
 
   const normalize = (s: string) => s.replace(/[\s-]/g, "").toUpperCase();
   const matches = kenteken.length > 0 && normalize(input) === normalize(kenteken);
+
+  // Laad info zodra dialog opent: factuur + documenten
+  useEffect(() => {
+    if (!open || !verkoopId) {
+      setMoneybirdInvoiceId(null);
+      setDocumentenAanwezig(false);
+      return;
+    }
+    (async () => {
+      const { data: verkoop } = await supabase
+        .from("verkopen")
+        .select("moneybird_factuur_id")
+        .eq("id", verkoopId)
+        .maybeSingle();
+      setMoneybirdInvoiceId((verkoop as any)?.moneybird_factuur_id || null);
+
+      const { count } = await supabase
+        .from("verkoop_documenten")
+        .select("id", { count: "exact", head: true })
+        .eq("verkoop_id", verkoopId);
+      setDocumentenAanwezig((count || 0) > 0);
+    })();
+  }, [open, verkoopId]);
 
   const handleClose = (next: boolean) => {
     if (loading) return;
@@ -49,14 +76,71 @@ export default function CancelVerkoopDialog({
     onOpenChange(next);
   };
 
+  // Moneybird factuur opruimen — niet-blokkerend bij fouten
+  const cleanupMoneybird = async (): Promise<void> => {
+    if (!moneybirdInvoiceId) return;
+    try {
+      const { invoice } = await invokeMoneybird("get_sales_invoice", {
+        invoice_id: moneybirdInvoiceId,
+      });
+      const status = (invoice?.state || invoice?.status || "").toLowerCase();
+      const isDraft = status === "draft" || status === "concept" || status === "new";
+
+      if (isDraft) {
+        await invokeMoneybird("delete_sales_invoice", { invoice_id: moneybirdInvoiceId });
+      } else {
+        await invokeMoneybird("create_credit_invoice", { invoice_id: moneybirdInvoiceId });
+        toast.message(
+          "De factuur was al verzonden. Er is automatisch een creditnota aangemaakt in Moneybird.",
+        );
+      }
+    } catch (err) {
+      console.error("Moneybird cleanup mislukt:", err);
+      toast.warning(
+        "Factuur kon niet automatisch worden verwijderd in Moneybird. Verwijder of crediteer deze handmatig.",
+      );
+    }
+  };
+
+  // Documenten + storage opruimen
+  const cleanupDocumenten = async (): Promise<void> => {
+    if (!verkoopId) return;
+    try {
+      // Lijst alle bestanden in verkopen/{verkoopId}/ in vehicle-documents
+      const folder = `verkopen/${verkoopId}`;
+      const { data: files } = await supabase.storage
+        .from("vehicle-documents")
+        .list(folder, { limit: 1000 });
+
+      if (files && files.length > 0) {
+        const paths = files.map((f) => `${folder}/${f.name}`);
+        await supabase.storage.from("vehicle-documents").remove(paths);
+      }
+
+      await supabase.from("verkoop_documenten").delete().eq("verkoop_id", verkoopId);
+    } catch (err) {
+      console.error("Documenten verwijderen mislukt:", err);
+      toast.warning("Niet alle gegenereerde documenten konden worden verwijderd.");
+    }
+  };
+
   const handleConfirm = async () => {
     if (!matches) return;
     setLoading(true);
     try {
+      // 1. Moneybird factuur opruimen (best-effort)
+      await cleanupMoneybird();
+
+      // 2. Documenten + storage opruimen (best-effort)
+      await cleanupDocumenten();
+
+      // 3. Verkoop record verwijderen
       if (verkoopId) {
         const { error: delErr } = await supabase.from("verkopen").delete().eq("id", verkoopId);
         if (delErr) throw delErr;
       }
+
+      // 4. Voertuig terug naar beschikbaar
       const { error: vErr } = await supabase
         .from("vehicles")
         .update({ status: "beschikbaar" })
@@ -73,6 +157,8 @@ export default function CancelVerkoopDialog({
       setLoading(false);
     }
   };
+
+  const showWaarschuwingen = !!moneybirdInvoiceId || documentenAanwezig;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -113,6 +199,21 @@ export default function CancelVerkoopDialog({
             disabled={loading}
           />
         </div>
+
+        {showWaarschuwingen && (
+          <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm space-y-1.5">
+            {moneybirdInvoiceId && (
+              <div className="text-foreground">
+                ⚠️ De Moneybird factuur wordt verwijderd of gecrediteerd.
+              </div>
+            )}
+            {documentenAanwezig && (
+              <div className="text-foreground">
+                ⚠️ Alle gegenereerde documenten worden verwijderd.
+              </div>
+            )}
+          </div>
+        )}
 
         <DialogFooter className="gap-2 sm:gap-2">
           <Button variant="outline" onClick={() => handleClose(false)} disabled={loading}>
