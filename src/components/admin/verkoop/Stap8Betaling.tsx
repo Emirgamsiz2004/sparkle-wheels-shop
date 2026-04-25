@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarIcon, CheckCircle2, CreditCard, Loader2, Plus, Trash2 } from "lucide-react";
+import { CalendarIcon, CheckCircle2, CreditCard, FileText, Loader2, Plus, Trash2 } from "lucide-react";
+import { generateRestbetalingPDF } from "@/lib/restbetalingsafspraakPdf";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { toast } from "sonner";
@@ -32,6 +33,12 @@ interface Props {
   voertuigKenteken: string;
   voertuigMerk: string;
   voertuigModel: string;
+  voertuigBouwjaar: number | null;
+  klantVoornaam: string;
+  klantAchternaam: string;
+  klantAdres: string;
+  klantPostcode: string;
+  klantWoonplaats: string;
   factuurMbId: string | null;
   factuurMbNummer: string | null;
   factuurTotaal: number;
@@ -42,6 +49,8 @@ interface Props {
   initialBetalingOpmerking: string | null;
   initialMoneybirdPaymentId: string | null;
   initialBetalingOntvangen: boolean;
+  initialRestbedragLater: boolean;
+  initialRestbedragVerwachteDatum: string | null;
   onSaved: (extra: Record<string, any>) => Promise<void>;
 }
 
@@ -50,6 +59,12 @@ const Stap8Betaling = ({
   voertuigKenteken,
   voertuigMerk,
   voertuigModel,
+  voertuigBouwjaar,
+  klantVoornaam,
+  klantAchternaam,
+  klantAdres,
+  klantPostcode,
+  klantWoonplaats,
   factuurMbId,
   factuurMbNummer,
   factuurTotaal,
@@ -60,6 +75,8 @@ const Stap8Betaling = ({
   initialBetalingOpmerking,
   initialMoneybirdPaymentId,
   initialBetalingOntvangen,
+  initialRestbedragLater,
+  initialRestbedragVerwachteDatum,
   onSaved,
 }: Props) => {
   const { invoke, loading: mbLoading } = useMoneybird();
@@ -99,6 +116,11 @@ const Stap8Betaling = ({
   );
   const [bevestigd, setBevestigd] = useState<boolean>(!!initialBetalingOntvangen);
   const [savingMb, setSavingMb] = useState(false);
+  const [restbedragLater, setRestbedragLater] = useState<boolean>(!!initialRestbedragLater);
+  const [verwachteDatum, setVerwachteDatum] = useState<string>(
+    initialRestbedragVerwachteDatum || "",
+  );
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   // ─── Auto-fill laatste rij met restbedrag (alleen als niet handmatig bewerkt) ───
   const totaalIngevuld = rijen
@@ -240,6 +262,88 @@ const Stap8Betaling = ({
       stap8_afgerond: val,
       factuur_betaald: val,
     });
+  };
+
+  // ─── Restbedrag later toggle ───
+  const handleToggleRestbedragLater = async (val: boolean) => {
+    setRestbedragLater(val);
+    await persist({
+      restbedrag_later: val,
+      restbedrag_verwachte_datum: val ? verwachteDatum || null : null,
+    });
+  };
+
+  const handleVerwachteDatumChange = async (iso: string) => {
+    setVerwachteDatum(iso);
+    if (restbedragLater) {
+      await persist({ restbedrag_later: true, restbedrag_verwachte_datum: iso || null });
+    }
+  };
+
+  // ─── Restbetalingsafspraak PDF ───
+  const handleGenerateRestbetalingPdf = async () => {
+    if (!verkoopId) {
+      toast.error("Geen verkoop gevonden");
+      return;
+    }
+    if (!verwachteDatum) {
+      toast.error("Vul eerst de uiterlijke betaaldatum in");
+      return;
+    }
+    setGeneratingPdf(true);
+    try {
+      const primaryMethode: Methode = rijen[0]?.methode || "bank";
+      const { blob, fileName } = generateRestbetalingPDF({
+        voertuig: {
+          merk: voertuigMerk,
+          model: voertuigModel,
+          bouwjaar: voertuigBouwjaar,
+          kenteken: voertuigKenteken,
+        },
+        klant: {
+          voornaam: klantVoornaam,
+          achternaam: klantAchternaam,
+          adres: klantAdres,
+          postcode: klantPostcode,
+          woonplaats: klantWoonplaats,
+        },
+        reedsVoldaan: aanbetalingBedrag,
+        restbedrag: nogTeOntvangen,
+        uiterlijkeDatum: verwachteDatum,
+        betaalwijze: primaryMethode === "cash" ? "cash" : "bank",
+        opmerking: opmerking,
+        datum: new Date().toISOString().slice(0, 10),
+      });
+
+      const localUrl = URL.createObjectURL(blob);
+      window.open(localUrl, "_blank");
+
+      try {
+        const path = `verkopen/${verkoopId}/${fileName}`;
+        const { error: upErr } = await supabase.storage
+          .from("vehicle-documents")
+          .upload(path, blob, { contentType: "application/pdf", upsert: true });
+        if (!upErr) {
+          const { data: signed } = await supabase.storage
+            .from("vehicle-documents")
+            .createSignedUrl(path, 60 * 60 * 24 * 365);
+          await supabase.from("verkoop_documenten").insert({
+            verkoop_id: verkoopId,
+            type: "restbetalingsafspraak",
+            pdf_url: signed?.signedUrl || path,
+          });
+        }
+      } catch (err) {
+        console.warn("Upload restbetalingsafspraak mislukt", err);
+      }
+
+      toast.success("Betalingsafspraak gegenereerd");
+    } catch (err) {
+      console.error(err);
+      toast.error("Genereren van PDF mislukt");
+    } finally {
+      setGeneratingPdf(false);
+    }
   };
 
   // ─── Auto-save bij wijziging van datum/opmerking/rijen (debounced via blur) ───
@@ -461,6 +565,74 @@ const Stap8Betaling = ({
             )}
             Registreer betaling in Moneybird
           </button>
+        )}
+      </div>
+
+      {/* ─── Restbedrag wordt later ontvangen ─── */}
+      <div className="rounded-[14px] border border-border bg-card p-6 space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-sm text-foreground font-medium">
+              Restbedrag wordt later ontvangen
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              Leg een betalingsafspraak vast met een uiterlijke betaaldatum.
+            </div>
+          </div>
+          <Switch
+            checked={restbedragLater}
+            onCheckedChange={handleToggleRestbedragLater}
+            className="data-[state=unchecked]:bg-white/10 data-[state=unchecked]:border-white/30 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500 [&>span]:bg-white"
+          />
+        </div>
+
+        {restbedragLater && (
+          <>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
+                Uiterlijk te voldoen op
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="w-full sm:w-auto inline-flex items-center justify-between gap-2 px-3 py-2 text-sm border border-border rounded-[10px] bg-background hover:bg-accent/50 transition-colors min-w-[220px]"
+                  >
+                    <span>
+                      {verwachteDatum
+                        ? format(parseISO(verwachteDatum), "d MMMM yyyy", { locale: nl })
+                        : "Kies datum"}
+                    </span>
+                    <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={verwachteDatum ? parseISO(verwachteDatum) : undefined}
+                    onSelect={(d) => {
+                      if (d) handleVerwachteDatumChange(format(d, "yyyy-MM-dd"));
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGenerateRestbetalingPdf}
+              disabled={generatingPdf || !verwachteDatum || nogTeOntvangen <= 0}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              {generatingPdf ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <FileText className="w-4 h-4" />
+              )}
+              Restbetalingsafspraak genereren als PDF
+            </button>
+          </>
         )}
       </div>
 

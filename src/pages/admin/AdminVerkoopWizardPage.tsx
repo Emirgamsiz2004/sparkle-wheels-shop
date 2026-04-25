@@ -191,6 +191,8 @@ const AdminVerkoopWizardPage = () => {
   const [betalingOpmerking, setBetalingOpmerking] = useState<string | null>(null);
   const [moneybirdPaymentId, setMoneybirdPaymentId] = useState<string | null>(null);
   const [betalingOntvangen, setBetalingOntvangen] = useState<boolean>(false);
+  const [restbedragLater, setRestbedragLater] = useState<boolean>(false);
+  const [restbedragVerwachteDatum, setRestbedragVerwachteDatum] = useState<string | null>(null);
 
   // Stap 9 state — Inruil op naam
   const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
@@ -375,6 +377,8 @@ const AdminVerkoopWizardPage = () => {
         setBetalingOpmerking(((e as any).betaling_opmerking as string) || null);
         setMoneybirdPaymentId(((e as any).moneybird_payment_id as string) || null);
         setBetalingOntvangen(!!(e as any).betaling_ontvangen);
+        setRestbedragLater(!!(e as any).restbedrag_later);
+        setRestbedragVerwachteDatum(((e as any).restbedrag_verwachte_datum as string) || null);
         // Stap 9 hydration — Inruil op naam
         setInruilOpNaam(!!(e as any).inruil_op_naam);
         setInruilOpNaamAt(((e as any).inruil_op_naam_at as string) || null);
@@ -1127,6 +1131,12 @@ const AdminVerkoopWizardPage = () => {
                 voertuigKenteken={vehicle?.kenteken || ""}
                 voertuigMerk={vehicle?.merk || ""}
                 voertuigModel={vehicle?.model || ""}
+                voertuigBouwjaar={vehicle?.bouwjaar ?? null}
+                klantVoornaam={klantVoornaam}
+                klantAchternaam={klantAchternaam}
+                klantAdres={klantAdres}
+                klantPostcode={klantPostcode}
+                klantWoonplaats={klantWoonplaats}
                 factuurMbId={factuurMbId}
                 factuurMbNummer={factuurMbNummer}
                 factuurTotaal={
@@ -1139,6 +1149,8 @@ const AdminVerkoopWizardPage = () => {
                 initialBetalingOpmerking={betalingOpmerking}
                 initialMoneybirdPaymentId={moneybirdPaymentId}
                 initialBetalingOntvangen={betalingOntvangen}
+                initialRestbedragLater={restbedragLater}
+                initialRestbedragVerwachteDatum={restbedragVerwachteDatum}
                 onSaved={async (extra) => {
                   if (extra.betaling_datum !== undefined) setBetalingDatum(extra.betaling_datum);
                   if (extra.betaling_opmerking !== undefined)
