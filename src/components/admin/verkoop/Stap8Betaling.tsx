@@ -51,6 +51,7 @@ interface Props {
   initialBetalingOntvangen: boolean;
   initialRestbedragLater: boolean;
   initialRestbedragVerwachteDatum: string | null;
+  initialOpenstaandRestbedrag?: number | null;
   onSaved: (extra: Record<string, any>) => Promise<void>;
 }
 
