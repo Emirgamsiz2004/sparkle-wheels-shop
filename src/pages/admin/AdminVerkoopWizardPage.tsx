@@ -221,6 +221,16 @@ const AdminVerkoopWizardPage = () => {
     }
   }, [activeStap, verkoopId, overeenkomstnummer]);
 
+  // Stap 9: zonder inruil automatisch afronden
+  useEffect(() => {
+    if (activeStap !== 9 || !verkoopId) return;
+    if (!inruil && !completed[9]) {
+      setCompleted((p) => ({ ...p, 9: true }));
+      saveCurrent({ stap9_afgerond: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeStap, verkoopId, inruil]);
+
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
     if (!vehicleId || !vehicle) return;
