@@ -801,7 +801,7 @@ const AdminVerkoopWizardPage = () => {
 
             <div className="mb-8">
               <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">
-                Stap {currentStep.num} van 12
+                Stap {currentDisplayNum > 0 ? currentDisplayNum : currentStep.num} van {visibleSteps.length}
               </div>
               <h1 className="text-2xl font-semibold text-foreground mb-1">{currentStep.title}</h1>
               <p className="text-sm text-muted-foreground">{currentStep.description}</p>
