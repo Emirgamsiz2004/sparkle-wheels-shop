@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   open: boolean;
