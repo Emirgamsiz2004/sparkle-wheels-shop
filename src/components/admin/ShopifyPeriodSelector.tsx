@@ -321,17 +321,29 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
                 caption: "flex justify-center pt-1 pb-2 relative items-center text-[12px] font-medium text-foreground",
                 caption_label: "text-[12px] font-medium text-foreground",
                 nav: "hidden",
-                head_cell: "text-muted-foreground/70 rounded-md w-9 font-normal text-[0.7rem] uppercase",
-                cell: "h-9 w-9 text-center text-sm p-0 relative bg-transparent [&:has([aria-selected])]:bg-white/[0.12] [&:has([aria-selected].day-outside)]:bg-transparent rounded-[8px] focus-within:relative focus-within:z-20",
-                day: "h-9 w-9 p-0 font-normal text-white bg-transparent hover:bg-white/[0.07] hover:text-white rounded-[8px] transition-colors aria-selected:opacity-100",
-                day_selected:
-                  "!bg-white/[0.20] !text-white hover:!bg-white/[0.25] focus:!bg-white/[0.20] rounded-[8px]",
+                head_cell: "text-muted-foreground/70 w-9 font-normal text-[0.7rem] uppercase",
+                row: "flex w-full mt-0",
+                // Cell holds the continuous range background. No radius by default;
+                // first/last cell of a row get rounded ends so each row closes neatly.
+                cell: cn(
+                  "h-9 w-9 text-center text-sm p-0 relative bg-transparent",
+                  "[&:has([aria-selected])]:bg-white/[0.12]",
+                  "[&:has([aria-selected].day-outside)]:bg-transparent",
+                  "first:[&:has([aria-selected])]:rounded-l-[8px]",
+                  "last:[&:has([aria-selected])]:rounded-r-[8px]",
+                  "[&:has(.day-range-start)]:rounded-l-[8px]",
+                  "[&:has(.day-range-end)]:rounded-r-[8px]",
+                  "focus-within:relative focus-within:z-20",
+                ),
+                // Day button is transparent so the cell background reads as one continuous bar.
+                day: "h-9 w-9 p-0 font-normal text-white bg-transparent hover:bg-white/[0.10] hover:text-white rounded-none transition-colors aria-selected:opacity-100",
+                day_selected: "!bg-transparent !text-white",
                 day_range_start:
-                  "day-range-start !bg-white/[0.20] !text-white rounded-[8px] hover:!bg-white/[0.25]",
+                  "day-range-start !bg-white/[0.20] !text-white !rounded-l-[8px] !rounded-r-none hover:!bg-white/[0.25]",
                 day_range_end:
-                  "day-range-end !bg-white/[0.20] !text-white rounded-[8px] hover:!bg-white/[0.25]",
+                  "day-range-end !bg-white/[0.20] !text-white !rounded-r-[8px] !rounded-l-none hover:!bg-white/[0.25]",
                 day_range_middle:
-                  "!bg-transparent !text-white !rounded-[8px] hover:!bg-white/[0.07]",
+                  "!bg-transparent !text-white !rounded-none hover:!bg-white/[0.10]",
                 day_today: "text-white font-semibold underline underline-offset-4",
                 day_outside: "text-muted-foreground/40 opacity-100",
                 day_disabled: "text-muted-foreground/30 opacity-50 hover:bg-transparent",
