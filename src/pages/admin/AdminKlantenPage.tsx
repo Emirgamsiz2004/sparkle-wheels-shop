@@ -156,41 +156,13 @@ const AdminKlantenPage = () => {
         </div>
       )}
 
-      {/* Add dialog */}
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-base font-medium">Klant toevoegen</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 pt-2">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">Voornaam</label>
-                <input value={form.voornaam} onChange={(e) => setForm({ ...form, voornaam: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring" />
-              </div>
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">Achternaam</label>
-                <input value={form.achternaam} onChange={(e) => setForm({ ...form, achternaam: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">E-mailadres</label>
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring" />
-            </div>
-            <div>
-              <label className="block text-xs text-muted-foreground mb-1">Telefoonnummer</label>
-              <input value={form.telefoon} onChange={(e) => setForm({ ...form, telefoon: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring" />
-            </div>
-            <button
-              onClick={handleAdd}
-              disabled={saving}
-              className="w-full py-2.5 text-sm font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.98] disabled:opacity-50"
-            >
-              {saving ? "Opslaan..." : "Klant toevoegen"}
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Add popover */}
+      <AddCustomerPopover
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        anchorRect={addAnchor}
+        onSubmit={handleAdd}
+      />
     </div>
   );
 };
