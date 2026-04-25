@@ -16,6 +16,7 @@ type Methode = "cash" | "pin" | "ideal" | "overboeking";
 interface Rij {
   methode: Methode;
   bedrag: number | "";
+  manueel?: boolean;
 }
 
 const METHODEN: { id: Methode; label: string }[] = [
@@ -76,12 +77,13 @@ const Stap8Betaling = ({
       (d): d is { methode: Methode; bedrag: number } =>
         !!d && ["cash", "pin", "ideal", "overboeking"].includes(d.methode as string),
     );
-    if (seed.length > 0) return seed.map((d) => ({ methode: d.methode, bedrag: d.bedrag }));
+    if (seed.length > 0)
+      return seed.map((d) => ({ methode: d.methode, bedrag: d.bedrag, manueel: true }));
     const m = (initialBetaalwijze || "").toLowerCase();
     const startMethode: Methode = (["cash", "pin", "ideal", "overboeking"].includes(m)
       ? m
       : "pin") as Methode;
-    return [{ methode: startMethode, bedrag: nogTeOntvangen }];
+    return [{ methode: startMethode, bedrag: nogTeOntvangen, manueel: false }];
   });
 
   const [datum, setDatum] = useState<string>(
@@ -94,7 +96,7 @@ const Stap8Betaling = ({
   const [bevestigd, setBevestigd] = useState<boolean>(!!initialBetalingOntvangen);
   const [savingMb, setSavingMb] = useState(false);
 
-  // ─── Auto-fill laatste rij met restbedrag ───
+  // ─── Auto-fill laatste rij met restbedrag (alleen als niet handmatig bewerkt) ───
   const totaalIngevuld = rijen
     .slice(0, -1)
     .reduce((sum, r) => sum + (typeof r.bedrag === "number" ? r.bedrag : 0), 0);
@@ -105,15 +107,11 @@ const Stap8Betaling = ({
       if (prev.length === 0) return prev;
       const idx = prev.length - 1;
       const last = prev[idx];
-      const want = autoLaatste;
-      // Alleen vervangen als waarde leeg is of als het de enige rij is
-      if (prev.length === 1 || last.bedrag === "" || last.bedrag === 0) {
-        if (last.bedrag === want) return prev;
-        const next = [...prev];
-        next[idx] = { ...last, bedrag: want };
-        return next;
-      }
-      return prev;
+      if (last.manueel) return prev;
+      if (last.bedrag === autoLaatste) return prev;
+      const next = [...prev];
+      next[idx] = { ...last, bedrag: autoLaatste };
+      return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoLaatste, rijen.length]);
@@ -123,6 +121,7 @@ const Stap8Betaling = ({
     0,
   );
   const verschil = totaalRijen - nogTeOntvangen;
+  const klopt = Math.abs(verschil) <= 0.01 && nogTeOntvangen > 0;
 
   // ─── Persisteren ───
   const persist = async (overrides: Record<string, any> = {}) => {
@@ -145,7 +144,14 @@ const Stap8Betaling = ({
   };
 
   const handleAddRij = () => {
-    setRijen((p) => [...p, { methode: "pin", bedrag: "" }]);
+    // Voeg toe als nieuwe laatste (auto), maak vorige laatste handmatig zodat hij vast staat
+    setRijen((p) => {
+      const next = p.map((r, i) =>
+        i === p.length - 1 ? { ...r, manueel: true } : r,
+      );
+      next.push({ methode: "pin", bedrag: "", manueel: false });
+      return next;
+    });
   };
 
   const handleRemoveRij = (idx: number) => {
@@ -156,9 +162,15 @@ const Stap8Betaling = ({
     setRijen((p) => p.map((r, i) => (i === idx ? { ...r, methode: m } : r)));
   };
 
+  const handleUnlockLast = (idx: number) => {
+    setRijen((p) => p.map((r, i) => (i === idx ? { ...r, manueel: true } : r)));
+  };
+
   const handleChangeBedrag = (idx: number, v: string) => {
     const num = v === "" ? "" : Number(v);
-    setRijen((p) => p.map((r, i) => (i === idx ? { ...r, bedrag: num as any } : r)));
+    setRijen((p) =>
+      p.map((r, i) => (i === idx ? { ...r, bedrag: num as any, manueel: true } : r)),
+    );
   };
 
   // ─── Moneybird betaling registreren ───
@@ -268,7 +280,10 @@ const Stap8Betaling = ({
           <div className="h-px bg-border my-2" />
 
           <Row label="Nog te ontvangen" emphasized>
-            <span className="text-foreground font-semibold">{fmtEur(nogTeOntvangen)}</span>
+            <span className="inline-flex items-center gap-2">
+              <span className="text-foreground font-semibold">{fmtEur(nogTeOntvangen)}</span>
+              {klopt && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+            </span>
           </Row>
         </div>
       </div>
@@ -282,6 +297,7 @@ const Stap8Betaling = ({
         <div className="space-y-3">
           {rijen.map((rij, idx) => {
             const isLast = idx === rijen.length - 1;
+            const isAuto = isLast && !rij.manueel;
             return (
               <div
                 key={idx}
@@ -312,11 +328,20 @@ const Stap8Betaling = ({
                     step="0.01"
                     value={rij.bedrag === "" ? "" : rij.bedrag}
                     onChange={(e) => handleChangeBedrag(idx, e.target.value)}
+                    onFocus={() => isAuto && handleUnlockLast(idx)}
+                    onClick={() => isAuto && handleUnlockLast(idx)}
                     onBlur={triggerSave}
-                    className="w-28 bg-background border border-border rounded-[8px] px-2 py-1.5 text-sm text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
+                    readOnly={isAuto}
+                    title={isAuto ? "Klik om handmatig te bewerken" : undefined}
+                    className={cn(
+                      "w-28 border border-border rounded-[8px] px-2 py-1.5 text-sm text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring",
+                      isAuto
+                        ? "bg-muted/40 text-muted-foreground cursor-pointer"
+                        : "bg-background",
+                    )}
                     placeholder="0,00"
                   />
-                  {rijen.length > 1 && !isLast && (
+                  {rijen.length > 1 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveRij(idx)}
@@ -341,10 +366,12 @@ const Stap8Betaling = ({
           </button>
 
           {Math.abs(verschil) > 0.01 && (
-            <div className="text-[12px] text-amber-400 mt-2">
-              {verschil > 0
-                ? `${fmtEur(verschil)} te veel ingevuld`
-                : `${fmtEur(-verschil)} resterend`}
+            <div className="text-[12px] text-red-500 mt-2">
+              Let op: bedragen komen niet overeen
+              {" "}
+              ({verschil > 0
+                ? `${fmtEur(verschil)} te veel`
+                : `${fmtEur(-verschil)} tekort`})
             </div>
           )}
         </div>
