@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   appointment: Appointment | null;
+  anchorRect?: DOMRect | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate: (id: string, updates: Partial<Appointment>) => Promise<void>;
@@ -46,8 +48,50 @@ const statusOptions: { value: AppointmentStatus; label: string }[] = [
   { value: "geannuleerd", label: "Geannuleerd" },
 ];
 
-const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, onDelete }: Props) => {
+const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, onUpdate, onDelete }: Props) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+  // ESC + click outside
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onOpenChange(false); };
+    const onDown = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) onOpenChange(false);
+    };
+    window.addEventListener("keydown", onKey);
+    // Defer to next tick so the opening click doesn't immediately close
+    const t = setTimeout(() => document.addEventListener("mousedown", onDown), 0);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      clearTimeout(t);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [open, onOpenChange]);
+
+  // Position popover near anchorRect (desktop)
+  useLayoutEffect(() => {
+    if (!open || isMobile || !anchorRect) { setPos(null); return; }
+    const POPOVER_W = 280;
+    const margin = 8;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    let left = anchorRect.right + margin;
+    if (left + POPOVER_W > vw - margin) left = anchorRect.left - POPOVER_W - margin;
+    if (left < margin) left = margin;
+    let top = anchorRect.top;
+    // Estimate height after mount
+    requestAnimationFrame(() => {
+      const h = containerRef.current?.offsetHeight ?? 360;
+      let t = top;
+      if (t + h > vh - margin) t = Math.max(margin, vh - h - margin);
+      setPos({ top: t, left });
+    });
+    setPos({ top, left });
+  }, [open, isMobile, anchorRect]);
+
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editDate, setEditDate] = useState<Date | undefined>(undefined);
@@ -143,9 +187,33 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
     navigate(`/admin/klanten/${appointment.customer.id}`);
   };
 
-  return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="p-0 gap-0 w-[calc(100vw-2rem)] sm:w-[300px] sm:max-w-[300px] rounded-[14px] border border-border bg-card shadow-lg overflow-hidden">
+  const containerClass = isMobile
+    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-[14px] border-t border-x border-border bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
+    : "fixed z-50 w-[280px] rounded-[14px] border border-border bg-card shadow-lg animate-in fade-in-0 zoom-in-95 duration-150";
+
+  const containerStyle: React.CSSProperties = isMobile
+    ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" }
+    : pos
+      ? { top: pos.top, left: pos.left }
+      : { top: -9999, left: -9999 };
+
+  if (!open) return null;
+
+  return createPortal(
+    <div ref={containerRef} className={containerClass} style={containerStyle} role="dialog">
+      {isMobile && (
+        <div className="pt-2 pb-1 flex justify-center">
+          <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+        </div>
+      )}
+      <button
+        onClick={() => onOpenChange(false)}
+        className="absolute top-2 right-2 z-10 h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors"
+        aria-label="Sluiten"
+      >
+        <X className="w-4 h-4" />
+      </button>
+      <div>
         {!editing ? (
           <AnimatePresence mode="wait">
             <motion.div
@@ -276,12 +344,10 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
           </AnimatePresence>
         ) : (
           <div className="p-4">
-            <DialogHeader className="mb-2">
-              <DialogTitle className="flex items-center gap-2 text-sm">
-                <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
-                <span className="text-muted-foreground font-normal">Bewerken</span>
-              </DialogTitle>
-            </DialogHeader>
+            <div className="mb-2 flex items-center gap-2 text-sm">
+              <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
+              <span className="text-muted-foreground font-normal">Bewerken</span>
+            </div>
 
             <motion.div
               key="edit"
@@ -431,7 +497,7 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
             </motion.div>
           </div>
         )}
-      </DialogContent>
+      </div>
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
@@ -456,7 +522,8 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Dialog>
+    </div>,
+    document.body
   );
 };
 
