@@ -198,6 +198,7 @@ const AdminProefrittenPage = () => {
       <NieuweProefritDialog
         open={newOpen}
         onClose={() => { setNewOpen(false); refetch(); }}
+        anchorRect={newAnchor}
       />
 
       {/* Start from scheduled appointment */}
