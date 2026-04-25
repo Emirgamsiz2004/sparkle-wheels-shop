@@ -377,6 +377,11 @@ const AdminVerkoopWizardPage = () => {
         // Stap 9 hydration — Inruil op naam
         setInruilOpNaam(!!(e as any).inruil_op_naam);
         setInruilOpNaamAt(((e as any).inruil_op_naam_at as string) || null);
+        // Stap 10 hydration — Vrijwaring
+        setVrijwaringBevestigd(!!(e as any).vrijwaring_bevestigd);
+        setVrijwaringDatum(((e as any).vrijwaring_datum as string) || null);
+        setVrijwaringTijdstip(((e as any).vrijwaring_tijdstip as string) || null);
+        setTenaamstellingsbewijsKlaargelegd(!!(e as any).tenaamstellingsbewijs_klaargelegd);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
