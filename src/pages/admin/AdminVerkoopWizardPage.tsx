@@ -883,9 +883,12 @@ const AdminVerkoopWizardPage = () => {
         />
 
       {/* Hoofdinhoud */}
-      <main className="lg:ml-[280px] h-screen overflow-y-scroll wizard-content" style={{ scrollbarGutter: "stable" }}>
+      <main className="lg:ml-[280px] h-screen overflow-y-scroll overflow-x-hidden wizard-content max-w-full" style={{ scrollbarGutter: "stable" }}>
         {/* Mobiele horizontale stappenindicator */}
-        <div className="lg:hidden sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-border">
+        <div
+          className="lg:hidden sticky top-0 z-20 bg-background border-b border-border"
+          style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+        >
           <div className="flex items-center justify-between px-4 py-2 text-[11px] text-muted-foreground">
             <span>Stap {currentDisplayNum > 0 ? currentDisplayNum : currentStep.num} van {visibleSteps.length}</span>
             <span>{doneCount}/{totalSteps} voltooid</span>
