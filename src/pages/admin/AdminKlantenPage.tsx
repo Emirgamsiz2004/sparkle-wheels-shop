@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useCustomers, Customer, statusLabels, statusColors } from "@/hooks/useCustomers";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Loader2, ChevronRight } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SlidingTabs from "@/components/admin/SlidingTabs";
