@@ -144,7 +144,14 @@ const Stap8Betaling = ({
   };
 
   const handleAddRij = () => {
-    setRijen((p) => [...p, { methode: "pin", bedrag: "" }]);
+    // Voeg toe als nieuwe laatste (auto), maak vorige laatste handmatig zodat hij vast staat
+    setRijen((p) => {
+      const next = p.map((r, i) =>
+        i === p.length - 1 ? { ...r, manueel: true } : r,
+      );
+      next.push({ methode: "pin", bedrag: "", manueel: false });
+      return next;
+    });
   };
 
   const handleRemoveRij = (idx: number) => {
@@ -153,6 +160,10 @@ const Stap8Betaling = ({
 
   const handleChangeMethode = (idx: number, m: Methode) => {
     setRijen((p) => p.map((r, i) => (i === idx ? { ...r, methode: m } : r)));
+  };
+
+  const handleUnlockLast = (idx: number) => {
+    setRijen((p) => p.map((r, i) => (i === idx ? { ...r, manueel: true } : r)));
   };
 
   const handleChangeBedrag = (idx: number, v: string) => {
