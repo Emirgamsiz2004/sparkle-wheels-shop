@@ -183,6 +183,12 @@ const AdminVerkoopWizardPage = () => {
   const [factuurVerstuurd, setFactuurVerstuurd] = useState<boolean>(false);
   const [factuurEmail, setFactuurEmail] = useState<string | null>(null);
 
+  // Stap 8 state — Betaling
+  const [betalingDatum, setBetalingDatum] = useState<string | null>(null);
+  const [betalingOpmerking, setBetalingOpmerking] = useState<string | null>(null);
+  const [moneybirdPaymentId, setMoneybirdPaymentId] = useState<string | null>(null);
+  const [betalingOntvangen, setBetalingOntvangen] = useState<boolean>(false);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
