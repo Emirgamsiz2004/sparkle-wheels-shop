@@ -322,16 +322,16 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
                 caption_label: "text-[12px] font-medium text-foreground",
                 nav: "hidden",
                 head_cell: "text-muted-foreground/70 rounded-md w-9 font-normal text-[0.7rem] uppercase",
-                cell: "h-9 w-9 text-center text-sm p-0 relative bg-transparent [&:has([aria-selected])]:bg-white/[0.10] [&:has([aria-selected].day-range-start)]:rounded-l-full [&:has([aria-selected].day-range-end)]:rounded-r-full [&:has([aria-selected].day-outside)]:bg-transparent first:[&:has([aria-selected])]:rounded-l-full last:[&:has([aria-selected])]:rounded-r-full focus-within:relative focus-within:z-20",
-                day: "h-9 w-9 p-0 font-normal text-white bg-transparent hover:bg-white/[0.06] hover:text-white rounded-[8px] transition-colors aria-selected:opacity-100",
+                cell: "h-9 w-9 text-center text-sm p-0 relative bg-transparent [&:has([aria-selected])]:bg-white/[0.12] [&:has([aria-selected].day-outside)]:bg-transparent rounded-[8px] focus-within:relative focus-within:z-20",
+                day: "h-9 w-9 p-0 font-normal text-white bg-transparent hover:bg-white/[0.07] hover:text-white rounded-[8px] transition-colors aria-selected:opacity-100",
                 day_selected:
-                  "!bg-white/[0.25] !text-white hover:!bg-white/[0.30] focus:!bg-white/[0.25] rounded-full",
+                  "!bg-white/[0.20] !text-white hover:!bg-white/[0.25] focus:!bg-white/[0.20] rounded-[8px]",
                 day_range_start:
-                  "day-range-start !bg-white/[0.25] !text-white rounded-full hover:!bg-white/[0.30]",
+                  "day-range-start !bg-white/[0.20] !text-white rounded-[8px] hover:!bg-white/[0.25]",
                 day_range_end:
-                  "day-range-end !bg-white/[0.25] !text-white rounded-full hover:!bg-white/[0.30]",
+                  "day-range-end !bg-white/[0.20] !text-white rounded-[8px] hover:!bg-white/[0.25]",
                 day_range_middle:
-                  "!bg-transparent !text-white !rounded-none hover:!bg-white/[0.06]",
+                  "!bg-transparent !text-white !rounded-[8px] hover:!bg-white/[0.07]",
                 day_today: "text-white font-semibold underline underline-offset-4",
                 day_outside: "text-muted-foreground/40 opacity-100",
                 day_disabled: "text-muted-foreground/30 opacity-50 hover:bg-transparent",
