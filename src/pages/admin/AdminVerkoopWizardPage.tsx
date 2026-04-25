@@ -78,6 +78,8 @@ const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil:
   if (stap >= 6 && stap <= 12 && !completed[5]) return true;
   // Stappen 9-12 vereisen 8 (betaling bevestigd)
   if (stap >= 9 && stap <= 12 && !completed[8]) return true;
+  // Stap 10+ vereist 9 (inruil op naam) — alleen relevant bij inruil
+  if (stap >= 10 && stap <= 12 && inruil && !completed[9]) return true;
   // Stappen 11-12 vereisen 10
   if (stap >= 11 && stap <= 12 && !completed[10]) return true;
   return false;
@@ -590,9 +592,14 @@ const AdminVerkoopWizardPage = () => {
 
   const handleStepClick = (stap: number) => {
     if (isStepBlocked(stap, completed, inruil)) {
-      // Specifieke melding bij betalingsblokkade
-      if (stap >= 9 && stap <= 12 && !completed[8] && completed[5]) {
-        toast.error("Betaling moet eerst bevestigd worden.");
+      if (completed[5]) {
+        const missing: string[] = [];
+        if (!completed[8]) missing.push("stap 8 (betaling bevestigen)");
+        if (stap >= 10 && inruil && !completed[9]) missing.push("stap 9 (inruil op naam zetten)");
+        if (stap >= 11 && !completed[10]) missing.push("stap 10 (vrijwaring)");
+        if (missing.length > 0) {
+          toast.error(`Rond eerst ${missing.join(" en ")} af.`);
+        }
       }
       return;
     }
@@ -723,9 +730,15 @@ const AdminVerkoopWizardPage = () => {
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               const hasIssues = !blocked && stepHasIssues(step.num);
-              // Slot tonen bij betalingsblokkade (stap 9-12, betaling niet bevestigd)
-              const lockedByPayment =
-                blocked && step.num >= 9 && step.num <= 12 && !completed[8] && !!completed[5];
+              // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/vrijwaring)
+              const lockedByPrereq =
+                blocked &&
+                step.num >= 9 &&
+                step.num <= 12 &&
+                !!completed[5] &&
+                ((!completed[8]) ||
+                  (step.num >= 10 && inruil && !completed[9]) ||
+                  (step.num >= 11 && !completed[10]));
 
               return (
                 <button
@@ -735,8 +748,8 @@ const AdminVerkoopWizardPage = () => {
                     "w-full text-left px-3 py-2.5 flex items-center gap-3 rounded-[10px] transition-colors",
                     active && !blocked ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
                     !active && !blocked ? "hover:bg-sidebar-accent/50 text-sidebar-foreground" : "",
-                    blocked && !lockedByPayment ? "opacity-40 cursor-not-allowed text-sidebar-foreground" : "",
-                    lockedByPayment ? "opacity-60 cursor-not-allowed text-sidebar-foreground hover:bg-sidebar-accent/30" : "",
+                    blocked && !lockedByPrereq ? "opacity-40 cursor-not-allowed text-sidebar-foreground" : "",
+                    lockedByPrereq ? "opacity-60 cursor-not-allowed text-sidebar-foreground hover:bg-sidebar-accent/30" : "",
                   ].join(" ")}
                 >
                   <span
@@ -746,15 +759,15 @@ const AdminVerkoopWizardPage = () => {
                       hasIssues && !active ? "bg-amber-500/15 border-amber-500/40 text-amber-400" : "",
                       hasIssues && active ? "bg-amber-500/20 border-amber-500/60 text-amber-300" : "",
                       !done && !hasIssues && active ? "bg-foreground/10 border-foreground/40 text-foreground" : "",
-                      !done && !hasIssues && !active && !lockedByPayment ? "border-sidebar-border text-sidebar-foreground/60" : "",
-                      lockedByPayment ? "border-sidebar-border text-sidebar-foreground/60" : "",
+                      !done && !hasIssues && !active && !lockedByPrereq ? "border-sidebar-border text-sidebar-foreground/60" : "",
+                      lockedByPrereq ? "border-sidebar-border text-sidebar-foreground/60" : "",
                     ].join(" ")}
                   >
                     {hasIssues ? (
                       <AlertTriangle className="w-3.5 h-3.5" />
                     ) : done ? (
                       <Check className="w-3.5 h-3.5" />
-                    ) : lockedByPayment ? (
+                    ) : lockedByPrereq ? (
                       <Lock className="w-3 h-3" />
                     ) : (
                       displayNum
