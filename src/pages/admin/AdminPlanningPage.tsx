@@ -401,7 +401,7 @@ const AdminPlanningPage = () => {
 
       {/* Dialogs */}
       <AppointmentFormDialog open={formOpen} onOpenChange={setFormOpen} customers={customers} vehicles={activeVehicles} allVehicles={allSelectableVehicles} onSubmit={addAppointment} />
-      <AppointmentDetailDialog appointment={detailAppointment} open={!!detailAppointment} onOpenChange={(v) => { if (!v) setDetailAppointment(null); }} onUpdate={updateAppointment} onDelete={deleteAppointment} />
+      <AppointmentDetailDialog appointment={detailAppointment} anchorRect={detailRect} open={!!detailAppointment} onOpenChange={(v) => { if (!v) setDetailAppointment(null); }} onUpdate={updateAppointment} onDelete={deleteAppointment} />
     </div>
   );
 };
