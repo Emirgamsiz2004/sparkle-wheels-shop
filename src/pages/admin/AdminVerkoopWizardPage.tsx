@@ -592,9 +592,14 @@ const AdminVerkoopWizardPage = () => {
 
   const handleStepClick = (stap: number) => {
     if (isStepBlocked(stap, completed, inruil)) {
-      // Specifieke melding bij betalingsblokkade
-      if (stap >= 9 && stap <= 12 && !completed[8] && completed[5]) {
-        toast.error("Betaling moet eerst bevestigd worden.");
+      if (completed[5]) {
+        const missing: string[] = [];
+        if (!completed[8]) missing.push("stap 8 (betaling bevestigen)");
+        if (stap >= 10 && inruil && !completed[9]) missing.push("stap 9 (inruil op naam zetten)");
+        if (stap >= 11 && !completed[10]) missing.push("stap 10 (vrijwaring)");
+        if (missing.length > 0) {
+          toast.error(`Rond eerst ${missing.join(" en ")} af.`);
+        }
       }
       return;
     }
