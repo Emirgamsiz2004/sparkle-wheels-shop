@@ -883,8 +883,40 @@ const AdminVerkoopWizardPage = () => {
         />
 
       {/* Hoofdinhoud */}
-      <main className="ml-[280px] h-screen overflow-y-scroll wizard-content" style={{ scrollbarGutter: "stable" }}>
-        <div className="px-8 pt-6 pb-32">
+      <main className="lg:ml-[280px] h-screen overflow-y-scroll wizard-content" style={{ scrollbarGutter: "stable" }}>
+        {/* Mobiele horizontale stappenindicator */}
+        <div className="lg:hidden sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-border">
+          <div className="flex items-center justify-between px-4 py-2 text-[11px] text-muted-foreground">
+            <span>Stap {currentDisplayNum > 0 ? currentDisplayNum : currentStep.num} van {visibleSteps.length}</span>
+            <span>{doneCount}/{totalSteps} voltooid</span>
+          </div>
+          <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 -mx-px scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+            {visibleSteps.map((step, idx) => {
+              const displayNum = idx + 1;
+              const blocked = isStepBlocked(step.num, completed, inruil);
+              const done = isStepDone(step.num, completed);
+              const active = step.num === activeStap;
+              return (
+                <button
+                  key={step.key}
+                  onClick={() => !blocked && handleStepClick(step.num)}
+                  disabled={blocked}
+                  className={[
+                    "shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border transition-colors",
+                    active ? "bg-foreground/15 border-foreground text-foreground" : "",
+                    !active && done ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400" : "",
+                    !active && !done && !blocked ? "border-border text-muted-foreground" : "",
+                    blocked ? "opacity-40 cursor-not-allowed border-border text-muted-foreground" : "",
+                  ].join(" ")}
+                  aria-label={`Stap ${displayNum}: ${step.title}`}
+                >
+                  {done ? <Check className="w-3.5 h-3.5" /> : displayNum}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="px-4 lg:px-8 pt-6 pb-32">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <button
