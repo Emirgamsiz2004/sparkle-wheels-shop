@@ -22,6 +22,7 @@ import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument"
 import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
 import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
 import Stap9InruilOpNaam from "@/components/admin/verkoop/Stap9InruilOpNaam";
+import Stap10Vrijwaring from "@/components/admin/verkoop/Stap10Vrijwaring";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
