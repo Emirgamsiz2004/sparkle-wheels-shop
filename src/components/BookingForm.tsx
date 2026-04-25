@@ -34,6 +34,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [date, setDate] = useState<Date>();
   const [tijd, setTijd] = useState("");
+  const [dateOpen, setDateOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
 
