@@ -193,6 +193,7 @@ const AdminVerkoopWizardPage = () => {
   const [betalingOntvangen, setBetalingOntvangen] = useState<boolean>(false);
   const [restbedragLater, setRestbedragLater] = useState<boolean>(false);
   const [restbedragVerwachteDatum, setRestbedragVerwachteDatum] = useState<string | null>(null);
+  const [openstaandRestbedrag, setOpenstaandRestbedrag] = useState<number | null>(null);
 
   // Stap 9 state — Inruil op naam
   const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
