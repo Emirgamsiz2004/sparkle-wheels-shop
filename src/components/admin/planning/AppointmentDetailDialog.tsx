@@ -197,31 +197,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
       ? { top: pos.top, left: pos.left }
       : { top: -9999, left: -9999 };
 
-  if (!open) {
-    return (
-      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Afspraak verwijderen?</AlertDialogTitle>
-            <AlertDialogDescription>Deze actie kan niet ongedaan worden gemaakt.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-red-500 text-white hover:bg-red-600"
-              onClick={async () => {
-                setConfirmDelete(false);
-                await onDelete(appointment.id);
-                handleClose(false);
-              }}
-            >
-              Verwijderen
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    );
-  }
+  if (!open) return null;
 
   return createPortal(
     <div ref={containerRef} className={containerClass} style={containerStyle} role="dialog">
