@@ -156,6 +156,8 @@ const AdminVerkoopWizardPage = () => {
   const [klantBedrijfsnaam, setKlantBedrijfsnaam] = useState("");
   const [klantKvk, setKlantKvk] = useState("");
   const [klantBtw, setKlantBtw] = useState("");
+  const [leadSource, setLeadSource] = useState<string>("");
+  const [leadSourceAnders, setLeadSourceAnders] = useState<string>("");
 
   // Stap 4 state
   const [garantieType, setGarantieType] = useState<"geen" | "autotrust">("geen");
@@ -348,6 +350,9 @@ const AdminVerkoopWizardPage = () => {
             setKlantBtw(cust.btw_nummer || "");
           }
         }
+        // Lead source hydration
+        setLeadSource(((existing as any).lead_source as string) || "");
+        setLeadSourceAnders(((existing as any).lead_source_anders as string) || "");
         // Stap 4 hydration
         if (existing.garantie_type === "geen" || existing.garantie_type === "autotrust") {
           setGarantieType(existing.garantie_type);
@@ -495,6 +500,8 @@ const AdminVerkoopWizardPage = () => {
       aanbetaling_bankrekening: laterOphalen && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
       customer_id: customerId,
       klant_type: klantZakelijk ? "zakelijk" : "particulier",
+      lead_source: leadSource || null,
+      lead_source_anders: leadSource === "Anders" ? (leadSourceAnders.trim() || null) : null,
       garantie_type: garantieType,
       garantie_pakket: garantieType === "autotrust" ? (garantiePakket.trim() || null) : null,
       garantie_looptijd: garantieType === "autotrust" && garantieLooptijd !== "" ? Number(garantieLooptijd) : null,
@@ -530,7 +537,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
+  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, leadSource, leadSourceAnders, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
 
   const handleVolgende = async () => {
     // Centrale validatie eerst
@@ -1010,6 +1017,8 @@ const AdminVerkoopWizardPage = () => {
                 bedrijfsnaam={klantBedrijfsnaam} setBedrijfsnaam={setKlantBedrijfsnaam}
                 kvk={klantKvk} setKvk={setKlantKvk}
                 btw={klantBtw} setBtw={setKlantBtw}
+                leadSource={leadSource} setLeadSource={setLeadSource}
+                leadSourceAnders={leadSourceAnders} setLeadSourceAnders={setLeadSourceAnders}
               />
             )}
 
@@ -2296,6 +2305,8 @@ interface Stap3Props {
   bedrijfsnaam: string; setBedrijfsnaam: (v: string) => void;
   kvk: string; setKvk: (v: string) => void;
   btw: string; setBtw: (v: string) => void;
+  leadSource: string; setLeadSource: (v: string) => void;
+  leadSourceAnders: string; setLeadSourceAnders: (v: string) => void;
 }
 
 interface CustomerSuggestion {
@@ -2735,6 +2746,44 @@ const Stap3Klant = (p: Stap3Props) => {
           </div>
         </div>
       )}
+
+      {/* Lead source — hoe heeft de klant ons gevonden */}
+      <div className="pt-5 mt-5 border-t border-border space-y-3">
+        <label className={labelCls}>Hoe heeft u ons gevonden? (optioneel)</label>
+        <div className="flex flex-wrap gap-2">
+          {["Marktplaats", "AutoScout24", "Facebook", "Instagram", "Google", "Via via / aanbeveling", "Anders"].map((opt) => {
+            const active = p.leadSource === opt;
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => p.setLeadSource(active ? "" : opt)}
+                className={cn(
+                  "px-3 py-2 rounded-[8px] text-sm border transition-colors",
+                  active
+                    ? "bg-foreground/10 border-foreground/40 text-foreground"
+                    : "bg-background border-border text-foreground/80 hover:bg-accent hover:text-foreground",
+                )}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+        {p.leadSource === "Anders" && (
+          <div>
+            <label className={labelCls}>Namelijk...</label>
+            <input
+              type="text"
+              value={p.leadSourceAnders}
+              onChange={(e) => p.setLeadSourceAnders(e.target.value)}
+              className={inputCls}
+              placeholder="Specificeer hoe u ons heeft gevonden"
+              maxLength={200}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

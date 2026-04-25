@@ -17,6 +17,7 @@ import {
 } from "recharts";
 import DashboardAppointmentsCard from "@/components/admin/DashboardAppointmentsCard";
 import DashboardLopendeVerkopenCard from "@/components/admin/DashboardLopendeVerkopenCard";
+import DashboardLeadSourcesCard from "@/components/admin/DashboardLeadSourcesCard";
 import ShopifyPeriodSelector, { type PeriodRange as ShopifyRange } from "@/components/admin/ShopifyPeriodSelector";
 
 const DONUT_COLORS = ["#3b82f6", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444"];
@@ -286,6 +287,9 @@ const AdminDashboardPage = () => {
           )}
         </div>
       </div>
+
+      {/* ═══ BLOK 3b — Herkomst klanten ═══ */}
+      <DashboardLeadSourcesCard from={periodRange.from} to={periodRange.to} />
 
       {/* ═══ BLOK 4 — Voorraad overzicht ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
