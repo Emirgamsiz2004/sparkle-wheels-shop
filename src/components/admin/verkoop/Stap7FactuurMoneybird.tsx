@@ -944,25 +944,18 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       </section>
 
       {/* Sectie 4 — Bevestiging */}
-      <section className="rounded-[10px] border border-border bg-card p-5">
-        <label className="flex items-start gap-3 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            className="mt-0.5 h-5 w-5 rounded-[4px] border-border accent-primary"
-            checked={bevestigd}
-            onChange={(e) => handleBevestig(e.target.checked)}
-            disabled={!factuurVerstuurd}
-          />
-          <div>
-            <div className="text-sm font-medium">
-              Factuur is verstuurd of meegegeven aan klant
-            </div>
-            <div className="text-[11px] text-muted-foreground mt-0.5">
-              Wordt automatisch aangevinkt na verzending.
-            </div>
-          </div>
-        </label>
-      </section>
+      <label className="flex items-center gap-3 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          className="h-4 w-4 rounded-[3px] border border-border bg-background accent-primary cursor-pointer disabled:cursor-not-allowed"
+          checked={bevestigd}
+          onChange={(e) => handleBevestig(e.target.checked)}
+          disabled={!factuurVerstuurd}
+        />
+        <span className="text-sm text-foreground">
+          Factuur is verstuurd of meegegeven aan klant
+        </span>
+      </label>
     </div>
   );
 }
