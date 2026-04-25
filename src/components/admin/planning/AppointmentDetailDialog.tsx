@@ -342,18 +342,20 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
               {/* 6. Status knoppen */}
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40" },
-                  { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/15 text-foreground border-muted-foreground/40" },
-                  { v: "geannuleerd" as AppointmentStatus, label: "No-show", active: "bg-orange-500/15 text-orange-300 border-orange-500/40" },
+                  { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-emerald-600/80 text-white border-emerald-500" },
+                  { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/40 text-white border-muted-foreground/60" },
+                  { v: "geannuleerd" as AppointmentStatus, label: "No-show", active: "bg-orange-600/80 text-white border-orange-500" },
                 ].map(({ v, label, active }) => {
-                  const isActive = appointment.status === v;
+                  const isActive = localStatus === v;
                   return (
                     <button
                       key={v}
+                      type="button"
+                      disabled={statusSaving}
                       onClick={() => setStatus(v)}
                       className={cn(
-                        "py-2 rounded-[10px] border text-[11px] font-medium transition-colors",
-                        isActive ? active : "bg-transparent text-foreground border-border/60 hover:bg-accent/30"
+                        "py-2 rounded-[10px] border text-[11px] font-medium transition-colors disabled:opacity-70",
+                        isActive ? active : "bg-transparent text-foreground/80 border-border/60 hover:bg-accent/30"
                       )}
                     >
                       {label}
