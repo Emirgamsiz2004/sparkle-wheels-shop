@@ -58,6 +58,7 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
   const [editNotities, setEditNotities] = useState("");
   const [editOnderwerp, setEditOnderwerp] = useState("");
   const [editBetalingsstatus, setEditBetalingsstatus] = useState<string>("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!appointment) return null;
 
