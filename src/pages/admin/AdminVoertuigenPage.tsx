@@ -102,7 +102,14 @@ const AdminVoertuigenPage = () => {
     if (updated > 0) refetch();
   };
 
-  const filtered = vehicles.filter((v) => {
+  // Verkochte voertuigen worden volledig verborgen uit de voorraadlijst.
+  // Ze blijven beschikbaar via de verkopenmodule.
+  const visibleVehicles = useMemo(
+    () => vehicles.filter((v) => v.status !== "verkocht"),
+    [vehicles]
+  );
+
+  const filtered = visibleVehicles.filter((v) => {
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
