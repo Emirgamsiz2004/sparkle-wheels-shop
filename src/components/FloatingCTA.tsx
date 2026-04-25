@@ -36,13 +36,9 @@ const FloatingCTA = ({ targetId, label = "Afspraak maken" }: FloatingCTAProps) =
           transition={{ duration: 0.3 }}
           className="fixed bottom-6 right-6 z-40 flex items-center gap-2"
         >
-          <button
-            onClick={handleClick}
-            className="group/cta relative flex items-center gap-2.5 bg-muted border border-border text-foreground px-5 py-3 shadow-lg shadow-black/30 overflow-hidden transition-all duration-500 hover:border-accent hover:text-accent"
-          >
-            <span className="absolute inset-0 bg-accent/10 origin-left scale-x-0 group-hover/cta:scale-x-100 transition-transform duration-500 ease-out" />
-            <CalendarCheck className="w-4 h-4 relative z-10" />
-            <span className="text-[10px] font-semibold tracking-[0.15em] uppercase relative z-10">{label}</span>
+          <button onClick={handleClick} className="btn-public btn-primary-public shadow-lg shadow-black/30">
+            <CalendarCheck className="w-4 h-4" />
+            {label}
           </button>
           <button
             onClick={() => setDismissed(true)}
