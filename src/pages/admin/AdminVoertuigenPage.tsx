@@ -198,7 +198,7 @@ const AdminVoertuigenPage = () => {
       ) : isMobile ? (
         <div className="space-y-1.5">
           {filtered.map((v) => {
-            const winst = calcWinst(v);
+            const consignatie = isConsignatie(v);
             return (
               <Link
                 key={v.id}
@@ -206,24 +206,31 @@ const AdminVoertuigenPage = () => {
                 className="flex items-center justify-between gap-3 bg-card border border-border rounded-lg p-3 active:bg-accent/30 transition-colors"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-foreground">{v.merk} {v.model}</p>
-                    <span className="text-xs text-muted-foreground">({v.bouwjaar})</span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`${BADGE_BASE} ${statusColors[v.status]}`}>
+                  {/* Rij 1: merk + model + bouwjaar | tag rechts */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{v.merk} {v.model}</p>
+                      <span className="text-xs text-muted-foreground shrink-0">({v.bouwjaar})</span>
+                    </div>
+                    <span className={`${BADGE_BASE} ${statusColors[v.status]} shrink-0`}>
                       {statusLabels[v.status]}
                     </span>
-                    {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
-                    <ApkBadge apkVervaldatum={v.apkVervaldatum} />
                   </div>
-                  <div className="flex items-center gap-3 mt-1.5">
+                  {/* Rij 2: kenteken + APK badge */}
+                  {(v.kenteken || v.apkVervaldatum) && (
+                    <div className="flex items-center gap-2 mt-1">
+                      {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
+                      <ApkBadge apkVervaldatum={v.apkVervaldatum} />
+                    </div>
+                  )}
+                  {/* Rij 3: inkoop links | verkoop rechts */}
+                  <div className="flex items-center justify-between gap-3 mt-1.5">
                     <span className="text-xs text-muted-foreground">
-                      {isConsignatie(v) ? `${v.consignatieCommissiePerc || 10}% commissie` : formatEuro(v.inkoopprijs)}
+                      {consignatie ? "Consignatie" : formatEuro(v.inkoopprijs)}
                     </span>
                     {v.verkoopprijs > 0 && (
-                      <span className={`text-xs font-medium tabular-nums ${winst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                        {formatEuro(winst)}
+                      <span className="text-xs font-medium tabular-nums text-emerald-500">
+                        {formatEuro(v.verkoopprijs)}
                       </span>
                     )}
                   </div>
