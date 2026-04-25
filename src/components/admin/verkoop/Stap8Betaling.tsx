@@ -122,6 +122,12 @@ const Stap8Betaling = ({
   const [verwachteDatum, setVerwachteDatum] = useState<string>(
     initialRestbedragVerwachteDatum || "",
   );
+  const [openstaandRestbedrag, setOpenstaandRestbedrag] = useState<number | "">(
+    typeof initialOpenstaandRestbedrag === "number" ? initialOpenstaandRestbedrag : "",
+  );
+  const [openstaandManueel, setOpenstaandManueel] = useState<boolean>(
+    typeof initialOpenstaandRestbedrag === "number" && initialOpenstaandRestbedrag > 0,
+  );
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
   // ─── Auto-fill laatste rij met restbedrag (alleen als niet handmatig bewerkt) ───
