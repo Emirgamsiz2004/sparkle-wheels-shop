@@ -280,7 +280,10 @@ const Stap8Betaling = ({
           <div className="h-px bg-border my-2" />
 
           <Row label="Nog te ontvangen" emphasized>
-            <span className="text-foreground font-semibold">{fmtEur(nogTeOntvangen)}</span>
+            <span className="inline-flex items-center gap-2">
+              <span className="text-foreground font-semibold">{fmtEur(nogTeOntvangen)}</span>
+              {klopt && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+            </span>
           </Row>
         </div>
       </div>
