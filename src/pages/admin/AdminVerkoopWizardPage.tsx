@@ -220,15 +220,17 @@ const AdminVerkoopWizardPage = () => {
     }
   }, [activeStap, verkoopId, overeenkomstnummer]);
 
-  // Stap 9: zonder inruil automatisch afronden
+  // Zonder inruil: stap 6 en 9 automatisch afronden
   useEffect(() => {
-    if (activeStap !== 9 || !verkoopId) return;
-    if (!inruil && !completed[9]) {
-      setCompleted((p) => ({ ...p, 9: true }));
-      saveCurrent({ stap9_afgerond: true });
-    }
+    if (!verkoopId || inruil) return;
+    const updates: Record<string, any> = {};
+    if (!completed[6]) updates.stap6_afgerond = true;
+    if (!completed[9]) updates.stap9_afgerond = true;
+    if (Object.keys(updates).length === 0) return;
+    setCompleted((p) => ({ ...p, 6: true, 9: true }));
+    saveCurrent(updates);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeStap, verkoopId, inruil]);
+  }, [verkoopId, inruil]);
 
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
