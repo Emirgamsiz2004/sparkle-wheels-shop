@@ -600,6 +600,50 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           </div>
         </div>
 
+        {/* Aangepaste velden (custom fields) preview */}
+        {(() => {
+          const kentekenVal = p.voertuigKenteken ? formatKenteken(p.voertuigKenteken) : "—";
+          const merkModelVal = `${p.voertuigMerk || ""} ${p.voertuigModel || ""}`.trim() || "—";
+          const bouwjaarVal = p.voertuigBouwjaar ? String(p.voertuigBouwjaar) : "—";
+          const kmVal = p.voertuigKilometerstand
+            ? `${Number(p.voertuigKilometerstand).toLocaleString("nl-NL")} km`
+            : "—";
+          const chassisVal = (p.voertuigChassisnummer || "").trim() || "—";
+          let garantieVal = "Geen garantie";
+          if (p.garantieType === "autotrust") {
+            const looptijd = num(p.garantieLooptijd);
+            const pakket = (p.garantiePakket || "").trim();
+            if (pakket && looptijd > 0) {
+              garantieVal = `${pakket} · ${looptijd} maanden via Autotrust`;
+            } else if (pakket) {
+              garantieVal = `${pakket} via Autotrust`;
+            } else {
+              garantieVal = "Autotrust";
+            }
+          }
+          const fields: Array<{ label: string; value: string }> = [
+            { label: "Kenteken", value: kentekenVal },
+            { label: "Merk / Model", value: merkModelVal },
+            { label: "Bouwjaar", value: bouwjaarVal },
+            { label: "Kilometerstand", value: kmVal },
+            { label: "Chassisnummer", value: chassisVal },
+            { label: "Garantie", value: garantieVal },
+          ];
+          return (
+            <div className="rounded-[8px] border border-border bg-muted/20 p-4">
+              <div className={`${labelCls} mb-3`}>Aangepaste velden (Moneybird)</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                {fields.map((f) => (
+                  <div key={f.label}>
+                    <div className={labelCls}>{f.label}</div>
+                    <div className="font-medium break-words">{f.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Bewerkbare factuurregels */}
         <div className="rounded-[8px] border border-border overflow-hidden">
           <table className="w-full text-sm">
