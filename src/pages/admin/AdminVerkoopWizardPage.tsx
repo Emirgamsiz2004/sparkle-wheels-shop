@@ -783,7 +783,7 @@ const AdminVerkoopWizardPage = () => {
   // ─────────────────────────────────────────────────────────
 
   return (
-    <div className="admin-theme h-screen overflow-hidden bg-background text-foreground">
+    <div className="admin-theme h-screen overflow-hidden bg-background text-foreground max-w-[100vw]" style={{ overflowX: "hidden" }}>
       {/* Fixed sidebar */}
       <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-[280px] z-10 border-r border-border bg-sidebar flex-col">
           <div className="p-5 border-b border-sidebar-border">
