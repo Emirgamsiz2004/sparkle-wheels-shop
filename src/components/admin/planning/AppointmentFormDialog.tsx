@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Car, PackageCheck, CalendarIcon, Clock, Wrench, Truck, MoreHorizontal, ArrowLeft } from "lucide-react";
+import { Eye, Car, PackageCheck, CalendarIcon, Clock, Wrench, Truck, MoreHorizontal, ArrowLeft, X } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,8 @@ interface Props {
   allVehicles?: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
   onSubmit: (data: any) => Promise<void>;
   defaultType?: string;
+  anchorRect?: DOMRect | null;
+  onBackToTypePicker?: () => void;
 }
 
 const typeOptions: { value: AppointmentType; label: string; icon: typeof Eye }[] = [
@@ -47,7 +50,7 @@ const timeSlots = Array.from({ length: 20 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${m}`;
 });
 
-const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType }: Props) => {
+const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType, anchorRect, onBackToTypePicker }: Props) => {
   const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
   const [type, setType] = useState<AppointmentType | null>((defaultType as AppointmentType) || null);
   const [saving, setSaving] = useState(false);
@@ -161,54 +164,96 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[500px] rounded-[3px] overflow-hidden">
-        <DialogHeader>
-          <DialogTitle className="font-heading">
-            {step === "type" ? "Wat voor afspraak?" : "Nieuwe afspraak"}
-          </DialogTitle>
-        </DialogHeader>
+  // Popover positioning + outside-click + ESC
+  const isMobile = useIsMobile();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleOpenChange(false); };
+    const onDown = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) handleOpenChange(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const t = setTimeout(() => document.addEventListener("mousedown", onDown), 0);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      clearTimeout(t);
+      document.removeEventListener("mousedown", onDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open || isMobile || !anchorRect) { setPos(null); return; }
+    const W = 360;
+    const margin = 8;
+    const vw = window.innerWidth;
+    let left = anchorRect.right - W;
+    if (left < margin) left = margin;
+    if (left + W > vw - margin) left = vw - W - margin;
+    const top = anchorRect.bottom + 6;
+    setPos({ top, left });
+  }, [open, isMobile, anchorRect]);
+
+  // Auto-resize textarea (notities)
+  const notitiesRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const el = notitiesRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [form.notities, open]);
+
+  if (!open) return null;
+
+  const containerClass = isMobile
+    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-[16px] border-t border-x border-border/60 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
+    : "fixed z-50 w-[360px] max-h-[85vh] overflow-y-auto rounded-[14px] border border-border/60 bg-card shadow-[0_8px_30px_rgba(0,0,0,0.35)] animate-in fade-in-0 zoom-in-95 duration-150 transition-[height] duration-200 ease-out";
+
+  const containerStyle: React.CSSProperties = isMobile
+    ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" }
+    : pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 };
+
+  return createPortal(
+    <div ref={containerRef} className={containerClass} style={containerStyle} role="dialog" aria-label="Nieuwe afspraak">
+      {isMobile && (
+        <div className="pt-2 pb-1 flex justify-center">
+          <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+        </div>
+      )}
+      <button
+        onClick={() => handleOpenChange(false)}
+        className="absolute top-3 right-3 z-10 h-7 w-7 inline-flex items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground hover:bg-accent/40 transition-colors"
+        aria-label="Sluiten"
+      >
+        <X className="w-4 h-4" />
+      </button>
+      <div style={{ padding: 18 }}>
 
         <AnimatePresence mode="wait">
-          {step === "type" ? (
-            <motion.div
-              key="type-step"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-2 gap-3 pt-2"
-            >
-              {typeOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => { setType(opt.value); setStep("form"); }}
-                  className="flex flex-col items-center justify-center gap-2 p-5 min-h-[96px] rounded-[8px] border border-border bg-card hover:bg-accent/40 hover:border-foreground/30 transition-colors"
-                >
-                  <opt.icon className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-sm font-body tracking-wide text-center">{opt.label}</span>
-                </button>
-              ))}
-            </motion.div>
-          ) : (
+          {step === "form" && (
             <motion.div
               key="form-step"
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-4 pt-2"
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              className="space-y-4"
             >
-              {/* Selected type badge — clickable to go back */}
+              {/* Header — back arrow + type badge */}
               {type && (
                 <button
                   type="button"
-                  onClick={() => setStep("type")}
-                  className="inline-flex items-center gap-1.5 group"
+                  onClick={() => {
+                    handleOpenChange(false);
+                    onBackToTypePicker?.();
+                  }}
+                  className="inline-flex items-center gap-1.5 group mb-1"
                   title="Wijzig type"
                 >
-                  <ArrowLeft className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <ArrowLeft className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
                   <Badge className={`${typeColors[type]} border text-[11px] cursor-pointer`}>
                     {typeLabels[type]}
                   </Badge>
@@ -360,20 +405,21 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                 )}
               </AnimatePresence>
 
-              {/* Notities */}
+              {/* Notities — autosize */}
               <div>
                 <Label className="text-xs text-muted-foreground mb-1.5 block">Notities <span className="opacity-50">(optioneel)</span></Label>
                 <Textarea
+                  ref={notitiesRef}
                   value={form.notities}
                   onChange={(e) => setForm({ ...form, notities: e.target.value })}
                   placeholder="Eventuele opmerkingen"
                   rows={2}
-                  className="rounded-[3px]"
+                  className="rounded-[3px] resize-none overflow-hidden min-h-[60px] transition-[height] duration-150"
                 />
               </div>
 
               {/* Submit */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <Button
                   className="w-full rounded-[3px] bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
                   onClick={handleSubmit}
@@ -385,8 +431,9 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
             </motion.div>
           )}
         </AnimatePresence>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>,
+    document.body
   );
 };
 

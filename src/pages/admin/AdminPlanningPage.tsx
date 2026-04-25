@@ -423,6 +423,11 @@ const AdminPlanningPage = () => {
         allVehicles={allSelectableVehicles}
         onSubmit={addAppointment}
         defaultType={pickedType}
+        anchorRect={pickerRect}
+        onBackToTypePicker={() => {
+          setPickerRect(addBtnRef.current?.getBoundingClientRect() || null);
+          setPickerOpen(true);
+        }}
       />
       <AppointmentDetailDialog appointment={detailAppointment} anchorRect={detailRect} open={!!detailAppointment} onOpenChange={(v) => { if (!v) setDetailAppointment(null); }} onUpdate={updateAppointment} onDelete={deleteAppointment} />
     </div>
