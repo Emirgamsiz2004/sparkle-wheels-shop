@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, ChevronLeft, ChevronRight, Check, Clock, Car, CalendarDays, List, Search } from "lucide-react";
@@ -9,6 +9,7 @@ import { useCustomers } from "@/hooks/useCustomers";
 import { useVehicles } from "@/hooks/useVehicles";
 import { useIsMobile } from "@/hooks/use-mobile";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
+import AppointmentTypePicker from "@/components/admin/planning/AppointmentTypePicker";
 import AppointmentDetailDialog from "@/components/admin/planning/AppointmentDetailDialog";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
@@ -48,6 +49,10 @@ const AdminPlanningPage = () => {
   const isMobile = useIsMobile();
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [formOpen, setFormOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerRect, setPickerRect] = useState<DOMRect | null>(null);
+  const [pickedType, setPickedType] = useState<string | undefined>(undefined);
+  const addBtnRef = useRef<HTMLButtonElement>(null);
   const [detailAppointment, setDetailAppointment] = useState<Appointment | null>(null);
   const [detailRect, setDetailRect] = useState<DOMRect | null>(null);
   const openDetail = (a: Appointment, e: React.MouseEvent) => {
@@ -135,7 +140,11 @@ const AdminPlanningPage = () => {
         <div className="flex items-center gap-2 shrink-0">
           <SlidingTabs tabs={viewTabs} value={view} onChange={(v) => setView(v as ViewMode)} />
           <button
-            onClick={() => setFormOpen(true)}
+            ref={addBtnRef}
+            onClick={() => {
+              setPickerRect(addBtnRef.current?.getBoundingClientRect() || null);
+              setPickerOpen(true);
+            }}
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97]"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -400,7 +409,21 @@ const AdminPlanningPage = () => {
       )}
 
       {/* Dialogs */}
-      <AppointmentFormDialog open={formOpen} onOpenChange={setFormOpen} customers={customers} vehicles={activeVehicles} allVehicles={allSelectableVehicles} onSubmit={addAppointment} />
+      <AppointmentTypePicker
+        open={pickerOpen}
+        anchorRect={pickerRect}
+        onOpenChange={setPickerOpen}
+        onSelect={(t) => { setPickedType(t); setFormOpen(true); }}
+      />
+      <AppointmentFormDialog
+        open={formOpen}
+        onOpenChange={(v) => { setFormOpen(v); if (!v) setPickedType(undefined); }}
+        customers={customers}
+        vehicles={activeVehicles}
+        allVehicles={allSelectableVehicles}
+        onSubmit={addAppointment}
+        defaultType={pickedType}
+      />
       <AppointmentDetailDialog appointment={detailAppointment} anchorRect={detailRect} open={!!detailAppointment} onOpenChange={(v) => { if (!v) setDetailAppointment(null); }} onUpdate={updateAppointment} onDelete={deleteAppointment} />
     </div>
   );
