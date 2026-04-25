@@ -49,6 +49,11 @@ const AdminPlanningPage = () => {
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [formOpen, setFormOpen] = useState(false);
   const [detailAppointment, setDetailAppointment] = useState<Appointment | null>(null);
+  const [detailRect, setDetailRect] = useState<DOMRect | null>(null);
+  const openDetail = (a: Appointment, e: React.MouseEvent) => {
+    setDetailRect((e.currentTarget as HTMLElement).getBoundingClientRect());
+    setDetailAppointment(a);
+  };
   const [view, setView] = useState<ViewMode>("agenda");
 
   // List view filters
