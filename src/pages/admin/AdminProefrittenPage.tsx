@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
 import { useAppointments, typeColors, typeLabels } from "@/hooks/useAppointments";
 import { Loader2, Search, ChevronRight, CheckCircle2, Clock, XCircle, Car, StopCircle, Plus, Play, CalendarDays } from "lucide-react";
