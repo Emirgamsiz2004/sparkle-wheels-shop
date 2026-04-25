@@ -78,6 +78,7 @@ const Stap8Betaling = ({
   initialBetalingOntvangen,
   initialRestbedragLater,
   initialRestbedragVerwachteDatum,
+  initialOpenstaandRestbedrag,
   onSaved,
 }: Props) => {
   const { invoke, loading: mbLoading } = useMoneybird();
