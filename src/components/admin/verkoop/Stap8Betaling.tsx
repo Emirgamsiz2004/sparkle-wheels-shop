@@ -154,10 +154,20 @@ const Stap8Betaling = ({
     (sum, r) => sum + (typeof r.bedrag === "number" ? r.bedrag : 0),
     0,
   );
-  const verschil = totaalRijen - nogTeOntvangen;
+  const openstaandNum = typeof openstaandRestbedrag === "number" ? openstaandRestbedrag : 0;
+  const verschil = restbedragLater
+    ? totaalRijen + openstaandNum - nogTeOntvangen
+    : totaalRijen - nogTeOntvangen;
   const klopt = Math.abs(verschil) <= 0.01 && nogTeOntvangen > 0;
 
-  // ─── Persisteren ───
+  // Auto-fill openstaand restbedrag wanneer toggle aan staat en niet handmatig bewerkt
+  useEffect(() => {
+    if (!restbedragLater) return;
+    if (openstaandManueel) return;
+    const auto = Math.max(0, nogTeOntvangen - totaalRijen);
+    setOpenstaandRestbedrag(auto);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restbedragLater, totaalRijen, nogTeOntvangen, openstaandManueel]);
   const persist = async (overrides: Record<string, any> = {}) => {
     if (!verkoopId) return;
     const primaryMethod: Methode = rijen[0]?.methode || "bank";
