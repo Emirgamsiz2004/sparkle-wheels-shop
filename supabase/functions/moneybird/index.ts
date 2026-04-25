@@ -485,10 +485,34 @@ Deno.serve(async (req) => {
       case "create_credit_invoice": {
         const { invoice_id: ccInvoiceId } = params;
         if (!ccInvoiceId) throw new Error("invoice_id is required");
-        result = await mbFetch(
-          `sales_invoices/${ccInvoiceId}/create_credit_invoice.json`,
-          { method: "POST", body: JSON.stringify({}) }
-        );
+
+        // 1) Haal de originele factuur op
+        const original: any = await mbFetch(`sales_invoices/${ccInvoiceId}.json`);
+
+        // 2) Bouw credit-payload (negatieve aantallen) op basis van de originele regels
+        const details = (original?.details_attributes || original?.details || []).map((d: any) => ({
+          description: d.description,
+          price: d.price,
+          amount: d.amount ? `-${String(d.amount).replace(/^-/, "")}` : "-1",
+          tax_rate_id: d.tax_rate_id,
+          ledger_account_id: d.ledger_account_id,
+          product_id: d.product_id,
+          period: d.period,
+          row_order: d.row_order,
+        }));
+
+        const creditPayload: Record<string, unknown> = {
+          sales_invoice: {
+            contact_id: original?.contact_id,
+            reference: `Creditnota voor ${original?.invoice_id || ccInvoiceId}`,
+            details_attributes: details,
+          },
+        };
+
+        result = await mbFetch("sales_invoices.json", {
+          method: "POST",
+          body: JSON.stringify(creditPayload),
+        });
         break;
       }
 
