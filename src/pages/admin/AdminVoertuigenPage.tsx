@@ -20,7 +20,6 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "consignatie", label: "Consignatie" },
   { value: "gereserveerd", label: "Gereserveerd" },
   { value: "reparatie_onderhoud", label: "Reparatie/Onderhoud" },
-  { value: "verkocht", label: "Verkocht" },
 ];
 
 const AdminVoertuigenPage = () => {
