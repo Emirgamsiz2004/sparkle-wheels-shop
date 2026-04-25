@@ -32,11 +32,11 @@ const AfleveringSection = () => {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="relative overflow-hidden">
+            <div className="relative overflow-hidden max-h-[300px]">
               <img
                 src={afleveringImg}
                 alt="Platin Automotive levert een rode Volkswagen Polo GTI af op locatie met eigen autotransporter"
-                className="w-full h-auto object-cover aspect-[16/10]"
+                className="w-full h-auto object-cover max-h-[300px]"
                 loading="lazy"
               />
             </div>
