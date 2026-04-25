@@ -609,6 +609,8 @@ const AdminVerkoopWizardPage = () => {
   const progressPct = Math.round((doneCount / totalSteps) * 100);
 
   const currentStep = STEPS.find((s) => s.num === activeStap)!;
+  const visibleSteps = STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9));
+  const currentDisplayNum = visibleSteps.findIndex((s) => s.num === activeStap) + 1;
 
   // ───────────────────────────────────────────────────────────
   // Centrale validatie
