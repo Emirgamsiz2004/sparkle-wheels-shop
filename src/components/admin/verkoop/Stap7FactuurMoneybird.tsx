@@ -45,7 +45,7 @@ const CUSTOM_FIELD_IDS = {
   bouwjaar: "482838097400169743",
   kilometerstand: "482048832877627078",
   merk_model: "482838073633146484",
-  garantie: "482848149761419699",
+  garantie: "482841497614419699",
 } as const;
 
 type VoertuigType = "marge" | "btw" | "consignatie";
