@@ -287,6 +287,9 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
+      {/* ═══ BLOK 3b — Herkomst klanten ═══ */}
+      <DashboardLeadSourcesCard from={periodRange.from} to={periodRange.to} />
+
       {/* ═══ BLOK 4 — Voorraad overzicht ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
