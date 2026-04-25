@@ -173,7 +173,7 @@ const App = () => (
           )}
           
           <WhatsAppButton />
-          <AfspraakStickyButton />
+          
           <CookieBanner />
         </BrowserRouter>
       </TooltipProvider>
