@@ -570,7 +570,13 @@ const AdminVerkoopWizardPage = () => {
   };
 
   const handleStepClick = (stap: number) => {
-    if (isStepBlocked(stap, completed, inruil)) return;
+    if (isStepBlocked(stap, completed, inruil)) {
+      // Specifieke melding bij betalingsblokkade
+      if (stap >= 9 && stap <= 12 && !completed[8] && completed[5]) {
+        toast.error("Betaling moet eerst bevestigd worden.");
+      }
+      return;
+    }
     setActiveStap(stap);
   };
 
