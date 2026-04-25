@@ -1,7 +1,0 @@
-{
-  "nodeModulesDir": "auto",
-  "compilerOptions": {
-    "skipLibCheck": true,
-    "noImplicitAny": false
-  }
-}
