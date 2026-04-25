@@ -521,7 +521,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
             </motion.div>
           </div>
         )}
-      </DialogContent>
+      </div>
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
@@ -546,7 +546,8 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Dialog>
+    </div>,
+    document.body
   );
 };
 
