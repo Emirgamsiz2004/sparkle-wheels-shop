@@ -783,7 +783,7 @@ const AdminVerkoopWizardPage = () => {
   // ─────────────────────────────────────────────────────────
 
   return (
-    <div className="admin-theme h-screen overflow-hidden bg-background text-foreground">
+    <div className="admin-theme h-screen overflow-hidden bg-background text-foreground max-w-[100vw]" style={{ overflowX: "hidden" }}>
       {/* Fixed sidebar */}
       <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-[280px] z-10 border-r border-border bg-sidebar flex-col">
           <div className="p-5 border-b border-sidebar-border">
@@ -883,9 +883,12 @@ const AdminVerkoopWizardPage = () => {
         />
 
       {/* Hoofdinhoud */}
-      <main className="lg:ml-[280px] h-screen overflow-y-scroll wizard-content" style={{ scrollbarGutter: "stable" }}>
+      <main className="lg:ml-[280px] h-screen overflow-y-scroll overflow-x-hidden wizard-content max-w-full" style={{ scrollbarGutter: "stable" }}>
         {/* Mobiele horizontale stappenindicator */}
-        <div className="lg:hidden sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-border">
+        <div
+          className="lg:hidden sticky top-0 z-20 bg-background border-b border-border"
+          style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+        >
           <div className="flex items-center justify-between px-4 py-2 text-[11px] text-muted-foreground">
             <span>Stap {currentDisplayNum > 0 ? currentDisplayNum : currentStep.num} van {visibleSteps.length}</span>
             <span>{doneCount}/{totalSteps} voltooid</span>
@@ -1378,27 +1381,30 @@ const AdminVerkoopWizardPage = () => {
       </main>
 
       {/* Fixed footer met navigatie */}
-      <div className="fixed bottom-0 left-[280px] right-0 z-10 border-t border-border bg-card/95 backdrop-blur px-8 py-4 flex items-center justify-between">
+      <div
+        className="fixed bottom-0 left-0 lg:left-[280px] right-0 z-10 border-t border-border bg-card/95 backdrop-blur px-4 lg:px-8 py-3 lg:py-4 flex items-center gap-2 lg:gap-4 max-w-full"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
+      >
         <button
           onClick={handleVorige}
           disabled={activeStap === 1}
-          className="px-5 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="w-[30%] lg:w-auto px-3 lg:px-5 py-2.5 text-sm border border-border rounded-[10px] hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Vorige
         </button>
-        <div className="text-[11px] text-muted-foreground">
+        <div className="hidden lg:block text-[11px] text-muted-foreground flex-1 text-center">
           {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
         </div>
         {activeStap < 11 ? (
           <button
             onClick={handleVolgende}
             disabled={saving}
-            className="px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
+            className="w-[70%] lg:w-auto lg:ml-auto px-3 lg:px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
           >
             Volgende
           </button>
         ) : (
-          <div />
+          <div className="w-[70%] lg:w-auto" />
         )}
       </div>
     </div>

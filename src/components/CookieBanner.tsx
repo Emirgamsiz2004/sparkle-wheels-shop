@@ -25,7 +25,10 @@ const CookieBanner = () => {
   };
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-[60] p-4 md:p-6">
+    <div
+      className="fixed bottom-0 left-0 right-0 z-[9999] p-4 md:p-6"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1rem)" }}
+    >
       <div className="mx-auto max-w-2xl bg-card border border-border rounded-xl p-5 shadow-2xl backdrop-blur-sm">
         <p className="text-sm text-muted-foreground leading-relaxed mb-4">
           Wij gebruiken cookies om uw ervaring op onze website te verbeteren. Noodzakelijke cookies zijn altijd actief. U kunt optionele cookies accepteren of weigeren.{" "}
