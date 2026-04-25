@@ -376,6 +376,15 @@ const VoorraadDetailPage = () => {
                   </a>
                 </div>
 
+                {/* Inline afspraak widget — desktop only */}
+                <div className="hidden lg:block">
+                  <InlineAfspraakWidget
+                    vehicleId={vehicle.id}
+                    merk={vehicle.merk}
+                    model={vehicle.model}
+                  />
+                </div>
+
                 {dbMarktplaatsUrl && (
                   <a
                     href={dbMarktplaatsUrl}
