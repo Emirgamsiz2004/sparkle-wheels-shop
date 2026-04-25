@@ -363,4 +363,18 @@ const ApkBadge = ({ apkVervaldatum }: { apkVervaldatum?: string }) => {
   );
 };
 
+// Mobiele APK-info: korte datumweergave + warn-flag (binnen 60 dagen of verlopen)
+const getMobileApkInfo = (apkVervaldatum?: string) => {
+  if (!apkVervaldatum) return null;
+  const apk = new Date(apkVervaldatum);
+  if (isNaN(apk.getTime())) return null;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil((apk.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const expired = diffDays < 0;
+  const warn = expired || diffDays <= 60;
+  const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+  const label = expired ? `Verlopen ${formatted}` : `APK tot ${formatted}`;
+  return { label, expired, warn };
+};
+
 export default AdminVoertuigenPage;
