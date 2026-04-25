@@ -781,16 +781,15 @@ const AdminVerkoopWizardPage = () => {
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               const hasIssues = !blocked && stepHasIssues(step.num);
-              // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/vrijwaring)
+              // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/tenaamstelling)
               const lockedByPrereq =
                 blocked &&
                 step.num >= 9 &&
-                step.num <= 12 &&
+                step.num <= 11 &&
                 !!completed[5] &&
                 ((!completed[8]) ||
                   (step.num >= 10 && inruil && !completed[9]) ||
-                  (step.num >= 11 && !completed[10]) ||
-                  (step.num === 12 && !completed[11]));
+                  (step.num === 11 && !completed[10]));
 
               return (
                 <button
