@@ -33,7 +33,6 @@ const AdminLayout = () => {
   const { user, loading, signOut, isAdmin, isMedewerker, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [overdueLeads, setOverdueLeads] = useState(0);
 
   // Fetch overdue leads count
