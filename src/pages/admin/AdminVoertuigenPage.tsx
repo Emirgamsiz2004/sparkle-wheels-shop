@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 
 import { useNavigate, Link } from "react-router-dom";
-import { Plus, Search, Loader2, ChevronRight, RefreshCw, AlertTriangle, FileWarning } from "lucide-react";
+import { Plus, Search, Loader2, ChevronRight, RefreshCw, AlertTriangle, FileWarning, ShieldCheck } from "lucide-react";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
 import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors, Vehicle } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -10,6 +10,7 @@ import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { getApkStatus } from "@/components/admin/detail/VehicleOverzichtTab";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { recheckApk } from "@/lib/apkRecheck";
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "alle", label: "Alle statussen" },
