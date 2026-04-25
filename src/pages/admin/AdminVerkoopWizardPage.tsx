@@ -1259,7 +1259,53 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 10 && (
+            {activeStap === 11 && (
+              <Stap11Uitlevering
+                verkoopId={verkoopId}
+                voertuigKenteken={vehicle?.kenteken || ""}
+                voertuigMerk={vehicle?.merk || ""}
+                voertuigModel={vehicle?.model || ""}
+                voertuigBouwjaar={vehicle?.bouwjaar || null}
+                voertuigApkVervaldatum={(vehicle as any)?.apkVervaldatum || null}
+                initialAutoSchoongemaakt={autoSchoongemaakt}
+                initialApkGecommuniceerd={apkGecommuniceerd}
+                initialSleutelsOverhandigd={sleutelsOverhandigd}
+                initialSleutelsAantal={sleutelsAantal}
+                initialGebrekenBesproken={gebrekenBesproken}
+                initialGebrekenOmschrijving={gebrekenOmschrijving}
+                initialTenaamstellingsbewijsMeegegeven={tenaamstellingsbewijsMeegegeven}
+                initialUitleveringFotos={uitleveringFotos}
+                initialUitleveringDatum={uitleveringDatum}
+                initialUitleveringVoltooid={uitleveringVoltooid}
+                onSaved={async (extra) => {
+                  if (extra.auto_schoongemaakt !== undefined)
+                    setAutoSchoongemaakt(!!extra.auto_schoongemaakt);
+                  if (extra.apk_gecommuniceerd !== undefined)
+                    setApkGecommuniceerd(!!extra.apk_gecommuniceerd);
+                  if (extra.sleutels_overhandigd !== undefined)
+                    setSleutelsOverhandigd(!!extra.sleutels_overhandigd);
+                  if (extra.sleutels_aantal !== undefined)
+                    setSleutelsAantal(extra.sleutels_aantal);
+                  if (extra.gebreken_besproken !== undefined)
+                    setGebrekenBesproken(!!extra.gebreken_besproken);
+                  if (extra.gebreken_omschrijving !== undefined)
+                    setGebrekenOmschrijving(extra.gebreken_omschrijving);
+                  if (extra.tenaamstellingsbewijs_meegegeven !== undefined)
+                    setTenaamstellingsbewijsMeegegeven(!!extra.tenaamstellingsbewijs_meegegeven);
+                  if (extra.uitlevering_fotos !== undefined)
+                    setUitleveringFotos(extra.uitlevering_fotos || []);
+                  if (extra.uitlevering_datum !== undefined)
+                    setUitleveringDatum(extra.uitlevering_datum);
+                  if (extra.uitlevering_voltooid !== undefined)
+                    setUitleveringVoltooid(!!extra.uitlevering_voltooid);
+                  if (extra.stap11_afgerond !== undefined)
+                    setCompleted((p) => ({ ...p, 11: !!extra.stap11_afgerond }));
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 11 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
