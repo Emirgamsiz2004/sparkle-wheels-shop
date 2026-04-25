@@ -4,12 +4,13 @@ import {
   startOfQuarter, startOfYear, addMonths, isSameDay, format, parse, isValid,
 } from "date-fns";
 import { nl } from "date-fns/locale";
-import { ChevronRight, ChevronLeft, ArrowLeft, Calendar as CalendarIcon } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowLeft, Calendar as CalendarIcon, X } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { DateRange } from "react-day-picker";
 
 export interface PeriodRange {
