@@ -233,44 +233,27 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
       <div style={{ padding: 18 }}>
 
         <AnimatePresence mode="wait">
-          {step === "type" ? (
-            <motion.div
-              key="type-step"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-2 gap-3 pt-2"
-            >
-              {typeOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => { setType(opt.value); setStep("form"); }}
-                  className="flex flex-col items-center justify-center gap-2 p-5 min-h-[96px] rounded-[8px] border border-border bg-card hover:bg-accent/40 hover:border-foreground/30 transition-colors"
-                >
-                  <opt.icon className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-sm font-body tracking-wide text-center">{opt.label}</span>
-                </button>
-              ))}
-            </motion.div>
-          ) : (
+          {step === "form" && (
             <motion.div
               key="form-step"
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-4 pt-2"
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              className="space-y-4"
             >
-              {/* Selected type badge — clickable to go back */}
+              {/* Header — back arrow + type badge */}
               {type && (
                 <button
                   type="button"
-                  onClick={() => setStep("type")}
-                  className="inline-flex items-center gap-1.5 group"
+                  onClick={() => {
+                    handleOpenChange(false);
+                    onBackToTypePicker?.();
+                  }}
+                  className="inline-flex items-center gap-1.5 group mb-1"
                   title="Wijzig type"
                 >
-                  <ArrowLeft className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <ArrowLeft className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
                   <Badge className={`${typeColors[type]} border text-[11px] cursor-pointer`}>
                     {typeLabels[type]}
                   </Badge>
