@@ -264,6 +264,88 @@ const Stap8Betaling = ({
     });
   };
 
+  // ─── Restbedrag later toggle ───
+  const handleToggleRestbedragLater = async (val: boolean) => {
+    setRestbedragLater(val);
+    await persist({
+      restbedrag_later: val,
+      restbedrag_verwachte_datum: val ? verwachteDatum || null : null,
+    });
+  };
+
+  const handleVerwachteDatumChange = async (iso: string) => {
+    setVerwachteDatum(iso);
+    if (restbedragLater) {
+      await persist({ restbedrag_later: true, restbedrag_verwachte_datum: iso || null });
+    }
+  };
+
+  // ─── Restbetalingsafspraak PDF ───
+  const handleGenerateRestbetalingPdf = async () => {
+    if (!verkoopId) {
+      toast.error("Geen verkoop gevonden");
+      return;
+    }
+    if (!verwachteDatum) {
+      toast.error("Vul eerst de uiterlijke betaaldatum in");
+      return;
+    }
+    setGeneratingPdf(true);
+    try {
+      const primaryMethode: Methode = rijen[0]?.methode || "bank";
+      const { blob, fileName } = generateRestbetalingPDF({
+        voertuig: {
+          merk: voertuigMerk,
+          model: voertuigModel,
+          bouwjaar: voertuigBouwjaar,
+          kenteken: voertuigKenteken,
+        },
+        klant: {
+          voornaam: klantVoornaam,
+          achternaam: klantAchternaam,
+          adres: klantAdres,
+          postcode: klantPostcode,
+          woonplaats: klantWoonplaats,
+        },
+        reedsVoldaan: aanbetalingBedrag,
+        restbedrag: nogTeOntvangen,
+        uiterlijkeDatum: verwachteDatum,
+        betaalwijze: primaryMethode === "cash" ? "cash" : "bank",
+        opmerking: opmerking,
+        datum: new Date().toISOString().slice(0, 10),
+      });
+
+      const localUrl = URL.createObjectURL(blob);
+      window.open(localUrl, "_blank");
+
+      try {
+        const path = `verkopen/${verkoopId}/${fileName}`;
+        const { error: upErr } = await supabase.storage
+          .from("vehicle-documents")
+          .upload(path, blob, { contentType: "application/pdf", upsert: true });
+        if (!upErr) {
+          const { data: signed } = await supabase.storage
+            .from("vehicle-documents")
+            .createSignedUrl(path, 60 * 60 * 24 * 365);
+          await supabase.from("verkoop_documenten").insert({
+            verkoop_id: verkoopId,
+            type: "restbetalingsafspraak",
+            pdf_url: signed?.signedUrl || path,
+          });
+        }
+      } catch (err) {
+        console.warn("Upload restbetalingsafspraak mislukt", err);
+      }
+
+      toast.success("Betalingsafspraak gegenereerd");
+    } catch (err) {
+      console.error(err);
+      toast.error("Genereren van PDF mislukt");
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
   // ─── Auto-save bij wijziging van datum/opmerking/rijen (debounced via blur) ───
   const triggerSave = () => {
     persist();
