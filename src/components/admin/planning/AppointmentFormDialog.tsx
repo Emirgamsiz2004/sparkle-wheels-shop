@@ -31,6 +31,8 @@ interface Props {
   allVehicles?: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
   onSubmit: (data: any) => Promise<void>;
   defaultType?: string;
+  anchorRect?: DOMRect | null;
+  onBackToTypePicker?: () => void;
 }
 
 const typeOptions: { value: AppointmentType; label: string; icon: typeof Eye }[] = [
