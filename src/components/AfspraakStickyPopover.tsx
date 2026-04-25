@@ -229,12 +229,15 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
       <motion.div
         ref={containerRef}
         layoutId="afspraak-cta"
-        initial={isMobile ? { y: "100%", opacity: 0 } : { opacity: 0, scale: 0.9 }}
-        animate={isMobile ? { y: 0, opacity: 1 } : { opacity: 1, scale: 1 }}
-        exit={isMobile ? { y: "100%", opacity: 0 } : { opacity: 0, scale: 0.9 }}
+        initial={isMobile ? { y: "100%", opacity: 0 } : false}
+        animate={isMobile ? { y: 0, opacity: 1 } : undefined}
+        exit={isMobile ? { y: "100%", opacity: 0 } : undefined}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         className={containerClass}
-        style={isMobile ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" } : undefined}
+        style={{
+          ...(isMobile ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" } : null),
+          borderRadius: 16,
+        }}
         role="dialog"
         aria-label="Afspraak maken"
       >
