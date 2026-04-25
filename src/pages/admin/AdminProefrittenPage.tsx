@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
 import { useAppointments, typeColors, typeLabels } from "@/hooks/useAppointments";
 import { Loader2, Search, ChevronRight, CheckCircle2, Clock, XCircle, Car, StopCircle, Plus, Play, CalendarDays } from "lucide-react";
@@ -31,6 +31,12 @@ const AdminProefrittenPage = () => {
   const [selected, setSelected] = useState<TestDrive | null>(null);
   const [ending, setEnding] = useState<TestDrive | null>(null);
   const [newOpen, setNewOpen] = useState(false);
+  const [newAnchor, setNewAnchor] = useState<DOMRect | null>(null);
+  const newBtnRef = useRef<HTMLButtonElement>(null);
+  const openNew = (el?: HTMLElement | null) => {
+    setNewAnchor((el ?? newBtnRef.current)?.getBoundingClientRect() ?? null);
+    setNewOpen(true);
+  };
   const [startFromAppointment, setStartFromAppointment] = useState<{ id: string; merk: string; model: string; kenteken?: string; bouwjaar?: number; kilometerstand?: number } | null>(null);
 
   // Upcoming proefrit appointments (scheduled, future or today)
@@ -63,7 +69,8 @@ const AdminProefrittenPage = () => {
           <p className="text-sm text-muted-foreground">{testDrives.length} proefrit{testDrives.length !== 1 ? "ten" : ""}</p>
         </div>
         <button
-          onClick={() => setNewOpen(true)}
+          ref={newBtnRef}
+          onClick={() => openNew()}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97] shrink-0"
         >
           <Plus className="w-3.5 h-3.5" />
@@ -191,6 +198,7 @@ const AdminProefrittenPage = () => {
       <NieuweProefritDialog
         open={newOpen}
         onClose={() => { setNewOpen(false); refetch(); }}
+        anchorRect={newAnchor}
       />
 
       {/* Start from scheduled appointment */}
