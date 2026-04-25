@@ -140,7 +140,11 @@ const AdminPlanningPage = () => {
         <div className="flex items-center gap-2 shrink-0">
           <SlidingTabs tabs={viewTabs} value={view} onChange={(v) => setView(v as ViewMode)} />
           <button
-            onClick={() => setFormOpen(true)}
+            ref={addBtnRef}
+            onClick={() => {
+              setPickerRect(addBtnRef.current?.getBoundingClientRect() || null);
+              setPickerOpen(true);
+            }}
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97]"
           >
             <Plus className="w-3.5 h-3.5" />
