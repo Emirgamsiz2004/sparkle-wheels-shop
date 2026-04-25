@@ -476,7 +476,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs text-muted-foreground mb-1.5 block">Datum</Label>
-                <Popover>
+                <Popover open={editDateOpen} onOpenChange={setEditDateOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -487,7 +487,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 rounded-[3px]" align="start">
-                    <Calendar mode="single" selected={editDate} onSelect={setEditDate} locale={nl} className="p-3 pointer-events-auto" />
+                    <Calendar mode="single" selected={editDate} onSelect={(d) => { setEditDate(d); setEditDateOpen(false); }} locale={nl} className="p-3 pointer-events-auto" />
                   </PopoverContent>
                 </Popover>
               </div>
