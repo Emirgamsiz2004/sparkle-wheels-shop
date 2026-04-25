@@ -644,6 +644,24 @@ const Stap8Betaling = ({
           <>
             <div>
               <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
+                Openstaand restbedrag
+              </label>
+              <div className="inline-flex items-center gap-2">
+                <span className="text-muted-foreground text-sm">€</span>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  value={openstaandRestbedrag === "" ? "" : openstaandRestbedrag}
+                  onChange={(e) => handleChangeOpenstaand(e.target.value)}
+                  onBlur={handleBlurOpenstaand}
+                  className="w-40 bg-background border border-border rounded-[8px] px-2 py-1.5 text-sm text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
                 Uiterlijk te voldoen op
               </label>
               <Popover>
