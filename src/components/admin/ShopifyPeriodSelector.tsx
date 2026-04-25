@@ -318,17 +318,23 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
               className={cn("p-0 pointer-events-auto")}
               classNames={{
                 months: "flex flex-row gap-4",
-                caption: "flex justify-center pt-1 pb-2 relative items-center text-[12px] font-medium",
+                caption: "flex justify-center pt-1 pb-2 relative items-center text-[12px] font-medium text-foreground",
+                caption_label: "text-[12px] font-medium text-foreground",
                 nav: "hidden",
+                head_cell: "text-muted-foreground/70 rounded-md w-9 font-normal text-[0.7rem] uppercase",
+                cell: "h-9 w-9 text-center text-sm p-0 relative bg-transparent [&:has([aria-selected])]:bg-transparent first:[&:has([aria-selected])]:rounded-none last:[&:has([aria-selected])]:rounded-none focus-within:relative focus-within:z-20",
+                day: "h-9 w-9 p-0 font-normal text-foreground bg-transparent hover:bg-white/[0.08] hover:text-white rounded-full transition-colors aria-selected:opacity-100",
                 day_selected:
-                  "bg-emerald-500 text-white hover:bg-emerald-500 hover:text-white focus:bg-emerald-500 focus:text-white rounded-full",
+                  "!bg-green-600 !text-white hover:!bg-green-600 focus:!bg-green-600 rounded-full",
                 day_range_start:
-                  "bg-emerald-500 text-white rounded-l-full hover:bg-emerald-500",
+                  "!bg-green-600 !text-white rounded-full hover:!bg-green-600",
                 day_range_end:
-                  "bg-emerald-500 text-white rounded-r-full hover:bg-emerald-500",
+                  "!bg-green-600 !text-white rounded-full hover:!bg-green-600",
                 day_range_middle:
-                  "bg-emerald-500/15 text-foreground rounded-none",
-                day_today: "text-emerald-400",
+                  "!bg-green-600/15 !text-white !rounded-none hover:!bg-green-600/25",
+                day_today: "text-green-500 font-semibold",
+                day_outside: "text-muted-foreground/40 opacity-100",
+                day_disabled: "text-muted-foreground/30 opacity-50 hover:bg-transparent",
               }}
             />
           </div>
@@ -337,7 +343,7 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 p-3 border-t border-border bg-card">
           <Button variant="ghost" size="sm" onClick={handleCancel}>Annuleren</Button>
-          <Button size="sm" onClick={handleApply} className="bg-emerald-500 hover:bg-emerald-600 text-white">
+          <Button size="sm" onClick={handleApply} className="bg-green-600 hover:bg-green-700 text-white">
             Toepassen
           </Button>
         </div>
