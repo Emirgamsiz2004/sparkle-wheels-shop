@@ -83,6 +83,7 @@ const lastFiveQuarters = (): { qIdx: number; year: number; label: string }[] => 
 type SubmenuId = null | "afgelopen" | "totnu" | "kwartalen";
 
 export default function ShopifyPeriodSelector({ value, onChange }: Props) {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [submenu, setSubmenu] = useState<SubmenuId>(null);
   const [draft, setDraft] = useState<DateRange | undefined>({ from: value.from, to: value.to });
@@ -91,6 +92,8 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
   const [calMonth, setCalMonth] = useState<Date>(value.from);
   const [fromText, setFromText] = useState(format(value.from, "dd-MM-yyyy"));
   const [toText, setToText] = useState(format(value.to, "dd-MM-yyyy"));
+  // Mobiel: aparte "view" state voor push-navigatie + custom-bereik
+  const [mobileView, setMobileView] = useState<"root" | "afgelopen" | "totnu" | "kwartalen" | "custom">("root");
 
   // Sync draft on open
   useEffect(() => {
