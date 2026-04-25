@@ -23,6 +23,7 @@ import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneyb
 import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
 import Stap9InruilOpNaam from "@/components/admin/verkoop/Stap9InruilOpNaam";
 import Stap10Vrijwaring from "@/components/admin/verkoop/Stap10Vrijwaring";
+import Stap11Uitlevering from "@/components/admin/verkoop/Stap11Uitlevering";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
@@ -83,6 +84,8 @@ const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil:
   if (stap >= 10 && stap <= 12 && inruil && !completed[9]) return true;
   // Stappen 11-12 vereisen 10
   if (stap >= 11 && stap <= 12 && !completed[10]) return true;
+  // Stap 12 vereist 11 (uitlevering)
+  if (stap === 12 && !completed[11]) return true;
   return false;
 };
 
@@ -205,6 +208,18 @@ const AdminVerkoopWizardPage = () => {
   const [machtigingOntvangen, setMachtigingOntvangen] = useState<boolean>(false);
   const [tenaamstellingBevestigd, setTenaamstellingBevestigd] = useState<boolean>(false);
   const [tenaamstellingDatum, setTenaamstellingDatum] = useState<string | null>(null);
+
+  // Stap 11 state — Uitlevering
+  const [autoSchoongemaakt, setAutoSchoongemaakt] = useState<boolean>(false);
+  const [apkGecommuniceerd, setApkGecommuniceerd] = useState<boolean>(false);
+  const [sleutelsOverhandigd, setSleutelsOverhandigd] = useState<boolean>(false);
+  const [sleutelsAantal, setSleutelsAantal] = useState<number | null>(null);
+  const [gebrekenBesproken, setGebrekenBesproken] = useState<boolean>(false);
+  const [gebrekenOmschrijving, setGebrekenOmschrijving] = useState<string | null>(null);
+  const [tenaamstellingsbewijsMeegegeven, setTenaamstellingsbewijsMeegegeven] = useState<boolean>(false);
+  const [uitleveringFotos, setUitleveringFotos] = useState<string[]>([]);
+  const [uitleveringDatum, setUitleveringDatum] = useState<string | null>(null);
+  const [uitleveringVoltooid, setUitleveringVoltooid] = useState<boolean>(false);
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
@@ -393,6 +408,19 @@ const AdminVerkoopWizardPage = () => {
         setMachtigingOntvangen(!!(e as any).machtiging_ontvangen);
         setTenaamstellingBevestigd(!!(e as any).tenaamstelling_bevestigd);
         setTenaamstellingDatum(((e as any).tenaamstelling_datum as string) || null);
+        // Stap 11 hydration — Uitlevering
+        setAutoSchoongemaakt(!!(e as any).auto_schoongemaakt);
+        setApkGecommuniceerd(!!(e as any).apk_gecommuniceerd);
+        setSleutelsOverhandigd(!!(e as any).sleutels_overhandigd);
+        setSleutelsAantal(
+          typeof (e as any).sleutels_aantal === "number" ? (e as any).sleutels_aantal : null,
+        );
+        setGebrekenBesproken(!!(e as any).gebreken_besproken);
+        setGebrekenOmschrijving(((e as any).gebreken_omschrijving as string) || null);
+        setTenaamstellingsbewijsMeegegeven(!!(e as any).tenaamstellingsbewijs_meegegeven);
+        setUitleveringFotos(Array.isArray((e as any).uitlevering_fotos) ? (e as any).uitlevering_fotos : []);
+        setUitleveringDatum(((e as any).uitlevering_datum as string) || null);
+        setUitleveringVoltooid(!!(e as any).uitlevering_voltooid);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -620,6 +648,7 @@ const AdminVerkoopWizardPage = () => {
         if (!completed[8]) missing.push("stap 8 (betaling bevestigen)");
         if (stap >= 10 && inruil && !completed[9]) missing.push("stap 9 (inruil op naam zetten)");
         if (stap >= 11 && !completed[10]) missing.push("stap 10 (vrijwaring)");
+        if (stap === 12 && !completed[11]) missing.push("stap 11 (uitlevering)");
         if (missing.length > 0) {
           toast.error(`Rond eerst ${missing.join(" en ")} af.`);
         }
@@ -761,7 +790,8 @@ const AdminVerkoopWizardPage = () => {
                 !!completed[5] &&
                 ((!completed[8]) ||
                   (step.num >= 10 && inruil && !completed[9]) ||
-                  (step.num >= 11 && !completed[10]));
+                  (step.num >= 11 && !completed[10]) ||
+                  (step.num === 12 && !completed[11]));
 
               return (
                 <button
@@ -1234,7 +1264,53 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 10 && (
+            {activeStap === 11 && (
+              <Stap11Uitlevering
+                verkoopId={verkoopId}
+                voertuigKenteken={vehicle?.kenteken || ""}
+                voertuigMerk={vehicle?.merk || ""}
+                voertuigModel={vehicle?.model || ""}
+                voertuigBouwjaar={vehicle?.bouwjaar || null}
+                voertuigApkVervaldatum={(vehicle as any)?.apkVervaldatum || null}
+                initialAutoSchoongemaakt={autoSchoongemaakt}
+                initialApkGecommuniceerd={apkGecommuniceerd}
+                initialSleutelsOverhandigd={sleutelsOverhandigd}
+                initialSleutelsAantal={sleutelsAantal}
+                initialGebrekenBesproken={gebrekenBesproken}
+                initialGebrekenOmschrijving={gebrekenOmschrijving}
+                initialTenaamstellingsbewijsMeegegeven={tenaamstellingsbewijsMeegegeven}
+                initialUitleveringFotos={uitleveringFotos}
+                initialUitleveringDatum={uitleveringDatum}
+                initialUitleveringVoltooid={uitleveringVoltooid}
+                onSaved={async (extra) => {
+                  if (extra.auto_schoongemaakt !== undefined)
+                    setAutoSchoongemaakt(!!extra.auto_schoongemaakt);
+                  if (extra.apk_gecommuniceerd !== undefined)
+                    setApkGecommuniceerd(!!extra.apk_gecommuniceerd);
+                  if (extra.sleutels_overhandigd !== undefined)
+                    setSleutelsOverhandigd(!!extra.sleutels_overhandigd);
+                  if (extra.sleutels_aantal !== undefined)
+                    setSleutelsAantal(extra.sleutels_aantal);
+                  if (extra.gebreken_besproken !== undefined)
+                    setGebrekenBesproken(!!extra.gebreken_besproken);
+                  if (extra.gebreken_omschrijving !== undefined)
+                    setGebrekenOmschrijving(extra.gebreken_omschrijving);
+                  if (extra.tenaamstellingsbewijs_meegegeven !== undefined)
+                    setTenaamstellingsbewijsMeegegeven(!!extra.tenaamstellingsbewijs_meegegeven);
+                  if (extra.uitlevering_fotos !== undefined)
+                    setUitleveringFotos(extra.uitlevering_fotos || []);
+                  if (extra.uitlevering_datum !== undefined)
+                    setUitleveringDatum(extra.uitlevering_datum);
+                  if (extra.uitlevering_voltooid !== undefined)
+                    setUitleveringVoltooid(!!extra.uitlevering_voltooid);
+                  if (extra.stap11_afgerond !== undefined)
+                    setCompleted((p) => ({ ...p, 11: !!extra.stap11_afgerond }));
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 11 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.

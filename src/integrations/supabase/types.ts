@@ -2343,6 +2343,8 @@ export type Database = {
           afleveradres: string | null
           afleverkosten: number | null
           afleverwijze: string | null
+          apk_gecommuniceerd: boolean
+          auto_schoongemaakt: boolean
           bedankbericht_gestuurd: boolean | null
           betaalwijze: string | null
           betaalwijze_details: Json | null
@@ -2365,6 +2367,8 @@ export type Database = {
           garantie_pakket: string | null
           garantie_prijs: number | null
           garantie_type: string | null
+          gebreken_besproken: boolean
+          gebreken_omschrijving: string | null
           id: string
           inruil: boolean | null
           inruil_bedrijfsnaam: string | null
@@ -2411,6 +2415,7 @@ export type Database = {
           restbedrag_verwachte_datum: string | null
           review_gevraagd: boolean | null
           sleutels_aantal: number | null
+          sleutels_overhandigd: boolean
           stap1_afgerond: boolean | null
           stap10_afgerond: boolean | null
           stap11_afgerond: boolean | null
@@ -2426,8 +2431,11 @@ export type Database = {
           tenaamstelling_bevestigd: boolean
           tenaamstelling_datum: string | null
           tenaamstellingsbewijs_klaargelegd: boolean
+          tenaamstellingsbewijs_meegegeven: boolean
           uitlevering_datum: string | null
           uitlevering_foto: boolean | null
+          uitlevering_fotos: string[]
+          uitlevering_voltooid: boolean
           updated_at: string | null
           vehicle_id: string | null
           verkoop_type: string | null
@@ -2449,6 +2457,8 @@ export type Database = {
           afleveradres?: string | null
           afleverkosten?: number | null
           afleverwijze?: string | null
+          apk_gecommuniceerd?: boolean
+          auto_schoongemaakt?: boolean
           bedankbericht_gestuurd?: boolean | null
           betaalwijze?: string | null
           betaalwijze_details?: Json | null
@@ -2471,6 +2481,8 @@ export type Database = {
           garantie_pakket?: string | null
           garantie_prijs?: number | null
           garantie_type?: string | null
+          gebreken_besproken?: boolean
+          gebreken_omschrijving?: string | null
           id?: string
           inruil?: boolean | null
           inruil_bedrijfsnaam?: string | null
@@ -2517,6 +2529,7 @@ export type Database = {
           restbedrag_verwachte_datum?: string | null
           review_gevraagd?: boolean | null
           sleutels_aantal?: number | null
+          sleutels_overhandigd?: boolean
           stap1_afgerond?: boolean | null
           stap10_afgerond?: boolean | null
           stap11_afgerond?: boolean | null
@@ -2532,8 +2545,11 @@ export type Database = {
           tenaamstelling_bevestigd?: boolean
           tenaamstelling_datum?: string | null
           tenaamstellingsbewijs_klaargelegd?: boolean
+          tenaamstellingsbewijs_meegegeven?: boolean
           uitlevering_datum?: string | null
           uitlevering_foto?: boolean | null
+          uitlevering_fotos?: string[]
+          uitlevering_voltooid?: boolean
           updated_at?: string | null
           vehicle_id?: string | null
           verkoop_type?: string | null
@@ -2555,6 +2571,8 @@ export type Database = {
           afleveradres?: string | null
           afleverkosten?: number | null
           afleverwijze?: string | null
+          apk_gecommuniceerd?: boolean
+          auto_schoongemaakt?: boolean
           bedankbericht_gestuurd?: boolean | null
           betaalwijze?: string | null
           betaalwijze_details?: Json | null
@@ -2577,6 +2595,8 @@ export type Database = {
           garantie_pakket?: string | null
           garantie_prijs?: number | null
           garantie_type?: string | null
+          gebreken_besproken?: boolean
+          gebreken_omschrijving?: string | null
           id?: string
           inruil?: boolean | null
           inruil_bedrijfsnaam?: string | null
@@ -2623,6 +2643,7 @@ export type Database = {
           restbedrag_verwachte_datum?: string | null
           review_gevraagd?: boolean | null
           sleutels_aantal?: number | null
+          sleutels_overhandigd?: boolean
           stap1_afgerond?: boolean | null
           stap10_afgerond?: boolean | null
           stap11_afgerond?: boolean | null
@@ -2638,8 +2659,11 @@ export type Database = {
           tenaamstelling_bevestigd?: boolean
           tenaamstelling_datum?: string | null
           tenaamstellingsbewijs_klaargelegd?: boolean
+          tenaamstellingsbewijs_meegegeven?: boolean
           uitlevering_datum?: string | null
           uitlevering_foto?: boolean | null
+          uitlevering_fotos?: string[]
+          uitlevering_voltooid?: boolean
           updated_at?: string | null
           vehicle_id?: string | null
           verkoop_type?: string | null
