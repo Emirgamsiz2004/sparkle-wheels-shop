@@ -72,12 +72,11 @@ const STEPS: StepDef[] = [
 const isStepDone = (stap: number, completed: Record<number, boolean>) => completed[stap] === true;
 
 const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean): boolean => {
-  // Stap 9 (inruil op naam) volledig verbergen zonder inruil
-  if (stap === 9 && !inruil) return true;
-  // Stap 6 mag altijd geopend worden — toont 'niet van toepassing' indien geen inruil
+  // Stap 6 (inruil document) en 9 (inruil op naam) volledig verbergen zonder inruil
+  if ((stap === 6 || stap === 9) && !inruil) return true;
   // Stappen 6-12 vereisen 5
   if (stap >= 6 && stap <= 12 && !completed[5]) return true;
-  // Stappen 9-12 vereisen 8
+  // Stappen 9-12 vereisen 8 (betaling bevestigd)
   if (stap >= 9 && stap <= 12 && !completed[8]) return true;
   // Stappen 11-12 vereisen 10
   if (stap >= 11 && stap <= 12 && !completed[10]) return true;
