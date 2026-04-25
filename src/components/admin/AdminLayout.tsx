@@ -34,6 +34,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [overdueLeads, setOverdueLeads] = useState(0);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Fetch overdue leads count
   useEffect(() => {
