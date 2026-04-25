@@ -113,118 +113,176 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
     onOpenChange(v);
   };
 
+  const customerName = appointment.customer ? `${appointment.customer.voornaam} ${appointment.customer.achternaam}`.trim() : null;
+  const phoneRaw = appointment.customer?.telefoon?.replace(/[^\d+]/g, "") || "";
+  // wa.me expects digits only, leading country code, no +
+  const waNumber = (() => {
+    if (!phoneRaw) return "";
+    let n = phoneRaw.replace(/^\+/, "");
+    if (n.startsWith("00")) n = n.slice(2);
+    if (n.startsWith("0")) n = "31" + n.slice(1);
+    return n;
+  })();
+  const waMessage = encodeURIComponent(
+    `Goedendag, we willen u herinneren aan uw afspraak op ${format(dt, "d MMMM yyyy", { locale: nl })} om ${format(dt, "HH:mm", { locale: nl })} bij Platin Automotive${appointment.vehicle ? ` voor de ${appointment.vehicle.merk} ${appointment.vehicle.model}` : ""}. Tot dan!`
+  );
+
+  const setStatus = async (s: AppointmentStatus) => {
+    if (appointment.status === s) return;
+    await onUpdate(appointment.id, { status: s });
+  };
+
+  const goToVehicle = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/voertuigen/${appointment.vehicle.id}`);
+  };
+  const goToCustomer = () => {
+    if (!appointment.customer) return;
+    handleClose(false);
+    navigate(`/admin/klanten/${appointment.customer.id}`);
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[440px]">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2">
-              <Badge className={`${typeColors[appointment.type]} border text-xs`}>{typeLabels[appointment.type]}</Badge>
-              {appointment.status === "voltooid" && <Badge variant="outline" className="text-emerald-400 border-emerald-500/30">Voltooid</Badge>}
-              {appointment.status === "geannuleerd" && <Badge variant="outline" className="text-muted-foreground">Geannuleerd</Badge>}
-            </DialogTitle>
-            {!editing && (
-              <Button variant="ghost" size="sm" onClick={startEdit} className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
-                <Pencil className="w-3.5 h-3.5" />
-              </Button>
-            )}
-          </div>
-        </DialogHeader>
-
-        <AnimatePresence mode="wait">
-          {!editing ? (
+      <DialogContent className="p-0 gap-0 w-[calc(100vw-2rem)] sm:w-[300px] sm:max-w-[300px] rounded-[14px] border border-border bg-card shadow-lg overflow-hidden">
+        {!editing ? (
+          <AnimatePresence mode="wait">
             <motion.div
               key="view"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
+              className="p-4"
             >
-              <div className="space-y-3 pt-1">
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span>
-                    {format(dt, "EEEE d MMMM yyyy 'om' HH:mm", { locale: nl })}
-                    {appointment.eind_datum_tijd && ` – ${format(new Date(appointment.eind_datum_tijd), "HH:mm", { locale: nl })}`}
-                  </span>
+              {/* Section 1 — Afspraakinfo */}
+              <div className="space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
                 </div>
-
-                {appointment.customer && (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span>{appointment.customer.voornaam} {appointment.customer.achternaam}</span>
-                    </div>
-                    <a href={`tel:${appointment.customer.telefoon}`} className="p-1.5 rounded-md hover:bg-accent transition-colors">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                    </a>
-                  </div>
-                )}
-
+                <div className="text-base font-semibold leading-tight">
+                  {format(dt, "EEEE d MMMM", { locale: nl })}
+                  <span className="text-muted-foreground font-normal"> · </span>
+                  {format(dt, "HH:mm", { locale: nl })}
+                  {appointment.eind_datum_tijd && <span className="text-muted-foreground font-normal"> – {format(new Date(appointment.eind_datum_tijd), "HH:mm")}</span>}
+                </div>
                 {appointment.vehicle && (
-                  <div className="flex items-center gap-2 text-sm cursor-pointer hover:text-foreground transition-colors"
-                    onClick={() => { handleClose(false); navigate(`/admin/voertuigen/${appointment.vehicle!.id}`); }}>
-                    <Car className="w-4 h-4 text-muted-foreground" />
-                    <span>{appointment.vehicle.merk} {appointment.vehicle.model} {appointment.vehicle.kenteken ? `(${appointment.vehicle.kenteken})` : ""}</span>
-                  </div>
+                  <button
+                    onClick={goToVehicle}
+                    className="flex items-center gap-1.5 text-sm text-foreground hover:text-primary transition-colors text-left"
+                  >
+                    <Car className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <span className="truncate">
+                      {appointment.vehicle.merk} {appointment.vehicle.model}
+                      {appointment.vehicle.kenteken && <span className="text-muted-foreground"> · {appointment.vehicle.kenteken}</span>}
+                    </span>
+                  </button>
                 )}
-
-                {appointment.medewerker && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <User className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Medewerker:</span> {appointment.medewerker}
-                  </div>
-                )}
-
-                {appointment.onderwerp && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileText className="w-4 h-4 text-muted-foreground" />
-                    <span>{appointment.onderwerp}</span>
-                  </div>
-                )}
-
-                {appointment.betalingsstatus && (
-                  <div className="text-sm">
-                    <Badge variant="outline" className={appointment.betalingsstatus === "volledig_betaald" ? "text-emerald-400 border-emerald-500/30" : "text-orange-400 border-orange-500/30"}>
-                      {appointment.betalingsstatus === "volledig_betaald" ? "Volledig betaald" : "Nog openstaand"}
-                    </Badge>
-                  </div>
-                )}
-
                 {appointment.notities && (
-                  <p className="text-sm text-muted-foreground bg-muted/50 rounded-md p-2.5">{appointment.notities}</p>
+                  <p className="text-xs text-muted-foreground bg-muted/40 rounded-md p-2 leading-snug">{appointment.notities}</p>
                 )}
               </div>
 
-              {isGepland && (
-                <div className="flex gap-2 pt-3 border-t border-border mt-3">
-                  {(appointment.type === "bezichtiging" || appointment.type === "proefrit") && (
-                    <Button size="sm" className="flex-1" variant="outline"
-                      onClick={() => { onUpdate(appointment.id, { status: "voltooid" }); handleClose(false); }}>
-                      <CheckCircle2 className="w-4 h-4 mr-1" />
-                      {appointment.type === "bezichtiging" ? "Proefrit starten" : "Afsluiten"}
-                    </Button>
-                  )}
-                  {appointment.type === "aflevering" && (
-                    <Button size="sm" className="flex-1" variant="outline"
-                      onClick={() => { onUpdate(appointment.id, { status: "voltooid" }); handleClose(false); }}>
-                      <CheckCircle2 className="w-4 h-4 mr-1" />Afgeleverd
-                    </Button>
-                  )}
-                  {appointment.type === "terugbelafspraak" && (
-                    <Button size="sm" className="flex-1" variant="outline"
-                      onClick={() => { onUpdate(appointment.id, { status: "voltooid" }); handleClose(false); }}>
-                      <CheckCircle2 className="w-4 h-4 mr-1" />Voltooid
-                    </Button>
-                  )}
-                  <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                    onClick={() => { onDelete(appointment.id); handleClose(false); }}>
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
+              <div className="my-3 border-t border-border/60" />
+
+              {/* Section 2 — Klantinfo */}
+              <div className="space-y-2">
+                {customerName ? (
+                  <>
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <User className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="font-medium truncate">{customerName}</span>
+                    </div>
+                    {appointment.customer?.telefoon && (
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`tel:${appointment.customer.telefoon}`}
+                          className="flex-1 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border text-xs hover:bg-accent/40 transition-colors"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                          <span className="truncate">{appointment.customer.telefoon}</span>
+                        </a>
+                        {waNumber && (
+                          <a
+                            href={`https://wa.me/${waNumber}?text=${waMessage}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center h-[30px] w-[30px] rounded-md border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                            aria-label="WhatsApp"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-xs text-muted-foreground">Geen klant gekoppeld</div>
+                )}
+              </div>
+
+              <div className="my-3 border-t border-border/60" />
+
+              {/* Section 3 — Status */}
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { v: "gepland" as AppointmentStatus, label: "Bevestigd", icon: Check, active: "bg-emerald-500/15 text-emerald-400 border-emerald-500/40", base: "text-muted-foreground border-border" },
+                  { v: "voltooid" as AppointmentStatus, label: "Afgerond", icon: CheckCircle2, active: "bg-muted text-foreground border-border", base: "text-muted-foreground border-border" },
+                  { v: "geannuleerd" as AppointmentStatus, label: "No-show", icon: XCircle, active: "bg-orange-500/15 text-orange-400 border-orange-500/40", base: "text-muted-foreground border-border" },
+                ].map(({ v, label, icon: Icon, active, base }) => {
+                  const isActive = appointment.status === v;
+                  return (
+                    <button
+                      key={v}
+                      onClick={() => setStatus(v)}
+                      className={cn(
+                        "flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-md border text-[10px] font-medium transition-colors hover:bg-accent/30",
+                        isActive ? active : base
+                      )}
+                    >
+                      <Icon className="w-3 h-3" />
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="my-3 border-t border-border/60" />
+
+              {/* Section 4 — Acties */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
+                <button onClick={startEdit} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                  <Pencil className="w-3 h-3" /> Bewerken
+                </button>
+                {appointment.vehicle && (
+                  <button onClick={goToVehicle} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                    <Car className="w-3 h-3" /> Naar voertuig
+                  </button>
+                )}
+                {appointment.customer && (
+                  <button onClick={goToCustomer} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                    <User className="w-3 h-3" /> Naar klant
+                  </button>
+                )}
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1 ml-auto"
+                >
+                  <Trash2 className="w-3 h-3" /> Verwijderen
+                </button>
+              </div>
             </motion.div>
-          ) : (
+          </AnimatePresence>
+        ) : (
+          <div className="p-4">
+            <DialogHeader className="mb-2">
+              <DialogTitle className="flex items-center gap-2 text-sm">
+                <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
+                <span className="text-muted-foreground font-normal">Bewerken</span>
+              </DialogTitle>
+            </DialogHeader>
+
             <motion.div
               key="edit"
               initial={{ opacity: 0, y: 6 }}
