@@ -196,6 +196,12 @@ const AdminVerkoopWizardPage = () => {
   const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
   const [inruilOpNaamAt, setInruilOpNaamAt] = useState<string | null>(null);
 
+  // Stap 10 state — Vrijwaring
+  const [vrijwaringBevestigd, setVrijwaringBevestigd] = useState<boolean>(false);
+  const [vrijwaringDatum, setVrijwaringDatum] = useState<string | null>(null);
+  const [vrijwaringTijdstip, setVrijwaringTijdstip] = useState<string | null>(null);
+  const [tenaamstellingsbewijsKlaargelegd, setTenaamstellingsbewijsKlaargelegd] = useState<boolean>(false);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
