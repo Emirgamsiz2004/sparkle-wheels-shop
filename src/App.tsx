@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import AfspraakStickyButton from "@/components/AfspraakStickyButton";
+import Afspraak from "./pages/Afspraak";
 import Index from "./pages/Index";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -118,6 +120,7 @@ const App = () => (
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/consignatie" element={<Consignatie />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/afspraak" element={<Afspraak />} />
               <Route path="/over-ons" element={<OverOns />} />
               <Route path="/diensten/in-en-verkoop" element={<InEnVerkoop />} />
               <Route path="/diensten/onderhoud-reparatie" element={<OnderhoudReparatie />} />
@@ -170,6 +173,7 @@ const App = () => (
           )}
           
           <WhatsAppButton />
+          <AfspraakStickyButton />
           <CookieBanner />
         </BrowserRouter>
       </TooltipProvider>

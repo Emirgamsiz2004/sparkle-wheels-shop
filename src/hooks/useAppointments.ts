@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export type AppointmentType = "bezichtiging" | "proefrit" | "terugbelafspraak" | "aflevering" | "ophalen" | "onderhoud" | "anders";
+export type AppointmentType = "bezichtiging" | "proefrit" | "terugbelafspraak" | "aflevering" | "ophalen" | "onderhoud" | "anders" | "poetsbeurt";
 export type AppointmentStatus = "gepland" | "voltooid" | "geannuleerd";
 
 export interface Appointment {
@@ -21,6 +21,15 @@ export interface Appointment {
   google_event_id: string | null;
   created_at: string;
   updated_at: string;
+  bron?: string | null;
+  is_aanvraag?: boolean;
+  aanvraag_omschrijving?: string | null;
+  voorkeursdatum?: string | null;
+  aanvrager_voornaam?: string | null;
+  aanvrager_achternaam?: string | null;
+  aanvrager_telefoon?: string | null;
+  aanvrager_email?: string | null;
+  aanvrager_kenteken?: string | null;
   // Joined
   customer?: { id: string; voornaam: string; achternaam: string; telefoon: string; email: string } | null;
   vehicle?: { id: string; merk: string; model: string; kenteken: string | null } | null;
@@ -34,6 +43,7 @@ export const typeLabels: Record<AppointmentType, string> = {
   ophalen: "Ophalen",
   onderhoud: "Onderhoud / reparatie",
   anders: "Anders",
+  poetsbeurt: "Poetsbeurt",
 };
 
 export const typeColors: Record<AppointmentType, string> = {
@@ -44,6 +54,7 @@ export const typeColors: Record<AppointmentType, string> = {
   ophalen: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
   onderhoud: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
   anders: "bg-slate-500/15 text-slate-300 border-slate-500/30",
+  poetsbeurt: "bg-pink-500/15 text-pink-400 border-pink-500/30",
 };
 
 export const typeDotColors: Record<AppointmentType, string> = {
@@ -54,6 +65,7 @@ export const typeDotColors: Record<AppointmentType, string> = {
   ophalen: "bg-cyan-400",
   onderhoud: "bg-yellow-400",
   anders: "bg-slate-400",
+  poetsbeurt: "bg-pink-400",
 };
 
 const SELECT = "*, customer:customers(id, voornaam, achternaam, telefoon, email), vehicle:vehicles(id, merk, model, kenteken)";
