@@ -196,7 +196,7 @@ const AdminVoertuigenPage = () => {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="shrink-0 sm:w-auto px-2 h-9 text-[14px] sm:text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
+          className="shrink-0 sm:w-auto px-2 h-9 text-[13px] sm:text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
         >
           {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
