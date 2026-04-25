@@ -2416,6 +2416,7 @@ export type Database = {
           stap7_afgerond: boolean | null
           stap8_afgerond: boolean | null
           stap9_afgerond: boolean | null
+          tenaamstellingsbewijs_klaargelegd: boolean
           uitlevering_datum: string | null
           uitlevering_foto: boolean | null
           updated_at: string | null
@@ -2512,6 +2513,7 @@ export type Database = {
           stap7_afgerond?: boolean | null
           stap8_afgerond?: boolean | null
           stap9_afgerond?: boolean | null
+          tenaamstellingsbewijs_klaargelegd?: boolean
           uitlevering_datum?: string | null
           uitlevering_foto?: boolean | null
           updated_at?: string | null
@@ -2608,6 +2610,7 @@ export type Database = {
           stap7_afgerond?: boolean | null
           stap8_afgerond?: boolean | null
           stap9_afgerond?: boolean | null
+          tenaamstellingsbewijs_klaargelegd?: boolean
           uitlevering_datum?: string | null
           uitlevering_foto?: boolean | null
           updated_at?: string | null
