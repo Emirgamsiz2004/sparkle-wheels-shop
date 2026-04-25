@@ -172,7 +172,13 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleOpenChange(false); };
     const onDown = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) handleOpenChange(false);
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (containerRef.current && containerRef.current.contains(target)) return;
+      // Ignore clicks inside Radix portals (Popover/Select/Calendar rendered outside our container)
+      const el = target as HTMLElement;
+      if (el.closest && el.closest('[data-radix-popper-content-wrapper], [data-radix-popover-content], [data-radix-select-content], [role="listbox"], [role="dialog"]')) return;
+      handleOpenChange(false);
     };
     window.addEventListener("keydown", onKey);
     const t = setTimeout(() => document.addEventListener("mousedown", onDown), 0);
