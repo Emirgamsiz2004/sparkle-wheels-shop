@@ -366,10 +366,12 @@ const Stap8Betaling = ({
           </button>
 
           {Math.abs(verschil) > 0.01 && (
-            <div className="text-[12px] text-amber-400 mt-2">
-              {verschil > 0
-                ? `${fmtEur(verschil)} te veel ingevuld`
-                : `${fmtEur(-verschil)} resterend`}
+            <div className="text-[12px] text-red-500 mt-2">
+              Let op: bedragen komen niet overeen
+              {" "}
+              ({verschil > 0
+                ? `${fmtEur(verschil)} te veel`
+                : `${fmtEur(-verschil)} tekort`})
             </div>
           )}
         </div>
