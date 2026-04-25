@@ -429,7 +429,7 @@ const AdminPlanningPage = () => {
           setPickerOpen(true);
         }}
       />
-      <AppointmentDetailDialog appointment={detailAppointment} anchorRect={detailRect} open={!!detailAppointment} onOpenChange={(v) => { if (!v) setDetailAppointment(null); }} onUpdate={updateAppointment} onDelete={deleteAppointment} />
+      <AppointmentDetailDialog appointment={detailAppointment} anchorRect={detailRect} open={!!detailAppointment} onOpenChange={(v) => { if (!v) setDetailAppointment(null); }} onUpdate={updateAppointment} onDelete={deleteAppointment} onCreate={addAppointment} />
     </div>
   );
 };
