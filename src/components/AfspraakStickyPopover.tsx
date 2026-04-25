@@ -254,7 +254,14 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
           <X className="w-4 h-4" />
         </button>
 
-        <motion.div layout transition={{ duration: 0.3, ease: "easeOut" }} className="p-5">
+        <motion.div
+          layout
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="p-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { duration: 0.2, delay: 0.15 } }}
+          exit={{ opacity: 0, transition: { duration: 0.1 } }}
+        >
           <AnimatePresence mode="wait" initial={false}>
             {step === "type" && (
               <motion.div key="type" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.2 }}>
