@@ -1156,6 +1156,7 @@ const AdminVerkoopWizardPage = () => {
                 initialBetalingOntvangen={betalingOntvangen}
                 initialRestbedragLater={restbedragLater}
                 initialRestbedragVerwachteDatum={restbedragVerwachteDatum}
+                initialOpenstaandRestbedrag={openstaandRestbedrag}
                 onSaved={async (extra) => {
                   if (extra.betaling_datum !== undefined) setBetalingDatum(extra.betaling_datum);
                   if (extra.betaling_opmerking !== undefined)
@@ -1166,6 +1167,14 @@ const AdminVerkoopWizardPage = () => {
                     setBetalingOntvangen(!!extra.betaling_ontvangen);
                   if (extra.betaalwijze_details !== undefined)
                     setBetaalwijzeDetails(extra.betaalwijze_details || []);
+                  if (extra.restbedrag_later !== undefined)
+                    setRestbedragLater(!!extra.restbedrag_later);
+                  if (extra.restbedrag_verwachte_datum !== undefined)
+                    setRestbedragVerwachteDatum(extra.restbedrag_verwachte_datum);
+                  if (extra.restbedrag !== undefined)
+                    setOpenstaandRestbedrag(
+                      typeof extra.restbedrag === "number" ? extra.restbedrag : null,
+                    );
                   if (extra.stap8_afgerond !== undefined) {
                     setCompleted((p) => ({ ...p, 8: !!extra.stap8_afgerond }));
                   }
