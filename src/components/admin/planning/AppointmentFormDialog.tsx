@@ -452,6 +452,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
             </motion.div>
           )}
         </AnimatePresence>
+        </motion.div>
       </div>
     </div>,
     document.body
