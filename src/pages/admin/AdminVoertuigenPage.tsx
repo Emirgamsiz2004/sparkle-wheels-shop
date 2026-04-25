@@ -209,48 +209,77 @@ const AdminVoertuigenPage = () => {
           ) : "Geen voertuigen gevonden."}
         </div>
       ) : isMobile ? (
-        <div className="space-y-1.5">
+        <div className="bg-card rounded-lg border border-border overflow-hidden divide-y divide-border">
           {filtered.map((v) => {
             const consignatie = isConsignatie(v);
+            const apkInfo = getMobileApkInfo(v.apkVervaldatum);
             return (
               <Link
                 key={v.id}
                 to={`/admin/voertuigen/${v.id}`}
-                className="flex items-center justify-between gap-3 bg-card border border-border rounded-lg p-3 active:bg-accent/30 transition-colors"
+                className="block active:bg-accent/30 transition-colors"
+                style={{ padding: "14px" }}
               >
-                <div className="min-w-0 flex-1">
-                  {/* Rij 1: merk + model + bouwjaar | tag rechts (alleen als label bestaat) */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{v.merk} {v.model}</p>
-                      <span className="text-xs text-muted-foreground shrink-0">({v.bouwjaar})</span>
-                    </div>
+                {/* Rij 1: merk/model | bouwjaar */}
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-[15px] font-semibold text-foreground truncate leading-tight">
+                    {v.merk} {v.model}
+                  </p>
+                  <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
+                    {v.bouwjaar}
+                  </span>
+                </div>
+
+                {/* Rij 2: kenteken | APK datum */}
+                {(v.kenteken || v.apkVervaldatum) && (
+                  <div className="flex items-center justify-between gap-2 mt-1.5">
+                    <span className="text-[11px] font-mono uppercase text-foreground/90 tracking-wide">
+                      {v.kenteken || ""}
+                    </span>
+                    {apkInfo && (
+                      <span className={`text-[11px] tabular-nums ${apkInfo.expired ? "text-amber-400" : "text-muted-foreground"}`}>
+                        {apkInfo.label}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Rij 3: inkoop / consignatie | verkoop */}
+                <div className="flex items-end justify-between gap-3 mt-2">
+                  <div className="flex flex-col leading-tight min-w-0">
+                    <span className="text-[10px] uppercase tracking-wide text-muted-foreground/70">
+                      {consignatie ? "" : "Inkoop"}
+                    </span>
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {consignatie ? "Consignatie" : formatEuro(v.inkoopprijs)}
+                    </span>
+                  </div>
+                  {v.verkoopprijs > 0 && (
+                    <span className="text-sm font-semibold tabular-nums text-foreground">
+                      {formatEuro(v.verkoopprijs)}
+                    </span>
+                  )}
+                </div>
+
+                {/* Tags rechtsonder: status + APK-warning. Subtiel & compact. */}
+                {(statusLabels[v.status] || apkInfo?.warn) && (
+                  <div className="flex justify-end gap-1 mt-2">
+                    {apkInfo?.warn && (
+                      <span className={`inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border max-w-[70px] truncate ${
+                        apkInfo.expired
+                          ? "bg-red-500/10 text-red-400 border-red-500/25"
+                          : "bg-amber-500/10 text-amber-400 border-amber-500/25"
+                      }`}>
+                        APK
+                      </span>
+                    )}
                     {statusLabels[v.status] && (
-                      <span className={`${BADGE_BASE} ${statusColors[v.status]} shrink-0`}>
+                      <span className={`inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border max-w-[70px] truncate ${statusColors[v.status]}`}>
                         {statusLabels[v.status]}
                       </span>
                     )}
                   </div>
-                  {/* Rij 2: kenteken + APK badge */}
-                  {(v.kenteken || v.apkVervaldatum) && (
-                    <div className="flex items-center gap-2 mt-1">
-                      {v.kenteken && <span className="text-[10px] font-mono text-muted-foreground uppercase">{v.kenteken}</span>}
-                      <ApkBadge apkVervaldatum={v.apkVervaldatum} />
-                    </div>
-                  )}
-                  {/* Rij 3: inkoop (grijs) links | verkoop (wit) rechts */}
-                  <div className="flex items-center justify-between gap-3 mt-1.5">
-                    <span className="text-xs text-muted-foreground">
-                      {consignatie ? "Consignatie" : formatEuro(v.inkoopprijs)}
-                    </span>
-                    {v.verkoopprijs > 0 && (
-                      <span className="text-xs font-medium tabular-nums text-foreground">
-                        {formatEuro(v.verkoopprijs)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                )}
               </Link>
             );
           })}
@@ -332,6 +361,20 @@ const ApkBadge = ({ apkVervaldatum }: { apkVervaldatum?: string }) => {
       {isExpired ? `Verlopen ${formatted}` : `Verloopt ${formatted}`}
     </span>
   );
+};
+
+// Mobiele APK-info: korte datumweergave + warn-flag (binnen 60 dagen of verlopen)
+const getMobileApkInfo = (apkVervaldatum?: string) => {
+  if (!apkVervaldatum) return null;
+  const apk = new Date(apkVervaldatum);
+  if (isNaN(apk.getTime())) return null;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil((apk.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const expired = diffDays < 0;
+  const warn = expired || diffDays <= 60;
+  const formatted = apk.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+  const label = expired ? `Verlopen ${formatted}` : `APK tot ${formatted}`;
+  return { label, expired, warn };
 };
 
 export default AdminVoertuigenPage;
