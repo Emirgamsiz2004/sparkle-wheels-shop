@@ -1064,7 +1064,43 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 7 && (
+            {activeStap === 8 && (
+              <Stap8Betaling
+                verkoopId={verkoopId}
+                voertuigKenteken={vehicle?.kenteken || ""}
+                voertuigMerk={vehicle?.merk || ""}
+                voertuigModel={vehicle?.model || ""}
+                factuurMbId={factuurMbId}
+                factuurMbNummer={factuurMbNummer}
+                factuurTotaal={
+                  verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum
+                }
+                aanbetalingBedrag={aanbetalingNum}
+                initialBetaaldatum={betalingDatum}
+                initialBetaalwijze={restBetaalwijze}
+                initialBetaalwijzeDetails={betaalwijzeDetails as any}
+                initialBetalingOpmerking={betalingOpmerking}
+                initialMoneybirdPaymentId={moneybirdPaymentId}
+                initialBetalingOntvangen={betalingOntvangen}
+                onSaved={async (extra) => {
+                  if (extra.betaling_datum !== undefined) setBetalingDatum(extra.betaling_datum);
+                  if (extra.betaling_opmerking !== undefined)
+                    setBetalingOpmerking(extra.betaling_opmerking);
+                  if (extra.moneybird_payment_id !== undefined)
+                    setMoneybirdPaymentId(extra.moneybird_payment_id);
+                  if (extra.betaling_ontvangen !== undefined)
+                    setBetalingOntvangen(!!extra.betaling_ontvangen);
+                  if (extra.betaalwijze_details !== undefined)
+                    setBetaalwijzeDetails(extra.betaalwijze_details || []);
+                  if (extra.stap8_afgerond) {
+                    setCompleted((p) => ({ ...p, 8: true }));
+                  }
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 8 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
