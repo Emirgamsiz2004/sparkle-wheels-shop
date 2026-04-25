@@ -230,7 +230,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
         <X className="w-4 h-4" />
       </button>
       <div style={{ padding: 18 }}>
-
+        <motion.div layout transition={{ duration: 0.25, ease: "easeOut" }}>
         <AnimatePresence mode="wait" initial={false}>
           {step === "type" ? (
             <motion.div
