@@ -340,8 +340,58 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
               </div>
             </motion.div>
           </AnimatePresence>
+        ) : (
+          <div className="p-4 space-y-4">
+            <div className="mb-2 flex items-center gap-2 text-sm">
+              <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
+              <span className="text-muted-foreground font-normal">Bewerken</span>
+            </div>
 
-              {/* Onderwerp (terugbelafspraak) */}
+            {/* Status */}
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1.5 block">Status</Label>
+              <Select value={editStatus} onValueChange={(v) => setEditStatus(v as AppointmentStatus)}>
+                <SelectTrigger className="rounded-[3px] h-10"><SelectValue /></SelectTrigger>
+                <SelectContent className="rounded-[3px]">
+                  {statusOptions.map((s) => (
+                    <SelectItem key={s.value} value={s.value} className="rounded-[3px]">{s.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Date & Time */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">Datum</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn("w-full justify-start text-left font-normal rounded-[3px] h-10", !editDate && "text-muted-foreground")}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 opacity-60" />
+                      {editDate ? format(editDate, "d MMM yyyy", { locale: nl }) : "Kies datum"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 rounded-[3px]" align="start">
+                    <Calendar mode="single" selected={editDate} onSelect={setEditDate} locale={nl} className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">Tijd</Label>
+                <Select value={editTime} onValueChange={setEditTime}>
+                  <SelectTrigger className="rounded-[3px] h-10"><SelectValue /></SelectTrigger>
+                  <SelectContent className="rounded-[3px] max-h-60">
+                    {timeSlots.map((t) => (
+                      <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
               <AnimatePresence>
                 {appointment.type === "terugbelafspraak" && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
