@@ -448,7 +448,8 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
               {/* Submit */}
               <div className="pt-1">
                 <Button
-                  className="w-full rounded-[3px] bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
+                  variant="outline"
+                  className="w-full rounded-[3px]"
                   onClick={handleSubmit}
                   disabled={saving || !selectedDate}
                 >
