@@ -153,7 +153,7 @@ const Stap8Betaling = ({
       const next = p.map((r, i) =>
         i === p.length - 1 ? { ...r, manueel: true } : r,
       );
-      next.push({ methode: "pin", bedrag: "", manueel: false });
+      next.push({ methode: "bank", bedrag: "", manueel: false });
       return next;
     });
   };
