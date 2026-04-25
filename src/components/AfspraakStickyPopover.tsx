@@ -554,36 +554,27 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
         <X className="w-4 h-4" />
       </button>
 
-      {/* Pager viewport — animates height, hides overflow */}
+      {/* Auto-height viewport — renders only the active slide so each step uses
+          its own natural height. Animates the height between steps. */}
       <div
         style={{
           height: pagerHeight === "auto" ? "auto" : pagerHeight,
-          transition: "height 350ms cubic-bezier(0.4, 0, 0.2, 1)",
-          overflow: "hidden",
+          transition: "height 300ms cubic-bezier(0.4, 0, 0.2, 1)",
           willChange: "height",
         }}
       >
-        {/* Track */}
-        <div
-          style={{
-            display: "flex",
-            width: `${totalSteps * 100}%`,
-            transform: `translateX(-${(stepIndex * 100) / totalSteps}%)`,
-            transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1)",
-            willChange: "transform",
-          }}
-        >
-          {slides.map((slide, i) => (
-            <div
-              key={i}
-              ref={(el) => { slidesRef.current[i] = el; }}
-              style={{ width: `${100 / totalSteps}%`, flexShrink: 0 }}
-              aria-hidden={i !== stepIndex}
-            >
-              {slide}
-            </div>
-          ))}
-        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={stepIndex}
+            ref={(el) => { slidesRef.current[stepIndex] = el; }}
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -12 }}
+            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {slides[stepIndex]}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </motion.div>,
     document.body
