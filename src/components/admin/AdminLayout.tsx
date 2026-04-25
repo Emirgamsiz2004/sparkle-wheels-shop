@@ -4,13 +4,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet,
-  Settings, LogOut, Users, Clock, CalendarDays, BadgeDollarSign, Inbox, ClipboardCheck,
+  Settings, LogOut, Users, Clock, CalendarDays, BadgeDollarSign, Inbox, ClipboardCheck, Menu,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
-import MobileBottomBar, { getMobilePageTitle } from "@/components/admin/MobileBottomBar";
+import MobileSidebar, { getMobilePageTitle } from "@/components/admin/MobileSidebar";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
@@ -34,6 +34,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [overdueLeads, setOverdueLeads] = useState(0);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Fetch overdue leads count
   useEffect(() => {
@@ -178,8 +179,15 @@ const AdminLayout = () => {
       {/* Main content — geen left margin op mobiel */}
       <div className="flex flex-col min-h-screen min-w-0 lg:ml-[56px]">
         <header className="sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 bg-background border-b border-border gap-3">
-          {/* Mobiel: titel of logo */}
+          {/* Mobiel: hamburger + titel/logo */}
           <div className="flex items-center gap-2 lg:hidden min-w-0 flex-1">
+            <button
+              onClick={() => setMobileNavOpen(true)}
+              aria-label="Menu openen"
+              className="text-foreground p-2 -ml-2 hover:bg-accent rounded-md transition-colors"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             {isDashboard ? (
               <img src={logo} alt="Platin" className="h-6 w-auto object-contain flex-shrink-0" loading="eager" decoding="sync" />
             ) : (
@@ -201,12 +209,12 @@ const AdminLayout = () => {
 
         <GlobalActiveBar />
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden pb-20 lg:pb-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden pb-8">
           <Outlet />
         </main>
       </div>
 
-      <MobileBottomBar />
+      <MobileSidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
     </div>
   );
 };
