@@ -785,7 +785,7 @@ const AdminVerkoopWizardPage = () => {
   return (
     <div className="admin-theme h-screen overflow-hidden bg-background text-foreground">
       {/* Fixed sidebar */}
-      <aside className="fixed top-0 left-0 h-screen w-[280px] z-10 border-r border-border bg-sidebar flex flex-col">
+      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-[280px] z-10 border-r border-border bg-sidebar flex-col">
           <div className="p-5 border-b border-sidebar-border">
             <img src={logo} alt="Platin Automotive" className="h-7 w-auto" />
           </div>
