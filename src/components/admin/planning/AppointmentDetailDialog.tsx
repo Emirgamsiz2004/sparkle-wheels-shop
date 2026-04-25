@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { Appointment, AppointmentType, AppointmentStatus, typeLabels, typeColors } from "@/hooks/useAppointments";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 interface Props {
   appointment: Appointment | null;
