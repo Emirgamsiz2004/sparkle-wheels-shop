@@ -48,8 +48,50 @@ const statusOptions: { value: AppointmentStatus; label: string }[] = [
   { value: "geannuleerd", label: "Geannuleerd" },
 ];
 
-const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, onDelete }: Props) => {
+const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, onUpdate, onDelete }: Props) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+  // ESC + click outside
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onOpenChange(false); };
+    const onDown = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) onOpenChange(false);
+    };
+    window.addEventListener("keydown", onKey);
+    // Defer to next tick so the opening click doesn't immediately close
+    const t = setTimeout(() => document.addEventListener("mousedown", onDown), 0);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      clearTimeout(t);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [open, onOpenChange]);
+
+  // Position popover near anchorRect (desktop)
+  useLayoutEffect(() => {
+    if (!open || isMobile || !anchorRect) { setPos(null); return; }
+    const POPOVER_W = 280;
+    const margin = 8;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    let left = anchorRect.right + margin;
+    if (left + POPOVER_W > vw - margin) left = anchorRect.left - POPOVER_W - margin;
+    if (left < margin) left = margin;
+    let top = anchorRect.top;
+    // Estimate height after mount
+    requestAnimationFrame(() => {
+      const h = containerRef.current?.offsetHeight ?? 360;
+      let t = top;
+      if (t + h > vh - margin) t = Math.max(margin, vh - h - margin);
+      setPos({ top: t, left });
+    });
+    setPos({ top, left });
+  }, [open, isMobile, anchorRect]);
+
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editDate, setEditDate] = useState<Date | undefined>(undefined);
