@@ -248,7 +248,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                   <li key={opt.value}>
                     <button
                       onClick={() => { setType(opt.value); setStep("form"); }}
-                      className="w-full flex items-center gap-3 rounded-[8px] px-2.5 py-2.5 text-left text-sm text-foreground hover:bg-accent/40 transition-colors"
+                      className="w-full flex items-center gap-3 rounded-[8px] px-2.5 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-[rgba(255,255,255,0.08)]"
                     >
                       <opt.icon className="w-4 h-4 text-muted-foreground shrink-0" />
                       <span>{opt.label}</span>
