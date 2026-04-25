@@ -77,6 +77,7 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const { action, ...params } = body;
+    console.log("[moneybird v2] action received:", action);
 
     // ─── PDF download als binary blob (proxy) ───
     if (action === "download_invoice_pdf_blob") {
