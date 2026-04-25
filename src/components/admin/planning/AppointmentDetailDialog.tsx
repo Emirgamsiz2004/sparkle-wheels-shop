@@ -368,12 +368,10 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
           </AnimatePresence>
         ) : (
           <div className="p-4">
-            <DialogHeader className="mb-2">
-              <DialogTitle className="flex items-center gap-2 text-sm">
-                <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
-                <span className="text-muted-foreground font-normal">Bewerken</span>
-              </DialogTitle>
-            </DialogHeader>
+            <div className="mb-2 flex items-center gap-2 text-sm">
+              <Badge className={`${typeColors[appointment.type]} border text-[11px]`}>{typeLabels[appointment.type]}</Badge>
+              <span className="text-muted-foreground font-normal">Bewerken</span>
+            </div>
 
             <motion.div
               key="edit"
