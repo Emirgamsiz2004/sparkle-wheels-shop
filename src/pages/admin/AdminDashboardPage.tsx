@@ -8,10 +8,8 @@ import {
   Calendar as CalendarIcon, ChevronDown, ChevronRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { format, parseISO, startOfMonth as startOfM, endOfMonth, startOfYear as startOfY, endOfYear } from "date-fns";
+import { format, parseISO, startOfMonth as startOfM, endOfMonth, startOfYear as startOfY, endOfYear, startOfDay, endOfDay } from "date-fns";
 import { nl } from "date-fns/locale";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -19,13 +17,7 @@ import {
 } from "recharts";
 import DashboardAppointmentsCard from "@/components/admin/DashboardAppointmentsCard";
 import DashboardLopendeVerkopenCard from "@/components/admin/DashboardLopendeVerkopenCard";
-
-/* ─── Constants ─── */
-const periodOrder: PeriodKey[] = ["7dagen", "30dagen", "kwartaal", "jaar"];
-const periodLabels: Record<PeriodKey, string> = {
-  vandaag: "Vandaag", gisteren: "Gisteren", "7dagen": "7 dagen", "30dagen": "30 dagen",
-  maand: "Deze maand", kwartaal: "Dit kwartaal", jaar: "Dit jaar", custom: "Aangepast",
-};
+import ShopifyPeriodSelector, { type PeriodRange as ShopifyRange } from "@/components/admin/ShopifyPeriodSelector";
 
 const DONUT_COLORS = ["#3b82f6", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444"];
 
