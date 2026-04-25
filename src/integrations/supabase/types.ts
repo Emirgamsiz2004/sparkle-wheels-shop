@@ -2407,6 +2407,8 @@ export type Database = {
           overboeking_bedrag: number | null
           overeenkomstnummer: string | null
           rdw_check_gedaan: boolean | null
+          restbedrag_later: boolean
+          restbedrag_verwachte_datum: string | null
           review_gevraagd: boolean | null
           sleutels_aantal: number | null
           stap1_afgerond: boolean | null
@@ -2511,6 +2513,8 @@ export type Database = {
           overboeking_bedrag?: number | null
           overeenkomstnummer?: string | null
           rdw_check_gedaan?: boolean | null
+          restbedrag_later?: boolean
+          restbedrag_verwachte_datum?: string | null
           review_gevraagd?: boolean | null
           sleutels_aantal?: number | null
           stap1_afgerond?: boolean | null
@@ -2615,6 +2619,8 @@ export type Database = {
           overboeking_bedrag?: number | null
           overeenkomstnummer?: string | null
           rdw_check_gedaan?: boolean | null
+          restbedrag_later?: boolean
+          restbedrag_verwachte_datum?: string | null
           review_gevraagd?: boolean | null
           sleutels_aantal?: number | null
           stap1_afgerond?: boolean | null
