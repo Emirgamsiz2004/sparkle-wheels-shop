@@ -1374,13 +1374,17 @@ const AdminVerkoopWizardPage = () => {
         <div className="text-[11px] text-muted-foreground">
           {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
         </div>
-        <button
-          onClick={handleVolgende}
-          disabled={saving}
-          className="px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
-        >
-          {activeStap === 12 ? "Bevestigen" : "Volgende"}
-        </button>
+        {activeStap < 12 ? (
+          <button
+            onClick={handleVolgende}
+            disabled={saving}
+            className="px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
+          >
+            Volgende
+          </button>
+        ) : (
+          <div />
+        )}
       </div>
     </div>
   );
