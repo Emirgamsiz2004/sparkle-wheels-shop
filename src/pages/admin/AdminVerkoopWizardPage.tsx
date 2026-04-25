@@ -72,12 +72,11 @@ const STEPS: StepDef[] = [
 const isStepDone = (stap: number, completed: Record<number, boolean>) => completed[stap] === true;
 
 const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean): boolean => {
-  // Stap 9 (inruil op naam) volledig verbergen zonder inruil
-  if (stap === 9 && !inruil) return true;
-  // Stap 6 mag altijd geopend worden — toont 'niet van toepassing' indien geen inruil
+  // Stap 6 (inruil document) en 9 (inruil op naam) volledig verbergen zonder inruil
+  if ((stap === 6 || stap === 9) && !inruil) return true;
   // Stappen 6-12 vereisen 5
   if (stap >= 6 && stap <= 12 && !completed[5]) return true;
-  // Stappen 9-12 vereisen 8
+  // Stappen 9-12 vereisen 8 (betaling bevestigd)
   if (stap >= 9 && stap <= 12 && !completed[8]) return true;
   // Stappen 11-12 vereisen 10
   if (stap >= 11 && stap <= 12 && !completed[10]) return true;
@@ -221,15 +220,17 @@ const AdminVerkoopWizardPage = () => {
     }
   }, [activeStap, verkoopId, overeenkomstnummer]);
 
-  // Stap 9: zonder inruil automatisch afronden
+  // Zonder inruil: stap 6 en 9 automatisch afronden
   useEffect(() => {
-    if (activeStap !== 9 || !verkoopId) return;
-    if (!inruil && !completed[9]) {
-      setCompleted((p) => ({ ...p, 9: true }));
-      saveCurrent({ stap9_afgerond: true });
-    }
+    if (!verkoopId || inruil) return;
+    const updates: Record<string, any> = {};
+    if (!completed[6]) updates.stap6_afgerond = true;
+    if (!completed[9]) updates.stap9_afgerond = true;
+    if (Object.keys(updates).length === 0) return;
+    setCompleted((p) => ({ ...p, 6: true, 9: true }));
+    saveCurrent(updates);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeStap, verkoopId, inruil]);
+  }, [verkoopId, inruil]);
 
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
@@ -608,6 +609,8 @@ const AdminVerkoopWizardPage = () => {
   const progressPct = Math.round((doneCount / totalSteps) * 100);
 
   const currentStep = STEPS.find((s) => s.num === activeStap)!;
+  const visibleSteps = STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9));
+  const currentDisplayNum = visibleSteps.findIndex((s) => s.num === activeStap) + 1;
 
   // ───────────────────────────────────────────────────────────
   // Centrale validatie
@@ -714,12 +717,12 @@ const AdminVerkoopWizardPage = () => {
           </div>
 
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            {STEPS.map((step) => {
+            {STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9)).map((step, visibleIdx) => {
+              const displayNum = visibleIdx + 1;
               const blocked = isStepBlocked(step.num, completed, inruil);
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
-              const nvt = step.optional && !inruil;
-              const hasIssues = !nvt && !blocked && stepHasIssues(step.num);
+              const hasIssues = !blocked && stepHasIssues(step.num);
               // Slot tonen bij betalingsblokkade (stap 9-12, betaling niet bevestigd)
               const lockedByPayment =
                 blocked && step.num >= 9 && step.num <= 12 && !completed[8] && !!completed[5];
@@ -751,16 +754,15 @@ const AdminVerkoopWizardPage = () => {
                       <AlertTriangle className="w-3.5 h-3.5" />
                     ) : done ? (
                       <Check className="w-3.5 h-3.5" />
-                    ) : nvt || lockedByPayment ? (
+                    ) : lockedByPayment ? (
                       <Lock className="w-3 h-3" />
                     ) : (
-                      step.num
+                      displayNum
                     )}
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-[13px] font-medium truncate">{step.title}</span>
-                    {nvt && <span className="block text-[10px] text-muted-foreground mt-0.5">Nvt</span>}
-                    {hasIssues && !nvt && (
+                    {hasIssues && (
                       <span className="block text-[10px] text-amber-400/80 mt-0.5">Ontbrekende info</span>
                     )}
                   </span>
@@ -799,7 +801,7 @@ const AdminVerkoopWizardPage = () => {
 
             <div className="mb-8">
               <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">
-                Stap {currentStep.num} van 12
+                Stap {currentDisplayNum > 0 ? currentDisplayNum : currentStep.num} van {visibleSteps.length}
               </div>
               <h1 className="text-2xl font-semibold text-foreground mb-1">{currentStep.title}</h1>
               <p className="text-sm text-muted-foreground">{currentStep.description}</p>
