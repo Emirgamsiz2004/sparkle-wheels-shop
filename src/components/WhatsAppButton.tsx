@@ -39,22 +39,33 @@ const WhatsAppButton = () => {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            style={{ borderRadius: 9999 }}
+            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            style={{
+              borderRadius: 50,
+              backgroundColor: "rgba(0,0,0,0.85)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+              padding: "14px 24px",
+              letterSpacing: "0.1em",
+              fontFamily: "Orbitron, sans-serif",
+            }}
+            whileHover={{
+              scale: 1.02,
+              borderColor: "rgba(255,255,255,0.3)",
+            }}
             className="fixed z-50 inline-flex items-center justify-center gap-2
               bottom-4 left-1/2 -translate-x-1/2 w-auto
               md:left-auto md:translate-x-0 md:right-5 md:bottom-5
-              px-5 py-3 bg-primary text-primary-foreground font-semibold text-sm
-              shadow-lg shadow-primary/30 hover:scale-[1.03] transition-transform"
+              text-white text-xs font-semibold uppercase backdrop-blur-sm"
             aria-label="Afspraak maken"
           >
             <motion.span
               layout="position"
               className="inline-flex items-center gap-2"
               initial={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.15 } }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
             >
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4" strokeWidth={2} />
               Afspraak maken
             </motion.span>
           </motion.button>
