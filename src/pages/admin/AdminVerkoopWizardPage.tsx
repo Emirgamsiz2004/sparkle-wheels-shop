@@ -191,6 +191,8 @@ const AdminVerkoopWizardPage = () => {
   const [betalingOpmerking, setBetalingOpmerking] = useState<string | null>(null);
   const [moneybirdPaymentId, setMoneybirdPaymentId] = useState<string | null>(null);
   const [betalingOntvangen, setBetalingOntvangen] = useState<boolean>(false);
+  const [restbedragLater, setRestbedragLater] = useState<boolean>(false);
+  const [restbedragVerwachteDatum, setRestbedragVerwachteDatum] = useState<string | null>(null);
 
   // Stap 9 state — Inruil op naam
   const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
