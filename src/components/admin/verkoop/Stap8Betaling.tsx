@@ -168,7 +168,9 @@ const Stap8Betaling = ({
 
   const handleChangeBedrag = (idx: number, v: string) => {
     const num = v === "" ? "" : Number(v);
-    setRijen((p) => p.map((r, i) => (i === idx ? { ...r, bedrag: num as any } : r)));
+    setRijen((p) =>
+      p.map((r, i) => (i === idx ? { ...r, bedrag: num as any, manueel: true } : r)),
+    );
   };
 
   // ─── Moneybird betaling registreren ───
