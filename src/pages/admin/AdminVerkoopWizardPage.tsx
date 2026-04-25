@@ -100,7 +100,18 @@ const AdminVerkoopWizardPage = () => {
   const [verkoopId, setVerkoopId] = useState<string | null>(null);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [activeStap, setActiveStap] = useState<number>(1);
+  const [touchedSteps, setTouchedSteps] = useState<Set<number>>(new Set([1]));
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
+
+  // Mark step as touched whenever the user navigates to it
+  useEffect(() => {
+    setTouchedSteps((prev) => {
+      if (prev.has(activeStap)) return prev;
+      const n = new Set(prev);
+      n.add(activeStap);
+      return n;
+    });
+  }, [activeStap]);
   const [saving, setSaving] = useState(false);
 
   // Stap 1 state
@@ -776,9 +787,11 @@ const AdminVerkoopWizardPage = () => {
             {STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9)).map((step, visibleIdx) => {
               const displayNum = visibleIdx + 1;
               const blocked = isStepBlocked(step.num, completed, inruil);
-              const done = isStepDone(step.num, completed);
+              const doneRaw = isStepDone(step.num, completed);
               const active = step.num === activeStap;
-              const hasIssues = !blocked && stepHasIssues(step.num);
+              const isTouched = touchedSteps.has(step.num) || doneRaw;
+              const done = doneRaw; // green only when stap{N}_afgerond = true
+              const hasIssues = !blocked && isTouched && !done && stepHasIssues(step.num);
               // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/tenaamstelling)
               const lockedByPrereq =
                 blocked &&
