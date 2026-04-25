@@ -254,6 +254,13 @@ const VoorraadDetailPage = () => {
                     <MessageCircle className="w-4 h-4" />
                     Stuur WhatsApp
                   </a>
+                  <Link
+                    to={`/afspraak?vehicle=${vehicle.id}`}
+                    className="btn-public btn-secondary-public w-full"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Afspraak maken
+                  </Link>
                 </div>
 
                 {dbMarktplaatsUrl && (
