@@ -343,7 +343,7 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 p-3 border-t border-border bg-card">
           <Button variant="ghost" size="sm" onClick={handleCancel}>Annuleren</Button>
-          <Button size="sm" onClick={handleApply} className="bg-emerald-500 hover:bg-emerald-600 text-white">
+          <Button size="sm" onClick={handleApply} className="bg-green-600 hover:bg-green-700 text-white">
             Toepassen
           </Button>
         </div>
