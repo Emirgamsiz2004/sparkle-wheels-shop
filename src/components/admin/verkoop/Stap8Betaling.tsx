@@ -33,6 +33,12 @@ interface Props {
   voertuigKenteken: string;
   voertuigMerk: string;
   voertuigModel: string;
+  voertuigBouwjaar: number | null;
+  klantVoornaam: string;
+  klantAchternaam: string;
+  klantAdres: string;
+  klantPostcode: string;
+  klantWoonplaats: string;
   factuurMbId: string | null;
   factuurMbNummer: string | null;
   factuurTotaal: number;
@@ -43,6 +49,8 @@ interface Props {
   initialBetalingOpmerking: string | null;
   initialMoneybirdPaymentId: string | null;
   initialBetalingOntvangen: boolean;
+  initialRestbedragLater: boolean;
+  initialRestbedragVerwachteDatum: string | null;
   onSaved: (extra: Record<string, any>) => Promise<void>;
 }
 
