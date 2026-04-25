@@ -38,6 +38,21 @@ const AdminVoertuigDetailPage = () => {
 
   const vehicle = vehicles.find((v) => v.id === id);
 
+  // Automatische APK-hercheck bij openen detailpagina
+  const apkCheckedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!vehicle?.id || !vehicle.kenteken) return;
+    if (apkCheckedRef.current === vehicle.id) return;
+    apkCheckedRef.current = vehicle.id;
+    (async () => {
+      const updated = await recheckApk(vehicle.id, vehicle.kenteken, vehicle.apkVervaldatum);
+      if (updated) {
+        toast.success(`APK datum bijgewerkt naar ${formatApkNl(updated)}`);
+        refetch();
+      }
+    })();
+  }, [vehicle?.id, vehicle?.kenteken, vehicle?.apkVervaldatum, refetch]);
+
   const logActivity = useCallback(async (type: string, beschrijving: string) => {
     if (!id) return;
     await supabase.from("vehicle_activity_log").insert({
