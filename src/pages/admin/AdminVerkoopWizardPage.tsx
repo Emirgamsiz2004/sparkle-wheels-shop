@@ -748,8 +748,8 @@ const AdminVerkoopWizardPage = () => {
                     "w-full text-left px-3 py-2.5 flex items-center gap-3 rounded-[10px] transition-colors",
                     active && !blocked ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
                     !active && !blocked ? "hover:bg-sidebar-accent/50 text-sidebar-foreground" : "",
-                    blocked && !lockedByPayment ? "opacity-40 cursor-not-allowed text-sidebar-foreground" : "",
-                    lockedByPayment ? "opacity-60 cursor-not-allowed text-sidebar-foreground hover:bg-sidebar-accent/30" : "",
+                    blocked && !lockedByPrereq ? "opacity-40 cursor-not-allowed text-sidebar-foreground" : "",
+                    lockedByPrereq ? "opacity-60 cursor-not-allowed text-sidebar-foreground hover:bg-sidebar-accent/30" : "",
                   ].join(" ")}
                 >
                   <span
@@ -759,15 +759,15 @@ const AdminVerkoopWizardPage = () => {
                       hasIssues && !active ? "bg-amber-500/15 border-amber-500/40 text-amber-400" : "",
                       hasIssues && active ? "bg-amber-500/20 border-amber-500/60 text-amber-300" : "",
                       !done && !hasIssues && active ? "bg-foreground/10 border-foreground/40 text-foreground" : "",
-                      !done && !hasIssues && !active && !lockedByPayment ? "border-sidebar-border text-sidebar-foreground/60" : "",
-                      lockedByPayment ? "border-sidebar-border text-sidebar-foreground/60" : "",
+                      !done && !hasIssues && !active && !lockedByPrereq ? "border-sidebar-border text-sidebar-foreground/60" : "",
+                      lockedByPrereq ? "border-sidebar-border text-sidebar-foreground/60" : "",
                     ].join(" ")}
                   >
                     {hasIssues ? (
                       <AlertTriangle className="w-3.5 h-3.5" />
                     ) : done ? (
                       <Check className="w-3.5 h-3.5" />
-                    ) : lockedByPayment ? (
+                    ) : lockedByPrereq ? (
                       <Lock className="w-3 h-3" />
                     ) : (
                       displayNum
