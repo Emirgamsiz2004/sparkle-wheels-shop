@@ -617,8 +617,8 @@ const AdminVerkoopWizardPage = () => {
       setCompleted((p) => ({ ...p, [activeStap]: true }));
       let next = activeStap + 1;
       const nextCompleted = { ...completed, [activeStap]: true };
-      while (next <= 12 && isStepBlocked(next, nextCompleted, inruil)) next++;
-      if (next <= 12) setActiveStap(next);
+      while (next <= 11 && isStepBlocked(next, nextCompleted, inruil)) next++;
+      if (next <= 11) setActiveStap(next);
       return;
     }
 
@@ -629,8 +629,8 @@ const AdminVerkoopWizardPage = () => {
     // Volgende non-blocked stap zoeken
     let next = activeStap + 1;
     const nextCompleted = { ...completed, [activeStap]: true };
-    while (next <= 12 && isStepBlocked(next, nextCompleted, inruil)) next++;
-    if (next <= 12) setActiveStap(next);
+    while (next <= 11 && isStepBlocked(next, nextCompleted, inruil)) next++;
+    if (next <= 11) setActiveStap(next);
     toast.success("Stap opgeslagen");
   };
 
