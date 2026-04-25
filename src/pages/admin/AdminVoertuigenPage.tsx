@@ -109,14 +109,30 @@ const AdminVoertuigenPage = () => {
     [vehicles]
   );
 
+  const normalizePlate = (s: string) => s.replace(/[-\s]/g, "").toUpperCase();
+
   const filtered = visibleVehicles.filter((v) => {
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
-      return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || v.kenteken?.toLowerCase().includes(q);
+      const qPlate = normalizePlate(search);
+      const plateMatch = v.kenteken ? normalizePlate(v.kenteken).includes(qPlate) : false;
+      return v.merk.toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || plateMatch;
     }
     return true;
   });
+
+  const suggestions = useMemo(() => {
+    if (!search.trim()) return [];
+    return filtered.slice(0, 5);
+  }, [search, filtered]);
+
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setShowSuggestions(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   if (loading) {
     return <div className="flex items-center justify-center py-20"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
@@ -182,21 +198,38 @@ const AdminVoertuigenPage = () => {
       </div>
 
       {/* Search + status filter */}
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <input
             type="text"
             placeholder="Zoek op merk, model, kenteken..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setShowSuggestions(true); }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
             className="w-full pl-7 pr-2 h-9 text-[13px] sm:text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
           />
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-card border border-border rounded-md shadow-lg overflow-hidden">
+              {suggestions.map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  onMouseDown={(e) => { e.preventDefault(); navigate(`/admin/voertuigen/${v.id}`); setShowSuggestions(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-accent/40 transition-colors border-b border-border last:border-b-0"
+                >
+                  <span className="font-mono text-foreground">{v.kenteken || "—"}</span>
+                  <span className="text-muted-foreground truncate">{v.merk} {v.model}{v.bouwjaar ? ` · ${v.bouwjaar}` : ""}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="shrink-0 sm:w-auto px-2 h-9 text-[13px] sm:text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
+          className="w-full sm:w-auto px-2 h-9 text-[13px] sm:text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
         >
           {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
