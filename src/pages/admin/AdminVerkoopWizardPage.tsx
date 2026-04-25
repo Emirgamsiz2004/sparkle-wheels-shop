@@ -24,6 +24,7 @@ import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
 import Stap9InruilOpNaam from "@/components/admin/verkoop/Stap9InruilOpNaam";
 import Stap10Vrijwaring from "@/components/admin/verkoop/Stap10Vrijwaring";
 import Stap11Uitlevering from "@/components/admin/verkoop/Stap11Uitlevering";
+import Stap12Afsluiting from "@/components/admin/verkoop/Stap12Afsluiting";
 import CancelVerkoopDialog from "@/components/admin/verkoop/CancelVerkoopDialog";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
@@ -1330,12 +1331,32 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 11 && (
-              <div className="rounded-[14px] border border-border bg-card p-8 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Inhoud voor deze stap volgt binnenkort.
-                </p>
-              </div>
+            {activeStap === 12 && (
+              <Stap12Afsluiting
+                verkoopId={verkoopId}
+                vehicleId={vehicleId}
+                completed={completed}
+                inruil={inruil}
+                voertuigKenteken={vehicle?.kenteken || null}
+                voertuigMerk={vehicle?.merk || null}
+                voertuigModel={vehicle?.model || null}
+                afleverwijze={afleverwijze}
+                aanbetalingBedrag={aanbetalingBedrag}
+                klantVoornaam={klantVoornaam}
+                klantAchternaam={klantAchternaam}
+                klantTelefoon={klantTelefoon}
+                garantieType={garantieType}
+                contractGetekend={contractGetekend}
+                factuurMbNummer={factuurMbNummer}
+                factuurVerstuurd={factuurVerstuurd}
+                ontvangenBedrag={typeof restbedragGlobal === "number" ? restbedragGlobal - (openstaandRestbedrag ?? 0) : null}
+                restbedragLater={restbedragLater}
+                restbedragBedrag={openstaandRestbedrag}
+                machtigingsnummer={machtigingsnummer}
+                machtigingDatum={machtigingDatum}
+                uitleveringDatum={uitleveringDatum}
+                onNavigateToStap={(s) => handleStepClick(s)}
+              />
             )}
           </div>
         </div>
@@ -1353,13 +1374,17 @@ const AdminVerkoopWizardPage = () => {
         <div className="text-[11px] text-muted-foreground">
           {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
         </div>
-        <button
-          onClick={handleVolgende}
-          disabled={saving}
-          className="px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
-        >
-          {activeStap === 12 ? "Bevestigen" : "Volgende"}
-        </button>
+        {activeStap < 12 ? (
+          <button
+            onClick={handleVolgende}
+            disabled={saving}
+            className="px-5 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
+          >
+            Volgende
+          </button>
+        ) : (
+          <div />
+        )}
       </div>
     </div>
   );
