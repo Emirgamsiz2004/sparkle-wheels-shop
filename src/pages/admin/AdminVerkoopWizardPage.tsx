@@ -1177,7 +1177,33 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 9 && (
+            {activeStap === 10 && (
+              <Stap10Vrijwaring
+                voertuigKenteken={vehicle?.kenteken || ""}
+                voertuigMerk={vehicle?.merk || ""}
+                voertuigModel={vehicle?.model || ""}
+                voertuigBouwjaar={vehicle?.bouwjaar || null}
+                initialVrijwaringBevestigd={vrijwaringBevestigd}
+                initialVrijwaringDatum={vrijwaringDatum}
+                initialVrijwaringTijdstip={vrijwaringTijdstip}
+                initialTenaamstellingsbewijsKlaargelegd={tenaamstellingsbewijsKlaargelegd}
+                onSaved={async (extra) => {
+                  if (extra.vrijwaring_bevestigd !== undefined)
+                    setVrijwaringBevestigd(!!extra.vrijwaring_bevestigd);
+                  if (extra.vrijwaring_datum !== undefined)
+                    setVrijwaringDatum(extra.vrijwaring_datum);
+                  if (extra.vrijwaring_tijdstip !== undefined)
+                    setVrijwaringTijdstip(extra.vrijwaring_tijdstip);
+                  if (extra.tenaamstellingsbewijs_klaargelegd !== undefined)
+                    setTenaamstellingsbewijsKlaargelegd(!!extra.tenaamstellingsbewijs_klaargelegd);
+                  if (extra.stap10_afgerond !== undefined)
+                    setCompleted((p) => ({ ...p, 10: !!extra.stap10_afgerond }));
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 10 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.
