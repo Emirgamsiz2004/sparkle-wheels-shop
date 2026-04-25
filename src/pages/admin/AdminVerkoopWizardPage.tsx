@@ -405,6 +405,19 @@ const AdminVerkoopWizardPage = () => {
         setMachtigingOntvangen(!!(e as any).machtiging_ontvangen);
         setTenaamstellingBevestigd(!!(e as any).tenaamstelling_bevestigd);
         setTenaamstellingDatum(((e as any).tenaamstelling_datum as string) || null);
+        // Stap 11 hydration — Uitlevering
+        setAutoSchoongemaakt(!!(e as any).auto_schoongemaakt);
+        setApkGecommuniceerd(!!(e as any).apk_gecommuniceerd);
+        setSleutelsOverhandigd(!!(e as any).sleutels_overhandigd);
+        setSleutelsAantal(
+          typeof (e as any).sleutels_aantal === "number" ? (e as any).sleutels_aantal : null,
+        );
+        setGebrekenBesproken(!!(e as any).gebreken_besproken);
+        setGebrekenOmschrijving(((e as any).gebreken_omschrijving as string) || null);
+        setTenaamstellingsbewijsMeegegeven(!!(e as any).tenaamstellingsbewijs_meegegeven);
+        setUitleveringFotos(Array.isArray((e as any).uitlevering_fotos) ? (e as any).uitlevering_fotos : []);
+        setUitleveringDatum(((e as any).uitlevering_datum as string) || null);
+        setUitleveringVoltooid(!!(e as any).uitlevering_voltooid);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
