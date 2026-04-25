@@ -32,15 +32,15 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <InventorySection />
+      <ReviewsSection />
+      <ServicesSection />
+      <PartnerBanner />
       <ConsignatieSection />
       <AfleveringSection />
-      <PartnerBanner />
-      <ServicesSection />
       <AboutSection />
-      <ReviewsSection />
-      <ContactSection />
       <LatestBlogSection />
       <FAQSection />
+      <ContactSection />
       <Footer />
     </div>
   );
