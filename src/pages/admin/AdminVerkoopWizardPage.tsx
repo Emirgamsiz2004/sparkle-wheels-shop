@@ -40,7 +40,7 @@ type StepKey =
   | "factuur"
   | "betaling"
   | "inruil_naam"
-  | "vrijwaring"
+  | "tenaamstelling"
   | "uitlevering"
   | "afsluiting";
 
@@ -62,7 +62,7 @@ const STEPS: StepDef[] = [
   { num: 7, key: "factuur", title: "Factuur", description: "Factuur opmaken en versturen" },
   { num: 8, key: "betaling", title: "Betaling", description: "Bevestig betaling van de koper" },
   { num: 9, key: "inruil_naam", title: "Inruil op naam", description: "Inruil overzetten op eigen naam (alleen bij inruil)", optional: true },
-  { num: 10, key: "vrijwaring", title: "Vrijwaring & overschrijving", description: "RDW vrijwaring en tenaamstelling koper" },
+  { num: 10, key: "tenaamstelling", title: "Tenaamstelling", description: "Machtiging aanvragen en voertuig overschrijven via VWE" },
   { num: 11, key: "uitlevering", title: "Uitlevering", description: "Voertuig overhandigen aan koper" },
   { num: 12, key: "afsluiting", title: "Afsluiting", description: "Verkoop afronden en archiveren" },
 ];
@@ -196,11 +196,12 @@ const AdminVerkoopWizardPage = () => {
   const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
   const [inruilOpNaamAt, setInruilOpNaamAt] = useState<string | null>(null);
 
-  // Stap 10 state — Vrijwaring
-  const [vrijwaringBevestigd, setVrijwaringBevestigd] = useState<boolean>(false);
-  const [vrijwaringDatum, setVrijwaringDatum] = useState<string | null>(null);
-  const [vrijwaringTijdstip, setVrijwaringTijdstip] = useState<string | null>(null);
-  const [tenaamstellingsbewijsKlaargelegd, setTenaamstellingsbewijsKlaargelegd] = useState<boolean>(false);
+  // Stap 10 state — Tenaamstelling (machtiging RDW + VWE)
+  const [machtigingsnummer, setMachtigingsnummer] = useState<string | null>(null);
+  const [machtigingDatum, setMachtigingDatum] = useState<string | null>(null);
+  const [machtigingOntvangen, setMachtigingOntvangen] = useState<boolean>(false);
+  const [tenaamstellingBevestigd, setTenaamstellingBevestigd] = useState<boolean>(false);
+  const [tenaamstellingDatum, setTenaamstellingDatum] = useState<string | null>(null);
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
@@ -377,11 +378,12 @@ const AdminVerkoopWizardPage = () => {
         // Stap 9 hydration — Inruil op naam
         setInruilOpNaam(!!(e as any).inruil_op_naam);
         setInruilOpNaamAt(((e as any).inruil_op_naam_at as string) || null);
-        // Stap 10 hydration — Vrijwaring
-        setVrijwaringBevestigd(!!(e as any).vrijwaring_bevestigd);
-        setVrijwaringDatum(((e as any).vrijwaring_datum as string) || null);
-        setVrijwaringTijdstip(((e as any).vrijwaring_tijdstip as string) || null);
-        setTenaamstellingsbewijsKlaargelegd(!!(e as any).tenaamstellingsbewijs_klaargelegd);
+        // Stap 10 hydration — Tenaamstelling
+        setMachtigingsnummer(((e as any).machtigingsnummer as string) || null);
+        setMachtigingDatum(((e as any).machtiging_datum as string) || null);
+        setMachtigingOntvangen(!!(e as any).machtiging_ontvangen);
+        setTenaamstellingBevestigd(!!(e as any).tenaamstelling_bevestigd);
+        setTenaamstellingDatum(((e as any).tenaamstelling_datum as string) || null);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -1183,19 +1185,22 @@ const AdminVerkoopWizardPage = () => {
                 voertuigMerk={vehicle?.merk || ""}
                 voertuigModel={vehicle?.model || ""}
                 voertuigBouwjaar={vehicle?.bouwjaar || null}
-                initialVrijwaringBevestigd={vrijwaringBevestigd}
-                initialVrijwaringDatum={vrijwaringDatum}
-                initialVrijwaringTijdstip={vrijwaringTijdstip}
-                initialTenaamstellingsbewijsKlaargelegd={tenaamstellingsbewijsKlaargelegd}
+                initialMachtigingsnummer={machtigingsnummer}
+                initialMachtigingDatum={machtigingDatum}
+                initialMachtigingOntvangen={machtigingOntvangen}
+                initialTenaamstellingBevestigd={tenaamstellingBevestigd}
+                initialTenaamstellingDatum={tenaamstellingDatum}
                 onSaved={async (extra) => {
-                  if (extra.vrijwaring_bevestigd !== undefined)
-                    setVrijwaringBevestigd(!!extra.vrijwaring_bevestigd);
-                  if (extra.vrijwaring_datum !== undefined)
-                    setVrijwaringDatum(extra.vrijwaring_datum);
-                  if (extra.vrijwaring_tijdstip !== undefined)
-                    setVrijwaringTijdstip(extra.vrijwaring_tijdstip);
-                  if (extra.tenaamstellingsbewijs_klaargelegd !== undefined)
-                    setTenaamstellingsbewijsKlaargelegd(!!extra.tenaamstellingsbewijs_klaargelegd);
+                  if (extra.machtigingsnummer !== undefined)
+                    setMachtigingsnummer(extra.machtigingsnummer);
+                  if (extra.machtiging_datum !== undefined)
+                    setMachtigingDatum(extra.machtiging_datum);
+                  if (extra.machtiging_ontvangen !== undefined)
+                    setMachtigingOntvangen(!!extra.machtiging_ontvangen);
+                  if (extra.tenaamstelling_bevestigd !== undefined)
+                    setTenaamstellingBevestigd(!!extra.tenaamstelling_bevestigd);
+                  if (extra.tenaamstelling_datum !== undefined)
+                    setTenaamstellingDatum(extra.tenaamstelling_datum);
                   if (extra.stap10_afgerond !== undefined)
                     setCompleted((p) => ({ ...p, 10: !!extra.stap10_afgerond }));
                   await saveCurrent(extra);
