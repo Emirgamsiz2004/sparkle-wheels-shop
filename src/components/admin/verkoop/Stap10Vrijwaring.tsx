@@ -3,6 +3,7 @@ import { Info } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { formatKenteken } from "@/lib/kenteken";
 
 interface Props {
@@ -10,28 +11,29 @@ interface Props {
   voertuigMerk: string;
   voertuigModel: string;
   voertuigBouwjaar: number | null;
-  initialVrijwaringBevestigd: boolean;
-  initialVrijwaringDatum: string | null; // YYYY-MM-DD
-  initialVrijwaringTijdstip: string | null; // HH:mm[:ss]
-  initialTenaamstellingsbewijsKlaargelegd: boolean;
+  initialMachtigingsnummer: string | null;
+  initialMachtigingDatum: string | null; // ISO timestamp
+  initialMachtigingOntvangen: boolean;
+  initialTenaamstellingBevestigd: boolean;
+  initialTenaamstellingDatum: string | null; // ISO timestamp
   onSaved: (extra: Record<string, any>) => Promise<void>;
 }
 
-const toLocalInput = (date: string | null, time: string | null): string => {
-  if (date) {
-    const t = (time || "00:00").slice(0, 5);
-    return `${date}T${t}`;
-  }
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
+const pad = (n: number) => String(n).padStart(2, "0");
+
+const isoToLocalInput = (iso: string | null): string => {
+  const d = iso ? new Date(iso) : new Date();
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
     d.getHours(),
   )}:${pad(d.getMinutes())}`;
 };
 
-const splitLocal = (v: string): { date: string; time: string } => {
-  const [d, t] = v.split("T");
-  return { date: d, time: (t || "00:00").slice(0, 5) };
+const localInputToIso = (v: string): string => new Date(v).toISOString();
+
+const formatLocal = (iso: string | null): string => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return `${format(d, "d MMMM yyyy", { locale: nl })} om ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
 const Stap10Vrijwaring = ({
@@ -39,55 +41,65 @@ const Stap10Vrijwaring = ({
   voertuigMerk,
   voertuigModel,
   voertuigBouwjaar,
-  initialVrijwaringBevestigd,
-  initialVrijwaringDatum,
-  initialVrijwaringTijdstip,
-  initialTenaamstellingsbewijsKlaargelegd,
+  initialMachtigingsnummer,
+  initialMachtigingDatum,
+  initialMachtigingOntvangen,
+  initialTenaamstellingBevestigd,
+  initialTenaamstellingDatum,
   onSaved,
 }: Props) => {
-  const [bevestigd, setBevestigd] = useState<boolean>(!!initialVrijwaringBevestigd);
-  const [moment, setMoment] = useState<string>(
-    toLocalInput(initialVrijwaringDatum, initialVrijwaringTijdstip),
+  const [machtigingsnummer, setMachtigingsnummer] = useState<string>(
+    initialMachtigingsnummer || "",
   );
-  const [tenaamstelling, setTenaamstelling] = useState<boolean>(
-    !!initialTenaamstellingsbewijsKlaargelegd,
+  const [machtigingMoment, setMachtigingMoment] = useState<string>(
+    isoToLocalInput(initialMachtigingDatum),
+  );
+  const [machtigingOntvangen, setMachtigingOntvangen] = useState<boolean>(
+    !!initialMachtigingOntvangen,
   );
 
-  const handleToggleVrijwaring = async (val: boolean) => {
-    setBevestigd(val);
-    const { date, time } = splitLocal(moment);
+  const [tenaamstellingMoment, setTenaamstellingMoment] = useState<string>(
+    isoToLocalInput(initialTenaamstellingDatum),
+  );
+  const [tenaamstellingBevestigd, setTenaamstellingBevestigd] = useState<boolean>(
+    !!initialTenaamstellingBevestigd,
+  );
+
+  const handleNummerBlur = async () => {
+    await onSaved({ machtigingsnummer: machtigingsnummer || null });
+  };
+
+  const handleMachtigingMomentChange = async (v: string) => {
+    if (!v) return;
+    setMachtigingMoment(v);
+    await onSaved({ machtiging_datum: localInputToIso(v) });
+  };
+
+  const handleToggleMachtiging = async (val: boolean) => {
+    setMachtigingOntvangen(val);
     await onSaved({
-      vrijwaring_bevestigd: val,
-      vrijwaring_datum: val ? date : null,
-      vrijwaring_tijdstip: val ? `${time}:00` : null,
-      stap10_afgerond: val,
+      machtiging_ontvangen: val,
+      machtigingsnummer: machtigingsnummer || null,
+      machtiging_datum: localInputToIso(machtigingMoment),
     });
   };
 
-  const handleMomentChange = async (v: string) => {
+  const handleTenaamstellingMomentChange = async (v: string) => {
     if (!v) return;
-    setMoment(v);
-    if (bevestigd) {
-      const { date, time } = splitLocal(v);
-      await onSaved({
-        vrijwaring_bevestigd: true,
-        vrijwaring_datum: date,
-        vrijwaring_tijdstip: `${time}:00`,
-        stap10_afgerond: true,
-      });
+    setTenaamstellingMoment(v);
+    if (tenaamstellingBevestigd) {
+      await onSaved({ tenaamstelling_datum: localInputToIso(v) });
     }
   };
 
   const handleToggleTenaamstelling = async (val: boolean) => {
-    setTenaamstelling(val);
-    await onSaved({ tenaamstellingsbewijs_klaargelegd: val });
+    setTenaamstellingBevestigd(val);
+    await onSaved({
+      tenaamstelling_bevestigd: val,
+      tenaamstelling_datum: val ? localInputToIso(tenaamstellingMoment) : null,
+      stap10_afgerond: val,
+    });
   };
-
-  const { date, time } = splitLocal(moment);
-  const vastgelegdLabel =
-    bevestigd && date
-      ? `Vastgelegd op ${format(parseISO(date), "d MMMM yyyy", { locale: nl })} om ${time}`
-      : null;
 
   return (
     <div className="space-y-6">
@@ -113,78 +125,130 @@ const Stap10Vrijwaring = ({
         </div>
       </div>
 
-      {/* ─── Info-blok ─── */}
-      <div className="rounded-[14px] border border-blue-500/30 bg-blue-500/5 p-4 flex gap-3">
-        <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-        <p className="text-sm text-foreground/90 leading-relaxed">
-          Vraag de vrijwaring aan via{" "}
-          <a
-            href="https://mijn.rdw.nl"
-            target="_blank"
-            rel="noreferrer"
-            className="underline hover:text-blue-300"
-          >
-            mijn.rdw.nl
-          </a>{" "}
-          <span className="font-semibold">VOORDAT</span> je de auto overhandigt. Leg de exacte
-          datum en tijd vast — dit is je juridisch bewijs dat je niet meer aansprakelijk bent voor
-          het voertuig vanaf dat moment. De koper heeft 5 werkdagen om het voertuig op zijn naam
-          te zetten.
-        </p>
-      </div>
-
-      {/* ─── Vrijwaring bevestigen ─── */}
-      <div className="rounded-[14px] border border-border bg-card p-6 space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-sm text-foreground font-medium">
-              Vrijwaring aangevraagd via RDW portaal
-            </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              Wordt vastgelegd als juridisch bewijs.
-            </div>
+      {/* ─── STAP 1 — Machtiging RDW ─── */}
+      <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+        <div>
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+            Stap 1
           </div>
-          <Switch
-            checked={bevestigd}
-            onCheckedChange={handleToggleVrijwaring}
-            className="data-[state=unchecked]:bg-white/10 data-[state=unchecked]:border-white/30 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 [&>span]:bg-white"
+          <h3 className="text-base font-semibold text-foreground">
+            Machtiging aanvragen via RDW
+          </h3>
+        </div>
+
+        <div className="rounded-[10px] border border-blue-500/30 bg-blue-500/5 p-3 flex gap-3">
+          <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-foreground/90 leading-relaxed">
+            Vraag een machtiging aan via{" "}
+            <a
+              href="https://mijn.rdw.nl"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-blue-300"
+            >
+              mijn.rdw.nl
+            </a>
+            . Je ontvangt een machtigingsnummer waarmee je het voertuig via het VWE portaal direct
+            op naam van de koper kunt zetten.
+          </p>
+        </div>
+
+        <div>
+          <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
+            Machtigingsnummer
+          </label>
+          <Input
+            value={machtigingsnummer}
+            onChange={(e) => setMachtigingsnummer(e.target.value)}
+            onBlur={handleNummerBlur}
+            placeholder="bijv. M-12345678"
+            className="w-full sm:max-w-xs"
           />
         </div>
 
         <div>
           <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
-            Datum & tijdstip aanvraag
+            Datum & tijdstip machtiging
           </label>
           <input
             type="datetime-local"
-            value={moment}
-            onChange={(e) => handleMomentChange(e.target.value)}
+            value={machtigingMoment}
+            onChange={(e) => handleMachtigingMomentChange(e.target.value)}
             className="w-full sm:w-auto bg-background border border-border rounded-[10px] px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
           />
-          {vastgelegdLabel && (
-            <div className="text-[11px] text-muted-foreground mt-1.5">{vastgelegdLabel}</div>
-          )}
         </div>
-      </div>
 
-      {/* ─── Overschrijving ─── */}
-      <div className="rounded-[14px] border border-border bg-card p-6 space-y-3">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 pt-2">
           <div>
-            <div className="text-sm text-foreground font-medium">
-              Tenaamstellingsbewijs klaargelegd voor de koper
+            <div className="text-sm text-foreground font-medium">Machtiging ontvangen</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              Bevestig zodra je het machtigingsnummer van de RDW hebt.
             </div>
           </div>
           <Switch
-            checked={tenaamstelling}
-            onCheckedChange={handleToggleTenaamstelling}
+            checked={machtigingOntvangen}
+            onCheckedChange={handleToggleMachtiging}
             className="data-[state=unchecked]:bg-white/10 data-[state=unchecked]:border-white/30 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 [&>span]:bg-white"
           />
         </div>
-        <p className="text-xs text-muted-foreground">
-          De koper moet het voertuig binnen 5 werkdagen op zijn naam zetten.
-        </p>
       </div>
+
+      {/* ─── STAP 2 — Tenaamstelling VWE ─── */}
+      {machtigingOntvangen && (
+        <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+              Stap 2
+            </div>
+            <h3 className="text-base font-semibold text-foreground">
+              Tenaamstelling via VWE portaal
+            </h3>
+          </div>
+
+          <div className="rounded-[10px] border border-blue-500/30 bg-blue-500/5 p-3 flex gap-3">
+            <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+            <p className="text-sm text-foreground/90 leading-relaxed">
+              Zet het voertuig op naam van de koper via het VWE portaal met het machtigingsnummer.
+            </p>
+          </div>
+
+          <div>
+            <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
+              Datum & tijdstip tenaamstelling
+            </label>
+            <input
+              type="datetime-local"
+              value={tenaamstellingMoment}
+              onChange={(e) => handleTenaamstellingMomentChange(e.target.value)}
+              className="w-full sm:w-auto bg-background border border-border rounded-[10px] px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+            {tenaamstellingBevestigd && (
+              <div className="text-[11px] text-muted-foreground mt-1.5">
+                Vastgelegd op {formatLocal(localInputToIso(tenaamstellingMoment))} — juridisch
+                bewijs van overschrijving
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between gap-4 pt-2">
+            <div>
+              <div className="text-sm text-foreground font-medium">
+                Voertuig tenaamgesteld op naam koper
+              </div>
+            </div>
+            <Switch
+              checked={tenaamstellingBevestigd}
+              onCheckedChange={handleToggleTenaamstelling}
+              className="data-[state=unchecked]:bg-white/10 data-[state=unchecked]:border-white/30 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 [&>span]:bg-white"
+            />
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            De koper heeft 5 werkdagen om de tenaamstelling te voltooien als dit nog niet gedaan
+            is.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
