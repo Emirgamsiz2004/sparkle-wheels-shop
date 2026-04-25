@@ -350,6 +350,9 @@ const AdminVerkoopWizardPage = () => {
             setKlantBtw(cust.btw_nummer || "");
           }
         }
+        // Lead source hydration
+        setLeadSource(((existing as any).lead_source as string) || "");
+        setLeadSourceAnders(((existing as any).lead_source_anders as string) || "");
         // Stap 4 hydration
         if (existing.garantie_type === "geen" || existing.garantie_type === "autotrust") {
           setGarantieType(existing.garantie_type);
