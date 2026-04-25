@@ -40,7 +40,7 @@ type StepKey =
   | "factuur"
   | "betaling"
   | "inruil_naam"
-  | "vrijwaring"
+  | "tenaamstelling"
   | "uitlevering"
   | "afsluiting";
 
