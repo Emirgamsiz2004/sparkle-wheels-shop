@@ -185,7 +185,7 @@ const AdminPlanningPage = () => {
                     ) : (
                       <div className="p-1.5 space-y-1">
                         {dayAppts.map((a) => (
-                          <button key={a.id} onClick={() => setDetailAppointment(a)}
+                          <button key={a.id} onClick={(e) => openDetail(a, e)}
                             className={`w-full text-left px-3 py-2 rounded-md text-sm leading-tight border transition-colors active:opacity-70 ${typeColors[a.type]}`}>
                             <div className="flex items-center justify-between gap-2">
                               <span className="font-medium">{format(new Date(a.datum_tijd), "HH:mm")}</span>
@@ -219,7 +219,7 @@ const AdminPlanningPage = () => {
                     </div>
                     <div className="flex-1 p-1 space-y-0.5 overflow-y-auto">
                       {dayAppts.map((a) => (
-                        <button key={a.id} onClick={() => setDetailAppointment(a)}
+                        <button key={a.id} onClick={(e) => openDetail(a, e)}
                           className={`w-full text-left px-1.5 py-1 rounded text-[11px] leading-tight border transition-colors hover:opacity-80 ${typeColors[a.type]}`}>
                           <span className="font-medium">{format(new Date(a.datum_tijd), "HH:mm")}</span>
                           {a.customer && <span className="block truncate">{a.customer.voornaam} {a.customer.achternaam}</span>}
@@ -275,7 +275,7 @@ const AdminPlanningPage = () => {
             ) : (
               <div className="space-y-1.5">
                 {upcoming.map((a) => (
-                  <button key={a.id} onClick={() => setDetailAppointment(a)}
+                  <button key={a.id} onClick={(e) => openDetail(a, e)}
                     className="w-full text-left bg-muted/30 hover:bg-muted/60 border border-border rounded-md px-3 py-2.5 transition-colors active:bg-muted/80">
                     <div className="flex items-center gap-2 mb-1">
                       <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${typeDotColors[a.type]}`} />
@@ -320,7 +320,7 @@ const AdminPlanningPage = () => {
               {filteredAppointments.map((a) => {
                 const isPast = new Date(a.datum_tijd) < new Date() && a.status === "gepland";
                 return (
-                  <button key={a.id} onClick={() => setDetailAppointment(a)}
+                  <button key={a.id} onClick={(e) => openDetail(a, e)}
                     className={`w-full text-left bg-card border border-border rounded-md p-3 active:bg-accent/30 transition-colors ${isPast ? "opacity-60" : ""}`}>
                     <div className="flex items-center justify-between gap-2 mb-1.5">
                       <span className="text-xs font-medium text-foreground">{format(new Date(a.datum_tijd), "EEE d MMM · HH:mm", { locale: nl })}</span>
@@ -356,7 +356,7 @@ const AdminPlanningPage = () => {
                     {filteredAppointments.map((a) => {
                       const isPast = new Date(a.datum_tijd) < new Date() && a.status === "gepland";
                       return (
-                        <tr key={a.id} onClick={() => setDetailAppointment(a)}
+                        <tr key={a.id} onClick={(e) => openDetail(a, e)}
                           className={`border-b border-border/50 hover:bg-accent/10 cursor-pointer transition-colors ${isPast ? "opacity-60" : ""}`}>
                           <td className="px-4 py-2.5 whitespace-nowrap">
                             <p className="font-medium">{format(new Date(a.datum_tijd), "d MMM yyyy", { locale: nl })}</p>
