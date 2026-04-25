@@ -129,13 +129,21 @@ export type Database = {
       }
       appointments: {
         Row: {
+          aanvraag_omschrijving: string | null
+          aanvrager_achternaam: string | null
+          aanvrager_email: string | null
+          aanvrager_kenteken: string | null
+          aanvrager_telefoon: string | null
+          aanvrager_voornaam: string | null
           betalingsstatus: string | null
+          bron: string | null
           created_at: string
           customer_id: string | null
           datum_tijd: string
           eind_datum_tijd: string | null
           google_event_id: string | null
           id: string
+          is_aanvraag: boolean
           medewerker: string | null
           notities: string | null
           onderwerp: string | null
@@ -144,15 +152,24 @@ export type Database = {
           updated_at: string
           vehicle_id: string | null
           voertuig_klaargemaakt: boolean
+          voorkeursdatum: string | null
         }
         Insert: {
+          aanvraag_omschrijving?: string | null
+          aanvrager_achternaam?: string | null
+          aanvrager_email?: string | null
+          aanvrager_kenteken?: string | null
+          aanvrager_telefoon?: string | null
+          aanvrager_voornaam?: string | null
           betalingsstatus?: string | null
+          bron?: string | null
           created_at?: string
           customer_id?: string | null
           datum_tijd: string
           eind_datum_tijd?: string | null
           google_event_id?: string | null
           id?: string
+          is_aanvraag?: boolean
           medewerker?: string | null
           notities?: string | null
           onderwerp?: string | null
@@ -161,15 +178,24 @@ export type Database = {
           updated_at?: string
           vehicle_id?: string | null
           voertuig_klaargemaakt?: boolean
+          voorkeursdatum?: string | null
         }
         Update: {
+          aanvraag_omschrijving?: string | null
+          aanvrager_achternaam?: string | null
+          aanvrager_email?: string | null
+          aanvrager_kenteken?: string | null
+          aanvrager_telefoon?: string | null
+          aanvrager_voornaam?: string | null
           betalingsstatus?: string | null
+          bron?: string | null
           created_at?: string
           customer_id?: string | null
           datum_tijd?: string
           eind_datum_tijd?: string | null
           google_event_id?: string | null
           id?: string
+          is_aanvraag?: boolean
           medewerker?: string | null
           notities?: string | null
           onderwerp?: string | null
@@ -178,6 +204,7 @@ export type Database = {
           updated_at?: string
           vehicle_id?: string | null
           voertuig_klaargemaakt?: boolean
+          voorkeursdatum?: string | null
         }
         Relationships: [
           {
@@ -1415,6 +1442,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_slots"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "notifications_appointment_id_fkey"
             columns: ["appointment_id"]
@@ -2714,7 +2748,41 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      appointment_slots: {
+        Row: {
+          datum_tijd: string | null
+          eind_datum_tijd: string | null
+          id: string | null
+          status: string | null
+          type: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          datum_tijd?: string | null
+          eind_datum_tijd?: string | null
+          id?: string | null
+          status?: string | null
+          type?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          datum_tijd?: string | null
+          eind_datum_tijd?: string | null
+          id?: string | null
+          status?: string | null
+          type?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       delete_email: {
