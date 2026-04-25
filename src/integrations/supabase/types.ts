@@ -1990,6 +1990,8 @@ export type Database = {
           garantie_maanden: number | null
           garantie_type: string
           id: string
+          lead_source: string | null
+          lead_source_anders: string | null
           moneybird_factuur_id: string | null
           overboeking_bedrag: number | null
           overeenkomst_ondertekend: boolean
@@ -2022,6 +2024,8 @@ export type Database = {
           garantie_maanden?: number | null
           garantie_type?: string
           id?: string
+          lead_source?: string | null
+          lead_source_anders?: string | null
           moneybird_factuur_id?: string | null
           overboeking_bedrag?: number | null
           overeenkomst_ondertekend?: boolean
@@ -2054,6 +2058,8 @@ export type Database = {
           garantie_maanden?: number | null
           garantie_type?: string
           id?: string
+          lead_source?: string | null
+          lead_source_anders?: string | null
           moneybird_factuur_id?: string | null
           overboeking_bedrag?: number | null
           overeenkomst_ondertekend?: boolean
