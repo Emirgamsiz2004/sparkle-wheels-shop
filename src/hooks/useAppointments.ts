@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export type AppointmentType = "bezichtiging" | "proefrit" | "terugbelafspraak" | "aflevering";
+export type AppointmentType = "bezichtiging" | "proefrit" | "terugbelafspraak" | "aflevering" | "ophalen" | "onderhoud" | "anders";
 export type AppointmentStatus = "gepland" | "voltooid" | "geannuleerd";
 
 export interface Appointment {
