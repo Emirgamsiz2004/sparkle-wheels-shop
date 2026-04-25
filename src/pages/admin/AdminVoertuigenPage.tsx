@@ -206,15 +206,17 @@ const AdminVoertuigenPage = () => {
                 className="flex items-center justify-between gap-3 bg-card border border-border rounded-lg p-3 active:bg-accent/30 transition-colors"
               >
                 <div className="min-w-0 flex-1">
-                  {/* Rij 1: merk + model + bouwjaar | tag rechts */}
+                  {/* Rij 1: merk + model + bouwjaar | tag rechts (alleen als label bestaat) */}
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{v.merk} {v.model}</p>
                       <span className="text-xs text-muted-foreground shrink-0">({v.bouwjaar})</span>
                     </div>
-                    <span className={`${BADGE_BASE} ${statusColors[v.status]} shrink-0`}>
-                      {statusLabels[v.status]}
-                    </span>
+                    {statusLabels[v.status] && (
+                      <span className={`${BADGE_BASE} ${statusColors[v.status]} shrink-0`}>
+                        {statusLabels[v.status]}
+                      </span>
+                    )}
                   </div>
                   {/* Rij 2: kenteken + APK badge */}
                   {(v.kenteken || v.apkVervaldatum) && (
@@ -223,13 +225,13 @@ const AdminVoertuigenPage = () => {
                       <ApkBadge apkVervaldatum={v.apkVervaldatum} />
                     </div>
                   )}
-                  {/* Rij 3: inkoop links | verkoop rechts */}
+                  {/* Rij 3: inkoop (grijs) links | verkoop (wit) rechts */}
                   <div className="flex items-center justify-between gap-3 mt-1.5">
                     <span className="text-xs text-muted-foreground">
                       {consignatie ? "Consignatie" : formatEuro(v.inkoopprijs)}
                     </span>
                     {v.verkoopprijs > 0 && (
-                      <span className="text-xs font-medium tabular-nums text-emerald-500">
+                      <span className="text-xs font-medium tabular-nums text-foreground">
                         {formatEuro(v.verkoopprijs)}
                       </span>
                     )}
