@@ -101,12 +101,21 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
       setDraft({ from: value.from, to: value.to });
       setDraftLabel(value.label);
       setSubmenu(null);
+      setMobileView("root");
       setCalMonth(value.from);
       setFromText(format(value.from, "dd-MM-yyyy"));
       setToText(format(value.to, "dd-MM-yyyy"));
       setActivePreset("custom");
     }
   }, [open, value]);
+
+  // Block body scroll while mobile sheet is open
+  useEffect(() => {
+    if (!isMobile || !open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [isMobile, open]);
 
   const applyPreset = (id: string, range: PeriodRange) => {
     setActivePreset(id);
