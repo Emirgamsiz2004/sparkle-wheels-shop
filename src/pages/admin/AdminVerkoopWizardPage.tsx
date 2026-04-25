@@ -2305,6 +2305,8 @@ interface Stap3Props {
   bedrijfsnaam: string; setBedrijfsnaam: (v: string) => void;
   kvk: string; setKvk: (v: string) => void;
   btw: string; setBtw: (v: string) => void;
+  leadSource: string; setLeadSource: (v: string) => void;
+  leadSourceAnders: string; setLeadSourceAnders: (v: string) => void;
 }
 
 interface CustomerSuggestion {
