@@ -406,25 +406,14 @@ const AdminPlanningPage = () => {
       )}
 
       {/* Dialogs */}
-      <AppointmentTypePicker
-        open={pickerOpen}
-        anchorRect={pickerRect}
-        onOpenChange={setPickerOpen}
-        onSelect={(t) => { setPickedType(t); setFormOpen(true); }}
-      />
       <AppointmentFormDialog
         open={formOpen}
-        onOpenChange={(v) => { setFormOpen(v); if (!v) setPickedType(undefined); }}
+        onOpenChange={setFormOpen}
         customers={customers}
         vehicles={activeVehicles}
         allVehicles={allSelectableVehicles}
         onSubmit={addAppointment}
-        defaultType={pickedType}
-        anchorRect={pickerRect}
-        onBackToTypePicker={() => {
-          setPickerRect(addBtnRef.current?.getBoundingClientRect() || null);
-          setPickerOpen(true);
-        }}
+        anchorRect={formAnchorRect}
       />
       <AppointmentDetailDialog appointment={detailAppointment} anchorRect={detailRect} open={!!detailAppointment} onOpenChange={(v) => { if (!v) setDetailAppointment(null); }} onUpdate={updateAppointment} onDelete={deleteAppointment} onCreate={addAppointment} />
     </div>
