@@ -1102,8 +1102,8 @@ const AdminVerkoopWizardPage = () => {
                     setBetalingOntvangen(!!extra.betaling_ontvangen);
                   if (extra.betaalwijze_details !== undefined)
                     setBetaalwijzeDetails(extra.betaalwijze_details || []);
-                  if (extra.stap8_afgerond) {
-                    setCompleted((p) => ({ ...p, 8: true }));
+                  if (extra.stap8_afgerond !== undefined) {
+                    setCompleted((p) => ({ ...p, 8: !!extra.stap8_afgerond }));
                   }
                   await saveCurrent(extra);
                 }}
