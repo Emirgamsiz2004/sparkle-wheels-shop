@@ -21,6 +21,7 @@ import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
 import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
 import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
 import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
+import Stap9InruilOpNaam from "@/components/admin/verkoop/Stap9InruilOpNaam";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
@@ -189,6 +190,10 @@ const AdminVerkoopWizardPage = () => {
   const [moneybirdPaymentId, setMoneybirdPaymentId] = useState<string | null>(null);
   const [betalingOntvangen, setBetalingOntvangen] = useState<boolean>(false);
 
+  // Stap 9 state — Inruil op naam
+  const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
+  const [inruilOpNaamAt, setInruilOpNaamAt] = useState<string | null>(null);
+
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
     const prevHtml = document.documentElement.style.overflow;
@@ -215,6 +220,16 @@ const AdminVerkoopWizardPage = () => {
       })();
     }
   }, [activeStap, verkoopId, overeenkomstnummer]);
+
+  // Stap 9: zonder inruil automatisch afronden
+  useEffect(() => {
+    if (activeStap !== 9 || !verkoopId) return;
+    if (!inruil && !completed[9]) {
+      setCompleted((p) => ({ ...p, 9: true }));
+      saveCurrent({ stap9_afgerond: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeStap, verkoopId, inruil]);
 
   // ─── Init: laad of maak verkoop record ───
   useEffect(() => {
@@ -349,6 +364,9 @@ const AdminVerkoopWizardPage = () => {
         setBetalingOpmerking(((e as any).betaling_opmerking as string) || null);
         setMoneybirdPaymentId(((e as any).moneybird_payment_id as string) || null);
         setBetalingOntvangen(!!(e as any).betaling_ontvangen);
+        // Stap 9 hydration — Inruil op naam
+        setInruilOpNaam(!!(e as any).inruil_op_naam);
+        setInruilOpNaamAt(((e as any).inruil_op_naam_at as string) || null);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -1110,7 +1128,29 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 8 && (
+            {activeStap === 9 && (
+              <Stap9InruilOpNaam
+                inruil={inruil}
+                inruilKenteken={inruilKenteken}
+                inruilMerk={inruilMerk}
+                inruilModel={inruilModel}
+                inruilKm={inruilKm}
+                inruilWaarde={inruilWaarde}
+                initialInruilOpNaam={inruilOpNaam}
+                initialInruilOpNaamAt={inruilOpNaamAt}
+                onSaved={async (extra) => {
+                  if (extra.inruil_op_naam !== undefined)
+                    setInruilOpNaam(!!extra.inruil_op_naam);
+                  if (extra.inruil_op_naam_at !== undefined)
+                    setInruilOpNaamAt(extra.inruil_op_naam_at);
+                  if (extra.stap9_afgerond !== undefined)
+                    setCompleted((p) => ({ ...p, 9: !!extra.stap9_afgerond }));
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 9 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.

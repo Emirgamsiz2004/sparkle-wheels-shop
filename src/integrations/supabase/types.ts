@@ -2379,6 +2379,7 @@ export type Database = {
           inruil_merk: string | null
           inruil_model: string | null
           inruil_op_naam: boolean | null
+          inruil_op_naam_at: string | null
           inruil_type: string | null
           inruil_uitvoering: string | null
           inruil_verkoper_achternaam: string | null
@@ -2474,6 +2475,7 @@ export type Database = {
           inruil_merk?: string | null
           inruil_model?: string | null
           inruil_op_naam?: boolean | null
+          inruil_op_naam_at?: string | null
           inruil_type?: string | null
           inruil_uitvoering?: string | null
           inruil_verkoper_achternaam?: string | null
@@ -2569,6 +2571,7 @@ export type Database = {
           inruil_merk?: string | null
           inruil_model?: string | null
           inruil_op_naam?: boolean | null
+          inruil_op_naam_at?: string | null
           inruil_type?: string | null
           inruil_uitvoering?: string | null
           inruil_verkoper_achternaam?: string | null
