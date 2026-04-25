@@ -103,26 +103,20 @@ const AdminLayout = () => {
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + "/");
 
+  const pageTitle = getMobilePageTitle(location.pathname);
+  const isDashboard = location.pathname === "/admin/dashboard";
+
   return (
     <div className="admin-theme min-h-screen bg-background overflow-x-hidden">
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-
-      {/* Sidebar — mobile drawer (240px). Desktop: fixed 56px collapsed, expands to 220px on hover (overlays content) */}
+      {/* Sidebar — desktop-only. Verborgen op mobiel; bottombar vervangt navigatie. */}
       <aside
-        className={`group/sidebar fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex flex-col transition-[transform,width] duration-200 ease-out overflow-hidden
-          w-[240px] lg:translate-x-0 lg:w-[56px] lg:hover:w-[220px]
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        className="group/sidebar hidden lg:flex fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex-col transition-[width] duration-200 ease-out overflow-hidden w-[56px] hover:w-[220px]"
       >
-        <div className="h-14 px-4 lg:px-3 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
+        <div className="h-14 px-3 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
           <Link to="/admin/dashboard" className="flex items-center gap-2.5 min-w-0">
             <img src={logo} alt="Platin" className="h-7 w-auto object-contain flex-shrink-0" loading="eager" decoding="sync" />
-            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground whitespace-nowrap transition-opacity duration-200 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Admin</span>
+            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground whitespace-nowrap transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">Admin</span>
           </Link>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground p-1">
-            <X className="w-4 h-4" />
-          </button>
         </div>
 
         <nav className="flex-1 px-2 py-3 overflow-y-auto overflow-x-hidden">
@@ -131,23 +125,22 @@ const AdminLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => setSidebarOpen(false)}
                 title={item.label}
-                className={`relative flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 whitespace-nowrap ${
+                className={`relative flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
                   isActive(item.path)
                     ? "bg-accent text-foreground font-medium"
                     : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
                 }`}
               >
                 <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
-                <span className="flex-1 transition-opacity duration-200 lg:opacity-0 lg:group-hover/sidebar:opacity-100">{item.label}</span>
+                <span className="flex-1 transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">{item.label}</span>
                 {item.path === "/admin/leads" && overdueLeads > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground transition-opacity duration-200 lg:opacity-0 lg:group-hover/sidebar:opacity-100">
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">
                     {overdueLeads}
                   </span>
                 )}
                 {item.path === "/admin/planning" && upcomingAppts > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground transition-opacity duration-200 lg:opacity-0 lg:group-hover/sidebar:opacity-100">
+                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">
                     {upcomingAppts}
                   </span>
                 )}
@@ -159,38 +152,42 @@ const AdminLayout = () => {
         <div className="p-2 border-t border-[hsl(var(--sidebar-border))]">
           <Link
             to="/admin/instellingen"
-            onClick={() => setSidebarOpen(false)}
             title="Instellingen"
-            className={`flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] rounded-md text-sm lg:text-[13px] transition-colors min-h-[44px] lg:min-h-0 whitespace-nowrap ${
+            className={`flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
               isActive("/admin/instellingen")
                 ? "bg-accent text-foreground font-medium"
                 : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
             }`}
           >
             <Settings className="w-4 h-4 flex-shrink-0 opacity-70" />
-            <span className="transition-opacity duration-200 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Instellingen</span>
+            <span className="transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">Instellingen</span>
           </Link>
           <div className="mt-1.5 pt-1.5 border-t border-[hsl(var(--sidebar-border))]">
-            <p className="text-[11px] text-muted-foreground truncate mb-1 px-3 whitespace-nowrap transition-opacity duration-200 lg:opacity-0 lg:group-hover/sidebar:opacity-100">{user.email}</p>
+            <p className="text-[11px] text-muted-foreground truncate mb-1 px-3 whitespace-nowrap transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">{user.email}</p>
             <button
               onClick={signOut}
               title="Uitloggen"
-              className="flex items-center gap-2.5 px-3 py-2.5 lg:py-[7px] text-sm lg:text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors w-full min-h-[44px] lg:min-h-0 whitespace-nowrap"
+              className="flex items-center gap-2.5 px-3 py-[7px] text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors w-full whitespace-nowrap"
             >
               <LogOut className="w-4 h-4 flex-shrink-0 opacity-70" />
-              <span className="transition-opacity duration-200 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Uitloggen</span>
+              <span className="transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">Uitloggen</span>
             </button>
           </div>
         </div>
       </aside>
 
-      {/* Main content — fixed 56px margin so expanded sidebar overlays content */}
+      {/* Main content — geen left margin op mobiel */}
       <div className="flex flex-col min-h-screen min-w-0 lg:ml-[56px]">
         <header className="sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 bg-background border-b border-border gap-3">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground p-2 -ml-1 flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center">
-            <Menu className="w-5 h-5" />
-          </button>
-          <img src={logo} alt="Platin" className="h-6 w-auto object-contain lg:hidden flex-shrink-0" loading="eager" decoding="sync" />
+          {/* Mobiel: titel of logo */}
+          <div className="flex items-center gap-2 lg:hidden min-w-0 flex-1">
+            {isDashboard ? (
+              <img src={logo} alt="Platin" className="h-6 w-auto object-contain flex-shrink-0" loading="eager" decoding="sync" />
+            ) : (
+              <h1 className="text-base font-medium text-foreground truncate">{pageTitle}</h1>
+            )}
+          </div>
+          {/* Desktop: zoekbalk in midden */}
           <div className="hidden lg:block flex-shrink-0" />
           <div className="flex-1 hidden lg:flex justify-center">
             <GlobalSearch />
@@ -205,10 +202,12 @@ const AdminLayout = () => {
 
         <GlobalActiveBar />
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden pb-20 lg:pb-8">
           <Outlet />
         </main>
       </div>
+
+      <MobileBottomBar />
     </div>
   );
 };
