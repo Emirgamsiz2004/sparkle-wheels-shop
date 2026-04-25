@@ -353,6 +353,9 @@ const AdminVerkoopWizardPage = () => {
         setBetalingOpmerking(((e as any).betaling_opmerking as string) || null);
         setMoneybirdPaymentId(((e as any).moneybird_payment_id as string) || null);
         setBetalingOntvangen(!!(e as any).betaling_ontvangen);
+        // Stap 9 hydration — Inruil op naam
+        setInruilOpNaam(!!(e as any).inruil_op_naam);
+        setInruilOpNaamAt(((e as any).inruil_op_naam_at as string) || null);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
