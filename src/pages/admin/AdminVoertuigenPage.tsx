@@ -144,6 +144,17 @@ const AdminVoertuigenPage = () => {
         </div>
         <div className="flex items-center gap-2">
           <button
+            onClick={handleApkRefresh}
+            disabled={apkRefreshing}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
+            title="APK data vernieuwen via RDW"
+          >
+            <ShieldCheck className={`w-3.5 h-3.5 ${apkRefreshing ? "animate-pulse" : ""}`} />
+            <span className="hidden sm:inline">
+              {apkRefreshing ? `APK ${apkProgress.done}/${apkProgress.total}` : "APK vernieuwen"}
+            </span>
+          </button>
+          <button
             onClick={handleSync}
             disabled={syncing}
             className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors disabled:opacity-50"
