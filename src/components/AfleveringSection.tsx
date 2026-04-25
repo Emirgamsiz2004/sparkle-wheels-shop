@@ -22,9 +22,9 @@ const features = [
 
 const AfleveringSection = () => {
   return (
-    <section className="py-10 md:py-16 bg-background">
+    <section className="py-8 md:py-[60px] bg-background">
       <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
-        <div className="grid lg:grid-cols-[40%_1fr] gap-8 lg:gap-12 items-center">
+        <div className="grid lg:grid-cols-[40%_1fr] gap-6 lg:gap-8 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
