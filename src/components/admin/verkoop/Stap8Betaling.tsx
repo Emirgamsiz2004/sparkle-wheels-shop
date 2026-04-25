@@ -77,12 +77,13 @@ const Stap8Betaling = ({
       (d): d is { methode: Methode; bedrag: number } =>
         !!d && ["cash", "pin", "ideal", "overboeking"].includes(d.methode as string),
     );
-    if (seed.length > 0) return seed.map((d) => ({ methode: d.methode, bedrag: d.bedrag }));
+    if (seed.length > 0)
+      return seed.map((d) => ({ methode: d.methode, bedrag: d.bedrag, manueel: true }));
     const m = (initialBetaalwijze || "").toLowerCase();
     const startMethode: Methode = (["cash", "pin", "ideal", "overboeking"].includes(m)
       ? m
       : "pin") as Methode;
-    return [{ methode: startMethode, bedrag: nogTeOntvangen }];
+    return [{ methode: startMethode, bedrag: nogTeOntvangen, manueel: false }];
   });
 
   const [datum, setDatum] = useState<string>(
@@ -95,7 +96,7 @@ const Stap8Betaling = ({
   const [bevestigd, setBevestigd] = useState<boolean>(!!initialBetalingOntvangen);
   const [savingMb, setSavingMb] = useState(false);
 
-  // ─── Auto-fill laatste rij met restbedrag ───
+  // ─── Auto-fill laatste rij met restbedrag (alleen als niet handmatig bewerkt) ───
   const totaalIngevuld = rijen
     .slice(0, -1)
     .reduce((sum, r) => sum + (typeof r.bedrag === "number" ? r.bedrag : 0), 0);
@@ -106,15 +107,11 @@ const Stap8Betaling = ({
       if (prev.length === 0) return prev;
       const idx = prev.length - 1;
       const last = prev[idx];
-      const want = autoLaatste;
-      // Alleen vervangen als waarde leeg is of als het de enige rij is
-      if (prev.length === 1 || last.bedrag === "" || last.bedrag === 0) {
-        if (last.bedrag === want) return prev;
-        const next = [...prev];
-        next[idx] = { ...last, bedrag: want };
-        return next;
-      }
-      return prev;
+      if (last.manueel) return prev;
+      if (last.bedrag === autoLaatste) return prev;
+      const next = [...prev];
+      next[idx] = { ...last, bedrag: autoLaatste };
+      return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoLaatste, rijen.length]);
@@ -124,6 +121,7 @@ const Stap8Betaling = ({
     0,
   );
   const verschil = totaalRijen - nogTeOntvangen;
+  const klopt = Math.abs(verschil) <= 0.01 && nogTeOntvangen > 0;
 
   // ─── Persisteren ───
   const persist = async (overrides: Record<string, any> = {}) => {
