@@ -69,7 +69,8 @@ const AdminProefrittenPage = () => {
           <p className="text-sm text-muted-foreground">{testDrives.length} proefrit{testDrives.length !== 1 ? "ten" : ""}</p>
         </div>
         <button
-          onClick={() => setNewOpen(true)}
+          ref={newBtnRef}
+          onClick={() => openNew()}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors active:scale-[0.97] shrink-0"
         >
           <Plus className="w-3.5 h-3.5" />
