@@ -16,6 +16,7 @@ type Methode = "cash" | "pin" | "ideal" | "overboeking";
 interface Rij {
   methode: Methode;
   bedrag: number | "";
+  manueel?: boolean;
 }
 
 const METHODEN: { id: Methode; label: string }[] = [
