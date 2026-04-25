@@ -462,7 +462,7 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
           </AnimatePresence>
         </motion.div>
       </motion.div>
-    </LayoutGroup>,
+    </>,
     document.body
   );
 };
