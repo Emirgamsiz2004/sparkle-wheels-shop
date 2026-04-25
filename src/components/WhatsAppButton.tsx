@@ -36,7 +36,7 @@ const WhatsAppButton = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
             style={{
-              borderRadius: 6,
+              borderRadius: 10,
               boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
             }}
             className="btn-public btn-sticky-public fixed z-50
