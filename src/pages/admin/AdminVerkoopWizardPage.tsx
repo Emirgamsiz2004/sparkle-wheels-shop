@@ -24,6 +24,7 @@ import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
 import Stap9InruilOpNaam from "@/components/admin/verkoop/Stap9InruilOpNaam";
 import Stap10Vrijwaring from "@/components/admin/verkoop/Stap10Vrijwaring";
 import Stap11Uitlevering from "@/components/admin/verkoop/Stap11Uitlevering";
+import Stap12Afsluiting from "@/components/admin/verkoop/Stap12Afsluiting";
 import CancelVerkoopDialog from "@/components/admin/verkoop/CancelVerkoopDialog";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
