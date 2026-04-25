@@ -97,6 +97,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editDate, setEditDate] = useState<Date | undefined>(undefined);
+  const [editDateOpen, setEditDateOpen] = useState(false);
   const [editTime, setEditTime] = useState("10:00");
   const [editEindTime, setEditEindTime] = useState("");
   const [editTijdvenster, setEditTijdvenster] = useState(false);
