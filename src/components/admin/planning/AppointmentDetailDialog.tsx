@@ -105,6 +105,12 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   const [editOnderwerp, setEditOnderwerp] = useState("");
   const [editBetalingsstatus, setEditBetalingsstatus] = useState<string>("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [localStatus, setLocalStatus] = useState<AppointmentStatus | null>(appointment?.status ?? null);
+  const [statusSaving, setStatusSaving] = useState(false);
+
+  useEffect(() => {
+    setLocalStatus(appointment?.status ?? null);
+  }, [appointment?.id, appointment?.status]);
 
   if (!appointment) return null;
 
