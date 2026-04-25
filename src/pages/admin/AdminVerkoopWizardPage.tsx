@@ -156,6 +156,8 @@ const AdminVerkoopWizardPage = () => {
   const [klantBedrijfsnaam, setKlantBedrijfsnaam] = useState("");
   const [klantKvk, setKlantKvk] = useState("");
   const [klantBtw, setKlantBtw] = useState("");
+  const [leadSource, setLeadSource] = useState<string>("");
+  const [leadSourceAnders, setLeadSourceAnders] = useState<string>("");
 
   // Stap 4 state
   const [garantieType, setGarantieType] = useState<"geen" | "autotrust">("geen");
