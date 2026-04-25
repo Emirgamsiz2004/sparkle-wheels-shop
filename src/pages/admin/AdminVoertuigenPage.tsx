@@ -209,7 +209,7 @@ const AdminVoertuigenPage = () => {
           ) : "Geen voertuigen gevonden."}
         </div>
       ) : isMobile ? (
-        <div className="bg-card rounded-lg border border-border overflow-hidden divide-y divide-border">
+        <div className="flex flex-col gap-2">
           {filtered.map((v) => {
             const consignatie = isConsignatie(v);
             const apkInfo = getMobileApkInfo(v.apkVervaldatum);
@@ -217,7 +217,7 @@ const AdminVoertuigenPage = () => {
               <Link
                 key={v.id}
                 to={`/admin/voertuigen/${v.id}`}
-                className="block active:bg-accent/30 transition-colors"
+                className="block bg-card border border-border rounded-[14px] active:bg-accent/30 transition-colors"
                 style={{ padding: "14px" }}
               >
                 {/* Rij 1: merk/model | bouwjaar */}
