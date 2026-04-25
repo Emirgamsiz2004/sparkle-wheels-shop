@@ -70,18 +70,24 @@ const Stap8Betaling = ({
   );
 
   // ─── State ───
+  const normalizeMethode = (raw: unknown): Methode => {
+    const s = String(raw || "").toLowerCase();
+    return s === "cash" ? "cash" : "bank";
+  };
+
   const [rijen, setRijen] = useState<Rij[]>(() => {
     const seed = (initialBetaalwijzeDetails || []).filter(
-      (d): d is { methode: Methode; bedrag: number } =>
-        !!d && ["cash", "pin", "ideal", "overboeking"].includes(d.methode as string),
+      (d) => !!d && typeof d.bedrag === "number",
     );
     if (seed.length > 0)
-      return seed.map((d) => ({ methode: d.methode, bedrag: d.bedrag, manueel: true }));
-    const m = (initialBetaalwijze || "").toLowerCase();
-    const startMethode: Methode = (["cash", "pin", "ideal", "overboeking"].includes(m)
-      ? m
-      : "pin") as Methode;
-    return [{ methode: startMethode, bedrag: nogTeOntvangen, manueel: false }];
+      return seed.map((d) => ({
+        methode: normalizeMethode(d.methode),
+        bedrag: d.bedrag,
+        manueel: true,
+      }));
+    return [
+      { methode: normalizeMethode(initialBetaalwijze), bedrag: nogTeOntvangen, manueel: false },
+    ];
   });
 
   const [datum, setDatum] = useState<string>(
