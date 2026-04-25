@@ -228,7 +228,7 @@ const BlogPost = () => {
           <div className="flex flex-col sm:flex-row items-start gap-3 pt-2">
             <a
               href="tel:+31612693825"
-              className="flex items-center gap-2 bg-foreground text-background px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase hover:bg-primary hover:text-primary-foreground transition-all"
+              className="btn-public btn-primary-public"
             >
               <Phone className="w-3.5 h-3.5" /> 06-12693825
             </a>

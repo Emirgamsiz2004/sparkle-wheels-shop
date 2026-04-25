@@ -189,7 +189,7 @@ const InEnVerkoop = () => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
                   to="/voorraad"
-                  className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300"
+                  className="btn-public btn-primary-public group"
                 >
                   Bekijk Voorraad
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

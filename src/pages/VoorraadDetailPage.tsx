@@ -239,7 +239,7 @@ const VoorraadDetailPage = () => {
                 <div className="space-y-2">
                   <a
                     href="tel:+31612693825"
-                    className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase"
+                    className="btn-public btn-primary-public w-full"
                   >
                     <Phone className="w-4 h-4" />
                     Bel Direct
@@ -248,7 +248,7 @@ const VoorraadDetailPage = () => {
                     href={`https://wa.me/31612693825?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase bg-transparent"
+                    className="btn-public btn-secondary-public w-full"
                   >
                     <MessageCircle className="w-4 h-4" />
                     Stuur WhatsApp
@@ -359,7 +359,7 @@ const VoorraadDetailPage = () => {
                 <div className="space-y-3">
                   <a
                     href="tel:+31612693825"
-                    className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase transition-all duration-500 hover:bg-primary hover:border-primary hover:text-primary-foreground"
+                    className="btn-public btn-primary-public w-full"
                   >
                     <Phone className="w-4 h-4" />
                     Bel Direct
@@ -368,7 +368,7 @@ const VoorraadDetailPage = () => {
                     href={`https://wa.me/31612693825?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase bg-transparent transition-all duration-500 hover:border-foreground hover:bg-foreground hover:text-background"
+                    className="btn-public btn-secondary-public w-full"
                   >
                     <MessageCircle className="w-4 h-4" />
                     Stuur WhatsApp
