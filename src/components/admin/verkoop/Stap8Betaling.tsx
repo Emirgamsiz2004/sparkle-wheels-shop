@@ -118,6 +118,8 @@ const Stap8Betaling = ({
   );
   const [bevestigd, setBevestigd] = useState<boolean>(!!initialBetalingOntvangen);
   const [savingMb, setSavingMb] = useState(false);
+  const [datumOpen, setDatumOpen] = useState(false);
+  const [verwachteDatumOpen, setVerwachteDatumOpen] = useState(false);
   const [restbedragLater, setRestbedragLater] = useState<boolean>(!!initialRestbedragLater);
   const [verwachteDatum, setVerwachteDatum] = useState<string>(
     initialRestbedragVerwachteDatum || "",
