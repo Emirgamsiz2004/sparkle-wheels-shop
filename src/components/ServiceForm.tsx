@@ -36,6 +36,7 @@ const ServiceForm = ({ dienst }: ServiceFormProps) => {
   const [formData, setFormData] = useState({ naam: "", telefoon: "", auto: "", omschrijving: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [date, setDate] = useState<Date>();
+  const [dateOpen, setDateOpen] = useState(false);
   const [tijd, setTijd] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
