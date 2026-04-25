@@ -40,18 +40,13 @@ const AdminKlantenPage = () => {
     return list;
   }, [customers, search, statusFilter]);
 
-  const handleAdd = async () => {
-    if (!form.voornaam || !form.achternaam || !form.email) {
-      toast.error("Vul naam en e-mail in");
-      return;
-    }
-    setSaving(true);
-    try {
-      await addCustomer({ ...form, status: "prospect" } as any);
-      setForm({ voornaam: "", achternaam: "", email: "", telefoon: "" });
-      setAddOpen(false);
-    } catch {}
-    setSaving(false);
+  const handleAdd = async (data: { voornaam: string; achternaam: string; email: string; telefoon: string }) => {
+    await addCustomer({ ...data, status: "prospect" } as any);
+  };
+
+  const openAdd = () => {
+    setAddAnchor(addBtnRef.current?.getBoundingClientRect() ?? null);
+    setAddOpen(true);
   };
 
   const formatDate = (d?: string) => {
