@@ -192,7 +192,7 @@ const AdminPlanningPage = () => {
                       <div className="p-1.5 space-y-1">
                         {dayAppts.map((a) => (
                           <button key={a.id} onClick={(e) => openDetail(a, e)}
-                            className={`w-full text-left px-3 py-2 rounded-md text-sm leading-tight border transition-colors active:opacity-70 ${typeColors[a.type]}`}>
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm leading-tight border transition-colors active:opacity-70 ${typeColors[a.type]} ${a.status === "voltooid" ? "opacity-50" : ""}`}>
                             <div className="flex items-center justify-between gap-2">
                               <span className="font-medium">{format(new Date(a.datum_tijd), "HH:mm")}</span>
                               <Badge className={`${typeColors[a.type]} border text-[10px]`}>{typeLabels[a.type]}</Badge>
