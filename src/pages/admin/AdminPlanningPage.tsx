@@ -9,7 +9,6 @@ import { useCustomers } from "@/hooks/useCustomers";
 import { useVehicles } from "@/hooks/useVehicles";
 import { useIsMobile } from "@/hooks/use-mobile";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
-import AppointmentTypePicker from "@/components/admin/planning/AppointmentTypePicker";
 import AppointmentDetailDialog from "@/components/admin/planning/AppointmentDetailDialog";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
