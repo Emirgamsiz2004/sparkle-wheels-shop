@@ -327,26 +327,27 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
                 // first/last cell of a row get rounded ends so each row closes neatly.
                 cell: cn(
                   "h-9 w-9 text-center text-sm p-0 relative bg-transparent",
-                  "[&:has([aria-selected])]:bg-white/[0.12]",
+                  // Continuous range bar background on the cell (no gap)
+                  "[&:has([aria-selected])]:bg-[rgba(255,255,255,0.10)]",
                   "[&:has([aria-selected].day-outside)]:bg-transparent",
+                  // Round the ends of each row so the bar closes neatly
                   "first:[&:has([aria-selected])]:rounded-l-[8px]",
                   "last:[&:has([aria-selected])]:rounded-r-[8px]",
-                  "[&:has(.day-range-start)]:rounded-l-[8px]",
-                  "[&:has(.day-range-end)]:rounded-r-[8px]",
                   "focus-within:relative focus-within:z-20",
                 ),
-                // Day button is transparent so the cell background reads as one continuous bar.
-                day: "h-9 w-9 p-0 font-normal text-white bg-transparent hover:bg-white/[0.10] hover:text-white rounded-none transition-colors aria-selected:opacity-100",
+                // Days outside the range: muted text, no background
+                day: "h-9 w-9 p-0 font-normal text-[rgba(255,255,255,0.45)] bg-transparent hover:bg-white/[0.08] hover:text-white rounded-[8px] transition-colors aria-selected:opacity-100",
+                // Days inside the range (middle): white text, transparent so bar shows through
                 day_selected: "!bg-transparent !text-white",
+                day_range_middle: "!bg-transparent !text-white !rounded-none",
+                // Start/end: visible "pill" on top of the bar
                 day_range_start:
-                  "day-range-start !bg-white/[0.20] !text-white !rounded-l-[8px] !rounded-r-none hover:!bg-white/[0.25]",
+                  "day-range-start !bg-[rgba(255,255,255,0.28)] !text-white font-bold !rounded-[8px]",
                 day_range_end:
-                  "day-range-end !bg-white/[0.20] !text-white !rounded-r-[8px] !rounded-l-none hover:!bg-white/[0.25]",
-                day_range_middle:
-                  "!bg-transparent !text-white !rounded-none hover:!bg-white/[0.10]",
-                day_today: "text-white font-semibold underline underline-offset-4",
-                day_outside: "text-muted-foreground/40 opacity-100",
-                day_disabled: "text-muted-foreground/30 opacity-50 hover:bg-transparent",
+                  "day-range-end !bg-[rgba(255,255,255,0.28)] !text-white font-bold !rounded-[8px]",
+                day_today: "text-white",
+                day_outside: "text-[rgba(255,255,255,0.25)] opacity-100",
+                day_disabled: "text-[rgba(255,255,255,0.20)] opacity-50 hover:bg-transparent",
               }}
             />
           </div>
