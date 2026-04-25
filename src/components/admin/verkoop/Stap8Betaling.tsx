@@ -11,7 +11,7 @@ import { useMoneybird } from "@/hooks/useMoneybird";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKenteken } from "@/lib/kenteken";
 
-type Methode = "cash" | "pin" | "ideal" | "overboeking";
+type Methode = "cash" | "bank";
 
 interface Rij {
   methode: Methode;
@@ -21,9 +21,7 @@ interface Rij {
 
 const METHODEN: { id: Methode; label: string }[] = [
   { id: "cash", label: "Cash" },
-  { id: "pin", label: "Pin" },
-  { id: "ideal", label: "iDEAL" },
-  { id: "overboeking", label: "Overboeking" },
+  { id: "bank", label: "Bank" },
 ];
 
 const fmtEur = (n: number) =>
@@ -72,18 +70,24 @@ const Stap8Betaling = ({
   );
 
   // ─── State ───
+  const normalizeMethode = (raw: unknown): Methode => {
+    const s = String(raw || "").toLowerCase();
+    return s === "cash" ? "cash" : "bank";
+  };
+
   const [rijen, setRijen] = useState<Rij[]>(() => {
     const seed = (initialBetaalwijzeDetails || []).filter(
-      (d): d is { methode: Methode; bedrag: number } =>
-        !!d && ["cash", "pin", "ideal", "overboeking"].includes(d.methode as string),
+      (d) => !!d && typeof d.bedrag === "number",
     );
     if (seed.length > 0)
-      return seed.map((d) => ({ methode: d.methode, bedrag: d.bedrag, manueel: true }));
-    const m = (initialBetaalwijze || "").toLowerCase();
-    const startMethode: Methode = (["cash", "pin", "ideal", "overboeking"].includes(m)
-      ? m
-      : "pin") as Methode;
-    return [{ methode: startMethode, bedrag: nogTeOntvangen, manueel: false }];
+      return seed.map((d) => ({
+        methode: normalizeMethode(d.methode),
+        bedrag: d.bedrag,
+        manueel: true,
+      }));
+    return [
+      { methode: normalizeMethode(initialBetaalwijze), bedrag: nogTeOntvangen, manueel: false },
+    ];
   });
 
   const [datum, setDatum] = useState<string>(
@@ -126,13 +130,13 @@ const Stap8Betaling = ({
   // ─── Persisteren ───
   const persist = async (overrides: Record<string, any> = {}) => {
     if (!verkoopId) return;
-    const primaryMethod = rijen[0]?.methode || "pin";
+    const primaryMethod: Methode = rijen[0]?.methode || "bank";
     const details = rijen.map((r) => ({
-      methode: r.methode,
+      methode: r.methode === "cash" ? "Cash" : "Bank",
       bedrag: typeof r.bedrag === "number" ? r.bedrag : 0,
     }));
     const payload: Record<string, any> = {
-      betaalwijze: primaryMethod,
+      betaalwijze: primaryMethod === "cash" ? "Cash" : "Bank",
       betaalwijze_details: details,
       betaling_datum: datum,
       betaling_opmerking: opmerking || null,
@@ -149,7 +153,7 @@ const Stap8Betaling = ({
       const next = p.map((r, i) =>
         i === p.length - 1 ? { ...r, manueel: true } : r,
       );
-      next.push({ methode: "pin", bedrag: "", manueel: false });
+      next.push({ methode: "bank", bedrag: "", manueel: false });
       return next;
     });
   };
@@ -189,7 +193,7 @@ const Stap8Betaling = ({
       // Optioneel: financial account uit app_settings ophalen op basis van methode
       let financialAccountId: string | null = null;
       try {
-        const primaryMethod = rijen[0]?.methode || "pin";
+        const primaryMethod: Methode = rijen[0]?.methode || "bank";
         const settingsKey =
           primaryMethod === "cash"
             ? "moneybird_financial_account_cash"
