@@ -200,6 +200,44 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
     navigate(`/admin/klanten/${appointment.customer.id}`);
   };
 
+  const startVerkoop = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/verkopen/nieuw/${appointment.vehicle.id}`);
+  };
+  const goToProefritDoc = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/proefriten?vehicle=${appointment.vehicle.id}`);
+  };
+  const goToVerkoopList = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/verkopen?vehicle=${appointment.vehicle.id}`);
+  };
+  const goToKosten = () => {
+    if (!appointment.vehicle) return;
+    handleClose(false);
+    navigate(`/admin/voertuigen/${appointment.vehicle.id}?tab=kosten`);
+  };
+  const convertToProefrit = async () => {
+    if (!onCreate || !appointment.vehicle) return;
+    await onCreate({
+      type: "proefrit",
+      datum_tijd: appointment.datum_tijd,
+      eind_datum_tijd: null,
+      customer_id: appointment.customer?.id || null,
+      vehicle_id: appointment.vehicle.id,
+      medewerker: null,
+      notities: appointment.notities || null,
+      onderwerp: null,
+      betalingsstatus: null,
+      voertuig_klaargemaakt: false,
+      status: "gepland",
+    });
+    handleClose(false);
+  };
+
   const containerClass = isMobile
     ? "fixed left-0 right-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-[16px] border-t border-x border-border/60 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
     : "fixed z-50 w-[300px] rounded-[16px] border border-border/60 bg-card shadow-[0_8px_30px_rgba(0,0,0,0.35)] animate-in fade-in-0 zoom-in-95 duration-150";
