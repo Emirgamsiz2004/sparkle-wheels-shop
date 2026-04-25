@@ -22,6 +22,7 @@ import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument"
 import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
 import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
 import Stap9InruilOpNaam from "@/components/admin/verkoop/Stap9InruilOpNaam";
+import Stap10Vrijwaring from "@/components/admin/verkoop/Stap10Vrijwaring";
 import { validateStap, getStapWarnings, type WizardState } from "@/lib/verkoopWizardValidation";
 
 type Betaalwijze = "cash" | "pin" | "ideal" | "overboeking" | "";
@@ -194,6 +195,12 @@ const AdminVerkoopWizardPage = () => {
   // Stap 9 state — Inruil op naam
   const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
   const [inruilOpNaamAt, setInruilOpNaamAt] = useState<string | null>(null);
+
+  // Stap 10 state — Vrijwaring
+  const [vrijwaringBevestigd, setVrijwaringBevestigd] = useState<boolean>(false);
+  const [vrijwaringDatum, setVrijwaringDatum] = useState<string | null>(null);
+  const [vrijwaringTijdstip, setVrijwaringTijdstip] = useState<string | null>(null);
+  const [tenaamstellingsbewijsKlaargelegd, setTenaamstellingsbewijsKlaargelegd] = useState<boolean>(false);
 
   // Lock body scroll — alleen de wizard content kolom scrollt
   useEffect(() => {
@@ -370,6 +377,11 @@ const AdminVerkoopWizardPage = () => {
         // Stap 9 hydration — Inruil op naam
         setInruilOpNaam(!!(e as any).inruil_op_naam);
         setInruilOpNaamAt(((e as any).inruil_op_naam_at as string) || null);
+        // Stap 10 hydration — Vrijwaring
+        setVrijwaringBevestigd(!!(e as any).vrijwaring_bevestigd);
+        setVrijwaringDatum(((e as any).vrijwaring_datum as string) || null);
+        setVrijwaringTijdstip(((e as any).vrijwaring_tijdstip as string) || null);
+        setTenaamstellingsbewijsKlaargelegd(!!(e as any).tenaamstellingsbewijs_klaargelegd);
         // Voltooide stappen herleiden
         const done: Record<number, boolean> = {};
         for (let i = 1; i <= 12; i++) {
@@ -1165,7 +1177,33 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
-            {activeStap > 9 && (
+            {activeStap === 10 && (
+              <Stap10Vrijwaring
+                voertuigKenteken={vehicle?.kenteken || ""}
+                voertuigMerk={vehicle?.merk || ""}
+                voertuigModel={vehicle?.model || ""}
+                voertuigBouwjaar={vehicle?.bouwjaar || null}
+                initialVrijwaringBevestigd={vrijwaringBevestigd}
+                initialVrijwaringDatum={vrijwaringDatum}
+                initialVrijwaringTijdstip={vrijwaringTijdstip}
+                initialTenaamstellingsbewijsKlaargelegd={tenaamstellingsbewijsKlaargelegd}
+                onSaved={async (extra) => {
+                  if (extra.vrijwaring_bevestigd !== undefined)
+                    setVrijwaringBevestigd(!!extra.vrijwaring_bevestigd);
+                  if (extra.vrijwaring_datum !== undefined)
+                    setVrijwaringDatum(extra.vrijwaring_datum);
+                  if (extra.vrijwaring_tijdstip !== undefined)
+                    setVrijwaringTijdstip(extra.vrijwaring_tijdstip);
+                  if (extra.tenaamstellingsbewijs_klaargelegd !== undefined)
+                    setTenaamstellingsbewijsKlaargelegd(!!extra.tenaamstellingsbewijs_klaargelegd);
+                  if (extra.stap10_afgerond !== undefined)
+                    setCompleted((p) => ({ ...p, 10: !!extra.stap10_afgerond }));
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
+            {activeStap > 10 && (
               <div className="rounded-[14px] border border-border bg-card p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   Inhoud voor deze stap volgt binnenkort.

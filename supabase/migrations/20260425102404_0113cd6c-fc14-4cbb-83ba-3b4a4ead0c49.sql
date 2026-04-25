@@ -1,0 +1,1 @@
+ALTER TABLE public.verkopen ADD COLUMN IF NOT EXISTS tenaamstellingsbewijs_klaargelegd boolean NOT NULL DEFAULT false;
