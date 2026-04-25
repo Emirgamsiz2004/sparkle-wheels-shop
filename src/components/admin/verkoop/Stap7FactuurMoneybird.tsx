@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { formatKenteken } from "@/lib/kenteken";
+import { Switch } from "@/components/ui/switch";
 
 const inputCls =
   "w-full h-10 px-3 bg-background border border-border rounded-[10px] text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors";
@@ -944,18 +945,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       </section>
 
       {/* Sectie 4 — Bevestiging */}
-      <label className="flex items-center gap-3 cursor-pointer select-none">
-        <input
-          type="checkbox"
-          className="h-4 w-4 rounded-[3px] border border-border bg-background accent-primary cursor-pointer disabled:cursor-not-allowed"
-          checked={bevestigd}
-          onChange={(e) => handleBevestig(e.target.checked)}
-          disabled={!factuurVerstuurd}
-        />
+      <div className="flex items-center justify-between gap-3">
         <span className="text-sm text-foreground">
           Factuur is verstuurd of meegegeven aan klant
         </span>
-      </label>
+        <Switch
+          checked={bevestigd}
+          onCheckedChange={handleBevestig}
+          disabled={!factuurVerstuurd}
+        />
+      </div>
     </div>
   );
 }
