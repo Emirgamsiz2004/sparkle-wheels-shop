@@ -538,7 +538,7 @@ const Stap8Betaling = ({
             <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
               Datum ontvangst
             </label>
-            <Popover>
+            <Popover open={datumOpen} onOpenChange={setDatumOpen}>
               <PopoverTrigger asChild>
                 <button
                   type="button"
@@ -561,6 +561,7 @@ const Stap8Betaling = ({
                       const iso = format(d, "yyyy-MM-dd");
                       setDatum(iso);
                       setTimeout(triggerSave, 0);
+                      setDatumOpen(false);
                     }
                   }}
                   initialFocus
