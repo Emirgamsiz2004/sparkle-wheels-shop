@@ -130,13 +130,13 @@ const Stap8Betaling = ({
   // ─── Persisteren ───
   const persist = async (overrides: Record<string, any> = {}) => {
     if (!verkoopId) return;
-    const primaryMethod = rijen[0]?.methode || "pin";
+    const primaryMethod: Methode = rijen[0]?.methode || "bank";
     const details = rijen.map((r) => ({
-      methode: r.methode,
+      methode: r.methode === "cash" ? "Cash" : "Bank",
       bedrag: typeof r.bedrag === "number" ? r.bedrag : 0,
     }));
     const payload: Record<string, any> = {
-      betaalwijze: primaryMethod,
+      betaalwijze: primaryMethod === "cash" ? "Cash" : "Bank",
       betaalwijze_details: details,
       betaling_datum: datum,
       betaling_opmerking: opmerking || null,
