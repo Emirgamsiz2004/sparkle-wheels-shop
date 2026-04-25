@@ -20,7 +20,6 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "consignatie", label: "Consignatie" },
   { value: "gereserveerd", label: "Gereserveerd" },
   { value: "reparatie_onderhoud", label: "Reparatie/Onderhoud" },
-  { value: "verkocht", label: "Verkocht" },
 ];
 
 const AdminVoertuigenPage = () => {
@@ -103,7 +102,14 @@ const AdminVoertuigenPage = () => {
     if (updated > 0) refetch();
   };
 
-  const filtered = vehicles.filter((v) => {
+  // Verkochte voertuigen worden volledig verborgen uit de voorraadlijst.
+  // Ze blijven beschikbaar via de verkopenmodule.
+  const visibleVehicles = useMemo(
+    () => vehicles.filter((v) => v.status !== "verkocht"),
+    [vehicles]
+  );
+
+  const filtered = visibleVehicles.filter((v) => {
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -140,9 +146,16 @@ const AdminVoertuigenPage = () => {
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-lg font-medium text-foreground">Voertuigen</h1>
-          <p className="text-sm text-muted-foreground">{vehicles.length} voertuig{vehicles.length !== 1 ? "en" : ""}</p>
+          <p className="text-sm text-muted-foreground">{visibleVehicles.length} voertuig{visibleVehicles.length !== 1 ? "en" : ""}</p>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            to="/admin/verkopen"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors text-muted-foreground"
+            title="Verkochte voertuigen bekijken"
+          >
+            Verkochte voertuigen
+          </Link>
           <button
             onClick={handleApkRefresh}
             disabled={apkRefreshing}
