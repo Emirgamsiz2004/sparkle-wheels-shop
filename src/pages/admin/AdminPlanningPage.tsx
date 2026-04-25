@@ -226,7 +226,7 @@ const AdminPlanningPage = () => {
                     <div className="flex-1 p-1 space-y-0.5 overflow-y-auto">
                       {dayAppts.map((a) => (
                         <button key={a.id} onClick={(e) => openDetail(a, e)}
-                          className={`w-full text-left px-1.5 py-1 rounded text-[11px] leading-tight border transition-colors hover:opacity-80 ${typeColors[a.type]}`}>
+                          className={`w-full text-left px-1.5 py-1 rounded text-[11px] leading-tight border transition-colors hover:opacity-80 ${typeColors[a.type]} ${a.status === "voltooid" ? "opacity-50" : ""}`}>
                           <span className="font-medium">{format(new Date(a.datum_tijd), "HH:mm")}</span>
                           {a.customer && <span className="block truncate">{a.customer.voornaam} {a.customer.achternaam}</span>}
                           {a.vehicle && <span className="block truncate text-[10px] opacity-70">{a.vehicle.merk} {a.vehicle.model}</span>}
