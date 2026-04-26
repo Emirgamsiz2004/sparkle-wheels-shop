@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
+import { DateRangePicker } from "@/components/admin/DateRangePicker";
 import { toast } from "sonner";
 
 type Tab = "overzicht" | "btw" | "moneybird";
@@ -169,13 +170,11 @@ function PeriodSelector({ periodType, setPeriodType, year, setYear, quarter, set
       )}
 
       {periodType === 'custom' && (
-        <div className="flex items-center gap-1.5">
-          <input type="date" value={customFrom ? customFrom.toISOString().split('T')[0] : ''} onChange={e => setCustomFrom(e.target.value ? new Date(e.target.value) : undefined)}
-            className="px-2 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
-          <span className="text-xs text-muted-foreground">t/m</span>
-          <input type="date" value={customTo ? customTo.toISOString().split('T')[0] : ''} onChange={e => setCustomTo(e.target.value ? new Date(e.target.value + 'T23:59:59') : undefined)}
-            className="px-2 py-1.5 text-sm bg-card border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
-        </div>
+        <DateRangePicker
+          from={customFrom}
+          to={customTo}
+          onChange={(f, t) => { setCustomFrom(f); setCustomTo(t); }}
+        />
       )}
     </div>
   );
