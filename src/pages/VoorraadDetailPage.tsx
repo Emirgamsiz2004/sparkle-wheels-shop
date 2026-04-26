@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKenteken } from "@/lib/kenteken";
 
 import RelatedVehicles from "@/components/RelatedVehicles";
+import VehicleBookingCard, { VehicleBookingMobileButton } from "@/components/VehicleBookingCard";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
