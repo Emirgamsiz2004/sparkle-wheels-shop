@@ -3,18 +3,20 @@ import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Calendar } from "lucide-react";
 import AfspraakStickyPopover from "./AfspraakStickyPopover";
+import MobileBookingSheet from "./MobileBookingSheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const HIDE_PATHS = ["/afspraak", "/admin", "/proefrit/", "/voorraad/"];
 
 /**
  * Sticky "Afspraak maken" knop op de publieke website.
- * Bij klikken morpht de pill-knop vloeiend naar de afspraak-popover
- * (gedeelde layoutId "afspraak-cta").
+ * Desktop: morpht naar popover. Mobiel: opent bottom sheet.
  */
 const WhatsAppButton = () => {
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   const hidden = HIDE_PATHS.some((p) => location.pathname.startsWith(p));
 
@@ -31,7 +33,7 @@ const WhatsAppButton = () => {
   return (
     <LayoutGroup>
       <AnimatePresence mode="popLayout">
-        {visible && !open && (
+        {visible && !(open && !isMobile) && (
           <motion.button
             key="cta-btn"
             layoutId="afspraak-cta"
@@ -49,10 +51,7 @@ const WhatsAppButton = () => {
               letterSpacing: "0.1em",
               fontFamily: "Orbitron, sans-serif",
             }}
-            whileHover={{
-              scale: 1.02,
-              borderColor: "rgba(255,255,255,0.3)",
-            }}
+            whileHover={{ scale: 1.02, borderColor: "rgba(255,255,255,0.3)" }}
             className="fixed z-50 inline-flex items-center justify-center gap-2
               bottom-4 left-1/2 -translate-x-1/2 w-auto
               md:left-auto md:translate-x-0 md:right-5 md:bottom-5
@@ -72,9 +71,14 @@ const WhatsAppButton = () => {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {open && <AfspraakStickyPopover open={open} onClose={() => setOpen(false)} />}
-      </AnimatePresence>
+      {/* Desktop: morph popover. Mobile: bottom sheet. */}
+      {isMobile ? (
+        <MobileBookingSheet open={open} onClose={() => setOpen(false)} />
+      ) : (
+        <AnimatePresence>
+          {open && <AfspraakStickyPopover open={open} onClose={() => setOpen(false)} />}
+        </AnimatePresence>
+      )}
     </LayoutGroup>
   );
 };
