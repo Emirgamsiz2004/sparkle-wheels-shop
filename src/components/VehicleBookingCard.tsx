@@ -310,6 +310,7 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };
