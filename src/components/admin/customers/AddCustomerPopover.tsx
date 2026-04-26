@@ -11,7 +11,7 @@ interface Props {
   onSubmit: (data: { voornaam: string; achternaam: string; email: string; telefoon: string }) => Promise<void>;
 }
 
-const labelCls = "block text-[10px] font-medium tracking-wider uppercase text-muted-foreground mb-1.5";
+const labelCls = "block text-xs font-normal text-muted-foreground mb-1.5";
 const inputCls =
   "w-full px-3 py-2.5 text-sm bg-background border border-border/60 rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/60";
 
@@ -21,20 +21,32 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ voornaam: "", achternaam: "", email: "", telefoon: "" });
+  const [mounted, setMounted] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   const handleClose = () => {
-    onOpenChange(false);
+    if (closing) return;
+    setClosing(true);
+    window.setTimeout(() => {
+      onOpenChange(false);
+    }, isMobile ? 280 : 160);
   };
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      setMounted(true);
+      setClosing(false);
       setForm({ voornaam: "", achternaam: "", email: "", telefoon: "" });
       setSaving(false);
+    } else {
+      // unmount after exit animation
+      const t = window.setTimeout(() => setMounted(false), isMobile ? 280 : 160);
+      return () => clearTimeout(t);
     }
-  }, [open]);
+  }, [open, isMobile]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || closing) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
     const onDown = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) handleClose();
@@ -47,7 +59,7 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
       document.removeEventListener("mousedown", onDown);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, closing]);
 
   useLayoutEffect(() => {
     if (!open || isMobile || !anchorRect) { setPos(null); return; }
@@ -77,79 +89,140 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
     }
   };
 
-  if (!open) return null;
+  if (!mounted) return null;
+
+  const overlayStyle: React.CSSProperties = {
+    opacity: closing ? 0 : 0.4,
+    transition: `opacity ${closing ? 160 : 200}ms ${closing ? "ease-in" : "ease-out"}`,
+    backgroundColor: "#000",
+    willChange: "opacity",
+  };
+
+  const desktopStyle: React.CSSProperties = {
+    borderRadius: 16,
+    border: "1px solid rgba(255,255,255,0.08)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+    background: "hsl(0 0% 8%)",
+    willChange: "transform, opacity",
+    opacity: closing ? 0 : 1,
+    transform: closing ? "translateY(-8px)" : "translateY(0)",
+    transition: closing
+      ? "opacity 160ms ease-in, transform 160ms ease-in"
+      : "opacity 220ms ease-out, transform 220ms ease-out",
+    ...(pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 }),
+  };
+
+  const mobileStyle: React.CSSProperties = {
+    borderRadius: "20px 20px 0 0",
+    paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    boxShadow: "0 -8px 32px rgba(0,0,0,0.5)",
+    background: "hsl(0 0% 8%)",
+    willChange: "transform",
+    transform: closing ? "translateY(100%)" : "translateY(0)",
+    transition: closing
+      ? "transform 280ms ease-in"
+      : "transform 320ms cubic-bezier(0.32, 0.72, 0, 1)",
+  };
+
+  // initial mount transform for mobile (slide up from below)
+  const [animateIn, setAnimateIn] = useState(false);
+  useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => setAnimateIn(true));
+    } else {
+      setAnimateIn(false);
+    }
+  }, [open]);
+
+  if (isMobile) {
+    mobileStyle.transform = closing
+      ? "translateY(100%)"
+      : animateIn ? "translateY(0)" : "translateY(100%)";
+  } else {
+    desktopStyle.opacity = closing ? 0 : animateIn ? 1 : 0;
+    desktopStyle.transform = closing
+      ? "translateY(-8px)"
+      : animateIn ? "translateY(0)" : "translateY(-8px)";
+  }
 
   const containerClass = isMobile
-    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto border-t border-x border-white/[0.08] bg-[hsl(0_0%_8%)] shadow-[0_-8px_32px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom duration-300"
-    : "fixed z-50 w-[360px] max-h-[85vh] overflow-y-auto border border-white/[0.08] bg-[hsl(0_0%_8%)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-in fade-in-0 zoom-in-[0.97] duration-200";
-
-  const containerStyle: React.CSSProperties = isMobile
-    ? { borderRadius: "20px 20px 0 0", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)", willChange: "transform" }
-    : { borderRadius: 16, willChange: "transform", ...(pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 }) };
+    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto"
+    : "fixed z-50 w-[360px] max-h-[85vh] overflow-y-auto";
 
   return createPortal(
-    <div ref={containerRef} className={containerClass} style={containerStyle} role="dialog" aria-label="Klant toevoegen">
-      {isMobile && (
-        <div className="pt-2 pb-1 flex justify-center">
-          <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
-        </div>
-      )}
-      <button
-        onClick={handleClose}
-        className="absolute top-3 right-3 z-10 h-7 w-7 inline-flex items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground hover:bg-accent/40 transition-colors"
-        aria-label="Sluiten"
+    <>
+      <div className="fixed inset-0 z-40" style={overlayStyle} aria-hidden />
+      <div
+        ref={containerRef}
+        className={containerClass}
+        style={isMobile ? mobileStyle : desktopStyle}
+        role="dialog"
+        aria-label="Klant toevoegen"
       >
-        <X className="w-4 h-4" />
-      </button>
-      <div style={{ padding: 18 }}>
-        <h3 className="text-sm font-medium text-foreground mb-4">Klant toevoegen</h3>
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+        {isMobile && (
+          <div className="pt-2 pb-1 flex justify-center">
+            <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+          </div>
+        )}
+        <button
+          onClick={handleClose}
+          className="absolute top-3 right-3 z-10 h-7 w-7 inline-flex items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground hover:bg-accent/40 transition-colors"
+          aria-label="Sluiten"
+        >
+          <X className="w-4 h-4" />
+        </button>
+        <div style={{ padding: 18 }}>
+          <h3 className="text-sm font-medium text-foreground mb-4">Klant toevoegen</h3>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls}>Voornaam</label>
+                <input
+                  value={form.voornaam}
+                  onChange={(e) => setForm({ ...form, voornaam: e.target.value })}
+                  className={inputCls}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Achternaam</label>
+                <input
+                  value={form.achternaam}
+                  onChange={(e) => setForm({ ...form, achternaam: e.target.value })}
+                  className={inputCls}
+                />
+              </div>
+            </div>
             <div>
-              <label className={labelCls}>Voornaam</label>
+              <label className={labelCls}>E-mailadres</label>
               <input
-                value={form.voornaam}
-                onChange={(e) => setForm({ ...form, voornaam: e.target.value })}
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className={inputCls}
-                autoFocus
               />
             </div>
             <div>
-              <label className={labelCls}>Achternaam</label>
+              <label className={labelCls}>Telefoonnummer</label>
               <input
-                value={form.achternaam}
-                onChange={(e) => setForm({ ...form, achternaam: e.target.value })}
+                value={form.telefoon}
+                onChange={(e) => setForm({ ...form, telefoon: e.target.value })}
                 className={inputCls}
               />
             </div>
+            <button
+              onClick={handleAdd}
+              disabled={saving}
+              className="w-full py-2.5 text-sm font-medium text-white border border-white/15 hover:bg-white/[0.06] rounded-[10px] transition-colors disabled:opacity-60"
+              style={{ background: "transparent" }}
+            >
+              {saving ? "Opslaan..." : "Klant toevoegen"}
+            </button>
           </div>
-          <div>
-            <label className={labelCls}>E-mailadres</label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className={inputCls}
-            />
-          </div>
-          <div>
-            <label className={labelCls}>Telefoonnummer</label>
-            <input
-              value={form.telefoon}
-              onChange={(e) => setForm({ ...form, telefoon: e.target.value })}
-              className={inputCls}
-            />
-          </div>
-          <button
-            onClick={handleAdd}
-            disabled={saving}
-            className="w-full py-2.5 text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-[10px] transition-colors disabled:opacity-60"
-          >
-            {saving ? "Opslaan..." : "Klant toevoegen"}
-          </button>
         </div>
       </div>
-    </div>,
+    </>,
     document.body
   );
 };
