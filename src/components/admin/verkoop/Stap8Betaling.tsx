@@ -118,8 +118,6 @@ const Stap8Betaling = ({
   );
   const [bevestigd, setBevestigd] = useState<boolean>(!!initialBetalingOntvangen);
   const [savingMb, setSavingMb] = useState(false);
-  const [datumOpen, setDatumOpen] = useState(false);
-  const [verwachteDatumOpen, setVerwachteDatumOpen] = useState(false);
   const [restbedragLater, setRestbedragLater] = useState<boolean>(!!initialRestbedragLater);
   const [verwachteDatum, setVerwachteDatum] = useState<string>(
     initialRestbedragVerwachteDatum || "",
@@ -538,7 +536,7 @@ const Stap8Betaling = ({
             <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
               Datum ontvangst
             </label>
-            <Popover open={datumOpen} onOpenChange={setDatumOpen}>
+            <Popover>
               <PopoverTrigger asChild>
                 <button
                   type="button"
@@ -561,7 +559,6 @@ const Stap8Betaling = ({
                       const iso = format(d, "yyyy-MM-dd");
                       setDatum(iso);
                       setTimeout(triggerSave, 0);
-                      setDatumOpen(false);
                     }
                   }}
                   initialFocus
@@ -667,7 +664,7 @@ const Stap8Betaling = ({
               <label className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 block">
                 Uiterlijk te voldoen op
               </label>
-              <Popover open={verwachteDatumOpen} onOpenChange={setVerwachteDatumOpen}>
+              <Popover>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
@@ -686,10 +683,7 @@ const Stap8Betaling = ({
                     mode="single"
                     selected={verwachteDatum ? parseISO(verwachteDatum) : undefined}
                     onSelect={(d) => {
-                      if (d) {
-                        handleVerwachteDatumChange(format(d, "yyyy-MM-dd"));
-                        setVerwachteDatumOpen(false);
-                      }
+                      if (d) handleVerwachteDatumChange(format(d, "yyyy-MM-dd"));
                     }}
                     initialFocus
                   />

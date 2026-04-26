@@ -83,7 +83,7 @@ const FAQSection = () => {
                   {faq.link && (
                     <Link
                       to={faq.link}
-                      className="btn-public btn-secondary-public mt-3"
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs tracking-[0.1em] uppercase font-medium text-foreground/70 hover:text-foreground transition-colors"
                     >
                       {faq.linkText}
                       <span aria-hidden="true">→</span>

@@ -34,7 +34,6 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [date, setDate] = useState<Date>();
   const [tijd, setTijd] = useState("");
-  const [dateOpen, setDateOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
 
@@ -107,7 +106,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
       <div className="grid sm:grid-cols-2 gap-5">
         <div>
           <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Voorkeursdatum</label>
-          <Popover open={dateOpen} onOpenChange={setDateOpen}>
+          <Popover>
             <PopoverTrigger asChild>
               <button
                 type="button"
@@ -124,7 +123,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={(d) => { setDate(d); setDateOpen(false); }}
+                onSelect={setDate}
                 disabled={(d) => d < new Date() || d.getDay() === 0}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
@@ -158,7 +157,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
         {errors.omschrijving && <p className="text-xs text-red-400 mt-1 font-body">{errors.omschrijving}</p>}
       </div>
 
-      <button type="submit" className="btn-public btn-primary-public group">
+      <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
         <Send className="w-3.5 h-3.5" />
         Afspraak Maken
         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

@@ -542,7 +542,7 @@ const Consignatie = () => {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="btn-public btn-primary-public"
+                className="flex items-center gap-2 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300 disabled:opacity-50"
               >
                 {submitting ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

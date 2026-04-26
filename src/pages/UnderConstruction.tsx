@@ -37,13 +37,13 @@ const UnderConstruction = () => {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href="tel:+31612693825"
-            className="btn-public btn-primary-public"
+            className="bg-foreground text-background px-8 py-3.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.25em] uppercase transition-all hover:bg-foreground/90"
           >
             Bel ons — 06-12693825
           </a>
           <a
             href="mailto:info@platinautomotive.nl"
-            className="btn-public btn-secondary-public"
+            className="border border-border px-8 py-3.5 text-[10px] md:text-xs font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
           >
             E-mail ons
           </a>

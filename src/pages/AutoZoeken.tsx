@@ -180,7 +180,7 @@ const AutoZoeken = () => {
                     <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Overige wensen</label>
                     <textarea name="wensen" value={formData.wensen} onChange={handleChange} rows={3} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Bijv. kleur, uitvoering, automaat, max km-stand..." />
                   </div>
-                  <button type="submit" className="btn-public btn-primary-public group">
+                  <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
                     <Search className="w-3.5 h-3.5" />
                     Zoekopdracht Versturen
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

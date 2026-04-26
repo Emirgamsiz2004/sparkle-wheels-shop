@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Calendar as CalIcon, Car, Check, Eye, MessageSquare, Search, Sparkles, Wrench, X, ArrowLeft } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -134,14 +134,13 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
     });
   };
 
-  // Measure ONLY the active slide's natural height for smooth height transitions.
-  // We render just the active slide so the popover never reserves space for other steps.
+  // Measure active slide height for smooth height transitions
   useLayoutEffect(() => {
     const el = slidesRef.current[stepIndex];
     if (!el) return;
     const update = () => {
-      // Use offsetHeight (layout box) — content is rendered with natural height.
-      setPagerHeight(el.offsetHeight);
+      const h = el.scrollHeight;
+      setPagerHeight(h);
     };
     update();
     const ro = new ResizeObserver(update);
@@ -554,27 +553,36 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
         <X className="w-4 h-4" />
       </button>
 
-      {/* Auto-height viewport — renders only the active slide so each step uses
-          its own natural height. Animates the height between steps. */}
+      {/* Pager viewport — animates height, hides overflow */}
       <div
         style={{
           height: pagerHeight === "auto" ? "auto" : pagerHeight,
-          transition: "height 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "height 350ms cubic-bezier(0.4, 0, 0.2, 1)",
+          overflow: "hidden",
           willChange: "height",
         }}
       >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={stepIndex}
-            ref={(el) => { slidesRef.current[stepIndex] = el; }}
-            initial={{ opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -12 }}
-            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-          >
-            {slides[stepIndex]}
-          </motion.div>
-        </AnimatePresence>
+        {/* Track */}
+        <div
+          style={{
+            display: "flex",
+            width: `${totalSteps * 100}%`,
+            transform: `translateX(-${(stepIndex * 100) / totalSteps}%)`,
+            transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+            willChange: "transform",
+          }}
+        >
+          {slides.map((slide, i) => (
+            <div
+              key={i}
+              ref={(el) => { slidesRef.current[i] = el; }}
+              style={{ width: `${100 / totalSteps}%`, flexShrink: 0 }}
+              aria-hidden={i !== stepIndex}
+            >
+              {slide}
+            </div>
+          ))}
+        </div>
       </div>
     </motion.div>,
     document.body

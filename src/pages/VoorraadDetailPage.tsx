@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKenteken } from "@/lib/kenteken";
 
 import RelatedVehicles from "@/components/RelatedVehicles";
-import InlineAfspraakWidget from "@/components/InlineAfspraakWidget";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
@@ -240,7 +239,7 @@ const VoorraadDetailPage = () => {
                 <div className="space-y-2">
                   <a
                     href="tel:+31612693825"
-                    className="btn-public btn-primary-public w-full"
+                    className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase"
                   >
                     <Phone className="w-4 h-4" />
                     Bel Direct
@@ -249,18 +248,11 @@ const VoorraadDetailPage = () => {
                     href={`https://wa.me/31612693825?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-public btn-secondary-public w-full"
+                    className="flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase bg-transparent"
                   >
                     <MessageCircle className="w-4 h-4" />
                     Stuur WhatsApp
                   </a>
-                  <Link
-                    to={`/afspraak?vehicle=${vehicle.id}`}
-                    className="btn-public btn-secondary-public w-full"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Afspraak maken
-                  </Link>
                 </div>
 
                 {dbMarktplaatsUrl && (
@@ -367,7 +359,7 @@ const VoorraadDetailPage = () => {
                 <div className="space-y-3">
                   <a
                     href="tel:+31612693825"
-                    className="btn-public btn-primary-public w-full"
+                    className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase transition-all duration-500 hover:bg-primary hover:border-primary hover:text-primary-foreground"
                   >
                     <Phone className="w-4 h-4" />
                     Bel Direct
@@ -376,20 +368,11 @@ const VoorraadDetailPage = () => {
                     href={`https://wa.me/31612693825?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-public btn-secondary-public w-full"
+                    className="flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase bg-transparent transition-all duration-500 hover:border-foreground hover:bg-foreground hover:text-background"
                   >
                     <MessageCircle className="w-4 h-4" />
                     Stuur WhatsApp
                   </a>
-                </div>
-
-                {/* Inline afspraak widget — desktop only */}
-                <div className="hidden lg:block">
-                  <InlineAfspraakWidget
-                    vehicleId={vehicle.id}
-                    merk={vehicle.merk}
-                    model={vehicle.model}
-                  />
                 </div>
 
                 {dbMarktplaatsUrl && (

@@ -168,7 +168,7 @@ const Garantie = () => {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <a
                   href="tel:+31713018060"
-                  className="btn-public btn-primary-public"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-colors text-sm"
                 >
                   <Phone className="h-4 w-4" />
                   Bel ons: 071 - 301 80 60

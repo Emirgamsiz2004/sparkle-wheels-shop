@@ -248,7 +248,7 @@ export default function ReviewsSection() {
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             to="/reviews"
-            className="btn-public btn-secondary-public group"
+            className="group inline-flex items-center gap-2 text-[11px] font-body font-semibold tracking-[0.15em] uppercase text-foreground hover:text-foreground/80 transition-colors duration-300 border border-border px-5 py-2.5 hover:border-foreground/30"
           >
             Bekijk alle reviews
             <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />

@@ -270,7 +270,7 @@ const VoertuigDetail = () => {
                 <div className="space-y-3">
                   <a
                     href="tel:+31612693825"
-                    className="btn-public btn-primary-public w-full"
+                    className="group/btn relative flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase overflow-hidden transition-all duration-500 hover:bg-primary hover:border-primary hover:text-primary-foreground"
                   >
                     <Phone className="w-4 h-4 relative z-10" />
                     <span className="relative z-10">Bel Direct — 06-12693825</span>
@@ -279,7 +279,7 @@ const VoertuigDetail = () => {
                     href={`https://wa.me/31612693825?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-public btn-secondary-public w-full"
+                    className="group/wa relative flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase overflow-hidden bg-transparent transition-all duration-500 hover:border-foreground hover:bg-foreground hover:text-background"
                   >
                     <MessageCircle className="w-4 h-4 relative z-10" />
                     <span className="relative z-10">Stuur WhatsApp</span>

@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   open: boolean;
@@ -82,7 +81,7 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
 
   const containerClass = isMobile
     ? "fixed left-0 right-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-[16px] border-t border-x border-border/60 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
-    : "fixed z-50 w-[360px] max-h-[85vh] overflow-y-auto rounded-[14px] border border-border/60 bg-card shadow-[0_8px_30px_rgba(0,0,0,0.35)] animate-in fade-in-0 zoom-in-95 duration-150 transition-[height] duration-200 ease-out";
+    : "fixed z-50 w-[360px] max-h-[85vh] overflow-y-auto rounded-[14px] border border-border/60 bg-card shadow-[0_8px_30px_rgba(0,0,0,0.35)] animate-in fade-in-0 zoom-in-95 duration-150";
 
   const containerStyle: React.CSSProperties = isMobile
     ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" }
@@ -103,66 +102,52 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
         <X className="w-4 h-4" />
       </button>
       <div style={{ padding: 18 }}>
-        <motion.div layout transition={{ duration: 0.25, ease: "easeOut" }}>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key="customer-form"
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.18 }}
-            >
-              <div className="text-[11px] uppercase tracking-wide text-muted-foreground px-1 mb-3">
-                Klant toevoegen
-              </div>
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelCls}>Voornaam</label>
-                    <input
-                      value={form.voornaam}
-                      onChange={(e) => setForm({ ...form, voornaam: e.target.value })}
-                      className={inputCls}
-                      autoFocus
-                    />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Achternaam</label>
-                    <input
-                      value={form.achternaam}
-                      onChange={(e) => setForm({ ...form, achternaam: e.target.value })}
-                      className={inputCls}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className={labelCls}>E-mailadres</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className={inputCls}
-                  />
-                </div>
-                <div>
-                  <label className={labelCls}>Telefoonnummer</label>
-                  <input
-                    value={form.telefoon}
-                    onChange={(e) => setForm({ ...form, telefoon: e.target.value })}
-                    className={inputCls}
-                  />
-                </div>
-                <button
-                  onClick={handleAdd}
-                  disabled={saving}
-                  className="w-full py-2.5 text-sm font-medium bg-foreground text-background hover:bg-foreground/90 rounded-[10px] transition-colors disabled:opacity-60"
-                >
-                  {saving ? "Opslaan..." : "Klant toevoegen"}
-                </button>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </motion.div>
+        <h3 className="text-sm font-medium text-foreground mb-4">Klant toevoegen</h3>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>Voornaam</label>
+              <input
+                value={form.voornaam}
+                onChange={(e) => setForm({ ...form, voornaam: e.target.value })}
+                className={inputCls}
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Achternaam</label>
+              <input
+                value={form.achternaam}
+                onChange={(e) => setForm({ ...form, achternaam: e.target.value })}
+                className={inputCls}
+              />
+            </div>
+          </div>
+          <div>
+            <label className={labelCls}>E-mailadres</label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Telefoonnummer</label>
+            <input
+              value={form.telefoon}
+              onChange={(e) => setForm({ ...form, telefoon: e.target.value })}
+              className={inputCls}
+            />
+          </div>
+          <button
+            onClick={handleAdd}
+            disabled={saving}
+            className="w-full py-2.5 text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-[10px] transition-colors disabled:opacity-60"
+          >
+            {saving ? "Opslaan..." : "Klant toevoegen"}
+          </button>
+        </div>
       </div>
     </div>,
     document.body
