@@ -148,8 +148,8 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
 
   return (
     <div
-      className="relative w-full overflow-hidden border border-white/10 bg-white/[0.03]"
-      style={{ height: 400, borderRadius: 12, padding: 20 }}
+      className="relative w-full border border-white/10 bg-white/[0.03]"
+      style={{ minHeight: 400, borderRadius: 12, padding: 20 }}
     >
       <AnimatePresence mode="wait" custom={direction} initial={false}>
         {step === 0 && (
