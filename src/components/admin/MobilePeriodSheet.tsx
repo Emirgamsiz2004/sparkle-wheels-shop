@@ -121,13 +121,22 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
     if (view === "root") {
       return (
         <>
-          <Header title="Periode" />
+          <Header title="Periode selecteren" />
           <Row label="Vandaag" selected={!!isToday} onClick={() => apply(rangeToCustom(now, now, value))} />
           <Row label="Gisteren" selected={!!isYesterday} onClick={() => apply(rangeToCustom(yest, yest, value))} />
-          <Row label="Afgelopen…" hasArrow onClick={() => goView("afgelopen", 1)} />
-          <Row label="Periode tot nu…" hasArrow onClick={() => goView("tot-nu", 1)} />
-          <Row label="Kwartalen…" hasArrow selected={value.periodType === "kwartaal"} onClick={() => goView("kwartalen", 1)} />
-          <Row label="Aangepast bereik…" hasArrow selected={value.periodType === "custom" && !isToday && !isYesterday} onClick={() => goView("custom", 1)} />
+          <Row label="Afgelopen" hasArrow onClick={() => goView("afgelopen", 1)} />
+          <Row label="Periode tot nu" hasArrow onClick={() => goView("tot-nu", 1)} />
+          <Row label="Kwartalen" hasArrow selected={value.periodType === "kwartaal"} onClick={() => goView("kwartalen", 1)} />
+          <Row label="Aangepast bereik" hasArrow selected={value.periodType === "custom" && !isToday && !isYesterday} onClick={() => goView("custom", 1)} />
+          <div style={{ padding: "16px 20px calc(env(safe-area-inset-bottom, 0px) + 20px)" }}>
+            <button
+              onClick={onClose}
+              className="w-full h-11 text-sm font-medium text-white border border-white/15 rounded-[10px] active:bg-white/[0.06] transition-colors"
+              style={{ background: "transparent" }}
+            >
+              Sluiten
+            </button>
+          </div>
         </>
       );
     }
@@ -245,7 +254,7 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
               }}
             />
           </div>
-          <div className="flex items-center gap-2 px-4 pb-5 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12 }}>
+          <div className="flex items-center gap-2 px-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
             <button
               onClick={onClose}
               className="flex-1 h-11 text-sm font-medium text-white/80 bg-transparent border border-white/10 rounded-[10px] active:bg-white/5"
@@ -253,8 +262,8 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
             <button
               disabled={!draft?.from || !draft?.to}
               onClick={() => draft?.from && draft?.to && apply(rangeToCustom(draft.from, draft.to, value))}
-              className="flex-1 h-11 text-sm font-bold text-white rounded-[10px] disabled:opacity-40"
-              style={{ background: "hsl(142 70% 45%)" }}
+              className="flex-1 h-11 text-sm font-medium text-white border border-white/15 rounded-[10px] active:bg-white/[0.06] disabled:opacity-40 transition-colors"
+              style={{ background: "transparent" }}
             >Toepassen</button>
           </div>
         </>
@@ -293,8 +302,9 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
             style={{
               background: "hsl(0 0% 8%)",
               borderRadius: "20px 20px 0 0",
-              maxHeight: "90vh",
+              maxHeight: "75vh",
               boxShadow: "0 -8px 32px rgba(0,0,0,0.5)",
+              willChange: "transform",
             }}
           >
             <div className="flex justify-center pt-3 pb-3 shrink-0">
