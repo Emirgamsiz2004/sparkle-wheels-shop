@@ -214,12 +214,12 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   if (!open) return null;
 
   const containerClass = isMobile
-    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-[16px] border-t border-x border-border/60 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
-    : "fixed z-50 w-[360px] max-h-[85vh] overflow-y-auto rounded-[14px] border border-border/60 bg-card shadow-[0_8px_30px_rgba(0,0,0,0.35)] animate-in fade-in-0 zoom-in-95 duration-150 transition-[height] duration-200 ease-out";
+    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto border-t border-x border-white/[0.08] bg-[hsl(0_0%_8%)] shadow-[0_-8px_32px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom duration-300"
+    : "fixed z-50 w-[360px] max-h-[85vh] overflow-y-auto border border-white/[0.08] bg-[hsl(0_0%_8%)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-in fade-in-0 zoom-in-[0.97] duration-200 transition-[height] ease-out";
 
   const containerStyle: React.CSSProperties = isMobile
-    ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" }
-    : pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 };
+    ? { borderRadius: "20px 20px 0 0", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)", willChange: "transform" }
+    : { borderRadius: 16, willChange: "transform", ...(pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 }) };
 
   return createPortal(
     <div ref={containerRef} className={containerClass} style={containerStyle} role="dialog" aria-label="Nieuwe afspraak">
