@@ -277,6 +277,8 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
+
+                <VehicleBookingMobileButton feedId={id || ""} />
               </div>
 
               {/* Kenmerken — Marktplaats-style grid */}
