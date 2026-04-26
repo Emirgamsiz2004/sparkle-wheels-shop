@@ -121,13 +121,22 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
     if (view === "root") {
       return (
         <>
-          <Header title="Periode" />
+          <Header title="Periode selecteren" />
           <Row label="Vandaag" selected={!!isToday} onClick={() => apply(rangeToCustom(now, now, value))} />
           <Row label="Gisteren" selected={!!isYesterday} onClick={() => apply(rangeToCustom(yest, yest, value))} />
-          <Row label="Afgelopen…" hasArrow onClick={() => goView("afgelopen", 1)} />
-          <Row label="Periode tot nu…" hasArrow onClick={() => goView("tot-nu", 1)} />
-          <Row label="Kwartalen…" hasArrow selected={value.periodType === "kwartaal"} onClick={() => goView("kwartalen", 1)} />
-          <Row label="Aangepast bereik…" hasArrow selected={value.periodType === "custom" && !isToday && !isYesterday} onClick={() => goView("custom", 1)} />
+          <Row label="Afgelopen" hasArrow onClick={() => goView("afgelopen", 1)} />
+          <Row label="Periode tot nu" hasArrow onClick={() => goView("tot-nu", 1)} />
+          <Row label="Kwartalen" hasArrow selected={value.periodType === "kwartaal"} onClick={() => goView("kwartalen", 1)} />
+          <Row label="Aangepast bereik" hasArrow selected={value.periodType === "custom" && !isToday && !isYesterday} onClick={() => goView("custom", 1)} />
+          <div style={{ padding: "16px 20px calc(env(safe-area-inset-bottom, 0px) + 20px)" }}>
+            <button
+              onClick={onClose}
+              className="w-full h-11 text-sm font-medium text-white border border-white/15 rounded-[10px] active:bg-white/[0.06] transition-colors"
+              style={{ background: "transparent" }}
+            >
+              Sluiten
+            </button>
+          </div>
         </>
       );
     }
