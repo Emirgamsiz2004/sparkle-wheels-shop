@@ -148,15 +148,16 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
 
   return (
     <div
-      className="relative w-full overflow-hidden border border-white/10 bg-white/[0.03]"
-      style={{ height: 400, borderRadius: 12, padding: 20 }}
+      className="relative w-full border border-white/10 bg-white/[0.03]"
+      style={{ minHeight: 400, borderRadius: 12, padding: 20 }}
     >
+      <div className="relative overflow-hidden" style={{ minHeight: 360 }}>
       <AnimatePresence mode="wait" custom={direction} initial={false}>
         {step === 0 && (
           <motion.div
             key="s0" custom={direction} variants={slideVariants}
             initial="enter" animate="center" exit="exit" transition={transition}
-            className="h-full flex flex-col"
+            className="flex flex-col min-h-[360px]"
           >
             <h3 className="text-lg font-display font-semibold text-foreground tracking-tight">Plan een afspraak</h3>
             <p className="text-[11px] font-body text-muted-foreground mt-1">Gratis en vrijblijvend</p>
@@ -185,7 +186,7 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
           <motion.div
             key="s1" custom={direction} variants={slideVariants}
             initial="enter" animate="center" exit="exit" transition={transition}
-            className="h-full flex flex-col"
+            className="flex flex-col min-h-[360px]"
           >
             <div className="flex items-center gap-2">
               <button onClick={goBack} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /></button>
@@ -220,7 +221,7 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
           <motion.div
             key="s2" custom={direction} variants={slideVariants}
             initial="enter" animate="center" exit="exit" transition={transition}
-            className="h-full flex flex-col"
+            className="flex flex-col min-h-[360px]"
           >
             <div className="flex items-center gap-2">
               <button onClick={goBack} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /></button>
@@ -258,7 +259,7 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
           <motion.div
             key="s3" custom={direction} variants={slideVariants}
             initial="enter" animate="center" exit="exit" transition={transition}
-            className="h-full flex flex-col"
+            className="flex flex-col min-h-[360px]"
           >
             <div className="flex items-center gap-2">
               <button onClick={goBack} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /></button>
@@ -293,7 +294,7 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
           <motion.div
             key="s4" custom={direction} variants={slideVariants}
             initial="enter" animate="center" exit="exit" transition={transition}
-            className="h-full flex flex-col items-center justify-center text-center px-2"
+            className="flex flex-col items-center justify-center text-center px-2 min-h-[360px]"
           >
             <div className="w-14 h-14 rounded-full border-2 border-foreground flex items-center justify-center">
               <Check className="w-7 h-7 text-foreground" />
@@ -309,6 +310,7 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };
