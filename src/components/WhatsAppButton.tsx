@@ -4,7 +4,7 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Calendar } from "lucide-react";
 import AfspraakStickyPopover from "./AfspraakStickyPopover";
 
-const HIDE_PATHS = ["/afspraak", "/admin", "/proefrit/"];
+const HIDE_PATHS = ["/afspraak", "/admin", "/proefrit/", "/voorraad/"];
 
 /**
  * Sticky "Afspraak maken" knop op de publieke website.
