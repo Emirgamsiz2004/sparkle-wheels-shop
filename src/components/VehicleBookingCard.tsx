@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar as CalIcon, Check, Eye, Car as CarIcon } from "luci
 import { format, addDays, isBefore, startOfDay, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import MobileBookingSheet from "./MobileBookingSheet";
 
 interface Props {
   feedId: string;
