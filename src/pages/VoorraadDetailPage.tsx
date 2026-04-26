@@ -375,6 +375,22 @@ const VoorraadDetailPage = () => {
                   </a>
                 </div>
 
+                <div className="border-t border-border pt-6 space-y-4">
+                  {sidebarFacts.map((fact) => (
+                    <div key={fact.label} className="flex items-center justify-between">
+                      <span className="text-[12px] font-body text-muted-foreground">{fact.label}</span>
+                      <span className="text-[12px] font-body font-medium text-foreground capitalize">{fact.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <VehicleBookingCard
+                  feedId={id || ""}
+                  merk={vehicle.merk}
+                  model={vehicle.model}
+                  kenteken={formattedKenteken}
+                />
+
                 {dbMarktplaatsUrl && (
                   <a
                     href={dbMarktplaatsUrl}
@@ -387,19 +403,6 @@ const VoorraadDetailPage = () => {
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}
-
-                <p className="text-[11px] font-body text-muted-foreground tracking-wide text-center">
-                  Proefrit mogelijk? Neem contact op
-                </p>
-
-                <div className="border-t border-border pt-6 space-y-4">
-                  {sidebarFacts.map((fact) => (
-                    <div key={fact.label} className="flex items-center justify-between">
-                      <span className="text-[12px] font-body text-muted-foreground">{fact.label}</span>
-                      <span className="text-[12px] font-body font-medium text-foreground capitalize">{fact.value}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
             </motion.div>
           </div>
