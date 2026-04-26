@@ -315,14 +315,31 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
   );
 };
 
-export const VehicleBookingMobileButton = ({ feedId }: { feedId: string }) => (
-  <Link
-    to={`/afspraak?voertuig=${encodeURIComponent(feedId)}`}
-    className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase"
-  >
-    <CalIcon className="w-4 h-4" />
-    Afspraak maken
-  </Link>
-);
+interface MobileBtnProps {
+  merk: string;
+  model: string;
+  kenteken: string;
+}
+
+export const VehicleBookingMobileButton = ({ merk, model, kenteken }: MobileBtnProps) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase"
+      >
+        <CalIcon className="w-4 h-4" />
+        Afspraak maken
+      </button>
+      <MobileBookingSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        preselected={{ merk, model, kenteken }}
+      />
+    </>
+  );
+};
 
 export default VehicleBookingCard;
