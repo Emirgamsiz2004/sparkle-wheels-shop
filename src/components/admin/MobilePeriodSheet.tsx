@@ -254,7 +254,7 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
               }}
             />
           </div>
-          <div className="flex items-center gap-2 px-4 pb-5 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12 }}>
+          <div className="flex items-center gap-2 px-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
             <button
               onClick={onClose}
               className="flex-1 h-11 text-sm font-medium text-white/80 bg-transparent border border-white/10 rounded-[10px] active:bg-white/5"
@@ -262,8 +262,8 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
             <button
               disabled={!draft?.from || !draft?.to}
               onClick={() => draft?.from && draft?.to && apply(rangeToCustom(draft.from, draft.to, value))}
-              className="flex-1 h-11 text-sm font-bold text-white rounded-[10px] disabled:opacity-40"
-              style={{ background: "hsl(142 70% 45%)" }}
+              className="flex-1 h-11 text-sm font-medium text-white border border-white/15 rounded-[10px] active:bg-white/[0.06] disabled:opacity-40 transition-colors"
+              style={{ background: "transparent" }}
             >Toepassen</button>
           </div>
         </>
