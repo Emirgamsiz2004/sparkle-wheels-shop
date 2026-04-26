@@ -12,6 +12,8 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { DateRangePicker } from "@/components/admin/DateRangePicker";
+import MobilePeriodSheet from "@/components/admin/MobilePeriodSheet";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 type Tab = "overzicht" | "btw" | "moneybird";
@@ -122,6 +124,9 @@ function PeriodSelector({ periodType, setPeriodType, year, setYear, quarter, set
   availableYears: number[];
   showMonth?: boolean;
 }) {
+  const isMobile = useIsMobile();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
   const periods: { key: PeriodType; label: string }[] = [
     { key: 'jaar', label: 'Jaar' },
     { key: 'kwartaal', label: 'Kwartaal' },
@@ -129,6 +134,37 @@ function PeriodSelector({ periodType, setPeriodType, year, setYear, quarter, set
     { key: 'custom', label: 'Periode' },
   ];
 
+  // ===== MOBILE: single trigger that opens bottom sheet =====
+  if (isMobile) {
+    const label = getPeriodLabel(periodType, year, quarter, month, customFrom, customTo) || 'Kies periode';
+    return (
+      <>
+        <button
+          onClick={() => setSheetOpen(true)}
+          className="w-full flex items-center justify-between px-4 h-12 bg-card border border-border rounded-[10px] text-sm text-foreground active:bg-white/[0.04] transition-colors"
+        >
+          <span className="font-medium truncate">{label}</span>
+          <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0 ml-2" />
+        </button>
+        <MobilePeriodSheet
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          value={{ periodType, year, quarter, month, customFrom, customTo }}
+          onApply={(next) => {
+            setPeriodType(next.periodType);
+            setYear(next.year);
+            setQuarter(next.quarter);
+            setMonth(next.month);
+            setCustomFrom(next.customFrom);
+            setCustomTo(next.customTo);
+          }}
+          availableYears={availableYears}
+        />
+      </>
+    );
+  }
+
+  // ===== DESKTOP =====
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex gap-0.5 bg-card border border-border rounded-lg p-0.5">
