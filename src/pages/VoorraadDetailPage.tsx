@@ -405,18 +405,6 @@ const VoorraadDetailPage = () => {
                   kenteken={formattedKenteken}
                 />
 
-                {dbMarktplaatsUrl && (
-                  <a
-                    href={dbMarktplaatsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2.5 w-full py-3 text-[11px] font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
-                  >
-                    <img src={marktplaatsLogo} alt="" className="h-4 brightness-0 invert opacity-50" />
-                    <span>Bekijk op Marktplaats</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
               </div>
             </motion.div>
           </div>
