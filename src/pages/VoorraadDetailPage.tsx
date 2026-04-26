@@ -332,9 +332,9 @@ const VoorraadDetailPage = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="hidden lg:block lg:w-[40%] lg:self-start"
+              className="hidden lg:block lg:w-[40%]"
             >
-              <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:scrollbar-hide space-y-7">
+              <div className="space-y-7">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground tracking-tight leading-tight">
                     {vehicle.merk} {vehicle.model}
