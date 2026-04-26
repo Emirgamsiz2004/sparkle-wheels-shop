@@ -142,7 +142,7 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
     center: { x: 0, opacity: 1 },
     exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
   };
-  const transition = { duration: 0.28, ease: [0.4, 0, 0.2, 1] };
+  const transition = { duration: 0.28, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] };
 
   const typeLabel = type === "proefrit" ? "Proefrit" : "Bezichtiging";
 
