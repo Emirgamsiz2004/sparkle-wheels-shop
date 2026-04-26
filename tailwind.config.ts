@@ -86,12 +86,22 @@ export default {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        "sheet-up": {
+          from: { transform: "translateY(100%)" },
+          to: { transform: "translateY(0)" },
+        },
+        "sheet-down": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in-up": "fade-in-up 0.8s ease-out forwards",
         "scroll-left": "scroll-left 35s linear infinite",
+        "sheet-up": "sheet-up 320ms cubic-bezier(0.32,0.72,0,1)",
+        "sheet-down": "sheet-down 280ms cubic-bezier(0.4,0,1,1)",
       },
     },
   },
