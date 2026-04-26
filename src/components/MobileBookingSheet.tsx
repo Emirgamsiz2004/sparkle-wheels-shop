@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import {
@@ -599,8 +599,8 @@ const MobileBookingSheet = ({ open, onClose, preselected = null }: Props) => {
               <X className="w-4 h-4" />
             </button>
 
-            {/* Scrollable content */}
-            <div className="overflow-y-auto" style={{ maxHeight: "calc(85vh - 24px)" }}>
+            {/* Animated-height content area */}
+            <AnimatedHeight stepKey={`${step}-${type}-${done}`}>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={`${step}-${type}-${done}`}
@@ -612,12 +612,54 @@ const MobileBookingSheet = ({ open, onClose, preselected = null }: Props) => {
                   {renderStep()}
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </AnimatedHeight>
           </motion.div>
         </>
       )}
     </AnimatePresence>,
     document.body
+  );
+};
+
+/**
+ * Wraps children in a container whose height animates smoothly to match its
+ * inner content. Uses ResizeObserver so reflow during the slide transition
+ * is also tracked. Internally scrollable so tall steps remain reachable.
+ */
+const AnimatedHeight = ({ children, stepKey }: { children: React.ReactNode; stepKey: string }) => {
+  const outerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | "auto">("auto");
+
+  useLayoutEffect(() => {
+    if (!innerRef.current) return;
+    const el = innerRef.current;
+    const measure = () => {
+      const h = el.scrollHeight;
+      // Cap to viewport so the sheet never exceeds 85vh - header (24px)
+      const max = Math.floor(window.innerHeight * 0.85) - 24;
+      setHeight(Math.min(h, max));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
+  }, [stepKey]);
+
+  return (
+    <div
+      ref={outerRef}
+      style={{
+        height: typeof height === "number" ? `${height}px` : "auto",
+        transition: "height 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+        overflow: "hidden",
+      }}
+    >
+      <div ref={innerRef} className="overflow-y-auto" style={{ maxHeight: "calc(85vh - 24px)" }}>
+        {children}
+      </div>
+    </div>
   );
 };
 
