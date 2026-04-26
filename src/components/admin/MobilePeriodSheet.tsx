@@ -302,8 +302,9 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
             style={{
               background: "hsl(0 0% 8%)",
               borderRadius: "20px 20px 0 0",
-              maxHeight: "90vh",
+              maxHeight: "75vh",
               boxShadow: "0 -8px 32px rgba(0,0,0,0.5)",
+              willChange: "transform",
             }}
           >
             <div className="flex justify-center pt-3 pb-3 shrink-0">
