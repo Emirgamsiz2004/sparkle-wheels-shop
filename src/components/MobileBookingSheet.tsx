@@ -599,8 +599,8 @@ const MobileBookingSheet = ({ open, onClose, preselected = null }: Props) => {
               <X className="w-4 h-4" />
             </button>
 
-            {/* Scrollable content */}
-            <div className="overflow-y-auto" style={{ maxHeight: "calc(85vh - 24px)" }}>
+            {/* Animated-height content area */}
+            <AnimatedHeight stepKey={`${step}-${type}-${done}`}>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={`${step}-${type}-${done}`}
@@ -612,7 +612,7 @@ const MobileBookingSheet = ({ open, onClose, preselected = null }: Props) => {
                   {renderStep()}
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </AnimatedHeight>
           </motion.div>
         </>
       )}
