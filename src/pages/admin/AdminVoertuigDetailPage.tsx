@@ -169,6 +169,7 @@ const AdminVoertuigDetailPage = () => {
         customers={customers.map(c => ({ id: c.id, voornaam: c.voornaam, achternaam: c.achternaam }))}
         vehicles={[{ id: vehicle.id, merk: vehicle.merk, model: vehicle.model, kenteken: vehicle.kenteken }]}
         defaultType={afspraakType}
+        defaultVehicleId={vehicle.id}
         onSubmit={async (data) => {
           await addAppointment({ ...data, vehicle_id: vehicle.id });
           toast.success("Afspraak ingepland");
