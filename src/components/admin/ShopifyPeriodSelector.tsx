@@ -221,199 +221,215 @@ export default function ShopifyPeriodSelector({ value, onChange }: Props) {
         </Button>
 
         {open && (
-          <div
-            className="fixed inset-0 z-[100] bg-background flex flex-col animate-in slide-in-from-bottom duration-300"
-            style={{
-              paddingTop: "env(safe-area-inset-top)",
-              paddingBottom: "env(safe-area-inset-bottom)",
-            }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between h-14 px-2 border-b border-border bg-background flex-shrink-0">
-              <button
-                type="button"
-                onClick={handleCancel}
-                aria-label="Sluiten"
-                className="w-10 h-10 inline-flex items-center justify-center rounded-md text-foreground hover:bg-accent"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <h2 className="text-base font-medium text-foreground">Periode selecteren</h2>
-              <button
-                type="button"
-                onClick={handleApply}
-                className="px-3 h-9 inline-flex items-center text-sm font-medium text-emerald-500 hover:text-emerald-400"
-              >
-                Toepassen
-              </button>
-            </div>
-
-            {/* Sub-header (back button when in submenu) */}
-            {mobileView !== "root" && (
-              <div className="flex items-center h-12 px-2 border-b border-border bg-background flex-shrink-0">
+          <>
+            {/* Overlay */}
+            <div
+              className="fixed inset-0 z-[100] bg-black/50 animate-in fade-in duration-200"
+              onClick={handleCancel}
+            />
+            {/* Bottom sheet */}
+            <div
+              className="fixed left-0 right-0 bottom-0 z-[101] flex flex-col animate-in slide-in-from-bottom duration-300"
+              style={{
+                background: "hsl(0 0% 8%)",
+                borderRadius: "20px 20px 0 0",
+                maxHeight: "75vh",
+                height: "auto",
+                boxShadow: "0 -8px 32px rgba(0,0,0,0.5)",
+                paddingBottom: "env(safe-area-inset-bottom)",
+              }}
+            >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-2 shrink-0">
+                <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)" }} />
+              </div>
+              {/* Header */}
+              <div className="flex items-center justify-between h-12 px-2 border-b border-white/[0.06] flex-shrink-0">
                 <button
                   type="button"
-                  onClick={() => setMobileView("root")}
-                  className="inline-flex items-center gap-1.5 px-2 h-9 text-sm text-foreground hover:bg-accent rounded-md"
+                  onClick={handleCancel}
+                  aria-label="Sluiten"
+                  className="w-10 h-10 inline-flex items-center justify-center rounded-md text-white/70 hover:text-white"
                 >
-                  <ArrowLeft className="w-4 h-4" /> Terug
+                  <X className="w-5 h-5" />
                 </button>
-                <span className="ml-2 text-sm text-muted-foreground">
-                  {mobileView === "afgelopen" && "Afgelopen"}
-                  {mobileView === "totnu" && "Periode tot nu"}
-                  {mobileView === "kwartalen" && "Kwartalen"}
-                  {mobileView === "custom" && "Aangepast bereik"}
-                </span>
+                <h2 className="text-base font-medium text-foreground">Periode selecteren</h2>
+                <button
+                  type="button"
+                  onClick={handleApply}
+                  className="px-3 h-9 inline-flex items-center text-base font-medium text-foreground hover:text-white"
+                >
+                  Toepassen
+                </button>
               </div>
-            )}
 
-            {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain">
-              {mobileView === "root" && (
-                <div>
-                  <MobileRow label="Vandaag" active={activePreset === "vandaag"}
-                    onClick={() => applyPreset("vandaag", buildPreset("vandaag"))} />
-                  <MobileRow label="Gisteren" active={activePreset === "gisteren"}
-                    onClick={() => applyPreset("gisteren", buildPreset("gisteren"))} />
-                  <MobileRow label="Afgelopen" hasSub onClick={() => setMobileView("afgelopen")} />
-                  <MobileRow label="Periode tot nu" hasSub onClick={() => setMobileView("totnu")} />
-                  <MobileRow label="Kwartalen" hasSub onClick={() => setMobileView("kwartalen")} />
-                  <MobileRow label="Aangepast bereik" hasSub
-                    active={activePreset === "custom"}
-                    onClick={() => { setActivePreset("custom"); setMobileView("custom"); }} />
+              {/* Sub-header (back button when in submenu) */}
+              {mobileView !== "root" && (
+                <div className="flex items-center h-12 px-2 border-b border-white/[0.06] flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setMobileView("root")}
+                    className="inline-flex items-center gap-1.5 px-2 h-9 text-sm text-foreground hover:bg-white/[0.06] rounded-md"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Terug
+                  </button>
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {mobileView === "afgelopen" && "Afgelopen"}
+                    {mobileView === "totnu" && "Periode tot nu"}
+                    {mobileView === "kwartalen" && "Kwartalen"}
+                    {mobileView === "custom" && "Aangepast bereik"}
+                  </span>
                 </div>
               )}
 
-              {mobileView === "afgelopen" && (
-                <div>
-                  <MobileRow label="Afgelopen 7 dagen" active={activePreset === "last7"}
-                    onClick={() => { applyPreset("last7", buildPreset("last7")); setMobileView("root"); }} />
-                  <MobileRow label="Afgelopen 30 dagen" active={activePreset === "last30"}
-                    onClick={() => { applyPreset("last30", buildPreset("last30")); setMobileView("root"); }} />
-                  <MobileRow label="Afgelopen 90 dagen" active={activePreset === "last90"}
-                    onClick={() => { applyPreset("last90", buildPreset("last90")); setMobileView("root"); }} />
-                  <MobileRow label="Afgelopen 365 dagen" active={activePreset === "last365"}
-                    onClick={() => { applyPreset("last365", buildPreset("last365")); setMobileView("root"); }} />
-                </div>
-              )}
-
-              {mobileView === "totnu" && (
-                <div>
-                  <MobileRow label="Week tot nu" active={activePreset === "wtd"}
-                    onClick={() => { applyPreset("wtd", buildPreset("wtd")); setMobileView("root"); }} />
-                  <MobileRow label="Maand tot nu" active={activePreset === "mtd"}
-                    onClick={() => { applyPreset("mtd", buildPreset("mtd")); setMobileView("root"); }} />
-                  <MobileRow label="Kwartaal tot nu" active={activePreset === "qtd"}
-                    onClick={() => { applyPreset("qtd", buildPreset("qtd")); setMobileView("root"); }} />
-                  <MobileRow label="Jaar tot nu" active={activePreset === "ytd"}
-                    onClick={() => { applyPreset("ytd", buildPreset("ytd")); setMobileView("root"); }} />
-                </div>
-              )}
-
-              {mobileView === "kwartalen" && (
-                <div>
-                  {quarters.map((q) => {
-                    const id = `q-${q.year}-${q.qIdx}`;
-                    return (
-                      <MobileRow
-                        key={id}
-                        label={q.label}
-                        active={activePreset === id}
-                        onClick={() => { applyPreset(id, buildPreset("q", { qIdx: q.qIdx, year: q.year })); setMobileView("root"); }}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-
-              {mobileView === "custom" && (
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex-1">
-                      <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Van</label>
-                      <Input
-                        value={fromText}
-                        onChange={(e) => setFromText(e.target.value)}
-                        onBlur={commitFromText}
-                        onKeyDown={(e) => { if (e.key === "Enter") commitFromText(); }}
-                        placeholder="dd-mm-jjjj"
-                        className="h-10 text-sm bg-background border-border"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Tot</label>
-                      <Input
-                        value={toText}
-                        onChange={(e) => setToText(e.target.value)}
-                        onBlur={commitToText}
-                        onKeyDown={(e) => { if (e.key === "Enter") commitToText(); }}
-                        placeholder="dd-mm-jjjj"
-                        className="h-10 text-sm bg-background border-border"
-                      />
-                    </div>
+              {/* Scrollable content */}
+              <div className="overflow-y-auto overscroll-contain">
+                {mobileView === "root" && (
+                  <div>
+                    <MobileRow label="Vandaag" active={activePreset === "vandaag"}
+                      onClick={() => applyPreset("vandaag", buildPreset("vandaag"))} />
+                    <MobileRow label="Gisteren" active={activePreset === "gisteren"}
+                      onClick={() => applyPreset("gisteren", buildPreset("gisteren"))} />
+                    <MobileRow label="Afgelopen" hasSub onClick={() => setMobileView("afgelopen")} />
+                    <MobileRow label="Periode tot nu" hasSub onClick={() => setMobileView("totnu")} />
+                    <MobileRow label="Kwartalen" hasSub onClick={() => setMobileView("kwartalen")} />
+                    <MobileRow label="Aangepast bereik" hasSub
+                      active={activePreset === "custom"}
+                      onClick={() => { setActivePreset("custom"); setMobileView("custom"); }} />
                   </div>
+                )}
 
-                  <div className="flex items-center justify-between mb-1">
-                    <button
-                      type="button"
-                      onClick={() => setCalMonth(addMonths(calMonth, -1))}
-                      className="w-10 h-10 inline-flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"
-                      aria-label="Vorige maand"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <div className="text-sm font-medium text-foreground">{monthLabelCap}</div>
-                    <button
-                      type="button"
-                      onClick={() => setCalMonth(addMonths(calMonth, 1))}
-                      className="w-10 h-10 inline-flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"
-                      aria-label="Volgende maand"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
+                {mobileView === "afgelopen" && (
+                  <div>
+                    <MobileRow label="Afgelopen 7 dagen" active={activePreset === "last7"}
+                      onClick={() => { applyPreset("last7", buildPreset("last7")); setMobileView("root"); }} />
+                    <MobileRow label="Afgelopen 30 dagen" active={activePreset === "last30"}
+                      onClick={() => { applyPreset("last30", buildPreset("last30")); setMobileView("root"); }} />
+                    <MobileRow label="Afgelopen 90 dagen" active={activePreset === "last90"}
+                      onClick={() => { applyPreset("last90", buildPreset("last90")); setMobileView("root"); }} />
+                    <MobileRow label="Afgelopen 365 dagen" active={activePreset === "last365"}
+                      onClick={() => { applyPreset("last365", buildPreset("last365")); setMobileView("root"); }} />
                   </div>
+                )}
 
-                  <Calendar
-                    mode="range"
-                    selected={draft}
-                    onSelect={onCalendarSelect}
-                    numberOfMonths={1}
-                    month={calMonth}
-                    onMonthChange={setCalMonth}
-                    locale={nl}
-                    weekStartsOn={1}
-                    disabled={(date) => date > new Date()}
-                    className={cn("p-0 pointer-events-auto w-full")}
-                    classNames={{
-                      months: "flex flex-col w-full",
-                      month: "w-full",
-                      table: "w-full border-collapse",
-                      caption: "hidden",
-                      nav: "hidden",
-                      head_row: "flex w-full",
-                      head_cell: "flex-1 text-muted-foreground/70 font-normal text-[0.7rem] uppercase text-center py-2",
-                      row: "flex w-full mt-0",
-                      cell: cn(
-                        "flex-1 text-center text-sm p-0 relative bg-transparent",
-                        "[&:has([aria-selected])]:bg-[rgba(255,255,255,0.10)]",
-                        "[&:has([aria-selected].day-outside)]:bg-transparent",
-                        "first:[&:has([aria-selected])]:rounded-l-[8px]",
-                        "last:[&:has([aria-selected])]:rounded-r-[8px]",
-                      ),
-                      day: "w-full h-11 p-0 font-normal text-[rgba(255,255,255,0.55)] bg-transparent hover:bg-white/[0.08] hover:text-white rounded-[8px] transition-colors",
-                      day_selected: "!bg-transparent !text-white",
-                      day_range_middle: "!bg-transparent !text-white !rounded-none",
-                      day_range_start: "day-range-start !bg-[rgba(255,255,255,0.28)] !text-white font-bold !rounded-[8px]",
-                      day_range_end: "day-range-end !bg-[rgba(255,255,255,0.28)] !text-white font-bold !rounded-[8px]",
-                      day_today: "text-white",
-                      day_outside: "text-[rgba(255,255,255,0.25)] opacity-100",
-                      day_disabled: "text-[rgba(255,255,255,0.20)] opacity-50 hover:bg-transparent",
-                    }}
-                  />
-                </div>
-              )}
+                {mobileView === "totnu" && (
+                  <div>
+                    <MobileRow label="Week tot nu" active={activePreset === "wtd"}
+                      onClick={() => { applyPreset("wtd", buildPreset("wtd")); setMobileView("root"); }} />
+                    <MobileRow label="Maand tot nu" active={activePreset === "mtd"}
+                      onClick={() => { applyPreset("mtd", buildPreset("mtd")); setMobileView("root"); }} />
+                    <MobileRow label="Kwartaal tot nu" active={activePreset === "qtd"}
+                      onClick={() => { applyPreset("qtd", buildPreset("qtd")); setMobileView("root"); }} />
+                    <MobileRow label="Jaar tot nu" active={activePreset === "ytd"}
+                      onClick={() => { applyPreset("ytd", buildPreset("ytd")); setMobileView("root"); }} />
+                  </div>
+                )}
+
+                {mobileView === "kwartalen" && (
+                  <div>
+                    {quarters.map((q) => {
+                      const id = `q-${q.year}-${q.qIdx}`;
+                      return (
+                        <MobileRow
+                          key={id}
+                          label={q.label}
+                          active={activePreset === id}
+                          onClick={() => { applyPreset(id, buildPreset("q", { qIdx: q.qIdx, year: q.year })); setMobileView("root"); }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+
+                {mobileView === "custom" && (
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex-1">
+                        <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Van</label>
+                        <Input
+                          value={fromText}
+                          onChange={(e) => setFromText(e.target.value)}
+                          onBlur={commitFromText}
+                          onKeyDown={(e) => { if (e.key === "Enter") commitFromText(); }}
+                          placeholder="dd-mm-jjjj"
+                          className="h-10 text-sm bg-background border-border"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Tot</label>
+                        <Input
+                          value={toText}
+                          onChange={(e) => setToText(e.target.value)}
+                          onBlur={commitToText}
+                          onKeyDown={(e) => { if (e.key === "Enter") commitToText(); }}
+                          placeholder="dd-mm-jjjj"
+                          className="h-10 text-sm bg-background border-border"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between mb-1">
+                      <button
+                        type="button"
+                        onClick={() => setCalMonth(addMonths(calMonth, -1))}
+                        className="w-10 h-10 inline-flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"
+                        aria-label="Vorige maand"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <div className="text-sm font-medium text-foreground">{monthLabelCap}</div>
+                      <button
+                        type="button"
+                        onClick={() => setCalMonth(addMonths(calMonth, 1))}
+                        className="w-10 h-10 inline-flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"
+                        aria-label="Volgende maand"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <Calendar
+                      mode="range"
+                      selected={draft}
+                      onSelect={onCalendarSelect}
+                      numberOfMonths={1}
+                      month={calMonth}
+                      onMonthChange={setCalMonth}
+                      locale={nl}
+                      weekStartsOn={1}
+                      disabled={(date) => date > new Date()}
+                      className={cn("p-0 pointer-events-auto w-full")}
+                      classNames={{
+                        months: "flex flex-col w-full",
+                        month: "w-full",
+                        table: "w-full border-collapse",
+                        caption: "hidden",
+                        nav: "hidden",
+                        head_row: "flex w-full",
+                        head_cell: "flex-1 text-muted-foreground/70 font-normal text-[0.7rem] uppercase text-center py-2",
+                        row: "flex w-full mt-0",
+                        cell: cn(
+                          "flex-1 text-center text-sm p-0 relative bg-transparent",
+                          "[&:has([aria-selected])]:bg-[rgba(255,255,255,0.10)]",
+                          "[&:has([aria-selected].day-outside)]:bg-transparent",
+                          "first:[&:has([aria-selected])]:rounded-l-[8px]",
+                          "last:[&:has([aria-selected])]:rounded-r-[8px]",
+                        ),
+                        day: "w-full h-11 p-0 font-normal text-[rgba(255,255,255,0.55)] bg-transparent hover:bg-white/[0.08] hover:text-white rounded-[8px] transition-colors",
+                        day_selected: "!bg-transparent !text-white",
+                        day_range_middle: "!bg-transparent !text-white !rounded-none",
+                        day_range_start: "day-range-start !bg-[rgba(255,255,255,0.28)] !text-white font-bold !rounded-[8px]",
+                        day_range_end: "day-range-end !bg-[rgba(255,255,255,0.28)] !text-white font-bold !rounded-[8px]",
+                        day_today: "text-white",
+                        day_outside: "text-[rgba(255,255,255,0.25)] opacity-100",
+                        day_disabled: "text-[rgba(255,255,255,0.20)] opacity-50 hover:bg-transparent",
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </>
     );
