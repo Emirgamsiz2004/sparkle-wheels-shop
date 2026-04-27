@@ -311,7 +311,7 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
             <div className="flex justify-center pt-3 pb-3 shrink-0">
               <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)" }} />
             </div>
-            <div className="overflow-y-auto overflow-x-hidden flex-1">
+            <div className="overflow-y-auto overflow-x-hidden">
               <AnimatePresence mode="wait" custom={viewDir} initial={false}>
                 <motion.div
                   key={view}
