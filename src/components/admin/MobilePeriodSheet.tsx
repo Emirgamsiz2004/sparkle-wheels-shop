@@ -41,15 +41,13 @@ function rangeToCustom(from: Date, to: Date, base: PeriodValue): PeriodValue {
 const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Props) => {
   const [view, setView] = useState<View>("root");
   const [viewDir, setViewDir] = useState(1);
-  const [dragY, setDragY] = useState(0);
-
   // Custom range draft
   const [draft, setDraft] = useState<DateRange | undefined>({ from: value.customFrom, to: value.customTo });
   const [calMonth, setCalMonth] = useState<Date>(value.customFrom || new Date());
 
   useEffect(() => {
     if (!open) {
-      const t = setTimeout(() => { setView("root"); setDragY(0); }, 320);
+      const t = setTimeout(() => { setView("root"); }, 320);
       return () => clearTimeout(t);
     }
     setDraft({ from: value.customFrom, to: value.customTo });
