@@ -109,7 +109,7 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
     >
       <span className={selected ? "font-semibold" : ""}>{label}</span>
       {selected ? (
-        <Check className="w-5 h-5" style={{ color: "hsl(142 70% 45%)" }} />
+        <Check className="w-5 h-5 text-white/70" />
       ) : hasArrow ? (
         <ChevronRight className="w-4 h-4 text-white/40" />
       ) : null}
@@ -242,11 +242,11 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
                 head_row: "flex w-full",
                 head_cell: "text-white/40 flex-1 h-8 font-medium text-[11px] uppercase tracking-wider flex items-center justify-center",
                 row: "flex w-full mt-1",
-                cell: "relative flex-1 aspect-square text-center text-sm p-0 [&:has([aria-selected])]:bg-[hsl(142_60%_45%/0.15)] first:[&:has([aria-selected])]:rounded-l-[10px] last:[&:has([aria-selected])]:rounded-r-[10px]",
+                cell: "relative flex-1 aspect-square text-center text-sm p-0 [&:has([aria-selected])]:bg-white/[0.08] first:[&:has([aria-selected])]:rounded-l-[10px] last:[&:has([aria-selected])]:rounded-r-[10px]",
                 day: "w-full h-full font-normal text-white/85 rounded-[10px] inline-flex items-center justify-center transition hover:bg-white/10",
-                day_range_start: "!bg-[hsl(142_70%_45%)] !text-white font-semibold rounded-[10px]",
-                day_range_end: "!bg-[hsl(142_70%_45%)] !text-white font-semibold rounded-[10px]",
-                day_selected: "!bg-[hsl(142_70%_45%)] !text-white font-semibold rounded-[10px]",
+                day_range_start: "!bg-white !text-black font-semibold rounded-[10px]",
+                day_range_end: "!bg-white !text-black font-semibold rounded-[10px]",
+                day_selected: "!bg-white !text-black font-semibold rounded-[10px]",
                 day_today: "ring-1 ring-white/20",
                 day_outside: "text-white/20",
                 day_range_middle: "!bg-transparent !text-white rounded-none",
@@ -303,6 +303,7 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
               background: "hsl(0 0% 8%)",
               borderRadius: "20px 20px 0 0",
               maxHeight: "75vh",
+              height: "auto",
               boxShadow: "0 -8px 32px rgba(0,0,0,0.5)",
               willChange: "transform",
             }}
