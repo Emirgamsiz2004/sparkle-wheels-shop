@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence, type PanInfo } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, animate, type PanInfo } from "framer-motion";
 import { ArrowLeft, ChevronRight, Check, ChevronLeft } from "lucide-react";
 import { DayPicker, type DateRange } from "react-day-picker";
 import { format, startOfDay, endOfDay, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subDays, subMonths, subYears, subQuarters } from "date-fns";
@@ -74,9 +74,15 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
 
   const goView = (v: View, dir: 1 | -1 = 1) => { setViewDir(dir); setView(v); };
 
+  const sheetY = useMotionValue(0);
+
   const handleDragEnd = (_: any, info: PanInfo) => {
-    if (info.offset.y > 80 || info.velocity.y > 500) onClose();
-    else setDragY(0);
+    if (info.offset.y > 80 || info.velocity.y > 500) {
+      onClose();
+    } else {
+      // Snap back with same easing as the open animation
+      animate(sheetY, 0, { duration: 0.32, ease: EASE });
+    }
   };
 
   const apply = (next: PeriodValue) => { onApply(next); onClose(); };
@@ -297,9 +303,11 @@ const MobilePeriodSheet = ({ open, onClose, value, onApply, availableYears }: Pr
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.6 }}
+            dragMomentum={false}
             onDragEnd={handleDragEnd}
             className="fixed left-0 right-0 bottom-0 z-[101] flex flex-col"
             style={{
+              y: sheetY,
               background: "hsl(0 0% 8%)",
               borderRadius: "20px 20px 0 0",
               maxHeight: "75vh",
