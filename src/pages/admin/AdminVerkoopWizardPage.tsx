@@ -783,9 +783,9 @@ const AdminVerkoopWizardPage = () => {
   // ─────────────────────────────────────────────────────────
 
   return (
-    <div className="admin-theme h-screen overflow-hidden bg-background text-foreground max-w-[100vw]" style={{ overflowX: "hidden" }}>
+    <div className="admin-theme overflow-hidden bg-background text-foreground max-w-[100vw]" style={{ overflowX: "hidden", height: "100dvh" }}>
       {/* Fixed sidebar */}
-      <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-[280px] z-10 border-r border-border bg-sidebar flex-col">
+      <aside className="hidden lg:flex fixed top-0 left-0 w-[280px] z-10 border-r border-border bg-sidebar flex-col" style={{ height: "100dvh" }}>
           <div className="p-5 border-b border-sidebar-border">
             <img src={logo} alt="Platin Automotive" className="h-7 w-auto" />
           </div>
@@ -883,7 +883,7 @@ const AdminVerkoopWizardPage = () => {
         />
 
       {/* Hoofdinhoud */}
-      <main className="lg:ml-[280px] h-screen overflow-y-scroll overflow-x-hidden wizard-content max-w-full" style={{ scrollbarGutter: "stable" }}>
+      <main className="lg:ml-[280px] overflow-y-scroll overflow-x-hidden wizard-content max-w-full" style={{ scrollbarGutter: "stable", height: "100dvh" }}>
         {/* Mobiele horizontale stappenindicator */}
         <div
           className="lg:hidden sticky top-0 z-20 bg-background border-b border-border"
@@ -919,7 +919,7 @@ const AdminVerkoopWizardPage = () => {
             })}
           </div>
         </div>
-        <div className="px-4 lg:px-8 pt-6 pb-32">
+        <div className="px-4 lg:px-8 pt-6" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 7rem)" }}>
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <button
@@ -1383,7 +1383,7 @@ const AdminVerkoopWizardPage = () => {
       {/* Fixed footer met navigatie */}
       <div
         className="fixed bottom-0 left-0 lg:left-[280px] right-0 z-10 border-t border-border bg-card/95 backdrop-blur px-4 lg:px-8 py-3 lg:py-4 flex items-center gap-2 lg:gap-4 max-w-full"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1rem)" }}
       >
         <button
           onClick={handleVorige}
