@@ -31,6 +31,7 @@ interface Props {
   allVehicles?: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
   onSubmit: (data: any) => Promise<void>;
   defaultType?: string;
+  defaultVehicleId?: string;
   anchorRect?: DOMRect | null;
 }
 
@@ -49,7 +50,7 @@ const timeSlots = Array.from({ length: 20 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${m}`;
 });
 
-const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType, anchorRect }: Props) => {
+const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType, defaultVehicleId, anchorRect }: Props) => {
   const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
   const [type, setType] = useState<AppointmentType | null>((defaultType as AppointmentType) || null);
   const [saving, setSaving] = useState(false);
@@ -64,7 +65,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     tijd: "10:00",
     klant_naam: "",
     klant_telefoon: "",
-    vehicle_id: "",
+    vehicle_id: defaultVehicleId || "",
     notities: "",
     onderwerp: "",
     betalingsstatus: "openstaand" as "volledig_betaald" | "openstaand",
@@ -76,6 +77,12 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
       setStep("form");
     }
   }, [open, defaultType]);
+
+  useEffect(() => {
+    if (open && defaultVehicleId) {
+      setForm((f) => ({ ...f, vehicle_id: defaultVehicleId }));
+    }
+  }, [open, defaultVehicleId]);
 
   // close customer dropdown on outside click
   useEffect(() => {
