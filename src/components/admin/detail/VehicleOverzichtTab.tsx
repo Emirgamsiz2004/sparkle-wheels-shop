@@ -98,6 +98,12 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
     toast.success("Verkoopprijs bijgewerkt");
   };
 
+  const handleSaveInkoopprijs = async (val: number) => {
+    await onSave({ ...vehicle, inkoopprijs: val });
+    onLogActivity("inkoopprijs_gewijzigd", `Inkoopprijs bijgewerkt naar ${formatEuroDecimal(val)}`);
+    toast.success("Inkoopprijs bijgewerkt");
+  };
+
   const inputCls = "w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all";
 
   const hasPaymentInfo = !!(vehicle.contantBedrag || vehicle.overboekingBedrag || vehicle.aanbetalingsbedrag || vehicle.financieringActief || vehicle.inruilKenteken);
@@ -109,7 +115,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
     <div className="space-y-4">
       {/* KPI cards - Inkoop / Verkoop / Winst / Marge */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="Inkoop" value={formatEuroDecimal(vehicle.inkoopprijs || 0)} />
+        <KpiCard
+          label="Inkoop"
+          value={formatEuroDecimal(vehicle.inkoopprijs || 0)}
+          editable
+          minValue={0}
+          rawValue={vehicle.inkoopprijs || 0}
+          onSave={handleSaveInkoopprijs}
+        />
         <KpiCard
           label="Verkoop"
           value={formatEuroDecimal(vehicle.verkoopprijs || 0)}
@@ -259,13 +272,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   );
 };
 
-const KpiCard = ({ label, value, color, editable, rawValue, onSave }: {
+const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1 }: {
   label: string;
   value: string;
   color?: string;
   editable?: boolean;
   rawValue?: number;
   onSave?: (val: number) => Promise<void>;
+  minValue?: number;
 }) => {
   const [editing, setEditing] = useState(false);
   const [editVal, setEditVal] = useState("");
@@ -286,8 +300,8 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave }: {
     const cleaned = editVal.trim().replace(",", ".");
     if (cleaned === "") return cancel();
     const num = Number(cleaned);
-    if (isNaN(num) || num < 1) {
-      toast.error("Voer een geldig bedrag in (minimaal € 1,00)");
+    if (isNaN(num) || num < minValue) {
+      toast.error(`Voer een geldig bedrag in (minimaal € ${minValue.toFixed(2).replace(".", ",")})`);
       return;
     }
     setSaving(true);
