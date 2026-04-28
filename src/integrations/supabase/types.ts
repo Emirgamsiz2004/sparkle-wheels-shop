@@ -1255,6 +1255,51 @@ export type Database = {
           },
         ]
       }
+      kosten: {
+        Row: {
+          actief: boolean
+          bedrag: number
+          categorie: string
+          created_at: string
+          datum: string
+          frequentie: string
+          id: string
+          leverancier: string | null
+          naam: string
+          notities: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          actief?: boolean
+          bedrag?: number
+          categorie?: string
+          created_at?: string
+          datum?: string
+          frequentie?: string
+          id?: string
+          leverancier?: string | null
+          naam: string
+          notities?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          actief?: boolean
+          bedrag?: number
+          categorie?: string
+          created_at?: string
+          datum?: string
+          frequentie?: string
+          id?: string
+          leverancier?: string | null
+          naam?: string
+          notities?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       lead_history: {
         Row: {
           beschrijving: string
