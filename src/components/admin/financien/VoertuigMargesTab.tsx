@@ -2,13 +2,12 @@ import { useMemo } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { useInkoopverklaringen } from "@/hooks/useInkoopverklaringen";
 import { formatEuro } from "@/hooks/useKosten";
-import { TrendingUp, TrendingDown, Award, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, Award, BarChart3, Handshake } from "lucide-react";
 
 const VoertuigMargesTab = () => {
   const { vehicles, loading } = useVehicles();
   const { verklaringen } = useInkoopverklaringen();
 
-  // Hybride: vehicle.inkoopprijs als basis, verrijk via inkoopverklaring (op vehicle_id of kenteken)
   const enriched = useMemo(() => {
     return [...vehicles]
       .sort((a: any, b: any) => {
@@ -22,21 +21,41 @@ const VoertuigMargesTab = () => {
             (x.vehicleId && x.vehicleId === v.id) ||
             (x.kenteken && v.kenteken && x.kenteken.replace(/-/g, "").toLowerCase() === v.kenteken.replace(/-/g, "").toLowerCase())
         );
-        const inkoopprijs = Number(v.inkoopprijs || 0) || Number(iv?.inkoopprijs || 0);
+        const isConsignatie = v.verkoopType === "consignatie" || v.status === "consignatie";
+        const inkoopprijs = isConsignatie ? 0 : (Number(v.inkoopprijs || 0) || Number(iv?.inkoopprijs || 0));
         const verkoopprijs = Number(v.verkoopprijs || 0);
         const verkocht = v.status === "verkocht" && verkoopprijs > 0;
-        const brutoMarge = verkocht ? verkoopprijs - inkoopprijs : null;
-        const margePerc = verkocht && inkoopprijs > 0 ? ((verkoopprijs - inkoopprijs) / inkoopprijs) * 100 : null;
+        const commissiePerc = Number(v.consignatieCommissiePerc) > 0 ? Number(v.consignatieCommissiePerc) : 10;
+
+        let brutoMarge: number | null = null;
+        let margePerc: number | null = null;
+
+        if (verkocht) {
+          if (isConsignatie) {
+            brutoMarge = verkoopprijs * (commissiePerc / 100);
+            margePerc = commissiePerc;
+          } else if (inkoopprijs > 0) {
+            brutoMarge = verkoopprijs - inkoopprijs;
+            margePerc = ((verkoopprijs - inkoopprijs) / inkoopprijs) * 100;
+          }
+        }
+
         return {
-          v, iv, inkoopprijs, verkoopprijs, verkocht, brutoMarge, margePerc,
+          v, iv, inkoopprijs, verkoopprijs, verkocht, brutoMarge, margePerc, isConsignatie, commissiePerc,
         };
       });
   }, [vehicles, verklaringen]);
 
   const verkocht = enriched.filter((e) => e.verkocht);
+  const verkochtEigen = verkocht.filter((e) => !e.isConsignatie && e.margePerc !== null);
+  const verkochtConsign = verkocht.filter((e) => e.isConsignatie);
+
   const totaalWinst = verkocht.reduce((s, e) => s + (e.brutoMarge || 0), 0);
-  const gemiddeldePerc =
-    verkocht.length > 0 ? verkocht.reduce((s, e) => s + (e.margePerc || 0), 0) / verkocht.length : 0;
+  const gemEigenPerc =
+    verkochtEigen.length > 0 ? verkochtEigen.reduce((s, e) => s + (e.margePerc || 0), 0) / verkochtEigen.length : 0;
+  const gemConsignPerc =
+    verkochtConsign.length > 0 ? verkochtConsign.reduce((s, e) => s + (e.margePerc || 0), 0) / verkochtConsign.length : 0;
+
   const hoogste = verkocht.reduce<typeof enriched[0] | null>(
     (best, e) => (best === null || (e.brutoMarge ?? -Infinity) > (best.brutoMarge ?? -Infinity) ? e : best),
     null
@@ -51,11 +70,18 @@ const VoertuigMargesTab = () => {
   return (
     <div className="space-y-5">
       {/* Samenvattingskaarten */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <SummaryCard
           icon={BarChart3}
-          label="Gemiddelde marge"
-          value={`${gemiddeldePerc.toFixed(1)}%`}
+          label="Gem. marge eigen inkoop"
+          value={verkochtEigen.length > 0 ? `${gemEigenPerc.toFixed(1)}%` : "—"}
+          sub={`${verkochtEigen.length} voertuig${verkochtEigen.length === 1 ? "" : "en"}`}
+        />
+        <SummaryCard
+          icon={Handshake}
+          label="Gem. commissie consignatie"
+          value={verkochtConsign.length > 0 ? `${gemConsignPerc.toFixed(1)}%` : "—"}
+          sub={`${verkochtConsign.length} voertuig${verkochtConsign.length === 1 ? "" : "en"}`}
         />
         <SummaryCard
           icon={TrendingUp}
@@ -88,6 +114,7 @@ const VoertuigMargesTab = () => {
                 <tr>
                   <th className="text-left px-4 py-2.5 font-medium">Voertuig</th>
                   <th className="text-left px-4 py-2.5 font-medium">Kenteken</th>
+                  <th className="text-left px-4 py-2.5 font-medium">Type</th>
                   <th className="text-left px-4 py-2.5 font-medium">Inkoop</th>
                   <th className="text-left px-4 py-2.5 font-medium">Verkoop</th>
                   <th className="text-right px-4 py-2.5 font-medium">Inkoopprijs</th>
@@ -102,6 +129,15 @@ const VoertuigMargesTab = () => {
                   <tr key={e.v.id} className="border-t border-border hover:bg-accent/30 transition-colors">
                     <td className="px-4 py-2.5 text-foreground">{e.v.merk} {e.v.model}</td>
                     <td className="px-4 py-2.5 text-muted-foreground tabular-nums">{e.v.kenteken || "—"}</td>
+                    <td className="px-4 py-2.5">
+                      <span className={`px-2 py-0.5 rounded-md text-[11px] border ${
+                        e.isConsignatie
+                          ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
+                          : "bg-secondary text-muted-foreground border-border"
+                      }`}>
+                        {e.isConsignatie ? "Consignatie" : "Eigen"}
+                      </span>
+                    </td>
                     <td className="px-4 py-2.5 text-muted-foreground tabular-nums">
                       {e.v.inkoopDatum ? new Date(e.v.inkoopDatum).toLocaleDateString("nl-NL") : "—"}
                     </td>
@@ -109,7 +145,13 @@ const VoertuigMargesTab = () => {
                       {e.v.verkoopDatum ? new Date(e.v.verkoopDatum).toLocaleDateString("nl-NL") : "—"}
                     </td>
                     <td className="px-4 py-2.5 text-right text-foreground tabular-nums">
-                      {e.inkoopprijs > 0 ? formatEuro(e.inkoopprijs) : "—"}
+                      {e.isConsignatie ? (
+                        <span className="text-xs text-muted-foreground italic">Consignatie</span>
+                      ) : e.inkoopprijs > 0 ? (
+                        formatEuro(e.inkoopprijs)
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td className="px-4 py-2.5 text-right text-foreground tabular-nums">
                       {e.verkocht ? formatEuro(e.verkoopprijs) : "—"}
