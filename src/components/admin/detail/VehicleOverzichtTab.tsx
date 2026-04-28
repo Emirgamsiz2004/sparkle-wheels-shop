@@ -259,12 +259,91 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   );
 };
 
-const KpiCard = ({ label, value, color }: { label: string; value: string; color?: string }) => (
-  <div className="bg-card border border-border rounded-lg p-3">
-    <p className="text-xs text-muted-foreground mb-1">{label}</p>
-    <p className={`text-base font-semibold tabular-nums ${color || ""}`}>{value}</p>
-  </div>
-);
+const KpiCard = ({ label, value, color, editable, rawValue, onSave }: {
+  label: string;
+  value: string;
+  color?: string;
+  editable?: boolean;
+  rawValue?: number;
+  onSave?: (val: number) => Promise<void>;
+}) => {
+  const [editing, setEditing] = useState(false);
+  const [editVal, setEditVal] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = () => {
+    setEditVal(rawValue && rawValue > 0 ? String(rawValue) : "");
+    setEditing(true);
+  };
+
+  const cancel = () => {
+    setEditing(false);
+    setEditVal("");
+  };
+
+  const commit = async () => {
+    if (!onSave) return cancel();
+    const cleaned = editVal.trim().replace(",", ".");
+    if (cleaned === "") return cancel();
+    const num = Number(cleaned);
+    if (isNaN(num) || num < 1) {
+      toast.error("Voer een geldig bedrag in (minimaal € 1,00)");
+      return;
+    }
+    setSaving(true);
+    try {
+      await onSave(num);
+      setEditing(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") { e.preventDefault(); commit(); }
+    if (e.key === "Escape") { e.preventDefault(); cancel(); }
+  };
+
+  return (
+    <div className="bg-card border border-border rounded-lg p-3 group">
+      <p className="text-xs text-muted-foreground mb-1">{label}</p>
+      {editing ? (
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm text-muted-foreground">€</span>
+          <input
+            autoFocus
+            type="text"
+            inputMode="decimal"
+            value={editVal}
+            disabled={saving}
+            onChange={(e) => setEditVal(e.target.value.replace(/[^0-9.,]/g, ""))}
+            onKeyDown={handleKey}
+            className="flex-1 min-w-0 px-2 py-1 text-base font-semibold tabular-nums bg-secondary/50 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+          <button onClick={commit} disabled={saving} className="p-1 text-emerald-500 hover:text-emerald-400 disabled:opacity-50">
+            <Check className="w-4 h-4" />
+          </button>
+          <button onClick={cancel} disabled={saving} className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-50">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-1.5">
+          <p className={`text-base font-semibold tabular-nums ${color || ""}`}>{value}</p>
+          {editable && (
+            <button
+              onClick={startEdit}
+              className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-foreground transition-opacity"
+              title="Verkoopprijs bewerken"
+            >
+              <Pencil className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ReadField = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
   <div className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0">
