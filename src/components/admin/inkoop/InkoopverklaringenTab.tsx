@@ -123,7 +123,7 @@ export default function InkoopverklaringenTab() {
             </thead>
             <tbody>
               {filtered.map(v => (
-                <tr key={v.id} onClick={() => handleDownload(v)} className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer group">
+                <tr key={v.id} onClick={() => openDetail(v)} className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer group">
                   <td className="px-3 py-2.5 text-foreground font-medium">{v.merk} {v.model}</td>
                   <td className="px-3 py-2.5 text-muted-foreground text-[11px] font-mono uppercase">{v.kenteken || "—"}</td>
                   <td className="px-3 py-2.5 text-muted-foreground text-xs">{v.verkoperNaam}</td>
@@ -136,10 +136,10 @@ export default function InkoopverklaringenTab() {
                   </td>
                   <td className="px-3 py-2.5 text-right">
                     <button
-                      onClick={(e) => { e.stopPropagation(); openDetail(v); }}
+                      onClick={(e) => { e.stopPropagation(); handleDownload(v); }}
                       className="text-[11px] text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
                     >
-                      Details
+                      PDF
                     </button>
                   </td>
                 </tr>
