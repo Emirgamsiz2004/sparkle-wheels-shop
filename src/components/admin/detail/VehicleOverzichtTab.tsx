@@ -98,6 +98,12 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
     toast.success("Verkoopprijs bijgewerkt");
   };
 
+  const handleSaveInkoopprijs = async (val: number) => {
+    await onSave({ ...vehicle, inkoopprijs: val });
+    onLogActivity("inkoopprijs_gewijzigd", `Inkoopprijs bijgewerkt naar ${formatEuroDecimal(val)}`);
+    toast.success("Inkoopprijs bijgewerkt");
+  };
+
   const inputCls = "w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all";
 
   const hasPaymentInfo = !!(vehicle.contantBedrag || vehicle.overboekingBedrag || vehicle.aanbetalingsbedrag || vehicle.financieringActief || vehicle.inruilKenteken);
