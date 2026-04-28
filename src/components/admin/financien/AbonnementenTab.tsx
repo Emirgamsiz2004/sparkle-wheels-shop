@@ -282,13 +282,25 @@ const AbonnementForm = ({
         <span className="block text-xs text-muted-foreground mb-1">Startdatum *</span>
         <input type="date" required value={datum} onChange={(e) => setDatum(e.target.value)} className="input" />
       </label>
-      <button
-        type="submit"
-        disabled={busy}
-        className="w-full h-10 bg-primary text-primary-foreground rounded-md text-sm font-medium disabled:opacity-50"
-      >
-        {busy ? "Opslaan…" : "Opslaan"}
-      </button>
+      <div className="flex gap-2 pt-1">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={busy}
+            className="flex-1 h-9 bg-transparent text-foreground border border-white/10 hover:bg-white/[0.04] rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50"
+          >
+            Annuleren
+          </button>
+        )}
+        <button
+          type="submit"
+          disabled={busy}
+          className="flex-1 h-9 bg-transparent text-foreground border border-white/10 hover:bg-white/[0.04] rounded-[10px] text-sm font-medium transition-colors disabled:opacity-50"
+        >
+          {busy ? "Opslaan…" : "Opslaan"}
+        </button>
+      </div>
       <style>{`
         .input { width: 100%; height: 36px; padding: 0 10px; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 6px; color: hsl(var(--foreground)); font-size: 14px; outline: none; }
         .input:focus { border-color: hsl(var(--ring)); }
