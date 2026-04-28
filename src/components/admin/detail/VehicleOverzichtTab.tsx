@@ -115,7 +115,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
     <div className="space-y-4">
       {/* KPI cards - Inkoop / Verkoop / Winst / Marge */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="Inkoop" value={formatEuroDecimal(vehicle.inkoopprijs || 0)} />
+        <KpiCard
+          label="Inkoop"
+          value={formatEuroDecimal(vehicle.inkoopprijs || 0)}
+          editable
+          minValue={0}
+          rawValue={vehicle.inkoopprijs || 0}
+          onSave={handleSaveInkoopprijs}
+        />
         <KpiCard
           label="Verkoop"
           value={formatEuroDecimal(vehicle.verkoopprijs || 0)}
