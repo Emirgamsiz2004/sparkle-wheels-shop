@@ -8,7 +8,12 @@ import {
 import {
   Loader2, Download, Info, Send, Upload, RefreshCw,
   CheckCircle, FileText, Receipt, BarChart3, Link2,
+  LayoutDashboard, Wallet, Repeat, Car,
 } from "lucide-react";
+import FinancienOverzichtTab from "@/components/admin/financien/FinancienOverzichtTab";
+import KostenTab from "@/components/admin/financien/KostenTab";
+import AbonnementenTab from "@/components/admin/financien/AbonnementenTab";
+import VoertuigMargesTab from "@/components/admin/financien/VoertuigMargesTab";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { DateRangePicker } from "@/components/admin/DateRangePicker";
@@ -16,7 +21,7 @@ import MobilePeriodSheet from "@/components/admin/MobilePeriodSheet";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
-type Tab = "overzicht" | "btw" | "moneybird";
+type Tab = "overzicht" | "btw" | "moneybird" | "dashboard" | "kosten" | "abonnementen" | "marges";
 
 const quarters = [
   { q: 1, label: "Q1 — Jan t/m Mrt", deadline: "30 april", months: [0, 1, 2] },
@@ -43,6 +48,10 @@ const AdminFinancieelPage = () => {
     { key: "overzicht", label: "Verkoop & Winst", icon: BarChart3 },
     { key: "btw", label: "BTW Aangifte", icon: Receipt },
     { key: "moneybird", label: "Moneybird", icon: Link2 },
+    { key: "dashboard", label: "Overzicht", icon: LayoutDashboard },
+    { key: "kosten", label: "Kosten", icon: Wallet },
+    { key: "abonnementen", label: "Abonnementen", icon: Repeat },
+    { key: "marges", label: "Voertuigmarges", icon: Car },
   ];
 
   return (
@@ -75,6 +84,10 @@ const AdminFinancieelPage = () => {
       {tab === "overzicht" && <OverzichtTab vehicles={vehicles} />}
       {tab === "btw" && <BtwTab vehicles={vehicles} />}
       {tab === "moneybird" && <MoneybirdTab vehicles={vehicles} />}
+      {tab === "dashboard" && <FinancienOverzichtTab />}
+      {tab === "kosten" && <KostenTab />}
+      {tab === "abonnementen" && <AbonnementenTab />}
+      {tab === "marges" && <VoertuigMargesTab />}
     </div>
   );
 };
