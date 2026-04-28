@@ -269,43 +269,23 @@ input[type="number"] {
   }
 
   /* ============================================================
-     UNIFIED ADMIN TABLES — match Voertuigen-tabel look everywhere
+     UNIFIED ADMIN TABLES — light, non-destructive baseline
+     Components keep full control over padding, color & header bg.
      ============================================================ */
   .admin-theme table {
     width: 100%;
     font-size: 0.875rem; /* text-sm */
     border-collapse: collapse;
   }
-  .admin-theme thead tr {
-    border-bottom: 1px solid hsl(var(--border));
-  }
-  .admin-theme thead th {
-    text-align: left;
-    padding: 0.5rem 0.75rem; /* py-2 px-3 */
-    font-size: 11px;
-    font-weight: 500;
-    color: hsl(var(--muted-foreground));
-    background: transparent;
-  }
   .admin-theme tbody tr {
-    border-bottom: 1px solid hsl(var(--border) / 0.5);
     transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .admin-theme tbody tr:hover {
-    background-color: hsl(var(--muted) / 0.7);
-  }
-  .admin-theme tbody tr:last-child {
+  .admin-theme tbody tr:last-child td {
     border-bottom: none;
   }
-  .admin-theme tbody td {
-    padding: 0.625rem 0.75rem; /* py-2.5 px-3 */
-    color: hsl(var(--foreground));
-    vertical-align: middle;
-  }
-  /* Numeric/right-aligned cells stay tabular */
+  /* Right-aligned numeric cells stay tabular */
   .admin-theme td.text-right,
   .admin-theme th.text-right {
-    text-align: right;
     font-variant-numeric: tabular-nums;
   }
 
