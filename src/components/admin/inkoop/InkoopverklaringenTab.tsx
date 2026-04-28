@@ -131,9 +131,23 @@ export default function InkoopverklaringenTab() {
                   <td className="px-3 py-2.5 text-right tabular-nums text-xs">{formatEuro(v.inkoopprijs)}</td>
                   <td className="px-3 py-2.5 text-muted-foreground text-xs">{formatDate(v.datum)}</td>
                   <td className="px-3 py-2.5">
-                    <span className={cn(BADGE_BASE, v.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
-                      {v.status === "ondertekend" ? "Ondertekend" : "Concept"}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn(BADGE_BASE, v.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
+                        {v.status === "ondertekend" ? "Ondertekend" : "Concept"}
+                      </span>
+                      {v.moneybirdReceiptId && (
+                        <TooltipProvider delayDuration={150}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Verstuurd naar boekhouding{v.moneybirdSyncedAt ? ` op ${new Date(v.moneybirdSyncedAt).toLocaleDateString("nl-NL")}` : ""}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
                   </td>
                   <td className="px-3 py-2.5 text-right">
                     <button
