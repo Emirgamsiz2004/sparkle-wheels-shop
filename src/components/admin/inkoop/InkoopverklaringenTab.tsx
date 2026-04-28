@@ -17,13 +17,14 @@ import { formatEuro } from "@/types/vehicle";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
 
 export default function InkoopverklaringenTab() {
-  const { verklaringen, loading, linkToVehicle, refetch } = useInkoopverklaringen();
+  const { verklaringen, loading, linkToVehicle, sendToMoneybird, refetch } = useInkoopverklaringen();
   const { vehicles } = useVehicles();
   const [search, setSearch] = useState("");
   const [wizardOpen, setWizardOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selected, setSelected] = useState<Inkoopverklaring | null>(null);
   const [linkVehicleId, setLinkVehicleId] = useState("");
+  const [sendingMb, setSendingMb] = useState(false);
   const isMobile = useIsMobile();
 
   const filtered = verklaringen.filter(v => {
