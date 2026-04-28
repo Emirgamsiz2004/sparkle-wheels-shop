@@ -159,6 +159,25 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
     if (result) {
       setSavedId(result.id);
       toast.success("Inkoopverklaring opgeslagen");
+      // Automatisch doorsturen naar Moneybird boekhouding
+      sendToMoneybird({
+        id: result.id,
+        documentNaam: docNaam,
+        verkoperNaam: verkoper.naam,
+        verkoperTelefoon: verkoper.telefoon,
+        verkoperAdres: verkoper.adres,
+        verkoperWoonplaats: verkoper.woonplaats,
+        kenteken: kenteken || undefined,
+        merk: voertuig.merk,
+        model: voertuig.model,
+        inkoopprijs: Number(transactie.inkoopprijs),
+        datum: transactie.datum,
+        pdfPath: filePath,
+        legitimatieType: legType,
+        legitimatieNummer: legNummer,
+        status: "ondertekend",
+        createdAt: new Date().toISOString(),
+      } as any);
     }
 
     setSaving(false);
