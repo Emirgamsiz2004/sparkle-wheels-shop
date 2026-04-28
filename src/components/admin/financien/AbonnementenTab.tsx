@@ -78,13 +78,39 @@ const AbonnementenTab = () => {
           <p className="text-xs text-muted-foreground">Totaal per jaar</p>
           <p className="text-2xl font-bold text-foreground tabular-nums">{formatEuro(totaalPerJaar)}</p>
         </div>
-        <button
-          onClick={() => { setEditing(null); setOpen(true); }}
-          className="inline-flex items-center gap-1.5 h-9 px-3 bg-primary text-primary-foreground rounded-md text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" />
-          Nieuw abonnement
-        </button>
+        {isMobile ? (
+          <button
+            onClick={() => { setEditing(null); setNewSheetOpen(true); }}
+            className="inline-flex items-center gap-1.5 h-9 px-3 bg-primary text-primary-foreground rounded-md text-sm font-medium"
+          >
+            <Plus className="w-4 h-4" />
+            Nieuw abonnement
+          </button>
+        ) : (
+          <Popover open={newOpen} onOpenChange={setNewOpen}>
+            <PopoverTrigger asChild>
+              <button
+                onClick={() => setEditing(null)}
+                className="inline-flex items-center gap-1.5 h-9 px-3 bg-primary text-primary-foreground rounded-md text-sm font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Nieuw abonnement
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              sideOffset={8}
+              className="w-[380px] p-4 bg-card border border-white/10 rounded-[16px] shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+            >
+              <div className="text-sm font-semibold text-foreground mb-3">Nieuw abonnement</div>
+              <AbonnementForm
+                initial={null}
+                onSubmit={async (d) => { await create(d); setNewOpen(false); }}
+                onCancel={() => setNewOpen(false)}
+              />
+            </PopoverContent>
+          </Popover>
+        )}
       </div>
 
       {ontbreekt.length > 0 && (
