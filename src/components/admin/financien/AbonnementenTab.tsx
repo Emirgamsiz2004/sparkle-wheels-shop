@@ -195,8 +195,8 @@ const AbonnementenTab = () => {
         </div>
       )}
 
-      {/* Sheet */}
-      <Sheet open={open} onOpenChange={setOpen}>
+      {/* Edit (altijd Sheet) + Mobiel "Nieuw" (bottom sheet) */}
+      <Sheet open={editOpen || newSheetOpen} onOpenChange={(v) => { if (!v) { setEditOpen(false); setNewSheetOpen(false); } }}>
         <SheetContent
           side={isMobile ? "bottom" : "right"}
           className={cn("overflow-y-auto", isMobile ? "h-[90vh] rounded-t-[16px]" : "w-full sm:max-w-md")}
@@ -209,8 +209,10 @@ const AbonnementenTab = () => {
             onSubmit={async (d) => {
               if (editing) await update(editing.id, d);
               else await create(d);
-              setOpen(false);
+              setEditOpen(false);
+              setNewSheetOpen(false);
             }}
+            onCancel={() => { setEditOpen(false); setNewSheetOpen(false); }}
           />
         </SheetContent>
       </Sheet>
