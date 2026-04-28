@@ -139,6 +139,7 @@ const AdminFinancieelPage = () => {
           {renderSubtabs(kostenSubtabs, kostenSection, setKostenSection)}
           {kostenSection === "kosten" && <KostenTab />}
           {kostenSection === "abonnementen" && <AbonnementenTab />}
+          {kostenSection === "moneybird_kosten" && <MoneybirdKostenSection vehicles={vehicles} />}
         </div>
       )}
     </div>
