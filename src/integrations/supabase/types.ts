@@ -1179,6 +1179,8 @@ export type Database = {
           legitimatie_type: string
           merk: string
           model: string
+          moneybird_receipt_id: string | null
+          moneybird_synced_at: string | null
           pdf_path: string | null
           status: string
           user_id: string | null
@@ -1204,6 +1206,8 @@ export type Database = {
           legitimatie_type: string
           merk: string
           model: string
+          moneybird_receipt_id?: string | null
+          moneybird_synced_at?: string | null
           pdf_path?: string | null
           status?: string
           user_id?: string | null
@@ -1229,6 +1233,8 @@ export type Database = {
           legitimatie_type?: string
           merk?: string
           model?: string
+          moneybird_receipt_id?: string | null
+          moneybird_synced_at?: string | null
           pdf_path?: string | null
           status?: string
           user_id?: string | null
