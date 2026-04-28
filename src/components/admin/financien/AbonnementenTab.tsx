@@ -221,8 +221,8 @@ const AbonnementenTab = () => {
 };
 
 const AbonnementForm = ({
-  initial, onSubmit,
-}: { initial: Kost | null; onSubmit: (d: Partial<Kost>) => Promise<void> }) => {
+  initial, onSubmit, onCancel,
+}: { initial: Kost | null; onSubmit: (d: Partial<Kost>) => Promise<void>; onCancel?: () => void }) => {
   const [naam, setNaam] = useState(initial?.naam || "");
   const [leverancier, setLeverancier] = useState(initial?.leverancier || "");
   const [bedrag, setBedrag] = useState(initial ? String(initial.bedrag) : "");
