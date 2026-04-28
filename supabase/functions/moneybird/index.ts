@@ -687,6 +687,89 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── Inkoopverklaring als bon (receipt) naar Moneybird sturen ───
+      case "send_inkoopverklaring_to_moneybird": {
+        const {
+          inkoopverklaring_id,
+          pdf_path,
+          document_naam,
+          verkoper_naam,
+          merk,
+          model,
+          kenteken,
+          inkoopprijs,
+          datum,
+        } = params;
+
+        if (!inkoopverklaring_id) throw new Error("inkoopverklaring_id is required");
+        if (!pdf_path) throw new Error("pdf_path is required");
+
+        // 1. PDF ophalen uit storage met service role
+        const sbAdmin = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        const { data: pdfBlob, error: dlErr } = await sbAdmin.storage
+          .from("vehicle-documents")
+          .download(pdf_path);
+        if (dlErr || !pdfBlob) throw new Error(`PDF download mislukt: ${dlErr?.message || "geen blob"}`);
+        const pdfBytes = new Uint8Array(await pdfBlob.arrayBuffer());
+
+        // 2. Receipt aanmaken in Moneybird met attachment via multipart
+        const token = Deno.env.get("MONEYBIRD_API_TOKEN");
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        if (!token || !adminId) throw new Error("Moneybird credentials missing");
+
+        const reference = `IKV-${kenteken || inkoopverklaring_id.slice(0, 8)}`;
+        const description = `Inkoop ${merk || ""} ${model || ""}${kenteken ? ` (${kenteken})` : ""} — ${verkoper_naam || ""}`.trim();
+
+        const formData = new FormData();
+        formData.append("receipt[reference]", reference);
+        formData.append("receipt[date]", (datum || new Date().toISOString().slice(0, 10)));
+        formData.append("receipt[description]", description);
+        formData.append("receipt[prices_are_incl_tax]", "true");
+        formData.append("receipt[currency]", "EUR");
+        formData.append(
+          "receipt[details_attributes][0][description]",
+          description || (document_naam || "Inkoopverklaring"),
+        );
+        formData.append("receipt[details_attributes][0][price]", String(inkoopprijs ?? 0));
+        formData.append("receipt[details_attributes][0][amount]", "1");
+        formData.append(
+          "receipt[attachment]",
+          new Blob([pdfBytes], { type: "application/pdf" }),
+          `${document_naam || "inkoopverklaring"}.pdf`,
+        );
+
+        const mbRes = await fetch(`${MB_BASE}/${adminId}/documents/receipts.json`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+
+        if (!mbRes.ok) {
+          const errText = await mbRes.text();
+          throw new Error(`Moneybird receipt aanmaken mislukt [${mbRes.status}]: ${errText}`);
+        }
+        const receipt = await mbRes.json();
+
+        // 3. ID opslaan in DB
+        await sbAdmin
+          .from("inkoopverklaringen")
+          .update({
+            moneybird_receipt_id: String(receipt.id),
+            moneybird_synced_at: new Date().toISOString(),
+          })
+          .eq("id", inkoopverklaring_id);
+
+        result = {
+          success: true,
+          receipt_id: receipt.id,
+          moneybird_url: `https://moneybird.com/${adminId}/documents/${receipt.id}`,
+        };
+        break;
+      }
+
       default:
         return new Response(
           JSON.stringify({ error: `Onbekende actie: ${action}` }),
