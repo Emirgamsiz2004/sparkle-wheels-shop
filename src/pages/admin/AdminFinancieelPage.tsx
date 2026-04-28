@@ -68,6 +68,7 @@ const AdminFinancieelPage = () => {
   const kostenSubtabs: { key: KostenSection; label: string }[] = [
     { key: "kosten", label: "Kosten" },
     { key: "abonnementen", label: "Abonnementen" },
+    { key: "moneybird_kosten", label: "Moneybird Kosten" },
   ];
 
   const renderSubtabs = (items: { key: string; label: string }[], active: string, setActive: (k: any) => void) => (
