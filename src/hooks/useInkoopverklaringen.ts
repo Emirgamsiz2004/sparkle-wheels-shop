@@ -25,6 +25,8 @@ export interface Inkoopverklaring {
   status: string;
   vehicleId?: string;
   userId?: string;
+  moneybirdReceiptId?: string;
+  moneybirdSyncedAt?: string;
   createdAt: string;
 }
 
