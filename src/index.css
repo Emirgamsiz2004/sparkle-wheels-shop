@@ -267,6 +267,110 @@ input[type="number"] {
     font-family: 'Poppins', sans-serif !important;
     font-weight: 600;
   }
+
+  /* ============================================================
+     UNIFIED ADMIN TABLES — match Voertuigen-tabel look everywhere
+     ============================================================ */
+  .admin-theme table {
+    width: 100%;
+    font-size: 0.875rem; /* text-sm */
+    border-collapse: collapse;
+  }
+  .admin-theme thead tr {
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .admin-theme thead th {
+    text-align: left;
+    padding: 0.5rem 0.75rem; /* py-2 px-3 */
+    font-size: 11px;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
+    background: transparent;
+  }
+  .admin-theme tbody tr {
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .admin-theme tbody tr:hover {
+    background-color: hsl(var(--muted) / 0.7);
+  }
+  .admin-theme tbody tr:last-child {
+    border-bottom: none;
+  }
+  .admin-theme tbody td {
+    padding: 0.625rem 0.75rem; /* py-2.5 px-3 */
+    color: hsl(var(--foreground));
+    vertical-align: middle;
+  }
+  /* Numeric/right-aligned cells stay tabular */
+  .admin-theme td.text-right,
+  .admin-theme th.text-right {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============================================================
+     UNIFIED POPOVERS / DIALOGS / SHEETS — Planning popover style
+     ============================================================ */
+  /* Dialog content (shadcn DialogContent / AlertDialogContent) */
+  body:has(.admin-theme) [data-radix-portal] [role="dialog"],
+  body:has(.admin-theme) [data-radix-portal] [role="alertdialog"] {
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+    background: hsl(0 0% 8%) !important;
+  }
+  /* Popover / dropdown / select / menu content */
+  body:has(.admin-theme) [data-radix-popper-content-wrapper] > * {
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+    background: hsl(0 0% 8%) !important;
+  }
+  /* Select & menu items keep tighter radius for crisp rows */
+  body:has(.admin-theme) [data-radix-select-item],
+  body:has(.admin-theme) [data-radix-menu-item],
+  body:has(.admin-theme) [role="menuitem"],
+  body:has(.admin-theme) [role="option"] {
+    border-radius: 8px !important;
+  }
+  /* Sheet content (vaul / shadcn Sheet) */
+  body:has(.admin-theme) [data-radix-portal] [class*="SheetContent"],
+  body:has(.admin-theme) [data-radix-portal] [data-vaul-drawer],
+  body:has(.admin-theme) [vaul-drawer] {
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5) !important;
+    background: hsl(0 0% 8%) !important;
+  }
+  /* Bottom sheets get rounded top corners only */
+  body:has(.admin-theme) [data-radix-portal] [class*="SheetContent"][data-side="bottom"],
+  body:has(.admin-theme) [vaul-drawer][data-vaul-drawer-direction="bottom"] {
+    border-radius: 20px 20px 0 0 !important;
+  }
+  /* Smooth fluid animations across all overlays */
+  body:has(.admin-theme) [data-radix-portal] [data-state="open"][role="dialog"],
+  body:has(.admin-theme) [data-radix-portal] [data-state="open"][role="alertdialog"],
+  body:has(.admin-theme) [data-radix-popper-content-wrapper] [data-state="open"],
+  body:has(.admin-theme) [data-radix-portal] [data-state="open"][class*="SheetContent"] {
+    animation-duration: 0.22s !important;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  body:has(.admin-theme) [data-radix-portal] [data-state="closed"][role="dialog"],
+  body:has(.admin-theme) [data-radix-portal] [data-state="closed"][role="alertdialog"],
+  body:has(.admin-theme) [data-radix-popper-content-wrapper] [data-state="closed"],
+  body:has(.admin-theme) [data-radix-portal] [data-state="closed"][class*="SheetContent"] {
+    animation-duration: 0.16s !important;
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1) !important;
+  }
+  /* Overlay (backdrop) — softer, smoother */
+  body:has(.admin-theme) [data-radix-portal] [class*="DialogOverlay"],
+  body:has(.admin-theme) [data-radix-portal] [class*="AlertDialogOverlay"],
+  body:has(.admin-theme) [data-radix-portal] [class*="SheetOverlay"] {
+    background-color: rgba(0, 0, 0, 0.55) !important;
+    backdrop-filter: blur(2px);
+    animation-duration: 0.22s !important;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
 }
 
 @keyframes admin-fade-in {
