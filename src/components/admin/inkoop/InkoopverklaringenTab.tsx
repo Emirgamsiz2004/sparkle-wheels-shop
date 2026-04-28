@@ -152,14 +152,14 @@ export default function InkoopverklaringenTab() {
       {/* Wizard */}
       <InkoopverklaringWizard open={wizardOpen} onOpenChange={setWizardOpen} onComplete={refetch} />
 
-      {/* Detail Dialog */}
-      <Dialog open={detailOpen} onOpenChange={(v) => { setDetailOpen(v); if (!v) setSelected(null); }}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      {/* Detail Sheet */}
+      <Sheet open={detailOpen} onOpenChange={(v) => { setDetailOpen(v); if (!v) setSelected(null); }}>
+        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
           {selected && (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-base">{selected.documentNaam}</DialogTitle>
-              </DialogHeader>
+              <SheetHeader>
+                <SheetTitle className="text-base">{selected.documentNaam}</SheetTitle>
+              </SheetHeader>
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Badge className={cn("text-xs border", selected.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
