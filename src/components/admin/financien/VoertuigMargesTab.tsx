@@ -97,82 +97,101 @@ const VoertuigMargesTab = () => {
           <div className="py-12 text-center text-sm text-muted-foreground">Nog geen voertuigen.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-secondary/40 text-muted-foreground text-[11px] uppercase tracking-wide">
+            <table className="w-full text-sm border-separate" style={{ borderSpacing: 0 }}>
+              <thead className="bg-secondary/60 text-muted-foreground text-[11px] uppercase tracking-wider">
                 <tr>
-                  <th className="text-left px-4 py-2 font-medium">Voertuig</th>
-                  <th className="text-left px-4 py-2 font-medium">Type</th>
-                  <th className="text-right px-4 py-2 font-medium">Inkoopprijs</th>
-                  <th className="text-right px-4 py-2 font-medium">Verkoopprijs</th>
-                  <th className="text-right px-4 py-2 font-medium">Bruto marge</th>
-                  <th className="text-right px-4 py-2 font-medium">Marge %</th>
-                  <th className="text-left px-4 py-2 font-medium">Status</th>
+                  <th className="text-left px-4 py-2.5 font-semibold border-b border-border">Voertuig</th>
+                  <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Type</th>
+                  <th className="text-right px-3 py-2.5 font-semibold border-b border-border">Inkoop</th>
+                  <th className="text-right px-3 py-2.5 font-semibold border-b border-border">Verkoop</th>
+                  <th className="text-right px-3 py-2.5 font-semibold border-b border-border">Bruto marge</th>
+                  <th className="text-right px-3 py-2.5 font-semibold border-b border-border">Marge %</th>
+                  <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {enriched.map((e) => {
+                {enriched.map((e, idx) => {
                   const ingekocht = e.v.inkoopDatum ? new Date(e.v.inkoopDatum).toLocaleDateString("nl-NL") : "—";
                   const verkochtDatum = e.v.verkoopDatum ? new Date(e.v.verkoopDatum).toLocaleDateString("nl-NL") : null;
                   const tooltip = verkochtDatum
                     ? `Ingekocht: ${ingekocht} | Verkocht: ${verkochtDatum}`
                     : `Ingekocht: ${ingekocht}`;
+
+                  const accent =
+                    e.brutoMarge === null
+                      ? "border-l-transparent"
+                      : e.brutoMarge >= 0
+                      ? "border-l-emerald-500"
+                      : "border-l-red-500";
+
+                  const margeColor =
+                    e.brutoMarge === null
+                      ? "text-muted-foreground"
+                      : e.brutoMarge >= 0
+                      ? "text-emerald-400"
+                      : "text-red-400";
+
+                  const margePercPill =
+                    e.margePerc === null
+                      ? "bg-secondary/60 text-muted-foreground border-border"
+                      : e.margePerc >= 20
+                      ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                      : e.margePerc >= 0
+                      ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                      : "bg-red-500/15 text-red-300 border-red-500/30";
+
+                  const zebra = idx % 2 === 1 ? "bg-card/40" : "";
+
                   return (
                     <tr
                       key={e.v.id}
                       title={tooltip}
-                      className="border-t border-border hover:bg-accent/30 transition-colors"
+                      className={`hover:bg-accent/40 transition-colors ${zebra}`}
                     >
-                      <td className="px-4 py-2.5">
+                      <td className={`px-4 py-3 border-b border-border/40 border-l-[3px] ${accent}`}>
                         <div className="text-[14px] font-semibold text-foreground leading-tight">
                           {e.v.merk} {e.v.model}
                         </div>
-                        <div className="text-[12px] text-muted-foreground tabular-nums leading-tight">
+                        <div className="text-[11px] text-muted-foreground tabular-nums leading-tight mt-0.5 uppercase font-mono">
                           {e.v.kenteken || "—"}
                         </div>
                       </td>
-                      <td className="px-4 py-2.5">
-                        <span className={`px-2 py-0.5 rounded-md text-[11px] border ${
+                      <td className="px-3 py-3 border-b border-border/40">
+                        <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium border ${
                           e.isConsignatie
-                            ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
-                            : "bg-secondary text-muted-foreground border-border"
+                            ? "bg-blue-500/15 text-blue-300 border-blue-500/30"
+                            : "bg-violet-500/10 text-violet-300 border-violet-500/25"
                         }`}>
                           {e.isConsignatie ? "Consignatie" : "Eigen"}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-right text-foreground tabular-nums text-[12px]">
+                      <td className="px-3 py-3 text-right tabular-nums text-[13px] text-foreground/90 border-b border-border/40">
                         {e.isConsignatie ? (
-                          <span className="text-muted-foreground italic">Consignatie</span>
+                          <span className="text-muted-foreground italic text-[12px]">n.v.t.</span>
                         ) : e.inkoopprijs > 0 ? (
                           formatEuro(e.inkoopprijs)
                         ) : (
-                          "—"
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 text-right text-foreground tabular-nums text-[12px]">
-                        {e.verkocht ? formatEuro(e.verkoopprijs) : "—"}
+                      <td className="px-3 py-3 text-right tabular-nums text-[13px] text-foreground/90 border-b border-border/40">
+                        {e.verkocht ? formatEuro(e.verkoopprijs) : <span className="text-muted-foreground">—</span>}
                       </td>
-                      <td className={`px-4 py-2.5 text-right tabular-nums font-medium text-[13px] ${
-                        e.brutoMarge === null
-                          ? "text-muted-foreground"
-                          : e.brutoMarge >= 0
-                          ? "text-emerald-500"
-                          : "text-red-400"
-                      }`}>
-                        {e.brutoMarge === null ? "—" : formatEuro(e.brutoMarge)}
+                      <td className={`px-3 py-3 text-right tabular-nums font-semibold text-[14px] border-b border-border/40 ${margeColor}`}>
+                        {e.brutoMarge === null ? <span className="text-muted-foreground font-normal">—</span> : formatEuro(e.brutoMarge)}
                       </td>
-                      <td className={`px-4 py-2.5 text-right tabular-nums text-[12px] ${
-                        e.margePerc === null
-                          ? "text-muted-foreground"
-                          : e.margePerc >= 0
-                          ? "text-emerald-500"
-                          : "text-red-400"
-                      }`}>
-                        {e.margePerc === null ? "—" : `${e.margePerc.toFixed(1)}%`}
+                      <td className="px-3 py-3 text-right border-b border-border/40">
+                        <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold tabular-nums border ${margePercPill}`}>
+                          {e.margePerc === null ? "—" : `${e.margePerc.toFixed(1)}%`}
+                        </span>
                       </td>
-                      <td className="px-4 py-2.5">
-                        <span className={`px-2 py-0.5 rounded-md text-[11px] ${
-                          e.verkocht ? "bg-emerald-500/15 text-emerald-400" : "bg-secondary text-muted-foreground"
+                      <td className="px-3 py-3 border-b border-border/40">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium border ${
+                          e.verkocht
+                            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                            : "bg-secondary/60 text-muted-foreground border-border"
                         }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${e.verkocht ? "bg-emerald-400" : "bg-muted-foreground/50"}`} />
                           {e.verkocht ? "Verkocht" : "In voorraad"}
                         </span>
                       </td>
