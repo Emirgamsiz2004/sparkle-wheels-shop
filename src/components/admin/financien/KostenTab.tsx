@@ -100,42 +100,55 @@ const KostenTab = () => {
             </button>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-secondary/40 text-muted-foreground text-xs uppercase tracking-wide">
+          <table className="w-full text-sm border-separate" style={{ borderSpacing: 0 }}>
+            <thead className="bg-secondary/60 text-muted-foreground text-[11px] uppercase tracking-wider">
               <tr>
-                <th className="text-left px-4 py-2.5 font-medium">Naam</th>
-                <th className="text-left px-4 py-2.5 font-medium">Categorie</th>
-                <th className="text-left px-4 py-2.5 font-medium">Leverancier</th>
-                <th className="text-right px-4 py-2.5 font-medium">Bedrag</th>
-                <th className="text-left px-4 py-2.5 font-medium">Frequentie</th>
-                <th className="text-left px-4 py-2.5 font-medium">Datum</th>
-                <th className="px-2 w-10" />
+                <th className="text-left px-4 py-2.5 font-semibold border-b border-border">Naam</th>
+                <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Categorie</th>
+                <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Leverancier</th>
+                <th className="text-right px-3 py-2.5 font-semibold border-b border-border">Bedrag</th>
+                <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Frequentie</th>
+                <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Datum</th>
+                <th className="px-2 w-10 border-b border-border" />
               </tr>
             </thead>
             <tbody>
-              {filtered.map((k) => (
-                <tr
-                  key={k.id}
-                  onClick={() => openEdit(k)}
-                  className="border-t border-border hover:bg-accent/30 cursor-pointer transition-colors"
-                >
-                  <td className="px-4 py-2.5 text-foreground">{k.naam}</td>
-                  <td className="px-4 py-2.5">
-                    <span className="px-2 py-0.5 rounded-md bg-secondary text-xs text-foreground">
-                      {kostCategorieLabels[k.categorie]}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 text-muted-foreground">{k.leverancier || "—"}</td>
-                  <td className="px-4 py-2.5 text-right text-foreground tabular-nums">{formatEuro(Number(k.bedrag))}</td>
-                  <td className="px-4 py-2.5 text-muted-foreground">{kostFrequentieLabels[k.frequentie]}</td>
-                  <td className="px-4 py-2.5 text-muted-foreground tabular-nums">
-                    {new Date(k.datum).toLocaleDateString("nl-NL")}
-                  </td>
-                  <td className="px-2 text-right">
-                    <Pencil className="w-3.5 h-3.5 text-muted-foreground inline-block" />
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((k, idx) => {
+                const catColor = getCategorieColor(k.categorie);
+                const freqColor = getFrequentieColor(k.frequentie);
+                const zebra = idx % 2 === 1 ? "bg-card/40" : "";
+                return (
+                  <tr
+                    key={k.id}
+                    onClick={() => openEdit(k)}
+                    className={`hover:bg-accent/40 cursor-pointer transition-colors ${zebra}`}
+                  >
+                    <td className={`px-4 py-3 text-foreground font-medium border-b border-border/40 border-l-[3px] ${catColor.bar}`}>
+                      {k.naam}
+                    </td>
+                    <td className="px-3 py-3 border-b border-border/40">
+                      <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium border ${catColor.pill}`}>
+                        {kostCategorieLabels[k.categorie]}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground text-[13px] border-b border-border/40">{k.leverancier || "—"}</td>
+                    <td className="px-3 py-3 text-right text-foreground font-semibold tabular-nums text-[14px] border-b border-border/40">
+                      {formatEuro(Number(k.bedrag))}
+                    </td>
+                    <td className="px-3 py-3 border-b border-border/40">
+                      <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium border ${freqColor}`}>
+                        {kostFrequentieLabels[k.frequentie]}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground tabular-nums text-[12px] border-b border-border/40">
+                      {new Date(k.datum).toLocaleDateString("nl-NL")}
+                    </td>
+                    <td className="px-2 text-right border-b border-border/40">
+                      <Pencil className="w-3.5 h-3.5 text-muted-foreground inline-block" />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
