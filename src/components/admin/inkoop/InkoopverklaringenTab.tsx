@@ -220,6 +220,40 @@ export default function InkoopverklaringenTab() {
                     <Download className="w-4 h-4" /> PDF downloaden
                   </Button>
 
+                  {selected.moneybirdReceiptId ? (
+                    <div className="flex items-center justify-center gap-2 text-xs text-emerald-400 py-1.5 px-3 rounded-md border border-emerald-500/30 bg-emerald-500/10">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Verzonden naar boekhouding
+                      {selected.moneybirdSyncedAt && (
+                        <span className="text-muted-foreground">
+                          · {new Date(selected.moneybirdSyncedAt).toLocaleDateString("nl-NL")}
+                        </span>
+                      )}
+                    </div>
+                  ) : null}
+
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      if (!selected) return;
+                      setSendingMb(true);
+                      const ok = await sendToMoneybird(selected);
+                      setSendingMb(false);
+                      if (ok) {
+                        setSelected({
+                          ...selected,
+                          moneybirdReceiptId: "synced",
+                          moneybirdSyncedAt: new Date().toISOString(),
+                        });
+                      }
+                    }}
+                    disabled={sendingMb || !selected.pdfPath}
+                    className="gap-2"
+                  >
+                    {sendingMb ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    {selected.moneybirdReceiptId ? "Opnieuw versturen naar boekhouding" : "Versturen naar boekhouding"}
+                  </Button>
+
                   {!selected.vehicleId && (
                     <div className="space-y-2">
                       <VehicleSearchSelect
