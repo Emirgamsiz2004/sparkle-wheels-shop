@@ -14,6 +14,7 @@ import FinancienOverzichtTab from "@/components/admin/financien/FinancienOverzic
 import KostenTab from "@/components/admin/financien/KostenTab";
 import AbonnementenTab from "@/components/admin/financien/AbonnementenTab";
 import VoertuigMargesTab from "@/components/admin/financien/VoertuigMargesTab";
+import MoneybirdKostenTab from "@/components/admin/financien/MoneybirdKostenTab";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { DateRangePicker } from "@/components/admin/DateRangePicker";
