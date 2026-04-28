@@ -272,13 +272,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   );
 };
 
-const KpiCard = ({ label, value, color, editable, rawValue, onSave }: {
+const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1 }: {
   label: string;
   value: string;
   color?: string;
   editable?: boolean;
   rawValue?: number;
   onSave?: (val: number) => Promise<void>;
+  minValue?: number;
 }) => {
   const [editing, setEditing] = useState(false);
   const [editVal, setEditVal] = useState("");
@@ -299,8 +300,8 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave }: {
     const cleaned = editVal.trim().replace(",", ".");
     if (cleaned === "") return cancel();
     const num = Number(cleaned);
-    if (isNaN(num) || num < 1) {
-      toast.error("Voer een geldig bedrag in (minimaal € 1,00)");
+    if (isNaN(num) || num < minValue) {
+      toast.error(`Voer een geldig bedrag in (minimaal € ${minValue.toFixed(2).replace(".", ",")})`);
       return;
     }
     setSaving(true);
