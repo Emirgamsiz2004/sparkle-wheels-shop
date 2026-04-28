@@ -4,7 +4,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import VehicleSearchSelect from "@/components/admin/VehicleSearchSelect";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -90,7 +90,7 @@ export default function InkoopverklaringenTab() {
       ) : isMobile ? (
         <div className="space-y-2">
           {filtered.map(v => (
-            <div key={v.id} onClick={() => handleDownload(v)} className="bg-card border border-border rounded-xl p-3.5 cursor-pointer active:bg-secondary/30 transition-all">
+            <div key={v.id} onClick={() => openDetail(v)} className="bg-card border border-border rounded-xl p-3.5 cursor-pointer active:bg-secondary/30 transition-all">
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div className="min-w-0">
                   <p className="font-semibold text-sm truncate">{v.merk} {v.model}</p>
@@ -123,7 +123,7 @@ export default function InkoopverklaringenTab() {
             </thead>
             <tbody>
               {filtered.map(v => (
-                <tr key={v.id} onClick={() => handleDownload(v)} className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer group">
+                <tr key={v.id} onClick={() => openDetail(v)} className="border-b border-border/50 hover:bg-muted/70 transition-colors cursor-pointer group">
                   <td className="px-3 py-2.5 text-foreground font-medium">{v.merk} {v.model}</td>
                   <td className="px-3 py-2.5 text-muted-foreground text-[11px] font-mono uppercase">{v.kenteken || "—"}</td>
                   <td className="px-3 py-2.5 text-muted-foreground text-xs">{v.verkoperNaam}</td>
@@ -136,10 +136,10 @@ export default function InkoopverklaringenTab() {
                   </td>
                   <td className="px-3 py-2.5 text-right">
                     <button
-                      onClick={(e) => { e.stopPropagation(); openDetail(v); }}
+                      onClick={(e) => { e.stopPropagation(); handleDownload(v); }}
                       className="text-[11px] text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
                     >
-                      Details
+                      PDF
                     </button>
                   </td>
                 </tr>
@@ -152,14 +152,14 @@ export default function InkoopverklaringenTab() {
       {/* Wizard */}
       <InkoopverklaringWizard open={wizardOpen} onOpenChange={setWizardOpen} onComplete={refetch} />
 
-      {/* Detail Dialog */}
-      <Dialog open={detailOpen} onOpenChange={(v) => { setDetailOpen(v); if (!v) setSelected(null); }}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      {/* Detail Sheet */}
+      <Sheet open={detailOpen} onOpenChange={(v) => { setDetailOpen(v); if (!v) setSelected(null); }}>
+        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
           {selected && (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-base">{selected.documentNaam}</DialogTitle>
-              </DialogHeader>
+              <SheetHeader>
+                <SheetTitle className="text-base">{selected.documentNaam}</SheetTitle>
+              </SheetHeader>
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Badge className={cn("text-xs border", selected.status === "ondertekend" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-orange-500/15 text-orange-400 border-orange-500/30")}>
@@ -276,8 +276,8 @@ export default function InkoopverklaringenTab() {
               </div>
             </>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
