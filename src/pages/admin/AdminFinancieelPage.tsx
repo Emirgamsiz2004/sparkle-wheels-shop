@@ -14,6 +14,7 @@ import FinancienOverzichtTab from "@/components/admin/financien/FinancienOverzic
 import KostenTab from "@/components/admin/financien/KostenTab";
 import AbonnementenTab from "@/components/admin/financien/AbonnementenTab";
 import VoertuigMargesTab from "@/components/admin/financien/VoertuigMargesTab";
+import MoneybirdKostenTab from "@/components/admin/financien/MoneybirdKostenTab";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GoogleDriveIcon from "@/components/admin/GoogleDriveIcon";
 import { DateRangePicker } from "@/components/admin/DateRangePicker";
@@ -24,7 +25,7 @@ import { toast } from "sonner";
 type MainTab = "dashboard" | "verkoop" | "btw" | "kosten";
 type VerkoopSection = "winst" | "marges";
 type BtwSection = "aangifte" | "moneybird";
-type KostenSection = "kosten" | "abonnementen";
+type KostenSection = "kosten" | "abonnementen" | "moneybird_kosten";
 
 const quarters = [
   { q: 1, label: "Q1 — Jan t/m Mrt", deadline: "30 april", months: [0, 1, 2] },
@@ -68,6 +69,7 @@ const AdminFinancieelPage = () => {
   const kostenSubtabs: { key: KostenSection; label: string }[] = [
     { key: "kosten", label: "Kosten" },
     { key: "abonnementen", label: "Abonnementen" },
+    { key: "moneybird_kosten", label: "Moneybird Kosten" },
   ];
 
   const renderSubtabs = (items: { key: string; label: string }[], active: string, setActive: (k: any) => void) => (
@@ -138,11 +140,36 @@ const AdminFinancieelPage = () => {
           {renderSubtabs(kostenSubtabs, kostenSection, setKostenSection)}
           {kostenSection === "kosten" && <KostenTab />}
           {kostenSection === "abonnementen" && <AbonnementenTab />}
+          {kostenSection === "moneybird_kosten" && <MoneybirdKostenSection vehicles={vehicles} />}
         </div>
       )}
     </div>
   );
 };
+
+/* ──────────── MONEYBIRD KOSTEN SECTION (wrapper met periode) ──────────── */
+function MoneybirdKostenSection({ vehicles }: { vehicles: any[] }) {
+  const now = new Date();
+  const [periodType, setPeriodType] = useState<PeriodType>('jaar');
+  const [year, setYear] = useState(now.getFullYear());
+  const [quarter, setQuarter] = useState(Math.floor(now.getMonth() / 3) + 1);
+  const [month, setMonth] = useState(now.getMonth());
+  const [customFrom, setCustomFrom] = useState<Date | undefined>();
+  const [customTo, setCustomTo] = useState<Date | undefined>();
+  const availableYears = getAvailableYears(vehicles);
+
+  return (
+    <div className="space-y-4">
+      <PeriodSelector
+        periodType={periodType} setPeriodType={setPeriodType}
+        year={year} setYear={setYear} quarter={quarter} setQuarter={setQuarter}
+        month={month} setMonth={setMonth} customFrom={customFrom} setCustomFrom={setCustomFrom}
+        customTo={customTo} setCustomTo={setCustomTo} availableYears={availableYears}
+      />
+      <MoneybirdKostenTab period={{ periodType, year, quarter, month, customFrom, customTo }} />
+    </div>
+  );
+}
 
 /* ──────────── PERIOD TYPES ──────────── */
 
