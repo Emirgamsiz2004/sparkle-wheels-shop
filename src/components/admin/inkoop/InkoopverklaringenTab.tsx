@@ -90,7 +90,7 @@ export default function InkoopverklaringenTab() {
       ) : isMobile ? (
         <div className="space-y-2">
           {filtered.map(v => (
-            <div key={v.id} onClick={() => handleDownload(v)} className="bg-card border border-border rounded-xl p-3.5 cursor-pointer active:bg-secondary/30 transition-all">
+            <div key={v.id} onClick={() => openDetail(v)} className="bg-card border border-border rounded-xl p-3.5 cursor-pointer active:bg-secondary/30 transition-all">
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div className="min-w-0">
                   <p className="font-semibold text-sm truncate">{v.merk} {v.model}</p>
