@@ -188,20 +188,20 @@ const VoertuigMargesTab = () => {
   );
 };
 
-const SummaryCard = ({
-  icon: Icon, label, value, sub, accent,
-}: { icon: any; label: string; value: string; sub?: string; accent?: "positive" | "negative" }) => (
-  <div className="bg-card border border-border rounded-[16px] p-4">
-    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-      <Icon className="w-3.5 h-3.5" />
-      {label}
+const CompactCard = ({
+  icon: Icon, label, primary, sub, accent,
+}: { icon: any; label: string; primary: string; sub?: string; accent?: "positive" | "negative" }) => (
+  <div className="bg-card border border-border rounded-[16px] px-4 py-3">
+    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-1">
+      <Icon className="w-3 h-3" />
+      <span className="truncate">{label}</span>
     </div>
-    <div className={`text-xl font-bold tabular-nums ${
+    <div className={`text-[15px] font-semibold tabular-nums truncate ${
       accent === "positive" ? "text-emerald-500" : accent === "negative" ? "text-red-400" : "text-foreground"
     }`}>
-      {value}
+      {primary}
     </div>
-    {sub && <p className="text-[11px] text-muted-foreground mt-1 truncate">{sub}</p>}
+    {sub && <p className="text-[11px] text-muted-foreground mt-0.5 truncate tabular-nums">{sub}</p>}
   </div>
 );
 
