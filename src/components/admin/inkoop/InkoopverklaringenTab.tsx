@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import VehicleSearchSelect from "@/components/admin/VehicleSearchSelect";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Search, Plus, FileText, Download, Link2, Loader2 } from "lucide-react";
+import { Search, Plus, FileText, Download, Link2, Loader2, Send, CheckCircle2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -17,13 +17,14 @@ import { formatEuro } from "@/types/vehicle";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
 
 export default function InkoopverklaringenTab() {
-  const { verklaringen, loading, linkToVehicle, refetch } = useInkoopverklaringen();
+  const { verklaringen, loading, linkToVehicle, sendToMoneybird, refetch } = useInkoopverklaringen();
   const { vehicles } = useVehicles();
   const [search, setSearch] = useState("");
   const [wizardOpen, setWizardOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selected, setSelected] = useState<Inkoopverklaring | null>(null);
   const [linkVehicleId, setLinkVehicleId] = useState("");
+  const [sendingMb, setSendingMb] = useState(false);
   const isMobile = useIsMobile();
 
   const filtered = verklaringen.filter(v => {
@@ -217,6 +218,40 @@ export default function InkoopverklaringenTab() {
                 <div className="flex flex-col gap-2 pt-2">
                   <Button onClick={() => handleDownload(selected)} className="gap-2">
                     <Download className="w-4 h-4" /> PDF downloaden
+                  </Button>
+
+                  {selected.moneybirdReceiptId ? (
+                    <div className="flex items-center justify-center gap-2 text-xs text-emerald-400 py-1.5 px-3 rounded-md border border-emerald-500/30 bg-emerald-500/10">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Verzonden naar boekhouding
+                      {selected.moneybirdSyncedAt && (
+                        <span className="text-muted-foreground">
+                          · {new Date(selected.moneybirdSyncedAt).toLocaleDateString("nl-NL")}
+                        </span>
+                      )}
+                    </div>
+                  ) : null}
+
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      if (!selected) return;
+                      setSendingMb(true);
+                      const ok = await sendToMoneybird(selected);
+                      setSendingMb(false);
+                      if (ok) {
+                        setSelected({
+                          ...selected,
+                          moneybirdReceiptId: "synced",
+                          moneybirdSyncedAt: new Date().toISOString(),
+                        });
+                      }
+                    }}
+                    disabled={sendingMb || !selected.pdfPath}
+                    className="gap-2"
+                  >
+                    {sendingMb ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    {selected.moneybirdReceiptId ? "Opnieuw versturen naar boekhouding" : "Versturen naar boekhouding"}
                   </Button>
 
                   {!selected.vehicleId && (
