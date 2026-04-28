@@ -110,7 +110,13 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
       {/* KPI cards - Inkoop / Verkoop / Winst / Marge */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard label="Inkoop" value={formatEuroDecimal(vehicle.inkoopprijs || 0)} />
-        <KpiCard label="Verkoop" value={formatEuroDecimal(vehicle.verkoopprijs || 0)} />
+        <KpiCard
+          label="Verkoop"
+          value={formatEuroDecimal(vehicle.verkoopprijs || 0)}
+          editable
+          rawValue={vehicle.verkoopprijs || 0}
+          onSave={handleSaveVerkoopprijs}
+        />
         <KpiCard label="Winst" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(eenvoudigeMarge) : "—"} color={eenvoudigeMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
         <KpiCard label="Marge" value={vehicle.verkoopprijs > 0 ? `${eenvoudigeMargePerc.toFixed(1)}%` : "—"} color={eenvoudigeMargePerc >= 0 ? "text-emerald-500" : "text-red-500"} />
       </div>
