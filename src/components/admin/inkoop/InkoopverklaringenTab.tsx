@@ -276,8 +276,8 @@ export default function InkoopverklaringenTab() {
               </div>
             </>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
