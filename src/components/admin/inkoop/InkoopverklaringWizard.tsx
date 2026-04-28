@@ -36,7 +36,7 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [rdwLoading, setRdwLoading] = useState(false);
-  const { addVerklaring } = useInkoopverklaringen();
+  const { addVerklaring, sendToMoneybird } = useInkoopverklaringen();
   const { vehicles } = useVehicles();
   const [linkVehicleId, setLinkVehicleId] = useState<string>("");
 
