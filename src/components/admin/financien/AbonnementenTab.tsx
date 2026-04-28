@@ -177,7 +177,7 @@ const AbonnementenTab = () => {
                 </button>
                 <div className="flex gap-1">
                   <button
-                    onClick={() => { setEditing(k); setOpen(true); }}
+                    onClick={() => { setEditing(k); setEditOpen(true); }}
                     className="p-1.5 hover:bg-accent rounded-md text-muted-foreground"
                   >
                     <Pencil className="w-3.5 h-3.5" />
