@@ -246,7 +246,7 @@ const AbonnementForm = ({
           });
         } finally { setBusy(false); }
       }}
-      className="space-y-4 mt-4"
+      className="space-y-3 mt-3"
     >
       <label className="block">
         <span className="block text-xs text-muted-foreground mb-1">Naam *</span>
