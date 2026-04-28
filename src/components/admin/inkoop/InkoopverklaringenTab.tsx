@@ -247,27 +247,29 @@ export default function InkoopverklaringenTab() {
                     </div>
                   ) : null}
 
-                  <Button
-                    variant="outline"
-                    onClick={async () => {
-                      if (!selected) return;
-                      setSendingMb(true);
-                      const ok = await sendToMoneybird(selected);
-                      setSendingMb(false);
-                      if (ok) {
-                        setSelected({
-                          ...selected,
-                          moneybirdReceiptId: "synced",
-                          moneybirdSyncedAt: new Date().toISOString(),
-                        });
-                      }
-                    }}
-                    disabled={sendingMb || !selected.pdfPath}
-                    className="gap-2"
-                  >
-                    {sendingMb ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    {selected.moneybirdReceiptId ? "Opnieuw versturen naar boekhouding" : "Versturen naar boekhouding"}
-                  </Button>
+                  {!selected.moneybirdReceiptId && (
+                    <Button
+                      variant="outline"
+                      onClick={async () => {
+                        if (!selected) return;
+                        setSendingMb(true);
+                        const ok = await sendToMoneybird(selected);
+                        setSendingMb(false);
+                        if (ok) {
+                          setSelected({
+                            ...selected,
+                            moneybirdReceiptId: "synced",
+                            moneybirdSyncedAt: new Date().toISOString(),
+                          });
+                        }
+                      }}
+                      disabled={sendingMb || !selected.pdfPath}
+                      className="gap-2"
+                    >
+                      {sendingMb ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      Verstuur naar boekhouding
+                    </Button>
+                  )}
 
                   {!selected.vehicleId && (
                     <div className="space-y-2">
