@@ -128,5 +128,40 @@ export function useInkoopverklaringen() {
     await fetch();
   }, [fetch]);
 
-  return { verklaringen, loading, addVerklaring, linkToVehicle, refetch: fetch };
+  const sendToMoneybird = useCallback(async (v: Inkoopverklaring, opts?: { silent?: boolean }) => {
+    if (!v.pdfPath) {
+      if (!opts?.silent) toast.error("Geen PDF beschikbaar om te versturen");
+      return false;
+    }
+    try {
+      const { data, error } = await supabase.functions.invoke("moneybird", {
+        body: {
+          action: "send_inkoopverklaring_to_moneybird",
+          inkoopverklaring_id: v.id,
+          pdf_path: v.pdfPath,
+          document_naam: v.documentNaam,
+          verkoper_naam: v.verkoperNaam,
+          merk: v.merk,
+          model: v.model,
+          kenteken: v.kenteken,
+          inkoopprijs: v.inkoopprijs,
+          datum: v.datum,
+        },
+      });
+      if (error || (data as any)?.error) {
+        const msg = (data as any)?.error || error?.message || "Onbekende fout";
+        if (!opts?.silent) toast.error(`Verzenden naar boekhouding mislukt: ${msg}`);
+        console.error("Moneybird send error:", msg);
+        return false;
+      }
+      if (!opts?.silent) toast.success("Inkoopverklaring verzonden naar boekhouding");
+      await fetch();
+      return true;
+    } catch (e: any) {
+      if (!opts?.silent) toast.error(`Verzenden mislukt: ${e.message}`);
+      return false;
+    }
+  }, [fetch]);
+
+  return { verklaringen, loading, addVerklaring, linkToVehicle, sendToMoneybird, refetch: fetch };
 }
