@@ -70,7 +70,7 @@ const AdminFinancieelPage = () => {
     { key: "abonnementen", label: "Abonnementen" },
   ];
 
-  const renderSubtabs = <T extends string>(items: { key: T; label: string }[], active: T, setActive: (k: T) => void) => (
+  const renderSubtabs = (items: { key: string; label: string }[], active: string, setActive: (k: any) => void) => (
     <div className="inline-flex gap-0.5 bg-card border border-border rounded-lg p-0.5">
       {items.map(s => (
         <button
