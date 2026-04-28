@@ -69,6 +69,8 @@ export function useInkoopverklaringen() {
         status: r.status,
         vehicleId: r.vehicle_id,
         userId: r.user_id,
+        moneybirdReceiptId: r.moneybird_receipt_id,
+        moneybirdSyncedAt: r.moneybird_synced_at,
         createdAt: r.created_at,
       }))
     );
