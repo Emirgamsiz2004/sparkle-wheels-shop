@@ -79,10 +79,23 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   };
 
   const handleSaveVehicleInfo = async () => {
-    await onSave({ ...form, kosten: vehicle.kosten, opmerkingen: notes || undefined, marktplaatsUrl: marktplaatsUrl || undefined });
+    await onSave({
+      ...form,
+      // Verkoopprijs nooit overschrijven vanuit voertuiggegevens-edit
+      verkoopprijs: vehicle.verkoopprijs,
+      kosten: vehicle.kosten,
+      opmerkingen: notes || undefined,
+      marktplaatsUrl: marktplaatsUrl || undefined,
+    });
     onLogActivity("voertuig_bewerkt", "Voertuiggegevens bijgewerkt");
     setEditMode(false);
     toast.success("Opgeslagen");
+  };
+
+  const handleSaveVerkoopprijs = async (val: number) => {
+    await onSave({ ...vehicle, verkoopprijs: val });
+    onLogActivity("verkoopprijs_gewijzigd", `Verkoopprijs bijgewerkt naar ${formatEuroDecimal(val)}`);
+    toast.success("Verkoopprijs bijgewerkt");
   };
 
   const inputCls = "w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all";
