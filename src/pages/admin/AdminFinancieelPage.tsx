@@ -24,7 +24,7 @@ import { toast } from "sonner";
 type MainTab = "dashboard" | "verkoop" | "btw" | "kosten";
 type VerkoopSection = "winst" | "marges";
 type BtwSection = "aangifte" | "moneybird";
-type KostenSection = "kosten" | "abonnementen";
+type KostenSection = "kosten" | "abonnementen" | "moneybird_kosten";
 
 const quarters = [
   { q: 1, label: "Q1 — Jan t/m Mrt", deadline: "30 april", months: [0, 1, 2] },
