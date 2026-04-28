@@ -36,7 +36,10 @@ const quarters = [
 /* ──────────────────── MAIN ──────────────────── */
 
 const AdminFinancieelPage = () => {
-  const [tab, setTab] = useState<Tab>("overzicht");
+  const [tab, setTab] = useState<MainTab>("dashboard");
+  const [verkoopSection, setVerkoopSection] = useState<VerkoopSection>("winst");
+  const [btwSection, setBtwSection] = useState<BtwSection>("aangifte");
+  const [kostenSection, setKostenSection] = useState<KostenSection>("kosten");
   const { vehicles, loading } = useVehicles();
 
   if (loading) {
@@ -47,15 +50,43 @@ const AdminFinancieelPage = () => {
     );
   }
 
-  const tabs: { key: Tab; label: string; icon: typeof BarChart3 }[] = [
-    { key: "overzicht", label: "Verkoop & Winst", icon: BarChart3 },
-    { key: "btw", label: "BTW Aangifte", icon: Receipt },
-    { key: "moneybird", label: "Moneybird", icon: Link2 },
+  const tabs: { key: MainTab; label: string; icon: typeof BarChart3 }[] = [
     { key: "dashboard", label: "Overzicht", icon: LayoutDashboard },
+    { key: "verkoop", label: "Verkoop & Marges", icon: BarChart3 },
+    { key: "btw", label: "BTW & Boekhouding", icon: Receipt },
     { key: "kosten", label: "Kosten", icon: Wallet },
-    { key: "abonnementen", label: "Abonnementen", icon: Repeat },
-    { key: "marges", label: "Voertuigmarges", icon: Car },
   ];
+
+  const verkoopSubtabs: { key: VerkoopSection; label: string }[] = [
+    { key: "winst", label: "Verkoop & Winst" },
+    { key: "marges", label: "Voertuigmarges" },
+  ];
+  const btwSubtabs: { key: BtwSection; label: string }[] = [
+    { key: "aangifte", label: "BTW Aangifte" },
+    { key: "moneybird", label: "Moneybird" },
+  ];
+  const kostenSubtabs: { key: KostenSection; label: string }[] = [
+    { key: "kosten", label: "Kosten" },
+    { key: "abonnementen", label: "Abonnementen" },
+  ];
+
+  const renderSubtabs = <T extends string>(items: { key: T; label: string }[], active: T, setActive: (k: T) => void) => (
+    <div className="inline-flex gap-0.5 bg-card border border-border rounded-lg p-0.5">
+      {items.map(s => (
+        <button
+          key={s.key}
+          onClick={() => setActive(s.key)}
+          className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+            active === s.key
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+          }`}
+        >
+          {s.label}
+        </button>
+      ))}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -84,13 +115,31 @@ const AdminFinancieelPage = () => {
         ))}
       </div>
 
-      {tab === "overzicht" && <OverzichtTab vehicles={vehicles} />}
-      {tab === "btw" && <BtwTab vehicles={vehicles} />}
-      {tab === "moneybird" && <MoneybirdTab vehicles={vehicles} />}
       {tab === "dashboard" && <FinancienOverzichtTab />}
-      {tab === "kosten" && <KostenTab />}
-      {tab === "abonnementen" && <AbonnementenTab />}
-      {tab === "marges" && <VoertuigMargesTab />}
+
+      {tab === "verkoop" && (
+        <div className="space-y-4">
+          {renderSubtabs(verkoopSubtabs, verkoopSection, setVerkoopSection)}
+          {verkoopSection === "winst" && <OverzichtTab vehicles={vehicles} />}
+          {verkoopSection === "marges" && <VoertuigMargesTab />}
+        </div>
+      )}
+
+      {tab === "btw" && (
+        <div className="space-y-4">
+          {renderSubtabs(btwSubtabs, btwSection, setBtwSection)}
+          {btwSection === "aangifte" && <BtwTab vehicles={vehicles} />}
+          {btwSection === "moneybird" && <MoneybirdTab vehicles={vehicles} />}
+        </div>
+      )}
+
+      {tab === "kosten" && (
+        <div className="space-y-4">
+          {renderSubtabs(kostenSubtabs, kostenSection, setKostenSection)}
+          {kostenSection === "kosten" && <KostenTab />}
+          {kostenSection === "abonnementen" && <AbonnementenTab />}
+        </div>
+      )}
     </div>
   );
 };
