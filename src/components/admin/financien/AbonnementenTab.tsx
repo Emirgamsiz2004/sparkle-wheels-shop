@@ -37,7 +37,9 @@ const volgendeBetaaldatum = (k: Kost): Date => {
 const AbonnementenTab = () => {
   const { kosten, loading, create, update, remove } = useKosten();
   const isMobile = useIsMobile();
-  const [open, setOpen] = useState(false);
+  const [newOpen, setNewOpen] = useState(false);
+  const [newSheetOpen, setNewSheetOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [editing, setEditing] = useState<Kost | null>(null);
 
   const abos = useMemo(
