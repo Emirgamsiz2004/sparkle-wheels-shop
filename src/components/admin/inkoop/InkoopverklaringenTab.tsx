@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import VehicleSearchSelect from "@/components/admin/VehicleSearchSelect";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Search, Plus, FileText, Download, Link2, Loader2 } from "lucide-react";
+import { Search, Plus, FileText, Download, Link2, Loader2, Send, CheckCircle2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
