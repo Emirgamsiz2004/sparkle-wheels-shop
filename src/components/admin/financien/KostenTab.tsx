@@ -8,6 +8,37 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 
+// Categorie-kleuren — zichtbare kleurcodering per kostensoort
+const getCategorieColor = (cat: KostCategorie): { pill: string; bar: string } => {
+  switch (cat) {
+    case "vaste_kosten":
+      return { pill: "bg-blue-500/15 text-blue-300 border-blue-500/30", bar: "border-l-blue-500" };
+    case "advertentiekosten":
+      return { pill: "bg-pink-500/15 text-pink-300 border-pink-500/30", bar: "border-l-pink-500" };
+    case "abonnementen":
+      return { pill: "bg-violet-500/15 text-violet-300 border-violet-500/30", bar: "border-l-violet-500" };
+    case "personeelskosten":
+      return { pill: "bg-amber-500/15 text-amber-300 border-amber-500/30", bar: "border-l-amber-500" };
+    case "voertuigkosten":
+      return { pill: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", bar: "border-l-emerald-500" };
+    default:
+      return { pill: "bg-secondary/60 text-muted-foreground border-border", bar: "border-l-muted-foreground/40" };
+  }
+};
+
+const getFrequentieColor = (freq: KostFrequentie): string => {
+  switch (freq) {
+    case "eenmalig":
+      return "bg-secondary/60 text-muted-foreground border-border";
+    case "maandelijks":
+      return "bg-cyan-500/15 text-cyan-300 border-cyan-500/30";
+    case "kwartaal":
+      return "bg-indigo-500/15 text-indigo-300 border-indigo-500/30";
+    case "jaarlijks":
+      return "bg-orange-500/15 text-orange-300 border-orange-500/30";
+  }
+};
+
 const KostenTab = () => {
   const { kosten, loading, create, update, remove } = useKosten();
   const isMobile = useIsMobile();
