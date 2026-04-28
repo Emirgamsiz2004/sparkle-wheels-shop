@@ -169,7 +169,7 @@ export default function InkoopverklaringenTab() {
 
       {/* Detail Sheet */}
       <Sheet open={detailOpen} onOpenChange={(v) => { setDetailOpen(v); if (!v) setSelected(null); }}>
-        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+        <SheetContent side={isMobile ? "bottom" : "right"} className={cn("overflow-y-auto", isMobile ? "h-[90vh] rounded-t-2xl" : "w-full sm:max-w-lg")}>
           {selected && (
             <>
               <SheetHeader>
