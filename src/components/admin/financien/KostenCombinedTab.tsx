@@ -644,6 +644,29 @@ const KostenCombinedTab = () => {
 
 /* ───────── Sub components ───────── */
 
+const OverzichtCard = ({ title, amount, sub, loading, icon, accent }: {
+  title: string; amount: number; sub?: string; loading?: boolean;
+  icon?: React.ReactNode; accent?: "emerald" | "red" | "neutral";
+}) => (
+  <div className="bg-card border border-border rounded-[16px] p-5">
+    <div className="flex items-center justify-between mb-2">
+      <span className="text-xs uppercase tracking-wider text-muted-foreground">{title}</span>
+      {icon}
+    </div>
+    {loading ? (
+      <div className="h-8 w-40 bg-secondary/60 animate-pulse rounded" />
+    ) : (
+      <p className={cn(
+        "text-2xl md:text-3xl font-bold tabular-nums",
+        accent === "emerald" ? "text-emerald-400" : accent === "red" ? "text-red-400" : "text-foreground"
+      )}>
+        {formatEuroDecimal(amount)}
+      </p>
+    )}
+    {sub && <p className="text-[11px] text-muted-foreground mt-2">{sub}</p>}
+  </div>
+);
+
 const KpiCard = ({ label, value, sub, danger }: { label: string; value: string; sub?: string; danger?: boolean }) => (
   <div className="bg-card border border-border rounded-[16px] p-4">
     <p className="text-xs text-muted-foreground">{label}</p>
