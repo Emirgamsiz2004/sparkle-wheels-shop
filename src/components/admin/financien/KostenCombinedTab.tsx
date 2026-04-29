@@ -349,8 +349,8 @@ const KostenCombinedTab = () => {
 
   /* ── Render ── */
   return (
-    <div className="space-y-4">
-      {/* Filterbar */}
+    <div className="space-y-5">
+      {/* Periode-selector bovenaan: filtert ALLES op de pagina */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex gap-0.5 bg-card border border-border rounded-lg p-0.5">
           {(["maand","kwartaal","jaar","custom"] as PeriodType[]).map((p) => (
@@ -389,7 +389,135 @@ const KostenCombinedTab = () => {
               className="h-8 px-2 text-xs bg-card border border-border rounded-md text-foreground" />
           </>
         )}
+        <span className="text-xs text-muted-foreground ml-1">Periode: <span className="text-foreground font-medium">{periodLabel}</span></span>
+      </div>
 
+      {/* Moneybird error banner */}
+      {mbError && (
+        <div className="bg-card border border-red-500/30 rounded-[16px] p-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-red-400">
+            <AlertTriangle className="w-4 h-4" />
+            <span>Moneybird ophalen mislukt: {mbError}. Supabase data wordt nog wel getoond.</span>
+          </div>
+          <button onClick={loadMoneybird}
+            className="inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium bg-primary text-primary-foreground rounded-md">
+            <RefreshCw className="w-3.5 h-3.5" /> Opnieuw
+          </button>
+        </div>
+      )}
+
+      {/* SECTIE 1 — Financieel overzicht */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <OverzichtCard
+          title="Opbrengsten"
+          amount={totalRevenue}
+          loading={mbLoading}
+          icon={<ArrowUpRight className="w-4 h-4 text-emerald-400" />}
+          accent="emerald"
+          sub={`Verkopen app: ${formatEuroDecimal(appSalesTotal)}  |  Moneybird facturen: ${formatEuroDecimal(mbSalesTotal)}`}
+        />
+        <OverzichtCard
+          title="Kosten"
+          amount={totalAllCosts}
+          loading={mbLoading || kostenLoading}
+          icon={<ArrowDownRight className="w-4 h-4 text-red-400" />}
+          accent="red"
+          sub={`Moneybird: ${formatEuroDecimal(mbCostsTotal)}  |  Handmatig: ${formatEuroDecimal(manualCostsTotal)}`}
+        />
+      </div>
+
+      {/* Netto resultaat */}
+      <div className={cn(
+        "rounded-[16px] border p-5 flex items-center justify-between",
+        netResult >= 0
+          ? "bg-emerald-500/5 border-emerald-500/30"
+          : "bg-red-500/5 border-red-500/30"
+      )}>
+        <div className="flex items-center gap-3">
+          {netResult >= 0
+            ? <TrendingUp className="w-5 h-5 text-emerald-400" />
+            : <TrendingDown className="w-5 h-5 text-red-400" />}
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Netto resultaat</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Opbrengsten − Kosten · {periodLabel}</p>
+          </div>
+        </div>
+        <p className={cn(
+          "text-3xl font-bold tabular-nums",
+          netResult >= 0 ? "text-emerald-400" : "text-red-400"
+        )}>
+          {netResult >= 0 ? "+" : ""}{formatEuroDecimal(netResult)}
+        </p>
+      </div>
+
+      {/* SECTIE 2 — Vaste lasten */}
+      <div className="bg-card border border-border rounded-[16px] overflow-hidden">
+        <div className="px-4 py-3 border-b border-border">
+          <h3 className="text-sm font-semibold text-foreground">Vaste lasten</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Terugkerende maandelijkse kosten</p>
+        </div>
+        {vasteLasten.length === 0 ? (
+          <div className="py-6 text-center text-xs text-muted-foreground">Geen vaste lasten gevonden in deze periode.</div>
+        ) : (
+          <ul className="divide-y divide-border/40">
+            {vasteLasten.map((v) => (
+              <li key={v.id} className="px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-accent/30">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className={cn("inline-flex px-2 py-0.5 rounded-md text-[10px] font-medium border shrink-0", CAT_COLORS[v.categorie])}>
+                    {CAT_LABELS[v.categorie]}
+                  </span>
+                  <span className="text-[13px] text-foreground truncate">{v.naam}</span>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  {v.status && <StateBadge state={v.status} />}
+                  <span className="text-[13px] font-semibold tabular-nums text-foreground whitespace-nowrap">
+                    {formatEuroDecimal(v.perMaand)} <span className="text-[10px] text-muted-foreground font-normal">/ mnd</span>
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="px-4 py-2.5 border-t border-border bg-secondary/30 flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">Totaal vaste lasten</span>
+          <span className="text-sm font-semibold tabular-nums text-foreground">{formatEuroDecimal(totaalVasteLastenPM)} <span className="text-[10px] text-muted-foreground font-normal">/ mnd</span></span>
+        </div>
+      </div>
+
+      {/* SECTIE 3 — Kosten per categorie */}
+      <div>
+        <h3 className="text-sm font-semibold text-foreground mb-2">Kosten per categorie</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {(Object.keys(CAT_LABELS) as CatKey[]).map((c) => {
+            const stat = perCategorie.get(c) || { total: 0, count: 0 };
+            const pct = totalAllCosts > 0 ? (stat.total / totalAllCosts) * 100 : 0;
+            const Icon = CAT_ICONS[c];
+            const active = filterCat === c;
+            return (
+              <button
+                key={c}
+                onClick={() => setFilterCat(active ? "all" : c)}
+                className={cn(
+                  "text-left bg-card border rounded-[16px] p-3 transition-all hover:border-primary/50 hover:bg-accent/30",
+                  active ? "border-primary ring-1 ring-primary/40" : "border-border"
+                )}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={cn("inline-flex w-6 h-6 items-center justify-center rounded-md border", CAT_COLORS[c])}>
+                    <Icon className="w-3.5 h-3.5" />
+                  </span>
+                  <span className="text-[11px] font-medium text-muted-foreground truncate">{CAT_LABELS[c]}</span>
+                </div>
+                <p className="text-base font-semibold tabular-nums text-foreground">{formatEuroDecimal(stat.total)}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{stat.count} {stat.count === 1 ? "post" : "posten"} · {pct.toFixed(0)}%</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Filterbar (zonder periode) + Kost toevoegen rechts */}
+      <div className="flex flex-wrap items-center gap-2 pt-1">
         <select value={filterCat} onChange={(e) => setFilterCat(e.target.value as any)}
           className="h-8 px-2.5 text-xs bg-card border border-border rounded-md text-foreground">
           <option value="all">Alle categorieën</option>
@@ -416,52 +544,28 @@ const KostenCombinedTab = () => {
           />
         </div>
 
-        <AddCostPopover
-          isMobile={isMobile}
-          open={addOpen}
-          onOpenChange={(v) => { setAddOpen(v); if (!v) setEditing(null); }}
-          editing={editing}
-          onSubmit={async (data) => {
-            if (editing) await update(editing.id, data);
-            else await create(data);
-            setAddOpen(false);
-            setEditing(null);
-          }}
-          onDelete={editing ? async () => {
-            if (confirm("Deze kost verwijderen?")) {
-              await remove(editing.id);
+        <div className="ml-auto">
+          <AddCostPopover
+            isMobile={isMobile}
+            open={addOpen}
+            onOpenChange={(v) => { setAddOpen(v); if (!v) setEditing(null); }}
+            editing={editing}
+            onSubmit={async (data) => {
+              if (editing) await update(editing.id, data);
+              else await create(data);
               setAddOpen(false);
               setEditing(null);
-            }
-          } : undefined}
-        />
-      </div>
-
-      {/* KPI cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <KpiCard label="Totale kosten" value={formatEuroDecimal(totalCost)} sub={periodLabel} />
-        <KpiCard
-          label="Openstaande facturen"
-          value={formatEuroDecimal(openTotal)}
-          sub={`${openInvoices.length} factu${openInvoices.length === 1 ? "ur" : "ren"}`}
-          danger={openTotal > 0}
-        />
-        <KpiCard label="Grootste kostenpost" value={formatEuroDecimal(biggest.val)} sub={biggest.name} />
-      </div>
-
-      {/* Moneybird error */}
-      {mbError && (
-        <div className="bg-card border border-red-500/30 rounded-lg p-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm text-red-400">
-            <AlertTriangle className="w-4 h-4" />
-            <span>Moneybird ophalen mislukt: {mbError}</span>
-          </div>
-          <button onClick={loadMoneybird}
-            className="inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium bg-primary text-primary-foreground rounded-md">
-            <RefreshCw className="w-3.5 h-3.5" /> Opnieuw proberen
-          </button>
+            }}
+            onDelete={editing ? async () => {
+              if (confirm("Deze kost verwijderen?")) {
+                await remove(editing.id);
+                setAddOpen(false);
+                setEditing(null);
+              }
+            } : undefined}
+          />
         </div>
-      )}
+      </div>
 
       {/* Tabel */}
       <div className="bg-card border border-border rounded-[16px] overflow-hidden">
