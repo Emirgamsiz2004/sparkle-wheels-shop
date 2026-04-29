@@ -178,7 +178,6 @@ const KostenCombinedTab = () => {
   /* ── Combine ── */
   const rows: UnifiedRow[] = useMemo(() => {
     const mbRows: UnifiedRow[] = invoices
-      .filter((inv) => !isVehiclePurchase(inv?.details?.[0]?.description || ""))
       .map((inv) => {
         const supplier = inv?.contact?.company_name || inv?.contact?.firstname || "Onbekend";
         const desc = inv?.details?.[0]?.description || "—";
