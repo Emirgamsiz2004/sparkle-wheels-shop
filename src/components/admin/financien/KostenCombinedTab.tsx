@@ -50,6 +50,8 @@ const CAT_ICONS: Record<CatKey, any> = {
   overig: MoreHorizontal,
 };
 
+const PLATE_RE = /^\s*[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}\s*,/i;
+
 function categorizeMoneybird(supplier: string, description: string): CatKey {
   const s = (supplier || "").toLowerCase();
   const d = (description || "").toLowerCase();
