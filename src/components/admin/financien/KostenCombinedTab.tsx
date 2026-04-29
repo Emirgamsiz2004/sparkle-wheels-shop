@@ -13,6 +13,7 @@ import { toast } from "sonner";
 /* ───────── Categorie mapping ───────── */
 type CatKey =
   | "voertuigkosten"
+  | "inkoop_voertuigen"
   | "vaste_kosten"
   | "advertentiekosten"
   | "abonnementen"
@@ -21,6 +22,7 @@ type CatKey =
 
 const CAT_LABELS: Record<CatKey, string> = {
   voertuigkosten: "Voertuigkosten",
+  inkoop_voertuigen: "Inkoop voertuigen",
   vaste_kosten: "Vaste kosten",
   advertentiekosten: "Advertentiekosten",
   abonnementen: "Abonnementen",
@@ -30,6 +32,7 @@ const CAT_LABELS: Record<CatKey, string> = {
 
 const CAT_COLORS: Record<CatKey, string> = {
   voertuigkosten: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  inkoop_voertuigen: "bg-amber-500/15 text-amber-300 border-amber-500/30",
   vaste_kosten: "bg-blue-500/15 text-blue-300 border-blue-500/30",
   advertentiekosten: "bg-pink-500/15 text-pink-300 border-pink-500/30",
   abonnementen: "bg-violet-500/15 text-violet-300 border-violet-500/30",
@@ -37,13 +40,25 @@ const CAT_COLORS: Record<CatKey, string> = {
   overig: "bg-secondary/60 text-muted-foreground border-border",
 };
 
+const CAT_ICONS: Record<CatKey, any> = {
+  voertuigkosten: Wrench,
+  inkoop_voertuigen: Car,
+  vaste_kosten: Home,
+  advertentiekosten: Megaphone,
+  abonnementen: Repeat,
+  software: Repeat,
+  overig: MoreHorizontal,
+};
+
 function categorizeMoneybird(supplier: string, description: string): CatKey {
   const s = (supplier || "").toLowerCase();
   const d = (description || "").toLowerCase();
+  if (PLATE_RE.test(description || "") || s.includes("sparks")) return "inkoop_voertuigen";
   if (s.includes("alliance") || s.includes("partspoint")) return "voertuigkosten";
   if (s.includes("elix")) return "vaste_kosten";
   if (s.includes("asr") || s.includes("verzekering") || s.includes("schade")) return "vaste_kosten";
-  if (s.includes("marktplaats") || s.includes("autoscout")) return "advertentiekosten";
+  if (s.includes("huur") || s.includes("cilinderweg")) return "vaste_kosten";
+  if (s.includes("marktplaats") || s.includes("autoscout") || s.includes("facebook") || s.includes("google ads")) return "advertentiekosten";
   if (s.includes("vwe") || s.includes("autotrust")) return "abonnementen";
   if (s.includes("moneybird") || s.includes("lovable")) return "software";
   if (d.includes("auto") || d.includes("voertuig")) return "voertuigkosten";
