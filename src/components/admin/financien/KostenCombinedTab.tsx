@@ -131,7 +131,7 @@ type UnifiedRow = {
 /* ───────── Component ───────── */
 const KostenCombinedTab = () => {
   const isMobile = useIsMobile();
-  const { getPurchaseInvoices } = useMoneybird();
+  const { getPurchaseInvoices, getSalesInvoices } = useMoneybird();
   const { kosten, loading: kostenLoading, create, update, remove } = useKosten();
 
   const now = new Date();
