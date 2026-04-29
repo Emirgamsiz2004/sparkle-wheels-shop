@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { useKosten, Kost, KostCategorie, KostFrequentie, kostCategorieLabels, kostFrequentieLabels, kostBedragInPeriode } from "@/hooks/useKosten";
 import { formatEuroDecimal } from "@/types/vehicle";
-import { Loader2, AlertTriangle, RefreshCw, Plus, Search, Trash2, Pencil, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2, AlertTriangle, RefreshCw, Plus, Search, Trash2, Pencil, X, Wrench, Car, Home, Megaphone, Repeat, MoreHorizontal, TrendingUp, TrendingDown, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 /* ───────── Categorie mapping ───────── */
 type CatKey =
   | "voertuigkosten"
+  | "inkoop_voertuigen"
   | "vaste_kosten"
   | "advertentiekosten"
   | "abonnementen"
@@ -20,6 +22,7 @@ type CatKey =
 
 const CAT_LABELS: Record<CatKey, string> = {
   voertuigkosten: "Voertuigkosten",
+  inkoop_voertuigen: "Inkoop voertuigen",
   vaste_kosten: "Vaste kosten",
   advertentiekosten: "Advertentiekosten",
   abonnementen: "Abonnementen",
@@ -29,6 +32,7 @@ const CAT_LABELS: Record<CatKey, string> = {
 
 const CAT_COLORS: Record<CatKey, string> = {
   voertuigkosten: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  inkoop_voertuigen: "bg-amber-500/15 text-amber-300 border-amber-500/30",
   vaste_kosten: "bg-blue-500/15 text-blue-300 border-blue-500/30",
   advertentiekosten: "bg-pink-500/15 text-pink-300 border-pink-500/30",
   abonnementen: "bg-violet-500/15 text-violet-300 border-violet-500/30",
@@ -36,13 +40,27 @@ const CAT_COLORS: Record<CatKey, string> = {
   overig: "bg-secondary/60 text-muted-foreground border-border",
 };
 
+const CAT_ICONS: Record<CatKey, any> = {
+  voertuigkosten: Wrench,
+  inkoop_voertuigen: Car,
+  vaste_kosten: Home,
+  advertentiekosten: Megaphone,
+  abonnementen: Repeat,
+  software: Repeat,
+  overig: MoreHorizontal,
+};
+
+const PLATE_RE = /^\s*[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}\s*,/i;
+
 function categorizeMoneybird(supplier: string, description: string): CatKey {
   const s = (supplier || "").toLowerCase();
   const d = (description || "").toLowerCase();
+  if (PLATE_RE.test(description || "") || s.includes("sparks")) return "inkoop_voertuigen";
   if (s.includes("alliance") || s.includes("partspoint")) return "voertuigkosten";
   if (s.includes("elix")) return "vaste_kosten";
   if (s.includes("asr") || s.includes("verzekering") || s.includes("schade")) return "vaste_kosten";
-  if (s.includes("marktplaats") || s.includes("autoscout")) return "advertentiekosten";
+  if (s.includes("huur") || s.includes("cilinderweg")) return "vaste_kosten";
+  if (s.includes("marktplaats") || s.includes("autoscout") || s.includes("facebook") || s.includes("google ads")) return "advertentiekosten";
   if (s.includes("vwe") || s.includes("autotrust")) return "abonnementen";
   if (s.includes("moneybird") || s.includes("lovable")) return "software";
   if (d.includes("auto") || d.includes("voertuig")) return "voertuigkosten";
@@ -87,8 +105,15 @@ function buildMoneybirdFilter(from: Date, to: Date): string {
   return `period:${fmtYmd(from)}..${fmtYmd(to)}`;
 }
 
-const PLATE_RE = /^\s*[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}\s*,/i;
-const isVehiclePurchase = (desc: string) => PLATE_RE.test(desc || "");
+
+
+const FREQ_TO_MONTHLY: Record<KostFrequentie, number> = {
+  eenmalig: 0,
+  maandelijks: 1,
+  kwartaal: 1 / 3,
+  jaarlijks: 1 / 12,
+};
+
 
 /* ───────── Unified row type ───────── */
 type UnifiedRow = {
@@ -106,7 +131,7 @@ type UnifiedRow = {
 /* ───────── Component ───────── */
 const KostenCombinedTab = () => {
   const isMobile = useIsMobile();
-  const { getPurchaseInvoices } = useMoneybird();
+  const { getPurchaseInvoices, getSalesInvoices } = useMoneybird();
   const { kosten, loading: kostenLoading, create, update, remove } = useKosten();
 
   const now = new Date();
@@ -124,6 +149,8 @@ const KostenCombinedTab = () => {
   const [mbLoading, setMbLoading] = useState(true);
   const [mbError, setMbError] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [salesInvoices, setSalesInvoices] = useState<any[]>([]);
+  const [appSales, setAppSales] = useState<{ verkoopprijs: number; verkoop_datum: string | null }[]>([]);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<Kost | null>(null);
@@ -139,15 +166,23 @@ const KostenCombinedTab = () => {
     setMbLoading(true);
     setMbError(null);
     try {
-      const all: any[] = [];
-      for (let page = 1; page <= 10; page++) {
-        const res: any = await getPurchaseInvoices(page, mbFilter);
-        const arr = Array.isArray(res) ? res : (res?.data || []);
-        if (!arr.length) break;
-        all.push(...arr);
-        if (arr.length < 100) break;
-      }
-      setInvoices(all);
+      const fetchAll = async (fn: (page: number, filter: string) => Promise<any>) => {
+        const all: any[] = [];
+        for (let page = 1; page <= 10; page++) {
+          const res: any = await fn(page, mbFilter);
+          const arr = Array.isArray(res) ? res : (res?.data || []);
+          if (!arr.length) break;
+          all.push(...arr);
+          if (arr.length < 100) break;
+        }
+        return all;
+      };
+      const [purchases, sales] = await Promise.all([
+        fetchAll(getPurchaseInvoices),
+        fetchAll(getSalesInvoices).catch(() => []),
+      ]);
+      setInvoices(purchases);
+      setSalesInvoices(sales);
     } catch (e: any) {
       setMbError(e?.message || "Kon Moneybird niet bereiken");
     } finally {
@@ -157,10 +192,25 @@ const KostenCombinedTab = () => {
 
   useEffect(() => { loadMoneybird(); }, [mbFilter]);
 
+  // Load supabase verkopen (revenue source A) for the period
+  useEffect(() => {
+    const fromIso = range.from.toISOString().slice(0, 10);
+    const toIso = range.to.toISOString().slice(0, 10);
+    supabase
+      .from("vehicle_sales")
+      .select("verkoopprijs, verkoop_datum, status")
+      .neq("status", "concept")
+      .gte("verkoop_datum", fromIso)
+      .lte("verkoop_datum", toIso)
+      .then(({ data, error }) => {
+        if (error) { console.error(error); setAppSales([]); return; }
+        setAppSales((data || []).map((d: any) => ({ verkoopprijs: Number(d.verkoopprijs) || 0, verkoop_datum: d.verkoop_datum })));
+      });
+  }, [range.from, range.to]);
+
   /* ── Combine ── */
   const rows: UnifiedRow[] = useMemo(() => {
     const mbRows: UnifiedRow[] = invoices
-      .filter((inv) => !isVehiclePurchase(inv?.details?.[0]?.description || ""))
       .map((inv) => {
         const supplier = inv?.contact?.company_name || inv?.contact?.firstname || "Onbekend";
         const desc = inv?.details?.[0]?.description || "—";
@@ -233,6 +283,56 @@ const KostenCombinedTab = () => {
     return max;
   }, [filtered]);
 
+  /* ── Opbrengsten / netto ── */
+  const totalAllCosts = rows.reduce((s, r) => s + r.amount, 0);
+  const mbCostsTotal = rows.filter((r) => r.source === "moneybird").reduce((s, r) => s + r.amount, 0);
+  const manualCostsTotal = rows.filter((r) => r.source === "handmatig").reduce((s, r) => s + r.amount, 0);
+
+  const appSalesTotal = appSales.reduce((s, x) => s + (x.verkoopprijs || 0), 0);
+  const mbSalesTotal = salesInvoices.reduce((s, inv: any) => s + (parseFloat(inv?.total_price_incl_tax || "0") || 0), 0);
+  const totalRevenue = appSalesTotal + mbSalesTotal;
+  const netResult = totalRevenue - totalAllCosts;
+
+  /* ── Per categorie ── */
+  const perCategorie = useMemo(() => {
+    const m = new Map<CatKey, { total: number; count: number }>();
+    rows.forEach((r) => {
+      const cur = m.get(r.category) || { total: 0, count: 0 };
+      cur.total += r.amount;
+      cur.count += 1;
+      m.set(r.category, cur);
+    });
+    return m;
+  }, [rows]);
+
+  /* ── Vaste lasten (per maand) ── */
+  const vasteLasten = useMemo(() => {
+    type VL = { id: string; naam: string; categorie: CatKey; perMaand: number; status?: "paid" | "open" | "late" | null; bron: "moneybird" | "handmatig" };
+    const out: VL[] = [];
+
+    // Moneybird vaste-lasten facturen in deze periode (al gefilterd op categorie vaste_kosten)
+    rows.filter((r) => r.source === "moneybird" && r.category === "vaste_kosten").forEach((r) => {
+      out.push({ id: r.id, naam: r.supplier, categorie: r.category, perMaand: r.amount, status: r.state, bron: "moneybird" });
+    });
+
+    // Handmatige kosten met terugkerende frequentie (alle, ongeacht categorie)
+    kosten.filter((k) => k.actief && k.frequentie !== "eenmalig").forEach((k) => {
+      const factor = FREQ_TO_MONTHLY[k.frequentie] || 0;
+      out.push({
+        id: `man-${k.id}`,
+        naam: k.naam,
+        categorie: mapManualCat(k.categorie),
+        perMaand: (k.bedrag || 0) * factor,
+        status: null,
+        bron: "handmatig",
+      });
+    });
+
+    return out;
+  }, [rows, kosten]);
+
+  const totaalVasteLastenPM = vasteLasten.reduce((s, v) => s + v.perMaand, 0);
+
   const availableYears = useMemo(() => {
     const ys = new Set<number>([now.getFullYear()]);
     for (let i = 1; i <= 4; i++) ys.add(now.getFullYear() - i);
@@ -249,8 +349,8 @@ const KostenCombinedTab = () => {
 
   /* ── Render ── */
   return (
-    <div className="space-y-4">
-      {/* Filterbar */}
+    <div className="space-y-5">
+      {/* Periode-selector bovenaan: filtert ALLES op de pagina */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex gap-0.5 bg-card border border-border rounded-lg p-0.5">
           {(["maand","kwartaal","jaar","custom"] as PeriodType[]).map((p) => (
@@ -289,7 +389,135 @@ const KostenCombinedTab = () => {
               className="h-8 px-2 text-xs bg-card border border-border rounded-md text-foreground" />
           </>
         )}
+        <span className="text-xs text-muted-foreground ml-1">Periode: <span className="text-foreground font-medium">{periodLabel}</span></span>
+      </div>
 
+      {/* Moneybird error banner */}
+      {mbError && (
+        <div className="bg-card border border-red-500/30 rounded-[16px] p-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-red-400">
+            <AlertTriangle className="w-4 h-4" />
+            <span>Moneybird ophalen mislukt: {mbError}. Supabase data wordt nog wel getoond.</span>
+          </div>
+          <button onClick={loadMoneybird}
+            className="inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium bg-primary text-primary-foreground rounded-md">
+            <RefreshCw className="w-3.5 h-3.5" /> Opnieuw
+          </button>
+        </div>
+      )}
+
+      {/* SECTIE 1 — Financieel overzicht */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <OverzichtCard
+          title="Opbrengsten"
+          amount={totalRevenue}
+          loading={mbLoading}
+          icon={<ArrowUpRight className="w-4 h-4 text-emerald-400" />}
+          accent="emerald"
+          sub={`Verkopen app: ${formatEuroDecimal(appSalesTotal)}  |  Moneybird facturen: ${formatEuroDecimal(mbSalesTotal)}`}
+        />
+        <OverzichtCard
+          title="Kosten"
+          amount={totalAllCosts}
+          loading={mbLoading || kostenLoading}
+          icon={<ArrowDownRight className="w-4 h-4 text-red-400" />}
+          accent="red"
+          sub={`Moneybird: ${formatEuroDecimal(mbCostsTotal)}  |  Handmatig: ${formatEuroDecimal(manualCostsTotal)}`}
+        />
+      </div>
+
+      {/* Netto resultaat */}
+      <div className={cn(
+        "rounded-[16px] border p-5 flex items-center justify-between",
+        netResult >= 0
+          ? "bg-emerald-500/5 border-emerald-500/30"
+          : "bg-red-500/5 border-red-500/30"
+      )}>
+        <div className="flex items-center gap-3">
+          {netResult >= 0
+            ? <TrendingUp className="w-5 h-5 text-emerald-400" />
+            : <TrendingDown className="w-5 h-5 text-red-400" />}
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Netto resultaat</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Opbrengsten − Kosten · {periodLabel}</p>
+          </div>
+        </div>
+        <p className={cn(
+          "text-3xl font-bold tabular-nums",
+          netResult >= 0 ? "text-emerald-400" : "text-red-400"
+        )}>
+          {netResult >= 0 ? "+" : ""}{formatEuroDecimal(netResult)}
+        </p>
+      </div>
+
+      {/* SECTIE 2 — Vaste lasten */}
+      <div className="bg-card border border-border rounded-[16px] overflow-hidden">
+        <div className="px-4 py-3 border-b border-border">
+          <h3 className="text-sm font-semibold text-foreground">Vaste lasten</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Terugkerende maandelijkse kosten</p>
+        </div>
+        {vasteLasten.length === 0 ? (
+          <div className="py-6 text-center text-xs text-muted-foreground">Geen vaste lasten gevonden in deze periode.</div>
+        ) : (
+          <ul className="divide-y divide-border/40">
+            {vasteLasten.map((v) => (
+              <li key={v.id} className="px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-accent/30">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className={cn("inline-flex px-2 py-0.5 rounded-md text-[10px] font-medium border shrink-0", CAT_COLORS[v.categorie])}>
+                    {CAT_LABELS[v.categorie]}
+                  </span>
+                  <span className="text-[13px] text-foreground truncate">{v.naam}</span>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  {v.status && <StateBadge state={v.status} />}
+                  <span className="text-[13px] font-semibold tabular-nums text-foreground whitespace-nowrap">
+                    {formatEuroDecimal(v.perMaand)} <span className="text-[10px] text-muted-foreground font-normal">/ mnd</span>
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="px-4 py-2.5 border-t border-border bg-secondary/30 flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">Totaal vaste lasten</span>
+          <span className="text-sm font-semibold tabular-nums text-foreground">{formatEuroDecimal(totaalVasteLastenPM)} <span className="text-[10px] text-muted-foreground font-normal">/ mnd</span></span>
+        </div>
+      </div>
+
+      {/* SECTIE 3 — Kosten per categorie */}
+      <div>
+        <h3 className="text-sm font-semibold text-foreground mb-2">Kosten per categorie</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {(Object.keys(CAT_LABELS) as CatKey[]).map((c) => {
+            const stat = perCategorie.get(c) || { total: 0, count: 0 };
+            const pct = totalAllCosts > 0 ? (stat.total / totalAllCosts) * 100 : 0;
+            const Icon = CAT_ICONS[c];
+            const active = filterCat === c;
+            return (
+              <button
+                key={c}
+                onClick={() => setFilterCat(active ? "all" : c)}
+                className={cn(
+                  "text-left bg-card border rounded-[16px] p-3 transition-all hover:border-primary/50 hover:bg-accent/30",
+                  active ? "border-primary ring-1 ring-primary/40" : "border-border"
+                )}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={cn("inline-flex w-6 h-6 items-center justify-center rounded-md border", CAT_COLORS[c])}>
+                    <Icon className="w-3.5 h-3.5" />
+                  </span>
+                  <span className="text-[11px] font-medium text-muted-foreground truncate">{CAT_LABELS[c]}</span>
+                </div>
+                <p className="text-base font-semibold tabular-nums text-foreground">{formatEuroDecimal(stat.total)}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{stat.count} {stat.count === 1 ? "post" : "posten"} · {pct.toFixed(0)}%</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Filterbar (zonder periode) + Kost toevoegen rechts */}
+      <div className="flex flex-wrap items-center gap-2 pt-1">
         <select value={filterCat} onChange={(e) => setFilterCat(e.target.value as any)}
           className="h-8 px-2.5 text-xs bg-card border border-border rounded-md text-foreground">
           <option value="all">Alle categorieën</option>
@@ -316,52 +544,28 @@ const KostenCombinedTab = () => {
           />
         </div>
 
-        <AddCostPopover
-          isMobile={isMobile}
-          open={addOpen}
-          onOpenChange={(v) => { setAddOpen(v); if (!v) setEditing(null); }}
-          editing={editing}
-          onSubmit={async (data) => {
-            if (editing) await update(editing.id, data);
-            else await create(data);
-            setAddOpen(false);
-            setEditing(null);
-          }}
-          onDelete={editing ? async () => {
-            if (confirm("Deze kost verwijderen?")) {
-              await remove(editing.id);
+        <div className="ml-auto">
+          <AddCostPopover
+            isMobile={isMobile}
+            open={addOpen}
+            onOpenChange={(v) => { setAddOpen(v); if (!v) setEditing(null); }}
+            editing={editing}
+            onSubmit={async (data) => {
+              if (editing) await update(editing.id, data);
+              else await create(data);
               setAddOpen(false);
               setEditing(null);
-            }
-          } : undefined}
-        />
-      </div>
-
-      {/* KPI cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <KpiCard label="Totale kosten" value={formatEuroDecimal(totalCost)} sub={periodLabel} />
-        <KpiCard
-          label="Openstaande facturen"
-          value={formatEuroDecimal(openTotal)}
-          sub={`${openInvoices.length} factu${openInvoices.length === 1 ? "ur" : "ren"}`}
-          danger={openTotal > 0}
-        />
-        <KpiCard label="Grootste kostenpost" value={formatEuroDecimal(biggest.val)} sub={biggest.name} />
-      </div>
-
-      {/* Moneybird error */}
-      {mbError && (
-        <div className="bg-card border border-red-500/30 rounded-lg p-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm text-red-400">
-            <AlertTriangle className="w-4 h-4" />
-            <span>Moneybird ophalen mislukt: {mbError}</span>
-          </div>
-          <button onClick={loadMoneybird}
-            className="inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium bg-primary text-primary-foreground rounded-md">
-            <RefreshCw className="w-3.5 h-3.5" /> Opnieuw proberen
-          </button>
+            }}
+            onDelete={editing ? async () => {
+              if (confirm("Deze kost verwijderen?")) {
+                await remove(editing.id);
+                setAddOpen(false);
+                setEditing(null);
+              }
+            } : undefined}
+          />
         </div>
-      )}
+      </div>
 
       {/* Tabel */}
       <div className="bg-card border border-border rounded-[16px] overflow-hidden">
@@ -439,6 +643,29 @@ const KostenCombinedTab = () => {
 };
 
 /* ───────── Sub components ───────── */
+
+const OverzichtCard = ({ title, amount, sub, loading, icon, accent }: {
+  title: string; amount: number; sub?: string; loading?: boolean;
+  icon?: React.ReactNode; accent?: "emerald" | "red" | "neutral";
+}) => (
+  <div className="bg-card border border-border rounded-[16px] p-5">
+    <div className="flex items-center justify-between mb-2">
+      <span className="text-xs uppercase tracking-wider text-muted-foreground">{title}</span>
+      {icon}
+    </div>
+    {loading ? (
+      <div className="h-8 w-40 bg-secondary/60 animate-pulse rounded" />
+    ) : (
+      <p className={cn(
+        "text-2xl md:text-3xl font-bold tabular-nums",
+        accent === "emerald" ? "text-emerald-400" : accent === "red" ? "text-red-400" : "text-foreground"
+      )}>
+        {formatEuroDecimal(amount)}
+      </p>
+    )}
+    {sub && <p className="text-[11px] text-muted-foreground mt-2">{sub}</p>}
+  </div>
+);
 
 const KpiCard = ({ label, value, sub, danger }: { label: string; value: string; sub?: string; danger?: boolean }) => (
   <div className="bg-card border border-border rounded-[16px] p-4">
