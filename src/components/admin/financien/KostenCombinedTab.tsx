@@ -166,15 +166,23 @@ const KostenCombinedTab = () => {
     setMbLoading(true);
     setMbError(null);
     try {
-      const all: any[] = [];
-      for (let page = 1; page <= 10; page++) {
-        const res: any = await getPurchaseInvoices(page, mbFilter);
-        const arr = Array.isArray(res) ? res : (res?.data || []);
-        if (!arr.length) break;
-        all.push(...arr);
-        if (arr.length < 100) break;
-      }
-      setInvoices(all);
+      const fetchAll = async (fn: (page: number, filter: string) => Promise<any>) => {
+        const all: any[] = [];
+        for (let page = 1; page <= 10; page++) {
+          const res: any = await fn(page, mbFilter);
+          const arr = Array.isArray(res) ? res : (res?.data || []);
+          if (!arr.length) break;
+          all.push(...arr);
+          if (arr.length < 100) break;
+        }
+        return all;
+      };
+      const [purchases, sales] = await Promise.all([
+        fetchAll(getPurchaseInvoices),
+        fetchAll(getSalesInvoices).catch(() => []),
+      ]);
+      setInvoices(purchases);
+      setSalesInvoices(sales);
     } catch (e: any) {
       setMbError(e?.message || "Kon Moneybird niet bereiken");
     } finally {
@@ -183,6 +191,22 @@ const KostenCombinedTab = () => {
   };
 
   useEffect(() => { loadMoneybird(); }, [mbFilter]);
+
+  // Load supabase verkopen (revenue source A) for the period
+  useEffect(() => {
+    const fromIso = range.from.toISOString().slice(0, 10);
+    const toIso = range.to.toISOString().slice(0, 10);
+    supabase
+      .from("vehicle_sales")
+      .select("verkoopprijs, verkoop_datum, status")
+      .neq("status", "concept")
+      .gte("verkoop_datum", fromIso)
+      .lte("verkoop_datum", toIso)
+      .then(({ data, error }) => {
+        if (error) { console.error(error); setAppSales([]); return; }
+        setAppSales((data || []).map((d: any) => ({ verkoopprijs: Number(d.verkoopprijs) || 0, verkoop_datum: d.verkoop_datum })));
+      });
+  }, [range.from, range.to]);
 
   /* ── Combine ── */
   const rows: UnifiedRow[] = useMemo(() => {
