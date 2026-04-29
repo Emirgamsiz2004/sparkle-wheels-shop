@@ -105,8 +105,8 @@ function buildMoneybirdFilter(from: Date, to: Date): string {
   return `period:${fmtYmd(from)}..${fmtYmd(to)}`;
 }
 
-const PLATE_RE = /^\s*[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}\s*,/i;
-const isVehiclePurchase = (desc: string) => PLATE_RE.test(desc || "");
+
+
 
 /* ───────── Unified row type ───────── */
 type UnifiedRow = {
