@@ -107,6 +107,13 @@ function buildMoneybirdFilter(from: Date, to: Date): string {
 
 
 
+const FREQ_TO_MONTHLY: Record<KostFrequentie, number> = {
+  eenmalig: 0,
+  maandelijks: 1,
+  kwartaal: 1 / 3,
+  jaarlijks: 1 / 12,
+};
+
 
 /* ───────── Unified row type ───────── */
 type UnifiedRow = {
