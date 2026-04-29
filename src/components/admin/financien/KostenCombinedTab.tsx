@@ -283,6 +283,56 @@ const KostenCombinedTab = () => {
     return max;
   }, [filtered]);
 
+  /* ── Opbrengsten / netto ── */
+  const totalAllCosts = rows.reduce((s, r) => s + r.amount, 0);
+  const mbCostsTotal = rows.filter((r) => r.source === "moneybird").reduce((s, r) => s + r.amount, 0);
+  const manualCostsTotal = rows.filter((r) => r.source === "handmatig").reduce((s, r) => s + r.amount, 0);
+
+  const appSalesTotal = appSales.reduce((s, x) => s + (x.verkoopprijs || 0), 0);
+  const mbSalesTotal = salesInvoices.reduce((s, inv: any) => s + (parseFloat(inv?.total_price_incl_tax || "0") || 0), 0);
+  const totalRevenue = appSalesTotal + mbSalesTotal;
+  const netResult = totalRevenue - totalAllCosts;
+
+  /* ── Per categorie ── */
+  const perCategorie = useMemo(() => {
+    const m = new Map<CatKey, { total: number; count: number }>();
+    rows.forEach((r) => {
+      const cur = m.get(r.category) || { total: 0, count: 0 };
+      cur.total += r.amount;
+      cur.count += 1;
+      m.set(r.category, cur);
+    });
+    return m;
+  }, [rows]);
+
+  /* ── Vaste lasten (per maand) ── */
+  const vasteLasten = useMemo(() => {
+    type VL = { id: string; naam: string; categorie: CatKey; perMaand: number; status?: "paid" | "open" | "late" | null; bron: "moneybird" | "handmatig" };
+    const out: VL[] = [];
+
+    // Moneybird vaste-lasten facturen in deze periode (al gefilterd op categorie vaste_kosten)
+    rows.filter((r) => r.source === "moneybird" && r.category === "vaste_kosten").forEach((r) => {
+      out.push({ id: r.id, naam: r.supplier, categorie: r.category, perMaand: r.amount, status: r.state, bron: "moneybird" });
+    });
+
+    // Handmatige kosten met terugkerende frequentie (alle, ongeacht categorie)
+    kosten.filter((k) => k.actief && k.frequentie !== "eenmalig").forEach((k) => {
+      const factor = FREQ_TO_MONTHLY[k.frequentie] || 0;
+      out.push({
+        id: `man-${k.id}`,
+        naam: k.naam,
+        categorie: mapManualCat(k.categorie),
+        perMaand: (k.bedrag || 0) * factor,
+        status: null,
+        bron: "handmatig",
+      });
+    });
+
+    return out;
+  }, [rows, kosten]);
+
+  const totaalVasteLastenPM = vasteLasten.reduce((s, v) => s + v.perMaand, 0);
+
   const availableYears = useMemo(() => {
     const ys = new Set<number>([now.getFullYear()]);
     for (let i = 1; i <= 4; i++) ys.add(now.getFullYear() - i);
