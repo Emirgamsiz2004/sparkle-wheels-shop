@@ -149,6 +149,8 @@ const KostenCombinedTab = () => {
   const [mbLoading, setMbLoading] = useState(true);
   const [mbError, setMbError] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [salesInvoices, setSalesInvoices] = useState<any[]>([]);
+  const [appSales, setAppSales] = useState<{ verkoopprijs: number; verkoop_datum: string | null }[]>([]);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<Kost | null>(null);
