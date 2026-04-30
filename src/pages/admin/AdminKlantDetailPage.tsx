@@ -274,8 +274,9 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
     setAvailLoading(false);
   };
 
-  const persistLink = async (verkoopId: string) => {
-    const { error } = await supabase.from("verkopen" as any).update({ customer_id: customerId }).eq("id", verkoopId);
+  const persistLink = async (optionId: string) => {
+    const target = splitSaleOptionId(optionId);
+    const { error } = await supabase.from(target.source as any).update({ customer_id: customerId }).eq("id", target.id);
     if (error) { toast.error("Koppelen mislukt"); return; }
     toast.success("Verkoop gekoppeld");
     await load();
@@ -310,7 +311,8 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
 
   const handleUnlink = async () => {
     if (!unlinkConfirm.verkoopId) return;
-    const { error } = await supabase.from("verkopen" as any).update({ customer_id: null }).eq("id", unlinkConfirm.verkoopId);
+    const target = splitSaleOptionId(unlinkConfirm.verkoopId);
+    const { error } = await supabase.from(target.source as any).update({ customer_id: null }).eq("id", target.id);
     if (error) { toast.error("Ontkoppelen mislukt"); return; }
     toast.success("Verkoop ontkoppeld");
     setUnlinkConfirm({ open: false, verkoopId: null, anchor: null, naam: "" });
@@ -342,7 +344,7 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
             const datum = r.contract_getekend_datum || v?.verkoop_datum || r.created_at;
             return (
               <div
-                key={r.id}
+                key={`${r.source}:${r.id}`}
                 onClick={() => v && navigate(`/admin/voertuigen/${r.vehicle_id}`)}
                 className="flex items-center justify-between gap-3 px-3 py-2.5 bg-secondary/30 border border-border rounded-xl hover:bg-accent/30 cursor-pointer transition-colors"
               >
