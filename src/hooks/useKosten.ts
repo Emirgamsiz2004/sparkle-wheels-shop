@@ -15,6 +15,7 @@ export interface Kost {
   id: string;
   naam: string;
   categorie: KostCategorie;
+  categorie_id?: string | null;
   bedrag: number;
   frequentie: KostFrequentie;
   datum: string;
@@ -69,6 +70,7 @@ export const useKosten = () => {
     const { error } = await supabase.from("kosten").insert({
       naam: input.naam!,
       categorie: input.categorie || "overig",
+      categorie_id: input.categorie_id || null,
       bedrag: input.bedrag || 0,
       frequentie: input.frequentie || "eenmalig",
       datum: input.datum || new Date().toISOString().slice(0, 10),

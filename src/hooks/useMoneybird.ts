@@ -96,6 +96,7 @@ export function useMoneybird() {
   const getFinancialStatements = useCallback((year?: number) => invoke('get_financial_statements', { year }), [invoke]);
   const getReceipts = useCallback((page?: number, filter?: string) => invoke('get_receipts', { page, filter }), [invoke]);
   const getPurchaseInvoices = useCallback((page?: number, filter?: string) => invoke('get_purchase_invoices', { page, filter }), [invoke]);
+  const getContacts = useCallback((page?: number, query?: string) => invoke('get_contacts', { page, query }), [invoke]);
 
   const downloadInvoicePdf = useCallback(
     (invoiceId: string) => invoke('download_invoice_pdf', { invoice_id: invoiceId }),
@@ -116,5 +117,6 @@ export function useMoneybird() {
     getFinancialStatements,
     getReceipts,
     getPurchaseInvoices,
+    getContacts,
   };
 }

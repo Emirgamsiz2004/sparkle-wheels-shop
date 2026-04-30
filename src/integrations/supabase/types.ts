@@ -1299,6 +1299,7 @@ export type Database = {
           actief: boolean
           bedrag: number
           categorie: string
+          categorie_id: string | null
           created_at: string
           datum: string
           frequentie: string
@@ -1313,6 +1314,7 @@ export type Database = {
           actief?: boolean
           bedrag?: number
           categorie?: string
+          categorie_id?: string | null
           created_at?: string
           datum?: string
           frequentie?: string
@@ -1327,6 +1329,7 @@ export type Database = {
           actief?: boolean
           bedrag?: number
           categorie?: string
+          categorie_id?: string | null
           created_at?: string
           datum?: string
           frequentie?: string
@@ -1336,6 +1339,35 @@ export type Database = {
           notities?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kosten_categorie_id_fkey"
+            columns: ["categorie_id"]
+            isOneToOne: false
+            referencedRelation: "kosten_categorieen"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kosten_categorieen: {
+        Row: {
+          aangemaakt_op: string
+          id: string
+          moneybird_contact_ids: string[]
+          naam: string
+        }
+        Insert: {
+          aangemaakt_op?: string
+          id?: string
+          moneybird_contact_ids?: string[]
+          naam: string
+        }
+        Update: {
+          aangemaakt_op?: string
+          id?: string
+          moneybird_contact_ids?: string[]
+          naam?: string
         }
         Relationships: []
       }
