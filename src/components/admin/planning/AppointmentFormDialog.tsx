@@ -94,9 +94,9 @@ const formatDuur = (mins: number): string => {
 const requiresVoorraadVehicle = (t: AppointmentType | null) =>
   t === "bezichtiging" || t === "proefrit" || t === "ophalen" || t === "aflevering";
 
-// Welke types vragen om diensten?
+// Welke types vragen om diensten? Alleen werk-gerelateerde types.
 const showsDiensten = (t: AppointmentType | null) =>
-  t === "bezichtiging" || t === "proefrit" || t === "onderhoud" || t === "poetsbeurt" || t === "anders";
+  t === "onderhoud" || t === "poetsbeurt" || t === "anders";
 
 // Bij welke types is dienst verplicht?
 const requiresDiensten = (t: AppointmentType | null) =>
