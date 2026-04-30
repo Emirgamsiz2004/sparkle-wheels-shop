@@ -115,7 +115,7 @@ const AdminKlantDetailPage = () => {
       </div>
 
       {activeTab === "profiel" && <ProfielTab customer={customer} onUpdate={updateCustomer} />}
-      {activeTab === "verkopen" && <GekoppeldeVerkopenSection customerId={customer.id} />}
+      {activeTab === "verkopen" && <GekoppeldeVerkopenSection customer={customer} />}
       {activeTab === "geschiedenis" && <GeschiedenisTab customerId={customer.id} customerEmail={customer.email} />}
       {activeTab === "documenten" && <DocumentenTab customerEmail={customer.email} customerNaam={`${customer.voornaam} ${customer.achternaam}`} />}
 
@@ -136,7 +136,7 @@ const AdminKlantDetailPage = () => {
 /* ── Gekoppelde verkopen Section (used on Profiel + Verkopen tab) ── */
 interface VerkoopRow {
   id: string;
-  source: "verkopen" | "vehicle_sales";
+  source: "verkopen" | "vehicle_sales" | "vehicles";
   vehicle_id: string | null;
   verkoopprijs: number | null;
   contract_getekend_datum: string | null;
@@ -151,12 +151,14 @@ interface VerkoopRow {
 const splitSaleOptionId = (id: string): { source: VerkoopRow["source"]; id: string } => {
   const [source, saleId] = id.split(":");
   return {
-    source: source === "vehicle_sales" ? "vehicle_sales" : "verkopen",
+    source: source === "vehicle_sales" || source === "vehicles" ? source : "verkopen",
     id: saleId || id,
   };
 };
 
-const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
+const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
+  const customerId = customer.id;
+  const customerEmail = customer.email?.trim();
   const [verkopen, setVerkopen] = useState<VerkoopRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [linkOpen, setLinkOpen] = useState(false);
