@@ -303,7 +303,7 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
     const naam = row.vehicle ? `${row.vehicle.merk || ""} ${row.vehicle.model || ""}`.trim() : "deze verkoop";
     setUnlinkConfirm({
       open: true,
-      verkoopId: row.id,
+      verkoopId: `${row.source}:${row.id}`,
       anchor: e.currentTarget.getBoundingClientRect(),
       naam,
     });
@@ -341,7 +341,7 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
           {verkopen.map((r) => {
             const v = r.vehicle;
             const naam = v ? `${v.merk || ""} ${v.model || ""}`.trim() : "Verkoop";
-            const datum = r.contract_getekend_datum || v?.verkoop_datum || r.created_at;
+            const datum = r.contract_getekend_datum || r.verkoop_datum || v?.verkoop_datum || r.created_at;
             return (
               <div
                 key={`${r.source}:${r.id}`}
