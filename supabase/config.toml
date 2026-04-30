@@ -1,6 +1,45 @@
 project_id = "leykexzdvatuyitkxdxs"
 
+[functions.send-whatsapp-notification]
+verify_jwt = false
+
+[functions.vwe-taxatie]
+verify_jwt = false
+
+[functions.analyze-deal]
+verify_jwt = false
+
+[functions.firecrawl-search]
+verify_jwt = false
+
+[functions.moneybird]
+verify_jwt = false
+
+[functions.make-webhook-handler]
+verify_jwt = false
+
+[functions.generate-social-post]
+verify_jwt = false
+
+[functions.fetch-google-reviews]
+verify_jwt = false
+
+[functions.estimate-trade-in-value]
+verify_jwt = false
+
+[functions.generate-blog-post]
+verify_jwt = false
+
+[functions.scheduled-blog-post]
+verify_jwt = false
+
+[functions.process-email-queue]
+verify_jwt = true
+
 [functions.send-transactional-email]
+verify_jwt = true
+
+[functions.preview-transactional-email]
 verify_jwt = false
 
 [functions.handle-email-unsubscribe]
@@ -9,11 +48,8 @@ verify_jwt = false
 [functions.handle-email-suppression]
 verify_jwt = false
 
-[functions.process-email-queue]
+[functions.send-appointment-reminders]
 verify_jwt = false
 
 [functions.appointment-ics]
-verify_jwt = false
-
-[functions.preview-transactional-email]
 verify_jwt = false
