@@ -136,14 +136,18 @@ export type Database = {
           aanvrager_telefoon: string | null
           aanvrager_voornaam: string | null
           betalingsstatus: string | null
+          bevestigingsmail_verstuurd: boolean
+          bevestigingsmail_verstuurd_op: string | null
           bron: string | null
           created_at: string
           customer_id: string | null
           datum_tijd: string
+          duur_minuten: number | null
           eind_datum_tijd: string | null
           google_event_id: string | null
           id: string
           is_aanvraag: boolean
+          klant_email: string | null
           medewerker: string | null
           notities: string | null
           onderwerp: string | null
@@ -162,14 +166,18 @@ export type Database = {
           aanvrager_telefoon?: string | null
           aanvrager_voornaam?: string | null
           betalingsstatus?: string | null
+          bevestigingsmail_verstuurd?: boolean
+          bevestigingsmail_verstuurd_op?: string | null
           bron?: string | null
           created_at?: string
           customer_id?: string | null
           datum_tijd: string
+          duur_minuten?: number | null
           eind_datum_tijd?: string | null
           google_event_id?: string | null
           id?: string
           is_aanvraag?: boolean
+          klant_email?: string | null
           medewerker?: string | null
           notities?: string | null
           onderwerp?: string | null
@@ -188,14 +196,18 @@ export type Database = {
           aanvrager_telefoon?: string | null
           aanvrager_voornaam?: string | null
           betalingsstatus?: string | null
+          bevestigingsmail_verstuurd?: boolean
+          bevestigingsmail_verstuurd_op?: string | null
           bron?: string | null
           created_at?: string
           customer_id?: string | null
           datum_tijd?: string
+          duur_minuten?: number | null
           eind_datum_tijd?: string | null
           google_event_id?: string | null
           id?: string
           is_aanvraag?: boolean
+          klant_email?: string | null
           medewerker?: string | null
           notities?: string | null
           onderwerp?: string | null
@@ -1066,6 +1078,33 @@ export type Database = {
           retry_after_until?: string | null
           send_delay_ms?: number
           transactional_email_ttl_minutes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          created_at: string
+          html_body: string
+          id: string
+          subject: string
+          template_key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          html_body?: string
+          id?: string
+          subject?: string
+          template_key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          html_body?: string
+          id?: string
+          subject?: string
+          template_key?: string
           updated_at?: string
         }
         Relationships: []
