@@ -180,7 +180,7 @@ const SearchSelectPopover = ({
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-40" style={overlayStyle} aria-hidden />
+      <div className="fixed inset-0 z-40" style={overlayStyle} aria-hidden onClick={isMobile ? handleClose : undefined} />
       <div ref={ref} className={containerClass} style={isMobile ? mobileStyle : desktopStyle} role="dialog">
         {isMobile && (
           <div className="pt-2 pb-1 flex justify-center shrink-0">
