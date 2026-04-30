@@ -2,9 +2,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Customer, statusLabels, statusColors, useCustomers } from "@/hooks/useCustomers";
-import { ArrowLeft, Phone, MessageCircle, Pencil, Loader2, ChevronDown, FileText, Download } from "lucide-react";
+import { ArrowLeft, Phone, MessageCircle, Loader2, ChevronDown, FileText, Download, Trash2, Plus, ExternalLink } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import ConfirmPopover from "@/components/admin/ConfirmPopover";
+import SearchSelectPopover, { SearchOption } from "@/components/admin/SearchSelectPopover";
+import { deleteCustomerSafely } from "@/lib/customerDelete";
 
 const allStatuses: Customer["status"][] = ["prospect", "klant", "inactief"];
 
@@ -13,8 +16,22 @@ const AdminKlantDetailPage = () => {
   const navigate = useNavigate();
   const { customers, loading, updateCustomer } = useCustomers();
   const [activeTab, setActiveTab] = useState("profiel");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteAnchor, setDeleteAnchor] = useState<DOMRect | null>(null);
+  const deleteBtnRef = useRef<HTMLButtonElement>(null);
 
   const customer = customers.find((c) => c.id === id);
+
+  const openDelete = () => {
+    setDeleteAnchor(deleteBtnRef.current?.getBoundingClientRect() ?? null);
+    setDeleteOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!customer) return;
+    const ok = await deleteCustomerSafely(customer.id);
+    if (ok) navigate("/admin/klanten");
+  };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
   if (!customer) return (
@@ -72,12 +89,19 @@ const AdminKlantDetailPage = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <button
+            ref={deleteBtnRef}
+            onClick={openDelete}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-red-500/30 text-red-400 rounded-xl hover:bg-red-500/10 transition-all active:scale-[0.97] ml-auto"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Verwijder klant
+          </button>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-0.5 bg-secondary/50 border border-border rounded-md p-0.5">
-        {[{ key: "profiel", label: "Profiel" }, { key: "geschiedenis", label: "Geschiedenis" }, { key: "documenten", label: "Documenten" }].map((t) => (
+        {[{ key: "profiel", label: "Profiel" }, { key: "verkopen", label: "Verkopen" }, { key: "geschiedenis", label: "Geschiedenis" }, { key: "documenten", label: "Documenten" }].map((t) => (
           <button
             key={t.key}
             onClick={() => setActiveTab(t.key)}
@@ -91,8 +115,183 @@ const AdminKlantDetailPage = () => {
       </div>
 
       {activeTab === "profiel" && <ProfielTab customer={customer} onUpdate={updateCustomer} />}
+      {activeTab === "verkopen" && <GekoppeldeVerkopenTab customerId={customer.id} />}
       {activeTab === "geschiedenis" && <GeschiedenisTab customerId={customer.id} customerEmail={customer.email} />}
       {activeTab === "documenten" && <DocumentenTab customerEmail={customer.email} customerNaam={`${customer.voornaam} ${customer.achternaam}`} />}
+
+      <ConfirmPopover
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        anchorRect={deleteAnchor}
+        title="Klant verwijderen"
+        message={`Weet je zeker dat je ${customer.voornaam} ${customer.achternaam} wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`}
+        confirmLabel="Verwijderen"
+        destructive
+        onConfirm={handleDelete}
+      />
+    </div>
+  );
+};
+
+/* ── Gekoppelde verkopen Tab ── */
+interface VerkoopRow {
+  id: string;
+  vehicle_id: string | null;
+  verkoopprijs: number | null;
+  contract_getekend_datum: string | null;
+  created_at: string;
+  stap11_afgerond: boolean | null;
+  wizard_status: string | null;
+  vehicle?: { merk: string; model: string; kenteken: string | null; verkoop_datum?: string | null } | null;
+}
+
+const GekoppeldeVerkopenTab = ({ customerId }: { customerId: string }) => {
+  const [verkopen, setVerkopen] = useState<VerkoopRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkAnchor, setLinkAnchor] = useState<DOMRect | null>(null);
+  const [available, setAvailable] = useState<SearchOption[]>([]);
+  const [availLoading, setAvailLoading] = useState(false);
+  const linkBtnRef = useRef<HTMLButtonElement>(null);
+  const navigate = useNavigate();
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("verkopen" as any)
+      .select("id, vehicle_id, verkoopprijs, contract_getekend_datum, created_at, stap11_afgerond, wizard_status")
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: false });
+    if (error) { toast.error("Kon verkopen niet laden"); setLoading(false); return; }
+
+    const rows = (data as any[]) || [];
+    const vehicleIds = Array.from(new Set(rows.map(r => r.vehicle_id).filter(Boolean)));
+    let vehicleMap: Record<string, any> = {};
+    if (vehicleIds.length > 0) {
+      const { data: vs } = await supabase
+        .from("vehicles")
+        .select("id, merk, model, kenteken, verkoop_datum")
+        .in("id", vehicleIds);
+      (vs || []).forEach((v: any) => { vehicleMap[v.id] = v; });
+    }
+    setVerkopen(rows.map(r => ({ ...r, vehicle: r.vehicle_id ? vehicleMap[r.vehicle_id] : null })));
+    setLoading(false);
+  }, [customerId]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const openLink = async () => {
+    setLinkAnchor(linkBtnRef.current?.getBoundingClientRect() ?? null);
+    setLinkOpen(true);
+    setAvailLoading(true);
+    // Verkopen zonder klant
+    const { data } = await supabase
+      .from("verkopen" as any)
+      .select("id, vehicle_id, created_at, contract_getekend_datum, verkoopprijs")
+      .is("customer_id", null)
+      .order("created_at", { ascending: false });
+    const rows = (data as any[]) || [];
+    const vehicleIds = Array.from(new Set(rows.map(r => r.vehicle_id).filter(Boolean)));
+    let vMap: Record<string, any> = {};
+    if (vehicleIds.length > 0) {
+      const { data: vs } = await supabase
+        .from("vehicles")
+        .select("id, merk, model, kenteken")
+        .in("id", vehicleIds);
+      (vs || []).forEach((v: any) => { vMap[v.id] = v; });
+    }
+    const opts: SearchOption[] = rows.map((r: any) => {
+      const v = r.vehicle_id ? vMap[r.vehicle_id] : null;
+      const naam = v ? `${v.merk || ""} ${v.model || ""}`.trim() : "Verkoop zonder voertuig";
+      const kenteken = v?.kenteken ? v.kenteken.toUpperCase() : "—";
+      const datum = r.contract_getekend_datum || r.created_at;
+      const datumStr = datum ? new Date(datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "";
+      return {
+        id: r.id,
+        label: naam,
+        sublabel: `${kenteken}`,
+        meta: datumStr,
+        searchText: `${naam} ${kenteken}`,
+      };
+    });
+    setAvailable(opts);
+    setAvailLoading(false);
+  };
+
+  const handleLink = async (verkoopId: string) => {
+    const { error } = await supabase.from("verkopen" as any).update({ customer_id: customerId }).eq("id", verkoopId);
+    if (error) { toast.error("Koppelen mislukt"); return; }
+    toast.success("Verkoop gekoppeld");
+    await load();
+  };
+
+  if (loading) return <div className="flex justify-center py-10"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gekoppelde verkopen</h3>
+        <button
+          ref={linkBtnRef}
+          onClick={openLink}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-xl hover:bg-accent transition-colors"
+        >
+          <Plus className="w-3.5 h-3.5" /> Koppel aan verkoop
+        </button>
+      </div>
+
+      {verkopen.length === 0 ? (
+        <div className="bg-card border border-border rounded-xl p-6 text-center">
+          <p className="text-sm text-muted-foreground">Nog geen verkopen gekoppeld aan deze klant.</p>
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          {verkopen.map((r) => {
+            const v = r.vehicle;
+            const naam = v ? `${v.merk || ""} ${v.model || ""}`.trim() : "Verkoop";
+            const datum = r.contract_getekend_datum || v?.verkoop_datum || r.created_at;
+            const isAfgerond = !!r.stap11_afgerond;
+            return (
+              <div
+                key={r.id}
+                onClick={() => v && navigate(`/admin/voertuigen/${r.vehicle_id}`)}
+                className="flex items-center justify-between gap-3 px-4 py-3 bg-card border border-border rounded-xl hover:bg-accent/30 cursor-pointer transition-colors"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium text-foreground">{naam}</p>
+                    {v?.kenteken && <span className="text-[10px] font-mono uppercase text-muted-foreground">{v.kenteken}</span>}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {datum ? new Date(datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "—"}
+                    {r.verkoopprijs ? ` · € ${Number(r.verkoopprijs).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : ""}
+                  </p>
+                </div>
+                <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-md border whitespace-nowrap ${
+                  isAfgerond
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                    : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                }`}>
+                  {isAfgerond ? "Afgerond" : "In behandeling"}
+                </span>
+                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <SearchSelectPopover
+        open={linkOpen}
+        onOpenChange={setLinkOpen}
+        anchorRect={linkAnchor}
+        title="Koppel aan verkoop"
+        placeholder="Zoek op voertuig of kenteken..."
+        options={available}
+        loading={availLoading}
+        emptyMessage="Geen vrije verkopen beschikbaar"
+        onSelect={handleLink}
+      />
     </div>
   );
 };

@@ -1,12 +1,14 @@
 import { useState, useMemo, useRef } from "react";
 import { useCustomers, Customer, statusLabels, statusColors } from "@/hooks/useCustomers";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Loader2, ChevronRight } from "lucide-react";
+import { Plus, Search, Loader2, ChevronRight, Trash2 } from "lucide-react";
 import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
+import ConfirmPopover from "@/components/admin/ConfirmPopover";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
+import { deleteCustomerSafely } from "@/lib/customerDelete";
 
 const allStatuses: Customer["status"][] = ["prospect", "klant", "inactief"];
 
@@ -16,7 +18,7 @@ const statusTabs = [
 ];
 
 const AdminKlantenPage = () => {
-  const { customers, loading, addCustomer } = useCustomers();
+  const { customers, loading, addCustomer, fetchCustomers } = useCustomers();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
@@ -24,6 +26,8 @@ const AdminKlantenPage = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [addAnchor, setAddAnchor] = useState<DOMRect | null>(null);
   const addBtnRef = useRef<HTMLButtonElement>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
+  const [deleteAnchor, setDeleteAnchor] = useState<DOMRect | null>(null);
 
   const filtered = useMemo(() => {
     let list = customers;
@@ -53,6 +57,20 @@ const AdminKlantenPage = () => {
     if (!d) return "—";
     return new Date(d).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
   };
+
+  const requestDelete = (e: React.MouseEvent, c: Customer) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setDeleteAnchor((e.currentTarget as HTMLElement).getBoundingClientRect());
+    setDeleteTarget(c);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const ok = await deleteCustomerSafely(deleteTarget.id);
+    if (ok) await fetchCustomers();
+  };
+
 
   return (
     <div className="space-y-4">
@@ -99,23 +117,34 @@ const AdminKlantenPage = () => {
         /* Mobile: card list */
         <div className="space-y-1.5">
           {filtered.map((c) => (
-            <button
+            <div
               key={c.id}
-              onClick={() => navigate(`/admin/klanten/${c.id}`)}
-              className="w-full text-left flex items-center justify-between gap-3 bg-card border border-border rounded-md p-3 active:bg-accent/30 transition-colors"
+              className="group relative flex items-center bg-card border border-border rounded-md active:bg-accent/30 transition-colors"
             >
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-foreground">{c.voornaam} {c.achternaam}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
-                    {statusLabels[c.status]}
-                  </span>
-                  <span className="text-xs text-muted-foreground truncate">{c.email}</span>
+              <button
+                onClick={() => navigate(`/admin/klanten/${c.id}`)}
+                className="flex-1 text-left flex items-center justify-between gap-3 p-3 min-w-0"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground">{c.voornaam} {c.achternaam}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
+                      {statusLabels[c.status]}
+                    </span>
+                    <span className="text-xs text-muted-foreground truncate">{c.email}</span>
+                  </div>
+                  {c.telefoon && <p className="text-xs text-muted-foreground mt-0.5">{c.telefoon}</p>}
                 </div>
-                {c.telefoon && <p className="text-xs text-muted-foreground mt-0.5">{c.telefoon}</p>}
-              </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-            </button>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+              </button>
+              <button
+                onClick={(e) => requestDelete(e, c)}
+                aria-label="Verwijder klant"
+                className="px-3 py-3 text-muted-foreground/60 hover:text-red-500 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           ))}
         </div>
       ) : (
@@ -130,6 +159,7 @@ const AdminKlantenPage = () => {
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">E-mail</th>
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Laatste contact</th>
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Status</th>
+                  <th className="w-10 px-3 py-2"></th>
                 </tr>
               </thead>
               <tbody>
@@ -137,7 +167,7 @@ const AdminKlantenPage = () => {
                   <tr
                     key={c.id}
                     onClick={() => navigate(`/admin/klanten/${c.id}`)}
-                    className="border-b border-border/50 hover:bg-muted/70 cursor-pointer transition-colors"
+                    className="group border-b border-border/50 hover:bg-muted/70 cursor-pointer transition-colors"
                   >
                     <td className="px-3 py-2.5 text-foreground">{c.voornaam} {c.achternaam}</td>
                     <td className="px-3 py-2.5 text-muted-foreground text-xs">{c.telefoon || "—"}</td>
@@ -147,6 +177,15 @@ const AdminKlantenPage = () => {
                       <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
                         {statusLabels[c.status]}
                       </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-right">
+                      <button
+                        onClick={(e) => requestDelete(e, c)}
+                        aria-label="Verwijder klant"
+                        className="p-1.5 rounded text-muted-foreground/40 opacity-0 group-hover:opacity-100 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -162,6 +201,18 @@ const AdminKlantenPage = () => {
         onOpenChange={setAddOpen}
         anchorRect={addAnchor}
         onSubmit={handleAdd}
+      />
+
+      {/* Delete confirm */}
+      <ConfirmPopover
+        open={!!deleteTarget}
+        onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}
+        anchorRect={deleteAnchor}
+        title="Klant verwijderen"
+        message={deleteTarget ? `Weet je zeker dat je ${deleteTarget.voornaam} ${deleteTarget.achternaam} wilt verwijderen? Dit kan niet ongedaan worden gemaakt.` : ""}
+        confirmLabel="Verwijderen"
+        destructive
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

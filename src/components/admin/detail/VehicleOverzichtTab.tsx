@@ -6,6 +6,7 @@ import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
 import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
 import { toast } from "sonner";
+import KoppelKlantBlock from "./KoppelKlantBlock";
 
 interface Props {
   vehicle: Vehicle;
@@ -194,6 +195,11 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
         </div>
 
       </div>
+
+      {/* Klant / koper info */}
+      {(vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
+        <KoppelKlantBlock vehicleId={vehicle.id} />
+      )}
 
       {/* Klant / koper info */}
       {(vehicle.status === "reparatie_onderhoud" || vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
