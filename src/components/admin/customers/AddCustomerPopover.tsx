@@ -26,12 +26,38 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
   const [animateIn, setAnimateIn] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      requestAnimationFrame(() => setAnimateIn(true));
-    } else {
+    if (!open) {
       setAnimateIn(false);
+      return;
     }
-  }, [open]);
+    // On mobile we can animate immediately. On desktop wait until pos is computed
+    // so the popover fades/slides in from its final anchor location, not from (-9999,-9999).
+    if (isMobile) {
+      const r1 = requestAnimationFrame(() => {
+        const r2 = requestAnimationFrame(() => setAnimateIn(true));
+        // store inner id for cleanup
+        (window as any).__addCustPopRaf = r2;
+      });
+      return () => {
+        cancelAnimationFrame(r1);
+        if ((window as any).__addCustPopRaf) cancelAnimationFrame((window as any).__addCustPopRaf);
+      };
+    }
+  }, [open, isMobile]);
+
+  // Desktop: trigger enter animation right after position is measured
+  useEffect(() => {
+    if (!open || isMobile) return;
+    if (!pos) return;
+    const r1 = requestAnimationFrame(() => {
+      const r2 = requestAnimationFrame(() => setAnimateIn(true));
+      (window as any).__addCustPopRaf2 = r2;
+    });
+    return () => {
+      cancelAnimationFrame(r1);
+      if ((window as any).__addCustPopRaf2) cancelAnimationFrame((window as any).__addCustPopRaf2);
+    };
+  }, [open, isMobile, pos]);
 
   const handleClose = () => {
     if (closing) return;
@@ -101,8 +127,8 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
   if (!mounted) return null;
 
   const overlayStyle: React.CSSProperties = {
-    opacity: closing ? 0 : 0.4,
-    transition: `opacity ${closing ? 160 : 200}ms ${closing ? "ease-in" : "ease-out"}`,
+    opacity: closing ? 0 : animateIn ? 0.4 : 0,
+    transition: `opacity ${closing ? 160 : 220}ms ${closing ? "ease-in" : "ease-out"}`,
     backgroundColor: "#000",
     willChange: "opacity",
   };
