@@ -184,10 +184,10 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
     ]);
     if (wizardRes.error || legacyRes.error) { toast.error("Kon verkopen niet laden"); setLoading(false); return; }
 
-    const wizardRows: VerkoopRow[] = ((wizardRes.data as any[]) || []).map(r => ({ ...r, source: "verkopen" }));
+    const wizardRows: VerkoopRow[] = ((wizardRes.data as any[]) || []).map(r => ({ ...r, source: "verkopen" as const }));
     const legacyRows: VerkoopRow[] = ((legacyRes.data as any[]) || []).map(r => ({
       id: r.id,
-      source: "vehicle_sales",
+      source: "vehicle_sales" as const,
       vehicle_id: r.vehicle_id,
       verkoopprijs: r.verkoopprijs,
       contract_getekend_datum: r.verkoop_datum || r.afleverdatum,
