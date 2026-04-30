@@ -58,6 +58,20 @@ const AdminKlantenPage = () => {
     return new Date(d).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
   };
 
+  const requestDelete = (e: React.MouseEvent, c: Customer) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setDeleteAnchor((e.currentTarget as HTMLElement).getBoundingClientRect());
+    setDeleteTarget(c);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const ok = await deleteCustomerSafely(deleteTarget.id);
+    if (ok) await fetchCustomers();
+  };
+
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
