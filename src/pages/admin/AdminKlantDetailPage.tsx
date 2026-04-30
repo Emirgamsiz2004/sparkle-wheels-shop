@@ -461,7 +461,7 @@ const ProfielTab = ({ customer, onUpdate }: { customer: Customer; onUpdate: (id:
         <p className="text-[10px] text-muted-foreground">Wordt automatisch opgeslagen na 2 seconden</p>
       </div>
 
-      <GekoppeldeVerkopenSection customerId={customer.id} />
+      <GekoppeldeVerkopenSection customer={customer} />
     </div>
   );
 };
