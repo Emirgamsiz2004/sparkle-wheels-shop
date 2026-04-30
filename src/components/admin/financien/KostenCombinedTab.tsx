@@ -681,14 +681,14 @@ function SourceBadge({ source }: { source: Row["source"] }) {
   return <span className={cn("text-[10px] px-1.5 py-0.5 rounded border whitespace-nowrap", m.cls)}>{m.label}</span>;
 }
 
-/* ───────── Category accent colors ───────── */
+/* ───────── Category accent colors (gedempte industriële palette) ───────── */
 const CATEGORY_COLORS: Record<string, string> = {
-  "Abonnementen & software": "#5DCAA5",
-  "Advertentiekosten": "#EF9F27",
-  "Personeelskosten": "#85B7EB",
-  "Vaste kosten": "#F09995",
-  "Onderdelen & materialen": "#AFA9EC",
-  "Inkoop voertuigen": "#B4B2A9",
+  "Abonnementen & software": "#4FB394",
+  "Advertentiekosten": "#D98B22",
+  "Personeelskosten": "#6FA3D4",
+  "Vaste kosten": "#D98480",
+  "Onderdelen & materialen": "#9994D4",
+  "Inkoop voertuigen": "#9C9A91",
 };
 
 /* ───────── CategoryCard (compact) ───────── */
@@ -719,23 +719,30 @@ function CategoryCard({
 
   const PREVIEW_LIMIT = 8;
   const visibleRows = expanded ? rows : rows.slice(0, PREVIEW_LIMIT);
-  const accentColor = CATEGORY_COLORS[categorie.naam] || "#B4B2A9";
+  const accentColor = CATEGORY_COLORS[categorie.naam] || "#9C9A91";
   const hasContacts = (categorie.moneybird_contact_ids || []).length > 0;
 
   return (
     <div className={cn(
-      "rounded-[14px] border border-border bg-secondary/20 overflow-hidden transition-all flex flex-col",
+      "rounded-[14px] border border-border bg-card overflow-hidden transition-all flex flex-col hover:border-border/80",
       expanded && "md:col-span-2"
     )}>
-      {/* Top accent bar */}
-      <div style={{ height: "3px", backgroundColor: accentColor }} />
-
       {/* Header strip */}
-      <div className="px-4 pt-3 pb-2.5 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="text-[12px] font-medium text-muted-foreground uppercase tracking-wide truncate">{categorie.naam}</h3>
-          <div className="mt-1 text-[20px] font-semibold tabular-nums leading-tight text-foreground">{formatEuro(total)}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">
+      <div className="px-4 pt-3.5 pb-3 flex items-start justify-between gap-3 border-b border-border/50">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span
+              className="w-1.5 h-1.5 rounded-full shrink-0"
+              style={{ backgroundColor: accentColor, boxShadow: `0 0 8px ${accentColor}40` }}
+            />
+            <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.08em] truncate">
+              {categorie.naam}
+            </h3>
+          </div>
+          <div className="mt-2 text-[22px] font-semibold tabular-nums leading-none text-foreground">
+            {formatEuro(total)}
+          </div>
+          <div className="text-[11px] text-muted-foreground/80 mt-1.5">
             {rows.length} post{rows.length === 1 ? "" : "en"} · {sourceLabel}
           </div>
         </div>
@@ -753,10 +760,10 @@ function CategoryCard({
 
       {/* Rows */}
       {rows.length === 0 ? (
-        <div className="px-4 pb-4 pt-3 border-t border-border/40 flex flex-col items-center gap-1.5">
+        <div className="px-4 py-6 flex flex-col items-center gap-1.5">
           <div className="text-[12px] text-muted-foreground">Geen posten deze periode</div>
           {!hasContacts && !isInkoopVoertuigen && (
-            <div className="text-[11px] text-muted-foreground/70">Geen contacten gekoppeld</div>
+            <div className="text-[11px] text-muted-foreground/60">Geen contacten gekoppeld</div>
           )}
           <button
             onClick={onAddManual}
@@ -768,21 +775,21 @@ function CategoryCard({
       ) : (
         <div className="flex-1 flex flex-col">
           {expanded ? (
-            <div className="-mx-px overflow-x-auto border-t border-border/60">
+            <div className="overflow-x-auto">
               <ExpandedTable rows={rows} isInkoopVoertuigen={isInkoopVoertuigen} onUpdateKost={onUpdateKost} onDeleteKost={onDeleteKost} onChanged={onKostChanged} isMobile={isMobile} />
             </div>
           ) : (
-            <div className="border-t border-border/60 divide-y divide-border/40">
+            <div className="divide-y divide-border/30">
               {visibleRows.map((r) => (
                 <div
                   key={r.id}
-                  className="grid grid-cols-[58px_1fr_auto] items-center gap-3 px-4 py-[7px] text-[12px] hover:bg-secondary/30 transition-colors"
+                  className="grid grid-cols-[52px_1fr_auto] items-center gap-3 px-4 py-2 text-[12px] hover:bg-secondary/20 transition-colors"
                 >
-                  <span className="text-[11px] text-muted-foreground tabular-nums">
+                  <span className="text-[11px] text-muted-foreground/70 tabular-nums">
                     {r.date.toLocaleDateString("nl-NL", { day: "2-digit", month: "2-digit" })}
                   </span>
-                  <span className="truncate text-foreground">
-                    {r.kenteken && <span className="mr-1.5 text-muted-foreground tabular-nums">{r.kenteken}</span>}
+                  <span className="truncate text-foreground/90">
+                    {r.kenteken && <span className="mr-1.5 text-muted-foreground/70 tabular-nums text-[11px]">{r.kenteken}</span>}
                     {r.description}
                   </span>
                   <span className="text-right font-medium tabular-nums whitespace-nowrap text-foreground">{formatEuro(r.amount)}</span>
@@ -792,17 +799,19 @@ function CategoryCard({
           )}
 
           {rows.length > PREVIEW_LIMIT && (
-            <div className="px-4 py-2 border-t border-border/60 flex justify-between items-center bg-secondary/10">
-              <button
-                onClick={onToggleExpand}
-                className="text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-              >
+            <button
+              onClick={onToggleExpand}
+              className="px-4 py-2.5 border-t border-border/50 flex justify-between items-center bg-secondary/10 hover:bg-secondary/30 transition-colors text-left"
+            >
+              <span className="text-[12px] text-muted-foreground hover:text-foreground transition-colors">
                 {expanded ? "Inklappen" : `Toon alle ${rows.length} posten`}
-              </button>
-              <span className="text-[11px] text-muted-foreground tabular-nums">
-                {expanded ? "" : `+${rows.length - PREVIEW_LIMIT} meer`}
               </span>
-            </div>
+              {!expanded && (
+                <span className="text-[11px] text-muted-foreground/70 tabular-nums">
+                  +{rows.length - PREVIEW_LIMIT} meer
+                </span>
+              )}
+            </button>
           )}
         </div>
       )}
@@ -1381,10 +1390,15 @@ function ContactPickerDialog({
 /* ───────── Marge per voertuig ───────── */
 function MargeSection({ rows, totaleBruto, gemMargePerc }: { rows: any[]; totaleBruto: number; gemMargePerc: number }) {
   return (
-    <div className="rounded-[14px] border border-border bg-secondary/20 overflow-hidden">
-      <div style={{ height: "3px", backgroundColor: "#1D9E75" }} />
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <h3 className="text-sm font-semibold">Marge per voertuig</h3>
+    <div className="rounded-[14px] border border-border bg-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3.5 border-b border-border/50">
+        <div className="flex items-center gap-2">
+          <span
+            className="w-1.5 h-1.5 rounded-full shrink-0"
+            style={{ backgroundColor: "#4FB394", boxShadow: "0 0 8px #4FB39440" }}
+          />
+          <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.08em]">Marge per voertuig</h3>
+        </div>
         <div className="text-sm font-semibold tabular-nums">{formatEuro(totaleBruto)}</div>
       </div>
       {rows.length === 0 ? (
