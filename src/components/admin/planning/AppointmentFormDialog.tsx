@@ -479,6 +479,50 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                 />
               </div>
 
+              {/* E-mailadres klant */}
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                  {selectedCustomerEmail ? "Bevestigingsmail naar" : "E-mailadres klant"}{" "}
+                  {!selectedCustomerEmail && <span className="opacity-50">(optioneel)</span>}
+                </Label>
+                <Input
+                  value={selectedCustomerEmail || form.klant_email}
+                  onChange={(e) => setForm({ ...form, klant_email: e.target.value })}
+                  placeholder="naam@voorbeeld.nl"
+                  type="email"
+                  readOnly={!!selectedCustomerEmail}
+                  className={cn("rounded-[3px] h-10", selectedCustomerEmail && "opacity-70 cursor-not-allowed")}
+                />
+              </div>
+
+              {/* Duur (minuten) */}
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                  {type === "onderhoud" ? "Duur reparatie (minuten)" : "Duur (minuten)"}
+                </Label>
+                <Input
+                  type="number"
+                  min={5}
+                  step={5}
+                  value={form.duur_minuten}
+                  onChange={(e) => setForm({ ...form, duur_minuten: parseInt(e.target.value) || 0 })}
+                  className="rounded-[3px] h-10"
+                />
+              </div>
+
+              {/* Toggle bevestigingsmail */}
+              <div className="flex items-center justify-between gap-3 py-1">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs text-foreground">Stuur bevestigingsmail</span>
+                </div>
+                <Switch
+                  checked={form.stuur_bevestigingsmail && !!effectiveEmail}
+                  disabled={!effectiveEmail}
+                  onCheckedChange={(v) => setForm({ ...form, stuur_bevestigingsmail: v })}
+                />
+              </div>
+
               {/* Aflevering: betalingsstatus */}
               <AnimatePresence>
                 {type === "aflevering" && (
