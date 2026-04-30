@@ -8,6 +8,7 @@ export interface SearchOption {
   label: string;
   sublabel?: string;
   meta?: string;
+  warning?: string;
   searchText: string;
 }
 
@@ -192,6 +193,7 @@ const SearchSelectPopover = ({
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-foreground truncate">{o.label}</p>
                     {o.sublabel && <p className="text-[11px] text-muted-foreground truncate">{o.sublabel}</p>}
+                    {o.warning && <p className="text-[11px] text-amber-400 truncate mt-0.5">⚠ {o.warning}</p>}
                   </div>
                   {o.meta && <span className="text-[11px] text-muted-foreground whitespace-nowrap">{o.meta}</span>}
                 </button>
