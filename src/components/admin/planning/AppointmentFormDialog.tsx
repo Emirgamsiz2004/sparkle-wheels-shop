@@ -137,7 +137,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     setCustomerSearch("");
     setSelectedCustomerId(null);
     setCustomerOpen(false);
-    setForm({ tijd: "10:00", klant_naam: "", klant_telefoon: "", vehicle_id: "", notities: "", onderwerp: "", betalingsstatus: "openstaand" });
+    setForm({ tijd: "10:00", klant_naam: "", klant_telefoon: "", klant_email: "", vehicle_id: "", notities: "", onderwerp: "", betalingsstatus: "openstaand", duur_minuten: 60, stuur_bevestigingsmail: false });
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -181,15 +181,17 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     try {
       const dateStr = format(selectedDate, "yyyy-MM-dd");
       const datum_tijd = new Date(`${dateStr}T${form.tijd}`).toISOString();
+      const duur = Math.max(5, form.duur_minuten || 60);
+      const eind_datum_tijd = new Date(new Date(datum_tijd).getTime() + duur * 60 * 1000).toISOString();
       const noteParts = [
         !selectedCustomerId && form.klant_naam ? `Klant: ${form.klant_naam}` : "",
         !selectedCustomerId && form.klant_telefoon ? `Tel: ${form.klant_telefoon}` : "",
         form.notities,
       ].filter(Boolean);
-      await onSubmit({
+      const result = await onSubmit({
         type,
         datum_tijd,
-        eind_datum_tijd: null,
+        eind_datum_tijd,
         customer_id: selectedCustomerId,
         vehicle_id: form.vehicle_id || null,
         medewerker: null,
@@ -198,7 +200,31 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
         betalingsstatus: type === "aflevering" ? form.betalingsstatus : null,
         voertuig_klaargemaakt: false,
         status: "gepland",
+        klant_email: effectiveEmail || null,
+        duur_minuten: duur,
       });
+
+      // Bevestigingsmail versturen indien toggle aan + email beschikbaar
+      const newId = typeof result === "string" ? result : null;
+      if (newId && form.stuur_bevestigingsmail && effectiveEmail) {
+        const klant = selectedCustomerId
+          ? customers.find((c) => c.id === selectedCustomerId)
+          : null;
+        const voornaam = klant?.voornaam || form.klant_naam.split(" ")[0] || "";
+        const veh = (form.vehicle_id ? vehicleList.find((v) => v.id === form.vehicle_id) : null) || null;
+        await sendAppointmentConfirmation({
+          appointmentId: newId,
+          recipientEmail: effectiveEmail,
+          voornaam,
+          type,
+          datumTijd: datum_tijd,
+          eindDatumTijd: eind_datum_tijd,
+          duurMinuten: duur,
+          voertuig: veh ? { merk: veh.merk, model: veh.model, kenteken: veh.kenteken } : null,
+          omschrijving: type === "terugbelafspraak" ? form.onderwerp : form.notities,
+        });
+      }
+
       handleOpenChange(false);
     } finally {
       setSaving(false);
