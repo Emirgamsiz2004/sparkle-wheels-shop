@@ -133,7 +133,7 @@ const AdminKlantDetailPage = () => {
   );
 };
 
-/* ── Gekoppelde verkopen Tab ── */
+/* ── Gekoppelde verkopen Section (used on Profiel + Verkopen tab) ── */
 interface VerkoopRow {
   id: string;
   vehicle_id: string | null;
@@ -142,16 +142,19 @@ interface VerkoopRow {
   created_at: string;
   stap11_afgerond: boolean | null;
   wizard_status: string | null;
+  customer_id?: string | null;
   vehicle?: { merk: string; model: string; kenteken: string | null; verkoop_datum?: string | null } | null;
 }
 
-const GekoppeldeVerkopenTab = ({ customerId }: { customerId: string }) => {
+const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
   const [verkopen, setVerkopen] = useState<VerkoopRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkAnchor, setLinkAnchor] = useState<DOMRect | null>(null);
   const [available, setAvailable] = useState<SearchOption[]>([]);
   const [availLoading, setAvailLoading] = useState(false);
+  const [unlinkConfirm, setUnlinkConfirm] = useState<{ open: boolean; verkoopId: string | null; anchor: DOMRect | null; naam: string }>({ open: false, verkoopId: null, anchor: null, naam: "" });
+  const [overwriteConfirm, setOverwriteConfirm] = useState<{ open: boolean; verkoopId: string | null; bestaandeNaam: string }>({ open: false, verkoopId: null, bestaandeNaam: "" });
   const linkBtnRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
 
@@ -184,51 +187,98 @@ const GekoppeldeVerkopenTab = ({ customerId }: { customerId: string }) => {
     setLinkAnchor(linkBtnRef.current?.getBoundingClientRect() ?? null);
     setLinkOpen(true);
     setAvailLoading(true);
-    // Verkopen zonder klant
+
+    // ALLE verkopen — niet enkel zonder klant
     const { data } = await supabase
       .from("verkopen" as any)
-      .select("id, vehicle_id, created_at, contract_getekend_datum, verkoopprijs")
-      .is("customer_id", null)
+      .select("id, vehicle_id, customer_id, created_at, contract_getekend_datum, verkoopprijs")
       .order("created_at", { ascending: false });
-    const rows = (data as any[]) || [];
+    const rows = ((data as any[]) || []).filter(r => r.customer_id !== customerId);
+
     const vehicleIds = Array.from(new Set(rows.map(r => r.vehicle_id).filter(Boolean)));
-    let vMap: Record<string, any> = {};
-    if (vehicleIds.length > 0) {
-      const { data: vs } = await supabase
-        .from("vehicles")
-        .select("id, merk, model, kenteken")
-        .in("id", vehicleIds);
-      (vs || []).forEach((v: any) => { vMap[v.id] = v; });
-    }
+    const customerIds = Array.from(new Set(rows.map(r => r.customer_id).filter(Boolean)));
+
+    const [vsRes, csRes] = await Promise.all([
+      vehicleIds.length > 0
+        ? supabase.from("vehicles").select("id, merk, model, kenteken").in("id", vehicleIds)
+        : Promise.resolve({ data: [] as any[] }),
+      customerIds.length > 0
+        ? supabase.from("customers").select("id, voornaam, achternaam, bedrijfsnaam").in("id", customerIds)
+        : Promise.resolve({ data: [] as any[] }),
+    ]);
+
+    const vMap: Record<string, any> = {};
+    (vsRes.data || []).forEach((v: any) => { vMap[v.id] = v; });
+    const cMap: Record<string, any> = {};
+    (csRes.data || []).forEach((c: any) => { cMap[c.id] = c; });
+
     const opts: SearchOption[] = rows.map((r: any) => {
       const v = r.vehicle_id ? vMap[r.vehicle_id] : null;
       const naam = v ? `${v.merk || ""} ${v.model || ""}`.trim() : "Verkoop zonder voertuig";
       const kenteken = v?.kenteken ? v.kenteken.toUpperCase() : "—";
       const datum = r.contract_getekend_datum || r.created_at;
       const datumStr = datum ? new Date(datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "";
+      const prijsStr = r.verkoopprijs ? `€ ${Number(r.verkoopprijs).toLocaleString("nl-NL", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "";
+      const c = r.customer_id ? cMap[r.customer_id] : null;
+      const huidige = c ? (c.bedrijfsnaam || `${c.voornaam || ""} ${c.achternaam || ""}`.trim() || "Onbekende klant") : null;
       return {
         id: r.id,
         label: naam,
-        sublabel: `${kenteken}`,
-        meta: datumStr,
-        searchText: `${naam} ${kenteken}`,
+        sublabel: [kenteken, datumStr, prijsStr].filter(Boolean).join(" · "),
+        meta: undefined,
+        warning: huidige ? `Al gekoppeld aan ${huidige}` : undefined,
+        searchText: `${naam} ${kenteken} ${huidige || ""}`,
       };
     });
     setAvailable(opts);
     setAvailLoading(false);
   };
 
-  const handleLink = async (verkoopId: string) => {
+  const persistLink = async (verkoopId: string) => {
     const { error } = await supabase.from("verkopen" as any).update({ customer_id: customerId }).eq("id", verkoopId);
     if (error) { toast.error("Koppelen mislukt"); return; }
     toast.success("Verkoop gekoppeld");
     await load();
   };
 
-  if (loading) return <div className="flex justify-center py-10"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
+  const handleLink = async (verkoopId: string) => {
+    const opt = available.find(o => o.id === verkoopId);
+    if (opt?.warning) {
+      const bestaande = opt.warning.replace(/^Al gekoppeld aan\s*/i, "");
+      setOverwriteConfirm({ open: true, verkoopId, bestaandeNaam: bestaande });
+      return;
+    }
+    await persistLink(verkoopId);
+  };
+
+  const confirmOverwrite = async () => {
+    if (!overwriteConfirm.verkoopId) return;
+    await persistLink(overwriteConfirm.verkoopId);
+    setOverwriteConfirm({ open: false, verkoopId: null, bestaandeNaam: "" });
+  };
+
+  const requestUnlink = (e: React.MouseEvent<HTMLButtonElement>, row: VerkoopRow) => {
+    e.stopPropagation();
+    const naam = row.vehicle ? `${row.vehicle.merk || ""} ${row.vehicle.model || ""}`.trim() : "deze verkoop";
+    setUnlinkConfirm({
+      open: true,
+      verkoopId: row.id,
+      anchor: e.currentTarget.getBoundingClientRect(),
+      naam,
+    });
+  };
+
+  const handleUnlink = async () => {
+    if (!unlinkConfirm.verkoopId) return;
+    const { error } = await supabase.from("verkopen" as any).update({ customer_id: null }).eq("id", unlinkConfirm.verkoopId);
+    if (error) { toast.error("Ontkoppelen mislukt"); return; }
+    toast.success("Verkoop ontkoppeld");
+    setUnlinkConfirm({ open: false, verkoopId: null, anchor: null, naam: "" });
+    await load();
+  };
 
   return (
-    <div className="space-y-3">
+    <div className="bg-card border border-border rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gekoppelde verkopen</h3>
         <button
@@ -240,26 +290,25 @@ const GekoppeldeVerkopenTab = ({ customerId }: { customerId: string }) => {
         </button>
       </div>
 
-      {verkopen.length === 0 ? (
-        <div className="bg-card border border-border rounded-xl p-6 text-center">
-          <p className="text-sm text-muted-foreground">Nog geen verkopen gekoppeld aan deze klant.</p>
-        </div>
+      {loading ? (
+        <div className="flex justify-center py-6"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>
+      ) : verkopen.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">Nog geen verkopen gekoppeld aan deze klant.</p>
       ) : (
         <div className="space-y-1.5">
           {verkopen.map((r) => {
             const v = r.vehicle;
             const naam = v ? `${v.merk || ""} ${v.model || ""}`.trim() : "Verkoop";
             const datum = r.contract_getekend_datum || v?.verkoop_datum || r.created_at;
-            const isAfgerond = !!r.stap11_afgerond;
             return (
               <div
                 key={r.id}
                 onClick={() => v && navigate(`/admin/voertuigen/${r.vehicle_id}`)}
-                className="flex items-center justify-between gap-3 px-4 py-3 bg-card border border-border rounded-xl hover:bg-accent/30 cursor-pointer transition-colors"
+                className="flex items-center justify-between gap-3 px-3 py-2.5 bg-secondary/30 border border-border rounded-xl hover:bg-accent/30 cursor-pointer transition-colors"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-medium text-foreground">{naam}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{naam}</p>
                     {v?.kenteken && <span className="text-[10px] font-mono uppercase text-muted-foreground">{v.kenteken}</span>}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -267,14 +316,13 @@ const GekoppeldeVerkopenTab = ({ customerId }: { customerId: string }) => {
                     {r.verkoopprijs ? ` · € ${Number(r.verkoopprijs).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : ""}
                   </p>
                 </div>
-                <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded-md border whitespace-nowrap ${
-                  isAfgerond
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                    : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                }`}>
-                  {isAfgerond ? "Afgerond" : "In behandeling"}
-                </span>
-                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                <button
+                  onClick={(e) => requestUnlink(e, r)}
+                  className="p-1.5 text-muted-foreground/60 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                  aria-label="Ontkoppelen"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
             );
           })}
@@ -289,8 +337,29 @@ const GekoppeldeVerkopenTab = ({ customerId }: { customerId: string }) => {
         placeholder="Zoek op voertuig of kenteken..."
         options={available}
         loading={availLoading}
-        emptyMessage="Geen vrije verkopen beschikbaar"
+        emptyMessage="Geen verkopen gevonden"
         onSelect={handleLink}
+      />
+
+      <ConfirmPopover
+        open={overwriteConfirm.open}
+        onOpenChange={(o) => !o && setOverwriteConfirm({ open: false, verkoopId: null, bestaandeNaam: "" })}
+        anchorRect={null}
+        title="Bestaande koppeling overschrijven?"
+        message={`Deze verkoop is al gekoppeld aan ${overwriteConfirm.bestaandeNaam}. Weet je zeker dat je dit wilt overschrijven?`}
+        confirmLabel="Bevestigen"
+        onConfirm={confirmOverwrite}
+      />
+
+      <ConfirmPopover
+        open={unlinkConfirm.open}
+        onOpenChange={(o) => !o && setUnlinkConfirm({ open: false, verkoopId: null, anchor: null, naam: "" })}
+        anchorRect={unlinkConfirm.anchor}
+        title="Verkoop ontkoppelen?"
+        message={`Weet je zeker dat je ${unlinkConfirm.naam} wilt ontkoppelen van deze klant?`}
+        confirmLabel="Ontkoppelen"
+        destructive
+        onConfirm={handleUnlink}
       />
     </div>
   );
