@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Customer, statusLabels, statusColors, useCustomers } from "@/hooks/useCustomers";
-import { ArrowLeft, Phone, MessageCircle, Loader2, ChevronDown, FileText, Download, Trash2, Plus, ExternalLink } from "lucide-react";
+import { ArrowLeft, Phone, MessageCircle, Loader2, ChevronDown, FileText, Download, Trash2, Plus, ExternalLink, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import ConfirmPopover from "@/components/admin/ConfirmPopover";
