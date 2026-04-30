@@ -705,7 +705,6 @@ const KostenCombinedTab = () => {
                       key={r.id}
                       onClick={() => {
                         if (r.source === "handmatig") { setEditing(r.raw as Kost); setAddOpen(true); }
-                        else if (r.source === "inkoopverklaring") { navigate(`/admin/inkoopverklaring/${(r.raw as InkoopRow).id}`); }
                         else { setDetailRow(r); }
                       }}
                       className={cn("hover:bg-accent/40 cursor-pointer transition-colors", idx % 2 === 1 && "bg-card/40")}
