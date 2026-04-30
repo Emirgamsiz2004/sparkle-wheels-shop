@@ -1591,16 +1591,15 @@ function AddCostDialog({
     );
   }
   return (
-    <Popover open={open} onOpenChange={(v) => !v && onClose()}>
-      <PopoverTrigger asChild><button className="hidden" /></PopoverTrigger>
-      <PopoverContent side="bottom" align="end" className="w-[440px] rounded-[16px] border-border bg-card p-4">
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="w-[460px] max-w-[95vw] rounded-[16px] border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold">Kost toevoegen</h3>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
         </div>
         {Body}
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   );
 }
 
