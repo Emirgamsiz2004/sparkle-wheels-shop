@@ -23,6 +23,15 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
   const [form, setForm] = useState({ voornaam: "", achternaam: "", email: "", telefoon: "" });
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => setAnimateIn(true));
+    } else {
+      setAnimateIn(false);
+    }
+  }, [open]);
 
   const handleClose = () => {
     if (closing) return;
@@ -124,16 +133,6 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
       ? "transform 280ms ease-in"
       : "transform 320ms cubic-bezier(0.32, 0.72, 0, 1)",
   };
-
-  // initial mount transform for mobile (slide up from below)
-  const [animateIn, setAnimateIn] = useState(false);
-  useEffect(() => {
-    if (open) {
-      requestAnimationFrame(() => setAnimateIn(true));
-    } else {
-      setAnimateIn(false);
-    }
-  }, [open]);
 
   if (isMobile) {
     mobileStyle.transform = closing
