@@ -172,6 +172,9 @@ const AdminInstellingenPage = () => {
         </CardContent>
       </Card>
 
+      {/* Diensten Beheer */}
+      <DienstenBeheer />
+
       {/* Google Drive Section */}
       <Card>
         <CardContent className="p-6 space-y-5">
