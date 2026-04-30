@@ -1,102 +1,87 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { useKosten, Kost, KostCategorie, KostFrequentie, kostCategorieLabels, kostFrequentieLabels, kostBedragInPeriode } from "@/hooks/useKosten";
-import { formatEuroDecimal } from "@/types/vehicle";
 import { supabase } from "@/integrations/supabase/client";
 
-import { Plus, Search, Trash2, X, Wrench, Car, Home, Megaphone, Repeat, MoreHorizontal, TrendingUp, TrendingDown, ArrowDownRight, ArrowUpRight, AlertTriangle, FileText } from "lucide-react";
+import { Plus, X, TrendingUp, TrendingDown, Receipt, Wallet, Percent, ShoppingCart, FileText } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-/* ───────── Categorie ───────── */
-type CatKey =
-  | "inkoop_voertuigen"
-  | "voertuigkosten"
-  | "advertentiekosten"
+/* ───────── Section keys ───────── */
+type SectionKey =
   | "vaste_kosten"
   | "abonnementen"
-  | "software"
-  | "overig";
+  | "inkoop_voertuigen"
+  | "variabele_kosten"
+  | "advertentiekosten"
+  | "personeelskosten";
 
-const CAT_LABELS: Record<CatKey, string> = {
+const SECTION_LABELS: Record<SectionKey, string> = {
+  vaste_kosten: "Vaste kosten",
+  abonnementen: "Abonnementen & software",
   inkoop_voertuigen: "Inkoop voertuigen",
-  voertuigkosten: "Voertuigkosten",
+  variabele_kosten: "Variabele kosten (onderdelen & reparaties)",
   advertentiekosten: "Advertentiekosten",
+  personeelskosten: "Personeelskosten",
+};
+
+const FILTER_LABELS: Record<SectionKey, string> = {
   vaste_kosten: "Vaste kosten",
   abonnementen: "Abonnementen",
-  software: "Software",
-  overig: "Overig",
-};
-
-const CAT_COLORS: Record<CatKey, string> = {
-  inkoop_voertuigen: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  voertuigkosten: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  advertentiekosten: "bg-pink-500/15 text-pink-300 border-pink-500/30",
-  vaste_kosten: "bg-blue-500/15 text-blue-300 border-blue-500/30",
-  abonnementen: "bg-violet-500/15 text-violet-300 border-violet-500/30",
-  software: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
-  overig: "bg-secondary/60 text-muted-foreground border-border",
-};
-
-const CAT_BAR: Record<CatKey, string> = {
-  inkoop_voertuigen: "bg-amber-400",
-  voertuigkosten: "bg-emerald-400",
-  advertentiekosten: "bg-pink-400",
-  vaste_kosten: "bg-blue-400",
-  abonnementen: "bg-violet-400",
-  software: "bg-cyan-400",
-  overig: "bg-muted-foreground/50",
-};
-
-const CAT_ICONS: Record<CatKey, any> = {
-  inkoop_voertuigen: Car,
-  voertuigkosten: Wrench,
-  advertentiekosten: Megaphone,
-  vaste_kosten: Home,
-  abonnementen: Repeat,
-  software: Repeat,
-  overig: MoreHorizontal,
+  inkoop_voertuigen: "Inkoop voertuigen",
+  variabele_kosten: "Variabele kosten",
+  advertentiekosten: "Advertentiekosten",
+  personeelskosten: "Personeelskosten",
 };
 
 /* ───────── Helpers ───────── */
-const PLATE_RE = /^\s*[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}\b/i;
-const AUTO_KEYWORDS = ["auto", "cars", "automotive"];
-const EXCLUDE_FOR_AUTO = ["alliance", "partspoint", "elix", "asr", "moneybird", "lovable", "marktplaats", "autoscout", "vwe", "autotrust"];
+const PLATE_RE = /\b[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}\b/i;
+const formatEuro = (n: number) =>
+  new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(n || 0);
+const formatDate = (d: Date) =>
+  d.toLocaleDateString("nl-NL", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+function extractKenteken(text: string): string | null {
+  const m = (text || "").match(PLATE_RE);
+  return m ? m[0].toUpperCase().replace(/-/g, "") : null;
+}
 
 function isAutoSupplier(supplier: string): boolean {
   const s = (supplier || "").toLowerCase();
   if (!s) return false;
+  if (s.includes("alliance") || s.includes("partspoint")) return false;
   if (s.includes("sparks")) return true;
-  if (EXCLUDE_FOR_AUTO.some((k) => s.includes(k))) return false;
-  return AUTO_KEYWORDS.some((k) => s.includes(k));
+  return s.includes("cars") || s.includes("automotive") || s.includes("auto ");
 }
 
-function categorizeMoneybird(supplier: string, description: string): CatKey {
+function categorizeMoneybird(supplier: string, description: string): SectionKey | "overig" {
   const s = (supplier || "").toLowerCase();
+  // Inkoop voertuigen
   if (PLATE_RE.test(description || "") || isAutoSupplier(supplier)) return "inkoop_voertuigen";
-  if (s.includes("alliance") || s.includes("partspoint")) return "voertuigkosten";
-  if (s.includes("elix") || s.includes("asr") || s.includes("verzekering") || s.includes("schade") || s.includes("huur") || s.includes("cilinderweg")) return "vaste_kosten";
-  if (s.includes("marktplaats") || s.includes("autoscout") || s.includes("facebook") || s.includes("google ads")) return "advertentiekosten";
-  if (s.includes("vwe") || s.includes("autotrust")) return "abonnementen";
-  if (s.includes("moneybird") || s.includes("lovable")) return "software";
+  // Abonnementen / software
+  if (s.includes("marktplaats") && (s.includes("advertentie") || s.includes("ads"))) return "advertentiekosten";
+  if (s.includes("google ads") || s.includes("facebook") || s.includes("meta") || s.includes("instagram")) return "advertentiekosten";
+  if (s.includes("marktplaats") || s.includes("autoscout") || s.includes("vwe") || s.includes("autotrust") || s.includes("moneybird") || s.includes("lovable")) return "abonnementen";
+  // Variabele kosten
+  if (s.includes("alliance") || s.includes("partspoint")) return "variabele_kosten";
+  // Vaste kosten
+  if (s.includes("asr") || s.includes("elix") || s.includes("verzekering") || s.includes("huur") || s.includes("cilinderweg") || s.includes("nuon") || s.includes("eneco") || s.includes("vattenfall") || s.includes("kpn") || s.includes("ziggo")) return "vaste_kosten";
   return "overig";
 }
 
-function mapManualCat(c: KostCategorie): CatKey {
+function mapManualToSection(c: KostCategorie, naam: string): SectionKey | "overig" {
   if (c === "vaste_kosten") return "vaste_kosten";
   if (c === "advertentiekosten") return "advertentiekosten";
   if (c === "abonnementen") return "abonnementen";
-  if (c === "voertuigkosten") return "voertuigkosten";
-  if (c === "personeelskosten") return "vaste_kosten";
+  if (c === "personeelskosten") return "personeelskosten";
+  if (c === "voertuigkosten") return "variabele_kosten";
+  // overig: try by naam
+  const n = (naam || "").toLowerCase();
+  if (n.includes("software") || n.includes("abonn")) return "abonnementen";
   return "overig";
-}
-
-function extractKenteken(text: string): string | null {
-  const m = (text || "").match(/\b[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}-?[A-Z0-9]{1,3}\b/i);
-  return m ? m[0].toUpperCase().replace(/-/g, "") : null;
 }
 
 /* ───────── Periode ───────── */
@@ -120,31 +105,36 @@ function buildMoneybirdFilter(from: Date, to: Date): string {
   return `period:${fmtYmd(from)}..${fmtYmd(to)}`;
 }
 
-const FREQ_TO_MONTHLY: Record<KostFrequentie, number> = {
-  eenmalig: 0, maandelijks: 1, kwartaal: 1 / 3, jaarlijks: 1 / 12,
-};
-
 /* ───────── Types ───────── */
-type Source = "moneybird" | "handmatig" | "inkoopverklaring";
+type PaymentState = "paid" | "open" | "late" | null;
 
-type UnifiedRow = {
+type Row = {
   id: string;
   date: Date;
   description: string;
   supplier: string;
-  category: CatKey;
   amount: number;
-  source: Source;
-  state?: "paid" | "open" | "late" | null;
-  raw: any;
+  section: SectionKey | "overig";
+  source: "moneybird" | "handmatig" | "inkoopverklaring";
+  state: PaymentState;
   kenteken?: string | null;
+  raw?: any;
 };
 
 type SaleRow = {
   id: string;
   verkoopprijs: number;
   verkoop_datum: string | null;
-  vehicle: { verkoop_type: string | null; status: string | null; consignatie_commissie_perc: number | null } | null;
+  vehicle: {
+    id: string;
+    kenteken: string | null;
+    merk: string | null;
+    model: string | null;
+    inkoopprijs: number | null;
+    verkoop_type: string | null;
+    status: string | null;
+    consignatie_commissie_perc: number | null;
+  } | null;
 };
 
 type InkoopRow = {
@@ -160,9 +150,8 @@ type InkoopRow = {
 /* ───────── Component ───────── */
 const KostenCombinedTab = () => {
   const isMobile = useIsMobile();
-  
   const { getPurchaseInvoices } = useMoneybird();
-  const { kosten, create, update, remove, reload: reloadKosten } = useKosten();
+  const { kosten, create, remove, reload: reloadKosten } = useKosten();
 
   const now = new Date();
   const [periodType, setPeriodType] = useState<PeriodType>("maand");
@@ -172,22 +161,14 @@ const KostenCombinedTab = () => {
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
 
-  const [filterCat, setFilterCat] = useState<CatKey | "all">("all");
-  const [filterStatus, setFilterStatus] = useState<"all" | "paid" | "open" | "late">("all");
-  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<SectionKey | "all">("all");
 
   const [loading, setLoading] = useState(true);
-  const [mbError, setMbError] = useState<string | null>(null);
   const [purchaseInvoices, setPurchaseInvoices] = useState<any[]>([]);
-  const [openInvoicesAll, setOpenInvoicesAll] = useState<any[]>([]);
   const [sales, setSales] = useState<SaleRow[]>([]);
   const [inkoopverklaringen, setInkoopverklaringen] = useState<InkoopRow[]>([]);
 
   const [addOpen, setAddOpen] = useState(false);
-  const [editing, setEditing] = useState<Kost | null>(null);
-  const [detailRow, setDetailRow] = useState<UnifiedRow | null>(null);
-
-  const tableRef = useRef<HTMLDivElement>(null);
 
   const range = useMemo(
     () => getPeriodRange(periodType, year, quarter, month, customFrom, customTo),
@@ -195,171 +176,138 @@ const KostenCombinedTab = () => {
   );
   const mbFilter = useMemo(() => buildMoneybirdFilter(range.from, range.to), [range]);
 
-  /* ── Load alles parallel ── */
   const loadAll = useCallback(async () => {
     setLoading(true);
-    setMbError(null);
-
     const fromIso = range.from.toISOString().slice(0, 10);
     const toIso = range.to.toISOString().slice(0, 10);
 
-    const fetchMbAll = async (filter: string) => {
+    const fetchMb = async (filter: string) => {
       const all: any[] = [];
       for (let page = 1; page <= 10; page++) {
-        const res: any = await getPurchaseInvoices(page, filter);
-        const arr = Array.isArray(res) ? res : (res?.data || []);
-        if (!arr.length) break;
-        all.push(...arr);
-        if (arr.length < 100) break;
+        try {
+          const res: any = await getPurchaseInvoices(page, filter);
+          const arr = Array.isArray(res) ? res : (res?.data || []);
+          if (!arr.length) break;
+          all.push(...arr);
+          if (arr.length < 100) break;
+        } catch (e) {
+          console.error("MB error", e);
+          break;
+        }
       }
       return all;
     };
 
-    const mbPurchases = fetchMbAll(mbFilter).catch((e) => {
-      setMbError(e?.message || "Moneybird onbereikbaar");
-      return [] as any[];
-    });
-    const mbOpen = fetchMbAll("filter=state:open|late").catch(() => [] as any[]);
-
+    const mbP = fetchMb(mbFilter);
     const verkopenP = supabase
       .from("vehicle_sales")
-      .select("id, verkoopprijs, verkoop_datum, vehicle:vehicles(verkoop_type, status, consignatie_commissie_perc)")
+      .select("id, verkoopprijs, verkoop_datum, vehicle:vehicles(id, kenteken, merk, model, inkoopprijs, verkoop_type, status, consignatie_commissie_perc)")
       .eq("status", "voltooid")
       .gte("verkoop_datum", fromIso)
       .lte("verkoop_datum", toIso);
-
     const ikvP = supabase
       .from("inkoopverklaringen")
       .select("id, inkoopprijs, datum, kenteken, merk, model, verkoper_naam")
       .gte("datum", fromIso)
       .lte("datum", toIso);
-
     const kostenP = reloadKosten();
 
-    const [mbInv, mbOpenInv, verkopenRes, ikvRes] = await Promise.all([
-      mbPurchases, mbOpen, verkopenP, ikvP, kostenP,
-    ]);
+    const [mbInv, verkopenRes, ikvRes] = await Promise.all([mbP, verkopenP, ikvP, kostenP]);
 
     setPurchaseInvoices(mbInv || []);
-    setOpenInvoicesAll(mbOpenInv || []);
-
-    if (verkopenRes.error) console.error(verkopenRes.error);
     setSales((verkopenRes.data as any[] || []) as SaleRow[]);
-
-    if (ikvRes.error) console.error(ikvRes.error);
     setInkoopverklaringen((ikvRes.data as any[] || []) as InkoopRow[]);
-
     setLoading(false);
   }, [mbFilter, range.from, range.to, getPurchaseInvoices, reloadKosten]);
 
   useEffect(() => { loadAll(); /* eslint-disable-next-line */ }, [mbFilter]);
 
-  /* ── Inkoop voertuigen: dedup MB + IKV ── */
-  const { ikvRows, mbInkoopRows, dedupedInkoopTotaal, ikvCount, mbInkoopCount } = useMemo(() => {
+  /* ─── Build rows per section ─── */
+  const { sectionRows, allRows } = useMemo(() => {
+    const byCat: Record<SectionKey, Row[]> = {
+      vaste_kosten: [], abonnementen: [], inkoop_voertuigen: [],
+      variabele_kosten: [], advertentiekosten: [], personeelskosten: [],
+    };
+
+    // Inkoopverklaringen first (for dedupe)
     const ikvKeys = new Set<string>();
-    const ikvRows: UnifiedRow[] = inkoopverklaringen.map((i) => {
+    inkoopverklaringen.forEach((i) => {
       const ken = (i.kenteken || "").toUpperCase().replace(/-/g, "") || null;
       const amt = Number(i.inkoopprijs) || 0;
       if (ken) ikvKeys.add(`${ken}|${Math.round(amt)}`);
-      return {
+      byCat.inkoop_voertuigen.push({
         id: `ikv-${i.id}`,
         date: new Date(i.datum),
         description: `${i.merk || ""} ${i.model || ""}`.trim() || "Inkoopverklaring",
         supplier: i.verkoper_naam || "Particulier",
-        category: "inkoop_voertuigen" as CatKey,
         amount: amt,
-        source: "inkoopverklaring" as Source,
+        section: "inkoop_voertuigen",
+        source: "inkoopverklaring",
         state: null,
+        kenteken: ken,
         raw: i,
-        kenteken: ken,
-      };
-    });
-
-    const mbInkoopRows: UnifiedRow[] = [];
-    purchaseInvoices.forEach((inv) => {
-      const supplier = inv?.contact?.company_name || inv?.contact?.firstname || "Onbekend";
-      const desc = inv?.details?.[0]?.description || "—";
-      const cat = categorizeMoneybird(supplier, desc);
-      if (cat !== "inkoop_voertuigen") return;
-      const amt = parseFloat(inv?.total_price_incl_tax || "0") || 0;
-      const ken = extractKenteken(desc) || extractKenteken(inv?.reference || "");
-      const dedupKey = ken ? `${ken}|${Math.round(amt)}` : null;
-      if (dedupKey && ikvKeys.has(dedupKey)) return; // skip duplicate
-      mbInkoopRows.push({
-        id: `mb-${inv.id}`,
-        date: inv.date ? new Date(inv.date) : new Date(),
-        description: desc,
-        supplier,
-        category: "inkoop_voertuigen",
-        amount: amt,
-        source: "moneybird",
-        state: inv?.state === "paid" ? "paid" : inv?.state === "late" ? "late" : "open",
-        raw: inv,
-        kenteken: ken,
       });
     });
 
-    const total = ikvRows.reduce((s, r) => s + r.amount, 0) + mbInkoopRows.reduce((s, r) => s + r.amount, 0);
-    return { ikvRows, mbInkoopRows, dedupedInkoopTotaal: total, ikvCount: ikvRows.length, mbInkoopCount: mbInkoopRows.length };
-  }, [inkoopverklaringen, purchaseInvoices]);
-
-  /* ── Combine all rows ── */
-  const rows: UnifiedRow[] = useMemo(() => {
-    const mbRows: UnifiedRow[] = purchaseInvoices.map((inv) => {
+    // Moneybird invoices
+    purchaseInvoices.forEach((inv) => {
       const supplier = inv?.contact?.company_name || inv?.contact?.firstname || "Onbekend";
-      const desc = inv?.details?.[0]?.description || "—";
-      const cat = categorizeMoneybird(supplier, desc);
-      if (cat === "inkoop_voertuigen") return null; // handled separately via dedupe
+      const desc = inv?.details?.[0]?.description || inv?.reference || "—";
+      const sec = categorizeMoneybird(supplier, desc);
       const amt = parseFloat(inv?.total_price_incl_tax || "0") || 0;
-      return {
+      const state: PaymentState = inv?.state === "paid" ? "paid" : inv?.state === "late" ? "late" : "open";
+      const ken = extractKenteken(desc) || extractKenteken(inv?.reference || "");
+
+      if (sec === "inkoop_voertuigen") {
+        const dedupKey = ken ? `${ken}|${Math.round(amt)}` : null;
+        if (dedupKey && ikvKeys.has(dedupKey)) return;
+      }
+
+      const row: Row = {
         id: `mb-${inv.id}`,
         date: inv.date ? new Date(inv.date) : new Date(),
         description: desc,
         supplier,
-        category: cat,
         amount: amt,
-        source: "moneybird" as Source,
-        state: inv?.state === "paid" ? "paid" : inv?.state === "late" ? "late" : "open",
+        section: sec,
+        source: "moneybird",
+        state,
+        kenteken: ken,
         raw: inv,
-      } as UnifiedRow;
-    }).filter(Boolean) as UnifiedRow[];
+      };
+      if (sec !== "overig") byCat[sec].push(row);
+    });
 
-    const manualRows: UnifiedRow[] = kosten.map((k) => {
+    // Manual kosten
+    kosten.forEach((k) => {
       const bedrag = kostBedragInPeriode(k, range.from, range.to);
-      if (bedrag <= 0) return null;
-      return {
+      if (bedrag <= 0) return;
+      const sec = mapManualToSection(k.categorie, k.naam);
+      const row: Row = {
         id: `man-${k.id}`,
         date: new Date(k.datum),
         description: k.naam,
         supplier: k.leverancier || "—",
-        category: mapManualCat(k.categorie),
         amount: bedrag,
-        source: "handmatig" as Source,
+        section: sec,
+        source: "handmatig",
         state: null,
         raw: k,
-      } as UnifiedRow;
-    }).filter(Boolean) as UnifiedRow[];
+      };
+      if (sec !== "overig") byCat[sec].push(row);
+    });
 
-    return [...mbInkoopRows, ...ikvRows, ...mbRows, ...manualRows]
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
-  }, [purchaseInvoices, kosten, range, mbInkoopRows, ikvRows]);
+    // sort each section newest first
+    (Object.keys(byCat) as SectionKey[]).forEach((k) => {
+      byCat[k].sort((a, b) => b.date.getTime() - a.date.getTime());
+    });
 
-  /* ── Filter ── */
-  const filtered = useMemo(() => rows.filter((r) => {
-    if (filterCat !== "all" && r.category !== filterCat) return false;
-    if (filterStatus !== "all") {
-      if (r.source !== "moneybird") return false;
-      if (r.state !== filterStatus) return false;
-    }
-    if (search) {
-      const q = search.toLowerCase();
-      if (!r.supplier.toLowerCase().includes(q) && !r.description.toLowerCase().includes(q)) return false;
-    }
-    return true;
-  }), [rows, filterCat, filterStatus, search]);
+    const all = ([] as Row[]).concat(...Object.values(byCat));
+    return { sectionRows: byCat, allRows: all };
+  }, [inkoopverklaringen, purchaseInvoices, kosten, range]);
 
-  /* ── Opbrengsten: alleen Supabase verkopen ── */
-  const opbrengsten = useMemo(() => {
+  /* ─── Omzet ─── */
+  const { omzet, verkopenAantal } = useMemo(() => {
     let total = 0;
     sales.forEach((s) => {
       const prijs = Number(s.verkoopprijs) || 0;
@@ -372,677 +320,700 @@ const KostenCombinedTab = () => {
         total += prijs;
       }
     });
-    return total;
+    return { omzet: total, verkopenAantal: sales.length };
   }, [sales]);
 
-  const totalCost = rows.reduce((s, r) => s + r.amount, 0);
-  const netResult = opbrengsten - totalCost;
+  const totalCost = allRows.reduce((s, r) => s + r.amount, 0);
+  const winst = omzet - totalCost;
 
-  /* ── Per categorie ── */
-  const perCategorie = useMemo(() => {
-    const m = new Map<CatKey, { total: number; count: number }>();
-    rows.forEach((r) => {
-      const cur = m.get(r.category) || { total: 0, count: 0 };
-      cur.total += r.amount;
-      cur.count += 1;
-      m.set(r.category, cur);
+  /* ─── BTW (margeregeling) ─── */
+  const btwMarge = useMemo(() => {
+    let totalBtw = 0;
+    sales.forEach((s) => {
+      const vt = s.vehicle?.verkoop_type || "regulier";
+      const vstatus = s.vehicle?.status || "";
+      if (vt === "consignatie" || vstatus === "consignatie") return;
+      const verkoop = Number(s.verkoopprijs) || 0;
+      const inkoop = Number(s.vehicle?.inkoopprijs) || 0;
+      const marge = Math.max(0, verkoop - inkoop);
+      totalBtw += marge * (21 / 121);
     });
-    return m;
-  }, [rows]);
+    return totalBtw;
+  }, [sales]);
 
-  const catList = useMemo(() => {
-    return (Object.keys(CAT_LABELS) as CatKey[])
-      .map((c) => ({ key: c, ...(perCategorie.get(c) || { total: 0, count: 0 }) }))
-      .filter((x) => x.total > 0)
-      .sort((a, b) => b.total - a.total);
-  }, [perCategorie]);
+  /* ─── Gem. marge % eigen voertuigen ─── */
+  const gemMargePerc = useMemo(() => {
+    const eigen = sales.filter((s) => {
+      const vt = s.vehicle?.verkoop_type || "regulier";
+      const vstatus = s.vehicle?.status || "";
+      return !(vt === "consignatie" || vstatus === "consignatie");
+    });
+    const valid = eigen.filter((s) => (Number(s.vehicle?.inkoopprijs) || 0) > 0);
+    if (!valid.length) return null;
+    const total = valid.reduce((sum, s) => {
+      const v = Number(s.verkoopprijs) || 0;
+      const i = Number(s.vehicle?.inkoopprijs) || 0;
+      return sum + ((v - i) / i) * 100;
+    }, 0);
+    return total / valid.length;
+  }, [sales]);
 
-  /* ── Vaste lasten / mnd ── */
-  const vasteLasten = useMemo(() => {
-    type VL = { id: string; naam: string; perMaand: number };
-    const out: VL[] = [];
-    // MB ASR + ELIX (most recent)
-    const groups = new Map<string, any[]>();
-    purchaseInvoices.forEach((inv) => {
-      const supplier = (inv?.contact?.company_name || "").toLowerCase();
-      if (supplier.includes("asr") || supplier.includes("elix")) {
-        const key = supplier.includes("asr") ? "ASR" : "ELIX";
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key)!.push(inv);
+  /* ─── Marge per voertuig ─── */
+  const margeRows = useMemo(() => {
+    return sales.map((s) => {
+      const vt = s.vehicle?.verkoop_type || "regulier";
+      const vstatus = s.vehicle?.status || "";
+      const isConsign = vt === "consignatie" || vstatus === "consignatie";
+      const verkoop = Number(s.verkoopprijs) || 0;
+      const inkoop = Number(s.vehicle?.inkoopprijs) || 0;
+      let marge = 0;
+      let margePerc: number | null = null;
+      if (isConsign) {
+        const perc = Number(s.vehicle?.consignatie_commissie_perc) || 10;
+        marge = verkoop * (perc / 100);
+        margePerc = perc;
+      } else if (inkoop > 0) {
+        marge = verkoop - inkoop;
+        margePerc = ((verkoop - inkoop) / inkoop) * 100;
+      } else {
+        marge = verkoop;
       }
-    });
-    groups.forEach((arr, key) => {
-      const sorted = arr.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-      const top = sorted[0];
-      const amt = parseFloat(top?.total_price_incl_tax || "0") || 0;
-      out.push({ id: `mb-vl-${key}`, naam: top?.contact?.company_name || key, perMaand: amt });
-    });
-    // Handmatig terugkerend
-    kosten.filter((k) => k.actief && k.frequentie !== "eenmalig").forEach((k) => {
-      const factor = FREQ_TO_MONTHLY[k.frequentie] || 0;
-      out.push({ id: `man-vl-${k.id}`, naam: k.naam, perMaand: (k.bedrag || 0) * factor });
-    });
-    return out;
-  }, [purchaseInvoices, kosten]);
-  const totaalVasteLastenPM = vasteLasten.reduce((s, v) => s + v.perMaand, 0);
+      return {
+        id: s.id,
+        merk: s.vehicle?.merk || "—",
+        model: s.vehicle?.model || "",
+        kenteken: s.vehicle?.kenteken || "",
+        isConsign,
+        inkoop,
+        verkoop,
+        marge,
+        margePerc,
+      };
+    }).sort((a, b) => b.marge - a.marge);
+  }, [sales]);
 
-  /* ── Openstaande facturen ── */
-  const openInvoices = useMemo(() => {
-    return openInvoicesAll.map((inv) => {
-      const supplier = inv?.contact?.company_name || inv?.contact?.firstname || "Onbekend";
-      const amt = parseFloat(inv?.total_price_incl_tax || "0") || 0;
-      const state: "open" | "late" = inv?.state === "late" ? "late" : "open";
-      return { id: inv.id, supplier, amount: amt, state };
-    });
-  }, [openInvoicesAll]);
-  const openTotaal = openInvoices.reduce((s, o) => s + o.amount, 0);
+  const totaleBruto = margeRows.reduce((s, r) => s + r.marge, 0);
+  const gemMargeAlle = margeRows.length
+    ? margeRows.filter((r) => r.margePerc !== null).reduce((s, r) => s + (r.margePerc || 0), 0) /
+      Math.max(1, margeRows.filter((r) => r.margePerc !== null).length)
+    : 0;
 
-  /* ── Periode UI ── */
-  const availableYears = useMemo(() => {
-    const ys = new Set<number>([now.getFullYear()]);
-    for (let i = 1; i <= 4; i++) ys.add(now.getFullYear() - i);
-    return Array.from(ys).sort((a, b) => b - a);
-  }, []);
-
-  const periodLabel = useMemo(() => {
-    if (periodType === "maand") return `${maandNamen[month]} ${year}`;
-    if (periodType === "kwartaal") return `Q${quarter} ${year}`;
-    if (periodType === "jaar") return String(year);
-    if (customFrom && customTo) return `${customFrom.toLocaleDateString("nl-NL")} t/m ${customTo.toLocaleDateString("nl-NL")}`;
-    return "Aangepast";
-  }, [periodType, year, quarter, month, customFrom, customTo]);
-
-  const handleCategoryClick = (c: CatKey) => {
-    setFilterCat((prev) => prev === c ? "all" : c);
-    setTimeout(() => tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-  };
-
-  /* ── Render ── */
-  if (loading) {
-    return (
-      <div className="space-y-5">
-        <PeriodeBar
-          periodType={periodType} setPeriodType={setPeriodType}
-          year={year} setYear={setYear} quarter={quarter} setQuarter={setQuarter}
-          month={month} setMonth={setMonth}
-          customFrom={customFrom} setCustomFrom={setCustomFrom}
-          customTo={customTo} setCustomTo={setCustomTo}
-          availableYears={availableYears} periodLabel={periodLabel}
-          disabled
-        />
-        <FullSkeleton />
-      </div>
-    );
-  }
+  /* ─── Render ─── */
+  const years = Array.from({ length: 5 }, (_, i) => now.getFullYear() - i);
 
   return (
     <div className="space-y-5">
-      <PeriodeBar
-        periodType={periodType} setPeriodType={setPeriodType}
-        year={year} setYear={setYear} quarter={quarter} setQuarter={setQuarter}
-        month={month} setMonth={setMonth}
-        customFrom={customFrom} setCustomFrom={setCustomFrom}
-        customTo={customTo} setCustomTo={setCustomTo}
-        availableYears={availableYears} periodLabel={periodLabel}
-      />
+      {/* Periode selector + Add button */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {(["maand", "kwartaal", "jaar", "custom"] as PeriodType[]).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPeriodType(p)}
+              className={cn(
+                "px-3 py-1.5 text-xs rounded-[10px] border transition-colors",
+                periodType === p
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-secondary/40 border-border text-muted-foreground hover:bg-secondary/60"
+              )}
+            >
+              {p === "maand" ? "Maand" : p === "kwartaal" ? "Kwartaal" : p === "jaar" ? "Jaar" : "Aangepast"}
+            </button>
+          ))}
 
-      {mbError && (
-        <div className="bg-card border border-amber-500/30 rounded-[16px] p-3 flex items-center gap-2 text-xs text-amber-300">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
-          <span>Moneybird tijdelijk niet bereikbaar — handmatige posten en verkopen worden wel getoond.</span>
+          <select
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+            className="bg-secondary/40 border border-border rounded-[10px] px-2 py-1.5 text-xs"
+          >
+            {years.map((y) => <option key={y} value={y}>{y}</option>)}
+          </select>
+
+          {periodType === "maand" && (
+            <select
+              value={month}
+              onChange={(e) => setMonth(Number(e.target.value))}
+              className="bg-secondary/40 border border-border rounded-[10px] px-2 py-1.5 text-xs"
+            >
+              {maandNamen.map((m, i) => <option key={i} value={i}>{m}</option>)}
+            </select>
+          )}
+
+          {periodType === "kwartaal" && (
+            <select
+              value={quarter}
+              onChange={(e) => setQuarter(Number(e.target.value))}
+              className="bg-secondary/40 border border-border rounded-[10px] px-2 py-1.5 text-xs"
+            >
+              {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}
+            </select>
+          )}
+
+          {periodType === "custom" && (
+            <>
+              <input type="date" value={customFrom ? customFrom.toISOString().slice(0, 10) : ""}
+                onChange={(e) => setCustomFrom(e.target.value ? new Date(e.target.value) : undefined)}
+                className="bg-secondary/40 border border-border rounded-[10px] px-2 py-1.5 text-xs" />
+              <input type="date" value={customTo ? customTo.toISOString().slice(0, 10) : ""}
+                onChange={(e) => setCustomTo(e.target.value ? new Date(e.target.value) : undefined)}
+                className="bg-secondary/40 border border-border rounded-[10px] px-2 py-1.5 text-xs" />
+            </>
+          )}
         </div>
+
+        <button
+          onClick={() => setAddOpen(true)}
+          className="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-[10px] bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Kost toevoegen
+        </button>
+      </div>
+
+      {loading ? (
+        <SkeletonAll />
+      ) : (
+        <>
+          {/* Hoofdkaarten */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <MetricCard
+              icon={TrendingUp}
+              label="Omzet"
+              value={formatEuro(omzet)}
+              sub={`${verkopenAantal} verkoop${verkopenAantal === 1 ? "" : "en"}`}
+              tone="positive"
+            />
+            <MetricCard
+              icon={Wallet}
+              label="Totale kosten"
+              value={formatEuro(totalCost)}
+              sub={`${allRows.length} posten`}
+              tone="neutral"
+            />
+            <MetricCard
+              icon={winst >= 0 ? TrendingUp : TrendingDown}
+              label="Winst"
+              value={formatEuro(winst)}
+              tone={winst >= 0 ? "positive" : "negative"}
+            />
+            <MetricCard
+              icon={Receipt}
+              label="BTW"
+              value={formatEuro(btwMarge)}
+              sub="Schatting margeregeling"
+              tone="neutral"
+            />
+            <MetricCard
+              icon={Percent}
+              label="Gem. marge %"
+              value={gemMargePerc !== null ? `${gemMargePerc.toFixed(1)}%` : "—"}
+              sub="Eigen voertuigen"
+              tone="neutral"
+            />
+          </div>
+
+          {/* Categorie filter */}
+          <div className="flex flex-wrap gap-2">
+            <FilterPill active={filter === "all"} onClick={() => setFilter("all")}>Alle</FilterPill>
+            {(Object.keys(FILTER_LABELS) as SectionKey[]).map((k) => (
+              <FilterPill key={k} active={filter === k} onClick={() => setFilter(k)}>
+                {FILTER_LABELS[k]}
+              </FilterPill>
+            ))}
+          </div>
+
+          {/* Sections */}
+          {filter === "all" ? (
+            <div className="space-y-4">
+              <Section title={SECTION_LABELS.vaste_kosten} rows={sectionRows.vaste_kosten} columns={["date", "desc", "supplier", "state", "amount"]} />
+              <SectionAbonnementen rows={sectionRows.abonnementen} />
+              <SectionInkoop rows={sectionRows.inkoop_voertuigen} />
+              <Section title={SECTION_LABELS.variabele_kosten} rows={sectionRows.variabele_kosten} columns={["date", "desc", "supplier", "state", "amount"]} />
+              <Section title={SECTION_LABELS.advertentiekosten} rows={sectionRows.advertentiekosten} columns={["date", "supplier", "desc", "amount"]} />
+              <SectionPersoneel rows={sectionRows.personeelskosten} onAdd={() => setAddOpen(true)} />
+              <MargeSection rows={margeRows} totaleBruto={totaleBruto} gemMargePerc={gemMargeAlle} />
+            </div>
+          ) : (
+            <FilteredList
+              title={SECTION_LABELS[filter]}
+              rows={sectionRows[filter]}
+              onAddPersoneel={filter === "personeelskosten" ? () => setAddOpen(true) : undefined}
+            />
+          )}
+        </>
       )}
 
-      {/* SECTIE 1 — Drie hoofdcijfers als één blok */}
-      <div className="bg-card border border-border rounded-[16px] overflow-hidden grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
-        <HeroCell
-          label="Opbrengsten"
-          amount={opbrengsten}
-          color="emerald"
-          icon={<ArrowUpRight className="w-4 h-4 text-emerald-400" />}
-          sub={`${sales.length} verkochte ${sales.length === 1 ? "voertuig" : "voertuigen"}`}
-        />
-        <HeroCell
-          label="Kosten"
-          amount={totalCost}
-          color="red"
-          icon={<ArrowDownRight className="w-4 h-4 text-red-400" />}
-          sub={`${rows.length} ${rows.length === 1 ? "post" : "posten"}`}
-        />
-        <HeroCell
-          label="Netto resultaat"
-          amount={netResult}
-          color={netResult >= 0 ? "emerald" : "red"}
-          icon={netResult >= 0 ? <TrendingUp className="w-4 h-4 text-emerald-400" /> : <TrendingDown className="w-4 h-4 text-red-400" />}
-          sub="Na alle kosten"
-          showSign
-        />
-      </div>
-
-      {/* SECTIE 2 — twee kolommen */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Links: Kosten per categorie */}
-        <div className="bg-card border border-border rounded-[16px] overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <h3 className="text-sm font-semibold text-foreground">Kosten per categorie</h3>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Klik om te filteren in de lijst</p>
-          </div>
-          {catList.length === 0 ? (
-            <div className="py-10 text-center text-xs text-muted-foreground">Geen kosten in deze periode.</div>
-          ) : (
-            <ul className="divide-y divide-border/40">
-              {catList.map(({ key, total, count }) => {
-                const Icon = CAT_ICONS[key];
-                const pct = totalCost > 0 ? (total / totalCost) * 100 : 0;
-                const active = filterCat === key;
-                return (
-                  <li key={key}>
-                    <button
-                      onClick={() => handleCategoryClick(key)}
-                      className={cn(
-                        "w-full px-4 py-3 text-left hover:bg-accent/30 transition-colors",
-                        active && "bg-accent/40"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={cn("inline-flex w-7 h-7 items-center justify-center rounded-md border shrink-0", CAT_COLORS[key])}>
-                          <Icon className="w-3.5 h-3.5" />
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[13px] font-medium text-foreground truncate">{CAT_LABELS[key]}</span>
-                            <span className="text-[14px] font-semibold tabular-nums text-foreground whitespace-nowrap">{formatEuroDecimal(total)}</span>
-                          </div>
-                          <div className="mt-1.5 h-1 rounded-full bg-secondary/60 overflow-hidden">
-                            <div className={cn("h-full rounded-full transition-all", CAT_BAR[key])} style={{ width: `${Math.min(100, pct)}%` }} />
-                          </div>
-                          <p className="text-[10px] text-muted-foreground mt-1">
-                            {pct.toFixed(0)}% · {count} {count === 1 ? "post" : "posten"}
-                            {key === "inkoop_voertuigen" && (ikvCount > 0 || mbInkoopCount > 0) && (
-                              <span className="ml-1">· {ikvCount} ikv · {mbInkoopCount} mb</span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-
-        {/* Rechts: vaste lasten + openstaande facturen */}
-        <div className="space-y-4">
-          <div className="bg-card border border-border rounded-[16px] overflow-hidden">
-            <div className="px-4 py-3 border-b border-border">
-              <h3 className="text-sm font-semibold text-foreground">Vaste lasten <span className="text-muted-foreground font-normal">· per maand</span></h3>
-            </div>
-            {vasteLasten.length === 0 ? (
-              <div className="py-6 text-center text-xs text-muted-foreground">Geen vaste lasten gevonden.</div>
-            ) : (
-              <ul className="divide-y divide-border/40">
-                {vasteLasten.map((v) => (
-                  <li key={v.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
-                    <span className="text-[13px] text-foreground truncate">{v.naam}</span>
-                    <span className="text-[13px] font-semibold tabular-nums text-foreground whitespace-nowrap">{formatEuroDecimal(v.perMaand)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="px-4 py-2.5 border-t border-border bg-secondary/30 flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Totaal</span>
-              <span className="text-sm font-semibold tabular-nums">{formatEuroDecimal(totaalVasteLastenPM)} <span className="text-[10px] text-muted-foreground font-normal">/ mnd</span></span>
-            </div>
-          </div>
-
-          <div className="bg-card border border-border rounded-[16px] overflow-hidden">
-            <div className="px-4 py-3 border-b border-border">
-              <h3 className="text-sm font-semibold text-foreground">Openstaande facturen</h3>
-            </div>
-            {openInvoices.length === 0 ? (
-              <div className="py-6 text-center text-xs text-muted-foreground">Geen openstaande facturen</div>
-            ) : (
-              <ul className="divide-y divide-border/40">
-                {openInvoices.map((o) => (
-                  <li key={o.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
-                    <span className="text-[13px] text-foreground truncate">{o.supplier}</span>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className={cn("text-[11px]", o.state === "late" ? "text-red-400" : "text-foreground/80")}>
-                        {o.state === "late" ? "Te laat" : "Open"}
-                      </span>
-                      <span className="text-[13px] font-semibold tabular-nums whitespace-nowrap">{formatEuroDecimal(o.amount)}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {openInvoices.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-border bg-secondary/30 flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Totaal openstaand</span>
-                <span className="text-sm font-semibold tabular-nums">{formatEuroDecimal(openTotaal)}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* SECTIE 3 — alle posten */}
-      <div ref={tableRef} className="space-y-3 pt-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <select value={filterCat} onChange={(e) => setFilterCat(e.target.value as any)}
-            className="h-8 px-2.5 text-xs bg-card border border-border rounded-md text-foreground">
-            <option value="all">Alle categorieën</option>
-            {(Object.keys(CAT_LABELS) as CatKey[]).map((c) => (
-              <option key={c} value={c}>{CAT_LABELS[c]}</option>
-            ))}
-          </select>
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="h-8 px-2.5 text-xs bg-card border border-border rounded-md text-foreground">
-            <option value="all">Alle statussen</option>
-            <option value="paid">Betaald</option>
-            <option value="open">Open</option>
-            <option value="late">Te laat</option>
-          </select>
-          <div className="relative flex-1 min-w-[180px]">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              placeholder="Zoek leverancier of omschrijving"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-8 pl-8 pr-3 bg-card border border-border rounded-md text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-          </div>
-          <div className="ml-auto">
-            <AddCostPopover
-              isMobile={isMobile}
-              open={addOpen}
-              onOpenChange={(v) => { setAddOpen(v); if (!v) setEditing(null); }}
-              editing={editing}
-              onSubmit={async (data) => {
-                if (editing) await update(editing.id, data);
-                else await create(data);
-                setAddOpen(false);
-                setEditing(null);
-                await loadAll();
-              }}
-              onDelete={editing ? async () => {
-                if (confirm("Deze kost verwijderen?")) {
-                  await remove(editing.id);
-                  setAddOpen(false);
-                  setEditing(null);
-                  await loadAll();
-                }
-              } : undefined}
-            />
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-[16px] overflow-hidden">
-          <div className="px-4 py-2.5 flex items-center justify-between border-b border-border">
-            <span className="text-xs text-muted-foreground">{filtered.length} {filtered.length === 1 ? "post" : "posten"}{filterCat !== "all" && ` · ${CAT_LABELS[filterCat]}`}</span>
-            <span className="text-sm font-semibold tabular-nums">{formatEuroDecimal(filtered.reduce((s, r) => s + r.amount, 0))}</span>
-          </div>
-
-          {filtered.length === 0 ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">Geen posten gevonden.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-separate" style={{ borderSpacing: 0 }}>
-                <thead className="bg-secondary/60 text-muted-foreground text-[11px] uppercase tracking-wider">
-                  <tr>
-                    <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Datum</th>
-                    <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Omschrijving</th>
-                    <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Categorie</th>
-                    <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Bron</th>
-                    <th className="text-right px-3 py-2.5 font-semibold border-b border-border">Bedrag</th>
-                    <th className="text-left px-3 py-2.5 font-semibold border-b border-border">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((r, idx) => (
-                    <tr
-                      key={r.id}
-                      onClick={() => {
-                        if (r.source === "handmatig") { setEditing(r.raw as Kost); setAddOpen(true); }
-                        else { setDetailRow(r); }
-                      }}
-                      className={cn("hover:bg-accent/40 cursor-pointer transition-colors", idx % 2 === 1 && "bg-card/40")}
-                    >
-                      <td className="px-3 py-3 text-muted-foreground tabular-nums text-[12px] border-b border-border/40 whitespace-nowrap">
-                        {r.date.toLocaleDateString("nl-NL")}
-                      </td>
-                      <td className="px-3 py-3 border-b border-border/40">
-                        <div className="text-foreground font-medium text-[13px] truncate max-w-[280px]" title={r.supplier}>{r.supplier}</div>
-                        <div className="text-muted-foreground text-[11px] truncate max-w-[280px]" title={r.description}>{r.description}</div>
-                      </td>
-                      <td className="px-3 py-3 border-b border-border/40">
-                        <span className={cn("inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium border", CAT_COLORS[r.category])}>
-                          {CAT_LABELS[r.category]}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 border-b border-border/40">
-                        <SourceBadge source={r.source} />
-                      </td>
-                      <td className="px-3 py-3 text-right text-foreground font-semibold tabular-nums text-[14px] border-b border-border/40 whitespace-nowrap">
-                        {formatEuroDecimal(r.amount)}
-                      </td>
-                      <td className="px-3 py-3 border-b border-border/40">
-                        {r.source === "moneybird" && r.state && <StateBadge state={r.state} />}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <DetailSheet row={detailRow} onClose={() => setDetailRow(null)} isMobile={isMobile} />
+      <AddCostDialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onCreated={async () => { setAddOpen(false); await loadAll(); }}
+        create={create}
+        isMobile={isMobile}
+      />
     </div>
   );
 };
 
-/* ───────── Sub-components ───────── */
+/* ───────── UI Subcomponents ───────── */
 
-const PeriodeBar = ({
-  periodType, setPeriodType, year, setYear, quarter, setQuarter, month, setMonth,
-  customFrom, setCustomFrom, customTo, setCustomTo, availableYears, periodLabel, disabled,
-}: any) => (
-  <div className={cn("flex flex-wrap items-center gap-2", disabled && "opacity-60 pointer-events-none")}>
-    <div className="flex gap-0.5 bg-card border border-border rounded-lg p-0.5">
-      {(["maand","kwartaal","jaar","custom"] as PeriodType[]).map((p) => (
-        <button key={p} onClick={() => setPeriodType(p)}
-          className={cn(
-            "px-2.5 py-1.5 text-xs font-medium rounded-md transition-all",
-            periodType === p ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-          )}>
-          {p === "maand" ? "Maand" : p === "kwartaal" ? "Kwartaal" : p === "jaar" ? "Jaar" : "Aangepast"}
-        </button>
-      ))}
+function MetricCard({ icon: Icon, label, value, sub, tone }: { icon: any; label: string; value: string; sub?: string; tone: "positive" | "negative" | "neutral" }) {
+  const toneCls = tone === "positive" ? "text-emerald-400" : tone === "negative" ? "text-red-400" : "text-foreground";
+  return (
+    <div className="rounded-[14px] border border-border bg-secondary/30 p-3">
+      <div className="flex items-center gap-2 text-[11px] text-muted-foreground uppercase tracking-wide">
+        <Icon className="w-3.5 h-3.5" />
+        {label}
+      </div>
+      <div className={cn("mt-1.5 text-lg font-semibold tabular-nums", toneCls)}>{value}</div>
+      {sub && <div className="text-[11px] text-muted-foreground mt-0.5">{sub}</div>}
     </div>
-    {periodType !== "custom" && (
-      <select value={year} onChange={(e) => setYear(Number(e.target.value))}
-        className="h-8 px-2.5 text-xs bg-card border border-border rounded-md text-foreground">
-        {availableYears.map((y: number) => <option key={y} value={y}>{y}</option>)}
-      </select>
-    )}
-    {periodType === "kwartaal" && (
-      <select value={quarter} onChange={(e) => setQuarter(Number(e.target.value))}
-        className="h-8 px-2.5 text-xs bg-card border border-border rounded-md text-foreground">
-        {[1,2,3,4].map((q) => <option key={q} value={q}>Q{q}</option>)}
-      </select>
-    )}
-    {periodType === "maand" && (
-      <select value={month} onChange={(e) => setMonth(Number(e.target.value))}
-        className="h-8 px-2.5 text-xs bg-card border border-border rounded-md text-foreground">
-        {maandNamen.map((m, i) => <option key={i} value={i}>{m}</option>)}
-      </select>
-    )}
-    {periodType === "custom" && (
-      <>
-        <input type="date" value={customFrom ? fmtYmd(customFrom).replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3") : ""}
-          onChange={(e) => setCustomFrom(e.target.value ? new Date(e.target.value) : undefined)}
-          className="h-8 px-2 text-xs bg-card border border-border rounded-md text-foreground" />
-        <input type="date" value={customTo ? fmtYmd(customTo).replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3") : ""}
-          onChange={(e) => setCustomTo(e.target.value ? new Date(e.target.value) : undefined)}
-          className="h-8 px-2 text-xs bg-card border border-border rounded-md text-foreground" />
-      </>
-    )}
-    <span className="text-xs text-muted-foreground ml-1">Periode: <span className="text-foreground font-medium">{periodLabel}</span></span>
-  </div>
-);
+  );
+}
 
-const HeroCell = ({ label, amount, sub, color, icon, showSign }: {
-  label: string; amount: number; sub?: string;
-  color: "emerald" | "red" | "neutral";
-  icon?: React.ReactNode; showSign?: boolean;
-}) => (
-  <div className="p-5">
-    <div className="flex items-center justify-between mb-2">
-      <span className="text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
-      {icon}
-    </div>
-    <p className={cn(
-      "text-2xl md:text-3xl font-bold tabular-nums",
-      color === "emerald" ? "text-emerald-400" : color === "red" ? "text-red-400" : "text-foreground"
-    )}>
-      {showSign && amount >= 0 ? "+" : ""}{formatEuroDecimal(amount)}
-    </p>
-    {sub && <p className="text-[11px] text-muted-foreground mt-2">{sub}</p>}
-  </div>
-);
+function FilterPill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "px-3 py-1.5 text-xs rounded-[10px] border transition-colors",
+        active
+          ? "bg-primary text-primary-foreground border-primary"
+          : "bg-secondary/40 border-border text-muted-foreground hover:bg-secondary/60"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
 
-const SourceBadge = ({ source }: { source: Source }) => {
-  const map: Record<Source, { label: string; cls: string }> = {
-    moneybird: { label: "Moneybird", cls: "bg-orange-500/15 text-orange-300 border-orange-500/30" },
-    handmatig: { label: "Handmatig", cls: "bg-secondary/60 text-muted-foreground border-border" },
-    inkoopverklaring: { label: "Inkoopverklaring", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
-  };
-  const m = map[source];
-  return <span className={cn("inline-flex px-2 py-0.5 rounded-md text-[10px] font-medium border", m.cls)}>{m.label}</span>;
-};
-
-const StateBadge = ({ state }: { state: "paid" | "open" | "late" }) => {
+function StateBadge({ state }: { state: PaymentState }) {
+  if (!state) return <span className="text-[11px] text-muted-foreground">—</span>;
   const map = {
     paid: { label: "Betaald", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
-    open: { label: "Open", cls: "bg-secondary/60 text-muted-foreground border-border" },
-    late: { label: "Te laat", cls: "bg-red-500/15 text-red-400 border-red-500/30" },
+    open: { label: "Open", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
+    late: { label: "Te laat", cls: "bg-red-500/15 text-red-300 border-red-500/30" },
   } as const;
   const m = map[state];
-  return <span className={cn("inline-flex px-2 py-0.5 rounded-md text-[10px] font-medium border", m.cls)}>{m.label}</span>;
-};
+  return <span className={cn("text-[10px] px-1.5 py-0.5 rounded border", m.cls)}>{m.label}</span>;
+}
 
-const FullSkeleton = () => (
-  <div className="space-y-5">
-    <div className="bg-card border border-border rounded-[16px] grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
-      {[0,1,2].map((i) => (
-        <div key={i} className="p-5 space-y-3">
-          <div className="h-3 w-24 bg-secondary/60 animate-pulse rounded" />
-          <div className="h-8 w-40 bg-secondary/60 animate-pulse rounded" />
-          <div className="h-3 w-32 bg-secondary/60 animate-pulse rounded" />
+type Col = "date" | "desc" | "supplier" | "amount" | "state" | "kenteken" | "source";
+
+function Section({ title, rows, columns }: { title: string; rows: Row[]; columns: Col[] }) {
+  const total = rows.reduce((s, r) => s + r.amount, 0);
+  return (
+    <div className="rounded-[14px] border border-border bg-secondary/20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        <div className="text-sm font-semibold tabular-nums">{formatEuro(total)}</div>
+      </div>
+      {rows.length === 0 ? (
+        <div className="px-4 py-6 text-xs text-muted-foreground text-center">Geen posten in deze periode</div>
+      ) : (
+        <div className="divide-y divide-border/60">
+          {rows.map((r) => <RowLine key={r.id} row={r} columns={columns} />)}
         </div>
+      )}
+      {rows.length > 0 && (
+        <div className="px-4 py-2.5 border-t border-border flex justify-between items-center text-xs">
+          <span className="text-muted-foreground">Subtotaal</span>
+          <span className="font-semibold tabular-nums">{formatEuro(total)}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RowLine({ row, columns }: { row: Row; columns: Col[] }) {
+  return (
+    <div className="px-4 py-2.5 grid gap-2 items-center text-xs hover:bg-secondary/30 transition-colors"
+      style={{ gridTemplateColumns: columns.map((c) => c === "amount" ? "auto" : c === "state" ? "70px" : c === "date" ? "85px" : "1fr").join(" ") }}>
+      {columns.map((c) => {
+        if (c === "date") return <span key={c} className="text-muted-foreground tabular-nums">{formatDate(row.date)}</span>;
+        if (c === "desc") return (
+          <span key={c} className="truncate">
+            {row.kenteken && <span className="text-muted-foreground mr-1.5 tabular-nums">{row.kenteken}</span>}
+            {row.description}
+          </span>
+        );
+        if (c === "supplier") return <span key={c} className="truncate text-muted-foreground">{row.supplier}</span>;
+        if (c === "kenteken") return <span key={c} className="text-muted-foreground tabular-nums">{row.kenteken || "—"}</span>;
+        if (c === "state") return <StateBadge key={c} state={row.state} />;
+        if (c === "source") return <span key={c} className="text-[10px] text-muted-foreground uppercase">{row.source === "moneybird" ? "MB" : row.source === "inkoopverklaring" ? "IKV" : "Handm."}</span>;
+        if (c === "amount") return <span key={c} className="text-right font-medium tabular-nums whitespace-nowrap">{formatEuro(row.amount)}</span>;
+        return null;
+      })}
+    </div>
+  );
+}
+
+function SectionAbonnementen({ rows }: { rows: Row[] }) {
+  const total = rows.reduce((s, r) => s + r.amount, 0);
+  // Approx jaartotaal: assume amounts are monthly equivalents — sum * 12 / aantal_maanden_in_periode is ambiguous; use total * 12 if periode is one month, anders project naar jaar
+  // Eenvoudig: per-post jaarbedrag inschatten op basis van handmatige frequentie indien beschikbaar (raw)
+  const jaartotaal = rows.reduce((sum, r) => {
+    const k: Kost | undefined = r.source === "handmatig" ? r.raw : undefined;
+    if (k) {
+      if (k.frequentie === "maandelijks") return sum + Number(k.bedrag) * 12;
+      if (k.frequentie === "kwartaal") return sum + Number(k.bedrag) * 4;
+      if (k.frequentie === "jaarlijks") return sum + Number(k.bedrag);
+      return sum + Number(k.bedrag);
+    }
+    // Moneybird: schat als maandelijks
+    return sum + r.amount * 12;
+  }, 0);
+
+  return (
+    <div className="rounded-[14px] border border-border bg-secondary/20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-semibold">{SECTION_LABELS.abonnementen}</h3>
+        <div className="text-sm font-semibold tabular-nums">{formatEuro(total)}</div>
+      </div>
+      {rows.length === 0 ? (
+        <div className="px-4 py-6 text-xs text-muted-foreground text-center">Geen abonnementen in deze periode</div>
+      ) : (
+        <div className="divide-y divide-border/60">
+          {rows.map((r) => (
+            <div key={r.id} className="px-4 py-2.5 grid grid-cols-[1fr_auto_70px_auto] gap-2 items-center text-xs hover:bg-secondary/30">
+              <span className="truncate">{r.description !== "—" ? r.description : r.supplier}</span>
+              <span className="text-muted-foreground tabular-nums">{formatEuro(r.amount)}/maand</span>
+              <StateBadge state={r.state} />
+              <span className="text-right text-muted-foreground tabular-nums whitespace-nowrap">{r.supplier}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {rows.length > 0 && (
+        <div className="px-4 py-2.5 border-t border-border flex justify-between items-center text-xs">
+          <span className="text-muted-foreground">Subtotaal periode</span>
+          <span className="font-semibold tabular-nums">{formatEuro(total)}</span>
+        </div>
+      )}
+      {rows.length > 0 && (
+        <div className="px-4 py-2 border-t border-border/60 flex justify-between items-center text-xs">
+          <span className="text-muted-foreground">Totaal per jaar</span>
+          <span className="font-semibold tabular-nums text-foreground/80">{formatEuro(jaartotaal)}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SectionInkoop({ rows }: { rows: Row[] }) {
+  const total = rows.reduce((s, r) => s + r.amount, 0);
+  return (
+    <div className="rounded-[14px] border border-border bg-secondary/20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-semibold">{SECTION_LABELS.inkoop_voertuigen}</h3>
+        <div className="text-sm font-semibold tabular-nums">{formatEuro(total)}</div>
+      </div>
+      {rows.length === 0 ? (
+        <div className="px-4 py-6 text-xs text-muted-foreground text-center">Geen inkopen in deze periode</div>
+      ) : (
+        <div className="divide-y divide-border/60">
+          {rows.map((r) => (
+            <div key={r.id} className="px-4 py-2.5 grid grid-cols-[85px_1fr_1fr_auto_70px] gap-2 items-center text-xs hover:bg-secondary/30">
+              <span className="text-muted-foreground tabular-nums">{formatDate(r.date)}</span>
+              <span className="truncate">
+                {r.kenteken && <span className="text-muted-foreground mr-1.5 tabular-nums">{r.kenteken}</span>}
+                {r.description}
+              </span>
+              <span className="truncate text-muted-foreground">{r.supplier}</span>
+              <span className="text-right font-medium tabular-nums whitespace-nowrap">{formatEuro(r.amount)}</span>
+              <span className={cn(
+                "text-[10px] px-1.5 py-0.5 rounded border text-center",
+                r.source === "inkoopverklaring"
+                  ? "bg-blue-500/15 text-blue-300 border-blue-500/30"
+                  : "bg-violet-500/15 text-violet-300 border-violet-500/30"
+              )}>
+                {r.source === "inkoopverklaring" ? "IKV" : "MB"}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      {rows.length > 0 && (
+        <div className="px-4 py-2.5 border-t border-border flex justify-between items-center text-xs">
+          <span className="text-muted-foreground">Subtotaal · {rows.length} voertuig{rows.length === 1 ? "" : "en"}</span>
+          <span className="font-semibold tabular-nums">{formatEuro(total)}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SectionPersoneel({ rows, onAdd }: { rows: Row[]; onAdd: () => void }) {
+  const total = rows.reduce((s, r) => s + r.amount, 0);
+  return (
+    <div className="rounded-[14px] border border-border bg-secondary/20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-semibold">{SECTION_LABELS.personeelskosten}</h3>
+        <div className="text-sm font-semibold tabular-nums">{formatEuro(total)}</div>
+      </div>
+      {rows.length === 0 ? (
+        <div className="px-4 py-6 flex flex-col items-center gap-2">
+          <div className="text-xs text-muted-foreground">Geen personeelskosten geregistreerd</div>
+          <button onClick={onAdd} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-[10px] bg-secondary/60 border border-border hover:bg-secondary">
+            <Plus className="w-3.5 h-3.5" /> Toevoegen
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="divide-y divide-border/60">
+            {rows.map((r) => (
+              <div key={r.id} className="px-4 py-2.5 grid grid-cols-[85px_1fr_1fr_auto] gap-2 items-center text-xs hover:bg-secondary/30">
+                <span className="text-muted-foreground tabular-nums">{formatDate(r.date)}</span>
+                <span className="truncate">{r.description}</span>
+                <span className="truncate text-muted-foreground">{r.supplier}</span>
+                <span className="text-right font-medium tabular-nums whitespace-nowrap">{formatEuro(r.amount)}</span>
+              </div>
+            ))}
+          </div>
+          <div className="px-4 py-2.5 border-t border-border flex justify-between items-center text-xs">
+            <span className="text-muted-foreground">Subtotaal</span>
+            <span className="font-semibold tabular-nums">{formatEuro(total)}</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function MargeSection({ rows, totaleBruto, gemMargePerc }: { rows: any[]; totaleBruto: number; gemMargePerc: number }) {
+  return (
+    <div className="rounded-[14px] border border-border bg-secondary/20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-semibold">Marge per voertuig</h3>
+        <div className="text-sm font-semibold tabular-nums">{formatEuro(totaleBruto)}</div>
+      </div>
+      {rows.length === 0 ? (
+        <div className="px-4 py-6 text-xs text-muted-foreground text-center">Geen verkopen in deze periode</div>
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-muted-foreground border-b border-border/60">
+                  <th className="text-left font-normal px-4 py-2">Voertuig</th>
+                  <th className="text-left font-normal px-2 py-2">Type</th>
+                  <th className="text-right font-normal px-2 py-2">Inkoop</th>
+                  <th className="text-right font-normal px-2 py-2">Verkoop</th>
+                  <th className="text-right font-normal px-2 py-2">Marge</th>
+                  <th className="text-right font-normal px-4 py-2">Marge %</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {rows.map((r) => (
+                  <tr key={r.id} className="hover:bg-secondary/30">
+                    <td className="px-4 py-2">
+                      <div className="truncate">{r.merk} {r.model}</div>
+                      <div className="text-[10px] text-muted-foreground tabular-nums">{r.kenteken}</div>
+                    </td>
+                    <td className="px-2 py-2">
+                      <span className={cn(
+                        "text-[10px] px-1.5 py-0.5 rounded border",
+                        r.isConsign ? "bg-violet-500/15 text-violet-300 border-violet-500/30" : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                      )}>
+                        {r.isConsign ? "Consignatie" : "Eigen"}
+                      </span>
+                    </td>
+                    <td className="px-2 py-2 text-right tabular-nums text-muted-foreground">{r.isConsign ? "—" : r.inkoop > 0 ? formatEuro(r.inkoop) : "—"}</td>
+                    <td className="px-2 py-2 text-right tabular-nums">{formatEuro(r.verkoop)}</td>
+                    <td className={cn("px-2 py-2 text-right tabular-nums font-medium", r.marge >= 0 ? "text-emerald-400" : "text-red-400")}>{formatEuro(r.marge)}</td>
+                    <td className="px-4 py-2 text-right tabular-nums">{r.margePerc !== null ? `${r.margePerc.toFixed(1)}%` : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-4 py-2.5 border-t border-border flex justify-between items-center text-xs">
+            <span className="text-muted-foreground">Gemiddelde marge: <span className="text-foreground font-medium">{gemMargePerc.toFixed(1)}%</span></span>
+            <span className="font-semibold tabular-nums">Totaal: {formatEuro(totaleBruto)}</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function FilteredList({ title, rows, onAddPersoneel }: { title: string; rows: Row[]; onAddPersoneel?: () => void }) {
+  const total = rows.reduce((s, r) => s + r.amount, 0);
+  return (
+    <div className="rounded-[14px] border border-border bg-secondary/20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        <div className="text-sm font-semibold tabular-nums">{formatEuro(total)}</div>
+      </div>
+      {rows.length === 0 ? (
+        <div className="px-4 py-8 flex flex-col items-center gap-2">
+          <div className="text-xs text-muted-foreground">Geen posten in deze periode</div>
+          {onAddPersoneel && (
+            <button onClick={onAddPersoneel} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-[10px] bg-secondary/60 border border-border hover:bg-secondary">
+              <Plus className="w-3.5 h-3.5" /> Toevoegen
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="divide-y divide-border/60">
+          {rows.map((r) => (
+            <div key={r.id} className="px-4 py-2.5 grid grid-cols-[85px_1fr_1fr_70px_auto] gap-2 items-center text-xs hover:bg-secondary/30">
+              <span className="text-muted-foreground tabular-nums">{formatDate(r.date)}</span>
+              <span className="truncate">{r.description}</span>
+              <span className="truncate text-muted-foreground">{r.supplier}</span>
+              <StateBadge state={r.state} />
+              <span className="text-right font-medium tabular-nums whitespace-nowrap">{formatEuro(r.amount)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SkeletonAll() {
+  return (
+    <div className="space-y-5 animate-pulse">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="rounded-[14px] border border-border bg-secondary/30 p-3 h-[88px]" />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="h-7 w-24 rounded-[10px] bg-secondary/40 border border-border" />
+        ))}
+      </div>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="rounded-[14px] border border-border bg-secondary/20 h-[160px]" />
       ))}
     </div>
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      {[0,1].map((i) => (
-        <div key={i} className="bg-card border border-border rounded-[16px] p-4 space-y-3">
-          <div className="h-4 w-40 bg-secondary/60 animate-pulse rounded" />
-          {[0,1,2,3].map((j) => <div key={j} className="h-10 bg-secondary/60 animate-pulse rounded" />)}
-        </div>
-      ))}
-    </div>
-    <div className="bg-card border border-border rounded-[16px] p-4 space-y-2">
-      {[0,1,2,3,4,5].map((i) => <div key={i} className="h-12 bg-secondary/60 animate-pulse rounded" />)}
-    </div>
-  </div>
-);
+  );
+}
 
-/* ─── Add / edit cost ─── */
-function AddCostPopover({
-  isMobile, open, onOpenChange, editing, onSubmit, onDelete,
+/* ───────── Add cost dialog ───────── */
+function AddCostDialog({
+  open, onClose, onCreated, create, isMobile,
 }: {
-  isMobile: boolean;
   open: boolean;
-  onOpenChange: (v: boolean) => void;
-  editing: Kost | null;
-  onSubmit: (data: Partial<Kost>) => Promise<void>;
-  onDelete?: () => Promise<void>;
+  onClose: () => void;
+  onCreated: () => void;
+  create: (input: Partial<Kost>) => Promise<void>;
+  isMobile: boolean;
 }) {
-  const trigger = (
-    <button
-      onClick={() => onOpenChange(true)}
-      className="h-8 px-3 inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors"
-    >
-      <Plus className="w-3.5 h-3.5" />
-      Kost toevoegen
-    </button>
+  const [naam, setNaam] = useState("");
+  const [leverancier, setLeverancier] = useState("");
+  const [categorie, setCategorie] = useState<KostCategorie>("vaste_kosten");
+  const [bedrag, setBedrag] = useState<string>("");
+  const [datum, setDatum] = useState(new Date().toISOString().slice(0, 10));
+  const [frequentie, setFrequentie] = useState<KostFrequentie>("eenmalig");
+  const [notities, setNotities] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      setNaam(""); setLeverancier(""); setCategorie("vaste_kosten");
+      setBedrag(""); setDatum(new Date().toISOString().slice(0, 10));
+      setFrequentie("eenmalig"); setNotities("");
+    }
+  }, [open]);
+
+  const submit = async () => {
+    if (!naam.trim()) return toast.error("Vul een omschrijving in");
+    const b = parseFloat(bedrag.replace(",", "."));
+    if (isNaN(b) || b <= 0) return toast.error("Vul een geldig bedrag in");
+    setSaving(true);
+    try {
+      await create({ naam, leverancier: leverancier || null, categorie, bedrag: b, datum, frequentie, notities: notities || null });
+      onCreated();
+    } catch {
+      // toast handled in hook
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const Body = (
+    <div className="space-y-3">
+      <Field label="Omschrijving">
+        <input value={naam} onChange={(e) => setNaam(e.target.value)} className={inputCls} placeholder="bijv. Verzekering bedrijfsauto" />
+      </Field>
+      <Field label="Leverancier">
+        <input value={leverancier} onChange={(e) => setLeverancier(e.target.value)} className={inputCls} placeholder="bijv. ASR" />
+      </Field>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Categorie">
+          <select value={categorie} onChange={(e) => setCategorie(e.target.value as KostCategorie)} className={inputCls}>
+            {(Object.keys(kostCategorieLabels) as KostCategorie[]).map((k) => (
+              <option key={k} value={k}>{kostCategorieLabels[k]}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Bedrag">
+          <input value={bedrag} onChange={(e) => setBedrag(e.target.value)} className={inputCls} placeholder="0,00" inputMode="decimal" />
+        </Field>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Datum">
+          <input type="date" value={datum} onChange={(e) => setDatum(e.target.value)} className={inputCls} />
+        </Field>
+        <Field label="Frequentie">
+          <select value={frequentie} onChange={(e) => setFrequentie(e.target.value as KostFrequentie)} className={inputCls}>
+            {(Object.keys(kostFrequentieLabels) as KostFrequentie[]).map((k) => (
+              <option key={k} value={k}>{kostFrequentieLabels[k]}</option>
+            ))}
+          </select>
+        </Field>
+      </div>
+      <Field label="Notities">
+        <textarea value={notities} onChange={(e) => setNotities(e.target.value)} className={cn(inputCls, "min-h-[60px] resize-none")} />
+      </Field>
+      <div className="flex gap-2 justify-end pt-2">
+        <button onClick={onClose} className="px-3 py-2 text-xs rounded-[10px] bg-secondary/40 border border-border hover:bg-secondary/60">Annuleren</button>
+        <button onClick={submit} disabled={saving} className="px-4 py-2 text-xs rounded-[10px] bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+          {saving ? "Opslaan…" : "Opslaan"}
+        </button>
+      </div>
+    </div>
   );
 
   if (isMobile) {
     return (
-      <>
-        {trigger}
-        <Sheet open={open} onOpenChange={onOpenChange}>
-          <SheetContent side="bottom" className="h-[90vh] rounded-t-[16px] overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>{editing ? "Kost bewerken" : "Nieuwe kost"}</SheetTitle>
-            </SheetHeader>
-            <KostForm initial={editing} onSubmit={onSubmit} onDelete={onDelete} />
-          </SheetContent>
-        </Sheet>
-      </>
+      <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+        <SheetContent side="bottom" className="rounded-t-[16px] border-border">
+          <SheetHeader className="mb-3">
+            <SheetTitle>Kost toevoegen</SheetTitle>
+          </SheetHeader>
+          {Body}
+        </SheetContent>
+      </Sheet>
     );
   }
 
   return (
-    <Popover open={open} onOpenChange={onOpenChange}>
-      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent align="end" className="w-[380px] p-4 rounded-[16px]">
+    <Popover open={open} onOpenChange={(v) => !v && onClose()}>
+      <PopoverTrigger asChild>
+        <button className="hidden" />
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="end" className="w-[420px] rounded-[16px] border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold">{editing ? "Kost bewerken" : "Nieuwe kost"}</h3>
-          <button onClick={() => onOpenChange(false)} className="text-muted-foreground hover:text-foreground">
-            <X className="w-4 h-4" />
-          </button>
+          <h3 className="text-sm font-semibold">Kost toevoegen</h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
         </div>
-        <KostForm initial={editing} onSubmit={onSubmit} onDelete={onDelete} />
+        {Body}
       </PopoverContent>
     </Popover>
   );
 }
 
-const KostForm = ({
-  initial, onSubmit, onDelete,
-}: {
-  initial: Kost | null;
-  onSubmit: (data: Partial<Kost>) => Promise<void>;
-  onDelete?: () => Promise<void>;
-}) => {
-  const [naam, setNaam] = useState(initial?.naam || "");
-  const [categorie, setCategorie] = useState<KostCategorie>(initial?.categorie || "vaste_kosten");
-  const [bedrag, setBedrag] = useState<string>(initial ? String(initial.bedrag) : "");
-  const [frequentie, setFrequentie] = useState<KostFrequentie>(initial?.frequentie || "eenmalig");
-  const [datum, setDatum] = useState(initial?.datum || new Date().toISOString().slice(0, 10));
-  const [leverancier, setLeverancier] = useState(initial?.leverancier || "");
-  const [notities, setNotities] = useState(initial?.notities || "");
-  const [busy, setBusy] = useState(false);
+const inputCls = "w-full bg-secondary/40 border border-border rounded-[10px] px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary";
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!naam || !bedrag) {
-      toast.error("Vul omschrijving en bedrag in");
-      return;
-    }
-    setBusy(true);
-    try {
-      await onSubmit({
-        naam, categorie, bedrag: Number(bedrag), frequentie, datum,
-        leverancier: leverancier || null, notities: notities || null,
-      });
-    } finally {
-      setBusy(false);
-    }
-  };
-
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <form onSubmit={submit} className="space-y-3">
-      <Field label="Omschrijving *">
-        <input required value={naam} onChange={(e) => setNaam(e.target.value)} className="kf-input" />
-      </Field>
-      <Field label="Leverancier">
-        <input value={leverancier} onChange={(e) => setLeverancier(e.target.value)} className="kf-input" />
-      </Field>
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Categorie *">
-          <select value={categorie} onChange={(e) => setCategorie(e.target.value as KostCategorie)} className="kf-input">
-            {Object.entries(kostCategorieLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </select>
-        </Field>
-        <Field label="Frequentie">
-          <select value={frequentie} onChange={(e) => setFrequentie(e.target.value as KostFrequentie)} className="kf-input">
-            {Object.entries(kostFrequentieLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </select>
-        </Field>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Bedrag incl. BTW *">
-          <input required type="number" step="0.01" placeholder="0,00" value={bedrag} onChange={(e) => setBedrag(e.target.value)} className="kf-input" />
-        </Field>
-        <Field label="Datum *">
-          <input type="date" required value={datum} onChange={(e) => setDatum(e.target.value)} className="kf-input" />
-        </Field>
-      </div>
-      <Field label="Notities">
-        <textarea rows={2} value={notities} onChange={(e) => setNotities(e.target.value)} className="kf-input resize-none" />
-      </Field>
-
-      <div className="flex items-center justify-between gap-2 pt-2 border-t border-border">
-        {onDelete ? (
-          <button type="button" onClick={onDelete}
-            className="inline-flex items-center gap-1.5 px-3 h-8 text-xs text-red-400 hover:bg-red-500/10 rounded-md">
-            <Trash2 className="w-3.5 h-3.5" />
-            Verwijderen
-          </button>
-        ) : <span />}
-        <button type="submit" disabled={busy}
-          className="px-4 h-8 bg-primary text-primary-foreground rounded-md text-xs font-medium disabled:opacity-50">
-          {busy ? "Opslaan…" : "Opslaan"}
-        </button>
-      </div>
-
-      <style>{`
-        .kf-input { width: 100%; height: 34px; padding: 0 10px; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 6px; color: hsl(var(--foreground)); font-size: 13px; outline: none; }
-        .kf-input:focus { border-color: hsl(var(--ring)); }
-        textarea.kf-input { height: auto; padding: 8px 10px; }
-      `}</style>
-    </form>
-  );
-};
-
-const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <label className="block">
-    <span className="block text-[11px] text-muted-foreground mb-1">{label}</span>
-    {children}
-  </label>
-);
-
-/* ─── Detail Sheet ─── */
-function DetailSheet({ row, onClose, isMobile }: { row: UnifiedRow | null; onClose: () => void; isMobile: boolean }) {
-  if (!row) return null;
-  const inv = row.raw;
-  return (
-    <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side={isMobile ? "bottom" : "right"} className={cn("overflow-y-auto rounded-[16px]", isMobile ? "h-[80vh] rounded-t-[16px]" : "w-full sm:max-w-md")}>
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2"><FileText className="w-4 h-4" /> Factuur details</SheetTitle>
-        </SheetHeader>
-        <div className="space-y-3 mt-4">
-          <DetailRow label="Leverancier" value={row.supplier} />
-          <DetailRow label="Datum" value={row.date.toLocaleDateString("nl-NL")} />
-          <DetailRow label="Omschrijving" value={row.description} />
-          <DetailRow label="Categorie" value={CAT_LABELS[row.category]} />
-          <DetailRow label="Bedrag incl. BTW" value={formatEuroDecimal(row.amount)} />
-          {row.state && (
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Status</span>
-              <StateBadge state={row.state} />
-            </div>
-          )}
-          {inv?.due_date && <DetailRow label="Vervaldatum" value={new Date(inv.due_date).toLocaleDateString("nl-NL")} />}
-          {inv?.paid_at && <DetailRow label="Betaald op" value={new Date(inv.paid_at).toLocaleDateString("nl-NL")} />}
-          {inv?.invoice_id && <DetailRow label="Factuurnummer" value={inv.invoice_id} />}
-        </div>
-      </SheetContent>
-    </Sheet>
+    <label className="block">
+      <span className="text-[11px] text-muted-foreground uppercase tracking-wide block mb-1">{label}</span>
+      {children}
+    </label>
   );
 }
-
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex items-start justify-between gap-3">
-    <span className="text-xs text-muted-foreground shrink-0">{label}</span>
-    <span className="text-sm text-foreground text-right break-words">{value}</span>
-  </div>
-);
 
 export default KostenCombinedTab;
