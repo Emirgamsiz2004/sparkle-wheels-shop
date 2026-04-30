@@ -35,7 +35,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onUpdate: (id: string, updates: Partial<Appointment>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  onCreate?: (data: any) => Promise<void>;
+  onCreate?: (data: any) => Promise<string | null | void>;
 }
 
 const timeSlots = Array.from({ length: 20 }, (_, i) => {

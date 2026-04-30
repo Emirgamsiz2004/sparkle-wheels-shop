@@ -29,7 +29,7 @@ interface Props {
   customers: CustomerOption[];
   vehicles: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
   allVehicles?: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
-  onSubmit: (data: any) => Promise<void>;
+  onSubmit: (data: any) => Promise<string | null | void>;
   defaultType?: string;
   defaultVehicleId?: string;
   anchorRect?: DOMRect | null;
