@@ -87,12 +87,29 @@ const SearchSelectPopover = ({
   useLayoutEffect(() => {
     if (!open || isMobile || !anchorRect) { setPos(null); return; }
     const W = 380;
+    const H_MAX = 480;
     const margin = 8;
     const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
     let left = anchorRect.right - W;
     if (left < margin) left = margin;
     if (left + W > vw - margin) left = vw - W - margin;
-    const top = anchorRect.bottom + 6;
+
+    const spaceBelow = vh - anchorRect.bottom - margin;
+    const spaceAbove = anchorRect.top - margin;
+    let top: number;
+    if (spaceBelow >= 240 || spaceBelow >= spaceAbove) {
+      // plaats onder, maar clamp binnen viewport
+      top = anchorRect.bottom + 6;
+      const maxTop = vh - margin - Math.min(H_MAX, spaceBelow);
+      if (top > maxTop) top = Math.max(margin, maxTop);
+    } else {
+      // flip naar boven
+      const h = Math.min(H_MAX, spaceAbove);
+      top = anchorRect.top - 6 - h;
+      if (top < margin) top = margin;
+    }
     setPos({ top, left });
   }, [open, isMobile, anchorRect]);
 
