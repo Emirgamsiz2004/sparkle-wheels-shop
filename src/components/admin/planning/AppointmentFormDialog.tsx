@@ -9,18 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Car, PackageCheck, CalendarIcon, Clock, Wrench, Truck, MoreHorizontal, ArrowLeft, X } from "lucide-react";
+import { Eye, Car, PackageCheck, CalendarIcon, Clock, Wrench, Truck, MoreHorizontal, ArrowLeft, X, Mail } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { AppointmentType, typeColors, typeLabels } from "@/hooks/useAppointments";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendAppointmentConfirmation } from "@/lib/sendAppointmentConfirmation";
 
 interface CustomerOption {
   id: string;
   voornaam: string;
   achternaam: string;
   telefoon?: string;
+  email?: string;
 }
 
 interface Props {
@@ -29,7 +32,7 @@ interface Props {
   customers: CustomerOption[];
   vehicles: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
   allVehicles?: { id: string; merk: string; model: string; kenteken: string | null; status?: string }[];
-  onSubmit: (data: any) => Promise<void>;
+  onSubmit: (data: any) => Promise<string | null | void>;
   defaultType?: string;
   defaultVehicleId?: string;
   anchorRect?: DOMRect | null;
@@ -50,6 +53,17 @@ const timeSlots = Array.from({ length: 20 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${m}`;
 });
 
+const defaultDuurMinuten: Record<string, number> = {
+  bezichtiging: 30,
+  proefrit: 60,
+  ophalen: 30,
+  aflevering: 60,
+  onderhoud: 120,
+  terugbelafspraak: 15,
+  anders: 60,
+  poetsbeurt: 120,
+};
+
 const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType, defaultVehicleId, anchorRect }: Props) => {
   const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
   const [type, setType] = useState<AppointmentType | null>((defaultType as AppointmentType) || null);
@@ -65,11 +79,32 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     tijd: "10:00",
     klant_naam: "",
     klant_telefoon: "",
+    klant_email: "",
     vehicle_id: defaultVehicleId || "",
     notities: "",
     onderwerp: "",
     betalingsstatus: "openstaand" as "volledig_betaald" | "openstaand",
+    duur_minuten: 60,
+    stuur_bevestigingsmail: false,
   });
+
+  const selectedCustomerEmail = useMemo(() => {
+    if (!selectedCustomerId) return "";
+    return customers.find((c) => c.id === selectedCustomerId)?.email || "";
+  }, [selectedCustomerId, customers]);
+
+  const effectiveEmail = (selectedCustomerEmail || form.klant_email || "").trim();
+
+  // Update default duur on type change
+  useEffect(() => {
+    if (!type) return;
+    setForm((f) => ({ ...f, duur_minuten: defaultDuurMinuten[type] || 60 }));
+  }, [type]);
+
+  // Toggle: standaard aan zodra er een e-mailadres beschikbaar is
+  useEffect(() => {
+    setForm((f) => ({ ...f, stuur_bevestigingsmail: Boolean(effectiveEmail) }));
+  }, [effectiveEmail]);
 
   useEffect(() => {
     if (open && defaultType) {
@@ -102,7 +137,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     setCustomerSearch("");
     setSelectedCustomerId(null);
     setCustomerOpen(false);
-    setForm({ tijd: "10:00", klant_naam: "", klant_telefoon: "", vehicle_id: "", notities: "", onderwerp: "", betalingsstatus: "openstaand" });
+    setForm({ tijd: "10:00", klant_naam: "", klant_telefoon: "", klant_email: "", vehicle_id: "", notities: "", onderwerp: "", betalingsstatus: "openstaand", duur_minuten: 60, stuur_bevestigingsmail: false });
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -146,15 +181,17 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     try {
       const dateStr = format(selectedDate, "yyyy-MM-dd");
       const datum_tijd = new Date(`${dateStr}T${form.tijd}`).toISOString();
+      const duur = Math.max(5, form.duur_minuten || 60);
+      const eind_datum_tijd = new Date(new Date(datum_tijd).getTime() + duur * 60 * 1000).toISOString();
       const noteParts = [
         !selectedCustomerId && form.klant_naam ? `Klant: ${form.klant_naam}` : "",
         !selectedCustomerId && form.klant_telefoon ? `Tel: ${form.klant_telefoon}` : "",
         form.notities,
       ].filter(Boolean);
-      await onSubmit({
+      const result = await onSubmit({
         type,
         datum_tijd,
-        eind_datum_tijd: null,
+        eind_datum_tijd,
         customer_id: selectedCustomerId,
         vehicle_id: form.vehicle_id || null,
         medewerker: null,
@@ -163,7 +200,31 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
         betalingsstatus: type === "aflevering" ? form.betalingsstatus : null,
         voertuig_klaargemaakt: false,
         status: "gepland",
+        klant_email: effectiveEmail || null,
+        duur_minuten: duur,
       });
+
+      // Bevestigingsmail versturen indien toggle aan + email beschikbaar
+      const newId = typeof result === "string" ? result : null;
+      if (newId && form.stuur_bevestigingsmail && effectiveEmail) {
+        const klant = selectedCustomerId
+          ? customers.find((c) => c.id === selectedCustomerId)
+          : null;
+        const voornaam = klant?.voornaam || form.klant_naam.split(" ")[0] || "";
+        const veh = (form.vehicle_id ? vehicleList.find((v) => v.id === form.vehicle_id) : null) || null;
+        await sendAppointmentConfirmation({
+          appointmentId: newId,
+          recipientEmail: effectiveEmail,
+          voornaam,
+          type,
+          datumTijd: datum_tijd,
+          eindDatumTijd: eind_datum_tijd,
+          duurMinuten: duur,
+          voertuig: veh ? { merk: veh.merk, model: veh.model, kenteken: veh.kenteken } : null,
+          omschrijving: type === "terugbelafspraak" ? form.onderwerp : form.notities,
+        });
+      }
+
       handleOpenChange(false);
     } finally {
       setSaving(false);
@@ -415,6 +476,50 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                   placeholder="06 12345678"
                   type="tel"
                   className="rounded-[3px] h-10"
+                />
+              </div>
+
+              {/* E-mailadres klant */}
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                  {selectedCustomerEmail ? "Bevestigingsmail naar" : "E-mailadres klant"}{" "}
+                  {!selectedCustomerEmail && <span className="opacity-50">(optioneel)</span>}
+                </Label>
+                <Input
+                  value={selectedCustomerEmail || form.klant_email}
+                  onChange={(e) => setForm({ ...form, klant_email: e.target.value })}
+                  placeholder="naam@voorbeeld.nl"
+                  type="email"
+                  readOnly={!!selectedCustomerEmail}
+                  className={cn("rounded-[3px] h-10", selectedCustomerEmail && "opacity-70 cursor-not-allowed")}
+                />
+              </div>
+
+              {/* Duur (minuten) */}
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                  {type === "onderhoud" ? "Duur reparatie (minuten)" : "Duur (minuten)"}
+                </Label>
+                <Input
+                  type="number"
+                  min={5}
+                  step={5}
+                  value={form.duur_minuten}
+                  onChange={(e) => setForm({ ...form, duur_minuten: parseInt(e.target.value) || 0 })}
+                  className="rounded-[3px] h-10"
+                />
+              </div>
+
+              {/* Toggle bevestigingsmail */}
+              <div className="flex items-center justify-between gap-3 py-1">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs text-foreground">Stuur bevestigingsmail</span>
+                </div>
+                <Switch
+                  checked={form.stuur_bevestigingsmail && !!effectiveEmail}
+                  disabled={!effectiveEmail}
+                  onCheckedChange={(v) => setForm({ ...form, stuur_bevestigingsmail: v })}
                 />
               </div>
 
