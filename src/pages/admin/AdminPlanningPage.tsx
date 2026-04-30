@@ -204,8 +204,12 @@ const AdminPlanningPage = () => {
                               <span className="font-medium">{format(new Date(a.datum_tijd), "HH:mm")}</span>
                               <Badge className={`${typeColors[a.type]} border text-[10px]`}>{typeLabels[a.type]}</Badge>
                             </div>
-                            {a.customer && <p className="text-sm mt-0.5 truncate">{a.customer.voornaam} {a.customer.achternaam}</p>}
+                            {(a.customer || a.klant_naam_los) && <p className="text-sm mt-0.5 truncate">{a.customer ? `${a.customer.voornaam} ${a.customer.achternaam}` : a.klant_naam_los}</p>}
                             {a.vehicle && <p className="text-xs opacity-70 truncate">{a.vehicle.merk} {a.vehicle.model}</p>}
+                            {a.voertuig_klant_omschrijving && <p className="text-xs opacity-70 truncate">{a.voertuig_klant_omschrijving}{a.voertuig_klant_kenteken ? ` · ${a.voertuig_klant_kenteken}` : ""}</p>}
+                            {a.diensten && a.diensten.length > 0 && (
+                              <p className="text-[10px] opacity-80 mt-0.5 truncate">{a.diensten.slice(0, 3).join(" • ")}{a.diensten.length > 3 ? ` +${a.diensten.length - 3}` : ""}</p>
+                            )}
                           </button>
                         ))}
                       </div>
