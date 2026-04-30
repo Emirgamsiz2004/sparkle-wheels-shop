@@ -1482,7 +1482,6 @@ function AddCostDialog({
       await create({
         naam, leverancier: leverancier || null, categorie: legacy,
         bedrag: b, datum, frequentie, notities: notities || null,
-        // @ts-expect-error categorie_id is een nieuwe kolom
         categorie_id: categorieId,
       });
       onCreated();
