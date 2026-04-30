@@ -115,7 +115,7 @@ const AdminKlantDetailPage = () => {
       </div>
 
       {activeTab === "profiel" && <ProfielTab customer={customer} onUpdate={updateCustomer} />}
-      {activeTab === "verkopen" && <GekoppeldeVerkopenSection customerId={customer.id} />}
+      {activeTab === "verkopen" && <GekoppeldeVerkopenSection customer={customer} />}
       {activeTab === "geschiedenis" && <GeschiedenisTab customerId={customer.id} customerEmail={customer.email} />}
       {activeTab === "documenten" && <DocumentenTab customerEmail={customer.email} customerNaam={`${customer.voornaam} ${customer.achternaam}`} />}
 
@@ -136,9 +136,11 @@ const AdminKlantDetailPage = () => {
 /* ── Gekoppelde verkopen Section (used on Profiel + Verkopen tab) ── */
 interface VerkoopRow {
   id: string;
+  source: "verkopen" | "vehicle_sales" | "vehicles";
   vehicle_id: string | null;
   verkoopprijs: number | null;
   contract_getekend_datum: string | null;
+  verkoop_datum?: string | null;
   created_at: string;
   stap11_afgerond: boolean | null;
   wizard_status: string | null;
@@ -146,7 +148,17 @@ interface VerkoopRow {
   vehicle?: { merk: string; model: string; kenteken: string | null; verkoop_datum?: string | null } | null;
 }
 
-const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
+const splitSaleOptionId = (id: string): { source: VerkoopRow["source"]; id: string } => {
+  const [source, saleId] = id.split(":");
+  return {
+    source: source === "vehicle_sales" || source === "vehicles" ? source : "verkopen",
+    id: saleId || id,
+  };
+};
+
+const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
+  const customerId = customer.id;
+  const customerEmail = customer.email?.trim();
   const [verkopen, setVerkopen] = useState<VerkoopRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [linkOpen, setLinkOpen] = useState(false);
@@ -160,14 +172,64 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("verkopen" as any)
-      .select("id, vehicle_id, verkoopprijs, contract_getekend_datum, created_at, stap11_afgerond, wizard_status")
-      .eq("customer_id", customerId)
-      .order("created_at", { ascending: false });
-    if (error) { toast.error("Kon verkopen niet laden"); setLoading(false); return; }
+    const [wizardRes, legacyRes, vehicleCustomerRes, vehicleEmailRes] = await Promise.all([
+      supabase
+        .from("verkopen" as any)
+        .select("id, vehicle_id, verkoopprijs, contract_getekend_datum, created_at, stap11_afgerond, wizard_status, customer_id")
+        .eq("customer_id", customerId)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("vehicle_sales" as any)
+        .select("id, vehicle_id, customer_id, verkoopprijs, verkoop_datum, afleverdatum, created_at, status")
+        .eq("customer_id", customerId)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("vehicles" as any)
+        .select("id, merk, model, kenteken, status, verkoop_datum, created_at, verkoopprijs, customer_id, koper_email")
+        .eq("customer_id", customerId)
+        .order("created_at", { ascending: false }),
+      customerEmail
+        ? supabase
+            .from("vehicles" as any)
+            .select("id, merk, model, kenteken, status, verkoop_datum, created_at, verkoopprijs, customer_id, koper_email")
+            .ilike("koper_email", customerEmail)
+            .order("created_at", { ascending: false })
+        : Promise.resolve({ data: [] as any[], error: null }),
+    ]);
+    if (wizardRes.error || legacyRes.error || vehicleCustomerRes.error || vehicleEmailRes.error) { toast.error("Kon verkopen niet laden"); setLoading(false); return; }
 
-    const rows = (data as any[]) || [];
+    const wizardRows: VerkoopRow[] = ((wizardRes.data as any[]) || []).map(r => ({ ...r, source: "verkopen" as const }));
+    const legacyRows: VerkoopRow[] = ((legacyRes.data as any[]) || []).map(r => ({
+      id: r.id,
+      source: "vehicle_sales" as const,
+      vehicle_id: r.vehicle_id,
+      verkoopprijs: r.verkoopprijs,
+      contract_getekend_datum: r.verkoop_datum || r.afleverdatum,
+      verkoop_datum: r.verkoop_datum || r.afleverdatum,
+      created_at: r.created_at,
+      stap11_afgerond: r.status === "voltooid",
+      wizard_status: r.status,
+      customer_id: r.customer_id,
+    }));
+    const usedVehicleIds = new Set([...wizardRows, ...legacyRows].map(r => r.vehicle_id).filter(Boolean));
+    const directVehicleMap = new Map<string, any>();
+    [...((vehicleCustomerRes.data as any[]) || []), ...((vehicleEmailRes.data as any[]) || [])].forEach(v => {
+      if (v.id && !usedVehicleIds.has(v.id) && (v.status === "verkocht" || v.verkoop_datum || v.customer_id || v.koper_email)) directVehicleMap.set(v.id, v);
+    });
+    const directVehicleRows: VerkoopRow[] = Array.from(directVehicleMap.values()).map(v => ({
+      id: v.id,
+      source: "vehicles" as const,
+      vehicle_id: v.id,
+      verkoopprijs: v.verkoopprijs,
+      contract_getekend_datum: v.verkoop_datum,
+      verkoop_datum: v.verkoop_datum,
+      created_at: v.verkoop_datum || v.created_at,
+      stap11_afgerond: true,
+      wizard_status: "verkocht",
+      customer_id: v.customer_id,
+      vehicle: { merk: v.merk, model: v.model, kenteken: v.kenteken, verkoop_datum: v.verkoop_datum },
+    }));
+    const rows = [...wizardRows, ...legacyRows, ...directVehicleRows].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     const vehicleIds = Array.from(new Set(rows.map(r => r.vehicle_id).filter(Boolean)));
     let vehicleMap: Record<string, any> = {};
     if (vehicleIds.length > 0) {
@@ -179,7 +241,7 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
     }
     setVerkopen(rows.map(r => ({ ...r, vehicle: r.vehicle_id ? vehicleMap[r.vehicle_id] : null })));
     setLoading(false);
-  }, [customerId]);
+  }, [customerId, customerEmail]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -188,12 +250,33 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
     setLinkOpen(true);
     setAvailLoading(true);
 
-    // ALLE verkopen — niet enkel zonder klant
-    const { data } = await supabase
-      .from("verkopen" as any)
-      .select("id, vehicle_id, customer_id, created_at, contract_getekend_datum, verkoopprijs")
-      .order("created_at", { ascending: false });
-    const rows = ((data as any[]) || []).filter(r => r.customer_id !== customerId);
+    // ALLE verkopen uit beide verkoopregistraties — inclusief al gekoppelde verkopen
+    const [wizardRes, legacyRes, vehiclesRes] = await Promise.all([
+      supabase
+        .from("verkopen" as any)
+        .select("id, vehicle_id, customer_id, created_at, contract_getekend_datum, verkoopprijs")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("vehicle_sales" as any)
+        .select("id, vehicle_id, customer_id, created_at, verkoop_datum, afleverdatum, verkoopprijs, status")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("vehicles" as any)
+        .select("id, merk, model, kenteken, status, verkoop_datum, created_at, verkoopprijs, customer_id, koper_naam, koper_email")
+        .order("created_at", { ascending: false }),
+    ]);
+    const registeredVehicleIds = new Set([
+      ...(((wizardRes.data as any[]) || []).map(r => r.vehicle_id).filter(Boolean)),
+      ...(((legacyRes.data as any[]) || []).map(r => r.vehicle_id).filter(Boolean)),
+    ]);
+    const rows = [
+      ...(((wizardRes.data as any[]) || []).map(r => ({ ...r, source: "verkopen" as const, datum: r.contract_getekend_datum || r.created_at }))),
+      ...(((legacyRes.data as any[]) || []).map(r => ({ ...r, source: "vehicle_sales" as const, datum: r.verkoop_datum || r.afleverdatum || r.created_at }))),
+      ...(((vehiclesRes.data as any[]) || [])
+        .filter(v => !registeredVehicleIds.has(v.id))
+        .filter(v => v.status === "verkocht" || v.verkoop_datum || v.customer_id || v.koper_email)
+        .map(v => ({ ...v, source: "vehicles" as const, vehicle_id: v.id, datum: v.verkoop_datum || v.created_at }))),
+    ].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
 
     const vehicleIds = Array.from(new Set(rows.map(r => r.vehicle_id).filter(Boolean)));
     const customerIds = Array.from(new Set(rows.map(r => r.customer_id).filter(Boolean)));
@@ -216,26 +299,28 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
       const v = r.vehicle_id ? vMap[r.vehicle_id] : null;
       const naam = v ? `${v.merk || ""} ${v.model || ""}`.trim() : "Verkoop zonder voertuig";
       const kenteken = v?.kenteken ? v.kenteken.toUpperCase() : "—";
-      const datum = r.contract_getekend_datum || r.created_at;
+      const datum = r.datum || r.created_at;
       const datumStr = datum ? new Date(datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "";
       const prijsStr = r.verkoopprijs ? `€ ${Number(r.verkoopprijs).toLocaleString("nl-NL", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "";
       const c = r.customer_id ? cMap[r.customer_id] : null;
-      const huidige = c ? (c.bedrijfsnaam || `${c.voornaam || ""} ${c.achternaam || ""}`.trim() || "Onbekende klant") : null;
+      const huidige = c ? (c.bedrijfsnaam || `${c.voornaam || ""} ${c.achternaam || ""}`.trim() || "Onbekende klant") : r.koper_naam || null;
+      const isCurrent = r.customer_id === customerId;
       return {
-        id: r.id,
+        id: `${r.source}:${r.id}`,
         label: naam,
         sublabel: [kenteken, datumStr, prijsStr].filter(Boolean).join(" · "),
-        meta: undefined,
-        warning: huidige ? `Al gekoppeld aan ${huidige}` : undefined,
-        searchText: `${naam} ${kenteken} ${huidige || ""}`,
+        meta: isCurrent ? "Al gekoppeld" : undefined,
+        warning: huidige && !isCurrent ? `Al gekoppeld aan ${huidige}` : undefined,
+        searchText: `${naam} ${kenteken} ${datumStr} ${prijsStr} ${huidige || ""}`,
       };
     });
     setAvailable(opts);
     setAvailLoading(false);
   };
 
-  const persistLink = async (verkoopId: string) => {
-    const { error } = await supabase.from("verkopen" as any).update({ customer_id: customerId }).eq("id", verkoopId);
+  const persistLink = async (optionId: string) => {
+    const target = splitSaleOptionId(optionId);
+    const { error } = await supabase.from(target.source as any).update({ customer_id: customerId }).eq("id", target.id);
     if (error) { toast.error("Koppelen mislukt"); return; }
     toast.success("Verkoop gekoppeld");
     await load();
@@ -262,7 +347,7 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
     const naam = row.vehicle ? `${row.vehicle.merk || ""} ${row.vehicle.model || ""}`.trim() : "deze verkoop";
     setUnlinkConfirm({
       open: true,
-      verkoopId: row.id,
+      verkoopId: `${row.source}:${row.id}`,
       anchor: e.currentTarget.getBoundingClientRect(),
       naam,
     });
@@ -270,7 +355,8 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
 
   const handleUnlink = async () => {
     if (!unlinkConfirm.verkoopId) return;
-    const { error } = await supabase.from("verkopen" as any).update({ customer_id: null }).eq("id", unlinkConfirm.verkoopId);
+    const target = splitSaleOptionId(unlinkConfirm.verkoopId);
+    const { error } = await supabase.from(target.source as any).update({ customer_id: null }).eq("id", target.id);
     if (error) { toast.error("Ontkoppelen mislukt"); return; }
     toast.success("Verkoop ontkoppeld");
     setUnlinkConfirm({ open: false, verkoopId: null, anchor: null, naam: "" });
@@ -299,10 +385,10 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
           {verkopen.map((r) => {
             const v = r.vehicle;
             const naam = v ? `${v.merk || ""} ${v.model || ""}`.trim() : "Verkoop";
-            const datum = r.contract_getekend_datum || v?.verkoop_datum || r.created_at;
+            const datum = r.contract_getekend_datum || r.verkoop_datum || v?.verkoop_datum || r.created_at;
             return (
               <div
-                key={r.id}
+                key={`${r.source}:${r.id}`}
                 onClick={() => v && navigate(`/admin/voertuigen/${r.vehicle_id}`)}
                 className="flex items-center justify-between gap-3 px-3 py-2.5 bg-secondary/30 border border-border rounded-xl hover:bg-accent/30 cursor-pointer transition-colors"
               >
@@ -417,7 +503,7 @@ const ProfielTab = ({ customer, onUpdate }: { customer: Customer; onUpdate: (id:
         <p className="text-[10px] text-muted-foreground">Wordt automatisch opgeslagen na 2 seconden</p>
       </div>
 
-      <GekoppeldeVerkopenSection customerId={customer.id} />
+      <GekoppeldeVerkopenSection customer={customer} />
     </div>
   );
 };
