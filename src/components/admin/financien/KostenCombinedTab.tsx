@@ -1225,26 +1225,34 @@ function CategorySettingsPopover({
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="text-muted-foreground hover:text-foreground p-1 rounded transition-colors"
-        title="Categorie instellingen"
-      >
-        <Settings className="w-3.5 h-3.5" />
-      </button>
-
       {isMobile ? (
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent side="bottom" className="rounded-t-[16px] border-border max-h-[85vh] overflow-y-auto">
-            <SheetHeader className="mb-3">
-              <SheetTitle>{categorie.naam}</SheetTitle>
-            </SheetHeader>
-            {Body}
-          </SheetContent>
-        </Sheet>
+        <>
+          <button
+            onClick={() => setOpen(true)}
+            className="text-muted-foreground hover:text-foreground p-1 rounded transition-colors shrink-0"
+            title="Categorie instellingen"
+          >
+            <Settings className="w-3.5 h-3.5" />
+          </button>
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetContent side="bottom" className="rounded-t-[16px] border-border max-h-[85vh] overflow-y-auto">
+              <SheetHeader className="mb-3">
+                <SheetTitle>{categorie.naam}</SheetTitle>
+              </SheetHeader>
+              {Body}
+            </SheetContent>
+          </Sheet>
+        </>
       ) : (
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild><button className="hidden" /></PopoverTrigger>
+          <PopoverTrigger asChild>
+            <button
+              className="text-muted-foreground hover:text-foreground p-1 rounded transition-colors shrink-0"
+              title="Categorie instellingen"
+            >
+              <Settings className="w-3.5 h-3.5" />
+            </button>
+          </PopoverTrigger>
           <PopoverContent side="bottom" align="end" className="w-[380px] rounded-[16px] border-border bg-card p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold">{categorie.naam}</h3>
