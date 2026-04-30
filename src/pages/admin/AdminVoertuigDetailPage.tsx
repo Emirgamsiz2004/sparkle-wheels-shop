@@ -10,17 +10,14 @@ import { Vehicle, statusLabels } from "@/types/vehicle";
 import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog";
 import VehicleDetailHeader from "@/components/admin/detail/VehicleDetailHeader";
 import VehicleOverzichtTab from "@/components/admin/detail/VehicleOverzichtTab";
-import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
-import VerkoopCompletenessBar from "@/components/admin/detail/VerkoopCompletenessBar";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useAppointments } from "@/hooks/useAppointments";
 
 const tabItems = [
   { key: "overzicht", label: "Overzicht" },
-  { key: "dossier", label: "Dossier" },
   { key: "taken", label: "Activiteit" },
 ];
 
