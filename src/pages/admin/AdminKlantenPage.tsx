@@ -18,7 +18,7 @@ const statusTabs = [
 ];
 
 const AdminKlantenPage = () => {
-  const { customers, loading, addCustomer } = useCustomers();
+  const { customers, loading, addCustomer, fetchCustomers } = useCustomers();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
@@ -26,6 +26,8 @@ const AdminKlantenPage = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [addAnchor, setAddAnchor] = useState<DOMRect | null>(null);
   const addBtnRef = useRef<HTMLButtonElement>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
+  const [deleteAnchor, setDeleteAnchor] = useState<DOMRect | null>(null);
 
   const filtered = useMemo(() => {
     let list = customers;
