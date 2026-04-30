@@ -10,17 +10,14 @@ import { Vehicle, statusLabels } from "@/types/vehicle";
 import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog";
 import VehicleDetailHeader from "@/components/admin/detail/VehicleDetailHeader";
 import VehicleOverzichtTab from "@/components/admin/detail/VehicleOverzichtTab";
-import VehicleDossierTab from "@/components/admin/detail/VehicleDossierTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
-import VerkoopCompletenessBar from "@/components/admin/detail/VerkoopCompletenessBar";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useAppointments } from "@/hooks/useAppointments";
 
 const tabItems = [
   { key: "overzicht", label: "Overzicht" },
-  { key: "dossier", label: "Dossier" },
   { key: "taken", label: "Activiteit" },
 ];
 
@@ -37,6 +34,13 @@ const AdminVoertuigDetailPage = () => {
   const [afspraakType, setAfspraakType] = useState<string | undefined>();
 
   const vehicle = vehicles.find((v) => v.id === id);
+
+  // Verkochte voertuigen horen niet thuis op de voertuigpagina — stuur door naar verkoop-detail
+  useEffect(() => {
+    if (vehicle && vehicle.status === "verkocht") {
+      navigate(`/admin/verkopen/${vehicle.id}`, { replace: true });
+    }
+  }, [vehicle?.id, vehicle?.status, navigate]);
 
   // Automatische APK-hercheck bij openen detailpagina
   const apkCheckedRef = useRef<string | null>(null);
@@ -109,17 +113,6 @@ const AdminVoertuigDetailPage = () => {
         onOpenVerkoop={() => navigate(`/admin/verkopen/nieuw/${vehicle.id}`)}
       />
 
-      <VerkoopCompletenessBar
-        vehicleId={vehicle.id}
-        vehicleStatus={vehicle.status}
-        koperNaam={vehicle.koperNaam}
-        koperEmail={vehicle.koperEmail}
-        koperTelefoon={vehicle.koperTelefoon}
-        verkoopDatum={vehicle.verkoopDatum}
-        verkoopprijs={vehicle.verkoopprijs}
-        onGoToDossier={() => setActiveTab("dossier")}
-      />
-
       {/* Tabs */}
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
         <SlidingTabs
@@ -134,22 +127,6 @@ const AdminVoertuigDetailPage = () => {
       <div>
         {activeTab === "overzicht" && (
           <VehicleOverzichtTab vehicle={vehicle} onSave={updateVehicle} onLogActivity={logActivity} />
-        )}
-        {activeTab === "dossier" && (
-          <VehicleDossierTab
-            vehicleId={vehicle.id}
-            vehicleStatus={vehicle.status}
-            verkoopType={vehicle.verkoopType}
-            koperNaam={vehicle.koperNaam}
-            koperEmail={vehicle.koperEmail}
-            koperTelefoon={vehicle.koperTelefoon}
-            verkoopDatum={vehicle.verkoopDatum}
-            verkoopprijs={vehicle.verkoopprijs}
-            merk={vehicle.merk}
-            model={vehicle.model}
-            bouwjaar={vehicle.bouwjaar}
-            kenteken={vehicle.kenteken}
-          />
         )}
         {activeTab === "taken" && (
           <VehicleTakenTab vehicleId={vehicle.id} />

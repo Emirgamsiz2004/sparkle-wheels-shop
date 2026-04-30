@@ -133,7 +133,7 @@ export default function GlobalSearch() {
               subtitle: `${v.kenteken ? formatKenteken(v.kenteken) : "—"} · Marge €${marge.toLocaleString("nl-NL")}`,
               badge: v.status || undefined,
               badgeColor: statusColors[v.status || ""] || "bg-muted text-muted-foreground",
-              link: `/admin/voertuigen/${v.id}`,
+              link: v.status === "verkocht" ? `/admin/verkopen/${v.id}` : `/admin/voertuigen/${v.id}`,
             };
           }),
         });
