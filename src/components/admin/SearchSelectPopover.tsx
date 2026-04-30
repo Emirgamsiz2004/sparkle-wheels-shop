@@ -8,6 +8,7 @@ export interface SearchOption {
   label: string;
   sublabel?: string;
   meta?: string;
+  warning?: string;
   searchText: string;
 }
 
