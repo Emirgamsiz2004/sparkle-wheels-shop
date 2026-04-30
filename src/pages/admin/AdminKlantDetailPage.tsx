@@ -214,7 +214,7 @@ const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
     const usedVehicleIds = new Set([...wizardRows, ...legacyRows].map(r => r.vehicle_id).filter(Boolean));
     const directVehicleMap = new Map<string, any>();
     [...((vehicleCustomerRes.data as any[]) || []), ...((vehicleEmailRes.data as any[]) || [])].forEach(v => {
-      if (v.id && !usedVehicleIds.has(v.id)) directVehicleMap.set(v.id, v);
+      if (v.id && !usedVehicleIds.has(v.id) && (v.status === "verkocht" || v.verkoop_datum || v.customer_id || v.koper_email)) directVehicleMap.set(v.id, v);
     });
     const directVehicleRows: VerkoopRow[] = Array.from(directVehicleMap.values()).map(v => ({
       id: v.id,
