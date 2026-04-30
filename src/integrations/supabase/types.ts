@@ -142,12 +142,18 @@ export type Database = {
           created_at: string
           customer_id: string | null
           datum_tijd: string
+          diensten: string[] | null
+          diensten_notitie: string | null
           duur_minuten: number | null
           eind_datum_tijd: string | null
+          geschatte_duur_minuten: number | null
           google_event_id: string | null
           id: string
           is_aanvraag: boolean
           klant_email: string | null
+          klant_email_los: string | null
+          klant_naam_los: string | null
+          klant_telefoon_los: string | null
           medewerker: string | null
           notities: string | null
           onderwerp: string | null
@@ -156,7 +162,10 @@ export type Database = {
           updated_at: string
           vehicle_id: string | null
           voertuig_klaargemaakt: boolean
+          voertuig_klant_kenteken: string | null
+          voertuig_klant_omschrijving: string | null
           voorkeursdatum: string | null
+          werkzaamheden_omschrijving: string | null
         }
         Insert: {
           aanvraag_omschrijving?: string | null
@@ -172,12 +181,18 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           datum_tijd: string
+          diensten?: string[] | null
+          diensten_notitie?: string | null
           duur_minuten?: number | null
           eind_datum_tijd?: string | null
+          geschatte_duur_minuten?: number | null
           google_event_id?: string | null
           id?: string
           is_aanvraag?: boolean
           klant_email?: string | null
+          klant_email_los?: string | null
+          klant_naam_los?: string | null
+          klant_telefoon_los?: string | null
           medewerker?: string | null
           notities?: string | null
           onderwerp?: string | null
@@ -186,7 +201,10 @@ export type Database = {
           updated_at?: string
           vehicle_id?: string | null
           voertuig_klaargemaakt?: boolean
+          voertuig_klant_kenteken?: string | null
+          voertuig_klant_omschrijving?: string | null
           voorkeursdatum?: string | null
+          werkzaamheden_omschrijving?: string | null
         }
         Update: {
           aanvraag_omschrijving?: string | null
@@ -202,12 +220,18 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           datum_tijd?: string
+          diensten?: string[] | null
+          diensten_notitie?: string | null
           duur_minuten?: number | null
           eind_datum_tijd?: string | null
+          geschatte_duur_minuten?: number | null
           google_event_id?: string | null
           id?: string
           is_aanvraag?: boolean
           klant_email?: string | null
+          klant_email_los?: string | null
+          klant_naam_los?: string | null
+          klant_telefoon_los?: string | null
           medewerker?: string | null
           notities?: string | null
           onderwerp?: string | null
@@ -216,7 +240,10 @@ export type Database = {
           updated_at?: string
           vehicle_id?: string | null
           voertuig_klaargemaakt?: boolean
+          voertuig_klant_kenteken?: string | null
+          voertuig_klant_omschrijving?: string | null
           voorkeursdatum?: string | null
+          werkzaamheden_omschrijving?: string | null
         }
         Relationships: [
           {
@@ -907,6 +934,39 @@ export type Database = {
           vwe_inkoopwaarde?: number | null
           vwe_nieuwprijs?: number | null
           vwe_verkoopwaarde?: number | null
+        }
+        Relationships: []
+      }
+      diensten: {
+        Row: {
+          actief: boolean
+          categorie: string
+          created_at: string
+          duur_minuten: number
+          id: string
+          naam: string
+          updated_at: string
+          volgorde: number
+        }
+        Insert: {
+          actief?: boolean
+          categorie?: string
+          created_at?: string
+          duur_minuten?: number
+          id?: string
+          naam: string
+          updated_at?: string
+          volgorde?: number
+        }
+        Update: {
+          actief?: boolean
+          categorie?: string
+          created_at?: string
+          duur_minuten?: number
+          id?: string
+          naam?: string
+          updated_at?: string
+          volgorde?: number
         }
         Relationships: []
       }
