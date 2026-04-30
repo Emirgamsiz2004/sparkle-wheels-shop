@@ -262,7 +262,7 @@ const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
         .order("created_at", { ascending: false }),
       supabase
         .from("vehicles" as any)
-        .select("id, merk, model, kenteken, verkoop_datum, created_at, verkoopprijs, customer_id, koper_naam, koper_email")
+        .select("id, merk, model, kenteken, status, verkoop_datum, created_at, verkoopprijs, customer_id, koper_naam, koper_email")
         .order("created_at", { ascending: false }),
     ]);
     const registeredVehicleIds = new Set([
@@ -274,6 +274,7 @@ const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
       ...(((legacyRes.data as any[]) || []).map(r => ({ ...r, source: "vehicle_sales" as const, datum: r.verkoop_datum || r.afleverdatum || r.created_at }))),
       ...(((vehiclesRes.data as any[]) || [])
         .filter(v => !registeredVehicleIds.has(v.id))
+        .filter(v => v.status === "verkocht" || v.verkoop_datum || v.customer_id || v.koper_email)
         .map(v => ({ ...v, source: "vehicles" as const, vehicle_id: v.id, datum: v.verkoop_datum || v.created_at }))),
     ].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
 
