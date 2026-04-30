@@ -22,17 +22,15 @@ export const dienstCategorieLabels: Record<DienstCategorie, string> = {
   overig: "Overig",
 };
 
-export const useDiensten = () => {
+export const useDiensten = (includeInactive = false) => {
   const [diensten, setDiensten] = useState<Dienst[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("diensten" as any)
-      .select("*")
-      .eq("actief", true)
-      .order("volgorde", { ascending: true });
+    let q = supabase.from("diensten" as any).select("*").order("volgorde", { ascending: true });
+    if (!includeInactive) q = q.eq("actief", true);
+    const { data, error } = await q;
     if (error) {
       console.error(error);
       toast.error("Kon diensten niet laden");
@@ -40,7 +38,7 @@ export const useDiensten = () => {
       setDiensten((data as any as Dienst[]) || []);
     }
     setLoading(false);
-  }, []);
+  }, [includeInactive]);
 
   useEffect(() => {
     load();

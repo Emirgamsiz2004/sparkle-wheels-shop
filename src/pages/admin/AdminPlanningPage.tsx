@@ -204,8 +204,12 @@ const AdminPlanningPage = () => {
                               <span className="font-medium">{format(new Date(a.datum_tijd), "HH:mm")}</span>
                               <Badge className={`${typeColors[a.type]} border text-[10px]`}>{typeLabels[a.type]}</Badge>
                             </div>
-                            {a.customer && <p className="text-sm mt-0.5 truncate">{a.customer.voornaam} {a.customer.achternaam}</p>}
+                            {(a.customer || a.klant_naam_los) && <p className="text-sm mt-0.5 truncate">{a.customer ? `${a.customer.voornaam} ${a.customer.achternaam}` : a.klant_naam_los}</p>}
                             {a.vehicle && <p className="text-xs opacity-70 truncate">{a.vehicle.merk} {a.vehicle.model}</p>}
+                            {a.voertuig_klant_omschrijving && <p className="text-xs opacity-70 truncate">{a.voertuig_klant_omschrijving}{a.voertuig_klant_kenteken ? ` · ${a.voertuig_klant_kenteken}` : ""}</p>}
+                            {a.diensten && a.diensten.length > 0 && (
+                              <p className="text-[10px] opacity-80 mt-0.5 truncate">{a.diensten.slice(0, 3).join(" • ")}{a.diensten.length > 3 ? ` +${a.diensten.length - 3}` : ""}</p>
+                            )}
                           </button>
                         ))}
                       </div>
@@ -235,8 +239,12 @@ const AdminPlanningPage = () => {
                         <button key={a.id} onClick={(e) => openDetail(a, e)}
                           className={`w-full text-left px-1.5 py-1 rounded text-[11px] leading-tight border transition-colors hover:opacity-80 ${typeColors[a.type]} ${a.status === "voltooid" ? "opacity-50" : ""}`}>
                           <span className="font-medium">{format(new Date(a.datum_tijd), "HH:mm")}</span>
-                          {a.customer && <span className="block truncate">{a.customer.voornaam} {a.customer.achternaam}</span>}
+                          {(a.customer || a.klant_naam_los) && <span className="block truncate">{a.customer ? `${a.customer.voornaam} ${a.customer.achternaam}` : a.klant_naam_los}</span>}
                           {a.vehicle && <span className="block truncate text-[10px] opacity-70">{a.vehicle.merk} {a.vehicle.model}</span>}
+                          {!a.vehicle && a.voertuig_klant_omschrijving && <span className="block truncate text-[10px] opacity-70">{a.voertuig_klant_omschrijving}</span>}
+                          {a.diensten && a.diensten.length > 0 && (
+                            <span className="block truncate text-[10px] opacity-80">{a.diensten.slice(0, 2).join(" • ")}{a.diensten.length > 2 ? ` +${a.diensten.length - 2}` : ""}</span>
+                          )}
                         </button>
                       ))}
                     </div>
