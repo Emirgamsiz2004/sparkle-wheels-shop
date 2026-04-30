@@ -218,12 +218,21 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
     setLinkOpen(true);
     setAvailLoading(true);
 
-    // ALLE verkopen — niet enkel zonder klant
-    const { data } = await supabase
-      .from("verkopen" as any)
-      .select("id, vehicle_id, customer_id, created_at, contract_getekend_datum, verkoopprijs")
-      .order("created_at", { ascending: false });
-    const rows = ((data as any[]) || []).filter(r => r.customer_id !== customerId);
+    // ALLE verkopen uit beide verkoopregistraties — inclusief al gekoppelde verkopen
+    const [wizardRes, legacyRes] = await Promise.all([
+      supabase
+        .from("verkopen" as any)
+        .select("id, vehicle_id, customer_id, created_at, contract_getekend_datum, verkoopprijs")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("vehicle_sales" as any)
+        .select("id, vehicle_id, customer_id, created_at, verkoop_datum, afleverdatum, verkoopprijs, status")
+        .order("created_at", { ascending: false }),
+    ]);
+    const rows = [
+      ...(((wizardRes.data as any[]) || []).map(r => ({ ...r, source: "verkopen" as const, datum: r.contract_getekend_datum || r.created_at }))),
+      ...(((legacyRes.data as any[]) || []).map(r => ({ ...r, source: "vehicle_sales" as const, datum: r.verkoop_datum || r.afleverdatum || r.created_at }))),
+    ].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
 
     const vehicleIds = Array.from(new Set(rows.map(r => r.vehicle_id).filter(Boolean)));
     const customerIds = Array.from(new Set(rows.map(r => r.customer_id).filter(Boolean)));
@@ -246,18 +255,19 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
       const v = r.vehicle_id ? vMap[r.vehicle_id] : null;
       const naam = v ? `${v.merk || ""} ${v.model || ""}`.trim() : "Verkoop zonder voertuig";
       const kenteken = v?.kenteken ? v.kenteken.toUpperCase() : "—";
-      const datum = r.contract_getekend_datum || r.created_at;
+      const datum = r.datum || r.created_at;
       const datumStr = datum ? new Date(datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "";
       const prijsStr = r.verkoopprijs ? `€ ${Number(r.verkoopprijs).toLocaleString("nl-NL", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "";
       const c = r.customer_id ? cMap[r.customer_id] : null;
       const huidige = c ? (c.bedrijfsnaam || `${c.voornaam || ""} ${c.achternaam || ""}`.trim() || "Onbekende klant") : null;
+      const isCurrent = r.customer_id === customerId;
       return {
-        id: r.id,
+        id: `${r.source}:${r.id}`,
         label: naam,
         sublabel: [kenteken, datumStr, prijsStr].filter(Boolean).join(" · "),
-        meta: undefined,
-        warning: huidige ? `Al gekoppeld aan ${huidige}` : undefined,
-        searchText: `${naam} ${kenteken} ${huidige || ""}`,
+        meta: isCurrent ? "Al gekoppeld" : undefined,
+        warning: huidige && !isCurrent ? `Al gekoppeld aan ${huidige}` : undefined,
+        searchText: `${naam} ${kenteken} ${datumStr} ${prijsStr} ${huidige || ""}`,
       };
     });
     setAvailable(opts);
