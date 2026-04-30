@@ -3,7 +3,7 @@ import { useMoneybird } from "@/hooks/useMoneybird";
 import { useKosten, Kost, KostCategorie, KostFrequentie, kostCategorieLabels, kostFrequentieLabels, kostBedragInPeriode } from "@/hooks/useKosten";
 import { formatEuroDecimal } from "@/types/vehicle";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+
 import { Plus, Search, Trash2, X, Wrench, Car, Home, Megaphone, Repeat, MoreHorizontal, TrendingUp, TrendingDown, ArrowDownRight, ArrowUpRight, AlertTriangle, FileText } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
