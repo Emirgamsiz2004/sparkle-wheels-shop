@@ -133,7 +133,10 @@ Deno.serve(async (req) => {
     switch (action) {
       // ─── Contacten ───
       case "get_contacts": {
-        result = await mbFetch("contacts.json?per_page=100");
+        const { page: cPage, query: cQuery } = params;
+        let cPath = `contacts.json?per_page=100&page=${cPage || 1}`;
+        if (cQuery) cPath += `&query=${encodeURIComponent(cQuery)}`;
+        result = await mbFetch(cPath);
         break;
       }
 
