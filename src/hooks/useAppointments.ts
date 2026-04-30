@@ -124,7 +124,7 @@ export const useAppointments = () => {
     fetchAppointments();
   }, [fetchAppointments]);
 
-  const addAppointment = async (appointment: Omit<Appointment, "id" | "created_at" | "updated_at" | "customer" | "vehicle" | "google_event_id">) => {
+  const addAppointment = async (appointment: Omit<Appointment, "id" | "created_at" | "updated_at" | "customer" | "vehicle" | "google_event_id">): Promise<string | null> => {
     const { data, error } = await supabase.from("appointments").insert(appointment as any).select("id").maybeSingle();
     if (error) {
       toast.error("Fout bij aanmaken afspraak");
@@ -133,6 +133,7 @@ export const useAppointments = () => {
     toast.success("Afspraak gepland");
     if (data?.id) syncToGoogle("create", data.id);
     await fetchAppointments();
+    return data?.id ?? null;
   };
 
   const updateAppointment = async (id: string, updates: Partial<Appointment>) => {
