@@ -160,7 +160,7 @@ type InkoopRow = {
 /* ───────── Component ───────── */
 const KostenCombinedTab = () => {
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
+  
   const { getPurchaseInvoices } = useMoneybird();
   const { kosten, create, update, remove, reload: reloadKosten } = useKosten();
 
