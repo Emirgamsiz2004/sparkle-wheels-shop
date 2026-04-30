@@ -681,6 +681,16 @@ function SourceBadge({ source }: { source: Row["source"] }) {
   return <span className={cn("text-[10px] px-1.5 py-0.5 rounded border whitespace-nowrap", m.cls)}>{m.label}</span>;
 }
 
+/* ───────── Category accent colors ───────── */
+const CATEGORY_COLORS: Record<string, string> = {
+  "Abonnementen & software": "#5DCAA5",
+  "Advertentiekosten": "#EF9F27",
+  "Personeelskosten": "#85B7EB",
+  "Vaste kosten": "#F09995",
+  "Onderdelen & materialen": "#AFA9EC",
+  "Inkoop voertuigen": "#B4B2A9",
+};
+
 /* ───────── CategoryCard (compact) ───────── */
 function CategoryCard({
   categorie, rows, expanded, onToggleExpand, onAddManual,
@@ -707,84 +717,88 @@ function CategoryCard({
         s === "moneybird" ? "Moneybird" : s === "inkoopverklaring" ? "IKV" : "Handmatig"
       ).join(" + ");
 
-  const visibleRows = expanded ? rows : rows.slice(0, 4);
+  const visibleRows = expanded ? rows : rows.slice(0, 3);
+  const accentColor = CATEGORY_COLORS[categorie.naam] || "#B4B2A9";
+  const hasContacts = (categorie.moneybird_contact_ids || []).length > 0;
 
   return (
     <div className={cn(
-      "rounded-[14px] border border-border bg-secondary/20 transition-all",
+      "rounded-[14px] border border-border bg-secondary/20 overflow-hidden transition-all",
       expanded && "md:col-span-2"
     )}>
-      {/* Header */}
-      <div className="flex items-start justify-between px-4 py-3 border-b border-border">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold truncate">{categorie.naam}</h3>
-            <CategorySettingsPopover
-              categorie={categorie}
-              onCategorieChanged={onCategorieChanged}
-              onKostChanged={onKostChanged}
-              onUpdateKost={onUpdateKost}
-              onDeleteKost={onDeleteKost}
-              onAddManual={onAddManual}
-              manualRows={rows.filter((r) => r.source === "handmatig")}
-              isMobile={isMobile}
-            />
-          </div>
-          <div className="text-lg font-semibold tabular-nums mt-1.5">{formatEuro(total)}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">
+      {/* Top accent bar */}
+      <div style={{ height: "3px", backgroundColor: accentColor }} />
+
+      <div className="px-5 py-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-[13px] font-medium truncate">{categorie.naam}</h3>
+          <CategorySettingsPopover
+            categorie={categorie}
+            onCategorieChanged={onCategorieChanged}
+            onKostChanged={onKostChanged}
+            onUpdateKost={onUpdateKost}
+            onDeleteKost={onDeleteKost}
+            onAddManual={onAddManual}
+            manualRows={rows.filter((r) => r.source === "handmatig")}
+            isMobile={isMobile}
+          />
+        </div>
+
+        {/* Total */}
+        <div className="mt-2">
+          <div className="text-[24px] font-medium tabular-nums leading-tight text-foreground">{formatEuro(total)}</div>
+          <div className="text-[12px] text-muted-foreground mt-0.5">
             {rows.length} post{rows.length === 1 ? "" : "en"} · {sourceLabel}
           </div>
         </div>
-      </div>
 
-      {/* Rows preview / full */}
-      {rows.length === 0 ? (
-        <div className="px-4 py-6 flex flex-col items-center gap-2">
-          <div className="text-xs text-muted-foreground">Geen posten in deze periode</div>
-          <button
-            onClick={onAddManual}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-[10px] bg-secondary/60 border border-border hover:bg-secondary"
-          >
-            <Plus className="w-3.5 h-3.5" /> Handmatig toevoegen
-          </button>
-        </div>
-      ) : (
-        <>
-          {expanded ? (
-            <div className="overflow-x-auto">
-              <ExpandedTable rows={rows} isInkoopVoertuigen={isInkoopVoertuigen} onUpdateKost={onUpdateKost} onDeleteKost={onDeleteKost} onChanged={onKostChanged} isMobile={isMobile} />
-            </div>
-          ) : (
-            <div className="divide-y divide-border/60">
-              {visibleRows.map((r) => (
-                <div
-                  key={r.id}
-                  className="px-4 py-2 grid grid-cols-[70px_1fr_auto] gap-2 items-center text-xs hover:bg-secondary/30"
-                >
-                  <span className="text-muted-foreground tabular-nums text-[11px]">
-                    {r.date.toLocaleDateString("nl-NL", { day: "2-digit", month: "2-digit" })}
-                  </span>
-                  <span className="truncate">
-                    {r.kenteken && <span className="text-muted-foreground mr-1.5 tabular-nums">{r.kenteken}</span>}
-                    {r.description}
-                  </span>
-                  <span className="text-right font-medium tabular-nums whitespace-nowrap">{formatEuro(r.amount)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="px-4 py-2.5 border-t border-border flex justify-between items-center">
+        {/* Rows preview / full */}
+        {rows.length === 0 ? (
+          <div className="mt-3 pt-2.5 border-t border-border/40 flex flex-col items-center gap-1.5 py-3">
+            <div className="text-[12px] text-muted-foreground">Geen posten deze periode</div>
+            {!hasContacts && !isInkoopVoertuigen && (
+              <div className="text-[11px] text-muted-foreground/70">Geen contacten gekoppeld</div>
+            )}
             <button
-              onClick={onToggleExpand}
-              className="text-[11px] text-primary hover:underline"
+              onClick={onAddManual}
+              className="text-[12px] text-primary hover:underline mt-0.5"
             >
-              {expanded ? "Inklappen" : `Bekijk alle ${rows.length} posten`}
+              + Handmatig toevoegen
             </button>
-            <span className="text-xs font-semibold tabular-nums">{formatEuro(total)}</span>
           </div>
-        </>
-      )}
+        ) : (
+          <>
+            {expanded ? (
+              <div className="mt-3 -mx-5 overflow-x-auto border-t border-border/40">
+                <ExpandedTable rows={rows} isInkoopVoertuigen={isInkoopVoertuigen} onUpdateKost={onUpdateKost} onDeleteKost={onDeleteKost} onChanged={onKostChanged} isMobile={isMobile} />
+              </div>
+            ) : (
+              <div className="mt-3 pt-2.5 border-t border-border/40 flex flex-col gap-[7px]">
+                {visibleRows.map((r) => (
+                  <div key={r.id} className="flex items-center justify-between gap-3 text-[12px]">
+                    <span className="truncate text-muted-foreground">
+                      {r.kenteken && <span className="mr-1.5 tabular-nums">{r.kenteken}</span>}
+                      {r.description}
+                    </span>
+                    <span className="text-right font-medium tabular-nums whitespace-nowrap text-foreground">{formatEuro(r.amount)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-2.5 pt-2.5 border-t border-border/40 flex justify-between items-center">
+              <button
+                onClick={onToggleExpand}
+                className="text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {expanded ? "Inklappen" : `Bekijk alle ${rows.length} posten`}
+              </button>
+              <span className="text-[12px] font-medium tabular-nums">{formatEuro(total)}</span>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
