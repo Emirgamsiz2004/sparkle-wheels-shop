@@ -114,8 +114,8 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
 
   return (
     <div className="space-y-4">
-      {/* KPI cards - Inkoop / Verkoop / Winst / Marge */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* KPI card - alleen Inkoop op de voertuigpagina (verkoopcijfers staan in de Verkoop module) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard
           label="Inkoop"
           value={formatEuroDecimal(vehicle.inkoopprijs || 0)}
@@ -124,15 +124,6 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
           rawValue={vehicle.inkoopprijs || 0}
           onSave={handleSaveInkoopprijs}
         />
-        <KpiCard
-          label="Verkoop"
-          value={formatEuroDecimal(vehicle.verkoopprijs || 0)}
-          editable
-          rawValue={vehicle.verkoopprijs || 0}
-          onSave={handleSaveVerkoopprijs}
-        />
-        <KpiCard label="Winst" value={vehicle.verkoopprijs > 0 ? formatEuroDecimal(eenvoudigeMarge) : "—"} color={eenvoudigeMarge >= 0 ? "text-emerald-500" : "text-red-500"} />
-        <KpiCard label="Marge" value={vehicle.verkoopprijs > 0 ? `${eenvoudigeMargePerc.toFixed(1)}%` : "—"} color={eenvoudigeMargePerc >= 0 ? "text-emerald-500" : "text-red-500"} />
       </div>
 
       {/* Vehicle info - full width */}
@@ -196,21 +187,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
 
       </div>
 
-      {/* Klant / koper info */}
-      {(vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
-        <KoppelKlantBlock vehicleId={vehicle.id} />
-      )}
-
-      {/* Klant / koper info */}
-      {(vehicle.status === "reparatie_onderhoud" || vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
+      {/* Klant koppeling alleen tonen voor reparatie/onderhoud — verkoopgerelateerde koppeling staat in de Verkoop module */}
+      {vehicle.status === "reparatie_onderhoud" && (
         <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            {vehicle.status === "reparatie_onderhoud" ? "Gekoppelde klant" : "Kopergegevens"}
-          </h3>
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gekoppelde klant</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs text-muted-foreground mb-1">Naam</label>
-              <input value={form.koperNaam || ""} onChange={(e) => update("koperNaam", e.target.value)} className={inputCls} placeholder="Naam koper" />
+              <input value={form.koperNaam || ""} onChange={(e) => update("koperNaam", e.target.value)} className={inputCls} placeholder="Naam klant" />
             </div>
             <div>
               <label className="block text-xs text-muted-foreground mb-1">Telefoon</label>
@@ -221,46 +205,8 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
               <input value={form.koperEmail || ""} onChange={(e) => update("koperEmail", e.target.value)} className={inputCls} placeholder="email@voorbeeld.nl" />
             </div>
           </div>
-          {vehicle.status === "verkocht" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">Verkoopdatum</label>
-                <input type="date" value={form.verkoopDatum || ""} onChange={(e) => update("verkoopDatum", e.target.value)} className={inputCls} />
-              </div>
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1">Verkoopprijs</label>
-                <input type="text" inputMode="decimal" value={form.verkoopprijs || ""} onChange={(e) => update("verkoopprijs", Number(e.target.value.replace(/[^0-9.]/g, "")))} className={inputCls} placeholder="0" />
-              </div>
-            </div>
-          )}
           <button onClick={handleSaveVehicleInfo} className="px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors">Opslaan</button>
         </div>
-      )}
-
-      {/* Betalingsoverzicht - read only samenvatting */}
-      {(vehicle.status === "verkocht" || vehicle.status === "gereserveerd") && (
-        hasPaymentInfo ? (
-          <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Betalingsoverzicht</h3>
-            <table className="w-full text-sm">
-              <tbody>
-                {!!vehicle.contantBedrag && <InfoRow label="Contant" value={formatEuroDecimal(vehicle.contantBedrag)} />}
-                {!!vehicle.overboekingBedrag && <InfoRow label="Overboeking" value={formatEuroDecimal(vehicle.overboekingBedrag)} />}
-                {!!vehicle.aanbetalingsbedrag && <InfoRow label="Aanbetaling" value={formatEuroDecimal(vehicle.aanbetalingsbedrag)} />}
-                {vehicle.financieringActief && <InfoRow label="Financiering" value={formatEuroDecimal(vehicle.financieringBedrag || 0)} />}
-                {vehicle.inruilKenteken && (
-                  <InfoRow label="Inruil" value={`${vehicle.inruilKenteken}${vehicle.inruilMerk ? ` — ${vehicle.inruilMerk} ${vehicle.inruilModel || ""}` : ""} (${formatEuro(vehicle.inruilWaarde || 0)})`} isLast />
-                )}
-              </tbody>
-            </table>
-            <p className="text-[10px] text-muted-foreground">Bewerk in het Financieel tabblad</p>
-          </div>
-        ) : (
-          <div className="bg-card border border-border rounded-lg p-4">
-            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Betalingsoverzicht</h3>
-            <p className="text-xs text-muted-foreground">Nog geen betalingsdetails ingevuld — vul deze in via het Financieel tabblad.</p>
-          </div>
-        )
       )}
 
       {/* Notes - auto-save */}
