@@ -30,6 +30,15 @@ export interface Appointment {
   aanvrager_telefoon?: string | null;
   aanvrager_email?: string | null;
   aanvrager_kenteken?: string | null;
+  diensten?: string[] | null;
+  diensten_notitie?: string | null;
+  geschatte_duur_minuten?: number | null;
+  voertuig_klant_kenteken?: string | null;
+  voertuig_klant_omschrijving?: string | null;
+  werkzaamheden_omschrijving?: string | null;
+  klant_naam_los?: string | null;
+  klant_telefoon_los?: string | null;
+  klant_email_los?: string | null;
   // Joined
   customer?: { id: string; voornaam: string; achternaam: string; telefoon: string; email: string } | null;
   vehicle?: { id: string; merk: string; model: string; kenteken: string | null } | null;
