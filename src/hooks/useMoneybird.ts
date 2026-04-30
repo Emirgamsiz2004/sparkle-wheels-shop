@@ -117,5 +117,6 @@ export function useMoneybird() {
     getFinancialStatements,
     getReceipts,
     getPurchaseInvoices,
+    getContacts,
   };
 }
