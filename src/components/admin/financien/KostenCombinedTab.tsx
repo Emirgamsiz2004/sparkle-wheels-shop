@@ -1390,10 +1390,15 @@ function ContactPickerDialog({
 /* ───────── Marge per voertuig ───────── */
 function MargeSection({ rows, totaleBruto, gemMargePerc }: { rows: any[]; totaleBruto: number; gemMargePerc: number }) {
   return (
-    <div className="rounded-[14px] border border-border bg-secondary/20 overflow-hidden">
-      <div style={{ height: "3px", backgroundColor: "#1D9E75" }} />
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <h3 className="text-sm font-semibold">Marge per voertuig</h3>
+    <div className="rounded-[14px] border border-border bg-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3.5 border-b border-border/50">
+        <div className="flex items-center gap-2">
+          <span
+            className="w-1.5 h-1.5 rounded-full shrink-0"
+            style={{ backgroundColor: "#4FB394", boxShadow: "0 0 8px #4FB39440" }}
+          />
+          <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.08em]">Marge per voertuig</h3>
+        </div>
         <div className="text-sm font-semibold tabular-nums">{formatEuro(totaleBruto)}</div>
       </div>
       {rows.length === 0 ? (
