@@ -26,6 +26,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -1374,16 +1375,15 @@ function ContactPickerDialog({
     );
   }
   return (
-    <Popover open={open} onOpenChange={(v) => !v && onClose()}>
-      <PopoverTrigger asChild><button className="hidden" /></PopoverTrigger>
-      <PopoverContent side="bottom" align="center" className="w-[420px] rounded-[16px] border-border bg-card p-4">
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="w-[440px] max-w-[95vw] rounded-[16px] border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold">Koppel Moneybird contact</h3>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
         </div>
         {Body}
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   );
 }
 
