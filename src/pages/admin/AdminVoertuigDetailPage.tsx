@@ -35,6 +35,13 @@ const AdminVoertuigDetailPage = () => {
 
   const vehicle = vehicles.find((v) => v.id === id);
 
+  // Verkochte voertuigen horen niet thuis op de voertuigpagina — stuur door naar verkoop-detail
+  useEffect(() => {
+    if (vehicle && vehicle.status === "verkocht") {
+      navigate(`/admin/verkopen/${vehicle.id}`, { replace: true });
+    }
+  }, [vehicle?.id, vehicle?.status, navigate]);
+
   // Automatische APK-hercheck bij openen detailpagina
   const apkCheckedRef = useRef<string | null>(null);
   useEffect(() => {
@@ -106,19 +113,25 @@ const AdminVoertuigDetailPage = () => {
         onOpenVerkoop={() => navigate(`/admin/verkopen/nieuw/${vehicle.id}`)}
       />
 
-      <VerkoopCompletenessBar
-        vehicleId={vehicle.id}
-        vehicleStatus={vehicle.status}
-        koperNaam={vehicle.koperNaam}
-        koperEmail={vehicle.koperEmail}
-        koperTelefoon={vehicle.koperTelefoon}
-        verkoopDatum={vehicle.verkoopDatum}
-        verkoopprijs={vehicle.verkoopprijs}
-        onGoToDossier={() => setActiveTab("dossier")}
-      />
-
       {/* Tabs */}
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <SlidingTabs
+          tabs={tabItems.map(t => ({ label: t.label, value: t.key }))}
+          value={activeTab}
+          onChange={setActiveTab}
+          className="min-w-max"
+        />
+      </div>
+
+      {/* Tab content */}
+      <div>
+        {activeTab === "overzicht" && (
+          <VehicleOverzichtTab vehicle={vehicle} onSave={updateVehicle} onLogActivity={logActivity} />
+        )}
+        {activeTab === "taken" && (
+          <VehicleTakenTab vehicleId={vehicle.id} />
+        )}
+      </div>
         <SlidingTabs
           tabs={tabItems.map(t => ({ label: t.label, value: t.key }))}
           value={activeTab}
