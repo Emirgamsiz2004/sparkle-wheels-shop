@@ -89,12 +89,19 @@ const AdminKlantDetailPage = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <button
+            ref={deleteBtnRef}
+            onClick={openDelete}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-red-500/30 text-red-400 rounded-xl hover:bg-red-500/10 transition-all active:scale-[0.97] ml-auto"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Verwijder klant
+          </button>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-0.5 bg-secondary/50 border border-border rounded-md p-0.5">
-        {[{ key: "profiel", label: "Profiel" }, { key: "geschiedenis", label: "Geschiedenis" }, { key: "documenten", label: "Documenten" }].map((t) => (
+        {[{ key: "profiel", label: "Profiel" }, { key: "verkopen", label: "Verkopen" }, { key: "geschiedenis", label: "Geschiedenis" }, { key: "documenten", label: "Documenten" }].map((t) => (
           <button
             key={t.key}
             onClick={() => setActiveTab(t.key)}
@@ -108,8 +115,20 @@ const AdminKlantDetailPage = () => {
       </div>
 
       {activeTab === "profiel" && <ProfielTab customer={customer} onUpdate={updateCustomer} />}
+      {activeTab === "verkopen" && <GekoppeldeVerkopenTab customerId={customer.id} />}
       {activeTab === "geschiedenis" && <GeschiedenisTab customerId={customer.id} customerEmail={customer.email} />}
       {activeTab === "documenten" && <DocumentenTab customerEmail={customer.email} customerNaam={`${customer.voornaam} ${customer.achternaam}`} />}
+
+      <ConfirmPopover
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        anchorRect={deleteAnchor}
+        title="Klant verwijderen"
+        message={`Weet je zeker dat je ${customer.voornaam} ${customer.achternaam} wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`}
+        confirmLabel="Verwijderen"
+        destructive
+        onConfirm={handleDelete}
+      />
     </div>
   );
 };
