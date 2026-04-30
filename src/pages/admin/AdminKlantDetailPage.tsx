@@ -16,8 +16,22 @@ const AdminKlantDetailPage = () => {
   const navigate = useNavigate();
   const { customers, loading, updateCustomer } = useCustomers();
   const [activeTab, setActiveTab] = useState("profiel");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteAnchor, setDeleteAnchor] = useState<DOMRect | null>(null);
+  const deleteBtnRef = useRef<HTMLButtonElement>(null);
 
   const customer = customers.find((c) => c.id === id);
+
+  const openDelete = () => {
+    setDeleteAnchor(deleteBtnRef.current?.getBoundingClientRect() ?? null);
+    setDeleteOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!customer) return;
+    const ok = await deleteCustomerSafely(customer.id);
+    if (ok) navigate("/admin/klanten");
+  };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
   if (!customer) return (
