@@ -115,7 +115,7 @@ const AdminKlantDetailPage = () => {
       </div>
 
       {activeTab === "profiel" && <ProfielTab customer={customer} onUpdate={updateCustomer} />}
-      {activeTab === "verkopen" && <GekoppeldeVerkopenTab customerId={customer.id} />}
+      {activeTab === "verkopen" && <GekoppeldeVerkopenSection customerId={customer.id} />}
       {activeTab === "geschiedenis" && <GeschiedenisTab customerId={customer.id} customerEmail={customer.email} />}
       {activeTab === "documenten" && <DocumentenTab customerEmail={customer.email} customerNaam={`${customer.voornaam} ${customer.achternaam}`} />}
 
