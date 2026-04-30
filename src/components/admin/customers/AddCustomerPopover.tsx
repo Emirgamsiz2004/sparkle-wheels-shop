@@ -127,8 +127,8 @@ const AddCustomerPopover = ({ open, onOpenChange, anchorRect, onSubmit }: Props)
   if (!mounted) return null;
 
   const overlayStyle: React.CSSProperties = {
-    opacity: closing ? 0 : 0.4,
-    transition: `opacity ${closing ? 160 : 200}ms ${closing ? "ease-in" : "ease-out"}`,
+    opacity: closing ? 0 : animateIn ? 0.4 : 0,
+    transition: `opacity ${closing ? 160 : 220}ms ${closing ? "ease-in" : "ease-out"}`,
     backgroundColor: "#000",
     willChange: "opacity",
   };
