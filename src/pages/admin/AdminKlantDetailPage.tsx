@@ -136,15 +136,25 @@ const AdminKlantDetailPage = () => {
 /* ── Gekoppelde verkopen Section (used on Profiel + Verkopen tab) ── */
 interface VerkoopRow {
   id: string;
+  source: "verkopen" | "vehicle_sales";
   vehicle_id: string | null;
   verkoopprijs: number | null;
   contract_getekend_datum: string | null;
+  verkoop_datum?: string | null;
   created_at: string;
   stap11_afgerond: boolean | null;
   wizard_status: string | null;
   customer_id?: string | null;
   vehicle?: { merk: string; model: string; kenteken: string | null; verkoop_datum?: string | null } | null;
 }
+
+const splitSaleOptionId = (id: string): { source: VerkoopRow["source"]; id: string } => {
+  const [source, saleId] = id.split(":");
+  return {
+    source: source === "vehicle_sales" ? "vehicle_sales" : "verkopen",
+    id: saleId || id,
+  };
+};
 
 const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
   const [verkopen, setVerkopen] = useState<VerkoopRow[]>([]);
@@ -160,14 +170,34 @@ const GekoppeldeVerkopenSection = ({ customerId }: { customerId: string }) => {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("verkopen" as any)
-      .select("id, vehicle_id, verkoopprijs, contract_getekend_datum, created_at, stap11_afgerond, wizard_status")
-      .eq("customer_id", customerId)
-      .order("created_at", { ascending: false });
-    if (error) { toast.error("Kon verkopen niet laden"); setLoading(false); return; }
+    const [wizardRes, legacyRes] = await Promise.all([
+      supabase
+        .from("verkopen" as any)
+        .select("id, vehicle_id, verkoopprijs, contract_getekend_datum, created_at, stap11_afgerond, wizard_status, customer_id")
+        .eq("customer_id", customerId)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("vehicle_sales" as any)
+        .select("id, vehicle_id, customer_id, verkoopprijs, verkoop_datum, afleverdatum, created_at, status")
+        .eq("customer_id", customerId)
+        .order("created_at", { ascending: false }),
+    ]);
+    if (wizardRes.error || legacyRes.error) { toast.error("Kon verkopen niet laden"); setLoading(false); return; }
 
-    const rows = (data as any[]) || [];
+    const wizardRows: VerkoopRow[] = ((wizardRes.data as any[]) || []).map(r => ({ ...r, source: "verkopen" }));
+    const legacyRows: VerkoopRow[] = ((legacyRes.data as any[]) || []).map(r => ({
+      id: r.id,
+      source: "vehicle_sales",
+      vehicle_id: r.vehicle_id,
+      verkoopprijs: r.verkoopprijs,
+      contract_getekend_datum: r.verkoop_datum || r.afleverdatum,
+      verkoop_datum: r.verkoop_datum || r.afleverdatum,
+      created_at: r.created_at,
+      stap11_afgerond: r.status === "voltooid",
+      wizard_status: r.status,
+      customer_id: r.customer_id,
+    }));
+    const rows = [...wizardRows, ...legacyRows].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     const vehicleIds = Array.from(new Set(rows.map(r => r.vehicle_id).filter(Boolean)));
     let vehicleMap: Record<string, any> = {};
     if (vehicleIds.length > 0) {
