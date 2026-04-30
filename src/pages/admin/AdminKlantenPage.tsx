@@ -1,12 +1,14 @@
 import { useState, useMemo, useRef } from "react";
 import { useCustomers, Customer, statusLabels, statusColors } from "@/hooks/useCustomers";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Loader2, ChevronRight } from "lucide-react";
+import { Plus, Search, Loader2, ChevronRight, Trash2 } from "lucide-react";
 import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
+import ConfirmPopover from "@/components/admin/ConfirmPopover";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
+import { deleteCustomerSafely } from "@/lib/customerDelete";
 
 const allStatuses: Customer["status"][] = ["prospect", "klant", "inactief"];
 
