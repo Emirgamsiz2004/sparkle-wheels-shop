@@ -185,13 +185,13 @@ const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
         .order("created_at", { ascending: false }),
       supabase
         .from("vehicles" as any)
-        .select("id, merk, model, kenteken, verkoop_datum, created_at, verkoopprijs, customer_id, koper_email")
+        .select("id, merk, model, kenteken, status, verkoop_datum, created_at, verkoopprijs, customer_id, koper_email")
         .eq("customer_id", customerId)
         .order("created_at", { ascending: false }),
       customerEmail
         ? supabase
             .from("vehicles" as any)
-            .select("id, merk, model, kenteken, verkoop_datum, created_at, verkoopprijs, customer_id, koper_email")
+            .select("id, merk, model, kenteken, status, verkoop_datum, created_at, verkoopprijs, customer_id, koper_email")
             .ilike("koper_email", customerEmail)
             .order("created_at", { ascending: false })
         : Promise.resolve({ data: [] as any[], error: null }),
