@@ -15,6 +15,7 @@ export interface Kost {
   id: string;
   naam: string;
   categorie: KostCategorie;
+  categorie_id?: string | null;
   bedrag: number;
   frequentie: KostFrequentie;
   datum: string;
