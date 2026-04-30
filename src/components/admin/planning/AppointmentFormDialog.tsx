@@ -53,6 +53,17 @@ const timeSlots = Array.from({ length: 20 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${m}`;
 });
 
+const defaultDuurMinuten: Record<string, number> = {
+  bezichtiging: 30,
+  proefrit: 60,
+  ophalen: 30,
+  aflevering: 60,
+  onderhoud: 120,
+  terugbelafspraak: 15,
+  anders: 60,
+  poetsbeurt: 120,
+};
+
 const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVehicles, onSubmit, defaultType, defaultVehicleId, anchorRect }: Props) => {
   const [step, setStep] = useState<"type" | "form">(defaultType ? "form" : "type");
   const [type, setType] = useState<AppointmentType | null>((defaultType as AppointmentType) || null);
@@ -68,11 +79,32 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     tijd: "10:00",
     klant_naam: "",
     klant_telefoon: "",
+    klant_email: "",
     vehicle_id: defaultVehicleId || "",
     notities: "",
     onderwerp: "",
     betalingsstatus: "openstaand" as "volledig_betaald" | "openstaand",
+    duur_minuten: 60,
+    stuur_bevestigingsmail: false,
   });
+
+  const selectedCustomerEmail = useMemo(() => {
+    if (!selectedCustomerId) return "";
+    return customers.find((c) => c.id === selectedCustomerId)?.email || "";
+  }, [selectedCustomerId, customers]);
+
+  const effectiveEmail = (selectedCustomerEmail || form.klant_email || "").trim();
+
+  // Update default duur on type change
+  useEffect(() => {
+    if (!type) return;
+    setForm((f) => ({ ...f, duur_minuten: defaultDuurMinuten[type] || 60 }));
+  }, [type]);
+
+  // Toggle: standaard aan zodra er een e-mailadres beschikbaar is
+  useEffect(() => {
+    setForm((f) => ({ ...f, stuur_bevestigingsmail: Boolean(effectiveEmail) }));
+  }, [effectiveEmail]);
 
   useEffect(() => {
     if (open && defaultType) {
