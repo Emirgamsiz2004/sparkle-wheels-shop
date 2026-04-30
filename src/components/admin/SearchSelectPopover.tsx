@@ -92,9 +92,11 @@ const SearchSelectPopover = ({
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
-    let left = anchorRect.right - W;
-    if (left < margin) left = margin;
+    // Lijn standaard links uit met de anchor zodat de popover direct onder de knop verschijnt
+    let left = anchorRect.left;
+    // Als hij rechts buiten beeld valt, schuif naar binnen
     if (left + W > vw - margin) left = vw - W - margin;
+    if (left < margin) left = margin;
 
     const spaceBelow = vh - anchorRect.bottom - margin;
     const spaceAbove = anchorRect.top - margin;
@@ -131,11 +133,18 @@ const SearchSelectPopover = ({
 
   if (!mounted) return null;
 
-  const overlayStyle: React.CSSProperties = {
-    opacity: closing ? 0 : 0.4,
-    transition: `opacity ${closing ? 160 : 200}ms ${closing ? "ease-in" : "ease-out"}`,
-    backgroundColor: "#000",
-  };
+  // Desktop: geen donkere overlay (alleen mobiel krijgt een dim achter de bottom sheet)
+  const overlayStyle: React.CSSProperties = isMobile
+    ? {
+        opacity: closing ? 0 : 0.4,
+        transition: `opacity ${closing ? 200 : 240}ms ${closing ? "ease-in" : "ease-out"}`,
+        backgroundColor: "#000",
+      }
+    : {
+        // volledig transparant — dient enkel als click-outside vangnet
+        backgroundColor: "transparent",
+        pointerEvents: "none",
+      };
 
   const desktopStyle: React.CSSProperties = {
     borderRadius: 16,
@@ -143,10 +152,15 @@ const SearchSelectPopover = ({
     boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
     background: "hsl(0 0% 8%)",
     opacity: closing ? 0 : animateIn ? 1 : 0,
-    transform: closing ? "translateY(-8px)" : animateIn ? "translateY(0)" : "translateY(-8px)",
+    transform: closing
+      ? "translateY(-6px) scale(0.98)"
+      : animateIn
+        ? "translateY(0) scale(1)"
+        : "translateY(-6px) scale(0.98)",
+    transformOrigin: "top left",
     transition: closing
-      ? "opacity 160ms ease-in, transform 160ms ease-in"
-      : "opacity 220ms ease-out, transform 220ms ease-out",
+      ? "opacity 140ms ease-in, transform 140ms ease-in"
+      : "opacity 200ms ease-out, transform 200ms cubic-bezier(0.22, 1, 0.36, 1)",
     ...(pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 }),
   };
 
@@ -166,7 +180,7 @@ const SearchSelectPopover = ({
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-40" style={overlayStyle} aria-hidden />
+      <div className="fixed inset-0 z-40" style={overlayStyle} aria-hidden onClick={isMobile ? handleClose : undefined} />
       <div ref={ref} className={containerClass} style={isMobile ? mobileStyle : desktopStyle} role="dialog">
         {isMobile && (
           <div className="pt-2 pb-1 flex justify-center shrink-0">
