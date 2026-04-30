@@ -132,39 +132,6 @@ const AdminVoertuigDetailPage = () => {
           <VehicleTakenTab vehicleId={vehicle.id} />
         )}
       </div>
-        <SlidingTabs
-          tabs={tabItems.map(t => ({ label: t.label, value: t.key }))}
-          value={activeTab}
-          onChange={setActiveTab}
-          className="min-w-max"
-        />
-      </div>
-
-      {/* Tab content */}
-      <div>
-        {activeTab === "overzicht" && (
-          <VehicleOverzichtTab vehicle={vehicle} onSave={updateVehicle} onLogActivity={logActivity} />
-        )}
-        {activeTab === "dossier" && (
-          <VehicleDossierTab
-            vehicleId={vehicle.id}
-            vehicleStatus={vehicle.status}
-            verkoopType={vehicle.verkoopType}
-            koperNaam={vehicle.koperNaam}
-            koperEmail={vehicle.koperEmail}
-            koperTelefoon={vehicle.koperTelefoon}
-            verkoopDatum={vehicle.verkoopDatum}
-            verkoopprijs={vehicle.verkoopprijs}
-            merk={vehicle.merk}
-            model={vehicle.model}
-            bouwjaar={vehicle.bouwjaar}
-            kenteken={vehicle.kenteken}
-          />
-        )}
-        {activeTab === "taken" && (
-          <VehicleTakenTab vehicleId={vehicle.id} />
-        )}
-      </div>
 
       {/* Dialogs */}
       <StartProefritDialog
