@@ -9,18 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Car, PackageCheck, CalendarIcon, Clock, Wrench, Truck, MoreHorizontal, ArrowLeft, X } from "lucide-react";
+import { Eye, Car, PackageCheck, CalendarIcon, Clock, Wrench, Truck, MoreHorizontal, ArrowLeft, X, Mail } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { AppointmentType, typeColors, typeLabels } from "@/hooks/useAppointments";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendAppointmentConfirmation } from "@/lib/sendAppointmentConfirmation";
 
 interface CustomerOption {
   id: string;
   voornaam: string;
   achternaam: string;
   telefoon?: string;
+  email?: string;
 }
 
 interface Props {
