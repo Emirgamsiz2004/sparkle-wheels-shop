@@ -251,7 +251,7 @@ const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
     setAvailLoading(true);
 
     // ALLE verkopen uit beide verkoopregistraties — inclusief al gekoppelde verkopen
-    const [wizardRes, legacyRes] = await Promise.all([
+    const [wizardRes, legacyRes, vehiclesRes] = await Promise.all([
       supabase
         .from("verkopen" as any)
         .select("id, vehicle_id, customer_id, created_at, contract_getekend_datum, verkoopprijs")
@@ -260,10 +260,21 @@ const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
         .from("vehicle_sales" as any)
         .select("id, vehicle_id, customer_id, created_at, verkoop_datum, afleverdatum, verkoopprijs, status")
         .order("created_at", { ascending: false }),
+      supabase
+        .from("vehicles" as any)
+        .select("id, merk, model, kenteken, verkoop_datum, created_at, verkoopprijs, customer_id, koper_naam, koper_email")
+        .order("created_at", { ascending: false }),
+    ]);
+    const registeredVehicleIds = new Set([
+      ...(((wizardRes.data as any[]) || []).map(r => r.vehicle_id).filter(Boolean)),
+      ...(((legacyRes.data as any[]) || []).map(r => r.vehicle_id).filter(Boolean)),
     ]);
     const rows = [
       ...(((wizardRes.data as any[]) || []).map(r => ({ ...r, source: "verkopen" as const, datum: r.contract_getekend_datum || r.created_at }))),
       ...(((legacyRes.data as any[]) || []).map(r => ({ ...r, source: "vehicle_sales" as const, datum: r.verkoop_datum || r.afleverdatum || r.created_at }))),
+      ...(((vehiclesRes.data as any[]) || [])
+        .filter(v => !registeredVehicleIds.has(v.id))
+        .map(v => ({ ...v, source: "vehicles" as const, vehicle_id: v.id, datum: v.verkoop_datum || v.created_at }))),
     ].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
 
     const vehicleIds = Array.from(new Set(rows.map(r => r.vehicle_id).filter(Boolean)));
@@ -291,7 +302,7 @@ const GekoppeldeVerkopenSection = ({ customer }: { customer: Customer }) => {
       const datumStr = datum ? new Date(datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "";
       const prijsStr = r.verkoopprijs ? `€ ${Number(r.verkoopprijs).toLocaleString("nl-NL", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "";
       const c = r.customer_id ? cMap[r.customer_id] : null;
-      const huidige = c ? (c.bedrijfsnaam || `${c.voornaam || ""} ${c.achternaam || ""}`.trim() || "Onbekende klant") : null;
+      const huidige = c ? (c.bedrijfsnaam || `${c.voornaam || ""} ${c.achternaam || ""}`.trim() || "Onbekende klant") : r.koper_naam || null;
       const isCurrent = r.customer_id === customerId;
       return {
         id: `${r.source}:${r.id}`,
