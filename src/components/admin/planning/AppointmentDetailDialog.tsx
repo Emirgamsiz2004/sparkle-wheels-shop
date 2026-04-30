@@ -336,6 +336,51 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                 )}
               </div>
 
+              {/* 4b. Diensten */}
+              {appointment.diensten && appointment.diensten.length > 0 && (
+                <div className="mt-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {appointment.diensten.map((d) => (
+                      <span key={d} className="inline-flex items-center px-2 py-0.5 rounded-[6px] bg-accent/40 border border-border/60 text-[11px] text-foreground">
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                  {appointment.geschatte_duur_minuten ? (
+                    <div className="text-[11px] text-muted-foreground mt-1.5 inline-flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> {appointment.geschatte_duur_minuten} min geschat
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {/* 4c. Klant-voertuig (onderhoud/poetsbeurt) */}
+              {(appointment.voertuig_klant_kenteken || appointment.voertuig_klant_omschrijving) && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-foreground">
+                  <Car className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="truncate">
+                    {appointment.voertuig_klant_omschrijving || ""}
+                    {appointment.voertuig_klant_kenteken && (
+                      <span className="text-muted-foreground"> · {appointment.voertuig_klant_kenteken}</span>
+                    )}
+                  </span>
+                </div>
+              )}
+
+              {/* 4d. Werkzaamheden / notitie diensten */}
+              {(appointment.werkzaamheden_omschrijving || appointment.diensten_notitie) && (
+                <div className="mt-3 text-xs text-muted-foreground bg-accent/20 rounded-[8px] p-2 border border-border/40 whitespace-pre-wrap">
+                  {appointment.werkzaamheden_omschrijving || appointment.diensten_notitie}
+                </div>
+              )}
+
+              {/* 4e. Notities algemeen */}
+              {appointment.notities && (
+                <div className="mt-3 text-xs text-muted-foreground bg-accent/20 rounded-[8px] p-2 border border-border/40 whitespace-pre-wrap">
+                  {appointment.notities}
+                </div>
+              )}
+
               {/* divider */}
               <div className="my-4 h-px bg-border/40" />
 
