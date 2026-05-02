@@ -334,40 +334,59 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
             <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-base font-medium text-foreground">Aanbetaling annuleren?</h3>
               <p className="text-sm text-muted-foreground">
-                Aanbetaling van <strong className="text-foreground">{formatEuroDecimal(active.aanbetalingsbedrag)}</strong>.
-                Kies hoe je deze wilt annuleren:
+                Aanbetaling van <strong className="text-foreground">{formatEuroDecimal(active.aanbetalingsbedrag)}</strong>
+                {active.status === "betaald" ? " is reeds ontvangen. Kies hoe je deze wilt annuleren:" : " is nog niet ontvangen."}
               </p>
 
               <div className="space-y-2">
-                <button
-                  onClick={() => setCancelMode("refund")}
-                  disabled={busy}
-                  className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
-                    cancelMode === "refund"
-                      ? "border-amber-500/50 bg-amber-500/10"
-                      : "border-border hover:border-amber-500/30 hover:bg-amber-500/5"
-                  }`}
-                >
-                  <div className="text-sm font-medium text-foreground">Annuleren mét terugbetaling</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    Annulering vanuit ons. Creditnota wordt aangemaakt en verstuurd, klant krijgt aanbetaling terug.
-                  </div>
-                </button>
+                {active.status === "betaald" ? (
+                  <>
+                    <button
+                      onClick={() => setCancelMode("refund")}
+                      disabled={busy}
+                      className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
+                        cancelMode === "refund"
+                          ? "border-amber-500/50 bg-amber-500/10"
+                          : "border-border hover:border-amber-500/30 hover:bg-amber-500/5"
+                      }`}
+                    >
+                      <div className="text-sm font-medium text-foreground">Annuleren mét terugbetaling</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        Annulering vanuit ons. Creditnota wordt aangemaakt en verstuurd, klant krijgt aanbetaling terug.
+                      </div>
+                    </button>
 
-                <button
-                  onClick={() => setCancelMode("no_refund")}
-                  disabled={busy}
-                  className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
-                    cancelMode === "no_refund"
-                      ? "border-rose-500/50 bg-rose-500/10"
-                      : "border-border hover:border-rose-500/30 hover:bg-rose-500/5"
-                  }`}
-                >
-                  <div className="text-sm font-medium text-foreground">Annuleren zónder terugbetaling</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    Annulering door klant. Aanbetaling wordt niet terugbetaald, geen creditnota.
-                  </div>
-                </button>
+                    <button
+                      onClick={() => setCancelMode("no_refund")}
+                      disabled={busy}
+                      className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
+                        cancelMode === "no_refund"
+                          ? "border-rose-500/50 bg-rose-500/10"
+                          : "border-border hover:border-rose-500/30 hover:bg-rose-500/5"
+                      }`}
+                    >
+                      <div className="text-sm font-medium text-foreground">Annuleren zónder terugbetaling</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        Annulering door klant. Aanbetaling wordt niet terugbetaald, geen creditnota.
+                      </div>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setCancelMode("void")}
+                    disabled={busy}
+                    className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
+                      cancelMode === "void"
+                        ? "border-rose-500/50 bg-rose-500/10"
+                        : "border-border hover:border-rose-500/30 hover:bg-rose-500/5"
+                    }`}
+                  >
+                    <div className="text-sm font-medium text-foreground">Factuur intrekken & annuleren</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      De openstaande aanbetalingsfactuur in Moneybird wordt gecrediteerd en de aanbetaling vervalt. Geen terugbetaling nodig (klant heeft nog niet betaald).
+                    </div>
+                  </button>
+                )}
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
