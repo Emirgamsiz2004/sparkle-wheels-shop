@@ -1064,6 +1064,7 @@ const AdminVerkoopWizardPage = () => {
                 aanbetalingBankrekening={aanbetalingBankrekening}
                 setAanbetalingBankrekening={setAanbetalingBankrekening}
                 onAutoSave={() => saveCurrent()}
+                aanbetalingExtern={aanbetalingExtern}
               />
             )}
 
