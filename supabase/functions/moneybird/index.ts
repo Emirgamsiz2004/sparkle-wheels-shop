@@ -546,6 +546,133 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ─── Aanbetalingsfactuur op afstand ───
+      case "create_aanbetaling_invoice": {
+        const {
+          voornaam, achternaam, email, telefoon,
+          bedrag, vehicle, workflow_id: aWorkflow, reference: aRef, description: aDesc,
+        } = params;
+        if (!email) throw new Error("email is required");
+        if (!bedrag || Number(bedrag) <= 0) throw new Error("bedrag is required");
+
+        // 1) Contact zoeken op email
+        let contact: any = null;
+        try {
+          const found = await mbFetch(`contacts.json?query=${encodeURIComponent(email)}`);
+          if (Array.isArray(found) && found.length > 0) {
+            contact = found.find((c: any) =>
+              (c.email && c.email.toLowerCase() === String(email).toLowerCase()) ||
+              (c.send_invoices_to_email && c.send_invoices_to_email.toLowerCase() === String(email).toLowerCase())
+            ) || found[0];
+          }
+        } catch (e) {
+          console.warn("contact search failed:", e);
+        }
+        if (!contact) {
+          const cp: Record<string, unknown> = {
+            company_name: `${voornaam || ""} ${achternaam || ""}`.trim() || email,
+            firstname: voornaam || undefined,
+            lastname: achternaam || undefined,
+            phone: telefoon || undefined,
+            send_invoices_to_email: email,
+            send_estimates_to_email: email,
+            country: "NL",
+          };
+          contact = await mbFetch("contacts.json", {
+            method: "POST",
+            body: JSON.stringify({ contact: cp }),
+          });
+        }
+
+        // 2) Aanbetalingsfactuur aanmaken
+        const today = new Date().toISOString().split("T")[0];
+        const due = new Date(Date.now() + 3 * 86400000).toISOString().split("T")[0];
+        const invoiceBody: Record<string, unknown> = {
+          contact_id: contact.id,
+          reference: aRef || `Aanbetaling ${vehicle?.kenteken || ""} ${vehicle?.merk || ""} ${vehicle?.model || ""}`.trim(),
+          invoice_date: today,
+          due_date: due,
+          prices_are_incl_tax: true,
+          details_attributes: [{
+            description: aDesc || `Aanbetaling ${vehicle?.merk || ""} ${vehicle?.model || ""} (${vehicle?.bouwjaar || ""}) — kenteken ${vehicle?.kenteken || ""}`.trim(),
+            price: String(bedrag),
+            amount: "1",
+          }],
+        };
+        if (aWorkflow) invoiceBody.workflow_id = String(aWorkflow);
+
+        const invoice = await mbFetch("sales_invoices.json", {
+          method: "POST",
+          body: JSON.stringify({ sales_invoice: invoiceBody }),
+        });
+
+        // 3) Versturen via email
+        try {
+          await mbFetch(`sales_invoices/${invoice.id}/send_invoice.json`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              sales_invoice_sending: { delivery_method: "Email", sending_scheduled_at: null },
+            }),
+          });
+        } catch (sendErr) {
+          console.error("send_invoice failed:", sendErr);
+        }
+
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        result = {
+          invoice,
+          contact,
+          moneybird_url: `https://moneybird.com/${adminId}/sales_invoices/${invoice.id}`,
+        };
+        break;
+      }
+
+      // ─── Creditnota voor aanbetaling: maken + versturen ───
+      case "credit_aanbetaling_invoice": {
+        const { invoice_id: cancInvId } = params;
+        if (!cancInvId) throw new Error("invoice_id is required");
+
+        const original: any = await mbFetch(`sales_invoices/${cancInvId}.json`);
+        const details = (original?.details_attributes || original?.details || []).map((d: any) => ({
+          description: d.description,
+          price: d.price,
+          amount: d.amount ? `-${String(d.amount).replace(/^-/, "")}` : "-1",
+          tax_rate_id: d.tax_rate_id,
+          ledger_account_id: d.ledger_account_id,
+          product_id: d.product_id,
+          period: d.period,
+          row_order: d.row_order,
+        }));
+
+        const credit = await mbFetch("sales_invoices.json", {
+          method: "POST",
+          body: JSON.stringify({
+            sales_invoice: {
+              contact_id: original?.contact_id,
+              workflow_id: original?.workflow_id,
+              reference: `Creditnota aanbetaling ${original?.invoice_id || cancInvId}`,
+              prices_are_incl_tax: original?.prices_are_incl_tax ?? true,
+              details_attributes: details,
+            },
+          }),
+        });
+
+        try {
+          await mbFetch(`sales_invoices/${credit.id}/send_invoice.json`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              sales_invoice_sending: { delivery_method: "Email", sending_scheduled_at: null },
+            }),
+          });
+        } catch (e) {
+          console.error("credit send_invoice failed:", e);
+        }
+
+        const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
+        result = { credit_invoice: credit, moneybird_url: `https://moneybird.com/${adminId}/sales_invoices/${credit.id}` };
+        break;
+      }
+
       // ─── Verkoopfactuur voor voertuig (legacy, kort) ───
       case "create_vehicle_invoice": {
         const { vehicle, buyer_name, buyer_email, buyer_phone } = params;
