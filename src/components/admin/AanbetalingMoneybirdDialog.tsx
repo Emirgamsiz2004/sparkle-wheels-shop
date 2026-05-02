@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { toast } from "sonner";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -113,66 +114,81 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-xl max-h-[80vh] sm:max-h-[75vh] overflow-y-auto admin-theme my-8">
-        <DialogHeader>
-          <DialogTitle>Aanbetaling op afstand</DialogTitle>
-          <DialogDescription>
-            Verstuur een Moneybird-aanbetalingsfactuur naar de klant
-          </DialogDescription>
-        </DialogHeader>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto pointer-events-none">
+          <DialogPrimitive.Content
+            className="admin-theme relative w-full max-w-xl my-auto bg-[hsl(0_0%_8%)] text-foreground border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.5)] p-5 pointer-events-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-[0.97] data-[state=open]:zoom-in-[0.97] ease-out flex flex-col max-h-[calc(100vh-4rem)]"
+            style={{ borderRadius: 16 }}
+          >
+            <DialogPrimitive.Close
+              className="absolute right-3 top-3 z-10 h-8 w-8 inline-flex items-center justify-center rounded-[10px] text-white/60 hover:text-white hover:bg-white/[0.06] transition"
+              aria-label="Sluiten"
+            >
+              <X className="h-4 w-4" />
+            </DialogPrimitive.Close>
 
-        <div className="space-y-4 py-2">
-          <div className="px-4 py-3 bg-secondary/40 rounded-2xl border border-border text-xs text-muted-foreground">
-            <strong className="text-foreground font-medium">Voertuig:</strong>{" "}
-            {vehicle.merk} {vehicle.model} {vehicle.bouwjaar} — {vehicle.kenteken} —{" "}
-            {formatEuroDecimal(vehicle.verkoopprijs)}
-          </div>
+            <DialogHeader>
+              <DialogTitle>Aanbetaling op afstand</DialogTitle>
+              <DialogDescription>
+                Verstuur een Moneybird-aanbetalingsfactuur naar de klant
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Voornaam *" value={voornaam} onChange={setVoornaam} />
-            <Field label="Achternaam *" value={achternaam} onChange={setAchternaam} />
-          </div>
-          <Field label="E-mailadres *" value={email} onChange={setEmail} type="email" />
-          <Field label="Telefoonnummer" value={telefoon} onChange={setTelefoon} />
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5">Aanbetalingsbedrag (€) *</label>
-            <input
-              type="number"
-              min={1}
-              value={bedrag}
-              onChange={(e) => setBedrag(e.target.value === "" ? "" : Number(e.target.value))}
-              className={inputCls}
-              placeholder="0"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5">Notities (intern)</label>
-            <textarea
-              value={notities}
-              onChange={(e) => setNotities(e.target.value)}
-              rows={3}
-              className={inputCls}
-            />
-          </div>
+            <div className="space-y-4 py-2 overflow-y-auto flex-1 min-h-0">
+              <div className="px-4 py-3 bg-secondary/40 rounded-2xl border border-border text-xs text-muted-foreground">
+                <strong className="text-foreground font-medium">Voertuig:</strong>{" "}
+                {vehicle.merk} {vehicle.model} {vehicle.bouwjaar} — {vehicle.kenteken} —{" "}
+                {formatEuroDecimal(vehicle.verkoopprijs)}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Voornaam *" value={voornaam} onChange={setVoornaam} />
+                <Field label="Achternaam *" value={achternaam} onChange={setAchternaam} />
+              </div>
+              <Field label="E-mailadres *" value={email} onChange={setEmail} type="email" />
+              <Field label="Telefoonnummer" value={telefoon} onChange={setTelefoon} />
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1.5">Aanbetalingsbedrag (€) *</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={bedrag}
+                  onChange={(e) => setBedrag(e.target.value === "" ? "" : Number(e.target.value))}
+                  className={inputCls}
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1.5">Notities (intern)</label>
+                <textarea
+                  value={notities}
+                  onChange={(e) => setNotities(e.target.value)}
+                  rows={3}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 mt-4">
+              <button
+                onClick={onClose}
+                className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl"
+              >
+                Annuleren
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={saving || !isValid}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium border border-emerald-500/30 text-emerald-400 rounded-xl hover:bg-emerald-500/10 active:scale-[0.97] transition-all disabled:opacity-50"
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                Aanbetalingsfactuur aanmaken & versturen
+              </button>
+            </DialogFooter>
+          </DialogPrimitive.Content>
         </div>
-
-        <DialogFooter className="gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl"
-          >
-            Annuleren
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={saving || !isValid}
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium border border-emerald-500/30 text-emerald-400 rounded-xl hover:bg-emerald-500/10 active:scale-[0.97] transition-all disabled:opacity-50"
-          >
-            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-            Aanbetalingsfactuur aanmaken & versturen
-          </button>
-        </DialogFooter>
-      </DialogContent>
+      </DialogPrimitive.Portal>
     </Dialog>
   );
 };
