@@ -238,7 +238,8 @@ export function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): jsP
     }
     doc.setFont("helvetica", opts.bold || opts.total ? "bold" : "normal");
     doc.setFontSize(opts.total ? 11 : 9.5);
-    doc.setTextColor(...(opts.muted ? subtle : ink));
+    const c = opts.muted ? subtle : ink;
+    doc.setTextColor(c[0], c[1], c[2]);
     doc.text(label, ml + 3, y + 1);
     doc.text(value, ml + cw - 3, y + 1, { align: "right" });
     y += 7;
