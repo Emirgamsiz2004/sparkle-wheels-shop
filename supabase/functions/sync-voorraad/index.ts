@@ -80,7 +80,7 @@ serve(async (req) => {
     // Get existing vehicles from DB
     const { data: existing } = await supabase
       .from("vehicles")
-      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand, merk, model, bouwjaar, brandstof, kleur, verkoop_datum");
+      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand, feed_verkoopprijs, feed_kilometerstand, merk, model, bouwjaar, brandstof, kleur, verkoop_datum");
 
     const existingByFeedId = new Map(
       (existing || []).filter((v: any) => v.feed_id).map((v: any) => [v.feed_id, v])
@@ -118,9 +118,29 @@ serve(async (req) => {
         if (!match.bouwjaar && fv.bouwjaar) updates.bouwjaar = fv.bouwjaar;
         if (!match.brandstof && fv.brandstof) updates.brandstof = fv.brandstof.toLowerCase();
         if (!match.kleur && fv.kleur) updates.kleur = fv.kleur;
-        // VWE feed is leidend voor prijs en km — altijd overnemen bij verschil
-        if (fv.verkoopprijs && Number(fv.verkoopprijs) !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
-        if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
+        // Feed is leidend ALLEEN als VWE een andere waarde stuurt sinds de vorige sync.
+        // We vergelijken met feed_verkoopprijs (laatst ontvangen feedwaarde), niet met verkoopprijs (kan handmatig aangepast zijn).
+        // Zo blijven handmatige DB-aanpassingen behouden tot VWE iets nieuws stuurt.
+        if (fv.verkoopprijs) {
+          if (match.feed_verkoopprijs == null) {
+            // Eerste sync: feed-baseline vastleggen, DB alleen vullen als nog leeg
+            updates.feed_verkoopprijs = fv.verkoopprijs;
+            if (!match.verkoopprijs || Number(match.verkoopprijs) === 0) updates.verkoopprijs = fv.verkoopprijs;
+          } else if (Number(fv.verkoopprijs) !== Number(match.feed_verkoopprijs)) {
+            // VWE heeft prijs gewijzigd → overnemen
+            updates.verkoopprijs = fv.verkoopprijs;
+            updates.feed_verkoopprijs = fv.verkoopprijs;
+          }
+        }
+        if (fv.kilometerstand) {
+          if (match.feed_kilometerstand == null) {
+            updates.feed_kilometerstand = fv.kilometerstand;
+            if (!match.kilometerstand || match.kilometerstand === 0) updates.kilometerstand = fv.kilometerstand;
+          } else if (fv.kilometerstand !== Number(match.feed_kilometerstand)) {
+            updates.kilometerstand = fv.kilometerstand;
+            updates.feed_kilometerstand = fv.kilometerstand;
+          }
+        }
         // VWE feed is leidend: alleen als de FEED zegt verkocht/gereserveerd nemen we dat over.
         // Als de feed "te_koop" zegt maar de DB heeft een handmatige status (verkocht, gereserveerd, 
         // consignatie, in_behandeling, inkoop), laten we die met rust.
@@ -172,9 +192,11 @@ serve(async (req) => {
           bouwjaar: fv.bouwjaar,
           brandstof: fv.brandstof?.toLowerCase() || null,
           kilometerstand: fv.kilometerstand,
+          feed_kilometerstand: fv.kilometerstand,
           kleur: fv.kleur,
           kenteken: fv.kenteken,
           verkoopprijs: fv.verkoopprijs,
+          feed_verkoopprijs: fv.verkoopprijs,
           status: fv.feed_status,
           inkoop_datum: new Date().toISOString().split("T")[0],
         });
