@@ -16,6 +16,11 @@ function attr(block: string, name: string): string {
   return m ? m[1] : "";
 }
 
+function normalizeKenteken(k: string | null | undefined): string {
+  if (!k) return "";
+  return k.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
 function extractFeedStatus(block: string): FeedStatus {
   const lowerBlock = block.toLowerCase();
 
@@ -190,6 +195,42 @@ async function fetchDetail(detailPath: string) {
   };
 }
 
+async function syncAutodealersPricesToDatabase(supabase: ReturnType<typeof createClient>, vehicles: any[]) {
+  const { data: dbVehicles, error } = await supabase
+    .from("vehicles")
+    .select("id, feed_id, kenteken, verkoopprijs, feed_verkoopprijs");
+
+  if (error) {
+    console.error("Autodealers price sync select error:", error);
+    return;
+  }
+
+  const byFeedId = new Map((dbVehicles || []).filter((v: any) => v.feed_id).map((v: any) => [v.feed_id, v]));
+  const byKenteken = new Map(
+    (dbVehicles || [])
+      .filter((v: any) => v.kenteken)
+      .map((v: any) => [normalizeKenteken(v.kenteken), v])
+  );
+
+  for (const vehicle of vehicles) {
+    const prijs = Number(vehicle.prijs) || 0;
+    if (!prijs) continue;
+
+    const match = byFeedId.get(vehicle.id) || byKenteken.get(normalizeKenteken(vehicle.kenteken));
+    if (!match) continue;
+
+    const updates: Record<string, unknown> = {};
+    if (!match.feed_id && vehicle.id) updates.feed_id = vehicle.id;
+    if (Number(match.verkoopprijs) !== prijs) updates.verkoopprijs = prijs;
+    if (Number(match.feed_verkoopprijs) !== prijs) updates.feed_verkoopprijs = prijs;
+
+    if (Object.keys(updates).length > 0) {
+      const { error: updateError } = await supabase.from("vehicles").update(updates).eq("id", match.id);
+      if (updateError) console.error("Autodealers price sync update error:", updateError);
+    }
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -221,10 +262,12 @@ Deno.serve(async (req) => {
     // List all vehicles — merge DB statuses
     const vehicles = await fetchList();
 
-    // Fetch DB statuses for all vehicles with a feed_id
+    // Sync DB prices from Autodealers whenever the live voorraad is loaded.
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    await syncAutodealersPricesToDatabase(supabase, vehicles);
 
     const { data: dbVehicles } = await supabase
       .from("vehicles")
