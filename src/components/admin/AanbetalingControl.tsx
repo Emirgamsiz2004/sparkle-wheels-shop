@@ -281,8 +281,8 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
         </button>
 
         {confirmReceived && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="bg-background border border-border rounded-2xl max-w-md w-full p-6 space-y-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
+            <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
               <h3 className="text-base font-medium">Aanbetaling als ontvangen markeren?</h3>
               <p className="text-sm text-muted-foreground">
                 Dit bevestigt dat de aanbetaling van <strong className="text-foreground">{formatEuroDecimal(active.aanbetalingsbedrag)}</strong> is ontvangen.
@@ -307,19 +307,56 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
         )}
 
         {confirmCancel && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="bg-background border border-border rounded-2xl max-w-sm w-full p-6 space-y-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
+            <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
               <h3 className="text-base font-medium">Aanbetaling annuleren?</h3>
               <p className="text-sm text-muted-foreground">
-                Weet je zeker dat je de aanbetaling van {formatEuroDecimal(active.aanbetalingsbedrag)} wilt annuleren? Er wordt een creditnota aangemaakt in Moneybird en verstuurd naar de klant.
+                Aanbetaling van <strong className="text-foreground">{formatEuroDecimal(active.aanbetalingsbedrag)}</strong>.
+                Kies hoe je deze wilt annuleren:
               </p>
+
+              <div className="space-y-2">
+                <button
+                  onClick={() => setCancelMode("refund")}
+                  disabled={busy}
+                  className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
+                    cancelMode === "refund"
+                      ? "border-amber-500/50 bg-amber-500/10"
+                      : "border-border hover:border-amber-500/30 hover:bg-amber-500/5"
+                  }`}
+                >
+                  <div className="text-sm font-medium text-foreground">Annuleren mét terugbetaling</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    Annulering vanuit ons. Creditnota wordt aangemaakt en verstuurd, klant krijgt aanbetaling terug.
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setCancelMode("no_refund")}
+                  disabled={busy}
+                  className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
+                    cancelMode === "no_refund"
+                      ? "border-rose-500/50 bg-rose-500/10"
+                      : "border-border hover:border-rose-500/30 hover:bg-rose-500/5"
+                  }`}
+                >
+                  <div className="text-sm font-medium text-foreground">Annuleren zónder terugbetaling</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    Annulering door klant. Aanbetaling wordt niet terugbetaald, geen creditnota.
+                  </div>
+                </button>
+              </div>
+
               <div className="flex justify-end gap-2 pt-2">
-                <button onClick={() => setConfirmCancel(false)} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground rounded-xl">
+                <button
+                  onClick={() => { setConfirmCancel(false); setCancelMode(null); }}
+                  className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground rounded-xl"
+                >
                   Terug
                 </button>
                 <button
-                  onClick={handleCancel}
-                  disabled={busy}
+                  onClick={() => cancelMode && handleCancel(cancelMode)}
+                  disabled={busy || !cancelMode}
                   className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-rose-500/30 text-rose-400 rounded-xl hover:bg-rose-500/10 disabled:opacity-50"
                 >
                   {busy && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
