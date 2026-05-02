@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import AanbetalingControl from "@/components/admin/AanbetalingControl";
 
 interface Props {
   vehicle: Vehicle;
