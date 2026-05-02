@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { Loader2, X, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const WORKFLOW_IDS = {
   marge_geen: "482837428008126425",
