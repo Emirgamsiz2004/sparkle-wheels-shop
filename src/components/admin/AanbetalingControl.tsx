@@ -70,35 +70,43 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
 
   const allowed = !["verkocht", "gereserveerd"].includes(vehicle.status);
 
-  const handleCancel = async (mode: "refund" | "no_refund") => {
+  const handleCancel = async (mode: "refund" | "no_refund" | "void") => {
     if (!active) return;
     setBusy(true);
     try {
-      const isRefund = mode === "refund";
-      // Alleen creditnota maken bij terugbetaling
-      if (isRefund && active.moneybird_invoice_id) {
+      // void = open factuur intrekken (creditnota, geen terugbetaling want nooit betaald)
+      // refund = betaalde aanbetaling terugbetalen via creditnota
+      // no_refund = annulering door klant, geen terugbetaling
+      const needsCredit = mode === "refund" || mode === "void";
+      if (needsCredit && active.moneybird_invoice_id) {
         await invoke("credit_aanbetaling_invoice", { invoice_id: active.moneybird_invoice_id });
       }
+      const newStatus =
+        mode === "refund" ? "geannuleerd_terugbetaald"
+        : mode === "void" ? "geannuleerd_ingetrokken"
+        : "geannuleerd_geen_terugbetaling";
       await supabase.from("aanbetalingen").update({
-        status: isRefund ? "geannuleerd_terugbetaald" : "geannuleerd_geen_terugbetaling",
+        status: newStatus,
         geannuleerd_op: new Date().toISOString(),
       } as any).eq("id", active.id);
       await supabase.from("vehicles").update({
         heeft_aanbetaling: false,
         aanbetalingsbedrag: 0,
       } as any).eq("id", vehicle.id);
+      const beschrijving =
+        mode === "refund" ? `Aanbetaling €${Number(active.aanbetalingsbedrag).toFixed(0)} geannuleerd MET terugbetaling, creditnota verstuurd`
+        : mode === "void" ? `Open aanbetalingsfactuur €${Number(active.aanbetalingsbedrag).toFixed(0)} ingetrokken (creditnota verstuurd, nooit betaald)`
+        : `Aanbetaling €${Number(active.aanbetalingsbedrag).toFixed(0)} geannuleerd ZONDER terugbetaling (annulering door klant)`;
       await supabase.from("vehicle_activity_log").insert({
         vehicle_id: vehicle.id,
         actie_type: "aanbetaling_geannuleerd",
-        beschrijving: isRefund
-          ? `Aanbetaling €${Number(active.aanbetalingsbedrag).toFixed(0)} geannuleerd MET terugbetaling, creditnota verstuurd`
-          : `Aanbetaling €${Number(active.aanbetalingsbedrag).toFixed(0)} geannuleerd ZONDER terugbetaling (annulering door klant)`,
+        beschrijving,
       } as any);
-      toast.success(
-        isRefund
-          ? "Aanbetaling geannuleerd en creditnota verstuurd"
-          : "Aanbetaling geannuleerd zonder terugbetaling"
-      );
+      const successMsg =
+        mode === "refund" ? "Aanbetaling geannuleerd en creditnota verstuurd"
+        : mode === "void" ? "Aanbetalingsfactuur ingetrokken"
+        : "Aanbetaling geannuleerd zonder terugbetaling";
+      toast.success(successMsg);
       setActive(null);
       setConfirmCancel(false);
       setCancelMode(null);
