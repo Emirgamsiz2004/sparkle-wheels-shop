@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { toast } from "sonner";
-import { Loader2, Wallet, X } from "lucide-react";
+import { Loader2, Wallet, X, Download } from "lucide-react";
 import AanbetalingMoneybirdDialog from "./AanbetalingMoneybirdDialog";
 
 interface Props {
@@ -79,6 +79,48 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
     setBusy(false);
   };
 
+  const handleDownload = async () => {
+    if (!active?.moneybird_invoice_id) {
+      toast.error("Geen Moneybird factuur gekoppeld");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Niet ingelogd");
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/moneybird`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            action: "download_invoice_pdf_blob",
+            invoice_id: active.moneybird_invoice_id,
+            kenteken: vehicle.kenteken,
+            datum: new Date().toISOString().slice(0, 10),
+          }),
+        }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Aanbetaling_${vehicle.kenteken || vehicle.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      toast.error(e.message || "Downloaden mislukt");
+    }
+    setBusy(false);
+  };
+
   if (!allowed && !active) return null;
 
   if (active) {
@@ -88,6 +130,9 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
           <Wallet className="w-3.5 h-3.5" />
           Aanbetaling {active.status === "betaald" ? "ontvangen" : "open"} — {formatEuroDecimal(active.aanbetalingsbedrag)}
         </span>
+        <button onClick={handleDownload} disabled={busy} className={btnCls} title="Factuur downloaden">
+          <Download className="w-3.5 h-3.5" /> Factuur
+        </button>
         <button onClick={() => setConfirmCancel(true)} className={btnCls + " !border-rose-500/30 !text-rose-400"}>
           <X className="w-3.5 h-3.5" /> Aanbetaling annuleren
         </button>

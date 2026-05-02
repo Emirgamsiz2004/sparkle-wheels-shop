@@ -112,9 +112,9 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm overflow-y-auto md:p-4">
-      <div className="bg-background border border-border rounded-t-2xl md:rounded-2xl w-full max-w-xl md:my-8">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm md:p-4 overflow-y-auto">
+      <div className="bg-background border border-border rounded-t-2xl md:rounded-2xl w-full max-w-xl md:my-8 flex flex-col max-h-[95vh]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border shrink-0">
           <div>
             <h2 className="text-base font-medium">Aanbetaling op afstand</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -126,7 +126,7 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div className="px-6 py-5 space-y-4 flex-1 overflow-y-auto min-h-0">
           <div className="px-4 py-3 bg-secondary/40 rounded-2xl border border-border text-xs text-muted-foreground">
             <strong className="text-foreground font-medium">Voertuig:</strong>{" "}
             {vehicle.merk} {vehicle.model} {vehicle.bouwjaar} — {vehicle.kenteken} —{" "}
@@ -161,7 +161,7 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-border">
+        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-border shrink-0">
           <button onClick={onClose} className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl">
             Annuleren
           </button>
