@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 export interface AanbetalingsbewijsData {
   voertuig: {
@@ -8,12 +9,14 @@ export interface AanbetalingsbewijsData {
     kenteken?: string | null;
   };
   klantNaam?: string;
+  klantEmail?: string;
   aanbetalingsbedrag: number;
   verkoopprijs: number;
   restbedrag: number;
   betaalwijze?: string;
-  leverdatum?: string; // ISO yyyy-mm-dd
-  datum: string; // ISO yyyy-mm-dd
+  leverdatum?: string;
+  datum: string;
+  bewijsNummer?: string;
   inruil?: {
     merk?: string;
     model?: string;
@@ -36,142 +39,365 @@ const formatDate = (d?: string) => {
   return d;
 };
 
-export function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): jsPDF {
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const pw = 210;
-  const ml = 20;
-  const mr = 20;
-  const cw = pw - ml - mr;
-  let y = 20;
+const formatKenteken = (k?: string | null) => (k ? k.toUpperCase().replace(/\s+/g, "") : "-");
 
-  // Header
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("PLATIN AUTOMOTIVE", ml, y);
-  y += 6;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(90);
-  doc.text("Cilinderweg 99, 2371 DZ Roelofarendsveen", ml, y);
-  y += 4;
-  doc.text("Tel: 06 8282 3050", ml, y);
-  doc.setTextColor(0);
-  y += 10;
+const escapeHtml = (s: string) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 
-  // Lijn
-  doc.setDrawColor(180);
-  doc.line(ml, y, ml + cw, y);
-  y += 10;
-
-  // Titel
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text("AANBETALINGSBEWIJS", ml, y);
-  y += 10;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text(`Datum: ${formatDate(data.datum)}`, ml, y);
-  y += 10;
-
-  // Voertuig
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text("Voertuig", ml, y);
-  y += 6;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+function buildHtml(data: AanbetalingsbewijsData): string {
   const v = data.voertuig;
-  const voertuigText = `${v.merk || ""} ${v.model || ""}${v.bouwjaar ? ` (${v.bouwjaar})` : ""}`;
-  doc.text(voertuigText.trim() || "-", ml, y);
-  y += 5;
-  doc.text(`Kenteken: ${v.kenteken || "-"}`, ml, y);
-  y += 10;
+  const voertuigText = `${v.merk || ""} ${v.model || ""}`.trim() || "-";
 
-  // Inruil sectie (optioneel)
-  if (data.inruil) {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.text("Inruil voertuig", ml, y);
-    y += 6;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    const inr = data.inruil;
-    const inrText = `${inr.merk || ""} ${inr.model || ""}`.trim();
-    if (inrText) {
-      doc.text(inrText, ml, y);
-      y += 5;
-    }
-    if (inr.kenteken) {
-      doc.text(`Kenteken: ${inr.kenteken}`, ml, y);
-      y += 5;
-    }
-    doc.text(`Inruilwaarde: ${formatEur(inr.waarde)}`, ml, y);
-    y += 10;
+  const inruilHtml = data.inruil
+    ? `
+    <div class="section">
+      <div class="section-label">Inruilvoertuig</div>
+      <div class="grid-2">
+        <div>
+          <div class="kv-label">Voertuig</div>
+          <div class="kv-value">${escapeHtml(`${data.inruil.merk || ""} ${data.inruil.model || ""}`.trim() || "-")}</div>
+        </div>
+        <div>
+          <div class="kv-label">Kenteken</div>
+          <div class="kv-value">${escapeHtml(formatKenteken(data.inruil.kenteken))}</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="kv-label">Inruilwaarde</div>
+        <div class="kv-value">${escapeHtml(formatEur(data.inruil.waarde))}</div>
+      </div>
+    </div>`
+    : "";
+
+  return `<!doctype html>
+<html><head><meta charset="utf-8"/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #111; background: #fff; }
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
   }
 
-  // Bedragen
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text("Financieel", ml, y);
-  y += 6;
+  /* HEADER */
+  .header {
+    background: #111;
+    color: #fff;
+    padding: 28px 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .brand-name { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+  .brand-meta { font-size: 11px; color: #b8b8b8; line-height: 1.6; margin-top: 6px; }
+  .doc-label { text-align: right; }
+  .doc-label .type { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #fff; }
+  .doc-label .nr { font-size: 11px; color: #b8b8b8; margin-top: 6px; }
+  .doc-label .date { font-size: 11px; color: #b8b8b8; margin-top: 2px; }
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  const drawRow = (label: string, value: string, bold = false) => {
-    doc.setFont("helvetica", bold ? "bold" : "normal");
-    doc.text(label, ml, y);
-    doc.text(value, ml + cw, y, { align: "right" });
-    y += 6;
-  };
-  drawRow("Verkoopprijs", formatEur(data.verkoopprijs));
-  if (data.inruil) drawRow("Inruilwaarde", `- ${formatEur(data.inruil.waarde)}`);
-  drawRow("Aanbetalingsbedrag", `- ${formatEur(data.aanbetalingsbedrag)}`, true);
-  if (data.betaalwijze) drawRow("Betaalmethode", data.betaalwijze);
-  // Separator line
-  doc.setDrawColor(180);
-  doc.line(ml, y - 2, ml + cw, y - 2);
-  drawRow("Restbedrag", formatEur(data.restbedrag), true);
-  drawRow("Verwachte leverdatum", formatDate(data.leverdatum));
-  y += 6;
+  /* CONTENT */
+  .content { padding: 36px 56px 0; flex: 1; }
 
-  // Klant naam
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text("Klantgegevens", ml, y);
-  y += 8;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text("Naam klant:", ml, y);
-  doc.line(ml + 30, y + 1, ml + cw, y + 1);
-  if (data.klantNaam) doc.text(data.klantNaam, ml + 32, y);
-  y += 20;
+  .title { font-size: 28px; font-weight: 700; color: #111; letter-spacing: -0.5px; }
+  .subtitle { font-size: 13px; color: #6b6b6b; margin-top: 8px; line-height: 1.55; max-width: 540px; }
 
-  // Handtekeningen
-  const sigW = (cw - 10) / 2;
-  doc.setFontSize(10);
-  doc.text("Handtekening klant:", ml, y);
-  doc.text("Handtekening Platin Automotive:", ml + sigW + 10, y);
-  y += 22;
-  doc.line(ml, y, ml + sigW, y);
-  doc.line(ml + sigW + 10, y, ml + cw, y);
-  y += 20;
+  /* AMOUNT CARD */
+  .amount-card {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 22px 26px;
+    margin-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .amount-card .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #6b6b6b;
+  }
+  .amount-card .amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111;
+    margin-top: 8px;
+    letter-spacing: -1px;
+  }
+  .amount-card .right { text-align: right; }
+  .badge {
+    display: inline-block;
+    background: #16a34a;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    padding: 6px 14px;
+    border-radius: 4px;
+  }
+  .amount-card .received { font-size: 11px; color: #6b6b6b; margin-top: 10px; }
 
-  // Footer
-  doc.setFontSize(9);
-  doc.setTextColor(120);
-  doc.text(
-    "Dit bewijs is opgesteld door Platin Automotive",
-    pw / 2,
-    285,
-    { align: "center" }
-  );
+  /* SECTIONS */
+  .section { margin-top: 32px; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    color: #6b6b6b;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 14px;
+  }
 
-  return doc;
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .kv-label { font-size: 11px; color: #6b6b6b; margin-bottom: 3px; }
+  .kv-value { font-size: 13px; font-weight: 600; color: #111; }
+  .kv + .kv { margin-top: 12px; }
+
+  /* FINANCIAL TABLE */
+  .fin-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 4px;
+    border-bottom: 1px solid #eee;
+    font-size: 12.5px;
+  }
+  .fin-row .lbl { color: #111; }
+  .fin-row .val { color: #111; font-weight: 500; }
+  .fin-row.muted .lbl, .fin-row.muted .val { color: #6b6b6b; }
+  .fin-row.bold .lbl, .fin-row.bold .val { font-weight: 700; }
+  .fin-row.total {
+    background: #f5f5f5;
+    border-bottom: none;
+    border-radius: 6px;
+    padding: 14px 14px;
+    margin-top: 6px;
+    font-size: 14px;
+  }
+  .fin-row.total .lbl, .fin-row.total .val { font-weight: 700; }
+
+  /* CONFIRMATION */
+  .confirm {
+    margin-top: 32px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .confirm .left { display: flex; align-items: center; gap: 14px; }
+  .check {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .confirm .title-sm { font-size: 13px; font-weight: 700; color: #111; }
+  .confirm .desc { font-size: 11px; color: #6b6b6b; margin-top: 3px; line-height: 1.5; }
+  .confirm .right { text-align: right; }
+  .confirm .right .lbl { font-size: 10px; color: #6b6b6b; }
+  .confirm .right .val { font-size: 12px; font-weight: 700; color: #111; margin-top: 3px; }
+
+  /* FOOTER */
+  .footer {
+    margin-top: auto;
+    padding: 18px 56px 24px;
+    border-top: 1px solid #e5e5e5;
+    text-align: center;
+    color: #8a8a8a;
+    font-size: 10px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div>
+      <div class="brand-name">PLATIN AUTOMOTIVE</div>
+      <div class="brand-meta">
+        Cilinderweg 99 · 2371 DZ Roelofarendsveen · 06 8282 3050<br/>
+        info@platinautomotive.nl · www.platinautomotive.nl · KvK 99146193
+      </div>
+    </div>
+    <div class="doc-label">
+      <div class="type">AANBETALINGSBEWIJS</div>
+      ${data.bewijsNummer ? `<div class="nr">Nr. ${escapeHtml(data.bewijsNummer)}</div>` : ""}
+      <div class="date">${escapeHtml(formatDate(data.datum))}</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="title">Aanbetaling ontvangen</div>
+    <div class="subtitle">
+      Hierbij bevestigen wij de ontvangst van uw aanbetaling voor het hieronder vermelde voertuig.
+      Dit document dient als officieel ontvangstbewijs.
+    </div>
+
+    <div class="amount-card">
+      <div>
+        <div class="label">ONTVANGEN AANBETALING</div>
+        <div class="amount">${escapeHtml(formatEur(data.aanbetalingsbedrag))}</div>
+      </div>
+      <div class="right">
+        <span class="badge">BETAALD</span>
+        <div class="received">Ontvangen op ${escapeHtml(formatDate(data.datum))}</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 32px;">
+      <div>
+        <div class="section-label">Klantgegevens</div>
+        <div class="kv">
+          <div class="kv-label">Naam</div>
+          <div class="kv-value">${escapeHtml(data.klantNaam || "-")}</div>
+        </div>
+        ${
+          data.klantEmail
+            ? `<div class="kv"><div class="kv-label">E-mail</div><div class="kv-value">${escapeHtml(data.klantEmail)}</div></div>`
+            : ""
+        }
+      </div>
+      <div>
+        <div class="section-label">Voertuig</div>
+        <div class="kv">
+          <div class="kv-label">Merk &amp; model</div>
+          <div class="kv-value">${escapeHtml(voertuigText)}</div>
+        </div>
+        <div class="kv">
+          <div class="kv-label">Kenteken</div>
+          <div class="kv-value">${escapeHtml(formatKenteken(v.kenteken))}</div>
+        </div>
+        ${
+          v.bouwjaar
+            ? `<div class="kv"><div class="kv-label">Bouwjaar</div><div class="kv-value">${v.bouwjaar}</div></div>`
+            : ""
+        }
+      </div>
+    </div>
+
+    ${inruilHtml}
+
+    <div class="section">
+      <div class="section-label">Financieel overzicht</div>
+      <div class="fin-row">
+        <div class="lbl">Verkoopprijs voertuig</div>
+        <div class="val">${escapeHtml(formatEur(data.verkoopprijs))}</div>
+      </div>
+      ${
+        data.inruil
+          ? `<div class="fin-row muted"><div class="lbl">Inruilwaarde</div><div class="val">- ${escapeHtml(formatEur(data.inruil.waarde))}</div></div>`
+          : ""
+      }
+      <div class="fin-row bold">
+        <div class="lbl">Reeds aanbetaald</div>
+        <div class="val">- ${escapeHtml(formatEur(data.aanbetalingsbedrag))}</div>
+      </div>
+      ${
+        data.betaalwijze
+          ? `<div class="fin-row muted"><div class="lbl">Betaalmethode</div><div class="val">${escapeHtml(data.betaalwijze)}</div></div>`
+          : ""
+      }
+      <div class="fin-row total">
+        <div class="lbl">Resterend te voldoen bij levering</div>
+        <div class="val">${escapeHtml(formatEur(data.restbedrag))}</div>
+      </div>
+      ${
+        data.leverdatum
+          ? `<div class="fin-row" style="border-bottom:none; margin-top:6px;"><div class="lbl" style="color:#6b6b6b;">Verwachte leverdatum</div><div class="val">${escapeHtml(formatDate(data.leverdatum))}</div></div>`
+          : ""
+      }
+    </div>
+
+    <div class="confirm">
+      <div class="left">
+        <div class="check">✓</div>
+        <div>
+          <div class="title-sm">Digitaal bevestigd</div>
+          <div class="desc">
+            Deze aanbetaling is op afstand voldaan en automatisch verwerkt.<br/>
+            Een fysieke handtekening is daarom niet vereist.
+          </div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="lbl">Bevestigd op</div>
+        <div class="val">${escapeHtml(formatDate(data.datum))}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Platin Automotive · Cilinderweg 99, 2371 DZ Roelofarendsveen · KvK 99146193<br/>
+    Dit is een automatisch gegenereerd document en is geldig zonder handtekening.
+  </div>
+</div>
+</body></html>`;
 }
 
-export function openAanbetalingsbewijsPdf(data: AanbetalingsbewijsData) {
-  const doc = generateAanbetalingsbewijsPdf(data);
+async function renderToPdf(data: AanbetalingsbewijsData): Promise<jsPDF> {
+  const html = buildHtml(data);
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.left = "-10000px";
+  container.style.top = "0";
+  container.style.width = "794px";
+  container.style.background = "#ffffff";
+  container.innerHTML = html;
+  document.body.appendChild(container);
+
+  try {
+    const target = container.querySelector(".page") as HTMLElement | null;
+    const node = target || container;
+
+    const canvas = await html2canvas(node, {
+      scale: 2,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      windowWidth: 794,
+    });
+    const imgData = canvas.toDataURL("image/jpeg", 0.95);
+
+    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pageW = 210;
+    const pageH = 297;
+    const imgWmm = pageW;
+    const imgHmm = (canvas.height * imgWmm) / canvas.width;
+    const finalH = Math.min(imgHmm, pageH);
+    const finalW = (canvas.width * finalH) / canvas.height;
+    const x = (pageW - finalW) / 2;
+    pdf.addImage(imgData, "JPEG", x, 0, finalW, finalH);
+    return pdf;
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
+export async function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): Promise<jsPDF> {
+  return renderToPdf(data);
+}
+
+export async function openAanbetalingsbewijsPdf(data: AanbetalingsbewijsData) {
+  const doc = await renderToPdf(data);
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   window.open(url, "_blank");
