@@ -3,7 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { toast } from "sonner";
-import { Loader2, Wallet, X, Download, CheckCircle2 } from "lucide-react";
+import { Loader2, Wallet, X, Download, CheckCircle2, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import AanbetalingMoneybirdDialog from "./AanbetalingMoneybirdDialog";
 import { generateAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
 
@@ -255,30 +262,36 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
     const isBetaald = active.status === "betaald";
     return (
       <>
-        <span className="inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium rounded-md border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 min-h-[36px]">
-          <Wallet className="w-3.5 h-3.5" />
-          Aanbetaling {isBetaald ? "ontvangen" : "open"} — {formatEuroDecimal(active.aanbetalingsbedrag)}
-        </span>
-
-        {!isBetaald && (
-          <button onClick={() => setConfirmReceived(true)} className={btnCls + " !border-emerald-500/30 !text-emerald-400"}>
-            <CheckCircle2 className="w-3.5 h-3.5" /> Markeer als ontvangen
-          </button>
-        )}
-
-        <button onClick={handleDownloadFactuur} disabled={busy} className={btnCls} title="Aanbetalingsfactuur downloaden">
-          <Download className="w-3.5 h-3.5" /> Factuur
-        </button>
-
-        {isBetaald && active.bewijs_pdf_path && (
-          <button onClick={handleDownloadBewijs} disabled={busy} className={btnCls} title="Aanbetalingsbewijs openen">
-            <Download className="w-3.5 h-3.5" /> Bewijs
-          </button>
-        )}
-
-        <button onClick={() => setConfirmCancel(true)} className={btnCls + " !border-rose-500/30 !text-rose-400"}>
-          <X className="w-3.5 h-3.5" /> Annuleren
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={btnCls + " !border-emerald-500/30 !text-emerald-400 hover:!bg-emerald-500/10"}
+            >
+              <Wallet className="w-3.5 h-3.5" />
+              Aanbetaling {isBetaald ? "ontvangen" : "open"} — {formatEuroDecimal(active.aanbetalingsbedrag)}
+              <ChevronDown className="w-3 h-3" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="p-1.5 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
+            {!isBetaald && (
+              <DropdownMenuItem onClick={() => setConfirmReceived(true)} className="flex items-center gap-2.5 text-emerald-400 focus:text-emerald-400">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Markeer als ontvangen
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onClick={handleDownloadFactuur} disabled={busy} className="flex items-center gap-2.5">
+              <Download className="w-3.5 h-3.5" /> Download factuur
+            </DropdownMenuItem>
+            {isBetaald && active.bewijs_pdf_path && (
+              <DropdownMenuItem onClick={handleDownloadBewijs} disabled={busy} className="flex items-center gap-2.5">
+                <Download className="w-3.5 h-3.5" /> Download aanbetalingsbewijs
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setConfirmCancel(true)} className="flex items-center gap-2.5 text-rose-400 focus:text-rose-400">
+              <X className="w-3.5 h-3.5" /> Annuleren
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {confirmReceived && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
