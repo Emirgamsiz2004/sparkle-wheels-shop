@@ -40,7 +40,70 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
   const [bedrag, setBedrag] = useState<number | "">("");
   const [notities, setNotities] = useState("");
 
-  if (!open) return null;
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto admin-theme">
+        <DialogHeader>
+          <DialogTitle>Aanbetaling op afstand</DialogTitle>
+          <DialogDescription>
+            Verstuur een Moneybird-aanbetalingsfactuur naar de klant
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          <div className="px-4 py-3 bg-secondary/40 rounded-2xl border border-border text-xs text-muted-foreground">
+            <strong className="text-foreground font-medium">Voertuig:</strong>{" "}
+            {vehicle.merk} {vehicle.model} {vehicle.bouwjaar} — {vehicle.kenteken} —{" "}
+            {formatEuroDecimal(vehicle.verkoopprijs)}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Voornaam *" value={voornaam} onChange={setVoornaam} />
+            <Field label="Achternaam *" value={achternaam} onChange={setAchternaam} />
+          </div>
+          <Field label="E-mailadres *" value={email} onChange={setEmail} type="email" />
+          <Field label="Telefoonnummer" value={telefoon} onChange={setTelefoon} />
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1.5">Aanbetalingsbedrag (€) *</label>
+            <input
+              type="number"
+              min={1}
+              value={bedrag}
+              onChange={(e) => setBedrag(e.target.value === "" ? "" : Number(e.target.value))}
+              className={inputCls}
+              placeholder="0"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1.5">Notities (intern)</label>
+            <textarea
+              value={notities}
+              onChange={(e) => setNotities(e.target.value)}
+              rows={3}
+              className={inputCls}
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <button onClick={onClose} className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl">
+            Annuleren
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={saving || !isValid}
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium border border-emerald-500/30 text-emerald-400 rounded-xl hover:bg-emerald-500/10 active:scale-[0.97] transition-all disabled:opacity-50"
+          >
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+            Aanbetalingsfactuur aanmaken & versturen
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  // legacy unused
+  // eslint-disable-next-line
 
   const isValid =
     voornaam.trim() && achternaam.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && Number(bedrag) > 0;
