@@ -161,7 +161,7 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-border">
+        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-border shrink-0">
           <button onClick={onClose} className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl">
             Annuleren
           </button>
