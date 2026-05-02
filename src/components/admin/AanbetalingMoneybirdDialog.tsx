@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { Loader2, X, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const WORKFLOW_IDS = {
   marge_geen: "482837428008126425",
@@ -32,10 +40,11 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
   const [bedrag, setBedrag] = useState<number | "">("");
   const [notities, setNotities] = useState("");
 
-  if (!open) return null;
-
   const isValid =
-    voornaam.trim() && achternaam.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && Number(bedrag) > 0;
+    !!voornaam.trim() &&
+    !!achternaam.trim() &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
+    Number(bedrag) > 0;
 
   const handleSubmit = async () => {
     if (!isValid) {
@@ -66,7 +75,6 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
       const contact = res?.contact;
       if (!invoice?.id) throw new Error("Geen factuur ontvangen");
 
-      // 1) Save in aanbetalingen
       await supabase.from("aanbetalingen").insert({
         vehicle_id: vehicle.id,
         klant_voornaam: voornaam,
@@ -88,13 +96,11 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
         bron: "moneybird",
       } as any);
 
-      // 2) Update vehicle flag
       await supabase.from("vehicles").update({
         heeft_aanbetaling: true,
         aanbetalingsbedrag: Number(bedrag),
       } as any).eq("id", vehicle.id);
 
-      // 3) Activity log
       await supabase.from("vehicle_activity_log").insert({
         vehicle_id: vehicle.id,
         actie_type: "aanbetaling_aangemaakt",
@@ -112,21 +118,16 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm md:p-4 overflow-y-auto">
-      <div className="bg-background border border-border rounded-t-2xl md:rounded-2xl w-full max-w-xl md:my-8 flex flex-col max-h-[95vh]">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border shrink-0">
-          <div>
-            <h2 className="text-base font-medium">Aanbetaling op afstand</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Verstuur een Moneybird-aanbetalingsfactuur naar de klant
-            </p>
-          </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto admin-theme">
+        <DialogHeader>
+          <DialogTitle>Aanbetaling op afstand</DialogTitle>
+          <DialogDescription>
+            Verstuur een Moneybird-aanbetalingsfactuur naar de klant
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="px-6 py-5 space-y-4 flex-1 overflow-y-auto min-h-0">
+        <div className="space-y-4 py-2">
           <div className="px-4 py-3 bg-secondary/40 rounded-2xl border border-border text-xs text-muted-foreground">
             <strong className="text-foreground font-medium">Voertuig:</strong>{" "}
             {vehicle.merk} {vehicle.model} {vehicle.bouwjaar} — {vehicle.kenteken} —{" "}
@@ -161,8 +162,11 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-border shrink-0">
-          <button onClick={onClose} className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl">
+        <DialogFooter className="gap-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-xl"
+          >
             Annuleren
           </button>
           <button
@@ -173,9 +177,9 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
             Aanbetalingsfactuur aanmaken & versturen
           </button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
