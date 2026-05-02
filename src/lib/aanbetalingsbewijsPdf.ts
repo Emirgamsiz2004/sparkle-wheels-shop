@@ -256,9 +256,9 @@ export function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): jsP
 
   fRow("Verkoopprijs voertuig", formatEur(data.verkoopprijs));
   if (data.inruil) {
-    fRow("Inruilwaarde", `− ${formatEur(data.inruil.waarde)}`, { muted: true });
+    fRow("Inruilwaarde", `- ${formatEur(data.inruil.waarde)}`, { muted: true });
   }
-  fRow("Reeds aanbetaald", `− ${formatEur(data.aanbetalingsbedrag)}`, { bold: true });
+  fRow("Reeds aanbetaald", `- ${formatEur(data.aanbetalingsbedrag)}`, { bold: true });
   if (data.betaalwijze) {
     fRow("Betaalmethode", data.betaalwijze, { muted: true });
   }
