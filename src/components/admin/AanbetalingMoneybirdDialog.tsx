@@ -112,9 +112,9 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm overflow-y-auto md:p-4">
-      <div className="bg-background border border-border rounded-t-2xl md:rounded-2xl w-full max-w-xl md:my-8">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm md:p-4 overflow-y-auto">
+      <div className="bg-background border border-border rounded-t-2xl md:rounded-2xl w-full max-w-xl md:my-8 flex flex-col max-h-[95vh]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border shrink-0">
           <div>
             <h2 className="text-base font-medium">Aanbetaling op afstand</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
