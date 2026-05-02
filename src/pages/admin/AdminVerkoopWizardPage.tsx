@@ -2215,6 +2215,22 @@ const Stap2Aflevering = (p: Stap2Props) => {
               {isAflevering ? "Betaling vooraf" : "Aanbetaling"}
             </div>
 
+            {p.aanbetalingExtern && !p.aanbetalingExtern.geannuleerd && (
+              <div className="rounded-[10px] border border-emerald-700/40 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-200 leading-relaxed">
+                ✓ Aanbetaling op afstand ontvangen via Moneybird:{" "}
+                <strong>
+                  {new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(p.aanbetalingExtern.bedrag)}
+                </strong>{" "}
+                ({p.aanbetalingExtern.status === "betaald" ? "betaald" : "open"}). Het bedrag wordt automatisch verrekend.
+              </div>
+            )}
+
+            {p.aanbetalingExtern?.geannuleerd && (
+              <div className="rounded-[10px] border border-orange-700/40 bg-orange-950/30 px-4 py-3 text-sm text-orange-200 leading-relaxed">
+                ⚠ Aanbetaling op afstand is geannuleerd. Vul hieronder een nieuwe aanbetaling in of laat leeg.
+              </div>
+            )}
+
             {isAflevering ? (
               <>
                 <div className="rounded-[10px] border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground leading-relaxed">
@@ -2246,7 +2262,8 @@ const Stap2Aflevering = (p: Stap2Props) => {
                     onChange={(e) =>
                       p.setAanbetalingBedrag(e.target.value === "" ? "" : Number(e.target.value))
                     }
-                    className={inputCls}
+                    readOnly={!!p.aanbetalingExtern && !p.aanbetalingExtern.geannuleerd}
+                    className={cn(inputCls, !!p.aanbetalingExtern && !p.aanbetalingExtern.geannuleerd && "bg-muted/40 cursor-not-allowed")}
                     placeholder="0"
                   />
                   <div className="mt-2 flex items-center justify-between text-sm">
@@ -2263,16 +2280,20 @@ const Stap2Aflevering = (p: Stap2Props) => {
                 <div>
                   <label className={labelCls}>Betaalmethode</label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {(["cash", "pin", "ideal", "overboeking"] as const).map((m) => (
-                      <button
-                        type="button"
-                        key={m}
-                        onClick={() => p.setAanbetalingBetaalwijze(m)}
-                        className={payCls(p.aanbetalingBetaalwijze === m)}
-                      >
-                        {m === "cash" ? "Cash" : m === "pin" ? "Pin" : m === "ideal" ? "iDEAL" : "Overboeking"}
-                      </button>
-                    ))}
+                    {(["cash", "pin", "ideal", "overboeking"] as const).map((m) => {
+                      const locked = !!p.aanbetalingExtern && !p.aanbetalingExtern.geannuleerd;
+                      return (
+                        <button
+                          type="button"
+                          key={m}
+                          onClick={() => !locked && p.setAanbetalingBetaalwijze(m)}
+                          disabled={locked}
+                          className={cn(payCls(p.aanbetalingBetaalwijze === m), locked && "opacity-60 cursor-not-allowed")}
+                        >
+                          {m === "cash" ? "Cash" : m === "pin" ? "Pin" : m === "ideal" ? "iDEAL" : "Overboeking"}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
