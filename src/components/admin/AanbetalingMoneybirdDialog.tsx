@@ -48,8 +48,7 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
     }
     setSaving(true);
     try {
-      const isBtw = vehicle.btwMargeType === "btw";
-      const workflow_id = isBtw ? WORKFLOW_IDS.btw_geen : WORKFLOW_IDS.marge_geen;
+      const workflow_id = AANBETALING_WORKFLOW_ID;
 
       const res = await invoke("create_aanbetaling_invoice", {
         voornaam,
