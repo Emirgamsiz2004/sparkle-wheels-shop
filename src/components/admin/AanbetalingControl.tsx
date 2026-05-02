@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { useMoneybird } from "@/hooks/useMoneybird";
@@ -293,10 +294,10 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {confirmReceived && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
-            <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-              <h3 className="text-base font-medium">Aanbetaling als ontvangen markeren?</h3>
+        {confirmReceived && createPortal(
+          <div className="admin-theme fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4" onClick={() => !busy && setConfirmReceived(false)}>
+            <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-base font-medium text-foreground">Aanbetaling als ontvangen markeren?</h3>
               <p className="text-sm text-muted-foreground">
                 Dit bevestigt dat de aanbetaling van <strong className="text-foreground">{formatEuroDecimal(active.aanbetalingsbedrag)}</strong> is ontvangen.
                 Er wordt automatisch een aanbetalingsbewijs gegenereerd en per e-mail verstuurd naar{" "}
@@ -316,13 +317,14 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
-        {confirmCancel && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
-            <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-              <h3 className="text-base font-medium">Aanbetaling annuleren?</h3>
+        {confirmCancel && createPortal(
+          <div className="admin-theme fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4" onClick={() => !busy && (setConfirmCancel(false), setCancelMode(null))}>
+            <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-base font-medium text-foreground">Aanbetaling annuleren?</h3>
               <p className="text-sm text-muted-foreground">
                 Aanbetaling van <strong className="text-foreground">{formatEuroDecimal(active.aanbetalingsbedrag)}</strong>.
                 Kies hoe je deze wilt annuleren:
@@ -377,7 +379,8 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </>
     );
