@@ -555,49 +555,55 @@ Deno.serve(async (req) => {
         if (!email) throw new Error("email is required");
         if (!bedrag || Number(bedrag) <= 0) throw new Error("bedrag is required");
 
-        // 1) Contact zoeken op email
-        let contact: any = null;
+        // 1) Altijd een nieuw contact aanmaken voor de aanbetaling — geen adres
+        //    zodat het factuur geen oude adresgegevens van een bestaand contact toont.
+        const cp: Record<string, unknown> = {
+          company_name: `${voornaam || ""} ${achternaam || ""}`.trim() || email,
+          firstname: voornaam || undefined,
+          lastname: achternaam || undefined,
+          phone: telefoon || undefined,
+          send_invoices_to_email: email,
+          send_estimates_to_email: email,
+          country: "NL",
+        };
+        const contact = await mbFetch("contacts.json", {
+          method: "POST",
+          body: JSON.stringify({ contact: cp }),
+        });
+
+        // 2) 0%-BTW tarief opzoeken (aanbetaling = geen BTW)
+        let zeroTaxRateId: string | undefined;
         try {
-          const found = await mbFetch(`contacts.json?query=${encodeURIComponent(email)}`);
-          if (Array.isArray(found) && found.length > 0) {
-            contact = found.find((c: any) =>
-              (c.email && c.email.toLowerCase() === String(email).toLowerCase()) ||
-              (c.send_invoices_to_email && c.send_invoices_to_email.toLowerCase() === String(email).toLowerCase())
-            ) || found[0];
+          const taxRates = await mbFetch("tax_rates.json");
+          if (Array.isArray(taxRates)) {
+            const zero = taxRates.find((t: any) =>
+              (t.tax_rate_type === "sales_invoice" || t.tax_rate_type === "general") &&
+              Number(t.percentage) === 0 &&
+              t.active !== false
+            ) || taxRates.find((t: any) => Number(t.percentage) === 0);
+            if (zero) zeroTaxRateId = String(zero.id);
           }
         } catch (e) {
-          console.warn("contact search failed:", e);
-        }
-        if (!contact) {
-          const cp: Record<string, unknown> = {
-            company_name: `${voornaam || ""} ${achternaam || ""}`.trim() || email,
-            firstname: voornaam || undefined,
-            lastname: achternaam || undefined,
-            phone: telefoon || undefined,
-            send_invoices_to_email: email,
-            send_estimates_to_email: email,
-            country: "NL",
-          };
-          contact = await mbFetch("contacts.json", {
-            method: "POST",
-            body: JSON.stringify({ contact: cp }),
-          });
+          console.warn("Kon tax_rates niet ophalen voor aanbetaling:", e);
         }
 
-        // 2) Aanbetalingsfactuur aanmaken
+        // 3) Aanbetalingsfactuur aanmaken (zonder BTW)
         const today = new Date().toISOString().split("T")[0];
         const due = new Date(Date.now() + 3 * 86400000).toISOString().split("T")[0];
+        const detail: Record<string, unknown> = {
+          description: aDesc || `Aanbetaling ${vehicle?.merk || ""} ${vehicle?.model || ""} (${vehicle?.bouwjaar || ""}) — kenteken ${vehicle?.kenteken || ""}`.trim(),
+          price: String(bedrag),
+          amount: "1",
+        };
+        if (zeroTaxRateId) detail.tax_rate_id = zeroTaxRateId;
+
         const invoiceBody: Record<string, unknown> = {
           contact_id: contact.id,
           reference: aRef || `Aanbetaling ${vehicle?.kenteken || ""} ${vehicle?.merk || ""} ${vehicle?.model || ""}`.trim(),
           invoice_date: today,
           due_date: due,
-          prices_are_incl_tax: true,
-          details_attributes: [{
-            description: aDesc || `Aanbetaling ${vehicle?.merk || ""} ${vehicle?.model || ""} (${vehicle?.bouwjaar || ""}) — kenteken ${vehicle?.kenteken || ""}`.trim(),
-            price: String(bedrag),
-            amount: "1",
-          }],
+          prices_are_incl_tax: false,
+          details_attributes: [detail],
         };
         if (aWorkflow) invoiceBody.workflow_id = String(aWorkflow);
 
@@ -606,7 +612,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({ sales_invoice: invoiceBody }),
         });
 
-        // 3) Versturen via email
+        // 4) Versturen via email
         try {
           await mbFetch(`sales_invoices/${invoice.id}/send_invoice.json`, {
             method: "PATCH",
