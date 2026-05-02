@@ -113,7 +113,7 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto admin-theme">
+      <DialogContent className="max-w-xl max-h-[80vh] sm:max-h-[75vh] overflow-y-auto admin-theme my-8">
         <DialogHeader>
           <DialogTitle>Aanbetaling op afstand</DialogTitle>
           <DialogDescription>
