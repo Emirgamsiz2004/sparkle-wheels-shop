@@ -19,6 +19,7 @@ import { template as afspraakBevestiging } from './afspraak-bevestiging.tsx'
 import { template as afspraakAanvraagOntvangen } from './afspraak-aanvraag-ontvangen.tsx'
 import { template as afspraakNotificatieAdmin } from './afspraak-notificatie-admin.tsx'
 import { template as afspraakAfwijzing } from './afspraak-afwijzing.tsx'
+import { template as aanbetalingsbewijs } from './aanbetalingsbewijs.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'proefrit-overeenkomst': proefritOvereenkomst,
@@ -31,4 +32,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'afspraak-aanvraag-ontvangen': afspraakAanvraagOntvangen,
   'afspraak-notificatie-admin': afspraakNotificatieAdmin,
   'afspraak-afwijzing': afspraakAfwijzing,
+  'aanbetalingsbewijs': aanbetalingsbewijs,
 }
