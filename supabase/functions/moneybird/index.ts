@@ -663,16 +663,7 @@ Deno.serve(async (req) => {
           }),
         });
 
-        try {
-          await mbFetch(`sales_invoices/${credit.id}/send_invoice.json`, {
-            method: "PATCH",
-            body: JSON.stringify({
-              sales_invoice_sending: { delivery_method: "Email", sending_scheduled_at: null },
-            }),
-          });
-        } catch (e) {
-          console.error("credit send_invoice failed:", e);
-        }
+        // Creditnota blijft intern in Moneybird (niet automatisch naar klant gemaild)
 
         const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
         result = { credit_invoice: credit, moneybird_url: `https://moneybird.com/${adminId}/sales_invoices/${credit.id}` };
