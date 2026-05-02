@@ -17,19 +17,27 @@ export type Database = {
       aanbetalingen: {
         Row: {
           aanbetalingsbedrag: number
+          betaald_op: string | null
+          bron: string
           created_at: string
           datum: string
+          geannuleerd_op: string | null
           id: string
           klant_achternaam: string
-          klant_adres: string
+          klant_adres: string | null
           klant_email: string
-          klant_postcode: string
-          klant_telefoon: string
+          klant_postcode: string | null
+          klant_telefoon: string | null
           klant_voornaam: string
-          klant_woonplaats: string
+          klant_woonplaats: string | null
+          moneybird_contact_id: string | null
+          moneybird_credit_invoice_id: string | null
+          moneybird_invoice_id: string | null
+          notities: string | null
           pdf_path: string | null
           plaats: string
           restbedrag: number
+          status: string
           uiterlijke_datum: string | null
           user_id: string | null
           vehicle_id: string
@@ -37,25 +45,33 @@ export type Database = {
           voertuig_bouwjaar: number | null
           voertuig_kenteken: string | null
           voertuig_kilometerstand: number | null
-          voertuig_merk: string
-          voertuig_model: string
+          voertuig_merk: string | null
+          voertuig_model: string | null
           voertuig_vin: string | null
         }
         Insert: {
           aanbetalingsbedrag?: number
+          betaald_op?: string | null
+          bron?: string
           created_at?: string
           datum?: string
+          geannuleerd_op?: string | null
           id?: string
           klant_achternaam: string
-          klant_adres: string
+          klant_adres?: string | null
           klant_email: string
-          klant_postcode: string
-          klant_telefoon: string
+          klant_postcode?: string | null
+          klant_telefoon?: string | null
           klant_voornaam: string
-          klant_woonplaats: string
+          klant_woonplaats?: string | null
+          moneybird_contact_id?: string | null
+          moneybird_credit_invoice_id?: string | null
+          moneybird_invoice_id?: string | null
+          notities?: string | null
           pdf_path?: string | null
           plaats?: string
           restbedrag?: number
+          status?: string
           uiterlijke_datum?: string | null
           user_id?: string | null
           vehicle_id: string
@@ -63,25 +79,33 @@ export type Database = {
           voertuig_bouwjaar?: number | null
           voertuig_kenteken?: string | null
           voertuig_kilometerstand?: number | null
-          voertuig_merk: string
-          voertuig_model: string
+          voertuig_merk?: string | null
+          voertuig_model?: string | null
           voertuig_vin?: string | null
         }
         Update: {
           aanbetalingsbedrag?: number
+          betaald_op?: string | null
+          bron?: string
           created_at?: string
           datum?: string
+          geannuleerd_op?: string | null
           id?: string
           klant_achternaam?: string
-          klant_adres?: string
+          klant_adres?: string | null
           klant_email?: string
-          klant_postcode?: string
-          klant_telefoon?: string
+          klant_postcode?: string | null
+          klant_telefoon?: string | null
           klant_voornaam?: string
-          klant_woonplaats?: string
+          klant_woonplaats?: string | null
+          moneybird_contact_id?: string | null
+          moneybird_credit_invoice_id?: string | null
+          moneybird_invoice_id?: string | null
+          notities?: string | null
           pdf_path?: string | null
           plaats?: string
           restbedrag?: number
+          status?: string
           uiterlijke_datum?: string | null
           user_id?: string | null
           vehicle_id?: string
@@ -89,8 +113,8 @@ export type Database = {
           voertuig_bouwjaar?: number | null
           voertuig_kenteken?: string | null
           voertuig_kilometerstand?: number | null
-          voertuig_merk?: string
-          voertuig_model?: string
+          voertuig_merk?: string | null
+          voertuig_model?: string | null
           voertuig_vin?: string | null
         }
         Relationships: [
@@ -2372,6 +2396,7 @@ export type Database = {
           google_drive_folder_id: string | null
           google_drive_folder_url: string | null
           google_drive_synced: boolean | null
+          heeft_aanbetaling: boolean
           id: string
           inkoop_datum: string | null
           inkoopprijs: number | null
@@ -2427,6 +2452,7 @@ export type Database = {
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
+          heeft_aanbetaling?: boolean
           id?: string
           inkoop_datum?: string | null
           inkoopprijs?: number | null
@@ -2482,6 +2508,7 @@ export type Database = {
           google_drive_folder_id?: string | null
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
+          heeft_aanbetaling?: boolean
           id?: string
           inkoop_datum?: string | null
           inkoopprijs?: number | null
