@@ -192,9 +192,11 @@ serve(async (req) => {
           bouwjaar: fv.bouwjaar,
           brandstof: fv.brandstof?.toLowerCase() || null,
           kilometerstand: fv.kilometerstand,
+          feed_kilometerstand: fv.kilometerstand,
           kleur: fv.kleur,
           kenteken: fv.kenteken,
           verkoopprijs: fv.verkoopprijs,
+          feed_verkoopprijs: fv.verkoopprijs,
           status: fv.feed_status,
           inkoop_datum: new Date().toISOString().split("T")[0],
         });
