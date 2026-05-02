@@ -209,6 +209,38 @@ const AdminVerkoopWizardPage = () => {
   const [restbedragVerwachteDatum, setRestbedragVerwachteDatum] = useState<string | null>(null);
   const [openstaandRestbedrag, setOpenstaandRestbedrag] = useState<number | null>(null);
 
+  // Aanbetaling op afstand (Moneybird)
+  const [aanbetalingExtern, setAanbetalingExtern] = useState<{ id: string; bedrag: number; status: string; geannuleerd: boolean } | null>(null);
+  useEffect(() => {
+    if (!vehicleId) return;
+    let cancelled = false;
+    const fetchAanbet = async () => {
+      const { data } = await supabase
+        .from("aanbetalingen")
+        .select("id, aanbetalingsbedrag, status")
+        .eq("vehicle_id", vehicleId)
+        .eq("bron", "moneybird")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (data && (data.status === "open" || data.status === "betaald")) {
+        setAanbetalingExtern({ id: data.id, bedrag: Number(data.aanbetalingsbedrag), status: data.status, geannuleerd: false });
+        setAanbetalingBedrag(Number(data.aanbetalingsbedrag));
+        setAanbetalingBetaalwijze("ideal");
+      } else if (data && data.status === "geannuleerd") {
+        setAanbetalingExtern({ id: data.id, bedrag: Number(data.aanbetalingsbedrag), status: "geannuleerd", geannuleerd: true });
+      }
+    };
+    fetchAanbet();
+    const ch = supabase.channel(`aanbet-${vehicleId}`).on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "aanbetalingen", filter: `vehicle_id=eq.${vehicleId}` },
+      () => fetchAanbet(),
+    ).subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [vehicleId]);
+
   // Stap 9 state — Inruil op naam
   const [inruilOpNaam, setInruilOpNaam] = useState<boolean>(false);
   const [inruilOpNaamAt, setInruilOpNaamAt] = useState<string | null>(null);

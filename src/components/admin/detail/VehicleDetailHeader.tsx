@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import AanbetalingControl from "@/components/admin/AanbetalingControl";
 
 interface Props {
   vehicle: Vehicle;
@@ -70,6 +71,8 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenKo
             <ShoppingCart className="w-3.5 h-3.5" /> Verkopen
           </button>
         )}
+
+        <AanbetalingControl vehicle={vehicle} />
 
         {onOpenAfspraak && (
           <DropdownMenu>
