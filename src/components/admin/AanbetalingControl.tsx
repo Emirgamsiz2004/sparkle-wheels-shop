@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { useMoneybird } from "@/hooks/useMoneybird";
