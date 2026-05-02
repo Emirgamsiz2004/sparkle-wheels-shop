@@ -45,6 +45,9 @@ const formatKenteken = (k?: string | null) => {
 
 export function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): jsPDF {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
+  doc.setCharSpace(0);
+  // jsPDF heeft een bug waarbij grote helvetica letters extra spacing krijgen — expliciet uitschakelen
+  (doc as any).internal.write("0 Tc");
   const pw = 210;
   const ph = 297;
   const ml = 18;
