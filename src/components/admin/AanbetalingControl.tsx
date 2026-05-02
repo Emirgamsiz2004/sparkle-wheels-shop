@@ -3,8 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { toast } from "sonner";
-import { Loader2, Wallet, X, Download } from "lucide-react";
+import { Loader2, Wallet, X, Download, CheckCircle2 } from "lucide-react";
 import AanbetalingMoneybirdDialog from "./AanbetalingMoneybirdDialog";
+import { generateAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
 
 interface Props {
   vehicle: Vehicle;
@@ -14,9 +15,19 @@ interface Props {
 interface Aanbetaling {
   id: string;
   aanbetalingsbedrag: number;
+  verkoopprijs: number | null;
+  restbedrag: number | null;
   status: string;
   moneybird_invoice_id: string | null;
   klant_email: string | null;
+  klant_voornaam: string | null;
+  klant_achternaam: string | null;
+  voertuig_merk: string | null;
+  voertuig_model: string | null;
+  voertuig_bouwjaar: number | null;
+  voertuig_kenteken: string | null;
+  bewijs_pdf_path: string | null;
+  betaald_op: string | null;
 }
 
 const btnCls =
@@ -26,13 +37,14 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
   const { invoke } = useMoneybird();
   const [open, setOpen] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmReceived, setConfirmReceived] = useState(false);
   const [active, setActive] = useState<Aanbetaling | null>(null);
   const [busy, setBusy] = useState(false);
 
   const load = async () => {
     const { data } = await supabase
       .from("aanbetalingen")
-      .select("id, aanbetalingsbedrag, status, moneybird_invoice_id, klant_email")
+      .select("id, aanbetalingsbedrag, verkoopprijs, restbedrag, status, moneybird_invoice_id, klant_email, klant_voornaam, klant_achternaam, voertuig_merk, voertuig_model, voertuig_bouwjaar, voertuig_kenteken, bewijs_pdf_path, betaald_op")
       .eq("vehicle_id", vehicle.id)
       .in("status", ["open", "betaald"])
       .eq("bron", "moneybird")
@@ -79,7 +91,95 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
     setBusy(false);
   };
 
-  const handleDownload = async () => {
+  const handleMarkReceived = async () => {
+    if (!active) return;
+    setBusy(true);
+    try {
+      const klantNaam = `${active.klant_voornaam || ""} ${active.klant_achternaam || ""}`.trim() || "Klant";
+      const today = new Date().toISOString().slice(0, 10);
+      const verkoopprijs = Number(active.verkoopprijs || vehicle.verkoopprijs || 0);
+      const aanbetaling = Number(active.aanbetalingsbedrag || 0);
+      const restbedrag = Number(active.restbedrag ?? Math.max(0, verkoopprijs - aanbetaling));
+
+      // 1) Genereer PDF
+      const doc = generateAanbetalingsbewijsPdf({
+        voertuig: {
+          merk: active.voertuig_merk || vehicle.merk,
+          model: active.voertuig_model || vehicle.model,
+          bouwjaar: active.voertuig_bouwjaar || vehicle.bouwjaar,
+          kenteken: active.voertuig_kenteken || vehicle.kenteken,
+        },
+        klantNaam,
+        aanbetalingsbedrag: aanbetaling,
+        verkoopprijs,
+        restbedrag,
+        datum: today,
+      });
+      const pdfBlob = doc.output("blob");
+
+      // 2) Upload naar storage
+      const safeKenteken = (active.voertuig_kenteken || vehicle.kenteken || "voertuig").replace(/[^A-Za-z0-9-]/g, "");
+      const path = `aanbetalingen/${vehicle.id}/Aanbetalingsbewijs_${safeKenteken}_${active.id.slice(0, 8)}.pdf`;
+      const { error: upErr } = await supabase.storage
+        .from("vehicle-documents")
+        .upload(path, pdfBlob, { contentType: "application/pdf", upsert: true });
+      if (upErr) throw new Error(`Upload mislukt: ${upErr.message}`);
+
+      // 3) Signed URL voor in mail (7 dagen)
+      const { data: signed } = await supabase.storage
+        .from("vehicle-documents")
+        .createSignedUrl(path, 60 * 60 * 24 * 7);
+
+      // 4) Update DB
+      await supabase.from("aanbetalingen").update({
+        status: "betaald",
+        betaald_op: new Date().toISOString(),
+        bewijs_pdf_path: path,
+      } as any).eq("id", active.id);
+
+      // 5) Mail naar klant
+      if (active.klant_email && signed?.signedUrl) {
+        try {
+          await supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "aanbetalingsbewijs",
+              recipientEmail: active.klant_email,
+              idempotencyKey: `aanbetalingsbewijs-${active.id}`,
+              templateData: {
+                klantNaam,
+                voertuig: `${active.voertuig_merk || vehicle.merk} ${active.voertuig_model || vehicle.model} ${active.voertuig_bouwjaar || vehicle.bouwjaar || ""}`.trim(),
+                kenteken: active.voertuig_kenteken || vehicle.kenteken,
+                bedrag: formatEuroDecimal(aanbetaling),
+                datum: new Date().toLocaleDateString("nl-NL"),
+                pdfUrl: signed.signedUrl,
+              },
+            },
+          });
+        } catch (mailErr) {
+          console.error("Mail mislukt:", mailErr);
+          toast.warning("Aanbetalingsbewijs opgeslagen, maar mailen mislukt");
+        }
+      }
+
+      // 6) Activity log
+      await supabase.from("vehicle_activity_log").insert({
+        vehicle_id: vehicle.id,
+        actie_type: "aanbetaling_ontvangen",
+        beschrijving: `Aanbetaling €${aanbetaling.toFixed(0)} bevestigd ontvangen, bewijs verstuurd naar ${active.klant_email || "klant"}`,
+      } as any);
+
+      toast.success(`Aanbetaling bevestigd en bewijs verstuurd${active.klant_email ? ` naar ${active.klant_email}` : ""}`);
+      setConfirmReceived(false);
+      await load();
+      onChange?.();
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Bevestigen mislukt");
+    }
+    setBusy(false);
+  };
+
+  const handleDownloadFactuur = async () => {
     if (!active?.moneybird_invoice_id) {
       toast.error("Geen Moneybird factuur gekoppeld");
       return;
@@ -110,7 +210,7 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Aanbetaling_${vehicle.kenteken || vehicle.id}.pdf`;
+      a.download = `Aanbetalingsfactuur_${vehicle.kenteken || vehicle.id}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -121,24 +221,83 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
     setBusy(false);
   };
 
+  const handleDownloadBewijs = async () => {
+    if (!active?.bewijs_pdf_path) {
+      toast.error("Geen aanbetalingsbewijs beschikbaar");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.storage
+        .from("vehicle-documents")
+        .createSignedUrl(active.bewijs_pdf_path, 60);
+      if (error || !data) throw new Error(error?.message || "Geen URL");
+      window.open(data.signedUrl, "_blank");
+    } catch (e: any) {
+      toast.error(e.message || "Openen mislukt");
+    }
+    setBusy(false);
+  };
+
   if (!allowed && !active) return null;
 
   if (active) {
+    const isBetaald = active.status === "betaald";
     return (
       <>
         <span className="inline-flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium rounded-md border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 min-h-[36px]">
           <Wallet className="w-3.5 h-3.5" />
-          Aanbetaling {active.status === "betaald" ? "ontvangen" : "open"} — {formatEuroDecimal(active.aanbetalingsbedrag)}
+          Aanbetaling {isBetaald ? "ontvangen" : "open"} — {formatEuroDecimal(active.aanbetalingsbedrag)}
         </span>
-        <button onClick={handleDownload} disabled={busy} className={btnCls} title="Factuur downloaden">
+
+        {!isBetaald && (
+          <button onClick={() => setConfirmReceived(true)} className={btnCls + " !border-emerald-500/30 !text-emerald-400"}>
+            <CheckCircle2 className="w-3.5 h-3.5" /> Markeer als ontvangen
+          </button>
+        )}
+
+        <button onClick={handleDownloadFactuur} disabled={busy} className={btnCls} title="Aanbetalingsfactuur downloaden">
           <Download className="w-3.5 h-3.5" /> Factuur
         </button>
+
+        {isBetaald && active.bewijs_pdf_path && (
+          <button onClick={handleDownloadBewijs} disabled={busy} className={btnCls} title="Aanbetalingsbewijs openen">
+            <Download className="w-3.5 h-3.5" /> Bewijs
+          </button>
+        )}
+
         <button onClick={() => setConfirmCancel(true)} className={btnCls + " !border-rose-500/30 !text-rose-400"}>
-          <X className="w-3.5 h-3.5" /> Aanbetaling annuleren
+          <X className="w-3.5 h-3.5" /> Annuleren
         </button>
 
+        {confirmReceived && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div className="bg-background border border-border rounded-2xl max-w-md w-full p-6 space-y-4">
+              <h3 className="text-base font-medium">Aanbetaling als ontvangen markeren?</h3>
+              <p className="text-sm text-muted-foreground">
+                Dit bevestigt dat de aanbetaling van <strong className="text-foreground">{formatEuroDecimal(active.aanbetalingsbedrag)}</strong> is ontvangen.
+                Er wordt automatisch een aanbetalingsbewijs gegenereerd en per e-mail verstuurd naar{" "}
+                <strong className="text-foreground">{active.klant_email || "de klant"}</strong>.
+              </p>
+              <div className="flex justify-end gap-2 pt-2">
+                <button onClick={() => setConfirmReceived(false)} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground rounded-xl">
+                  Terug
+                </button>
+                <button
+                  onClick={handleMarkReceived}
+                  disabled={busy}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-emerald-500/30 text-emerald-400 rounded-xl hover:bg-emerald-500/10 disabled:opacity-50"
+                >
+                  {busy && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  Bevestig & verstuur bewijs
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {confirmCancel && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
             <div className="bg-background border border-border rounded-2xl max-w-sm w-full p-6 space-y-4">
               <h3 className="text-base font-medium">Aanbetaling annuleren?</h3>
               <p className="text-sm text-muted-foreground">

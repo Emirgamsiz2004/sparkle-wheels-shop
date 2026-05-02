@@ -1,0 +1,1 @@
+ALTER TABLE public.aanbetalingen ADD COLUMN IF NOT EXISTS bewijs_pdf_path text;
