@@ -62,15 +62,17 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
 
   const allowed = !["verkocht", "gereserveerd"].includes(vehicle.status);
 
-  const handleCancel = async () => {
+  const handleCancel = async (mode: "refund" | "no_refund") => {
     if (!active) return;
     setBusy(true);
     try {
-      if (active.moneybird_invoice_id) {
+      const isRefund = mode === "refund";
+      // Alleen creditnota maken bij terugbetaling
+      if (isRefund && active.moneybird_invoice_id) {
         await invoke("credit_aanbetaling_invoice", { invoice_id: active.moneybird_invoice_id });
       }
       await supabase.from("aanbetalingen").update({
-        status: "geannuleerd",
+        status: isRefund ? "geannuleerd_terugbetaald" : "geannuleerd_geen_terugbetaling",
         geannuleerd_op: new Date().toISOString(),
       } as any).eq("id", active.id);
       await supabase.from("vehicles").update({
@@ -80,11 +82,18 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
       await supabase.from("vehicle_activity_log").insert({
         vehicle_id: vehicle.id,
         actie_type: "aanbetaling_geannuleerd",
-        beschrijving: `Aanbetaling €${Number(active.aanbetalingsbedrag).toFixed(0)} geannuleerd, creditnota verstuurd`,
+        beschrijving: isRefund
+          ? `Aanbetaling €${Number(active.aanbetalingsbedrag).toFixed(0)} geannuleerd MET terugbetaling, creditnota verstuurd`
+          : `Aanbetaling €${Number(active.aanbetalingsbedrag).toFixed(0)} geannuleerd ZONDER terugbetaling (annulering door klant)`,
       } as any);
-      toast.success("Aanbetaling geannuleerd en creditnota verstuurd");
+      toast.success(
+        isRefund
+          ? "Aanbetaling geannuleerd en creditnota verstuurd"
+          : "Aanbetaling geannuleerd zonder terugbetaling"
+      );
       setActive(null);
       setConfirmCancel(false);
+      setCancelMode(null);
       onChange?.();
     } catch (e: any) {
       toast.error(e.message || "Annuleren mislukt");
