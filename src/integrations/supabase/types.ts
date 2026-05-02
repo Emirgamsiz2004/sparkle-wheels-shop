@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           aanbetalingsbedrag: number
           betaald_op: string | null
+          bewijs_pdf_path: string | null
           bron: string
           created_at: string
           datum: string
@@ -52,6 +53,7 @@ export type Database = {
         Insert: {
           aanbetalingsbedrag?: number
           betaald_op?: string | null
+          bewijs_pdf_path?: string | null
           bron?: string
           created_at?: string
           datum?: string
@@ -86,6 +88,7 @@ export type Database = {
         Update: {
           aanbetalingsbedrag?: number
           betaald_op?: string | null
+          bewijs_pdf_path?: string | null
           bron?: string
           created_at?: string
           datum?: string
