@@ -118,8 +118,8 @@ serve(async (req) => {
         if (!match.bouwjaar && fv.bouwjaar) updates.bouwjaar = fv.bouwjaar;
         if (!match.brandstof && fv.brandstof) updates.brandstof = fv.brandstof.toLowerCase();
         if (!match.kleur && fv.kleur) updates.kleur = fv.kleur;
-        // VWE feed is altijd leidend voor verkoopprijs en kilometerstand.
-        // Site (autodealers.nl) is de master — wijzigingen daar worden direct overgenomen in de DB.
+        // Autodealers.nl voorraadpagina is leidend voor verkoopprijs en kilometerstand.
+        // Wijzigingen daar worden direct overgenomen in de DB.
         if (fv.verkoopprijs && Number(fv.verkoopprijs) !== Number(match.verkoopprijs)) {
           updates.verkoopprijs = fv.verkoopprijs;
           updates.feed_verkoopprijs = fv.verkoopprijs;
@@ -128,7 +128,7 @@ serve(async (req) => {
           updates.kilometerstand = fv.kilometerstand;
           updates.feed_kilometerstand = fv.kilometerstand;
         }
-        // VWE feed is leidend: alleen als de FEED zegt verkocht/gereserveerd nemen we dat over.
+        // Autodealers is leidend: alleen als de feed zegt verkocht/gereserveerd nemen we dat over.
         // Als de feed "te_koop" zegt maar de DB heeft een handmatige status (verkocht, gereserveerd, 
         // consignatie, in_behandeling, inkoop), laten we die met rust.
         if (fv.feed_status !== match.status) {
