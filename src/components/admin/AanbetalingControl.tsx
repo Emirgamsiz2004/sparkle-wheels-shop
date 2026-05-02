@@ -86,11 +86,27 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
     }
     setBusy(true);
     try {
-      const res = await invoke("download_invoice_pdf", { invoice_id: active.moneybird_invoice_id });
-      const base64 = res?.pdf_base64 || res?.base64 || res?.pdf;
-      if (!base64) throw new Error("Geen PDF data ontvangen");
-      const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-      const blob = new Blob([bytes], { type: "application/pdf" });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Niet ingelogd");
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/moneybird`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            action: "download_invoice_pdf_blob",
+            invoice_id: active.moneybird_invoice_id,
+            kenteken: vehicle.kenteken,
+            datum: new Date().toISOString().slice(0, 10),
+          }),
+        }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
