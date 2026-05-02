@@ -135,7 +135,7 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-2 overflow-y-auto min-h-0">
+            <div className="space-y-4 py-2">
               <div className="px-4 py-3 bg-secondary/40 rounded-2xl border border-border text-xs text-muted-foreground">
                 <strong className="text-foreground font-medium">Voertuig:</strong>{" "}
                 {vehicle.merk} {vehicle.model} {vehicle.bouwjaar} — {vehicle.kenteken} —{" "}
