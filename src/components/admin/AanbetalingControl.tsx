@@ -38,6 +38,7 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
   const [open, setOpen] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmReceived, setConfirmReceived] = useState(false);
+  const [cancelMode, setCancelMode] = useState<"refund" | "no_refund" | null>(null);
   const [active, setActive] = useState<Aanbetaling | null>(null);
   const [busy, setBusy] = useState(false);
 
