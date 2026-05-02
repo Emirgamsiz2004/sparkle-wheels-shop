@@ -118,8 +118,9 @@ serve(async (req) => {
         if (!match.bouwjaar && fv.bouwjaar) updates.bouwjaar = fv.bouwjaar;
         if (!match.brandstof && fv.brandstof) updates.brandstof = fv.brandstof.toLowerCase();
         if (!match.kleur && fv.kleur) updates.kleur = fv.kleur;
-        if ((!match.verkoopprijs || Number(match.verkoopprijs) === 0) && fv.verkoopprijs) updates.verkoopprijs = fv.verkoopprijs;
-        if ((!match.kilometerstand || match.kilometerstand === 0) && fv.kilometerstand) updates.kilometerstand = fv.kilometerstand;
+        // VWE feed is leidend voor prijs en km — altijd overnemen bij verschil
+        if (fv.verkoopprijs && Number(fv.verkoopprijs) !== Number(match.verkoopprijs)) updates.verkoopprijs = fv.verkoopprijs;
+        if (fv.kilometerstand && fv.kilometerstand !== match.kilometerstand) updates.kilometerstand = fv.kilometerstand;
         // VWE feed is leidend: alleen als de FEED zegt verkocht/gereserveerd nemen we dat over.
         // Als de feed "te_koop" zegt maar de DB heeft een handmatige status (verkocht, gereserveerd, 
         // consignatie, in_behandeling, inkoop), laten we die met rust.
