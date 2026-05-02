@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { toast } from "sonner";
-import { Loader2, Wallet, X } from "lucide-react";
+import { Loader2, Wallet, X, Download } from "lucide-react";
 import AanbetalingMoneybirdDialog from "./AanbetalingMoneybirdDialog";
 
 interface Props {
