@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { toast } from "sonner";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
