@@ -72,6 +72,8 @@ const VehicleDetailHeader = ({ vehicle, onStatusChange, onOpenProefrit, onOpenKo
           </button>
         )}
 
+        <AanbetalingControl vehicle={vehicle} />
+
         {onOpenAfspraak && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
