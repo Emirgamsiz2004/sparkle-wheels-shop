@@ -1988,6 +1988,7 @@ interface Stap2Props {
   aanbetalingBankrekening: string;
   setAanbetalingBankrekening: (v: string) => void;
   onAutoSave?: () => void | Promise<any>;
+  aanbetalingExtern?: { id: string; bedrag: number; status: string; geannuleerd: boolean } | null;
 }
 
 const Stap2Aflevering = (p: Stap2Props) => {
