@@ -79,6 +79,32 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
     setBusy(false);
   };
 
+  const handleDownload = async () => {
+    if (!active?.moneybird_invoice_id) {
+      toast.error("Geen Moneybird factuur gekoppeld");
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await invoke("download_invoice_pdf", { invoice_id: active.moneybird_invoice_id });
+      const base64 = res?.pdf_base64 || res?.base64 || res?.pdf;
+      if (!base64) throw new Error("Geen PDF data ontvangen");
+      const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Aanbetaling_${vehicle.kenteken || vehicle.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      toast.error(e.message || "Downloaden mislukt");
+    }
+    setBusy(false);
+  };
+
   if (!allowed && !active) return null;
 
   if (active) {
@@ -88,6 +114,9 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
           <Wallet className="w-3.5 h-3.5" />
           Aanbetaling {active.status === "betaald" ? "ontvangen" : "open"} — {formatEuroDecimal(active.aanbetalingsbedrag)}
         </span>
+        <button onClick={handleDownload} disabled={busy} className={btnCls} title="Factuur downloaden">
+          <Download className="w-3.5 h-3.5" /> Factuur
+        </button>
         <button onClick={() => setConfirmCancel(true)} className={btnCls + " !border-rose-500/30 !text-rose-400"}>
           <X className="w-3.5 h-3.5" /> Aanbetaling annuleren
         </button>
