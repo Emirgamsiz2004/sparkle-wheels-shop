@@ -118,8 +118,8 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 pt-8 pb-12 sm:py-10 overflow-y-auto pointer-events-none">
           <DialogPrimitive.Content
-            className="relative w-full max-w-xl bg-[hsl(0_0%_8%)] text-foreground border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.5)] p-5 pointer-events-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-[0.97] data-[state=open]:zoom-in-[0.97] ease-out admin-theme-scope"
-            style={{ borderRadius: 16 }}
+            className="admin-theme relative w-full max-w-xl bg-[hsl(0_0%_8%)] text-foreground border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.5)] p-5 pointer-events-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-[0.97] data-[state=open]:zoom-in-[0.97] ease-out"
+            style={{ borderRadius: 16, minHeight: 0 }}
           >
             <DialogPrimitive.Close
               className="absolute right-3 top-3 z-10 h-8 w-8 inline-flex items-center justify-center rounded-[10px] text-white/60 hover:text-white hover:bg-white/[0.06] transition"
