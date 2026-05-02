@@ -128,7 +128,7 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
       const restbedrag = Number(active.restbedrag ?? Math.max(0, verkoopprijs - aanbetaling));
 
       // 1) Genereer PDF
-      const doc = generateAanbetalingsbewijsPdf({
+      const doc = await generateAanbetalingsbewijsPdf({
         voertuig: {
           merk: active.voertuig_merk || vehicle.merk,
           model: active.voertuig_model || vehicle.model,
