@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 export interface AanbetalingsbewijsData {
   voertuig: {
@@ -38,322 +39,365 @@ const formatDate = (d?: string) => {
   return d;
 };
 
-const formatKenteken = (k?: string | null) => {
-  if (!k) return "-";
-  return k.toUpperCase().replace(/\s+/g, "");
-};
+const formatKenteken = (k?: string | null) => (k ? k.toUpperCase().replace(/\s+/g, "") : "-");
 
-export function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): jsPDF {
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
-  doc.setCharSpace(0);
-  // jsPDF heeft een bug waarbij grote helvetica letters extra spacing krijgen — expliciet uitschakelen
-  (doc as any).internal.write("0 Tc");
-  const pw = 210;
-  const ph = 297;
-  const ml = 18;
-  const mr = 18;
-  const cw = pw - ml - mr;
+const escapeHtml = (s: string) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 
-  // ─── Brand colors ───────────────────────────
-  const ink = [17, 17, 17] as const;          // near-black
-  const subtle = [110, 110, 110] as const;    // muted grey
-  const line = [225, 225, 225] as const;      // hairline
-  const accentBg = [245, 245, 245] as const;  // soft grey card
-  const success = [34, 134, 58] as const;     // confirmation green
-
-  // ═══════════════════════════════════════════
-  // HEADER BAR (full-width black)
-  // ═══════════════════════════════════════════
-  doc.setFillColor(...ink);
-  doc.rect(0, 0, pw, 32, "F");
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.setTextColor(255, 255, 255);
-  doc.text("PLATIN AUTOMOTIVE", ml, 15);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8.5);
-  doc.setTextColor(190, 190, 190);
-  doc.text("Cilinderweg 99  ·  2371 DZ Roelofarendsveen  ·  06 8282 3050", ml, 22);
-  doc.text("info@platinautomotive.nl  ·  www.platinautomotive.nl  ·  KvK 99146193", ml, 27);
-
-  // Document label (right side of header)
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(255, 255, 255);
-  doc.text("AANBETALINGSBEWIJS", pw - mr, 15, { align: "right" });
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(190, 190, 190);
-  if (data.bewijsNummer) {
-    doc.text(`Nr. ${data.bewijsNummer}`, pw - mr, 22, { align: "right" });
-  }
-  doc.text(formatDate(data.datum), pw - mr, 27, { align: "right" });
-
-  // ═══════════════════════════════════════════
-  let y = 48;
-
-  // Title block
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(...ink);
-  doc.text("Aanbetaling ontvangen", ml, y);
-  y += 7;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(...subtle);
-  doc.text(
-    "Hierbij bevestigen wij de ontvangst van uw aanbetaling voor het hieronder",
-    ml,
-    y,
-  );
-  y += 4.5;
-  doc.text("vermelde voertuig. Dit document dient als officieel ontvangstbewijs.", ml, y);
-  y += 14;
-
-  // ═══════════════════════════════════════════
-  // BEDRAG HIGHLIGHT CARD
-  // ═══════════════════════════════════════════
-  const cardH = 28;
-  doc.setFillColor(...accentBg);
-  doc.roundedRect(ml, y, cw, cardH, 2, 2, "F");
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(...subtle);
-  doc.text("ONTVANGEN AANBETALING", ml + 6, y + 9);
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(24);
-  doc.setTextColor(...ink);
-  doc.text(formatEur(data.aanbetalingsbedrag), ml + 6, y + 21);
-
-  // Status badge (right side)
-  const badgeText = "BETAALD";
-  const badgeW = 28;
-  const badgeH = 8;
-  const badgeX = ml + cw - badgeW - 6;
-  const badgeY = y + 9;
-  doc.setFillColor(...success);
-  doc.roundedRect(badgeX, badgeY, badgeW, badgeH, 1.5, 1.5, "F");
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
-  doc.setTextColor(255, 255, 255);
-  doc.text(badgeText, badgeX + badgeW / 2, badgeY + 5.5, { align: "center" });
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8.5);
-  doc.setTextColor(...subtle);
-  doc.text(`Ontvangen op ${formatDate(data.datum)}`, ml + cw - 6, y + 21, {
-    align: "right",
-  });
-
-  y += cardH + 12;
-
-  // ═══════════════════════════════════════════
-  // TWO COLUMN INFO: KLANT + VOERTUIG
-  // ═══════════════════════════════════════════
-  const colGap = 8;
-  const colW = (cw - colGap) / 2;
-  const colTop = y;
-
-  // Helper for section label
-  const sectionLabel = (text: string, x: number, yy: number) => {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8.5);
-    doc.setTextColor(...subtle);
-    doc.text(text.toUpperCase(), x, yy);
-    doc.setDrawColor(...line);
-    doc.setLineWidth(0.3);
-    doc.line(x, yy + 2, x + colW, yy + 2);
-  };
-
-  const kvRow = (label: string, value: string, x: number, yy: number) => {
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
-    doc.setTextColor(...subtle);
-    doc.text(label, x, yy);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(...ink);
-    doc.text(value || "-", x, yy + 4.5);
-  };
-
-  // Linker kolom: Klantgegevens
-  let yL = colTop;
-  sectionLabel("Klantgegevens", ml, yL);
-  yL += 8;
-  kvRow("Naam", data.klantNaam || "-", ml, yL);
-  yL += 11;
-  if (data.klantEmail) {
-    kvRow("E-mail", data.klantEmail, ml, yL);
-    yL += 11;
-  }
-
-  // Rechter kolom: Voertuig
-  let yR = colTop;
-  const xR = ml + colW + colGap;
-  sectionLabel("Voertuig", xR, yR);
-  yR += 8;
+function buildHtml(data: AanbetalingsbewijsData): string {
   const v = data.voertuig;
   const voertuigText = `${v.merk || ""} ${v.model || ""}`.trim() || "-";
-  kvRow("Merk & model", voertuigText, xR, yR);
-  yR += 11;
-  kvRow("Kenteken", formatKenteken(v.kenteken), xR, yR);
-  yR += 11;
-  if (v.bouwjaar) {
-    kvRow("Bouwjaar", String(v.bouwjaar), xR, yR);
-    yR += 11;
+
+  const inruilHtml = data.inruil
+    ? `
+    <div class="section">
+      <div class="section-label">Inruilvoertuig</div>
+      <div class="grid-2">
+        <div>
+          <div class="kv-label">Voertuig</div>
+          <div class="kv-value">${escapeHtml(`${data.inruil.merk || ""} ${data.inruil.model || ""}`.trim() || "-")}</div>
+        </div>
+        <div>
+          <div class="kv-label">Kenteken</div>
+          <div class="kv-value">${escapeHtml(formatKenteken(data.inruil.kenteken))}</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="kv-label">Inruilwaarde</div>
+        <div class="kv-value">${escapeHtml(formatEur(data.inruil.waarde))}</div>
+      </div>
+    </div>`
+    : "";
+
+  return `<!doctype html>
+<html><head><meta charset="utf-8"/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #111; background: #fff; }
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
   }
 
-  y = Math.max(yL, yR) + 8;
+  /* HEADER */
+  .header {
+    background: #111;
+    color: #fff;
+    padding: 28px 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .brand-name { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+  .brand-meta { font-size: 11px; color: #b8b8b8; line-height: 1.6; margin-top: 6px; }
+  .doc-label { text-align: right; }
+  .doc-label .type { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #fff; }
+  .doc-label .nr { font-size: 11px; color: #b8b8b8; margin-top: 6px; }
+  .doc-label .date { font-size: 11px; color: #b8b8b8; margin-top: 2px; }
 
-  // ═══════════════════════════════════════════
-  // INRUIL (optioneel)
-  // ═══════════════════════════════════════════
-  if (data.inruil) {
-    sectionLabel("Inruilvoertuig", ml, y);
-    y += 8;
-    const inrText = `${data.inruil.merk || ""} ${data.inruil.model || ""}`.trim();
-    if (inrText) {
-      kvRow("Voertuig", inrText, ml, y);
-    }
-    if (data.inruil.kenteken) {
-      kvRow("Kenteken", formatKenteken(data.inruil.kenteken), ml + colW + colGap, y);
-    }
-    y += 11;
-    kvRow("Inruilwaarde", formatEur(data.inruil.waarde), ml, y);
-    y += 14;
+  /* CONTENT */
+  .content { padding: 36px 56px 0; flex: 1; }
+
+  .title { font-size: 28px; font-weight: 700; color: #111; letter-spacing: -0.5px; }
+  .subtitle { font-size: 13px; color: #6b6b6b; margin-top: 8px; line-height: 1.55; max-width: 540px; }
+
+  /* AMOUNT CARD */
+  .amount-card {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 22px 26px;
+    margin-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .amount-card .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #6b6b6b;
+  }
+  .amount-card .amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111;
+    margin-top: 8px;
+    letter-spacing: -1px;
+  }
+  .amount-card .right { text-align: right; }
+  .badge {
+    display: inline-block;
+    background: #16a34a;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    padding: 6px 14px;
+    border-radius: 4px;
+  }
+  .amount-card .received { font-size: 11px; color: #6b6b6b; margin-top: 10px; }
+
+  /* SECTIONS */
+  .section { margin-top: 32px; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    color: #6b6b6b;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 14px;
   }
 
-  // ═══════════════════════════════════════════
-  // FINANCIEEL OVERZICHT (tabel)
-  // ═══════════════════════════════════════════
-  sectionLabel("Financieel overzicht", ml, y);
-  y += 10;
-
-  const fRow = (label: string, value: string, opts: { bold?: boolean; muted?: boolean; total?: boolean } = {}) => {
-    if (opts.total) {
-      doc.setFillColor(...accentBg);
-      doc.rect(ml, y - 4, cw, 8, "F");
-    }
-    doc.setFont("helvetica", opts.bold || opts.total ? "bold" : "normal");
-    doc.setFontSize(opts.total ? 11 : 9.5);
-    const c = opts.muted ? subtle : ink;
-    doc.setTextColor(c[0], c[1], c[2]);
-    doc.text(label, ml + 3, y + 1);
-    doc.text(value, ml + cw - 3, y + 1, { align: "right" });
-    y += 7;
-
-    if (!opts.total) {
-      doc.setDrawColor(...line);
-      doc.setLineWidth(0.2);
-      doc.line(ml, y - 2, ml + cw, y - 2);
-    }
-  };
-
-  fRow("Verkoopprijs voertuig", formatEur(data.verkoopprijs));
-  if (data.inruil) {
-    fRow("Inruilwaarde", `- ${formatEur(data.inruil.waarde)}`, { muted: true });
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
   }
-  fRow("Reeds aanbetaald", `- ${formatEur(data.aanbetalingsbedrag)}`, { bold: true });
-  if (data.betaalwijze) {
-    fRow("Betaalmethode", data.betaalwijze, { muted: true });
+  .kv-label { font-size: 11px; color: #6b6b6b; margin-bottom: 3px; }
+  .kv-value { font-size: 13px; font-weight: 600; color: #111; }
+  .kv + .kv { margin-top: 12px; }
+
+  /* FINANCIAL TABLE */
+  .fin-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 4px;
+    border-bottom: 1px solid #eee;
+    font-size: 12.5px;
   }
-  y += 1;
-  fRow("Resterend te voldoen bij levering", formatEur(data.restbedrag), { total: true });
-
-  if (data.leverdatum) {
-    y += 4;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(...subtle);
-    doc.text("Verwachte leverdatum", ml + 3, y);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...ink);
-    doc.text(formatDate(data.leverdatum), ml + cw - 3, y, { align: "right" });
-    y += 6;
+  .fin-row .lbl { color: #111; }
+  .fin-row .val { color: #111; font-weight: 500; }
+  .fin-row.muted .lbl, .fin-row.muted .val { color: #6b6b6b; }
+  .fin-row.bold .lbl, .fin-row.bold .val { font-weight: 700; }
+  .fin-row.total {
+    background: #f5f5f5;
+    border-bottom: none;
+    border-radius: 6px;
+    padding: 14px 14px;
+    margin-top: 6px;
+    font-size: 14px;
   }
+  .fin-row.total .lbl, .fin-row.total .val { font-weight: 700; }
 
-  y += 12;
+  /* CONFIRMATION */
+  .confirm {
+    margin-top: 32px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .confirm .left { display: flex; align-items: center; gap: 14px; }
+  .check {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .confirm .title-sm { font-size: 13px; font-weight: 700; color: #111; }
+  .confirm .desc { font-size: 11px; color: #6b6b6b; margin-top: 3px; line-height: 1.5; }
+  .confirm .right { text-align: right; }
+  .confirm .right .lbl { font-size: 10px; color: #6b6b6b; }
+  .confirm .right .val { font-size: 12px; font-weight: 700; color: #111; margin-top: 3px; }
 
-  // ═══════════════════════════════════════════
-  // DIGITALE BEVESTIGING (vervangt handtekeningen)
-  // ═══════════════════════════════════════════
-  const confH = 26;
-  doc.setDrawColor(...line);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(ml, y, cw, confH, 2, 2, "S");
+  /* FOOTER */
+  .footer {
+    margin-top: auto;
+    padding: 18px 56px 24px;
+    border-top: 1px solid #e5e5e5;
+    text-align: center;
+    color: #8a8a8a;
+    font-size: 10px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div>
+      <div class="brand-name">PLATIN AUTOMOTIVE</div>
+      <div class="brand-meta">
+        Cilinderweg 99 · 2371 DZ Roelofarendsveen · 06 8282 3050<br/>
+        info@platinautomotive.nl · www.platinautomotive.nl · KvK 99146193
+      </div>
+    </div>
+    <div class="doc-label">
+      <div class="type">AANBETALINGSBEWIJS</div>
+      ${data.bewijsNummer ? `<div class="nr">Nr. ${escapeHtml(data.bewijsNummer)}</div>` : ""}
+      <div class="date">${escapeHtml(formatDate(data.datum))}</div>
+    </div>
+  </div>
 
-  // Linker kant: checkmark + label
-  doc.setFillColor(...success);
-  doc.circle(ml + 8, y + confH / 2, 3.5, "F");
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(255, 255, 255);
-  doc.text("✓", ml + 8, y + confH / 2 + 1.5, { align: "center" });
+  <div class="content">
+    <div class="title">Aanbetaling ontvangen</div>
+    <div class="subtitle">
+      Hierbij bevestigen wij de ontvangst van uw aanbetaling voor het hieronder vermelde voertuig.
+      Dit document dient als officieel ontvangstbewijs.
+    </div>
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
-  doc.setTextColor(...ink);
-  doc.text("Digitaal bevestigd", ml + 16, y + 11);
+    <div class="amount-card">
+      <div>
+        <div class="label">ONTVANGEN AANBETALING</div>
+        <div class="amount">${escapeHtml(formatEur(data.aanbetalingsbedrag))}</div>
+      </div>
+      <div class="right">
+        <span class="badge">BETAALD</span>
+        <div class="received">Ontvangen op ${escapeHtml(formatDate(data.datum))}</div>
+      </div>
+    </div>
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8.5);
-  doc.setTextColor(...subtle);
-  doc.text(
-    "Deze aanbetaling is op afstand voldaan en automatisch verwerkt.",
-    ml + 16,
-    y + 16,
-  );
-  doc.text(
-    "Een fysieke handtekening is daarom niet vereist.",
-    ml + 16,
-    y + 20,
-  );
+    <div class="grid-2" style="margin-top: 32px;">
+      <div>
+        <div class="section-label">Klantgegevens</div>
+        <div class="kv">
+          <div class="kv-label">Naam</div>
+          <div class="kv-value">${escapeHtml(data.klantNaam || "-")}</div>
+        </div>
+        ${
+          data.klantEmail
+            ? `<div class="kv"><div class="kv-label">E-mail</div><div class="kv-value">${escapeHtml(data.klantEmail)}</div></div>`
+            : ""
+        }
+      </div>
+      <div>
+        <div class="section-label">Voertuig</div>
+        <div class="kv">
+          <div class="kv-label">Merk &amp; model</div>
+          <div class="kv-value">${escapeHtml(voertuigText)}</div>
+        </div>
+        <div class="kv">
+          <div class="kv-label">Kenteken</div>
+          <div class="kv-value">${escapeHtml(formatKenteken(v.kenteken))}</div>
+        </div>
+        ${
+          v.bouwjaar
+            ? `<div class="kv"><div class="kv-label">Bouwjaar</div><div class="kv-value">${v.bouwjaar}</div></div>`
+            : ""
+        }
+      </div>
+    </div>
 
-  // Rechter kant: timestamp
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(...subtle);
-  doc.text("Bevestigd op", ml + cw - 6, y + 11, { align: "right" });
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(...ink);
-  doc.text(formatDate(data.datum), ml + cw - 6, y + 16, { align: "right" });
+    ${inruilHtml}
 
-  y += confH + 10;
+    <div class="section">
+      <div class="section-label">Financieel overzicht</div>
+      <div class="fin-row">
+        <div class="lbl">Verkoopprijs voertuig</div>
+        <div class="val">${escapeHtml(formatEur(data.verkoopprijs))}</div>
+      </div>
+      ${
+        data.inruil
+          ? `<div class="fin-row muted"><div class="lbl">Inruilwaarde</div><div class="val">- ${escapeHtml(formatEur(data.inruil.waarde))}</div></div>`
+          : ""
+      }
+      <div class="fin-row bold">
+        <div class="lbl">Reeds aanbetaald</div>
+        <div class="val">- ${escapeHtml(formatEur(data.aanbetalingsbedrag))}</div>
+      </div>
+      ${
+        data.betaalwijze
+          ? `<div class="fin-row muted"><div class="lbl">Betaalmethode</div><div class="val">${escapeHtml(data.betaalwijze)}</div></div>`
+          : ""
+      }
+      <div class="fin-row total">
+        <div class="lbl">Resterend te voldoen bij levering</div>
+        <div class="val">${escapeHtml(formatEur(data.restbedrag))}</div>
+      </div>
+      ${
+        data.leverdatum
+          ? `<div class="fin-row" style="border-bottom:none; margin-top:6px;"><div class="lbl" style="color:#6b6b6b;">Verwachte leverdatum</div><div class="val">${escapeHtml(formatDate(data.leverdatum))}</div></div>`
+          : ""
+      }
+    </div>
 
-  // ═══════════════════════════════════════════
-  // FOOTER
-  // ═══════════════════════════════════════════
-  doc.setDrawColor(...line);
-  doc.setLineWidth(0.3);
-  doc.line(ml, ph - 18, pw - mr, ph - 18);
+    <div class="confirm">
+      <div class="left">
+        <div class="check">✓</div>
+        <div>
+          <div class="title-sm">Digitaal bevestigd</div>
+          <div class="desc">
+            Deze aanbetaling is op afstand voldaan en automatisch verwerkt.<br/>
+            Een fysieke handtekening is daarom niet vereist.
+          </div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="lbl">Bevestigd op</div>
+        <div class="val">${escapeHtml(formatDate(data.datum))}</div>
+      </div>
+    </div>
+  </div>
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.setTextColor(...subtle);
-  doc.text(
-    "Platin Automotive  ·  Cilinderweg 99, 2371 DZ Roelofarendsveen  ·  KvK 99146193",
-    pw / 2,
-    ph - 13,
-    { align: "center" },
-  );
-  doc.text(
-    "Dit is een automatisch gegenereerd document en is geldig zonder handtekening.",
-    pw / 2,
-    ph - 9,
-    { align: "center" },
-  );
-
-  return doc;
+  <div class="footer">
+    Platin Automotive · Cilinderweg 99, 2371 DZ Roelofarendsveen · KvK 99146193<br/>
+    Dit is een automatisch gegenereerd document en is geldig zonder handtekening.
+  </div>
+</div>
+</body></html>`;
 }
 
-export function openAanbetalingsbewijsPdf(data: AanbetalingsbewijsData) {
-  const doc = generateAanbetalingsbewijsPdf(data);
+async function renderToPdf(data: AanbetalingsbewijsData): Promise<jsPDF> {
+  const html = buildHtml(data);
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.left = "-10000px";
+  container.style.top = "0";
+  container.style.width = "794px";
+  container.style.background = "#ffffff";
+  container.innerHTML = html;
+  document.body.appendChild(container);
+
+  try {
+    const target = container.querySelector(".page") as HTMLElement | null;
+    const node = target || container;
+
+    const canvas = await html2canvas(node, {
+      scale: 2,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      windowWidth: 794,
+    });
+    const imgData = canvas.toDataURL("image/jpeg", 0.95);
+
+    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pageW = 210;
+    const pageH = 297;
+    const imgWmm = pageW;
+    const imgHmm = (canvas.height * imgWmm) / canvas.width;
+    const finalH = Math.min(imgHmm, pageH);
+    const finalW = (canvas.width * finalH) / canvas.height;
+    const x = (pageW - finalW) / 2;
+    pdf.addImage(imgData, "JPEG", x, 0, finalW, finalH);
+    return pdf;
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
+export async function generateAanbetalingsbewijsPdf(data: AanbetalingsbewijsData): Promise<jsPDF> {
+  return renderToPdf(data);
+}
+
+export async function openAanbetalingsbewijsPdf(data: AanbetalingsbewijsData) {
+  const doc = await renderToPdf(data);
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   window.open(url, "_blank");
