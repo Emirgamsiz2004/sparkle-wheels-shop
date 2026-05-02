@@ -3,7 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { toast } from "sonner";
-import { Loader2, Wallet, X, Download, CheckCircle2 } from "lucide-react";
+import { Loader2, Wallet, X, Download, CheckCircle2, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import AanbetalingMoneybirdDialog from "./AanbetalingMoneybirdDialog";
 import { generateAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
 
