@@ -712,7 +712,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 /* ───────── CategoryCard (compact) ───────── */
 function CategoryCard({
   categorie, rows, expanded, onToggleExpand, onAddManual,
-  onCategorieChanged, onKostChanged, onUpdateKost, onDeleteKost, isMobile,
+  onCategorieChanged, onKostChanged, onUpdateKost, onDeleteKost, isMobile, contactNameMap,
 }: {
   categorie: Categorie;
   rows: Row[];
@@ -724,6 +724,7 @@ function CategoryCard({
   onUpdateKost: (id: string, input: Partial<Kost>) => Promise<void>;
   onDeleteKost: (id: string) => Promise<void>;
   isMobile: boolean;
+  contactNameMap: Record<string, string>;
 }) {
   const total = rows.reduce((s, r) => s + r.amount, 0);
   const isInkoopVoertuigen = categorie.naam === INKOOP_VOERTUIGEN_NAAM;
