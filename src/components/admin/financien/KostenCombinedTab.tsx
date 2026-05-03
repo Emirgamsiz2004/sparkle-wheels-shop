@@ -774,6 +774,7 @@ function CategoryCard({
           onAddManual={onAddManual}
           manualRows={rows.filter((r) => r.source === "handmatig")}
           isMobile={isMobile}
+          contactNameMap={contactNameMap}
         />
       </div>
 
