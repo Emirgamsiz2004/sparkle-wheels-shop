@@ -360,6 +360,21 @@ const KostenCombinedTab = () => {
     [rowsPerCat]
   );
 
+  /* ─── Map contact_id → naam (uit geladen Moneybird facturen) ─── */
+  const contactNameMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    purchaseInvoices.forEach((inv) => {
+      const cid = inv?.contact?.id ? String(inv.contact.id) : null;
+      if (!cid) return;
+      const naam =
+        inv?.contact?.company_name ||
+        [inv?.contact?.firstname, inv?.contact?.lastname].filter(Boolean).join(" ") ||
+        "";
+      if (naam && !m[cid]) m[cid] = naam;
+    });
+    return m;
+  }, [purchaseInvoices]);
+
   /* ─── Omzet ─── */
   const { omzet, verkopenAantal } = useMemo(() => {
     let total = 0;
