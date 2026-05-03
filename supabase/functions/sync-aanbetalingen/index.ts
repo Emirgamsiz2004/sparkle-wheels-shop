@@ -140,8 +140,14 @@ async function processAanbetaling(supabase: any, a: Aanbetaling, supabaseUrl: st
   if (a.klant_email && signed?.signedUrl) {
     const klantNaam = `${a.klant_voornaam || ""} ${a.klant_achternaam || ""}`.trim() || "Klant";
     const voertuig = `${a.voertuig_merk || ""} ${a.voertuig_model || ""} ${a.voertuig_bouwjaar || ""}`.trim();
-    const { error } = await supabase.functions.invoke("send-transactional-email", {
-      body: {
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
+    const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(anonKey ? { Authorization: `Bearer ${anonKey}`, apikey: anonKey } : {}),
+      },
+      body: JSON.stringify({
         templateName: "aanbetalingsbewijs",
         recipientEmail: a.klant_email,
         idempotencyKey: `aanbetalingsbewijs-${a.id}`,
@@ -153,9 +159,9 @@ async function processAanbetaling(supabase: any, a: Aanbetaling, supabaseUrl: st
           datum: formatDate(paidAt),
           pdfUrl: signed.signedUrl,
         },
-      },
+      }),
     });
-    if (error) emailError = error.message || "Mailen mislukt";
+    if (!emailRes.ok) emailError = await emailRes.text();
     else emailSent = true;
   }
 
