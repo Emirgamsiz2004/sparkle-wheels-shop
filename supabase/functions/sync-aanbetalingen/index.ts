@@ -140,12 +140,12 @@ async function processAanbetaling(supabase: any, a: Aanbetaling, supabaseUrl: st
   if (a.klant_email && signed?.signedUrl) {
     const klantNaam = `${a.klant_voornaam || ""} ${a.klant_achternaam || ""}`.trim() || "Klant";
     const voertuig = `${a.voertuig_merk || ""} ${a.voertuig_model || ""} ${a.voertuig_bouwjaar || ""}`.trim();
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(anonKey ? { Authorization: `Bearer ${anonKey}`, apikey: anonKey } : {}),
+        ...(serviceKey ? { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey } : {}),
       },
       body: JSON.stringify({
         templateName: "aanbetalingsbewijs",
