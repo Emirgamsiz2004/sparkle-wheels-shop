@@ -1103,7 +1103,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 /* ───────── Category settings popover (gear icon) ───────── */
 function CategorySettingsPopover({
   categorie, onCategorieChanged, onKostChanged, onUpdateKost, onDeleteKost,
-  onAddManual, manualRows, isMobile,
+  onAddManual, manualRows, isMobile, contactNameMap,
 }: {
   categorie: Categorie;
   onCategorieChanged: () => Promise<any>;
@@ -1113,7 +1113,9 @@ function CategorySettingsPopover({
   onAddManual: () => void;
   manualRows: Row[];
   isMobile: boolean;
+  contactNameMap: Record<string, string>;
 }) {
+  const { invoke } = useMoneybird();
   const [open, setOpen] = useState(false);
   const [linkedContacts, setLinkedContacts] = useState<{ id: string; name: string }[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(false);
@@ -1126,17 +1128,38 @@ function CategorySettingsPopover({
     }
     setLoadingContacts(true);
     try {
-      // Try to get names from cached purchase invoices isn't easy; fetch via get_contacts page 1 + match
-      // Simpler: render IDs with a "?" fallback. We'll fetch contacts lazily.
-      const names: { id: string; name: string }[] = categorie.moneybird_contact_ids.map((id) => ({
+      // Eerst namen uit gecachte facturen
+      const initial = categorie.moneybird_contact_ids.map((id) => ({
         id,
-        name: `Contact ${id}`,
+        name: contactNameMap[id] || `Contact ${id}`,
       }));
-      setLinkedContacts(names);
+      setLinkedContacts(initial);
+
+      // Voor onbekenden: ophalen via Moneybird get_contact
+      const missing = initial.filter((c) => !contactNameMap[c.id]);
+      if (missing.length) {
+        const resolved = await Promise.all(
+          missing.map(async (c) => {
+            try {
+              const res: any = await invoke("get_contact", { contact_id: c.id });
+              const naam =
+                res?.company_name ||
+                [res?.firstname, res?.lastname].filter(Boolean).join(" ") ||
+                `Contact ${c.id}`;
+              return { id: c.id, name: naam };
+            } catch {
+              return c;
+            }
+          })
+        );
+        setLinkedContacts((prev) =>
+          prev.map((c) => resolved.find((r) => r.id === c.id) || c)
+        );
+      }
     } finally {
       setLoadingContacts(false);
     }
-  }, [categorie.moneybird_contact_ids]);
+  }, [categorie.moneybird_contact_ids, contactNameMap, invoke]);
 
   useEffect(() => {
     if (open) loadLinkedContacts();
