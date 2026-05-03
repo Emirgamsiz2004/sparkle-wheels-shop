@@ -178,14 +178,37 @@ Deno.serve(async (req) => {
     const adminId = Deno.env.get("MONEYBIRD_ADMINISTRATION_ID");
     if (!token || !adminId) throw new Error("Moneybird credentials missing");
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
+      supabaseUrl,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    let body: any = {};
+    try {
+      body = req.method === "POST" ? await req.json() : {};
+    } catch (_e) {
+      body = {};
+    }
+
+    if (body?.action === "process_single" && body?.aanbetaling_id) {
+      const { data: aanbetaling, error: singleError } = await supabase
+        .from("aanbetalingen")
+        .select("id, vehicle_id, status, moneybird_invoice_id, bewijs_pdf_path, betaald_op, aanbetalingsbedrag, verkoopprijs, restbedrag, voertuig_merk, voertuig_model, voertuig_bouwjaar, voertuig_kenteken, klant_voornaam, klant_achternaam, klant_email")
+        .eq("id", body.aanbetaling_id)
+        .maybeSingle();
+      if (singleError) throw singleError;
+      if (!aanbetaling) throw new Error("Aanbetaling niet gevonden");
+
+      const result = await processAanbetaling(supabase, aanbetaling as Aanbetaling, supabaseUrl);
+      return new Response(JSON.stringify({ ok: true, result }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { data: open, error } = await supabase
       .from("aanbetalingen")
-      .select("id, vehicle_id, moneybird_invoice_id, aanbetalingsbedrag, voertuig_merk, voertuig_model, voertuig_kenteken, klant_voornaam")
+      .select("id, vehicle_id, status, moneybird_invoice_id, bewijs_pdf_path, betaald_op, aanbetalingsbedrag, verkoopprijs, restbedrag, voertuig_merk, voertuig_model, voertuig_bouwjaar, voertuig_kenteken, klant_voornaam, klant_achternaam, klant_email")
       .eq("status", "open")
       .not("moneybird_invoice_id", "is", null);
     if (error) throw error;
@@ -199,9 +222,7 @@ Deno.serve(async (req) => {
         if (!r.ok) continue;
         const inv = await r.json();
         if (inv.state === "paid") {
-          await supabase.from("aanbetalingen")
-            .update({ status: "betaald", betaald_op: new Date().toISOString() })
-            .eq("id", a.id);
+          await processAanbetaling(supabase, a as Aanbetaling, supabaseUrl);
 
           // In-app notification for all admins
           const { data: admins } = await supabase
