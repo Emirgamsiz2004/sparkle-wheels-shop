@@ -174,9 +174,8 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     setForm((f) => ({ ...f, eindtijd: addMinutesToTime(f.tijd, duur), duur_minuten: duur }));
   }, [form.tijd, dienstenDuur, type, eindtijdManueel]);
 
-  useEffect(() => {
-    setForm((f) => ({ ...f, stuur_bevestigingsmail: Boolean(effectiveEmail) }));
-  }, [effectiveEmail]);
+  // Bevestigingsmail standaard uit – gebruiker moet bewust aanvinken
+
 
   useEffect(() => {
     if (open && defaultType) {
