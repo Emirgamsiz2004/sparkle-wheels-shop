@@ -2,6 +2,9 @@
 // Also processes a single aanbetaling when the admin manually marks it as received.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { PDFDocument, StandardFonts, rgb } from "https://esm.sh/pdf-lib@1.17.1";
+import * as React from "npm:react@18.3.1";
+import { renderAsync } from "npm:@react-email/components@0.0.22";
+import { TEMPLATES } from "../_shared/transactional-email-templates/registry.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,6 +12,9 @@ const corsHeaders = {
 };
 
 const MB_BASE = "https://moneybird.com/api/v2";
+const SITE_NAME = "Platin Automotive";
+const SENDER_DOMAIN = "notify.platinautomotive.nl";
+const FROM_DOMAIN = "notify.platinautomotive.nl";
 
 type Aanbetaling = {
   id: string;
@@ -38,6 +44,74 @@ const emailMoney = (value: number) =>
 const formatDate = (date: Date) => date.toLocaleDateString("nl-NL", { timeZone: "Europe/Amsterdam" });
 
 const safeText = (value?: string | null) => String(value || "-").replace(/[€]/g, "EUR").replace(/[—–]/g, "-");
+
+function generateToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function enqueueAanbetalingsbewijsEmail(supabase: any, recipientEmail: string, idempotencyKey: string, templateData: Record<string, any>) {
+  const templateName = "aanbetalingsbewijs";
+  const template = TEMPLATES[templateName];
+  const normalizedEmail = recipientEmail.toLowerCase();
+  const messageId = crypto.randomUUID();
+
+  const { data: suppressed, error: suppressionError } = await supabase
+    .from("suppressed_emails")
+    .select("id")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
+  if (suppressionError) throw suppressionError;
+  if (suppressed) return { sent: false, suppressed: true };
+
+  let unsubscribeToken = generateToken();
+  const { data: existingToken, error: tokenLookupError } = await supabase
+    .from("email_unsubscribe_tokens")
+    .select("token, used_at")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
+  if (tokenLookupError) throw tokenLookupError;
+  if (existingToken?.token && !existingToken.used_at) {
+    unsubscribeToken = existingToken.token;
+  } else if (!existingToken) {
+    const { error: tokenError } = await supabase
+      .from("email_unsubscribe_tokens")
+      .upsert({ token: unsubscribeToken, email: normalizedEmail }, { onConflict: "email", ignoreDuplicates: true });
+    if (tokenError) throw tokenError;
+  }
+
+  const html = await renderAsync(React.createElement(template.component, templateData));
+  const text = await renderAsync(React.createElement(template.component, templateData), { plainText: true });
+  const subject = typeof template.subject === "function" ? template.subject(templateData) : template.subject;
+
+  await supabase.from("email_send_log").insert({
+    message_id: messageId,
+    template_name: templateName,
+    recipient_email: recipientEmail,
+    status: "pending",
+  });
+
+  const { error: enqueueError } = await supabase.rpc("enqueue_email", {
+    queue_name: "transactional_emails",
+    payload: {
+      message_id: messageId,
+      to: recipientEmail,
+      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      sender_domain: SENDER_DOMAIN,
+      subject,
+      html,
+      text,
+      purpose: "transactional",
+      label: templateName,
+      idempotency_key: idempotencyKey,
+      unsubscribe_token: unsubscribeToken,
+      queued_at: new Date().toISOString(),
+    },
+  });
+  if (enqueueError) throw enqueueError;
+  return { sent: true, suppressed: false };
+}
 
 async function generateProofPdf(a: Aanbetaling, paidAt: Date) {
   const pdf = await PDFDocument.create();
