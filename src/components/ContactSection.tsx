@@ -86,7 +86,7 @@ const ContactSection = () => {
               <div className="flex items-center gap-2 md:gap-3 mt-1.5 text-xs font-body text-foreground">
                 <span>Ma–Vr: 09:00 – 18:00</span>
                 <span className="text-border">·</span>
-                <span>Za–Zo: 10:00 – 17:00</span>
+                <span>Zaterdag: 10:00 – 17:00 · Zondag: Gesloten</span>
               </div>
             </div>
           </motion.div>
