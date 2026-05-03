@@ -228,7 +228,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
 
   const vehicleList = type === "aflevering" || type === "ophalen"
     ? (allVehicles || vehicles)
-    : (vehicles || []).filter((v) => !v.status || v.status === "beschikbaar");
+    : (allVehicles || vehicles || []).filter((v) => v.status !== "verkocht");
 
   const filteredVehicles = useMemo(() => {
     if (!vehicleSearch) return vehicleList;
