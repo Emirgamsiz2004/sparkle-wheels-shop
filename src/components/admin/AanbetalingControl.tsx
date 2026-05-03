@@ -196,9 +196,19 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
         .from("vehicle-documents")
         .createSignedUrl(active.bewijs_pdf_path, 60);
       if (error || !data) throw new Error(error?.message || "Geen URL");
-      window.open(data.signedUrl, "_blank");
+      const res = await fetch(data.signedUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Aanbetalingsbewijs_${active.voertuig_kenteken || vehicle.kenteken || active.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch (e: any) {
-      toast.error(e.message || "Openen mislukt");
+      toast.error(e.message || "Downloaden mislukt");
     }
     setBusy(false);
   };
