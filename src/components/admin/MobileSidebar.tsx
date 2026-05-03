@@ -111,7 +111,7 @@ export default function MobileSidebar({ open, onClose }: Props) {
                   to={item.path}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
                     active
-                      ? "bg-emerald-500/10 text-emerald-500 font-medium"
+                      ? "bg-accent/60 text-foreground font-medium"
                       : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
                   }`}
                 >
