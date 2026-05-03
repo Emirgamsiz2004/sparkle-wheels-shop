@@ -586,6 +586,7 @@ const KostenCombinedTab = () => {
                     onUpdateKost={update}
                     onDeleteKost={remove}
                     isMobile={isMobile}
+                    contactNameMap={contactNameMap}
                   />
                 );
               })}
@@ -603,6 +604,7 @@ const KostenCombinedTab = () => {
                   onUpdateKost={update}
                   onDeleteKost={remove}
                   isMobile={isMobile}
+                  contactNameMap={contactNameMap}
                 />
               );
             })()
