@@ -209,19 +209,23 @@ Deno.serve(async (req) => {
     const { data: open, error } = await supabase
       .from("aanbetalingen")
       .select("id, vehicle_id, status, moneybird_invoice_id, bewijs_pdf_path, betaald_op, aanbetalingsbedrag, verkoopprijs, restbedrag, voertuig_merk, voertuig_model, voertuig_bouwjaar, voertuig_kenteken, klant_voornaam, klant_achternaam, klant_email")
-      .eq("status", "open")
+      .or("status.eq.open,and(status.eq.betaald,bewijs_pdf_path.is.null)")
       .not("moneybird_invoice_id", "is", null);
     if (error) throw error;
 
     const updates: any[] = [];
     for (const a of (open || [])) {
       try {
-        const r = await fetch(`${MB_BASE}/${adminId}/sales_invoices/${a.moneybird_invoice_id}.json`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!r.ok) continue;
-        const inv = await r.json();
-        if (inv.state === "paid") {
+        let isPaid = a.status === "betaald";
+        if (!isPaid) {
+          const r = await fetch(`${MB_BASE}/${adminId}/sales_invoices/${a.moneybird_invoice_id}.json`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!r.ok) continue;
+          const inv = await r.json();
+          isPaid = inv.state === "paid";
+        }
+        if (isPaid) {
           await processAanbetaling(supabase, a as Aanbetaling, supabaseUrl);
 
           // In-app notification for all admins
