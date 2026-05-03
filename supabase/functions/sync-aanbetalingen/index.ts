@@ -214,29 +214,20 @@ async function processAanbetaling(supabase: any, a: Aanbetaling, supabaseUrl: st
   if (a.klant_email && signed?.signedUrl) {
     const klantNaam = `${a.klant_voornaam || ""} ${a.klant_achternaam || ""}`.trim() || "Klant";
     const voertuig = `${a.voertuig_merk || ""} ${a.voertuig_model || ""} ${a.voertuig_bouwjaar || ""}`.trim();
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(serviceKey ? { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey } : {}),
-      },
-      body: JSON.stringify({
-        templateName: "aanbetalingsbewijs",
-        recipientEmail: a.klant_email,
-        idempotencyKey: `aanbetalingsbewijs-${a.id}`,
-        templateData: {
-          klantNaam,
-          voertuig,
-          kenteken: a.voertuig_kenteken || "",
-          bedrag: emailMoney(Number(a.aanbetalingsbedrag || 0)),
-          datum: formatDate(paidAt),
-          pdfUrl: signed.signedUrl,
-        },
-      }),
-    });
-    if (!emailRes.ok) emailError = await emailRes.text();
-    else emailSent = true;
+    try {
+      const result = await enqueueAanbetalingsbewijsEmail(supabase, a.klant_email, `aanbetalingsbewijs-${a.id}`, {
+        klantNaam,
+        voertuig,
+        kenteken: a.voertuig_kenteken || "",
+        bedrag: emailMoney(Number(a.aanbetalingsbedrag || 0)),
+        datum: formatDate(paidAt),
+        pdfUrl: signed.signedUrl,
+      });
+      emailSent = result.sent;
+      if (result.suppressed) emailError = "E-mailadres is uitgeschreven of geblokkeerd";
+    } catch (err: any) {
+      emailError = err?.message || "Mailen mislukt";
+    }
   }
 
   if (a.status !== "betaald" || !a.bewijs_pdf_path) {
