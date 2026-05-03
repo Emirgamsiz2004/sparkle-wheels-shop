@@ -123,9 +123,9 @@ const BlogPost = () => {
         <meta property="og:description" content={post.meta_description || post.excerpt || ""} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://platinautomotive.nl/blog/${post.slug}`} />
-        <meta property="og:image" content={post.featured_image || "https://platinautomotive.nl/images/platin-logo.png"} />
+        <meta property="og:image" content={post.featured_image || "https://platinautomotive.nl/images/platin-og-logo-v2.jpg?v=2"} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content={post.featured_image || "https://platinautomotive.nl/images/platin-logo.png"} />
+        <meta name="twitter:image" content={post.featured_image || "https://platinautomotive.nl/images/platin-og-logo-v2.jpg?v=2"} />
         {articleJsonLd && (
           <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
         )}
