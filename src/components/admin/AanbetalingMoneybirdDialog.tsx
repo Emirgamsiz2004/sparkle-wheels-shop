@@ -70,6 +70,41 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
       const contact = res?.contact;
       if (!invoice?.id) throw new Error("Geen factuur ontvangen");
 
+      // Klant automatisch opslaan/bijwerken in CRM
+      try {
+        const emailLower = email.trim().toLowerCase();
+        const { data: existing } = await supabase
+          .from("customers")
+          .select("id")
+          .ilike("email", emailLower)
+          .maybeSingle();
+
+        if (existing?.id) {
+          await supabase
+            .from("customers")
+            .update({
+              voornaam,
+              achternaam,
+              telefoon: telefoon || "",
+              moneybird_contact_id: contact?.id ? String(contact.id) : null,
+              laatste_contact: new Date().toISOString(),
+            } as any)
+            .eq("id", existing.id);
+        } else {
+          await supabase.from("customers").insert({
+            voornaam,
+            achternaam,
+            email: emailLower,
+            telefoon: telefoon || "",
+            moneybird_contact_id: contact?.id ? String(contact.id) : null,
+            status: "klant",
+            notities: `Automatisch aangemaakt via aanbetaling ${vehicle.merk} ${vehicle.model} ${vehicle.kenteken || ""}`.trim(),
+          } as any);
+        }
+      } catch (e) {
+        console.warn("Klant opslaan mislukt:", e);
+      }
+
       await supabase.from("aanbetalingen").insert({
         vehicle_id: vehicle.id,
         klant_voornaam: voornaam,
