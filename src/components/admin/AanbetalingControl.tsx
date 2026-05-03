@@ -287,6 +287,11 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
                 <CheckCircle2 className="w-3.5 h-3.5" /> Markeer als ontvangen
               </DropdownMenuItem>
             )}
+            {isBetaald && !active.bewijs_pdf_path && (
+              <DropdownMenuItem onClick={() => setConfirmReceived(true)} className="flex items-center gap-2.5 text-emerald-400 focus:text-emerald-400">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Genereer & verstuur bewijs
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={handleDownloadFactuur} disabled={busy} className="flex items-center gap-2.5">
               <Download className="w-3.5 h-3.5" /> Download factuur
             </DropdownMenuItem>
