@@ -13,7 +13,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import AanbetalingMoneybirdDialog from "./AanbetalingMoneybirdDialog";
-import { generateAanbetalingsbewijsPdf } from "@/lib/aanbetalingsbewijsPdf";
 
 interface Props {
   vehicle: Vehicle;
@@ -121,80 +120,19 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
     if (!active) return;
     setBusy(true);
     try {
-      const klantNaam = `${active.klant_voornaam || ""} ${active.klant_achternaam || ""}`.trim() || "Klant";
-      const today = new Date().toISOString().slice(0, 10);
-      const verkoopprijs = Number(active.verkoopprijs || vehicle.verkoopprijs || 0);
-      const aanbetaling = Number(active.aanbetalingsbedrag || 0);
-      const restbedrag = Number(active.restbedrag ?? Math.max(0, verkoopprijs - aanbetaling));
-
-      // 1) Genereer PDF
-      const doc = await generateAanbetalingsbewijsPdf({
-        voertuig: {
-          merk: active.voertuig_merk || vehicle.merk,
-          model: active.voertuig_model || vehicle.model,
-          bouwjaar: active.voertuig_bouwjaar || vehicle.bouwjaar,
-          kenteken: active.voertuig_kenteken || vehicle.kenteken,
-        },
-        klantNaam,
-        aanbetalingsbedrag: aanbetaling,
-        verkoopprijs,
-        restbedrag,
-        datum: today,
+      const { data, error } = await supabase.functions.invoke("sync-aanbetalingen", {
+        body: { action: "process_single", aanbetaling_id: active.id },
       });
-      const pdfBlob = doc.output("blob");
+      if (error) throw new Error(error.message || "Verwerken mislukt");
 
-      // 2) Upload naar storage
-      const safeKenteken = (active.voertuig_kenteken || vehicle.kenteken || "voertuig").replace(/[^A-Za-z0-9-]/g, "");
-      const path = `aanbetalingen/${vehicle.id}/Aanbetalingsbewijs_${safeKenteken}_${active.id.slice(0, 8)}.pdf`;
-      const { error: upErr } = await supabase.storage
-        .from("vehicle-documents")
-        .upload(path, pdfBlob, { contentType: "application/pdf", upsert: true });
-      if (upErr) throw new Error(`Upload mislukt: ${upErr.message}`);
-
-      // 3) Signed URL voor in mail (7 dagen)
-      const { data: signed } = await supabase.storage
-        .from("vehicle-documents")
-        .createSignedUrl(path, 60 * 60 * 24 * 7);
-
-      // 4) Update DB
-      await supabase.from("aanbetalingen").update({
-        status: "betaald",
-        betaald_op: new Date().toISOString(),
-        bewijs_pdf_path: path,
-      } as any).eq("id", active.id);
-
-      // 5) Mail naar klant
-      if (active.klant_email && signed?.signedUrl) {
-        try {
-          await supabase.functions.invoke("send-transactional-email", {
-            body: {
-              templateName: "aanbetalingsbewijs",
-              recipientEmail: active.klant_email,
-              idempotencyKey: `aanbetalingsbewijs-${active.id}`,
-              templateData: {
-                klantNaam,
-                voertuig: `${active.voertuig_merk || vehicle.merk} ${active.voertuig_model || vehicle.model} ${active.voertuig_bouwjaar || vehicle.bouwjaar || ""}`.trim(),
-                kenteken: active.voertuig_kenteken || vehicle.kenteken,
-                bedrag: formatEuroDecimal(aanbetaling),
-                datum: new Date().toLocaleDateString("nl-NL"),
-                pdfUrl: signed.signedUrl,
-              },
-            },
-          });
-        } catch (mailErr) {
-          console.error("Mail mislukt:", mailErr);
-          toast.warning("Aanbetalingsbewijs opgeslagen, maar mailen mislukt");
-        }
+      const result = (data as any)?.result;
+      if (result?.emailError) {
+        toast.warning("Aanbetalingsbewijs is opgeslagen, maar mailen is mislukt");
+      } else if (result?.emailMissing) {
+        toast.warning("Aanbetalingsbewijs is opgeslagen, maar er is geen e-mailadres bekend");
+      } else {
+        toast.success(`Aanbetaling bevestigd en bewijs verstuurd${active.klant_email ? ` naar ${active.klant_email}` : ""}`);
       }
-
-      // 6) Activity log
-      await supabase.from("vehicle_activity_log").insert({
-        vehicle_id: vehicle.id,
-        actie_type: "aanbetaling_ontvangen",
-        beschrijving: `Aanbetaling €${aanbetaling.toFixed(0)} bevestigd ontvangen, bewijs verstuurd naar ${active.klant_email || "klant"}`,
-      } as any);
-
-      toast.success(`Aanbetaling bevestigd en bewijs verstuurd${active.klant_email ? ` naar ${active.klant_email}` : ""}`);
       setConfirmReceived(false);
       await load();
       onChange?.();
@@ -258,9 +196,19 @@ const AanbetalingControl = ({ vehicle, onChange }: Props) => {
         .from("vehicle-documents")
         .createSignedUrl(active.bewijs_pdf_path, 60);
       if (error || !data) throw new Error(error?.message || "Geen URL");
-      window.open(data.signedUrl, "_blank");
+      const res = await fetch(data.signedUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Aanbetalingsbewijs_${active.voertuig_kenteken || vehicle.kenteken || active.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch (e: any) {
-      toast.error(e.message || "Openen mislukt");
+      toast.error(e.message || "Downloaden mislukt");
     }
     setBusy(false);
   };
