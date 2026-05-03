@@ -898,7 +898,7 @@ function ExpandedTable({
 
 /* ───────── Full category view (when filtered) ───────── */
 function FullCategoryView({
-  categorie, rows, onAddManual, onCategorieChanged, onUpdateKost, onDeleteKost, isMobile,
+  categorie, rows, onAddManual, onCategorieChanged, onUpdateKost, onDeleteKost, isMobile, contactNameMap,
 }: {
   categorie: Categorie;
   rows: Row[];
@@ -907,6 +907,7 @@ function FullCategoryView({
   onUpdateKost: (id: string, input: Partial<Kost>) => Promise<void>;
   onDeleteKost: (id: string) => Promise<void>;
   isMobile: boolean;
+  contactNameMap: Record<string, string>;
 }) {
   const total = rows.reduce((s, r) => s + r.amount, 0);
   const isInkoopVoertuigen = categorie.naam === INKOOP_VOERTUIGEN_NAAM;
@@ -924,6 +925,7 @@ function FullCategoryView({
             onAddManual={onAddManual}
             manualRows={rows.filter((r) => r.source === "handmatig")}
             isMobile={isMobile}
+            contactNameMap={contactNameMap}
           />
         </div>
         <div className="text-sm font-semibold tabular-nums">{formatEuro(total)}</div>
