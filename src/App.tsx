@@ -175,7 +175,7 @@ const App = () => (
             </Routes>
           )}
           
-          <WhatsAppButton />
+          {/* <WhatsAppButton /> tijdelijk uitgezet */}
           
           <CookieBanner />
         </BrowserRouter>
