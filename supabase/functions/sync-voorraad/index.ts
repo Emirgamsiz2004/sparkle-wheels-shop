@@ -80,7 +80,7 @@ serve(async (req) => {
     // Get existing vehicles from DB
     const { data: existing } = await supabase
       .from("vehicles")
-      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand, feed_verkoopprijs, feed_kilometerstand, merk, model, bouwjaar, brandstof, kleur, verkoop_datum");
+      .select("id, feed_id, kenteken, status, verkoopprijs, kilometerstand, feed_verkoopprijs, feed_kilometerstand, merk, model, bouwjaar, brandstof, kleur, verkoop_datum, koper_naam, koper_email");
 
     const existingByFeedId = new Map(
       (existing || []).filter((v: any) => v.feed_id).map((v: any) => [v.feed_id, v])
@@ -128,18 +128,19 @@ serve(async (req) => {
           updates.kilometerstand = fv.kilometerstand;
           updates.feed_kilometerstand = fv.kilometerstand;
         }
-        // Autodealers is leidend: alleen als de feed zegt verkocht/gereserveerd nemen we dat over.
-        // Als de feed "te_koop" zegt maar de DB heeft een handmatige status (verkocht, gereserveerd, 
-        // consignatie, in_behandeling, inkoop), laten we die met rust.
-        if (fv.feed_status !== match.status) {
+        // Autodealers is leidend, behalve voor handmatige statussen.
+        // Een verkoop wordt als "echt" beschouwd als er een koper bekend is.
+        const isManualSale = match.status === "verkocht" && (match.koper_naam || match.koper_email);
+        const manualStatuses = ["consignatie", "in_behandeling", "inkoop"];
+        const isManualStatus = manualStatuses.includes(match.status) || isManualSale;
+
+        if (fv.feed_status !== match.status && !isManualStatus) {
           if (fv.feed_status === "verkocht" || fv.feed_status === "gereserveerd") {
-            // Feed zegt verkocht/gereserveerd → altijd overnemen
             const wasNotVerkocht = match.status !== "verkocht";
             updates.status = fv.feed_status;
             if (fv.feed_status === "verkocht" && !match.verkoop_datum) {
               updates.verkoop_datum = new Date().toISOString().split("T")[0];
             }
-            // Auto-create verkoop checklist tasks when auto-set to verkocht
             if (fv.feed_status === "verkocht" && wasNotVerkocht) {
               const verkoopTaken = [
                 "Kopersgegevens invullen",
@@ -161,8 +162,16 @@ serve(async (req) => {
                 beschrijving: "Automatisch op verkocht gezet via feed — verkooptaken aangemaakt",
               });
             }
+          } else if (fv.feed_status === "te_koop" && match.status === "verkocht" && !isManualSale) {
+            // Auto-verkocht teruggedraaid: voertuig staat weer in feed → terug naar te_koop
+            updates.status = "te_koop";
+            updates.verkoop_datum = null;
+            await supabase.from("vehicle_activity_log").insert({
+              vehicle_id: match.id,
+              actie_type: "status_gewijzigd",
+              beschrijving: "Automatisch teruggezet naar te koop (weer aanwezig in feed)",
+            });
           }
-          // Als feed "te_koop" zegt maar DB heeft een andere status → NIET overschrijven
         }
 
         if (Object.keys(updates).length > 0) {
