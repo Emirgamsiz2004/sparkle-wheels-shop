@@ -39,6 +39,7 @@ const AfleveringSection = () => {
                 className="w-full h-auto object-cover aspect-[16/10]"
                 loading="lazy"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/30 to-background/10 pointer-events-none" />
             </div>
           </motion.div>
 
