@@ -278,7 +278,7 @@ const VoorraadDetailPage = () => {
                   ))}
                 </div>
 
-                <VehicleBookingMobileButton merk={vehicle.merk} model={vehicle.model} kenteken={formattedKenteken} />
+                {/* <VehicleBookingMobileButton merk={vehicle.merk} model={vehicle.model} kenteken={formattedKenteken} /> tijdelijk uitgezet */}
               </div>
 
               {/* Kenmerken — Marktplaats-style grid */}
