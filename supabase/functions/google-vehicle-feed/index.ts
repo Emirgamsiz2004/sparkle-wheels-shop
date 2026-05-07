@@ -158,7 +158,6 @@ Deno.serve(async (req) => {
       }
       const fuel = mapFuel(v.brandstof);
       if (fuel) fields.push(`    <g:vehicle_fuel_type>${xmlEscape(fuel)}</g:vehicle_fuel_type>`);
-      fields.push(`    <g:vehicle_transmission>${mapTransmission(null)}</g:vehicle_transmission>`);
       if (v.kleur) fields.push(`    <g:color>${xmlEscape(capitalize(v.kleur))}</g:color>`);
       if (v.chassis_nummer) fields.push(`    <g:vehicle_vin>${xmlEscape(v.chassis_nummer)}</g:vehicle_vin>`);
       fields.push(`    <g:product_type>Car</g:product_type>`);
