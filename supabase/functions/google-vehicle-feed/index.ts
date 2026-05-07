@@ -169,11 +169,31 @@ Deno.serve(async (req) => {
 
     const items: string[] = [];
 
+    const eligible = vehicles.filter(
+      (v: any) =>
+        v.feedStatus !== "verkocht" &&
+        v.prijs > 0 &&
+        kentekenUpper(v.kenteken) &&
+        v.detailPath
+    );
+
+    const photoLists = await mapWithConcurrency(eligible, 8, (v: any) =>
+      fetchDetailPhotos(v.detailPath)
+    );
+    const photosByAid = new Map<string, string[]>();
+    eligible.forEach((v: any, i: number) => photosByAid.set(v.id, photoLists[i] || []));
+
     for (const v of vehicles) {
       if (v.feedStatus === "verkocht") continue;
       if (!v.prijs || v.prijs <= 0) continue;
       const kentekenClean = kentekenUpper(v.kenteken);
       const slug = kentekenSlug(v.kenteken);
+      if (!kentekenClean || !slug) continue;
+
+      const fotos = photosByAid.get(v.id) || [];
+      const hoofdfoto = fotos[0] || v.afbeelding || "";
+      const extraFotos = fotos.slice(1, 11);
+
       if (!kentekenClean || !slug) continue;
 
       const title = `${v.merk} ${v.model}`.trim();
