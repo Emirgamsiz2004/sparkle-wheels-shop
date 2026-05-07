@@ -59,3 +59,6 @@ verify_jwt = false
 
 [functions.sitemap]
 verify_jwt = false
+
+[functions.google-vehicle-feed]
+verify_jwt = false
