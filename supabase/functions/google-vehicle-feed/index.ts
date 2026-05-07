@@ -223,7 +223,10 @@ Deno.serve(async (req) => {
       fields.push(`    <title>${xmlEscape(title)}</title>`);
       if (description) fields.push(`    <description>${xmlEscape(description)}</description>`);
       fields.push(`    <link>${xmlEscape(link)}</link>`);
-      if (v.afbeelding) fields.push(`    <g:image_link>${xmlEscape(v.afbeelding)}</g:image_link>`);
+      if (hoofdfoto) fields.push(`    <g:image_link>${xmlEscape(hoofdfoto)}</g:image_link>`);
+      for (const ef of extraFotos) {
+        fields.push(`    <g:additional_image_link>${xmlEscape(ef)}</g:additional_image_link>`);
+      }
       fields.push(`    <g:price>${xmlEscape(price)}</g:price>`);
       fields.push(`    <g:condition>used</g:condition>`);
       fields.push(`    <g:vehicle_make>${xmlEscape(v.merk)}</g:vehicle_make>`);
