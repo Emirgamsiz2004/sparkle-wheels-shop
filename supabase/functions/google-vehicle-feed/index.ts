@@ -1,16 +1,15 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
 };
 
 const SITE = "https://platinautomotive.nl";
+const BASE = "https://svl.autodealers.nl";
+const LIST_URL = `${BASE}/occasions.aspx?did=91347&format=xml`;
 
 function xmlEscape(s: string | number | null | undefined): string {
-  if (s === null || s === undefined) return "";
+  if (s === null || s === undefined || s === "") return "";
   return String(s)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -19,15 +18,18 @@ function xmlEscape(s: string | number | null | undefined): string {
     .replace(/'/g, "&apos;");
 }
 
+function attr(block: string, name: string): string {
+  const m = block.match(new RegExp(`data-${name}="([^"]*)"`));
+  return m ? m[1] : "";
+}
+
 function kentekenSlug(k: string): string {
   return (k || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
-
 function kentekenUpper(k: string): string {
   return (k || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
-
-function capitalize(s: string | null | undefined): string {
+function capitalize(s: string): string {
   if (!s) return "";
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
@@ -36,8 +38,10 @@ const fuelMap: Record<string, string> = {
   benzine: "Gasoline",
   diesel: "Diesel",
   elektrisch: "Electric",
+  electric: "Electric",
   hybride: "Hybrid",
   "plug-in hybride": "Plug-in Hybrid",
+  "plug-in": "Plug-in Hybrid",
   lpg: "LPG",
 };
 
@@ -45,27 +49,71 @@ const bodyMap: Record<string, string> = {
   sedan: "Sedan",
   hatchback: "Hatchback",
   stationwagon: "Wagon",
+  station: "Wagon",
   suv: "SUV",
   cabrio: "Convertible",
+  cabriolet: "Convertible",
   "coupé": "Coupe",
   coupe: "Coupe",
   mpv: "Minivan",
   bestelwagen: "Van",
+  bestel: "Van",
 };
 
-function mapFuel(b: string | null | undefined): string {
+function mapFuel(b: string): string {
   if (!b) return "";
   return fuelMap[b.toLowerCase()] || capitalize(b);
 }
-
-function mapTransmission(t: string | null | undefined): string {
-  if (!t) return "Manual";
+function mapTransmission(t: string): string {
+  if (!t) return "";
   return t.toLowerCase().startsWith("automaat") ? "Automatic" : "Manual";
 }
-
-function mapBody(b: string | null | undefined): string {
+function mapBody(b: string): string {
   if (!b) return "";
   return bodyMap[b.toLowerCase()] || "";
+}
+
+function extractFeedStatus(block: string): string {
+  const lower = block.toLowerCase();
+  if (lower.includes("occ_verkocht.png") || lower.includes(">verkocht<")) return "verkocht";
+  if (lower.includes("occ_gereserveerd.png") || lower.includes(">gereserveerd<")) return "gereserveerd";
+  return "te_koop";
+}
+
+async function fetchList() {
+  const res = await fetch(LIST_URL);
+  if (!res.ok) throw new Error(`Feed returned ${res.status}`);
+  const html = await res.text();
+  const blocks = html.split(/(?=<div[^>]+class="advertisement)/);
+  const vehicles: any[] = [];
+
+  for (const block of blocks) {
+    const merk = attr(block, "merk");
+    if (!merk) continue;
+
+    const photoMatch = block.match(/data-lazyloader-src="([^"]+)"/);
+    const photo = photoMatch ? photoMatch[1] : "";
+
+    vehicles.push({
+      id: attr(block, "aid"),
+      merk,
+      model: attr(block, "model"),
+      type: attr(block, "type"),
+      bouwjaar: attr(block, "bouwjaar"),
+      brandstof: attr(block, "brandstof"),
+      transmissie: attr(block, "transmissie"),
+      kilometerstand: attr(block, "kilometerstand"),
+      carrosserie: attr(block, "carrosserie"),
+      kleur: attr(block, "kleur"),
+      prijs: parseInt(attr(block, "prijs") || "0", 10),
+      vermogen_pk: attr(block, "vermogen-pk"),
+      afbeelding: photo,
+      kenteken: attr(block, "kenteken"),
+      feedStatus: extractFeedStatus(block),
+    });
+  }
+
+  return vehicles;
 }
 
 Deno.serve(async (req) => {
@@ -75,68 +123,41 @@ Deno.serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
     const feedUrl = `${supabaseUrl}/functions/v1/google-vehicle-feed`;
     console.log(`[google-vehicle-feed] Public feed URL: ${feedUrl}`);
 
-    const { data: vehicles, error } = await supabase
-      .from("vehicles")
-      .select("*")
-      .neq("status", "verkocht")
-      .gt("verkoopprijs", 0)
-      .not("kenteken", "is", null)
-      .neq("kenteken", "")
-      .limit(2000);
-
-    if (error) throw error;
-
-    const vehicleIds = (vehicles || []).map((v: any) => v.id);
-    const { data: photos } = await supabase
-      .from("vehicle_photos")
-      .select("vehicle_id, file_path, volgorde, is_hoofdfoto")
-      .in("vehicle_id", vehicleIds.length ? vehicleIds : ["00000000-0000-0000-0000-000000000000"])
-      .order("is_hoofdfoto", { ascending: false })
-      .order("volgorde", { ascending: true });
-
-    const photoByVehicle = new Map<string, string>();
-    for (const p of photos || []) {
-      if (!photoByVehicle.has(p.vehicle_id)) {
-        photoByVehicle.set(
-          p.vehicle_id,
-          `${supabaseUrl}/storage/v1/object/public/vehicle-photos/${p.file_path}`
-        );
-      }
-    }
-
+    const vehicles = await fetchList();
     const now = new Date().toISOString();
     const year = new Date().getFullYear();
 
     const items: string[] = [];
 
-    for (const v of vehicles || []) {
+    for (const v of vehicles) {
+      if (v.feedStatus === "verkocht") continue;
+      if (!v.prijs || v.prijs <= 0) continue;
       const kentekenClean = kentekenUpper(v.kenteken);
       const slug = kentekenSlug(v.kenteken);
       if (!kentekenClean || !slug) continue;
 
-      const title = `${v.merk || ""} ${v.model || ""}`.trim();
+      const title = `${v.merk} ${v.model}`.trim();
       const link = `${SITE}/autos/${slug}`;
-      const image = photoByVehicle.get(v.id);
 
       const km = v.kilometerstand
         ? new Intl.NumberFormat("nl-NL").format(Number(v.kilometerstand))
         : "";
 
       const descParts = [
-        v.bouwjaar ? String(v.bouwjaar) : "",
+        v.bouwjaar || "",
         km ? `${km} Km` : "",
         v.brandstof ? capitalize(v.brandstof) : "",
+        v.transmissie || "",
+        v.carrosserie ? capitalize(v.carrosserie) : "",
         v.kleur ? capitalize(v.kleur) : "",
+        v.vermogen_pk ? `${v.vermogen_pk} Pk` : "",
       ].filter(Boolean);
       const description = descParts.join(" · ");
 
-      const price = `${Math.round(Number(v.verkoopprijs))}.00 EUR`;
+      const price = `${Math.round(Number(v.prijs))}.00 EUR`;
       const id = `tag:platinautomotive.nl,${year}:${kentekenClean}`;
 
       const fields: string[] = [];
@@ -145,11 +166,11 @@ Deno.serve(async (req) => {
       fields.push(`    <title>${xmlEscape(title)}</title>`);
       if (description) fields.push(`    <description>${xmlEscape(description)}</description>`);
       fields.push(`    <link>${xmlEscape(link)}</link>`);
-      if (image) fields.push(`    <g:image_link>${xmlEscape(image)}</g:image_link>`);
+      if (v.afbeelding) fields.push(`    <g:image_link>${xmlEscape(v.afbeelding)}</g:image_link>`);
       fields.push(`    <g:price>${xmlEscape(price)}</g:price>`);
       fields.push(`    <g:condition>used</g:condition>`);
-      if (v.merk) fields.push(`    <g:vehicle_make>${xmlEscape(v.merk)}</g:vehicle_make>`);
-      if (v.model) fields.push(`    <g:vehicle_model>${xmlEscape(v.model)}</g:vehicle_model>`);
+      fields.push(`    <g:vehicle_make>${xmlEscape(v.merk)}</g:vehicle_make>`);
+      fields.push(`    <g:vehicle_model>${xmlEscape(v.model)}</g:vehicle_model>`);
       if (v.bouwjaar) fields.push(`    <g:vehicle_year>${xmlEscape(v.bouwjaar)}</g:vehicle_year>`);
       if (v.kilometerstand) {
         fields.push(
@@ -158,8 +179,11 @@ Deno.serve(async (req) => {
       }
       const fuel = mapFuel(v.brandstof);
       if (fuel) fields.push(`    <g:vehicle_fuel_type>${xmlEscape(fuel)}</g:vehicle_fuel_type>`);
+      const trans = mapTransmission(v.transmissie);
+      if (trans) fields.push(`    <g:vehicle_transmission>${trans}</g:vehicle_transmission>`);
       if (v.kleur) fields.push(`    <g:color>${xmlEscape(capitalize(v.kleur))}</g:color>`);
-      if (v.chassis_nummer) fields.push(`    <g:vehicle_vin>${xmlEscape(v.chassis_nummer)}</g:vehicle_vin>`);
+      const body = mapBody(v.carrosserie);
+      if (body) fields.push(`    <g:vehicle_body_style>${body}</g:vehicle_body_style>`);
       fields.push(`    <g:product_type>Car</g:product_type>`);
       fields.push(`    <g:availability>in stock</g:availability>`);
       fields.push(`    <g:brand>Platin Automotive</g:brand>`);
