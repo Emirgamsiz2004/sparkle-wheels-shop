@@ -94,6 +94,9 @@ async function fetchList() {
     const photoMatch = block.match(/data-lazyloader-src="([^"]+)"/);
     const photo = photoMatch ? photoMatch[1] : "";
 
+    const detailMatch = block.match(/href="(\/[^"]*details\.aspx[^"]*)"/);
+    const detailPath = detailMatch ? detailMatch[1] : "";
+
     vehicles.push({
       id: attr(block, "aid"),
       merk,
@@ -108,12 +111,46 @@ async function fetchList() {
       prijs: parseInt(attr(block, "prijs") || "0", 10),
       vermogen_pk: attr(block, "vermogen-pk"),
       afbeelding: photo,
+      detailPath,
       kenteken: attr(block, "kenteken"),
       feedStatus: extractFeedStatus(block),
     });
   }
 
   return vehicles;
+}
+
+async function fetchDetailPhotos(detailPath: string): Promise<string[]> {
+  try {
+    const res = await fetch(`${BASE}${detailPath}`);
+    if (!res.ok) return [];
+    const html = await res.text();
+    const all = html.match(/https:\/\/media-cdn\.vwe\.nl\/Images\/\d+/g) || [];
+    const unique = [...new Set(all)];
+    return unique.map((p) => `${p}?templateid=&overlay=&bgc=f5f5f5&w=1280`);
+  } catch {
+    return [];
+  }
+}
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  fn: (item: T, i: number) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let idx = 0;
+  const workers = new Array(Math.min(concurrency, items.length || 1))
+    .fill(0)
+    .map(async () => {
+      while (true) {
+        const i = idx++;
+        if (i >= items.length) return;
+        results[i] = await fn(items[i], i);
+      }
+    });
+  await Promise.all(workers);
+  return results;
 }
 
 Deno.serve(async (req) => {
@@ -132,11 +169,31 @@ Deno.serve(async (req) => {
 
     const items: string[] = [];
 
+    const eligible = vehicles.filter(
+      (v: any) =>
+        v.feedStatus !== "verkocht" &&
+        v.prijs > 0 &&
+        kentekenUpper(v.kenteken) &&
+        v.detailPath
+    );
+
+    const photoLists = await mapWithConcurrency(eligible, 8, (v: any) =>
+      fetchDetailPhotos(v.detailPath)
+    );
+    const photosByAid = new Map<string, string[]>();
+    eligible.forEach((v: any, i: number) => photosByAid.set(v.id, photoLists[i] || []));
+
     for (const v of vehicles) {
       if (v.feedStatus === "verkocht") continue;
       if (!v.prijs || v.prijs <= 0) continue;
       const kentekenClean = kentekenUpper(v.kenteken);
       const slug = kentekenSlug(v.kenteken);
+      if (!kentekenClean || !slug) continue;
+
+      const fotos = photosByAid.get(v.id) || [];
+      const hoofdfoto = fotos[0] || v.afbeelding || "";
+      const extraFotos = fotos.slice(1, 11);
+
       if (!kentekenClean || !slug) continue;
 
       const title = `${v.merk} ${v.model}`.trim();
@@ -166,7 +223,10 @@ Deno.serve(async (req) => {
       fields.push(`    <title>${xmlEscape(title)}</title>`);
       if (description) fields.push(`    <description>${xmlEscape(description)}</description>`);
       fields.push(`    <link>${xmlEscape(link)}</link>`);
-      if (v.afbeelding) fields.push(`    <g:image_link>${xmlEscape(v.afbeelding)}</g:image_link>`);
+      if (hoofdfoto) fields.push(`    <g:image_link>${xmlEscape(hoofdfoto)}</g:image_link>`);
+      for (const ef of extraFotos) {
+        fields.push(`    <g:additional_image_link>${xmlEscape(ef)}</g:additional_image_link>`);
+      }
       fields.push(`    <g:price>${xmlEscape(price)}</g:price>`);
       fields.push(`    <g:condition>used</g:condition>`);
       fields.push(`    <g:vehicle_make>${xmlEscape(v.merk)}</g:vehicle_make>`);
