@@ -94,6 +94,9 @@ async function fetchList() {
     const photoMatch = block.match(/data-lazyloader-src="([^"]+)"/);
     const photo = photoMatch ? photoMatch[1] : "";
 
+    const detailMatch = block.match(/href="(\/[^"]*details\.aspx[^"]*)"/);
+    const detailPath = detailMatch ? detailMatch[1] : "";
+
     vehicles.push({
       id: attr(block, "aid"),
       merk,
@@ -108,12 +111,46 @@ async function fetchList() {
       prijs: parseInt(attr(block, "prijs") || "0", 10),
       vermogen_pk: attr(block, "vermogen-pk"),
       afbeelding: photo,
+      detailPath,
       kenteken: attr(block, "kenteken"),
       feedStatus: extractFeedStatus(block),
     });
   }
 
   return vehicles;
+}
+
+async function fetchDetailPhotos(detailPath: string): Promise<string[]> {
+  try {
+    const res = await fetch(`${BASE}${detailPath}`);
+    if (!res.ok) return [];
+    const html = await res.text();
+    const all = html.match(/https:\/\/media-cdn\.vwe\.nl\/Images\/\d+/g) || [];
+    const unique = [...new Set(all)];
+    return unique.map((p) => `${p}?templateid=&overlay=&bgc=f5f5f5&w=1280`);
+  } catch {
+    return [];
+  }
+}
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  fn: (item: T, i: number) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let idx = 0;
+  const workers = new Array(Math.min(concurrency, items.length || 1))
+    .fill(0)
+    .map(async () => {
+      while (true) {
+        const i = idx++;
+        if (i >= items.length) return;
+        results[i] = await fn(items[i], i);
+      }
+    });
+  await Promise.all(workers);
+  return results;
 }
 
 Deno.serve(async (req) => {
