@@ -26,6 +26,7 @@ interface PdfData {
     plaats: string;
   };
   effectiveCommissie: number;
+  verkoperHandtekeningDataUrl?: string;
 }
 
 const formatEur = (n: number) =>
@@ -38,7 +39,7 @@ const formatDate = (d: string) => {
   return d;
 };
 
-function buildConsignatieDoc({ vehicle, form, effectiveCommissie }: PdfData) {
+function buildConsignatieDoc({ vehicle, form, effectiveCommissie, verkoperHandtekeningDataUrl }: PdfData) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pw = 210;
   const ml = 20;
@@ -255,6 +256,9 @@ function buildConsignatieDoc({ vehicle, form, effectiveCommissie }: PdfData) {
   addText("Handtekening:", ml, y);
   addText("Handtekening:", ml + colW + 10, y);
   y += 3;
+  if (verkoperHandtekeningDataUrl) {
+    try { doc.addImage(verkoperHandtekeningDataUrl, "PNG", ml, y, 50, 18); } catch {}
+  }
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.3);
   doc.line(ml, y + 20, ml + colW, y + 20);
