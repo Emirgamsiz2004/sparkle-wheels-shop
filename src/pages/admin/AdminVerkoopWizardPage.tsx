@@ -3167,6 +3167,8 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       await p.onAutoSave();
 
       const { buildKoopovereenkomstDoc } = await import("@/lib/koopovereenkomstPdf");
+      const { getCurrentUserSignatureDataUrl } = await import("@/lib/userSignature");
+      const verkoperHandtekeningDataUrl = (await getCurrentUserSignatureDataUrl()) || undefined;
       const doc = await buildKoopovereenkomstDoc({
         voertuig: {
           merk: p.vehicle.merk,
