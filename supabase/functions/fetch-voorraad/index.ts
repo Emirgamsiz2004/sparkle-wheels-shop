@@ -271,14 +271,16 @@ Deno.serve(async (req) => {
 
     const { data: dbVehicles } = await supabase
       .from("vehicles")
-      .select("feed_id, kenteken, status, marktplaats_url")
+      .select("feed_id, kenteken, status, marktplaats_url, verkoop_datum")
       .in("status", ["verkocht", "gereserveerd"]);
 
-    const statusByFeedId = new Map<string, { status: string; marktplaats_url: string | null }>();
-    const statusByKenteken = new Map<string, { status: string; marktplaats_url: string | null }>();
+    type DbMatch = { status: string; marktplaats_url: string | null; verkoop_datum: string | null };
+    const statusByFeedId = new Map<string, DbMatch>();
+    const statusByKenteken = new Map<string, DbMatch>();
     for (const v of (dbVehicles || [])) {
-      if (v.feed_id) statusByFeedId.set(v.feed_id, { status: v.status, marktplaats_url: v.marktplaats_url });
-      if (v.kenteken) statusByKenteken.set(v.kenteken.toUpperCase().replace(/[^A-Z0-9]/g, ""), { status: v.status, marktplaats_url: v.marktplaats_url });
+      const entry: DbMatch = { status: v.status, marktplaats_url: v.marktplaats_url, verkoop_datum: v.verkoop_datum };
+      if (v.feed_id) statusByFeedId.set(v.feed_id, entry);
+      if (v.kenteken) statusByKenteken.set(v.kenteken.toUpperCase().replace(/[^A-Z0-9]/g, ""), entry);
     }
 
     // Merge status into feed vehicles
@@ -288,6 +290,7 @@ Deno.serve(async (req) => {
       return {
         ...v,
         dbStatus: match?.status || v.feedStatus || "te_koop",
+        verkochtOp: match?.verkoop_datum || null,
       };
     });
 
