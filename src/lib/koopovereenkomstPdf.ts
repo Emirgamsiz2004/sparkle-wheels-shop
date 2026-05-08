@@ -342,22 +342,24 @@ function buildHtml(data: KoopovereenkomstData): string {
   ${data.opmerkingen ? `<div class="opm"><strong>Opmerkingen:</strong> ${escapeHtml(data.opmerkingen)}</div>` : ""}
 
   <!-- HANDTEKENINGEN -->
-  <div class="signs">
-    <div class="sign">
-      <h4>Verkoper</h4>
-      <div class="name">Platin Automotive</div>
-      <div class="row"><span class="label">Datum</span><span class="line"></span></div>
-      <div class="row"><span class="label">Plaats</span><span class="line"></span></div>
-      <div class="siglabel">Handtekening</div>
-      <div class="sigbox"></div>
+  <div style="margin-top: 26px;">
+    <div class="row" style="display:flex;align-items:baseline;gap:10px;font-size:10px;color:#444;margin-bottom:14px;">
+      <span style="color:#666;min-width:55px;">Datum</span>
+      <span style="flex:0 0 220px;border-bottom:0.5px solid #888;height:13px;"></span>
     </div>
-    <div class="sign">
-      <h4>Koper</h4>
-      <div class="name">${escapeHtml(klantNaam)}</div>
-      <div class="row"><span class="label">Datum</span><span class="line"></span></div>
-      <div class="row"><span class="label">Plaats</span><span class="line"></span></div>
-      <div class="siglabel">Handtekening</div>
-      <div class="sigbox"></div>
+    <div class="signs">
+      <div class="sign">
+        <h4>Verkoper</h4>
+        <div class="name">Platin Automotive</div>
+        <div class="siglabel">Handtekening</div>
+        <div class="sigbox"></div>
+      </div>
+      <div class="sign">
+        <h4>Koper</h4>
+        <div class="name">${escapeHtml(klantNaam)}</div>
+        <div class="siglabel">Handtekening</div>
+        <div class="sigbox"></div>
+      </div>
     </div>
   </div>
 
