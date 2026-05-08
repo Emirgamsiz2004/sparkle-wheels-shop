@@ -121,6 +121,8 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
       const aanbetalingId = inserted?.id;
 
       // Generate PDF
+      const { getCurrentUserSignatureDataUrl } = await import("@/lib/userSignature");
+      const verkoperHandtekeningDataUrl = (await getCurrentUserSignatureDataUrl()) || undefined;
       const pdfData = {
         voertuig: {
           merk: vehicle.merk,
@@ -149,6 +151,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
         contantBedrag: form.betaalwijze === "combinatie" ? form.contantBedrag : undefined,
         datum: form.datum,
         plaats: form.plaats,
+        verkoperHandtekeningDataUrl,
       };
 
       const pdfBlob = generateAanbetalingBlob(pdfData);
