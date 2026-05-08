@@ -3231,6 +3231,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         plaats: "Roelofarendsveen",
         afleverDatum: p.leverdatum,
         opmerkingen: p.opmerkingen,
+        verkoperHandtekeningDataUrl,
       });
 
       // Open PDF in nieuw tabblad
