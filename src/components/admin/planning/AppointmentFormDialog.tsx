@@ -509,11 +509,13 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                         <SelectValue placeholder="Selecteer voertuig" />
                       </SelectTrigger>
                       <SelectContent className="rounded-[3px] max-h-[260px]">
-                        <div className="px-2 pb-2 pt-1">
+                        <div className="px-2 pb-2 pt-1" onKeyDown={(e) => e.stopPropagation()}>
                           <Input
                             placeholder="Zoek op merk, model of kenteken..."
                             value={vehicleSearch}
                             onChange={(e) => setVehicleSearch(e.target.value)}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}
                             className="rounded-[3px] h-8 text-xs"
                           />
                         </div>
