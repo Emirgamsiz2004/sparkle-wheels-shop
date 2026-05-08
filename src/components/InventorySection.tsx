@@ -7,7 +7,15 @@ import useEmblaCarousel from "embla-carousel-react";
 import { useCallback } from "react";
 
 const InventorySection = () => {
-  const { data: voertuigen, isLoading } = useVoorraadFeed();
+  const { data: alleVoertuigen, isLoading } = useVoorraadFeed();
+  // Verberg verkochte voertuigen die meer dan 14 dagen geleden zijn verkocht
+  const RECENT_SOLD_DAYS = 14;
+  const voertuigen = alleVoertuigen?.filter((v) => {
+    if (v.dbStatus !== "verkocht") return true;
+    if (!v.verkochtOp) return false;
+    const days = (Date.now() - new Date(v.verkochtOp).getTime()) / 86400000;
+    return days <= RECENT_SOLD_DAYS;
+  });
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     slidesToScroll: 1,

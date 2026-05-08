@@ -1,17 +1,28 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Loader2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Loader2, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import VoorraadCard from "@/components/VoorraadCard";
 import { useVoorraadFeed } from "@/hooks/useVoorraadFeed";
+import useEmblaCarousel from "embla-carousel-react";
+import { useCallback } from "react";
 
 const Voorraad = () => {
   const { data: voertuigen, isLoading, isError, error } = useVoorraadFeed();
 
   const beschikbaar = voertuigen?.filter((v) => v.dbStatus !== "verkocht") ?? [];
   const verkocht = voertuigen?.filter((v) => v.dbStatus === "verkocht") ?? [];
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    slidesToScroll: 1,
+    containScroll: "trimSnaps",
+    loop: false,
+  });
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,19 +118,46 @@ const Voorraad = () => {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="mt-20"
             >
-              <div className="mb-10">
-                <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
-                  Recent verkocht
-                </p>
-                <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight">
-                  Eerder verkocht
-                </h2>
+              <div className="mb-10 flex items-end justify-between gap-4">
+                <div>
+                  <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
+                    Recent verkocht
+                  </p>
+                  <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight">
+                    Onlangs verkocht
+                  </h2>
+                </div>
+                {verkocht.length > 3 && (
+                  <div className="hidden md:flex items-center gap-2">
+                    <button
+                      onClick={scrollPrev}
+                      className="w-10 h-10 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors duration-300"
+                      aria-label="Vorige"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={scrollNext}
+                      className="w-10 h-10 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors duration-300"
+                      aria-label="Volgende"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {verkocht.map((v, i) => (
-                  <VoorraadCard key={v.id} voertuig={v} index={i} />
-                ))}
+              <div className="overflow-hidden" ref={emblaRef}>
+                <div className="flex gap-5">
+                  {verkocht.map((v, i) => (
+                    <div
+                      key={v.id}
+                      className="flex-[0_0_85%] min-w-0 sm:flex-[0_0_calc(50%-10px)] lg:flex-[0_0_calc(33.333%-14px)]"
+                    >
+                      <VoorraadCard voertuig={v} index={i} />
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )}
