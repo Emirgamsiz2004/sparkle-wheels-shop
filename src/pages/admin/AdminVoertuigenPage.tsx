@@ -404,6 +404,17 @@ const AdminVoertuigenPage = () => {
           </div>
         </div>
       )}
+
+      <ConfirmPopover
+        open={!!confirmDelete}
+        onOpenChange={(o) => { if (!o) setConfirmDelete(null); }}
+        anchorRect={confirmDelete?.rect ?? null}
+        title="Voertuig verwijderen?"
+        message={confirmDelete ? `${confirmDelete.label} en alle bijbehorende gegevens worden permanent verwijderd. Dit kan niet ongedaan worden gemaakt.` : ""}
+        confirmLabel="Verwijderen"
+        destructive
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };
