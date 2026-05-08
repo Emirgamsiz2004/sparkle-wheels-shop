@@ -37,6 +37,7 @@ export interface KoopovereenkomstData {
     betalingen?: Array<{ methode: string; bedrag: number; maatschappij?: string }>;
     aanbetalingActief: boolean;
     aanbetalingsbedrag?: number;
+    aanbetalingBetaalwijze?: string;
     restbedrag?: number;
   };
   garantie: {
