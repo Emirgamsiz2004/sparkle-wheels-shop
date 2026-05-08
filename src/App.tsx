@@ -14,6 +14,7 @@ import Voorraad from "./pages/Voorraad";
 import VoertuigDetail from "./pages/VoertuigDetail";
 import VoorraadDetailPage from "./pages/VoorraadDetailPage";
 import Consignatie from "./pages/Consignatie";
+import ConsignatieVoorwaarden from "./pages/ConsignatieVoorwaarden";
 import Contact from "./pages/Contact";
 import OverOns from "./pages/OverOns";
 import InEnVerkoop from "./pages/InEnVerkoop";
