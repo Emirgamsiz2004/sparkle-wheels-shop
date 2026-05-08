@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, Copy, Check, Bell } from "lucide-react";
 import { toast } from "sonner";
 import DienstenBeheer from "@/components/admin/instellingen/DienstenBeheer";
+import HandtekeningUpload from "@/components/admin/instellingen/HandtekeningUpload";
 
 const WEBHOOK_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID || "leykexzdvatuyitkxdxs"}.supabase.co/functions/v1/make-webhook-handler`;
 
@@ -171,6 +172,9 @@ const AdminInstellingenPage = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Handtekening */}
+      <HandtekeningUpload />
 
       {/* Diensten Beheer */}
       <DienstenBeheer />
