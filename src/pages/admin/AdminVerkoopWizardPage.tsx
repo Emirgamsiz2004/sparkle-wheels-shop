@@ -308,6 +308,19 @@ const AdminVerkoopWizardPage = () => {
     if (!vehicleId || !vehicle) return;
     let cancelled = false;
     (async () => {
+      // Blokkeer wizard als voertuig al verkocht is
+      if ((vehicle as any).status === "verkocht") {
+        // Sluit eventuele resterende 'bezig' wizards automatisch
+        await supabase
+          .from("verkopen")
+          .update({ wizard_status: "geannuleerd" } as any)
+          .eq("vehicle_id", vehicleId)
+          .eq("wizard_status", "bezig");
+        if (cancelled) return;
+        toast.error('Dit voertuig is al verkocht. Zet het terug op "te koop" om een nieuwe verkoop te starten.');
+        navigate(`/admin/verkopen/${vehicleId}`, { replace: true });
+        return;
+      }
       // Bestaand 'bezig' record zoeken
       const { data: existing } = await supabase
         .from("verkopen")
