@@ -1,17 +1,28 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Loader2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Loader2, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import VoorraadCard from "@/components/VoorraadCard";
 import { useVoorraadFeed } from "@/hooks/useVoorraadFeed";
+import useEmblaCarousel from "embla-carousel-react";
+import { useCallback } from "react";
 
 const Voorraad = () => {
   const { data: voertuigen, isLoading, isError, error } = useVoorraadFeed();
 
   const beschikbaar = voertuigen?.filter((v) => v.dbStatus !== "verkocht") ?? [];
   const verkocht = voertuigen?.filter((v) => v.dbStatus === "verkocht") ?? [];
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    slidesToScroll: 1,
+    containScroll: "trimSnaps",
+    loop: false,
+  });
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
     <div className="min-h-screen bg-background">
