@@ -354,7 +354,7 @@ function buildHtml(data: KoopovereenkomstData): string {
         <h4>Verkoper</h4>
         <div class="name">Platin Automotive</div>
         <div class="siglabel">Handtekening</div>
-        <div class="sigbox"></div>
+        <div class="sigbox">${data.verkoperHandtekeningDataUrl ? `<img src="${data.verkoperHandtekeningDataUrl}" alt="Handtekening" />` : ""}</div>
       </div>
       <div class="sign">
         <h4>Koper</h4>
