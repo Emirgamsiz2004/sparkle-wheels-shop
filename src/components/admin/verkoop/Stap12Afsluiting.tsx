@@ -234,6 +234,14 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
         .eq("id", p.vehicleId);
       if (e2) throw e2;
 
+      // Sluit alle andere openstaande verkoopwizards voor dit voertuig
+      await supabase
+        .from("verkopen")
+        .update({ wizard_status: "geannuleerd" } as any)
+        .eq("vehicle_id", p.vehicleId)
+        .eq("wizard_status", "bezig")
+        .neq("id", p.verkoopId);
+
       toast.success("Verkoop succesvol afgesloten");
       navigate("/admin/verkopen");
     } catch (err) {
