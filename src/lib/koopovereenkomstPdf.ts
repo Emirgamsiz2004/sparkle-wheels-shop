@@ -320,7 +320,7 @@ function buildHtml(data: KoopovereenkomstData): string {
       ${(data.financieel.afleverkosten || 0) > 0 ? `<tr class="sub"><td>Afleverkosten</td><td class="amt">${formatEur(data.financieel.afleverkosten || 0)}</td></tr>` : ""}
       ${(data.financieel.leges || 0) > 0 ? `<tr class="sub"><td>Leges</td><td class="amt">${formatEur(data.financieel.leges || 0)}</td></tr>` : ""}
       <tr class="divider total"><td>Totaalbedrag</td><td class="amt">${formatEur(totaal)}</td></tr>
-      ${aanbetaling > 0 ? `<tr class="sub"><td>Aanbetaling</td><td class="amt">− ${formatEur(aanbetaling)}</td></tr>` : ""}
+      ${aanbetaling > 0 ? `<tr class="sub"><td>Aanbetaling${data.financieel.aanbetalingBetaalwijze ? ` (${escapeHtml(({cash:"Cash",pin:"Pin",ideal:"iDEAL",overboeking:"Overboeking",bank:"Bank",financiering:"Financiering"} as Record<string,string>)[data.financieel.aanbetalingBetaalwijze] || data.financieel.aanbetalingBetaalwijze)})` : ""} — reeds voldaan</td><td class="amt">− ${formatEur(aanbetaling)}</td></tr>` : ""}
       <tr class="rest"><td>Restbedrag</td><td class="amt">${formatEur(restbedrag)}</td></tr>
       ${(data.financieel.betalingen && data.financieel.betalingen.length > 0)
         ? data.financieel.betalingen.map(b => {
@@ -329,11 +329,10 @@ function buildHtml(data: KoopovereenkomstData): string {
             const suffix = b.methode === "financiering" && b.maatschappij ? ` (${escapeHtml(b.maatschappij)})` : "";
             return `<tr class="pay"><td>${escapeHtml(label)}${suffix}</td><td class="amt">${formatEur(b.bedrag || 0)}</td></tr>`;
           }).join("")
-        : `<tr class="pay"><td>Betaalwijze: ${escapeHtml(data.financieel.betaalwijze || "—")}</td><td></td></tr>`}
+        : `<tr class="pay"><td>Betaalwijze restbedrag: ${escapeHtml(data.financieel.betaalwijze || "—")}</td><td></td></tr>`}
     </table>
     <div class="fin-foot">
       <span><strong>Verwachte leverdatum:</strong> ${escapeHtml(formatDate(data.afleverDatum))}</span>
-      <span><strong>Plaats:</strong> ${escapeHtml(data.plaats || "Roelofarendsveen")}</span>
     </div>
   </div>
 
