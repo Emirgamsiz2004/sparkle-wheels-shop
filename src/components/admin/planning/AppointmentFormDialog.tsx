@@ -656,7 +656,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                 {/* Datum */}
                 <div>
                   <Label className="text-xs text-muted-foreground mb-1.5 block">Datum *</Label>
-                  <Popover>
+                  <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -669,52 +669,46 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                         {selectedDate ? format(selectedDate, "d MMM yyyy", { locale: nl }) : "Kies datum"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 rounded-[3px]" align="start">
+                    <PopoverContent className="w-auto p-0 rounded-[12px]" align="start">
                       <Calendar
                         mode="single"
                         selected={selectedDate}
-                        onSelect={setSelectedDate}
+                        onSelect={(d) => {
+                          if (!d) return;
+                          setSelectedDate(d);
+                          setDatePopoverOpen(false);
+                        }}
                         locale={nl}
                         className="p-3 pointer-events-auto"
+                        classNames={{
+                          day: cn(
+                            "h-9 w-9 p-0 font-normal rounded-full inline-flex items-center justify-center hover:bg-accent/50 transition-colors aria-selected:opacity-100"
+                          ),
+                          day_selected:
+                            "bg-primary text-primary-foreground rounded-full hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                          day_today:
+                            "ring-1 ring-primary/60 text-primary font-semibold rounded-full",
+                          cell:
+                            "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+                        }}
                         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                       />
                     </PopoverContent>
                   </Popover>
                 </div>
 
-                {/* Begintijd + eindtijd */}
+                {/* Afspraaktijd */}
                 <div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1.5 block">Begintijd *</Label>
-                      <Select value={form.tijd} onValueChange={(v) => setForm({ ...form, tijd: v })}>
-                        <SelectTrigger className="rounded-[3px] h-10">
-                          <Clock className="mr-2 h-4 w-4 opacity-60" />
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-[3px] max-h-[240px]">
-                          {timeSlots.map((t) => <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1.5 block flex items-center justify-between">
-                        <span>Eindtijd</span>
-                        {eindtijdManueel && (
-                          <button type="button" onClick={() => setEindtijdManueel(false)} className="text-[10px] text-primary hover:underline">auto</button>
-                        )}
-                      </Label>
-                      <Select value={form.eindtijd} onValueChange={(v) => { setForm({ ...form, eindtijd: v }); setEindtijdManueel(true); }}>
-                        <SelectTrigger className="rounded-[3px] h-10">
-                          <Clock className="mr-2 h-4 w-4 opacity-60" />
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-[3px] max-h-[240px]">
-                          {timeSlots.map((t) => <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">Tijd *</Label>
+                  <Select value={form.tijd} onValueChange={(v) => setForm({ ...form, tijd: v })}>
+                    <SelectTrigger className="rounded-[3px] h-10">
+                      <Clock className="mr-2 h-4 w-4 opacity-60" />
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-[3px] max-h-[240px]">
+                      {timeSlots.map((t) => <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   {dienstenDuur > 0 && (
                     <p className="text-[11px] text-muted-foreground mt-1.5">
                       Geschatte duur diensten: <span className="text-foreground">{formatDuur(dienstenDuur)}</span>
