@@ -118,6 +118,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   const [type, setType] = useState<AppointmentType | null>((defaultType as AppointmentType) || null);
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
   const [vehicleSearch, setVehicleSearch] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [customerOpen, setCustomerOpen] = useState(false);
