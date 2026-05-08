@@ -612,6 +612,16 @@ const Consignatie = () => {
               </p>
             </div>
           </div>
+
+          <div className="mt-12 flex justify-center">
+            <Link
+              to="/consignatie-voorwaarden"
+              className="inline-flex items-center gap-2 px-6 py-3 text-[10px] tracking-[0.2em] uppercase font-body font-medium bg-foreground text-background hover:bg-foreground/90 transition-all"
+            >
+              Bekijk onze consignatievoorwaarden
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
       </section>
 
