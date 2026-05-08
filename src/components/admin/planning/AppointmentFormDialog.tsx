@@ -386,24 +386,13 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   const containerRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
 
+  // Sluit alleen op Escape of via het kruisje — NIET op outside-click,
+  // zodat per ongeluk klikken naast de popover de invoer niet verloren gaat.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleOpenChange(false); };
-    const onDown = (e: MouseEvent) => {
-      const target = e.target as Node | null;
-      if (!target) return;
-      if (containerRef.current && containerRef.current.contains(target)) return;
-      const el = target as HTMLElement;
-      if (el.closest && el.closest('[data-radix-popper-content-wrapper], [data-radix-popover-content], [data-radix-select-content], [role="listbox"], [role="dialog"]')) return;
-      handleOpenChange(false);
-    };
     window.addEventListener("keydown", onKey);
-    const t = setTimeout(() => document.addEventListener("mousedown", onDown), 0);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      clearTimeout(t);
-      document.removeEventListener("mousedown", onDown);
-    };
+    return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
