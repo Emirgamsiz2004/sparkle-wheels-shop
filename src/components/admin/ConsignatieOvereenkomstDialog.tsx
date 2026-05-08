@@ -203,7 +203,9 @@ const ConsignatieOvereenkomstDialog = ({ open, onClose, vehicle }: Props) => {
       }
 
       // Generate PDF blob for storage
-      const pdfData = { vehicle, form, effectiveCommissie };
+      const { getCurrentUserSignatureDataUrl } = await import("@/lib/userSignature");
+      const verkoperHandtekeningDataUrl = (await getCurrentUserSignatureDataUrl()) || undefined;
+      const pdfData = { vehicle, form, effectiveCommissie, verkoperHandtekeningDataUrl };
       const pdfBlob = generateConsignatieOvereenkomstBlob(pdfData);
 
       // Upload to storage

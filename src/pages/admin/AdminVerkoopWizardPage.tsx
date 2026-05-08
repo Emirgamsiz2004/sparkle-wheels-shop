@@ -3167,6 +3167,8 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       await p.onAutoSave();
 
       const { buildKoopovereenkomstDoc } = await import("@/lib/koopovereenkomstPdf");
+      const { getCurrentUserSignatureDataUrl } = await import("@/lib/userSignature");
+      const verkoperHandtekeningDataUrl = (await getCurrentUserSignatureDataUrl()) || undefined;
       const doc = await buildKoopovereenkomstDoc({
         voertuig: {
           merk: p.vehicle.merk,
@@ -3229,6 +3231,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         plaats: "Roelofarendsveen",
         afleverDatum: p.leverdatum,
         opmerkingen: p.opmerkingen,
+        verkoperHandtekeningDataUrl,
       });
 
       // Open PDF in nieuw tabblad

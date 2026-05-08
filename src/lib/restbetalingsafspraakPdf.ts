@@ -20,6 +20,7 @@ export interface RestbetalingPdfData {
   betaalwijze: "bank" | "cash";
   opmerking?: string;
   datum: string; // YYYY-MM-DD (vandaag)
+  verkoperHandtekeningDataUrl?: string;
 }
 
 const fmtEur = (n: number) =>
@@ -201,6 +202,9 @@ function buildDoc(data: RestbetalingPdfData) {
   doc.text("Handtekening:", ml, y);
   doc.text("Handtekening:", ml + colW + 10, y);
   y += 3;
+  if (data.verkoperHandtekeningDataUrl) {
+    try { doc.addImage(data.verkoperHandtekeningDataUrl, "PNG", ml, y, 50, 20); } catch {}
+  }
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.3);
   doc.line(ml, y + 22, ml + colW, y + 22);

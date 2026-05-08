@@ -28,6 +28,7 @@ interface AanbetalingPdfData {
   contantBedrag?: number;
   datum: string;
   plaats: string;
+  verkoperHandtekeningDataUrl?: string;
 }
 
 const formatEur = (n: number) =>
@@ -199,6 +200,9 @@ function buildDoc(data: AanbetalingPdfData) {
   doc.text("Handtekening:", ml, y);
   doc.text("Handtekening:", ml + colW + 10, y);
   y += 3;
+  if (data.verkoperHandtekeningDataUrl) {
+    try { doc.addImage(data.verkoperHandtekeningDataUrl, "PNG", ml, y, 50, 18); } catch {}
+  }
   doc.setDrawColor(180, 180, 180);
   doc.setLineWidth(0.3);
   doc.line(ml, y + 20, ml + colW, y + 20);
