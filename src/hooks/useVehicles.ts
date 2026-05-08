@@ -196,8 +196,19 @@ export function useVehicles() {
   };
 
   const deleteVehicle = async (id: string) => {
+    // Ruim child-records op zodat het voertuig compleet verwijderd kan worden
+    await Promise.all([
+      supabase.from('vehicle_costs').delete().eq('vehicle_id', id),
+      supabase.from('vehicle_documents').delete().eq('vehicle_id', id),
+      supabase.from('vehicle_activity_log').delete().eq('vehicle_id', id),
+      supabase.from('document_checklist_items').delete().eq('vehicle_id', id),
+    ]);
     const { error } = await supabase.from('vehicles').delete().eq('id', id);
-    if (error) { toast.error('Fout bij verwijderen voertuig'); return; }
+    if (error) {
+      console.error(error);
+      toast.error('Fout bij verwijderen voertuig: ' + (error.message || ''));
+      return;
+    }
     toast.success('Voertuig verwijderd');
     fetchVehicles();
   };

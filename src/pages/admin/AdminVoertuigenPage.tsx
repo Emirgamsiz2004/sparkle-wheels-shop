@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 
 import { useNavigate, Link } from "react-router-dom";
-import { Plus, Search, Loader2, ChevronRight, RefreshCw, AlertTriangle, FileWarning, ShieldCheck } from "lucide-react";
+import { Plus, Search, Loader2, ChevronRight, RefreshCw, AlertTriangle, FileWarning, ShieldCheck, Trash2 } from "lucide-react";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
 import { formatEuro, calcWinst, calcMarge, isConsignatie, statusLabels, statusColors, Vehicle } from "@/types/vehicle";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -11,6 +11,7 @@ import { getApkStatus } from "@/components/admin/detail/VehicleOverzichtTab";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { recheckApk } from "@/lib/apkRecheck";
+import ConfirmPopover from "@/components/admin/ConfirmPopover";
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "alle", label: "Alle statussen" },
@@ -23,7 +24,25 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
 ];
 
 const AdminVoertuigenPage = () => {
-  const { vehicles, loading, refetch } = useVehicles();
+  const { vehicles, loading, refetch, deleteVehicle } = useVehicles();
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; label: string; rect: DOMRect | null } | null>(null);
+
+  const handleDeleteClick = (e: React.MouseEvent, v: Vehicle) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setConfirmDelete({
+      id: v.id,
+      label: `${v.merk} ${v.model}${v.kenteken ? ` (${v.kenteken})` : ""}`,
+      rect,
+    });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmDelete) return;
+    await deleteVehicle(confirmDelete.id);
+    setConfirmDelete(null);
+  };
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("alle");
   const [search, setSearch] = useState("");
@@ -250,9 +269,17 @@ const AdminVoertuigenPage = () => {
               <Link
                 key={v.id}
                 to={`/admin/voertuigen/${v.id}`}
-                className="block bg-card border border-border rounded-[14px] active:bg-accent/30 transition-colors"
+                className="block bg-card border border-border rounded-[14px] active:bg-accent/30 transition-colors relative"
                 style={{ padding: "14px" }}
               >
+                <button
+                  onClick={(e) => handleDeleteClick(e, v)}
+                  className="absolute top-2 right-2 p-2 rounded-md text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="Verwijderen"
+                  aria-label="Verwijderen"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
                 {/* Rij 1: merk/model | bouwjaar */}
                 <div className="flex items-baseline justify-between gap-2">
                   <p className="text-[15px] font-semibold text-foreground truncate leading-tight">
@@ -323,7 +350,7 @@ const AdminVoertuigenPage = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  {["Voertuig", "Kenteken", "APK", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive"].map((h, i) => (
+                  {["Voertuig", "Kenteken", "APK", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive", ""].map((h, i) => (
                     <th key={h || i} className={`${i >= 3 && i <= 5 ? "text-right" : i >= 6 ? "text-center" : "text-left"} px-3 py-2 text-[11px] font-medium text-muted-foreground`}>{h}</th>
                   ))}
                 </tr>
@@ -360,6 +387,15 @@ const AdminVoertuigenPage = () => {
                       <td className="px-3 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
                         <GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} />
                       </td>
+                      <td className="px-2 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={(e) => handleDeleteClick(e, v)}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          title="Voertuig verwijderen"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -368,6 +404,17 @@ const AdminVoertuigenPage = () => {
           </div>
         </div>
       )}
+
+      <ConfirmPopover
+        open={!!confirmDelete}
+        onOpenChange={(o) => { if (!o) setConfirmDelete(null); }}
+        anchorRect={confirmDelete?.rect ?? null}
+        title="Voertuig verwijderen?"
+        message={confirmDelete ? `${confirmDelete.label} en alle bijbehorende gegevens worden permanent verwijderd. Dit kan niet ongedaan worden gemaakt.` : ""}
+        confirmLabel="Verwijderen"
+        destructive
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };
