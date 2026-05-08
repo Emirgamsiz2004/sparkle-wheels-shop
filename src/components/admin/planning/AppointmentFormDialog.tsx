@@ -118,6 +118,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   const [type, setType] = useState<AppointmentType | null>((defaultType as AppointmentType) || null);
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
   const [vehicleSearch, setVehicleSearch] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [customerOpen, setCustomerOpen] = useState(false);
@@ -386,24 +387,13 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   const containerRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
 
+  // Sluit alleen op Escape of via het kruisje — NIET op outside-click,
+  // zodat per ongeluk klikken naast de popover de invoer niet verloren gaat.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleOpenChange(false); };
-    const onDown = (e: MouseEvent) => {
-      const target = e.target as Node | null;
-      if (!target) return;
-      if (containerRef.current && containerRef.current.contains(target)) return;
-      const el = target as HTMLElement;
-      if (el.closest && el.closest('[data-radix-popper-content-wrapper], [data-radix-popover-content], [data-radix-select-content], [role="listbox"], [role="dialog"]')) return;
-      handleOpenChange(false);
-    };
     window.addEventListener("keydown", onKey);
-    const t = setTimeout(() => document.addEventListener("mousedown", onDown), 0);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      clearTimeout(t);
-      document.removeEventListener("mousedown", onDown);
-    };
+    return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -520,11 +510,13 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                         <SelectValue placeholder="Selecteer voertuig" />
                       </SelectTrigger>
                       <SelectContent className="rounded-[3px] max-h-[260px]">
-                        <div className="px-2 pb-2 pt-1">
+                        <div className="px-2 pb-2 pt-1" onKeyDown={(e) => e.stopPropagation()}>
                           <Input
                             placeholder="Zoek op merk, model of kenteken..."
                             value={vehicleSearch}
                             onChange={(e) => setVehicleSearch(e.target.value)}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}
                             className="rounded-[3px] h-8 text-xs"
                           />
                         </div>
@@ -664,7 +656,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                 {/* Datum */}
                 <div>
                   <Label className="text-xs text-muted-foreground mb-1.5 block">Datum *</Label>
-                  <Popover>
+                  <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -677,52 +669,46 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                         {selectedDate ? format(selectedDate, "d MMM yyyy", { locale: nl }) : "Kies datum"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 rounded-[3px]" align="start">
+                    <PopoverContent className="w-auto p-0 rounded-[12px]" align="start">
                       <Calendar
                         mode="single"
                         selected={selectedDate}
-                        onSelect={setSelectedDate}
+                        onSelect={(d) => {
+                          if (!d) return;
+                          setSelectedDate(d);
+                          setDatePopoverOpen(false);
+                        }}
                         locale={nl}
                         className="p-3 pointer-events-auto"
+                        classNames={{
+                          day: cn(
+                            "h-9 w-9 p-0 font-normal rounded-full inline-flex items-center justify-center hover:bg-accent/50 transition-colors aria-selected:opacity-100"
+                          ),
+                          day_selected:
+                            "bg-primary text-primary-foreground rounded-full hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                          day_today:
+                            "ring-1 ring-primary/60 text-primary font-semibold rounded-full",
+                          cell:
+                            "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+                        }}
                         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                       />
                     </PopoverContent>
                   </Popover>
                 </div>
 
-                {/* Begintijd + eindtijd */}
+                {/* Afspraaktijd */}
                 <div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1.5 block">Begintijd *</Label>
-                      <Select value={form.tijd} onValueChange={(v) => setForm({ ...form, tijd: v })}>
-                        <SelectTrigger className="rounded-[3px] h-10">
-                          <Clock className="mr-2 h-4 w-4 opacity-60" />
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-[3px] max-h-[240px]">
-                          {timeSlots.map((t) => <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1.5 block flex items-center justify-between">
-                        <span>Eindtijd</span>
-                        {eindtijdManueel && (
-                          <button type="button" onClick={() => setEindtijdManueel(false)} className="text-[10px] text-primary hover:underline">auto</button>
-                        )}
-                      </Label>
-                      <Select value={form.eindtijd} onValueChange={(v) => { setForm({ ...form, eindtijd: v }); setEindtijdManueel(true); }}>
-                        <SelectTrigger className="rounded-[3px] h-10">
-                          <Clock className="mr-2 h-4 w-4 opacity-60" />
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-[3px] max-h-[240px]">
-                          {timeSlots.map((t) => <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">Tijd *</Label>
+                  <Select value={form.tijd} onValueChange={(v) => setForm({ ...form, tijd: v })}>
+                    <SelectTrigger className="rounded-[3px] h-10">
+                      <Clock className="mr-2 h-4 w-4 opacity-60" />
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-[3px] max-h-[240px]">
+                      {timeSlots.map((t) => <SelectItem key={t} value={t} className="rounded-[3px]">{t}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   {dienstenDuur > 0 && (
                     <p className="text-[11px] text-muted-foreground mt-1.5">
                       Geschatte duur diensten: <span className="text-foreground">{formatDuur(dienstenDuur)}</span>
