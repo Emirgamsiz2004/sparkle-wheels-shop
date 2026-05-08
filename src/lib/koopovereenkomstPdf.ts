@@ -52,6 +52,7 @@ export interface KoopovereenkomstData {
   plaats: string;
   afleverDatum?: string;
   opmerkingen?: string;
+  verkoperHandtekeningDataUrl?: string;
   bedrijf?: {
     kvk?: string;
   };
