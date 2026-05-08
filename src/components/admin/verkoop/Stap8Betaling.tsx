@@ -340,6 +340,8 @@ const Stap8Betaling = ({
     setGeneratingPdf(true);
     try {
       const primaryMethode: Methode = rijen[0]?.methode || "bank";
+      const { getCurrentUserSignatureDataUrl } = await import("@/lib/userSignature");
+      const verkoperHandtekeningDataUrl = (await getCurrentUserSignatureDataUrl()) || undefined;
       const { blob, fileName } = generateRestbetalingPDF({
         voertuig: {
           merk: voertuigMerk,
@@ -360,6 +362,7 @@ const Stap8Betaling = ({
         betaalwijze: primaryMethode === "cash" ? "cash" : "bank",
         opmerking: opmerking,
         datum: new Date().toISOString().slice(0, 10),
+        verkoperHandtekeningDataUrl,
       });
 
       const localUrl = URL.createObjectURL(blob);
