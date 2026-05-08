@@ -37,6 +37,7 @@ export interface KoopovereenkomstData {
     betalingen?: Array<{ methode: string; bedrag: number; maatschappij?: string }>;
     aanbetalingActief: boolean;
     aanbetalingsbedrag?: number;
+    aanbetalingBetaalwijze?: string;
     restbedrag?: number;
   };
   garantie: {
@@ -319,7 +320,7 @@ function buildHtml(data: KoopovereenkomstData): string {
       ${(data.financieel.afleverkosten || 0) > 0 ? `<tr class="sub"><td>Afleverkosten</td><td class="amt">${formatEur(data.financieel.afleverkosten || 0)}</td></tr>` : ""}
       ${(data.financieel.leges || 0) > 0 ? `<tr class="sub"><td>Leges</td><td class="amt">${formatEur(data.financieel.leges || 0)}</td></tr>` : ""}
       <tr class="divider total"><td>Totaalbedrag</td><td class="amt">${formatEur(totaal)}</td></tr>
-      ${aanbetaling > 0 ? `<tr class="sub"><td>Aanbetaling</td><td class="amt">− ${formatEur(aanbetaling)}</td></tr>` : ""}
+      ${aanbetaling > 0 ? `<tr class="sub"><td>Aanbetaling${data.financieel.aanbetalingBetaalwijze ? ` (${escapeHtml(({cash:"Cash",pin:"Pin",ideal:"iDEAL",overboeking:"Overboeking",bank:"Bank",financiering:"Financiering"} as Record<string,string>)[data.financieel.aanbetalingBetaalwijze] || data.financieel.aanbetalingBetaalwijze)})` : ""} — reeds voldaan</td><td class="amt">− ${formatEur(aanbetaling)}</td></tr>` : ""}
       <tr class="rest"><td>Restbedrag</td><td class="amt">${formatEur(restbedrag)}</td></tr>
       ${(data.financieel.betalingen && data.financieel.betalingen.length > 0)
         ? data.financieel.betalingen.map(b => {
@@ -328,11 +329,10 @@ function buildHtml(data: KoopovereenkomstData): string {
             const suffix = b.methode === "financiering" && b.maatschappij ? ` (${escapeHtml(b.maatschappij)})` : "";
             return `<tr class="pay"><td>${escapeHtml(label)}${suffix}</td><td class="amt">${formatEur(b.bedrag || 0)}</td></tr>`;
           }).join("")
-        : `<tr class="pay"><td>Betaalwijze: ${escapeHtml(data.financieel.betaalwijze || "—")}</td><td></td></tr>`}
+        : `<tr class="pay"><td>Betaalwijze restbedrag: ${escapeHtml(data.financieel.betaalwijze || "—")}</td><td></td></tr>`}
     </table>
     <div class="fin-foot">
       <span><strong>Verwachte leverdatum:</strong> ${escapeHtml(formatDate(data.afleverDatum))}</span>
-      <span><strong>Plaats:</strong> ${escapeHtml(data.plaats || "Roelofarendsveen")}</span>
     </div>
   </div>
 
@@ -342,22 +342,24 @@ function buildHtml(data: KoopovereenkomstData): string {
   ${data.opmerkingen ? `<div class="opm"><strong>Opmerkingen:</strong> ${escapeHtml(data.opmerkingen)}</div>` : ""}
 
   <!-- HANDTEKENINGEN -->
-  <div class="signs">
-    <div class="sign">
-      <h4>Verkoper</h4>
-      <div class="name">Platin Automotive</div>
-      <div class="row"><span class="label">Datum</span><span class="line"></span></div>
-      <div class="row"><span class="label">Plaats</span><span class="line"></span></div>
-      <div class="siglabel">Handtekening</div>
-      <div class="sigbox"></div>
+  <div style="margin-top: 26px;">
+    <div class="row" style="display:flex;align-items:baseline;gap:10px;font-size:10px;color:#444;margin-bottom:14px;">
+      <span style="color:#666;min-width:55px;">Datum</span>
+      <span style="flex:0 0 220px;border-bottom:0.5px solid #888;height:13px;"></span>
     </div>
-    <div class="sign">
-      <h4>Koper</h4>
-      <div class="name">${escapeHtml(klantNaam)}</div>
-      <div class="row"><span class="label">Datum</span><span class="line"></span></div>
-      <div class="row"><span class="label">Plaats</span><span class="line"></span></div>
-      <div class="siglabel">Handtekening</div>
-      <div class="sigbox"></div>
+    <div class="signs">
+      <div class="sign">
+        <h4>Verkoper</h4>
+        <div class="name">Platin Automotive</div>
+        <div class="siglabel">Handtekening</div>
+        <div class="sigbox"></div>
+      </div>
+      <div class="sign">
+        <h4>Koper</h4>
+        <div class="name">${escapeHtml(klantNaam)}</div>
+        <div class="siglabel">Handtekening</div>
+        <div class="sigbox"></div>
+      </div>
     </div>
   </div>
 
