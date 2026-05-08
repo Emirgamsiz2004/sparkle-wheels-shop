@@ -3213,6 +3213,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
             : undefined,
           aanbetalingActief: (p.aanbetalingBedrag || 0) > 0,
           aanbetalingsbedrag: p.aanbetalingBedrag,
+          aanbetalingBetaalwijze: p.aanbetalingBetaalwijze || undefined,
           restbedrag,
         },
         garantie: {
