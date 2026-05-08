@@ -342,7 +342,7 @@ const AdminVoertuigenPage = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  {["Voertuig", "Kenteken", "APK", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive"].map((h, i) => (
+                  {["Voertuig", "Kenteken", "APK", "Inkoopprijs", "Verkoopprijs", "Marge", "Status", "Drive", ""].map((h, i) => (
                     <th key={h || i} className={`${i >= 3 && i <= 5 ? "text-right" : i >= 6 ? "text-center" : "text-left"} px-3 py-2 text-[11px] font-medium text-muted-foreground`}>{h}</th>
                   ))}
                 </tr>
@@ -378,6 +378,15 @@ const AdminVoertuigenPage = () => {
                       </td>
                       <td className="px-3 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
                         <GoogleDriveIcon linked={!!v.googleDriveFolderId} url={v.googleDriveFolderUrl} />
+                      </td>
+                      <td className="px-2 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={(e) => handleDeleteClick(e, v)}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          title="Voertuig verwijderen"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </td>
                     </tr>
                   );
