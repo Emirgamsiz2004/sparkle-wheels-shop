@@ -229,7 +229,8 @@ function buildHtml(data: KoopovereenkomstData): string {
   .sign .row .label { color: #666; min-width: 55px; }
   .sign .row .line { flex: 1; border-bottom: 0.5px solid #888; height: 13px; }
   .sign .siglabel { font-size: 10px; color: #666; margin-top: 16px; }
-  .sign .sigbox { border-bottom: 0.5px solid #1a1a1a; height: 38px; margin-top: 4px; }
+  .sign .sigbox { border-bottom: 0.5px solid #1a1a1a; height: 38px; margin-top: 4px; position: relative; }
+  .sign .sigbox img { position: absolute; left: 0; bottom: 2px; max-height: 36px; max-width: 100%; object-fit: contain; }
 
   /* ───── FOOTER ───── */
   .footer {
