@@ -68,6 +68,7 @@ export interface Stap7Props {
   afleverkosten: number | "";
   leges: number | "";
   aanbetalingBedrag: number | "";
+  aanbetalingBetaalwijze?: string | null;
 
   // Garantie (uit stap 4)
   garantieType: GarantieType;
@@ -187,10 +188,12 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       });
     }
     if (num(p.aanbetalingBedrag) > 0) {
+      const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", bank: "Bank", financiering: "Financiering" };
+      const bw = p.aanbetalingBetaalwijze ? (labels[p.aanbetalingBetaalwijze] || p.aanbetalingBetaalwijze) : "";
       list.push({
         id: "aanbetaling",
         kind: "aanbetaling",
-        description: "Aanbetaling (reeds voldaan)",
+        description: `Aanbetaling${bw ? ` (${bw})` : ""} — reeds voldaan`,
         price: -num(p.aanbetalingBedrag),
         btwPercent: 0,
         locked: true,
