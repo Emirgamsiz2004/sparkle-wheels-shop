@@ -269,9 +269,17 @@ const AdminVoertuigenPage = () => {
               <Link
                 key={v.id}
                 to={`/admin/voertuigen/${v.id}`}
-                className="block bg-card border border-border rounded-[14px] active:bg-accent/30 transition-colors"
+                className="block bg-card border border-border rounded-[14px] active:bg-accent/30 transition-colors relative"
                 style={{ padding: "14px" }}
               >
+                <button
+                  onClick={(e) => handleDeleteClick(e, v)}
+                  className="absolute top-2 right-2 p-2 rounded-md text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="Verwijderen"
+                  aria-label="Verwijderen"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
                 {/* Rij 1: merk/model | bouwjaar */}
                 <div className="flex items-baseline justify-between gap-2">
                   <p className="text-[15px] font-semibold text-foreground truncate leading-tight">
