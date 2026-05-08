@@ -139,14 +139,14 @@ const Stap10Vrijwaring = ({
         <div className="rounded-[10px] border border-blue-500/30 bg-blue-500/5 p-3 flex gap-3">
           <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
           <p className="text-sm text-foreground/90 leading-relaxed">
-            Vraag een machtiging aan via{" "}
+            Vraag een digitale machtiging aan via{" "}
             <a
-              href="https://mijn.rdw.nl"
+              href="https://digitaalmachtigen.rdw.nl/"
               target="_blank"
               rel="noreferrer"
               className="underline hover:text-blue-300"
             >
-              mijn.rdw.nl
+              digitaalmachtigen.rdw.nl
             </a>
             . Je ontvangt een machtigingsnummer waarmee je het voertuig via het VWE portaal direct
             op naam van de koper kunt zetten.
@@ -208,7 +208,16 @@ const Stap10Vrijwaring = ({
           <div className="rounded-[10px] border border-blue-500/30 bg-blue-500/5 p-3 flex gap-3">
             <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
             <p className="text-sm text-foreground/90 leading-relaxed">
-              Zet het voertuig op naam van de koper via het VWE portaal met het machtigingsnummer.
+              Zet het voertuig op naam van de koper via het VWE portaal met het machtigingsnummer:{" "}
+              <a
+                href="https://mijn.vwe.nl/rdw/tv"
+                target="_blank"
+                rel="noreferrer"
+                className="underline hover:text-blue-300"
+              >
+                mijn.vwe.nl/rdw/tv
+              </a>
+              .
             </p>
           </div>
 
