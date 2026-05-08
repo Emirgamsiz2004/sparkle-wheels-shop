@@ -1225,6 +1225,7 @@ const AdminVerkoopWizardPage = () => {
                 afleverkosten={afleverkosten}
                 leges={leges}
                 aanbetalingBedrag={aanbetalingBedrag}
+                aanbetalingBetaalwijze={aanbetalingBetaalwijze || null}
                 garantieType={garantieType}
                 garantiePakket={garantiePakket}
                 garantieLooptijd={garantieLooptijd}
