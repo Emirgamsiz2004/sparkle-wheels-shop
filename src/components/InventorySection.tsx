@@ -7,7 +7,9 @@ import useEmblaCarousel from "embla-carousel-react";
 import { useCallback } from "react";
 
 const InventorySection = () => {
-  const { data: voertuigen, isLoading } = useVoorraadFeed();
+  const { data: alleVoertuigen, isLoading } = useVoorraadFeed();
+  // Verberg verkochte voertuigen op de homepage volledig
+  const voertuigen = alleVoertuigen?.filter((v) => v.dbStatus !== "verkocht");
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     slidesToScroll: 1,
