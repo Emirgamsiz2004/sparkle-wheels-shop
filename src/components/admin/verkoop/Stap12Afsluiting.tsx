@@ -235,9 +235,53 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
         .eq("id", p.verkoopId);
       if (e1) throw e1;
 
+      // Haal volledige verkoopregel + klant op om voertuigvelden te synchroniseren
+      const { data: vkFull } = await supabase
+        .from("verkopen")
+        .select("*")
+        .eq("id", p.verkoopId)
+        .maybeSingle();
+
+      let koperNaam: string | null = null;
+      let koperEmail: string | null = null;
+      let koperTelefoon: string | null = null;
+      if (vkFull?.customer_id) {
+        const { data: cust } = await supabase
+          .from("customers")
+          .select("voornaam, achternaam, bedrijfsnaam, email, telefoon")
+          .eq("id", vkFull.customer_id)
+          .maybeSingle();
+        if (cust) {
+          koperNaam = (cust.bedrijfsnaam?.trim()
+            ? cust.bedrijfsnaam
+            : `${cust.voornaam || ""} ${cust.achternaam || ""}`.trim()) || null;
+          koperEmail = cust.email || null;
+          koperTelefoon = cust.telefoon || null;
+        }
+      }
+
+      const vkAny: any = vkFull || {};
+      const vehicleSync: any = {
+        status: "verkocht",
+        verkoop_datum: vkAny.leverdatum || new Date().toISOString().split("T")[0],
+        verkoopprijs: vkAny.verkoopprijs ?? null,
+        koper_naam: koperNaam,
+        koper_email: koperEmail,
+        koper_telefoon: koperTelefoon,
+        betaalmethode: vkAny.betaalwijze || null,
+        contant_bedrag: 0,
+        overboeking_bedrag: vkAny.overboeking_bedrag || 0,
+        financiering_actief: !!vkAny.financiering,
+        aanbetalingsbedrag: vkAny.aanbetaling_bedrag || 0,
+        inruil_kenteken: vkAny.inruil ? (vkAny.inruil_kenteken || null) : null,
+        inruil_merk: vkAny.inruil ? (vkAny.inruil_merk || null) : null,
+        inruil_model: vkAny.inruil ? (vkAny.inruil_model || null) : null,
+        inruil_waarde: vkAny.inruil ? (vkAny.inruil_waarde || 0) : 0,
+      };
+      // Verwijder null/undefined velden niet — we willen ze juist overschrijven
       const { error: e2 } = await supabase
         .from("vehicles")
-        .update({ status: "verkocht" } as any)
+        .update(vehicleSync)
         .eq("id", p.vehicleId);
       if (e2) throw e2;
 
