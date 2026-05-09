@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Wallet, Car } from "lucide-react";
+import { Wallet, Car, BarChart3 } from "lucide-react";
 import KostenCombinedTab from "@/components/admin/financien/KostenCombinedTab";
 import VoertuigMargesTab from "@/components/admin/financien/VoertuigMargesTab";
+import MaandOverzichtTab from "@/components/admin/financien/MaandOverzichtTab";
 
-type MainTab = "kosten" | "marges";
+type MainTab = "overzicht" | "kosten" | "marges";
 
 const AdminFinancieelPage = () => {
-  const [tab, setTab] = useState<MainTab>("kosten");
+  const [tab, setTab] = useState<MainTab>("overzicht");
 
   const tabs: { key: MainTab; label: string; icon: typeof Wallet }[] = [
+    { key: "overzicht", label: "Maand overzicht", icon: BarChart3 },
     { key: "kosten", label: "Kosten", icon: Wallet },
-    { key: "marges", label: "Marges", icon: Car },
+    { key: "marges", label: "Alle marges", icon: Car },
   ];
 
   return (
@@ -40,6 +42,7 @@ const AdminFinancieelPage = () => {
         ))}
       </div>
 
+      {tab === "overzicht" && <MaandOverzichtTab />}
       {tab === "kosten" && <KostenCombinedTab />}
       {tab === "marges" && <VoertuigMargesTab />}
     </div>
