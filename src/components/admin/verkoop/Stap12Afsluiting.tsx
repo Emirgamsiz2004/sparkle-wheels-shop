@@ -204,7 +204,14 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
   const waMessage = `Beste ${voornaam}, hartelijk bedankt voor uw aankoop bij Platin Automotive! 🚗 We hopen dat u veel rijplezier beleeft aan uw ${merkModelText}. Bent u tevreden? We zouden het heel fijn vinden als u een review wilt achterlaten — dat helpt ons enorm! 👉 https://g.page/r/CT1_sFLfuDgAEBM/review Heeft u vragen, dan staan we altijd voor u klaar. Met vriendelijke groet, Platin Automotive`;
   const rawPhone = (p.klantTelefoon || "").replace(/[^\d]/g, "").replace(/^0/, "");
   const waPhone = rawPhone ? `31${rawPhone}` : "";
-  const waUrl = waPhone ? `https://wa.me/${waPhone}?text=${encodeURIComponent(waMessage)}` : "";
+  // WhatsApp Business: gebruik Android intent met package com.whatsapp.w4b,
+  // val terug op api.whatsapp.com (opent WA Business als dat de standaard app is).
+  const isAndroid = typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
+  const waUrl = waPhone
+    ? isAndroid
+      ? `intent://send?phone=${waPhone}&text=${encodeURIComponent(waMessage)}#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end`
+      : `https://api.whatsapp.com/send?phone=${waPhone}&text=${encodeURIComponent(waMessage)}`
+    : "";
 
   const handleAfsluiten = async () => {
     if (!p.verkoopId || !p.vehicleId) {
@@ -392,7 +399,7 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
             className="flex items-center justify-center gap-2 px-4 py-3 rounded-[10px] border border-border bg-background hover:bg-accent text-sm font-medium transition-colors"
           >
             <MessageCircle className="w-4 h-4" />
-            Stuur bedankbericht + review verzoek via WhatsApp
+            Stuur bedankbericht + review verzoek via WhatsApp Business
           </a>
         ) : (
           <div className="space-y-2">
@@ -402,7 +409,7 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
               className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-[10px] border border-border bg-background text-sm font-medium opacity-50 cursor-not-allowed"
             >
               <MessageCircle className="w-4 h-4" />
-              Stuur bedankbericht + review verzoek via WhatsApp
+              Stuur bedankbericht + review verzoek via WhatsApp Business
             </button>
             <p className="text-xs text-orange-500">
               Geen telefoonnummer bekend — voeg dit toe in stap 3
