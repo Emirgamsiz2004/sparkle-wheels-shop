@@ -244,9 +244,15 @@ Deno.serve(async (req) => {
       if (v.kleur) fields.push(`    <g:color>${xmlEscape(capitalize(v.kleur))}</g:color>`);
       const body = mapBody(v.carrosserie);
       if (body) fields.push(`    <g:vehicle_body_style>${body}</g:vehicle_body_style>`);
+      fields.push(`    <g:google_product_category>916</g:google_product_category>`);
       fields.push(`    <g:product_type>Car</g:product_type>`);
       fields.push(`    <g:availability>in stock</g:availability>`);
       fields.push(`    <g:brand>Platin Automotive</g:brand>`);
+      fields.push(`    <g:shipping>`);
+      fields.push(`      <g:country>NL</g:country>`);
+      fields.push(`      <g:service>Afhalen</g:service>`);
+      fields.push(`      <g:price>0.00 EUR</g:price>`);
+      fields.push(`    </g:shipping>`);
 
       items.push(`  <entry>\n${fields.join("\n")}\n  </entry>`);
     }
