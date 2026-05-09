@@ -3,5 +3,13 @@ Allow: /
 Disallow: /admin
 Disallow: /proefrit/
 
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /proefrit/
+
+User-agent: Googlebot-Image
+Allow: /
+
 Sitemap: https://platinautomotive.nl/sitemap.xml
 Sitemap: https://leykexzdvatuyitkxdxs.supabase.co/functions/v1/sitemap
