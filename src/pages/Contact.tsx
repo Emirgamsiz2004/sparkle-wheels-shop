@@ -19,18 +19,32 @@ const contactFormSchema = z.object({
 const contactDetails = [
   {
     icon: Phone,
-    label: "Telefoon",
+    label: "Verkoop",
     value: "06-12693825",
     href: "tel:+31612693825",
-    description: "Bel ons direct voor vragen of een afspraak",
+    description: "Bel voor vragen over auto's, een afspraak of inruil",
+  },
+  {
+    icon: Phone,
+    label: "Werkplaats",
+    value: "06-20686868",
+    href: "tel:+31620686868",
+    description: "Bel voor onderhoud, reparatie, detailing en customizing",
   },
   {
     icon: MessageCircle,
-    label: "WhatsApp",
+    label: "WhatsApp Verkoop",
     value: "06-12693825",
     href: "https://wa.me/31612693825?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20auto.",
-    description: "Stuur ons een berichtje via WhatsApp",
+    description: "Stuur een berichtje over een auto",
     highlight: true,
+  },
+  {
+    icon: MessageCircle,
+    label: "WhatsApp Werkplaats",
+    value: "06-20686868",
+    href: "https://wa.me/31620686868?text=Hallo%2C%20ik%20heb%20een%20vraag%20voor%20de%20werkplaats.",
+    description: "Stuur een berichtje voor onderhoud of service",
   },
   {
     icon: Mail,
