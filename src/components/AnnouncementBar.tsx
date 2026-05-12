@@ -93,13 +93,22 @@ const AnnouncementBar = () => {
             )}
           </div>
 
-          {/* Phone */}
+          {/* Phone Verkoop */}
           <a
             href="tel:+31612693825"
             className="hidden sm:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-500 whitespace-nowrap"
           >
             <Phone className="w-3 h-3 shrink-0" />
-            06-12693825
+            <span className="text-muted-foreground/60">Verkoop:</span> 06-12693825
+          </a>
+
+          {/* Phone Werkplaats */}
+          <a
+            href="tel:+31620686868"
+            className="hidden md:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-500 whitespace-nowrap"
+          >
+            <Phone className="w-3 h-3 shrink-0" />
+            <span className="text-muted-foreground/60">Werkplaats:</span> 06-20686868
           </a>
 
           {/* Address */}
