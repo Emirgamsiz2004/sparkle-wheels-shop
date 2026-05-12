@@ -205,17 +205,17 @@ const OnderhoudReparatie = () => {
 
               <div className="space-y-4 mb-8">
                 <a
-                  href="tel:+31612693825"
+                  href="tel:+31620686868"
                   className="group flex items-center gap-4 p-4 border border-border hover:border-foreground/30 transition-all duration-300"
                 >
                   <Phone className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                   <div>
-                    <p className="text-sm font-display font-semibold text-foreground">Bel ons</p>
-                    <p className="text-xs font-body text-muted-foreground">06-12693825</p>
+                    <p className="text-sm font-display font-semibold text-foreground">Bel werkplaats</p>
+                    <p className="text-xs font-body text-muted-foreground">06-20686868</p>
                   </div>
                 </a>
                 <a
-                  href="https://wa.me/31612693825?text=Hallo%2C%20ik%20wil%20graag%20een%20afspraak%20voor%20onderhoud."
+                  href="https://wa.me/31620686868?text=Hallo%2C%20ik%20wil%20graag%20een%20afspraak%20voor%20onderhoud."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-4 p-4 border border-border hover:border-foreground/30 transition-all duration-300"
