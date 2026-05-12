@@ -2,8 +2,6 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle } from "lucide-react";
 
 const contactInfo = [
-  { icon: Phone, label: "Verkoop", value: "06-12693825", href: "tel:+31612693825" },
-  { icon: Phone, label: "Werkplaats", value: "06-20686868", href: "tel:+31620686868" },
   { icon: MessageCircle, label: "WhatsApp", value: "Stuur een bericht", href: "https://wa.me/31612693825" },
   { icon: Mail, label: "E-mail", value: "info@platinautomotive.nl", href: "mailto:info@platinautomotive.nl" },
   { icon: MapPin, label: "Adres", value: "Cilinderweg 99\n2371 DZ Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+2371DZ+Roelofarendsveen" },
@@ -60,6 +58,34 @@ const ContactSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col gap-px bg-border"
           >
+            {/* Telefoon-tegel: gesplitst in Verkoop + Werkplaats */}
+            <div className="grid grid-cols-2 gap-px bg-border">
+              <a
+                href="tel:+31612693825"
+                className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
+              >
+                <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
+                <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
+                  Verkoop
+                </p>
+                <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
+                  06-12693825
+                </p>
+              </a>
+              <a
+                href="tel:+31620686868"
+                className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
+              >
+                <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
+                <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
+                  Werkplaats
+                </p>
+                <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
+                  06-20686868
+                </p>
+              </a>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
               {contactInfo.map((item) => (
                 <a
