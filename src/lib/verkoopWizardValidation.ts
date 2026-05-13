@@ -74,7 +74,7 @@ export function validateStap1(s: WizardState): string[] {
     if (!isFilled(s.inruilKenteken)) errors.push("Kenteken inruil is niet ingevuld");
     if (!isFilled(s.inruilMerk) || !isFilled(s.inruilModel))
       errors.push("Merk en model van inruil zijn niet ingevuld");
-    if (!isPositive(s.inruilWaarde)) errors.push("Inruilwaarde is niet ingevuld");
+    if (s.inruilWaarde === "" || Number(s.inruilWaarde) < 0) errors.push("Inruilwaarde is niet ingevuld");
     if (s.inruilVerkoper === "zakelijk") {
       if (!isFilled(s.inruilBedrijfsnaam)) errors.push("Bedrijfsnaam inruil is verplicht");
       if (!isFilled(s.inruilKvk)) errors.push("KVK-nummer inruil is verplicht");
