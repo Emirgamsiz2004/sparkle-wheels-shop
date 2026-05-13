@@ -634,10 +634,31 @@ const AdminVerkoopWizardPage = () => {
         if (updErr) { toast.error("Opslaan klant mislukt"); console.error(updErr); return; }
       } else {
         const { data: created, error: insErr } = await supabase.from("customers").insert(customerPayload).select().single();
-        if (insErr || !created) { toast.error("Aanmaken klant mislukt"); console.error(insErr); return; }
-        custId = created.id;
-        setCustomerId(custId);
-        existingMbId = (created as any).moneybird_contact_id ?? null;
+        if (insErr || !created) {
+          // Fallback: misschien bestaat de klant al (bv. duplicate email) — zoek en werk bij
+          const fallbackEmail = customerPayload.email;
+          const { data: existing } = await supabase
+            .from("customers")
+            .select("id, moneybird_contact_id")
+            .eq("email", fallbackEmail)
+            .maybeSingle();
+          if (existing?.id) {
+            const { error: updErr2 } = await supabase.from("customers").update(customerPayload).eq("id", existing.id);
+            if (updErr2) { toast.error("Bijwerken klant mislukt"); console.error(updErr2); return; }
+            custId = existing.id;
+            setCustomerId(custId);
+            existingMbId = (existing as any).moneybird_contact_id ?? null;
+            toast.success("Bestaande klant bijgewerkt");
+          } else {
+            toast.error("Aanmaken klant mislukt");
+            console.error(insErr);
+            return;
+          }
+        } else {
+          custId = created.id;
+          setCustomerId(custId);
+          existingMbId = (created as any).moneybird_contact_id ?? null;
+        }
       }
 
       // Sync naar Moneybird (alleen als nog geen contact gekoppeld is)
@@ -2723,7 +2744,7 @@ const Stap3Klant = (p: Stap3Props) => {
           {p.customerId && (
             <div className="rounded-[10px] border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm">
               <div className="flex items-center gap-2 text-emerald-400 font-medium mb-1">
-                <Check className="w-4 h-4" /> Klant geselecteerd
+                <Check className="w-4 h-4" /> Klant geselecteerd — vul ontbrekende gegevens hieronder aan
               </div>
               <div className="text-foreground">
                 {p.voornaam} {p.achternaam}
@@ -2737,8 +2758,8 @@ const Stap3Klant = (p: Stap3Props) => {
         </div>
       )}
 
-      {/* Nieuwe klant formulier */}
-      {mode === "new" && (
+      {/* Nieuwe klant formulier — ook getoond bij geselecteerde bestaande klant om aan te vullen */}
+      {(mode === "new" || (mode === "existing" && p.customerId)) && (
         <div className="w-full rounded-[14px] border border-border bg-card p-6 space-y-5">
           <InlineKlantTypeToggle zakelijk={p.zakelijk} onChange={switchKlantType} />
 

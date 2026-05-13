@@ -143,7 +143,7 @@ export default function Stap6InruilDocument(p: Stap6Props) {
       if (!p.bedrijfAdres || !p.bedrijfPostcode || !p.bedrijfWoonplaats) return toast.error("Vul bedrijfsadres in");
     }
     if (!p.inruilBetaalwijze) return toast.error("Kies een betaalwijze voor de inruil");
-    if (!inruilWaardeNum) return toast.error("Inruilwaarde ontbreekt — vul deze in stap 1 in");
+    if (p.inruilWaarde === "" || Number(p.inruilWaarde) < 0) return toast.error("Inruilwaarde ontbreekt — vul deze in stap 1 in");
 
     setGenerating(true);
     try {
