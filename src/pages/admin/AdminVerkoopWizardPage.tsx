@@ -2723,7 +2723,7 @@ const Stap3Klant = (p: Stap3Props) => {
           {p.customerId && (
             <div className="rounded-[10px] border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm">
               <div className="flex items-center gap-2 text-emerald-400 font-medium mb-1">
-                <Check className="w-4 h-4" /> Klant geselecteerd
+                <Check className="w-4 h-4" /> Klant geselecteerd — vul ontbrekende gegevens hieronder aan
               </div>
               <div className="text-foreground">
                 {p.voornaam} {p.achternaam}
@@ -2737,8 +2737,8 @@ const Stap3Klant = (p: Stap3Props) => {
         </div>
       )}
 
-      {/* Nieuwe klant formulier */}
-      {mode === "new" && (
+      {/* Nieuwe klant formulier — ook getoond bij geselecteerde bestaande klant om aan te vullen */}
+      {(mode === "new" || (mode === "existing" && p.customerId)) && (
         <div className="w-full rounded-[14px] border border-border bg-card p-6 space-y-5">
           <InlineKlantTypeToggle zakelijk={p.zakelijk} onChange={switchKlantType} />
 
