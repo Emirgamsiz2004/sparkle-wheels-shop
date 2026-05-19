@@ -279,7 +279,7 @@ const VoorraadDetailPage = () => {
                       <LeaseCalculatorPopover prijs={vehicle.prijs} />
                     </div>
                     <p className="text-[10px] font-body text-muted-foreground/70 leading-relaxed">
-                      Indicatief bedrag. 7,9% rente, 72 mnd, 10% aanbetaling. Onder voorbehoud van kredietgoedkeuring.
+                      Indicatief. 7,9% rente, 72 mnd, 10% aanbetaling, 30% slottermijn. Onder voorbehoud van kredietgoedkeuring.
                     </p>
                   </div>
                 )}
@@ -435,7 +435,7 @@ const VoorraadDetailPage = () => {
                         <LeaseCalculatorPopover prijs={vehicle.prijs} />
                       </div>
                       <p className="text-[10px] font-body text-muted-foreground/70 leading-relaxed max-w-sm">
-                        Indicatief bedrag. 7,9% rente, 72 mnd, 10% aanbetaling. Onder voorbehoud van kredietgoedkeuring.
+                        Indicatief. 7,9% rente, 72 mnd, 10% aanbetaling, 30% slottermijn. Onder voorbehoud van kredietgoedkeuring.
                       </p>
                     </div>
                   )}
