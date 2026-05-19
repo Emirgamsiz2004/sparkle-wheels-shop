@@ -3,28 +3,34 @@
 
 ## Bedrijf
 - Adres: Cilinderweg 99, 2371 DZ Roelofarendsveen
-- Telefoon: 06-12693825
+- Telefoon verkoop: 06-12693825
+- Telefoon werkplaats: 06-20686868
 - Email: info@platinautomotive.nl
 - Openingstijden: maandag t/m vrijdag 09:00-18:00, zaterdag 10:00-17:00, zondag gesloten
 - RDW-erkend autobedrijf
 - Garantie via AutoTrust (dochteronderneming van BOVAG)
 
-## Diensten
-- Verkoop van occasions
-- Inkoop van auto's
-- Consignatie verkoop
-- Auto detailing
-- Onderhoud en reparaties
-- Financiering via financiallease.nl
-- AutoTrust garantiepakketten
-
 ## Pagina's
-- Homepage: https://platinautomotive.nl
-- Voorraad: https://platinautomotive.nl/voorraad
-- Consignatie: https://platinautomotive.nl/consignatie
-- Diensten: https://platinautomotive.nl/diensten
-- Over Ons: https://platinautomotive.nl/over-ons
-- Contact: https://platinautomotive.nl/contact
+- [Homepage](https://platinautomotive.nl/): Overzicht van Platin Automotive met diensten, occasions en contact.
+- [Voorraad](https://platinautomotive.nl/voorraad): Actueel aanbod tweedehands auto's met foto's en specificaties.
+- [In- en verkoop](https://platinautomotive.nl/diensten/in-en-verkoop): Verkoop en inkoop van auto's met taxatie.
+- [Consignatie](https://platinautomotive.nl/consignatie): Uw auto verkopen via consignatie zonder gedoe.
+- [Onderhoud en reparatie](https://platinautomotive.nl/diensten/onderhoud-reparatie): Klein onderhoud en reparaties in eigen werkplaats.
+- [Auto detailing](https://platinautomotive.nl/diensten/auto-detailing): Professionele detailing en cosmetisch herstel.
+- [Auto customizing](https://platinautomotive.nl/diensten/auto-customizing): Customizing en modificaties op maat.
+- [Auto zoeken](https://platinautomotive.nl/diensten/auto-zoeken): Wij zoeken de juiste auto voor u in ons netwerk.
+- [Garantie](https://platinautomotive.nl/garantie): AutoTrust-garantiepakketten en voorwaarden.
+- [Over ons](https://platinautomotive.nl/over-ons): Het verhaal van het familiebedrijf Platin Automotive.
+- [Contact](https://platinautomotive.nl/contact): Adres, telefoon, openingstijden en contactformulier.
+- [Blog](https://platinautomotive.nl/blog): Nieuws en artikelen over occasions en autotips.
 
 ## Service gebied
-Roelofarendsveen, Alphen aan den Rijn, Leiden, Kaag en Braassem, Zuid-Holland
+- [Occasions Leiden](https://platinautomotive.nl/occasions-leiden): Occasions voor klanten uit Leiden en omgeving.
+- [Occasions Alphen aan den Rijn](https://platinautomotive.nl/occasions-alphen-aan-den-rijn): Occasions voor Alphen aan den Rijn.
+- [Occasions Zoetermeer](https://platinautomotive.nl/occasions-zoetermeer): Occasions voor klanten uit Zoetermeer.
+- [Occasions Den Haag](https://platinautomotive.nl/occasions-den-haag): Occasions voor de regio Den Haag.
+
+## Optional
+- [Privacybeleid](https://platinautomotive.nl/privacybeleid): Hoe wij omgaan met persoonsgegevens.
+- [Cookiebeleid](https://platinautomotive.nl/cookiebeleid): Cookie-informatie en voorkeuren.
+- [Algemene voorwaarden](https://platinautomotive.nl/algemene-voorwaarden): Algemene verkoopvoorwaarden.

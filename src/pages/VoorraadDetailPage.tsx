@@ -159,6 +159,37 @@ const VoorraadDetailPage = () => {
         <title>{metaTitle}</title>
         <meta name="description" content={metaDesc} />
         <link rel="canonical" href={`https://platinautomotive.nl/voorraad/${id}`} />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDesc} />
+        <meta property="og:url" content={`https://platinautomotive.nl/voorraad/${id}`} />
+        <meta property="og:type" content="product" />
+        {vehicle && photoUrls[0] && <meta property="og:image" content={photoUrls[0]} />}
+        {vehicle && (
+          <script type="application/ld+json">{JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Car",
+            name: `${vehicle.merk} ${vehicle.model}`,
+            brand: { "@type": "Brand", name: vehicle.merk },
+            model: vehicle.model,
+            vehicleModelDate: vehicle.bouwjaar ? String(vehicle.bouwjaar) : undefined,
+            mileageFromOdometer: vehicle.kilometerstand ? { "@type": "QuantitativeValue", value: Number(vehicle.kilometerstand), unitCode: "KMT" } : undefined,
+            fuelType: vehicle.brandstof || undefined,
+            vehicleTransmission: vehicle.transmissie || undefined,
+            bodyType: vehicle.carrosserie || undefined,
+            color: vehicle.kleur || undefined,
+            image: photoUrls.slice(0, 5),
+            description: metaDesc,
+            url: `https://platinautomotive.nl/voorraad/${id}`,
+            offers: vehicle.prijs ? {
+              "@type": "Offer",
+              price: Number(vehicle.prijs),
+              priceCurrency: "EUR",
+              availability: "https://schema.org/InStock",
+              url: `https://platinautomotive.nl/voorraad/${id}`,
+              seller: { "@type": "AutoDealer", name: "Platin Automotive" },
+            } : undefined,
+          })}</script>
+        )}
       </Helmet>
       <Navbar />
 
