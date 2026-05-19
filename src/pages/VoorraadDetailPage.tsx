@@ -265,17 +265,8 @@ const VoorraadDetailPage = () => {
 
                 {isLeaseEligible(vehicle.prijs) && (
                   <div className="-mt-2 space-y-1">
-                    <p className="text-[12px] font-body text-foreground/80">
-                      of vanaf{" "}
-                      <a
-                        href={LEASE_DEFAULTS.partnerUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-semibold text-foreground underline underline-offset-2"
-                      >
-                        {formatEuro(berekenLeaseVanaf(vehicle.prijs))} per maand
-                      </a>{" "}
-                      via financial lease
+                    <p className="text-[12px] font-body text-muted-foreground">
+                      v.a. <span className="text-foreground font-semibold">{formatEuro(berekenLeaseVanaf(vehicle.prijs))}</span> p/m
                     </p>
                     <div className="flex items-center gap-3">
                       <LeaseCalculatorPopover prijs={vehicle.prijs} />
@@ -421,17 +412,8 @@ const VoorraadDetailPage = () => {
 
                   {isLeaseEligible(vehicle.prijs) && (
                     <div className="mt-3 space-y-1.5">
-                      <p className="text-[13px] font-body text-foreground/80">
-                        of vanaf{" "}
-                        <a
-                          href={LEASE_DEFAULTS.partnerUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-semibold text-foreground underline underline-offset-2 hover:text-primary transition-colors"
-                        >
-                          {formatEuro(berekenLeaseVanaf(vehicle.prijs))} per maand
-                        </a>{" "}
-                        via financial lease
+                      <p className="text-[13px] font-body text-muted-foreground">
+                        v.a. <span className="text-foreground font-semibold">{formatEuro(berekenLeaseVanaf(vehicle.prijs))}</span> p/m
                       </p>
                       <div>
                         <LeaseCalculatorPopover prijs={vehicle.prijs} />
