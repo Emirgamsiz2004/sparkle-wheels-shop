@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Calendar, Fuel, Gauge, Car, Settings2, ShieldCheck } from "lucide-react";
 import type { VoorraadVoertuig } from "@/hooks/useVoorraadFeed";
 import { berekenLeaseVanaf, isLeaseEligible, formatEuro } from "@/lib/lease";
+import { getVoertuigFotoUrl } from "@/lib/vwePhoto";
 
 interface Props {
   voertuig: VoorraadVoertuig;
