@@ -43,7 +43,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
         <div className="relative aspect-[16/10] overflow-hidden bg-secondary">
           {voertuig.afbeelding ? (
             <img
-              src={voertuig.afbeelding}
+              src={getVoertuigFotoUrl(voertuig.afbeelding, isSold)}
               alt={title}
               loading="lazy"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
