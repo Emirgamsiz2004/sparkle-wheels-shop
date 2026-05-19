@@ -155,7 +155,7 @@ const VoorraadDetailPage = () => {
     );
   }
 
-  const mainPhoto = photoUrls[selectedPhoto] ?? vehicle.afbeelding ?? "/placeholder.svg";
+  const mainPhoto = photoUrls[selectedPhoto] ?? getVoertuigFotoUrl(vehicle.afbeelding, isSold) ?? "/placeholder.svg";
 
   return (
     <div className="min-h-screen bg-background">
