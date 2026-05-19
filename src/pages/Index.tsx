@@ -12,6 +12,8 @@ import LatestBlogSection from "@/components/LatestBlogSection";
 import FAQSection from "@/components/FAQSection";
 import PartnerBanner from "@/components/PartnerBanner";
 import AfleveringSection from "@/components/AfleveringSection";
+import FinancieringSection from "@/components/FinancieringSection";
+import GarantieSection from "@/components/GarantieSection";
 
 const Index = () => {
   return (
@@ -52,6 +54,8 @@ const Index = () => {
       <AfleveringSection />
       <PartnerBanner />
       <ServicesSection />
+      <FinancieringSection />
+      <GarantieSection />
       <AboutSection />
       <ReviewsSection />
       <ContactSection />

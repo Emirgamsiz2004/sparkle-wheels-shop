@@ -8,6 +8,8 @@ import { formatKenteken } from "@/lib/kenteken";
 
 import RelatedVehicles from "@/components/RelatedVehicles";
 import VehicleBookingCard, { VehicleBookingMobileButton } from "@/components/VehicleBookingCard";
+import LeaseCalculatorPopover from "@/components/LeaseCalculatorPopover";
+import { berekenLeaseVanaf, isLeaseEligible, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
@@ -259,6 +261,31 @@ const VoorraadDetailPage = () => {
                   {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
                 </p>
 
+                {isLeaseEligible(vehicle.prijs) && (
+                  <div className="-mt-2 space-y-1">
+                    <p className="text-[12px] font-body text-foreground/80">
+                      of vanaf{" "}
+                      <a
+                        href={LEASE_DEFAULTS.partnerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-foreground underline underline-offset-2"
+                      >
+                        {formatEuro(berekenLeaseVanaf(vehicle.prijs))} per maand
+                      </a>{" "}
+                      via financial lease
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <LeaseCalculatorPopover prijs={vehicle.prijs} />
+                    </div>
+                    <p className="text-[10px] font-body text-muted-foreground/70 leading-relaxed">
+                      Indicatief bedrag. 7,9% rente, 72 mnd, 10% aanbetaling. Onder voorbehoud van kredietgoedkeuring.
+                    </p>
+                  </div>
+                )}
+
+
+
                 <div className="flex items-center gap-2 text-sm font-body text-foreground">
                   <span>{vehicle.bouwjaar}</span>
                   <span className="text-muted-foreground">·</span>
@@ -383,10 +410,35 @@ const VoorraadDetailPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
-                    {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
-                  </p>
+                <div>
+                  <div className="flex items-center gap-4">
+                    <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
+                      {vehicle.prijs > 0 ? fmt.format(vehicle.prijs) : "Op aanvraag"}
+                    </p>
+                  </div>
+
+                  {isLeaseEligible(vehicle.prijs) && (
+                    <div className="mt-3 space-y-1.5">
+                      <p className="text-[13px] font-body text-foreground/80">
+                        of vanaf{" "}
+                        <a
+                          href={LEASE_DEFAULTS.partnerUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-foreground underline underline-offset-2 hover:text-primary transition-colors"
+                        >
+                          {formatEuro(berekenLeaseVanaf(vehicle.prijs))} per maand
+                        </a>{" "}
+                        via financial lease
+                      </p>
+                      <div>
+                        <LeaseCalculatorPopover prijs={vehicle.prijs} />
+                      </div>
+                      <p className="text-[10px] font-body text-muted-foreground/70 leading-relaxed max-w-sm">
+                        Indicatief bedrag. 7,9% rente, 72 mnd, 10% aanbetaling. Onder voorbehoud van kredietgoedkeuring.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
 

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Calendar, Fuel, Gauge, Car, Settings2, ShieldCheck } from "lucide-react";
 import type { VoorraadVoertuig } from "@/hooks/useVoorraadFeed";
+import { berekenLeaseVanaf, isLeaseEligible, formatEuro } from "@/lib/lease";
 
 interface Props {
   voertuig: VoorraadVoertuig;
@@ -99,13 +100,20 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
           </div>
 
           <div className="mt-auto pt-3 flex items-end justify-between gap-3">
-            <span className="font-display text-xl md:text-2xl font-bold text-accent tracking-tight">
-              {isSold ? (
-                <span className="text-muted-foreground line-through">{voertuig.prijs > 0 ? fmt.format(voertuig.prijs) : "—"}</span>
-              ) : (
-                voertuig.prijs > 0 ? fmt.format(voertuig.prijs) : "Op aanvraag"
+            <div className="flex flex-col">
+              <span className="font-display text-xl md:text-2xl font-bold text-accent tracking-tight">
+                {isSold ? (
+                  <span className="text-muted-foreground line-through">{voertuig.prijs > 0 ? fmt.format(voertuig.prijs) : "—"}</span>
+                ) : (
+                  voertuig.prijs > 0 ? fmt.format(voertuig.prijs) : "Op aanvraag"
+                )}
+              </span>
+              {!isSold && isLeaseEligible(voertuig.prijs) && (
+                <span className="text-[10px] font-body text-muted-foreground/70 mt-0.5">
+                  Vanaf {formatEuro(berekenLeaseVanaf(voertuig.prijs))}/mnd lease
+                </span>
               )}
-            </span>
+            </div>
 
             <span className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 border border-border text-[10px] tracking-[0.15em] uppercase font-body font-semibold text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors duration-300">
               {isSold ? "Bekijk details →" : "Meer info →"}
