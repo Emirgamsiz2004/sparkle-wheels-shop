@@ -152,22 +152,22 @@ const ContactForm = () => {
       <div className="grid sm:grid-cols-2 gap-5">
         <div>
           <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Naam *</label>
-          <input type="text" name="naam" value={formData.naam} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Uw naam" />
+          <input type="text" name="naam" value={formData.naam} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Uw naam" />
           {errors.naam && <p className="text-xs text-red-400 mt-1 font-body">{errors.naam}</p>}
         </div>
         <div>
           <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">E-mail *</label>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="uw@email.nl" />
+          <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="uw@email.nl" />
           {errors.email && <p className="text-xs text-red-400 mt-1 font-body">{errors.email}</p>}
         </div>
       </div>
       <div>
         <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Telefoon</label>
-        <input type="tel" name="telefoon" value={formData.telefoon} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="06 - 0000 0000" />
+        <input type="tel" name="telefoon" value={formData.telefoon} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="06 - 0000 0000" />
       </div>
       <div>
         <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Bericht *</label>
-        <textarea name="bericht" value={formData.bericht} onChange={handleChange} rows={5} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Waar kunnen wij u mee helpen?" />
+        <textarea name="bericht" value={formData.bericht} onChange={handleChange} rows={5} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Waar kunnen wij u mee helpen?" />
         {errors.bericht && <p className="text-xs text-red-400 mt-1 font-body">{errors.bericht}</p>}
       </div>
       <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">

@@ -155,37 +155,37 @@ const AutoZoeken = () => {
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Naam *</label>
-                      <input type="text" name="naam" value={formData.naam} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Uw naam" />
+                      <input type="text" name="naam" value={formData.naam} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Uw naam" />
                       {errors.naam && <p className="text-xs text-red-400 mt-1 font-body">{errors.naam}</p>}
                     </div>
                     <div>
                       <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Telefoon *</label>
-                      <input type="tel" name="telefoon" value={formData.telefoon} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="06 - 0000 0000" />
+                      <input type="tel" name="telefoon" value={formData.telefoon} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="06 - 0000 0000" />
                       {errors.telefoon && <p className="text-xs text-red-400 mt-1 font-body">{errors.telefoon}</p>}
                     </div>
                   </div>
                   <div className="grid sm:grid-cols-3 gap-5">
                     <div>
                       <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Merk *</label>
-                      <input type="text" name="merk" value={formData.merk} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. BMW" />
+                      <input type="text" name="merk" value={formData.merk} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. BMW" />
                       {errors.merk && <p className="text-xs text-red-400 mt-1 font-body">{errors.merk}</p>}
                     </div>
                     <div>
                       <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Model</label>
-                      <input type="text" name="model" value={formData.model} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. 3-serie" />
+                      <input type="text" name="model" value={formData.model} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. 3-serie" />
                     </div>
                     <div>
                       <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Bouwjaar</label>
-                      <input type="text" name="bouwjaar" value={formData.bouwjaar} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. 2020" />
+                      <input type="text" name="bouwjaar" value={formData.bouwjaar} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. 2020" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Budget (indicatie)</label>
-                    <input type="text" name="budget" value={formData.budget} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. €15.000 - €20.000" />
+                    <input type="text" name="budget" value={formData.budget} onChange={handleChange} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors" placeholder="Bijv. €15.000 - €20.000" />
                   </div>
                   <div>
                     <label className="block text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground mb-2">Overige wensen</label>
-                    <textarea name="wensen" value={formData.wensen} onChange={handleChange} rows={3} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Bijv. kleur, uitvoering, automaat, max km-stand..." />
+                    <textarea name="wensen" value={formData.wensen} onChange={handleChange} rows={3} className="w-full bg-background border border-border px-4 py-3 text-sm font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 transition-colors resize-none" placeholder="Bijv. kleur, uitvoering, automaat, max km-stand..." />
                   </div>
                   <button type="submit" className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-foreground/90 transition-all duration-300">
                     <Search className="w-3.5 h-3.5" />
