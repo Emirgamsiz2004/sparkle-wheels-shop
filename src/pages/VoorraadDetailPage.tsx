@@ -58,7 +58,8 @@ const VoorraadDetailPage = () => {
       });
   }, [vehicle?.kenteken]);
 
-  const photoUrls = vehicle?.fotos ?? [];
+  const isSold = vehicle?.dbStatus === "verkocht";
+  const photoUrls = (vehicle?.fotos ?? []).map((u) => getVoertuigFotoUrl(u, isSold));
 
   const navigateLightbox = useCallback(
     (dir: number) => {
