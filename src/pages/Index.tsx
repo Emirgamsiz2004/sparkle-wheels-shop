@@ -54,6 +54,8 @@ const Index = () => {
       <AfleveringSection />
       <PartnerBanner />
       <ServicesSection />
+      <FinancieringSection />
+      <GarantieSection />
       <AboutSection />
       <ReviewsSection />
       <ContactSection />
