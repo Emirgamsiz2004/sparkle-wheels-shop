@@ -120,21 +120,24 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
           </div>
         </div>
 
+        <div className="border-t border-b border-border divide-y divide-border">
+          {[
+            { label: "Leenbedrag", value: prijs - aanbetalingBedrag - slottermijnBedrag },
+            { label: "Totale rente", value: Math.max(0, maandbedrag * looptijd - (prijs - aanbetalingBedrag - slottermijnBedrag)) },
+            { label: "Slottermijn", value: slottermijnBedrag },
+          ].map((row) => (
+            <div key={row.label} className="flex justify-between items-center py-2">
+              <span className="text-[12px] font-body text-muted-foreground">{row.label}</span>
+              <span className="text-[13px] font-body font-medium text-foreground">
+                {formatEuro(Math.round(row.value))}
+              </span>
+            </div>
+          ))}
+        </div>
+
         <div>
           <p className="text-[11px] font-body text-muted-foreground">
             Rente <span className="text-foreground/40">7,9% (vast)</span>
-          </p>
-        </div>
-
-        <div className="bg-background border border-border p-3">
-          <p className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground mb-0.5">
-            Slottermijn aan einde looptijd
-          </p>
-          <p className="text-sm font-display font-semibold text-foreground">
-            {formatEuro(slottermijnBedrag)}
-          </p>
-          <p className="text-[10px] text-muted-foreground/70 mt-1 leading-snug">
-            Dit bedrag betaalt u in één keer aan het einde van de looptijd.
           </p>
         </div>
 
