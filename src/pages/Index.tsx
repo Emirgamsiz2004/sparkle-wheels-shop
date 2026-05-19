@@ -17,10 +17,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Autohandelaar Roelofarendsveen | Occasions & Detailing | Platin Automotive</title>
+        <title>Occasions & Detailing Roelofarendsveen | Platin Automotive</title>
         <meta name="description" content="Platin Automotive – uw betrouwbare autohandelaar in Roelofarendsveen. Occasions, detailing, onderhoud & consignatie. RDW-erkend. Bel of WhatsApp ons!" />
         <link rel="canonical" href="https://platinautomotive.nl/" />
-        <meta property="og:title" content="Platin Automotive | Occasions & Detailing Roelofarendsveen" />
+        <meta property="og:title" content="Occasions & Detailing Roelofarendsveen | Platin Automotive" />
         <meta property="og:description" content="Betrouwbare occasions, detailing en consignatie in Roelofarendsveen. Eerlijke prijzen, persoonlijk advies." />
         <meta property="og:image" content="https://platinautomotive.nl/images/platin-og-logo-v2.jpg?v=2" />
         <meta property="og:image:secure_url" content="https://platinautomotive.nl/images/platin-og-logo-v2.jpg?v=2" />
