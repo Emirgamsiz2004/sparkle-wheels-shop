@@ -31,6 +31,18 @@ const Voorraad = () => {
         <meta name="description" content="Bekijk ons actuele aanbod tweedehands auto's. Alle merken, eerlijke prijzen, APK-gekeurd. Platin Automotive in Roelofarendsveen." />
         <link rel="canonical" href="https://platinautomotive.nl/voorraad" />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Occasions Kopen Roelofarendsveen | Platin Automotive" />
+        <meta property="og:description" content="Bekijk ons actuele aanbod tweedehands auto's. Alle merken, eerlijke prijzen. Platin Automotive in Roelofarendsveen." />
+        <meta property="og:url" content="https://platinautomotive.nl/voorraad" />
+        <meta property="og:type" content="website" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Occasions voorraad Platin Automotive",
+          description: "Actueel aanbod tweedehands auto's bij Platin Automotive in Roelofarendsveen.",
+          url: "https://platinautomotive.nl/voorraad",
+          isPartOf: { "@type": "WebSite", name: "Platin Automotive", url: "https://platinautomotive.nl" },
+        })}</script>
       </Helmet>
 
       <Navbar />
