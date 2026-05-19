@@ -18,6 +18,7 @@ const navLinks = [
   { label: "Consignatie", href: "/consignatie" },
   { label: "Diensten", href: "/#diensten", section: "diensten", hasDropdown: true },
   { label: "Garantie", href: "/garantie" },
+  { label: "Financiering", href: "/financiering" },
   { label: "Over Ons", href: "/over-ons" },
   { label: "Contact", href: "/contact" },
 ];
