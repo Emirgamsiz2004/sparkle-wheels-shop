@@ -55,6 +55,7 @@ import OccasionsLeiden from "./pages/OccasionsLeiden";
 import OccasionsZoetermeer from "./pages/OccasionsZoetermeer";
 import OccasionsDenHaag from "./pages/OccasionsDenHaag";
 import Garantie from "./pages/Garantie";
+import Financiering from "./pages/Financiering";
 
 import ReviewsPage from "./pages/ReviewsPage";
 import NotFound from "./pages/NotFound";
