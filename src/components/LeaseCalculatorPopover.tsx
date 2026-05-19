@@ -67,33 +67,59 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
         </div>
 
         <div>
-          <div className="flex justify-between text-[11px] font-body mb-2">
+          <div className="flex justify-between items-center text-[11px] font-body mb-2">
             <span className="text-muted-foreground">Aanbetaling</span>
-            <span className="text-foreground font-medium">
-              {aanbetalingPct.toFixed(0)}% · {formatEuro(aanbetalingBedrag)}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-muted-foreground">{aanbetalingPct.toFixed(0)}%</span>
+              <span className="text-muted-foreground">·</span>
+              <span className="text-muted-foreground">€</span>
+              <input
+                type="number"
+                min={0}
+                max={prijs}
+                value={aanbetalingBedrag}
+                onChange={(e) => {
+                  const v = Math.max(0, Math.min(prijs, Number(e.target.value) || 0));
+                  setAanbetalingPct((v / prijs) * 100);
+                }}
+                className="w-20 bg-transparent border-b border-border text-foreground font-medium text-right focus:outline-none focus:border-foreground"
+              />
+            </div>
           </div>
           <Slider
             value={[aanbetalingPct]}
-            min={10}
-            max={50}
-            step={5}
+            min={0}
+            max={90}
+            step={1}
             onValueChange={(v) => setAanbetalingPct(v[0])}
           />
         </div>
 
         <div>
-          <div className="flex justify-between text-[11px] font-body mb-2">
+          <div className="flex justify-between items-center text-[11px] font-body mb-2">
             <span className="text-muted-foreground">Slottermijn</span>
-            <span className="text-foreground font-medium">
-              {slottermijnPct.toFixed(0)}% · {formatEuro(slottermijnBedrag)}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-muted-foreground">{slottermijnPct.toFixed(0)}%</span>
+              <span className="text-muted-foreground">·</span>
+              <span className="text-muted-foreground">€</span>
+              <input
+                type="number"
+                min={0}
+                max={prijs}
+                value={slottermijnBedrag}
+                onChange={(e) => {
+                  const v = Math.max(0, Math.min(prijs, Number(e.target.value) || 0));
+                  setSlottermijnPct((v / prijs) * 100);
+                }}
+                className="w-20 bg-transparent border-b border-border text-foreground font-medium text-right focus:outline-none focus:border-foreground"
+              />
+            </div>
           </div>
           <Slider
             value={[slottermijnPct]}
             min={0}
-            max={30}
-            step={5}
+            max={50}
+            step={1}
             onValueChange={(v) => setSlottermijnPct(v[0])}
           />
         </div>
