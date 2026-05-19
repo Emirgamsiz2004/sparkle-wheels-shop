@@ -264,14 +264,14 @@ const VoorraadDetailPage = () => {
                 </p>
 
                 {isLeaseEligible(vehicle.prijs) && (
-                  <div className="-mt-2 space-y-1">
-                    <p className="text-[12px] font-body text-muted-foreground">
+                  <div className="-mt-2 space-y-2">
+                    <p className="text-[15px] font-body text-muted-foreground">
                       v.a. <span className="text-foreground font-semibold">{formatEuro(berekenLeaseVanaf(vehicle.prijs))}</span> p/m
                     </p>
                     <div className="flex items-center gap-3">
                       <LeaseCalculatorPopover prijs={vehicle.prijs} />
                     </div>
-                    <p className="text-[10px] font-body text-muted-foreground/70 leading-relaxed">
+                    <p className="text-[11px] font-body text-muted-foreground/70 leading-relaxed">
                       Indicatief. 7,9% rente, 72 mnd, 10% aanbetaling, 30% slottermijn. Onder voorbehoud van kredietgoedkeuring.
                     </p>
                   </div>
@@ -411,14 +411,14 @@ const VoorraadDetailPage = () => {
                   </div>
 
                   {isLeaseEligible(vehicle.prijs) && (
-                    <div className="mt-3 space-y-1.5">
-                      <p className="text-[13px] font-body text-muted-foreground">
+                    <div className="mt-3 space-y-2">
+                      <p className="text-[15px] font-body text-muted-foreground">
                         v.a. <span className="text-foreground font-semibold">{formatEuro(berekenLeaseVanaf(vehicle.prijs))}</span> p/m
                       </p>
                       <div>
                         <LeaseCalculatorPopover prijs={vehicle.prijs} />
                       </div>
-                      <p className="text-[10px] font-body text-muted-foreground/70 leading-relaxed max-w-sm">
+                      <p className="text-[11px] font-body text-muted-foreground/70 leading-relaxed max-w-sm">
                         Indicatief. 7,9% rente, 72 mnd, 10% aanbetaling, 30% slottermijn. Onder voorbehoud van kredietgoedkeuring.
                       </p>
                     </div>
