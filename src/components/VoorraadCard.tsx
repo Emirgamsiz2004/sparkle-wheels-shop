@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Calendar, Fuel, Gauge, Car, Settings2, ShieldCheck } from "lucide-react";
 import type { VoorraadVoertuig } from "@/hooks/useVoorraadFeed";
+import { berekenLeaseVanaf, isLeaseEligible, formatEuro } from "@/lib/lease";
 
 interface Props {
   voertuig: VoorraadVoertuig;
