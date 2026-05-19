@@ -10,6 +10,7 @@ import RelatedVehicles from "@/components/RelatedVehicles";
 import VehicleBookingCard, { VehicleBookingMobileButton } from "@/components/VehicleBookingCard";
 import LeaseCalculatorPopover from "@/components/LeaseCalculatorPopover";
 import { berekenLeaseVanaf, isLeaseEligible, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
+import { getVoertuigFotoUrl } from "@/lib/vwePhoto";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
@@ -57,7 +58,8 @@ const VoorraadDetailPage = () => {
       });
   }, [vehicle?.kenteken]);
 
-  const photoUrls = vehicle?.fotos ?? [];
+  const isSold = vehicle?.dbStatus === "verkocht";
+  const photoUrls = (vehicle?.fotos ?? []).map((u) => getVoertuigFotoUrl(u, isSold));
 
   const navigateLightbox = useCallback(
     (dir: number) => {
@@ -153,7 +155,7 @@ const VoorraadDetailPage = () => {
     );
   }
 
-  const mainPhoto = photoUrls[selectedPhoto] ?? vehicle.afbeelding ?? "/placeholder.svg";
+  const mainPhoto = photoUrls[selectedPhoto] ?? getVoertuigFotoUrl(vehicle.afbeelding, isSold) ?? "/placeholder.svg";
 
   return (
     <div className="min-h-screen bg-background">
