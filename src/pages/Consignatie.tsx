@@ -339,6 +339,13 @@ const Consignatie = () => {
         <meta name="description" content="Wil je je auto verkopen zonder gedoe? Platin Automotive verkoopt jouw auto via consignatie – zorgeloos, veilig en voor de beste prijs. Gratis taxatie!" />
         <link rel="canonical" href="https://platinautomotive.nl/consignatie" />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Auto Verkopen via Consignatie Zuid-Holland | Platin Automotive" />
+        <meta property="og:description" content="Wil je je auto verkopen zonder gedoe? Platin Automotive verkoopt jouw auto via consignatie – zorgeloos, veilig en voor de beste prijs. Gratis taxatie!" />
+        <meta property="og:url" content="https://platinautomotive.nl/consignatie" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Auto Verkopen via Consignatie Zuid-Holland | Platin Automotive" />
+        <meta name="twitter:description" content="Wil je je auto verkopen zonder gedoe? Platin Automotive verkoopt jouw auto via consignatie – zorgeloos, veilig en voor de beste prijs. Gratis taxatie!" />
+
       </Helmet>
       <Navbar />
 

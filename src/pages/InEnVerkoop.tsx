@@ -37,6 +37,13 @@ const InEnVerkoop = () => {
         <meta name="description" content="Platin Automotive koopt en verkoopt auto's in Roelofarendsveen. Eerlijke inruilprijs, snelle afhandeling. Verkoop je auto vandaag – gratis waardebepaling!" />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/in-en-verkoop" />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Auto Inkopen & Verkopen Roelofarendsveen | Platin Automotive" />
+        <meta property="og:description" content="Platin Automotive koopt en verkoopt auto's in Roelofarendsveen. Eerlijke inruilprijs, snelle afhandeling. Verkoop je auto vandaag – gratis waardebepaling!" />
+        <meta property="og:url" content="https://platinautomotive.nl/diensten/in-en-verkoop" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Auto Inkopen & Verkopen Roelofarendsveen | Platin Automotive" />
+        <meta name="twitter:description" content="Platin Automotive koopt en verkoopt auto's in Roelofarendsveen. Eerlijke inruilprijs, snelle afhandeling. Verkoop je auto vandaag – gratis waardebepaling!" />
+
       </Helmet>
       <Navbar />
 

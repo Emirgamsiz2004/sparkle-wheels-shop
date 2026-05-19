@@ -15,6 +15,13 @@ const OverOns = () => {
         <meta name="description" content="Platin Automotive is een eerlijk en persoonlijk autobedrijf in Roelofarendsveen. RDW-erkend, topbeoordeeld door klanten uit heel Zuid-Holland." />
         <link rel="canonical" href="https://platinautomotive.nl/over-ons" />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Over Ons | Platin Automotive Roelofarendsveen" />
+        <meta property="og:description" content="Platin Automotive is een eerlijk en persoonlijk autobedrijf in Roelofarendsveen. RDW-erkend, topbeoordeeld door klanten uit heel Zuid-Holland." />
+        <meta property="og:url" content="https://platinautomotive.nl/over-ons" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Over Ons | Platin Automotive Roelofarendsveen" />
+        <meta name="twitter:description" content="Platin Automotive is een eerlijk en persoonlijk autobedrijf in Roelofarendsveen. RDW-erkend, topbeoordeeld door klanten uit heel Zuid-Holland." />
+
       </Helmet>
       <Navbar />
 

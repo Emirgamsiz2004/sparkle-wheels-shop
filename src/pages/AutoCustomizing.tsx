@@ -26,6 +26,13 @@ const AutoCustomizing = () => {
         <meta name="description" content="Geef jouw auto een unieke look bij Platin Automotive. Professioneel auto customizing in Roelofarendsveen: folie, styling en modificaties op maat." />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-customizing" />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Auto Customizing Roelofarendsveen | Styling & Modificaties | Platin" />
+        <meta property="og:description" content="Geef jouw auto een unieke look bij Platin Automotive. Professioneel auto customizing in Roelofarendsveen: folie, styling en modificaties op maat." />
+        <meta property="og:url" content="https://platinautomotive.nl/diensten/auto-customizing" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Auto Customizing Roelofarendsveen | Styling & Modificaties | Platin" />
+        <meta name="twitter:description" content="Geef jouw auto een unieke look bij Platin Automotive. Professioneel auto customizing in Roelofarendsveen: folie, styling en modificaties op maat." />
+
       </Helmet>
       <Navbar />
       <FloatingCTA targetId="afspraak" label="Afspraak maken" />

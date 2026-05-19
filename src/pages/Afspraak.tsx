@@ -312,6 +312,13 @@ const Afspraak = () => {
         <title>Afspraak maken — Platin Automotive</title>
         <meta name="description" content="Plan online een bezichtiging, proefrit of serviceafspraak bij Platin Automotive in Roelofarendsveen." />
         <link rel="canonical" href="https://www.platinautomotive.nl/afspraak" />
+        <meta property="og:title" content="Afspraak maken — Platin Automotive" />
+        <meta property="og:description" content="Plan online een bezichtiging, proefrit of serviceafspraak bij Platin Automotive in Roelofarendsveen." />
+        <meta property="og:url" content="https://www.platinautomotive.nl/afspraak" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Afspraak maken — Platin Automotive" />
+        <meta name="twitter:description" content="Plan online een bezichtiging, proefrit of serviceafspraak bij Platin Automotive in Roelofarendsveen." />
+
       </Helmet>
       <Navbar />
 

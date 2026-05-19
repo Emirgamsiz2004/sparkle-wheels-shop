@@ -65,6 +65,13 @@ const ReviewsPage = () => {
         <meta name="description" content="Lees wat onze klanten zeggen over Platin Automotive. Bekijk alle Google Reviews." />
         <link rel="canonical" href="https://platinautomotive.nl/reviews" />
         <meta name="robots" content="noindex, nofollow" />
+        <meta property="og:title" content="Klantreviews | Platin Automotive" />
+        <meta property="og:description" content="Lees wat onze klanten zeggen over Platin Automotive. Bekijk alle Google Reviews." />
+        <meta property="og:url" content="https://platinautomotive.nl/reviews" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Klantreviews | Platin Automotive" />
+        <meta name="twitter:description" content="Lees wat onze klanten zeggen over Platin Automotive. Bekijk alle Google Reviews." />
+
       </Helmet>
       <Navbar />
       <main className="min-h-screen bg-background pt-20">
