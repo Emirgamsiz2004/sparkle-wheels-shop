@@ -180,9 +180,9 @@ const VoorraadDetailPage = () => {
             image: photoUrls.slice(0, 5),
             description: metaDesc,
             url: `https://platinautomotive.nl/voorraad/${id}`,
-            offers: vehicle.verkoopprijs ? {
+            offers: vehicle.prijs ? {
               "@type": "Offer",
-              price: Number(vehicle.verkoopprijs),
+              price: Number(vehicle.prijs),
               priceCurrency: "EUR",
               availability: "https://schema.org/InStock",
               url: `https://platinautomotive.nl/voorraad/${id}`,
