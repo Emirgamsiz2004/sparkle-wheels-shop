@@ -16,6 +16,13 @@ const Garantie = () => {
           content="Zorgeloos rijden met een AutoTrust garantie via Platin Automotive. Instap en Uitgebreid garantiepakketten voor uw occasion."
         />
         <link rel="canonical" href="https://platinautomotive.nl/garantie" />
+        <meta property="og:title" content="AutoTrust Garantie | Platin Automotive" />
+        <meta property="og:description" content="Zorgeloos rijden met een AutoTrust garantie via Platin Automotive. Instap en Uitgebreid garantiepakketten voor uw occasion." />
+        <meta property="og:url" content="https://platinautomotive.nl/garantie" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="AutoTrust Garantie | Platin Automotive" />
+        <meta name="twitter:description" content="Zorgeloos rijden met een AutoTrust garantie via Platin Automotive. Instap en Uitgebreid garantiepakketten voor uw occasion." />
+
       </Helmet>
       <Navbar />
 

@@ -27,6 +27,13 @@ const OnderhoudReparatie = () => {
         <meta name="description" content="Betrouwbaar onderhoud en reparatie voor alle merken bij Platin Automotive. Snelle service, eerlijke prijs in Roelofarendsveen. Maak vandaag een afspraak." />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/onderhoud-reparatie" />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Auto Onderhoud & Reparatie | Platin Automotive" />
+        <meta property="og:description" content="Betrouwbaar onderhoud en reparatie voor alle merken bij Platin Automotive. Snelle service, eerlijke prijs in Roelofarendsveen. Maak vandaag een afspraak." />
+        <meta property="og:url" content="https://platinautomotive.nl/diensten/onderhoud-reparatie" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Auto Onderhoud & Reparatie | Platin Automotive" />
+        <meta name="twitter:description" content="Betrouwbaar onderhoud en reparatie voor alle merken bij Platin Automotive. Snelle service, eerlijke prijs in Roelofarendsveen. Maak vandaag een afspraak." />
+
       </Helmet>
       <Navbar />
       <FloatingCTA targetId="afspraak" label="Afspraak maken" />

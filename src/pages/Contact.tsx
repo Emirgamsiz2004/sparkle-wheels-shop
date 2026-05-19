@@ -187,6 +187,13 @@ const Contact = () => {
         <meta name="description" content="Neem contact op met Platin Automotive. Bel 06-12693825, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
         <link rel="canonical" href="https://platinautomotive.nl/contact" />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Contact | Platin Automotive Roelofarendsveen" />
+        <meta property="og:description" content="Neem contact op met Platin Automotive. Bel 06-12693825, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
+        <meta property="og:url" content="https://platinautomotive.nl/contact" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Contact | Platin Automotive Roelofarendsveen" />
+        <meta name="twitter:description" content="Neem contact op met Platin Automotive. Bel 06-12693825, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
+
       </Helmet>
       <Navbar />
 

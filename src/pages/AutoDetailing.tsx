@@ -27,6 +27,13 @@ const AutoDetailing = () => {
         <meta name="description" content="Professionele auto detailing bij Platin Automotive. Interieur- en exterieurreiniging, polijsten, lakbescherming. Resultaat gegarandeerd – maak een afspraak!" />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-detailing" />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Auto Detailing Roelofarendsveen | Platin Automotive" />
+        <meta property="og:description" content="Professionele auto detailing bij Platin Automotive. Interieur- en exterieurreiniging, polijsten, lakbescherming. Resultaat gegarandeerd – maak een afspraak!" />
+        <meta property="og:url" content="https://platinautomotive.nl/diensten/auto-detailing" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Auto Detailing Roelofarendsveen | Platin Automotive" />
+        <meta name="twitter:description" content="Professionele auto detailing bij Platin Automotive. Interieur- en exterieurreiniging, polijsten, lakbescherming. Resultaat gegarandeerd – maak een afspraak!" />
+
       </Helmet>
       <Navbar />
       <FloatingCTA targetId="afspraak" label="Afspraak maken" />
