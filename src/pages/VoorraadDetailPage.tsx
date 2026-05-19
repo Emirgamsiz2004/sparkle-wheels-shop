@@ -10,6 +10,7 @@ import RelatedVehicles from "@/components/RelatedVehicles";
 import VehicleBookingCard, { VehicleBookingMobileButton } from "@/components/VehicleBookingCard";
 import LeaseCalculatorPopover from "@/components/LeaseCalculatorPopover";
 import { berekenLeaseVanaf, isLeaseEligible, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
+import { getVoertuigFotoUrl } from "@/lib/vwePhoto";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
