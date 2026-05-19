@@ -52,10 +52,10 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
         {trigger ?? (
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 text-[11px] font-body text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+            className="inline-flex items-center gap-1.5 text-[13px] font-body font-medium text-foreground/80 hover:text-foreground underline underline-offset-4 transition-colors"
           >
-            <Calculator className="w-3 h-3" />
-            Bereken zelf
+            <Calculator className="w-3.5 h-3.5" />
+            Bereken zelf je leasetermijn
           </button>
         )}
       </PopoverTrigger>
