@@ -110,7 +110,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
               </span>
               {!isSold && isLeaseEligible(voertuig.prijs) && (
                 <span className="text-[12px] md:text-[13px] font-body font-medium text-muted-foreground mt-1">
-                  vanaf <span className="text-foreground font-semibold">{formatEuro(berekenLeaseVanaf(voertuig.prijs))}</span> p/mnd
+                  v.a. <span className="text-foreground font-semibold">{formatEuro(berekenLeaseVanaf(voertuig.prijs))}</span> p/m
                 </span>
               )}
             </div>
