@@ -1863,11 +1863,13 @@ export type Database = {
           eind_tijd: string | null
           email_verzonden_op: string | null
           formulier_ingevuld_op: string | null
+          gereden_km: number | null
           handtekening_data: string | null
           id: string
           ip_adres: string | null
           km_na: number | null
           km_voor: number
+          max_duur_minuten: number
           opmerkingen_na: string | null
           opmerkingen_voor: string | null
           pdf_definitief_path: string | null
@@ -1875,8 +1877,10 @@ export type Database = {
           schade_fotos: string[] | null
           start_tijd: string
           status: string
+          terugkomst_tijd: string | null
           token: string
           vehicle_id: string | null
+          vertrek_tijd: string | null
           voertuig_bouwjaar: number | null
           voertuig_kenteken: string | null
           voertuig_merk: string | null
@@ -1890,11 +1894,13 @@ export type Database = {
           eind_tijd?: string | null
           email_verzonden_op?: string | null
           formulier_ingevuld_op?: string | null
+          gereden_km?: number | null
           handtekening_data?: string | null
           id?: string
           ip_adres?: string | null
           km_na?: number | null
           km_voor: number
+          max_duur_minuten?: number
           opmerkingen_na?: string | null
           opmerkingen_voor?: string | null
           pdf_definitief_path?: string | null
@@ -1902,8 +1908,10 @@ export type Database = {
           schade_fotos?: string[] | null
           start_tijd?: string
           status?: string
+          terugkomst_tijd?: string | null
           token: string
           vehicle_id?: string | null
+          vertrek_tijd?: string | null
           voertuig_bouwjaar?: number | null
           voertuig_kenteken?: string | null
           voertuig_merk?: string | null
@@ -1917,11 +1925,13 @@ export type Database = {
           eind_tijd?: string | null
           email_verzonden_op?: string | null
           formulier_ingevuld_op?: string | null
+          gereden_km?: number | null
           handtekening_data?: string | null
           id?: string
           ip_adres?: string | null
           km_na?: number | null
           km_voor?: number
+          max_duur_minuten?: number
           opmerkingen_na?: string | null
           opmerkingen_voor?: string | null
           pdf_definitief_path?: string | null
@@ -1929,8 +1939,10 @@ export type Database = {
           schade_fotos?: string[] | null
           start_tijd?: string
           status?: string
+          terugkomst_tijd?: string | null
           token?: string
           vehicle_id?: string | null
+          vertrek_tijd?: string | null
           voertuig_bouwjaar?: number | null
           voertuig_kenteken?: string | null
           voertuig_merk?: string | null
