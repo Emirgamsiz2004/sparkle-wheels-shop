@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet, Settings, LogOut,
   Users, Clock, CalendarDays, BadgeDollarSign, Inbox, ClipboardCheck, X,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTestDrives } from "@/hooks/useTestDrives";
+import { pickPrimaryActive, useProefritTimer } from "@/hooks/useProefritTimer";
+import SidebarQuickActions from "@/components/admin/SidebarQuickActions";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
@@ -31,6 +34,9 @@ export default function MobileSidebar({ open, onClose }: Props) {
   const location = useLocation();
   const { isAdmin, signOut, user } = useAuth();
   const items = isAdmin ? NAV : NAV.filter((i) => i.medewerker);
+  const { testDrives } = useTestDrives();
+  const activeProefrit = pickPrimaryActive(testDrives);
+  const proefritTimer = useProefritTimer(activeProefrit);
 
   const isActive = (path: string) =>
     location.pathname === path || location.pathname.startsWith(path + "/");
@@ -116,12 +122,28 @@ export default function MobileSidebar({ open, onClose }: Props) {
                   }`}
                 >
                   <item.icon className="w-4 h-4 flex-shrink-0 opacity-80" />
-                  <span>{item.label}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {item.path === "/admin/proefriten" && proefritTimer.active && (
+                    <span
+                      className={`inline-flex items-center justify-center px-1.5 h-[18px] text-[10px] font-mono font-semibold rounded-full border ${
+                        proefritTimer.tone === "expired" ? "bg-red-500/20 text-red-300 border-red-500/50 animate-pulse"
+                        : proefritTimer.tone === "red" ? "bg-red-500/15 text-red-400 border-red-500/30"
+                        : proefritTimer.tone === "amber" ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                        : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                      }`}
+                    >
+                      {proefritTimer.mmss}
+                    </span>
+                  )}
                 </Link>
               );
             })}
           </div>
         </nav>
+
+        <div className="px-3 py-2 border-t border-[hsl(var(--sidebar-border))]">
+          <SidebarQuickActions variant="rail" className="w-full justify-start" />
+        </div>
 
         <div className="p-3 border-t border-[hsl(var(--sidebar-border))]">
           <p className="text-sm font-medium text-foreground px-1">Platin Automotive</p>

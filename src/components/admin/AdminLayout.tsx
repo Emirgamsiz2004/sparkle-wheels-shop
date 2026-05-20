@@ -11,6 +11,10 @@ import NotificationBell from "@/components/admin/NotificationBell";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
 import MobileSidebar, { getMobilePageTitle } from "@/components/admin/MobileSidebar";
+import SidebarQuickActions from "@/components/admin/SidebarQuickActions";
+import ProefritExpiryWatcher from "@/components/admin/proefrit/ProefritExpiryWatcher";
+import { useTestDrives } from "@/hooks/useTestDrives";
+import { pickPrimaryActive, useProefritTimer } from "@/hooks/useProefritTimer";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
@@ -106,6 +110,42 @@ const AdminLayout = () => {
   const pageTitle = getMobilePageTitle(location.pathname);
   const isDashboard = location.pathname === "/admin/dashboard";
 
+  return <AdminLayoutInner
+    user={user}
+    signOut={signOut}
+    visibleNavItems={visibleNavItems}
+    isActive={isActive}
+    pageTitle={pageTitle}
+    isDashboard={isDashboard}
+    overdueLeads={overdueLeads}
+    upcomingAppts={upcomingAppts}
+    mobileNavOpen={mobileNavOpen}
+    setMobileNavOpen={setMobileNavOpen}
+  />;
+};
+
+interface InnerProps {
+  user: any;
+  signOut: () => void;
+  visibleNavItems: NavItem[];
+  isActive: (path: string) => boolean;
+  pageTitle: string;
+  isDashboard: boolean;
+  overdueLeads: number;
+  upcomingAppts: number;
+  mobileNavOpen: boolean;
+  setMobileNavOpen: (v: boolean) => void;
+}
+
+const AdminLayoutInner = ({
+  user, signOut, visibleNavItems, isActive, pageTitle, isDashboard,
+  overdueLeads, upcomingAppts, mobileNavOpen, setMobileNavOpen,
+}: InnerProps) => {
+  const { testDrives } = useTestDrives();
+  const activeProefrit = pickPrimaryActive(testDrives);
+  const proefritTimer = useProefritTimer(activeProefrit);
+
+
   return (
     <div className="admin-theme min-h-screen bg-background overflow-x-hidden">
       {/* Sidebar — desktop-only. Verborgen op mobiel; bottombar vervangt navigatie. */}
@@ -144,12 +184,28 @@ const AdminLayout = () => {
                     {upcomingAppts}
                   </span>
                 )}
+                {item.path === "/admin/proefriten" && proefritTimer.active && (
+                  <span
+                    className={`inline-flex items-center justify-center px-1.5 h-[18px] text-[10px] font-mono font-semibold rounded-full border ${
+                      proefritTimer.tone === "expired" ? "bg-red-500/20 text-red-300 border-red-500/50 animate-pulse"
+                      : proefritTimer.tone === "red" ? "bg-red-500/15 text-red-400 border-red-500/30"
+                      : proefritTimer.tone === "amber" ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                      : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                    } transition-opacity duration-200 opacity-100`}
+                    title="Actieve proefrit — resterende tijd"
+                  >
+                    {proefritTimer.mmss}
+                  </span>
+                )}
               </Link>
             ))}
           </div>
         </nav>
 
-        <div className="p-2 border-t border-[hsl(var(--sidebar-border))]">
+        <div className="p-2 border-t border-[hsl(var(--sidebar-border))] space-y-1.5">
+          <div className="px-1">
+            <SidebarQuickActions variant="rail" />
+          </div>
           <Link
             to="/admin/instellingen"
             title="Instellingen"
@@ -215,6 +271,7 @@ const AdminLayout = () => {
       </div>
 
       <MobileSidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+      <ProefritExpiryWatcher />
     </div>
   );
 };

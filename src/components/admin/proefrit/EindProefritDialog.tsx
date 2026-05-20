@@ -92,11 +92,22 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
             </label>
             <input
               type="number"
+              inputMode="numeric"
               value={kmNa}
               onChange={(e) => setKmNa(e.target.value)}
               placeholder="bijv. 45280"
-              className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
+              className="w-full h-12 px-4 text-base bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
             />
+            {(() => {
+              const km = parseInt(kmNa);
+              if (!kmNa) {
+                return <p className="mt-2 text-[11px] text-muted-foreground">Verplicht — vul de eindkilometerstand in.</p>;
+              }
+              if (!km || km < testDrive.km_voor) {
+                return <p className="mt-2 text-[11px] text-red-400">Eindkilometerstand moet hoger zijn dan {testDrive.km_voor.toLocaleString("nl-NL")}.</p>;
+              }
+              return <p className="mt-2 text-[11px] text-emerald-400">Gereden: {(km - testDrive.km_voor).toLocaleString("nl-NL")} km</p>;
+            })()}
           </div>
 
           <div>
@@ -152,8 +163,8 @@ const EindProefritDialog = ({ testDrive, open, onClose }: Props) => {
 
           <button
             onClick={handleEnd}
-            disabled={loading || !kmNa}
-            className="w-full py-3 text-sm font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.98] transition-all disabled:opacity-50"
+            disabled={loading || !kmNa || !parseInt(kmNa) || parseInt(kmNa) < testDrive.km_voor}
+            className="w-full py-3 text-sm font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Bezig..." : "Afsluiten en opslaan"}
           </button>

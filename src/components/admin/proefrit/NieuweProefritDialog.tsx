@@ -303,6 +303,10 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
                 <label className="block text-[11px] text-muted-foreground mb-1">Begeleidende medewerker</label>
                 <input value={medewerker} onChange={(e) => setMedewerker(e.target.value)} placeholder="Naam medewerker" className={inputCls} />
               </div>
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                <span aria-hidden>⏱</span>
+                Maximale proefritduur: 30 minuten
+              </p>
               <div className="flex gap-2">
                 {!preselectedVehicle && (
                   <button onClick={() => { setStep("select"); setSelectedVehicle(null); }} className="flex-1 py-2.5 text-xs font-medium border border-border/60 rounded-[10px] hover:bg-accent/20 transition-colors">

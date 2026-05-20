@@ -10,6 +10,7 @@ import {
   Download, Mail, StopCircle, FileText, X, Trash2,
 } from "lucide-react";
 import EindProefritDialog from "./EindProefritDialog";
+import ProefritCountdown from "./ProefritCountdown";
 import { useTestDrives } from "@/hooks/useTestDrives";
 
 interface Props {
@@ -155,7 +156,13 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
           </div>
 
           <div className="p-5 space-y-5">
-            {/* Klantgegevens */}
+            {td.status === "actief" && (
+              <div className="flex flex-col items-center gap-2 bg-muted/30 border border-border rounded-md p-4">
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Resterende proefritduur</p>
+                <ProefritCountdown testDrive={td} size="lg" />
+                <p className="text-[11px] text-muted-foreground">Max. 30 minuten</p>
+              </div>
+            )}
             <section>
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-3">Klantgegevens</p>
               {td.customer ? (

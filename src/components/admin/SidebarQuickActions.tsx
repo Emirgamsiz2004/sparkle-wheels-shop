@@ -1,0 +1,212 @@
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
+import { Plus, Car, FileSignature, BadgeDollarSign, CreditCard, UserPlus, ClipboardCheck, CalendarPlus, FileText, Search, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+interface ActionItem {
+  icon: typeof Car;
+  label: string;
+  onClick: () => void;
+}
+
+interface Section {
+  title: string;
+  items: ActionItem[];
+}
+
+interface Props {
+  /** Visual style for the trigger button. */
+  variant?: "rail" | "wide";
+  className?: string;
+}
+
+const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const [kenteken, setKenteken] = useState("");
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+
+  const go = (path: string) => {
+    setOpen(false);
+    navigate(path);
+  };
+
+  const sections: Section[] = [
+    {
+      title: "Voertuig & verkoop",
+      items: [
+        { icon: Car, label: "Voertuig toevoegen", onClick: () => go("/admin/voertuigen/nieuw") },
+        { icon: FileSignature, label: "Inkoopverklaring", onClick: () => go("/admin/inkoop?new=1") },
+        { icon: BadgeDollarSign, label: "Verkoop starten", onClick: () => go("/admin/verkopen?new=1") },
+        { icon: CreditCard, label: "Aanbetaling registreren", onClick: () => go("/admin/financieel?aanbetaling=1") },
+      ],
+    },
+    {
+      title: "Klanten & proefritten",
+      items: [
+        { icon: UserPlus, label: "Nieuwe klant", onClick: () => go("/admin/klanten?new=1") },
+        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => go("/admin/proefriten?new=1") },
+        { icon: CalendarPlus, label: "Afspraak plannen", onClick: () => go("/admin/planning?new=1") },
+      ],
+    },
+    {
+      title: "Overig",
+      items: [
+        { icon: FileText, label: "Document aanmaken", onClick: () => go("/admin/archief?new=1") },
+      ],
+    },
+  ];
+
+  // Outside click + escape
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onDown = (e: MouseEvent) => {
+      if (popRef.current?.contains(e.target as Node)) return;
+      if (btnRef.current?.contains(e.target as Node)) return;
+      setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const t = setTimeout(() => document.addEventListener("mousedown", onDown), 0);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      clearTimeout(t);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [open]);
+
+  // Position popover next to button on desktop
+  useEffect(() => {
+    if (!open || isMobile || !btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+    const W = 280;
+    const left = Math.min(window.innerWidth - W - 8, r.right + 8);
+    const top = Math.max(8, Math.min(window.innerHeight - 420, r.top));
+    setPos({ top, left });
+  }, [open, isMobile]);
+
+  const handleKentekenSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const k = kenteken.trim().replace(/[-\s]/g, "");
+    if (!k) return;
+    setOpen(false);
+    setKenteken("");
+    navigate(`/admin/voertuigen?search=${encodeURIComponent(k)}`);
+  };
+
+  const trigger = (
+    <button
+      ref={btnRef}
+      onClick={() => setOpen((v) => !v)}
+      title="Snelstart"
+      aria-label="Snelstart openen"
+      className={
+        variant === "rail"
+          ? `flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap text-foreground hover:bg-accent/60 border border-border/60 ${
+              open ? "bg-accent" : ""
+            } ${className}`
+          : `inline-flex items-center justify-center w-9 h-9 rounded-full border border-border bg-background hover:bg-accent text-foreground transition-colors ${
+              open ? "bg-accent" : ""
+            } ${className}`
+      }
+    >
+      <Plus className="w-4 h-4 flex-shrink-0" />
+      {variant === "rail" && (
+        <span className="transition-opacity duration-200 opacity-100 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Snelstart</span>
+      )}
+    </button>
+  );
+
+  const panel = open ? (
+    isMobile ? (
+      <>
+        <div
+          className="fixed inset-0 z-[60] bg-black/50 animate-in fade-in duration-150"
+          onClick={() => setOpen(false)}
+        />
+        <div
+          ref={popRef}
+          className="fixed bottom-0 inset-x-0 z-[61] bg-card border-t border-border rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,12px)] animate-in slide-in-from-bottom duration-200 max-h-[85vh] overflow-y-auto"
+        >
+          <div className="pt-2 pb-1 flex justify-center">
+            <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+          </div>
+          <div className="px-4 pb-3 flex items-center justify-between">
+            <h3 className="text-sm font-medium text-foreground">Snelstart</h3>
+            <button onClick={() => setOpen(false)} className="p-1 -mr-1 text-muted-foreground"><X className="w-4 h-4" /></button>
+          </div>
+          <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
+        </div>
+      </>
+    ) : (
+      <div
+        ref={popRef}
+        style={pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 }}
+        className="fixed z-[60] w-[280px] max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(0,0,0,0.45)] animate-in fade-in-0 zoom-in-95 duration-150"
+      >
+        <div className="px-3 py-2 border-b border-border/60 flex items-center justify-between">
+          <h3 className="text-xs font-medium text-foreground tracking-wide">Snelstart</h3>
+          <button onClick={() => setOpen(false)} className="p-1 -mr-1 text-muted-foreground hover:text-foreground"><X className="w-3.5 h-3.5" /></button>
+        </div>
+        <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
+      </div>
+    )
+  ) : null;
+
+  return (
+    <>
+      {trigger}
+      {panel && createPortal(panel, document.body)}
+    </>
+  );
+};
+
+const PanelInner = ({
+  sections, kenteken, setKenteken, onKentekenSubmit,
+}: {
+  sections: Section[];
+  kenteken: string;
+  setKenteken: (v: string) => void;
+  onKentekenSubmit: (e: React.FormEvent) => void;
+}) => (
+  <div className="py-1">
+    {sections.map((sec) => (
+      <div key={sec.title} className="px-1 py-1">
+        <p className="px-3 py-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{sec.title}</p>
+        <div className="space-y-px">
+          {sec.items.map((it) => (
+            <button
+              key={it.label}
+              onClick={it.onClick}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] text-foreground hover:bg-accent/60 transition-colors text-left"
+            >
+              <it.icon className="w-4 h-4 text-muted-foreground" />
+              <span>{it.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    ))}
+    <div className="px-3 pt-2 pb-3 border-t border-border/60">
+      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-2">Kenteken opzoeken</p>
+      <form onSubmit={onKentekenSubmit} className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <input
+            value={kenteken}
+            onChange={(e) => setKenteken(e.target.value.toUpperCase())}
+            placeholder="AB-12-CD"
+            className="w-full pl-8 pr-2 h-9 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60 uppercase"
+          />
+        </div>
+        <button type="submit" className="h-9 px-3 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors">Ga</button>
+      </form>
+    </div>
+  </div>
+);
+
+export default SidebarQuickActions;

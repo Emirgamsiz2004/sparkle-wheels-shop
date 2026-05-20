@@ -45,6 +45,10 @@ export interface TestDrive {
   voertuig_model?: string;
   voertuig_kenteken?: string;
   voertuig_bouwjaar?: number;
+  vertrek_tijd?: string;
+  terugkomst_tijd?: string;
+  gereden_km?: number;
+  max_duur_minuten?: number;
   // joined
   customer?: TestDriveCustomer;
 }
@@ -101,9 +105,14 @@ export function useTestDrives() {
   };
 
   const endTestDrive = async (id: string, kmNa: number, opmerkingenNa?: string, schadeFotos?: string[]) => {
+    const td = testDrives.find((t) => t.id === id);
+    const geredenKm = td ? Math.max(0, kmNa - td.km_voor) : null;
+    const nowIso = new Date().toISOString();
     const { error } = await supabase.from('test_drives').update({
       km_na: kmNa,
-      eind_tijd: new Date().toISOString(),
+      eind_tijd: nowIso,
+      terugkomst_tijd: nowIso,
+      gereden_km: geredenKm,
       opmerkingen_na: opmerkingenNa || null,
       schade_fotos: schadeFotos || [],
       status: 'afgesloten',

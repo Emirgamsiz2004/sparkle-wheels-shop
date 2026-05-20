@@ -225,11 +225,13 @@ const ProefritFormulier = () => {
       } catch { clientIp = "onbekend"; }
 
       // Update test drive
+      const nowIso = new Date().toISOString();
       const { error: tdErr } = await supabase.from("test_drives").update({
         customer_id: customerId,
         handtekening_data: signatureData,
         opmerkingen_voor: opmerkingen || null,
-        formulier_ingevuld_op: new Date().toISOString(),
+        formulier_ingevuld_op: nowIso,
+        vertrek_tijd: nowIso,
         status: "actief",
         ip_adres: clientIp,
       } as any).eq("id", testDrive.id);

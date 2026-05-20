@@ -91,6 +91,10 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                 className="w-full h-12 px-4 text-base bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
               />
             </div>
+            <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+              <span aria-hidden>⏱</span>
+              Maximale proefritduur: 30 minuten
+            </p>
             <button
               onClick={handleStart}
               disabled={loading || !kmVoor}

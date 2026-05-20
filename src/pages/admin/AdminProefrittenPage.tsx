@@ -1,4 +1,5 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
 import { useAppointments, typeColors, typeLabels } from "@/hooks/useAppointments";
 import { Loader2, Search, ChevronRight, CheckCircle2, Clock, XCircle, Car, StopCircle, Plus, Play, CalendarDays } from "lucide-react";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import ProefritDetailDialog from "@/components/admin/proefrit/ProefritDetailDialog";
 import EindProefritDialog from "@/components/admin/proefrit/EindProefritDialog";
 import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDialog";
+import ProefritCountdown from "@/components/admin/proefrit/ProefritCountdown";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
@@ -38,6 +40,24 @@ const AdminProefrittenPage = () => {
     setNewOpen(true);
   };
   const [startFromAppointment, setStartFromAppointment] = useState<{ id: string; merk: string; model: string; kenteken?: string; bouwjaar?: number; kilometerstand?: number } | null>(null);
+
+  // URL params: ?new=1 opens nieuwe-proefrit, ?afsluiten=<id> opens eind-dialog
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("new") === "1") {
+      openNew();
+      searchParams.delete("new");
+      setSearchParams(searchParams, { replace: true });
+    }
+    const afsluitenId = searchParams.get("afsluiten");
+    if (afsluitenId) {
+      const td = testDrives.find((t) => t.id === afsluitenId);
+      if (td) setEnding(td);
+      searchParams.delete("afsluiten");
+      setSearchParams(searchParams, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, testDrives]);
 
   // Upcoming proefrit appointments (scheduled, future or today)
   const scheduledProefritten = useMemo(() => {
