@@ -294,7 +294,71 @@ Deno.serve(async (req) => {
       };
     });
 
-    return new Response(JSON.stringify({ vehicles: enriched, count: enriched.length }), {
+    // Voeg verkochte voertuigen toe die niet meer in de feed staan (verwijderd uit
+    // advertentie-manager), zodat ze in "Onlangs verkocht" blijven verschijnen.
+    const feedIds = new Set(vehicles.map((v: any) => v.id).filter(Boolean));
+    const feedKentekens = new Set(
+      vehicles.map((v: any) => normalizeKenteken(v.kenteken)).filter(Boolean)
+    );
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
+
+    const { data: soldDbVehicles } = await supabase
+      .from("vehicles")
+      .select("id, feed_id, kenteken, merk, model, bouwjaar, brandstof, kilometerstand, kleur, verkoopprijs, feed_verkoopprijs, verkoop_datum")
+      .eq("status", "verkocht")
+      .gte("verkoop_datum", cutoff.toISOString().slice(0, 10))
+      .order("verkoop_datum", { ascending: false });
+
+    const extras: any[] = [];
+    for (const v of soldDbVehicles || []) {
+      if (v.feed_id && feedIds.has(v.feed_id)) continue;
+      if (v.kenteken && feedKentekens.has(normalizeKenteken(v.kenteken))) continue;
+
+      const { data: photos } = await supabase
+        .from("vehicle_photos")
+        .select("file_path, is_hoofdfoto, volgorde")
+        .eq("vehicle_id", v.id)
+        .order("is_hoofdfoto", { ascending: false })
+        .order("volgorde", { ascending: true })
+        .limit(1);
+
+      let afbeelding = "";
+      const path = photos?.[0]?.file_path;
+      if (path) {
+        const { data: pub } = supabase.storage.from("vehicle-photos").getPublicUrl(path);
+        afbeelding = pub.publicUrl;
+      }
+
+      const prijs = Number(v.feed_verkoopprijs || v.verkoopprijs) || 0;
+
+      extras.push({
+        id: v.feed_id || v.id,
+        merk: v.merk || "",
+        model: v.model || "",
+        type: "",
+        bouwjaar: v.bouwjaar ? String(v.bouwjaar) : "",
+        brandstof: v.brandstof || "",
+        transmissie: "",
+        kilometerstand: v.kilometerstand ? String(v.kilometerstand) : "",
+        carrosserie: "",
+        kleur: v.kleur || "",
+        prijs,
+        vermogen_pk: "",
+        afbeelding,
+        detailPath: "",
+        kenteken: v.kenteken || "",
+        nap: "",
+        feedStatus: "verkocht",
+        dbStatus: "verkocht",
+        verkochtOp: v.verkoop_datum,
+        detailAvailable: false,
+      });
+    }
+
+    const all = [...enriched, ...extras];
+
+    return new Response(JSON.stringify({ vehicles: all, count: all.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
