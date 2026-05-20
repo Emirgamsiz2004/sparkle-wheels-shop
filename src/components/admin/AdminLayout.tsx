@@ -184,12 +184,28 @@ const AdminLayoutInner = ({
                     {upcomingAppts}
                   </span>
                 )}
+                {item.path === "/admin/proefriten" && proefritTimer.active && (
+                  <span
+                    className={`inline-flex items-center justify-center px-1.5 h-[18px] text-[10px] font-mono font-semibold rounded-full border ${
+                      proefritTimer.tone === "expired" ? "bg-red-500/20 text-red-300 border-red-500/50 animate-pulse"
+                      : proefritTimer.tone === "red" ? "bg-red-500/15 text-red-400 border-red-500/30"
+                      : proefritTimer.tone === "amber" ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                      : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                    } transition-opacity duration-200 opacity-100`}
+                    title="Actieve proefrit — resterende tijd"
+                  >
+                    {proefritTimer.mmss}
+                  </span>
+                )}
               </Link>
             ))}
           </div>
         </nav>
 
-        <div className="p-2 border-t border-[hsl(var(--sidebar-border))]">
+        <div className="p-2 border-t border-[hsl(var(--sidebar-border))] space-y-1.5">
+          <div className="px-1">
+            <SidebarQuickActions variant="rail" />
+          </div>
           <Link
             to="/admin/instellingen"
             title="Instellingen"
