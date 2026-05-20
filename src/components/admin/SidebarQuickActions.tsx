@@ -97,14 +97,27 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
     };
   }, [open]);
 
-  // Position popover next to button on desktop
-  useEffect(() => {
-    if (!open || isMobile || !btnRef.current) return;
+  // Compute popover position synchronously when opening to avoid flicker
+  const computePos = () => {
+    if (!btnRef.current) return;
     const r = btnRef.current.getBoundingClientRect();
-    const W = 280;
-    const left = Math.min(window.innerWidth - W - 8, r.right + 8);
-    const top = Math.max(8, Math.min(window.innerHeight - 420, r.top));
-    setPos({ top, left });
+    // Anchor panel above the FAB, aligned to its right edge
+    const bottom = Math.max(8, window.innerHeight - r.top + 12);
+    const right = Math.max(8, window.innerWidth - r.right);
+    setPos({ bottom, right });
+  };
+
+  const handleToggle = () => {
+    if (!open && !isMobile) computePos();
+    setOpen((v) => !v);
+  };
+
+  // Reposition on resize while open
+  useEffect(() => {
+    if (!open || isMobile) return;
+    const onResize = () => computePos();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, [open, isMobile]);
 
   const handleKentekenSearch = (e: React.FormEvent) => {
@@ -119,12 +132,12 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const trigger = (
     <button
       ref={btnRef}
-      onClick={() => setOpen((v) => !v)}
+      onClick={handleToggle}
       title="Snelstart"
       aria-label="Snelstart openen"
       className={
         variant === "fab"
-          ? `inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_8px_24px_rgba(16,185,129,0.45)] ring-2 ring-emerald-300/40 transition-all active:scale-95 ${
+          ? `inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_8px_24px_rgba(16,185,129,0.45)] ring-2 ring-emerald-300/40 transition-transform duration-300 ease-out active:scale-95 ${
               open ? "rotate-45" : ""
             } ${className}`
           : variant === "rail"
@@ -143,41 +156,60 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
     </button>
   );
 
-  const panel = open ? (
-    isMobile ? (
-      <>
-        <div
-          className="fixed inset-0 z-[60] bg-black/50 animate-in fade-in duration-150"
-          onClick={() => setOpen(false)}
-        />
-        <div
-          ref={popRef}
-          className="fixed bottom-0 inset-x-0 z-[61] bg-card border-t border-border rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,12px)] animate-in slide-in-from-bottom duration-200 max-h-[85vh] overflow-y-auto"
-        >
-          <div className="pt-2 pb-1 flex justify-center">
-            <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
-          </div>
-          <div className="px-4 pb-3 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-foreground">Snelstart</h3>
-            <button onClick={() => setOpen(false)} className="p-1 -mr-1 text-muted-foreground"><X className="w-4 h-4" /></button>
-          </div>
-          <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
-        </div>
-      </>
-    ) : (
-      <div
-        ref={popRef}
-        style={pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 }}
-        className="fixed z-[60] w-[280px] max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(0,0,0,0.45)] animate-in fade-in-0 zoom-in-95 duration-150"
-      >
-        <div className="px-3 py-2 border-b border-border/60 flex items-center justify-between">
-          <h3 className="text-xs font-medium text-foreground tracking-wide">Snelstart</h3>
-          <button onClick={() => setOpen(false)} className="p-1 -mr-1 text-muted-foreground hover:text-foreground"><X className="w-3.5 h-3.5" /></button>
-        </div>
-        <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
-      </div>
-    )
-  ) : null;
+  const panel = (
+    <AnimatePresence>
+      {open && (
+        isMobile ? (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
+              onClick={() => setOpen(false)}
+            />
+            <motion.div
+              ref={popRef}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 32, stiffness: 320, mass: 0.8 }}
+              className="fixed bottom-0 inset-x-0 z-[61] bg-card border-t border-border rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,12px)] max-h-[85vh] overflow-y-auto"
+            >
+              <div className="pt-2 pb-1 flex justify-center">
+                <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+              </div>
+              <div className="px-4 pb-3 flex items-center justify-between">
+                <h3 className="text-sm font-medium text-foreground">Snelstart</h3>
+                <button onClick={() => setOpen(false)} className="p-1 -mr-1 text-muted-foreground"><X className="w-4 h-4" /></button>
+              </div>
+              <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
+            </motion.div>
+          </>
+        ) : (
+          <motion.div
+            ref={popRef}
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.97 }}
+            transition={{ type: "spring", damping: 28, stiffness: 360, mass: 0.7 }}
+            style={pos ? { bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
+            className="fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_20px_50px_-12px_rgba(0,0,0,0.6)] origin-bottom-right"
+          >
+            <div className="px-4 py-3 border-b border-border/60 flex items-center justify-between sticky top-0 bg-card z-10">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground tracking-tight">Snelstart</h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Start direct een actie</p>
+              </div>
+              <button onClick={() => setOpen(false)} className="p-1.5 -mr-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"><X className="w-4 h-4" /></button>
+            </div>
+            <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
+          </motion.div>
+        )
+      )}
+    </AnimatePresence>
+  );
 
   return (
     <>
