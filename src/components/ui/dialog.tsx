@@ -129,7 +129,10 @@ const DialogContent = React.forwardRef<
   };
 
   if (isMobile) {
-    const mobileMaxHeight = `min(85vh, calc(${keyboardViewport.height}px - 16px))`;
+    const mobileBottom = Math.max(keyboardViewport.bottomInset, keyboardViewport.focusedInset);
+    const mobileMaxHeight = keyboardViewport.isInputFocused
+      ? `min(68vh, calc(${keyboardViewport.height}px - 18px))`
+      : `min(85vh, calc(${keyboardViewport.height}px - 16px))`;
 
     return (
       <DialogPortal>
@@ -149,7 +152,7 @@ const DialogContent = React.forwardRef<
           style={{
             borderRadius: "20px 20px 0 0",
             willChange: "transform",
-            bottom: keyboardViewport.bottomInset,
+            bottom: mobileBottom,
             maxHeight: mobileMaxHeight,
             transition: "bottom 220ms ease-out, transform 280ms cubic-bezier(0.32,0.72,0,1)",
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
