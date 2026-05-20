@@ -27,7 +27,8 @@ const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
 >(({ className, children, style, ...props }, ref) => {
-  const { bottomInset, height } = useKeyboardSafeViewport(true);
+  const { bottomInset, focusedInset, height, isInputFocused } = useKeyboardSafeViewport(true);
+  const mobileBottom = Math.max(bottomInset, focusedInset);
 
   return (
     <DrawerPortal>
@@ -39,8 +40,8 @@ const DrawerContent = React.forwardRef<
           className,
         )}
         style={{
-          bottom: bottomInset,
-          maxHeight: `min(92vh, calc(${height}px - 12px))`,
+          bottom: mobileBottom,
+          maxHeight: isInputFocused ? `min(70vh, calc(${height}px - 12px))` : `min(92vh, calc(${height}px - 12px))`,
           ...style,
         }}
         onFocusCapture={(e) => keepFocusedFieldVisible(e.target)}
