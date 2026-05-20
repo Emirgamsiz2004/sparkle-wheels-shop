@@ -11,6 +11,10 @@ import NotificationBell from "@/components/admin/NotificationBell";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
 import MobileSidebar, { getMobilePageTitle } from "@/components/admin/MobileSidebar";
+import SidebarQuickActions from "@/components/admin/SidebarQuickActions";
+import ProefritExpiryWatcher from "@/components/admin/proefrit/ProefritExpiryWatcher";
+import { useTestDrives } from "@/hooks/useTestDrives";
+import { pickPrimaryActive, useProefritTimer } from "@/hooks/useProefritTimer";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
