@@ -200,6 +200,7 @@ serve(async (req) => {
           kenteken: fv.kenteken,
           verkoopprijs: fv.verkoopprijs,
           feed_verkoopprijs: fv.verkoopprijs,
+          feed_afbeelding: fv.feed_afbeelding || null,
           status: fv.feed_status,
           inkoop_datum: new Date().toISOString().split("T")[0],
         });
