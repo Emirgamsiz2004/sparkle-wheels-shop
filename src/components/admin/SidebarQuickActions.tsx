@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { Plus, Car, FileSignature, BadgeDollarSign, CreditCard, UserPlus, ClipboardCheck, CalendarPlus, FileText, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDialog";
+import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
+import InkoopverklaringWizard from "@/components/admin/inkoop/InkoopverklaringWizard";
+import { useCustomers } from "@/hooks/useCustomers";
 
 interface ActionItem {
   icon: typeof Car;
