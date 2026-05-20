@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet, Settings, LogOut,
   Users, Clock, CalendarDays, BadgeDollarSign, Inbox, ClipboardCheck, X,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTestDrives } from "@/hooks/useTestDrives";
+import { pickPrimaryActive, useProefritTimer } from "@/hooks/useProefritTimer";
+import SidebarQuickActions from "@/components/admin/SidebarQuickActions";
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
