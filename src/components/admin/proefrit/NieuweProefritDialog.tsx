@@ -172,11 +172,16 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
   if (!open) return null;
 
   const containerClass = isMobile
-    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-[16px] border-t border-x border-border/60 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
+    ? "fixed left-0 right-0 z-50 flex flex-col overflow-hidden rounded-t-[16px] border-t border-x border-border/60 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
     : "fixed z-50 w-[380px] max-h-[85vh] overflow-y-auto rounded-[14px] border border-border/60 bg-card shadow-[0_8px_30px_rgba(0,0,0,0.35)] animate-in fade-in-0 zoom-in-95 duration-150";
 
   const containerStyle: React.CSSProperties = isMobile
-    ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" }
+    ? {
+        bottom: keyboardViewport.bottomInset,
+        maxHeight: `min(90vh, calc(${keyboardViewport.height}px - 14px))`,
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        transition: "bottom 220ms ease-out, transform 220ms ease-out",
+      }
     : pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 };
 
   const title =
@@ -196,7 +201,10 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
       >
         <X className="w-4 h-4" />
       </button>
-      <div style={{ padding: 18 }}>
+      <div
+        className="flex-1 overflow-y-auto overscroll-contain px-[18px] pb-[18px] pt-3"
+        onFocusCapture={(e) => keepFocusedFieldVisible(e.target)}
+      >
         <h3 className="text-sm font-medium text-foreground mb-4 pr-8">{title}</h3>
 
         <AnimatePresence mode="wait">
