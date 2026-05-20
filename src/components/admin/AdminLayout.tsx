@@ -110,6 +110,42 @@ const AdminLayout = () => {
   const pageTitle = getMobilePageTitle(location.pathname);
   const isDashboard = location.pathname === "/admin/dashboard";
 
+  return <AdminLayoutInner
+    user={user}
+    signOut={signOut}
+    visibleNavItems={visibleNavItems}
+    isActive={isActive}
+    pageTitle={pageTitle}
+    isDashboard={isDashboard}
+    overdueLeads={overdueLeads}
+    upcomingAppts={upcomingAppts}
+    mobileNavOpen={mobileNavOpen}
+    setMobileNavOpen={setMobileNavOpen}
+  />;
+};
+
+interface InnerProps {
+  user: any;
+  signOut: () => void;
+  visibleNavItems: NavItem[];
+  isActive: (path: string) => boolean;
+  pageTitle: string;
+  isDashboard: boolean;
+  overdueLeads: number;
+  upcomingAppts: number;
+  mobileNavOpen: boolean;
+  setMobileNavOpen: (v: boolean) => void;
+}
+
+const AdminLayoutInner = ({
+  user, signOut, visibleNavItems, isActive, pageTitle, isDashboard,
+  overdueLeads, upcomingAppts, mobileNavOpen, setMobileNavOpen,
+}: InnerProps) => {
+  const { testDrives } = useTestDrives();
+  const activeProefrit = pickPrimaryActive(testDrives);
+  const proefritTimer = useProefritTimer(activeProefrit);
+
+
   return (
     <div className="admin-theme min-h-screen bg-background overflow-x-hidden">
       {/* Sidebar — desktop-only. Verborgen op mobiel; bottombar vervangt navigatie. */}
