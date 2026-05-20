@@ -177,8 +177,10 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
 
   const containerStyle: React.CSSProperties = isMobile
     ? {
-        bottom: keyboardViewport.bottomInset,
-        maxHeight: `min(90vh, calc(${keyboardViewport.height}px - 14px))`,
+        bottom: Math.max(keyboardViewport.bottomInset, keyboardViewport.focusedInset),
+        maxHeight: keyboardViewport.isInputFocused
+          ? `min(68vh, calc(${keyboardViewport.height}px - 14px))`
+          : `min(90vh, calc(${keyboardViewport.height}px - 14px))`,
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
         transition: "bottom 220ms ease-out, transform 220ms ease-out",
       }
