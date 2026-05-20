@@ -198,7 +198,7 @@ async function fetchDetail(detailPath: string) {
 async function syncAutodealersPricesToDatabase(supabase: ReturnType<typeof createClient>, vehicles: any[]) {
   const { data: dbVehicles, error } = await supabase
     .from("vehicles")
-    .select("id, feed_id, kenteken, verkoopprijs, feed_verkoopprijs");
+    .select("id, feed_id, kenteken, verkoopprijs, feed_verkoopprijs, feed_afbeelding");
 
   if (error) {
     console.error("Autodealers price sync select error:", error);
@@ -214,15 +214,16 @@ async function syncAutodealersPricesToDatabase(supabase: ReturnType<typeof creat
 
   for (const vehicle of vehicles) {
     const prijs = Number(vehicle.prijs) || 0;
-    if (!prijs) continue;
-
     const match = byFeedId.get(vehicle.id) || byKenteken.get(normalizeKenteken(vehicle.kenteken));
     if (!match) continue;
 
     const updates: Record<string, unknown> = {};
     if (!match.feed_id && vehicle.id) updates.feed_id = vehicle.id;
-    if (Number(match.verkoopprijs) !== prijs) updates.verkoopprijs = prijs;
-    if (Number(match.feed_verkoopprijs) !== prijs) updates.feed_verkoopprijs = prijs;
+    if (prijs && Number(match.verkoopprijs) !== prijs) updates.verkoopprijs = prijs;
+    if (prijs && Number(match.feed_verkoopprijs) !== prijs) updates.feed_verkoopprijs = prijs;
+    if (vehicle.afbeelding && match.feed_afbeelding !== vehicle.afbeelding) {
+      updates.feed_afbeelding = vehicle.afbeelding;
+    }
 
     if (Object.keys(updates).length > 0) {
       const { error: updateError } = await supabase.from("vehicles").update(updates).eq("id", match.id);
