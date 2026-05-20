@@ -133,7 +133,7 @@ const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="space-y-5 max-w-[1200px]">
+    <div className="space-y-5 w-full">
       {/* ─── Header + period selector ─── */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
