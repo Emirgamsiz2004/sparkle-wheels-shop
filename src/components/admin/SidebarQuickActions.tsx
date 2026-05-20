@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { Plus, Car, FileSignature, BadgeDollarSign, CreditCard, UserPlus, ClipboardCheck, CalendarPlus, FileText, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDialog";
+import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
+import InkoopverklaringWizard from "@/components/admin/inkoop/InkoopverklaringWizard";
+import { useCustomers } from "@/hooks/useCustomers";
 
 interface ActionItem {
   icon: typeof Car;
@@ -24,15 +28,28 @@ interface Props {
 const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { addCustomer } = useCustomers();
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [kenteken, setKenteken] = useState("");
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
 
+  // Direct-action dialogs launched from the quick menu
+  const [proefritOpen, setProefritOpen] = useState(false);
+  const [klantOpen, setKlantOpen] = useState(false);
+  const [klantAnchor, setKlantAnchor] = useState<DOMRect | null>(null);
+  const [inkoopOpen, setInkoopOpen] = useState(false);
+
   const go = (path: string) => {
     setOpen(false);
     navigate(path);
+  };
+
+  const launch = (fn: () => void) => {
+    setOpen(false);
+    // Wait a tick so the popover close animation doesn't fight with the dialog opening
+    setTimeout(fn, 0);
   };
 
   const sections: Section[] = [
@@ -40,7 +57,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       title: "Voertuig & verkoop",
       items: [
         { icon: Car, label: "Voertuig toevoegen", onClick: () => go("/admin/voertuigen/nieuw") },
-        { icon: FileSignature, label: "Inkoopverklaring", onClick: () => go("/admin/inkoop?new=1") },
+        { icon: FileSignature, label: "Inkoopverklaring", onClick: () => launch(() => setInkoopOpen(true)) },
         { icon: BadgeDollarSign, label: "Verkoop starten", onClick: () => go("/admin/verkopen?new=1") },
         { icon: CreditCard, label: "Aanbetaling registreren", onClick: () => go("/admin/financieel?aanbetaling=1") },
       ],
@@ -48,8 +65,8 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
     {
       title: "Klanten & proefritten",
       items: [
-        { icon: UserPlus, label: "Nieuwe klant", onClick: () => go("/admin/klanten?new=1") },
-        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => go("/admin/proefriten?new=1") },
+        { icon: UserPlus, label: "Nieuwe klant", onClick: () => launch(() => { setKlantAnchor(btnRef.current?.getBoundingClientRect() || null); setKlantOpen(true); }) },
+        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => launch(() => setProefritOpen(true)) },
         { icon: CalendarPlus, label: "Afspraak plannen", onClick: () => go("/admin/planning?new=1") },
       ],
     },
@@ -161,6 +178,19 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
     <>
       {trigger}
       {panel && createPortal(panel, document.body)}
+
+      {/* Direct-action dialogs — opened from the snelstart menu */}
+      <NieuweProefritDialog open={proefritOpen} onClose={() => setProefritOpen(false)} />
+      <AddCustomerPopover
+        open={klantOpen}
+        onOpenChange={setKlantOpen}
+        anchorRect={klantAnchor}
+        onSubmit={async (data) => {
+          await addCustomer({ ...data, status: "prospect" } as any);
+          setKlantOpen(false);
+        }}
+      />
+      <InkoopverklaringWizard open={inkoopOpen} onOpenChange={setInkoopOpen} />
     </>
   );
 };
