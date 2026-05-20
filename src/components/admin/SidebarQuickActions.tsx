@@ -21,7 +21,7 @@ interface Section {
 
 interface Props {
   /** Visual style for the trigger button. */
-  variant?: "rail" | "wide";
+  variant?: "rail" | "wide" | "fab";
   className?: string;
 }
 
