@@ -57,7 +57,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       title: "Voertuig & verkoop",
       items: [
         { icon: Car, label: "Voertuig toevoegen", onClick: () => go("/admin/voertuigen/nieuw") },
-        { icon: FileSignature, label: "Inkoopverklaring", onClick: () => go("/admin/inkoop?new=1") },
+        { icon: FileSignature, label: "Inkoopverklaring", onClick: () => launch(() => setInkoopOpen(true)) },
         { icon: BadgeDollarSign, label: "Verkoop starten", onClick: () => go("/admin/verkopen?new=1") },
         { icon: CreditCard, label: "Aanbetaling registreren", onClick: () => go("/admin/financieel?aanbetaling=1") },
       ],
@@ -65,8 +65,8 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
     {
       title: "Klanten & proefritten",
       items: [
-        { icon: UserPlus, label: "Nieuwe klant", onClick: () => go("/admin/klanten?new=1") },
-        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => go("/admin/proefriten?new=1") },
+        { icon: UserPlus, label: "Nieuwe klant", onClick: () => launch(() => { setKlantAnchor(btnRef.current?.getBoundingClientRect() || null); setKlantOpen(true); }) },
+        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => launch(() => setProefritOpen(true)) },
         { icon: CalendarPlus, label: "Afspraak plannen", onClick: () => go("/admin/planning?new=1") },
       ],
     },
