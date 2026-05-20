@@ -7,6 +7,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { Copy, Check, ExternalLink, Printer, Search, Car, X } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { keepFocusedFieldVisible, useKeyboardSafeViewport } from "@/hooks/use-keyboard-safe-viewport";
 
 interface Props {
   open: boolean;
@@ -18,12 +19,13 @@ interface Props {
 
 type Step = "select" | "form" | "result";
 
-const inputCls = "w-full px-3 py-2.5 text-sm bg-background border border-border/60 rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60";
+const inputCls = "w-full h-12 px-4 text-base md:h-auto md:px-3 md:py-2.5 md:text-sm bg-background border border-border/60 rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60";
 
 const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }: Props) => {
   const { startTestDrive } = useTestDrives();
   const { vehicles } = useVehicles();
   const isMobile = useIsMobile();
+  const keyboardViewport = useKeyboardSafeViewport(open && isMobile);
   const [step, setStep] = useState<Step>(preselectedVehicle ? "form" : "select");
   const [search, setSearch] = useState("");
   const [useManual, setUseManual] = useState(false);
