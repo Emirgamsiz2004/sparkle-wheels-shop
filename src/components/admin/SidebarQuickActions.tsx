@@ -178,6 +178,19 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
     <>
       {trigger}
       {panel && createPortal(panel, document.body)}
+
+      {/* Direct-action dialogs — opened from the snelstart menu */}
+      <NieuweProefritDialog open={proefritOpen} onClose={() => setProefritOpen(false)} />
+      <AddCustomerPopover
+        open={klantOpen}
+        onOpenChange={setKlantOpen}
+        anchorRect={klantAnchor}
+        onSubmit={async (data) => {
+          await addCustomer({ ...data, status: "prospect" } as any);
+          setKlantOpen(false);
+        }}
+      />
+      <InkoopverklaringWizard open={inkoopOpen} onOpenChange={setInkoopOpen} />
     </>
   );
 };
