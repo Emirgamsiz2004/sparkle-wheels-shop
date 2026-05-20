@@ -2407,6 +2407,7 @@ export type Database = {
           created_at: string
           customer_id: string | null
           datum_deel_1: string | null
+          feed_afbeelding: string | null
           feed_id: string | null
           feed_kilometerstand: number | null
           feed_verkoopprijs: number | null
@@ -2465,6 +2466,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           datum_deel_1?: string | null
+          feed_afbeelding?: string | null
           feed_id?: string | null
           feed_kilometerstand?: number | null
           feed_verkoopprijs?: number | null
@@ -2523,6 +2525,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           datum_deel_1?: string | null
+          feed_afbeelding?: string | null
           feed_id?: string | null
           feed_kilometerstand?: number | null
           feed_verkoopprijs?: number | null

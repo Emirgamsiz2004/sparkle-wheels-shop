@@ -48,6 +48,9 @@ async function fetchFeedVehicles() {
     const merk = attr(block, "merk");
     if (!merk) continue;
 
+    const photoMatch = block.match(/data-lazyloader-src="([^"]+)"/);
+    const afbeelding = photoMatch ? photoMatch[1] : "";
+
     vehicles.push({
       feed_id: attr(block, "aid"),
       merk,
@@ -59,6 +62,7 @@ async function fetchFeedVehicles() {
       kenteken: attr(block, "kenteken") || null,
       verkoopprijs: parseInt(attr(block, "prijs") || "0", 10) || 0,
       feed_status: extractFeedStatus(block),
+      feed_afbeelding: afbeelding,
     });
   }
 
@@ -128,6 +132,9 @@ serve(async (req) => {
           updates.kilometerstand = fv.kilometerstand;
           updates.feed_kilometerstand = fv.kilometerstand;
         }
+        if (fv.feed_afbeelding) {
+          updates.feed_afbeelding = fv.feed_afbeelding;
+        }
         // Autodealers is leidend, behalve voor handmatige statussen.
         // Een verkoop wordt als "echt" beschouwd als er een koper bekend is.
         const isManualSale = match.status === "verkocht" && (match.koper_naam || match.koper_email);
@@ -193,6 +200,7 @@ serve(async (req) => {
           kenteken: fv.kenteken,
           verkoopprijs: fv.verkoopprijs,
           feed_verkoopprijs: fv.verkoopprijs,
+          feed_afbeelding: fv.feed_afbeelding || null,
           status: fv.feed_status,
           inkoop_datum: new Date().toISOString().split("T")[0],
         });

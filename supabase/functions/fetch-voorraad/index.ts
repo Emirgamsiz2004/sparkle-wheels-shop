@@ -198,7 +198,7 @@ async function fetchDetail(detailPath: string) {
 async function syncAutodealersPricesToDatabase(supabase: ReturnType<typeof createClient>, vehicles: any[]) {
   const { data: dbVehicles, error } = await supabase
     .from("vehicles")
-    .select("id, feed_id, kenteken, verkoopprijs, feed_verkoopprijs");
+    .select("id, feed_id, kenteken, verkoopprijs, feed_verkoopprijs, feed_afbeelding");
 
   if (error) {
     console.error("Autodealers price sync select error:", error);
@@ -214,15 +214,16 @@ async function syncAutodealersPricesToDatabase(supabase: ReturnType<typeof creat
 
   for (const vehicle of vehicles) {
     const prijs = Number(vehicle.prijs) || 0;
-    if (!prijs) continue;
-
     const match = byFeedId.get(vehicle.id) || byKenteken.get(normalizeKenteken(vehicle.kenteken));
     if (!match) continue;
 
     const updates: Record<string, unknown> = {};
     if (!match.feed_id && vehicle.id) updates.feed_id = vehicle.id;
-    if (Number(match.verkoopprijs) !== prijs) updates.verkoopprijs = prijs;
-    if (Number(match.feed_verkoopprijs) !== prijs) updates.feed_verkoopprijs = prijs;
+    if (prijs && Number(match.verkoopprijs) !== prijs) updates.verkoopprijs = prijs;
+    if (prijs && Number(match.feed_verkoopprijs) !== prijs) updates.feed_verkoopprijs = prijs;
+    if (vehicle.afbeelding && match.feed_afbeelding !== vehicle.afbeelding) {
+      updates.feed_afbeelding = vehicle.afbeelding;
+    }
 
     if (Object.keys(updates).length > 0) {
       const { error: updateError } = await supabase.from("vehicles").update(updates).eq("id", match.id);
@@ -305,7 +306,7 @@ Deno.serve(async (req) => {
 
     const { data: soldDbVehicles } = await supabase
       .from("vehicles")
-      .select("id, feed_id, kenteken, merk, model, bouwjaar, brandstof, kilometerstand, kleur, verkoopprijs, feed_verkoopprijs, verkoop_datum")
+      .select("id, feed_id, kenteken, merk, model, bouwjaar, brandstof, kilometerstand, kleur, verkoopprijs, feed_verkoopprijs, verkoop_datum, feed_afbeelding")
       .eq("status", "verkocht")
       .gte("verkoop_datum", cutoff.toISOString().slice(0, 10))
       .order("verkoop_datum", { ascending: false });
@@ -315,19 +316,22 @@ Deno.serve(async (req) => {
       if (v.feed_id && feedIds.has(v.feed_id)) continue;
       if (v.kenteken && feedKentekens.has(normalizeKenteken(v.kenteken))) continue;
 
-      const { data: photos } = await supabase
-        .from("vehicle_photos")
-        .select("file_path, is_hoofdfoto, volgorde")
-        .eq("vehicle_id", v.id)
-        .order("is_hoofdfoto", { ascending: false })
-        .order("volgorde", { ascending: true })
-        .limit(1);
+      let afbeelding = v.feed_afbeelding || "";
 
-      let afbeelding = "";
-      const path = photos?.[0]?.file_path;
-      if (path) {
-        const { data: pub } = supabase.storage.from("vehicle-photos").getPublicUrl(path);
-        afbeelding = pub.publicUrl;
+      if (!afbeelding) {
+        const { data: photos } = await supabase
+          .from("vehicle_photos")
+          .select("file_path, is_hoofdfoto, volgorde")
+          .eq("vehicle_id", v.id)
+          .order("is_hoofdfoto", { ascending: false })
+          .order("volgorde", { ascending: true })
+          .limit(1);
+
+        const path = photos?.[0]?.file_path;
+        if (path) {
+          const { data: pub } = supabase.storage.from("vehicle-photos").getPublicUrl(path);
+          afbeelding = pub.publicUrl;
+        }
       }
 
       const prijs = Number(v.feed_verkoopprijs || v.verkoopprijs) || 0;
