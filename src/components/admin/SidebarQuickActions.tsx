@@ -137,9 +137,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       aria-label="Snelstart openen"
       className={
         variant === "fab"
-          ? `inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_8px_24px_rgba(16,185,129,0.45)] ring-2 ring-emerald-300/40 transition-transform duration-300 ease-out active:scale-95 ${
-              open ? "rotate-45" : ""
-            } ${className}`
+          ? `inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_10px_30px_-6px_rgba(16,185,129,0.55)] ring-1 ring-emerald-300/30 transition-transform duration-200 ease-out active:scale-95 ${className}`
           : variant === "rail"
           ? `flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap text-foreground hover:bg-accent/60 border border-border/60 ${
               open ? "bg-accent" : ""
@@ -149,7 +147,19 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
             } ${className}`
       }
     >
-      <Plus className={variant === "fab" ? "w-6 h-6 flex-shrink-0 transition-transform" : "w-4 h-4 flex-shrink-0"} />
+      {variant === "fab" ? (
+        <motion.span
+          key={open ? "x" : "plus"}
+          initial={{ rotate: -90, opacity: 0, scale: 0.6 }}
+          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="inline-flex"
+        >
+          {open ? <X className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
+        </motion.span>
+      ) : (
+        <Plus className="w-4 h-4 flex-shrink-0" />
+      )}
       {variant === "rail" && (
         <span className="transition-opacity duration-200 opacity-100 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Snelstart</span>
       )}
@@ -190,19 +200,19 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
         ) : (
           <motion.div
             ref={popRef}
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{ type: "spring", damping: 28, stiffness: 360, mass: 0.7 }}
+            exit={{ opacity: 0, y: 4, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             style={pos ? { bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
-            className="fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_20px_50px_-12px_rgba(0,0,0,0.6)] origin-bottom-right"
+            className="fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-3xl border border-border/80 bg-card shadow-[0_24px_60px_-12px_rgba(0,0,0,0.65)] origin-bottom-right backdrop-blur-xl"
           >
-            <div className="px-4 py-3 border-b border-border/60 flex items-center justify-between sticky top-0 bg-card z-10">
+            <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between sticky top-0 bg-card/95 backdrop-blur-md z-10 rounded-t-3xl">
               <div>
                 <h3 className="text-sm font-semibold text-foreground tracking-tight">Snelstart</h3>
                 <p className="text-[11px] text-muted-foreground mt-0.5">Start direct een actie</p>
               </div>
-              <button onClick={() => setOpen(false)} className="p-1.5 -mr-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"><X className="w-4 h-4" /></button>
+              <button onClick={() => setOpen(false)} className="p-1.5 -mr-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"><X className="w-4 h-4" /></button>
             </div>
             <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
           </motion.div>
@@ -249,9 +259,9 @@ const PanelInner = ({
             <button
               key={it.label}
               onClick={it.onClick}
-              className="group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12.5px] text-foreground bg-accent/20 hover:bg-accent/60 border border-border/40 hover:border-border transition-all duration-150 text-left active:scale-[0.98]"
+              className="group flex items-center gap-2.5 px-3 py-3 rounded-2xl text-[12.5px] text-foreground bg-accent/20 hover:bg-accent/60 border border-border/40 hover:border-border/80 transition-all duration-150 text-left active:scale-[0.97]"
             >
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-background/60 border border-border/40 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0">
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-background/70 border border-border/40 text-muted-foreground group-hover:text-foreground group-hover:bg-background transition-colors flex-shrink-0">
                 <it.icon className="w-3.5 h-3.5" />
               </span>
               <span className="leading-tight">{it.label}</span>
