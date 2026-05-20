@@ -141,9 +141,6 @@ export default function MobileSidebar({ open, onClose }: Props) {
           </div>
         </nav>
 
-        <div className="px-3 py-2 border-t border-[hsl(var(--sidebar-border))]">
-          <SidebarQuickActions variant="rail" className="w-full justify-start" />
-        </div>
 
         <div className="p-3 border-t border-[hsl(var(--sidebar-border))]">
           <p className="text-sm font-medium text-foreground px-1">Platin Automotive</p>
