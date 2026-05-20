@@ -271,6 +271,7 @@ const AdminLayoutInner = ({
       </div>
 
       <MobileSidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+      <ProefritExpiryWatcher />
     </div>
   );
 };
