@@ -122,7 +122,11 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       title="Snelstart"
       aria-label="Snelstart openen"
       className={
-        variant === "rail"
+        variant === "fab"
+          ? `inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_8px_24px_rgba(16,185,129,0.45)] ring-2 ring-emerald-300/40 transition-all active:scale-95 ${
+              open ? "rotate-45" : ""
+            } ${className}`
+          : variant === "rail"
           ? `flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap text-foreground hover:bg-accent/60 border border-border/60 ${
               open ? "bg-accent" : ""
             } ${className}`
@@ -131,7 +135,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
             } ${className}`
       }
     >
-      <Plus className="w-4 h-4 flex-shrink-0" />
+      <Plus className={variant === "fab" ? "w-6 h-6 flex-shrink-0 transition-transform" : "w-4 h-4 flex-shrink-0"} />
       {variant === "rail" && (
         <span className="transition-opacity duration-200 opacity-100 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Snelstart</span>
       )}
