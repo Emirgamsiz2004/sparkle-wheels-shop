@@ -116,7 +116,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
     >
       <Plus className="w-4 h-4 flex-shrink-0" />
       {variant === "rail" && (
-        <span className="transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">Snelstart</span>
+        <span className="transition-opacity duration-200 opacity-100 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Snelstart</span>
       )}
     </button>
   );
