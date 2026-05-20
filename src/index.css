@@ -389,12 +389,25 @@ input[type="number"] {
     overflow-x: hidden;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* Reserveer altijd ruimte voor de scrollbar zodat layout niet schuift
+       wanneer een dialog/popover de body-scroll lockt */
+    scrollbar-gutter: stable;
   }
 
   body {
     @apply bg-background text-foreground font-body antialiased;
     overflow-x: hidden;
   }
+
+  /* Voorkom dat Radix UI (Dialog/Popover/Sheet/Drawer) padding-right
+     toevoegt aan de body bij het locken van scroll — dat veroorzaakt
+     een zichtbare horizontale shift op de achtergrond. */
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    overflow: hidden !important;
+  }
+
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
