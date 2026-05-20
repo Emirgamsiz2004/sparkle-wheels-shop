@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Car, FileSignature, BadgeDollarSign, CreditCard, UserPlus, ClipboardCheck, CalendarPlus, FileText, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDialog";
