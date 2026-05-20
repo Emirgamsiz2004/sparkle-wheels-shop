@@ -203,9 +203,6 @@ const AdminLayoutInner = ({
         </nav>
 
         <div className="p-2 border-t border-[hsl(var(--sidebar-border))] space-y-1.5">
-          <div className="px-1">
-            <SidebarQuickActions variant="rail" />
-          </div>
           <Link
             to="/admin/instellingen"
             title="Instellingen"
