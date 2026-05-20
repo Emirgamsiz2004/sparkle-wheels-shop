@@ -7,7 +7,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useTestDrives } from "@/hooks/useTestDrives";
 import { pickPrimaryActive, useProefritTimer } from "@/hooks/useProefritTimer";
-import SidebarQuickActions from "@/components/admin/SidebarQuickActions";
+
 
 interface NavItem { label: string; icon: typeof LayoutDashboard; path: string; medewerker?: boolean; }
 
