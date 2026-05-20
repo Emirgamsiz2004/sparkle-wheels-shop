@@ -19,6 +19,7 @@ export interface VoorraadVoertuig {
   nap: string;
   dbStatus?: "te_koop" | "verkocht" | "gereserveerd";
   verkochtOp?: string | null;
+  detailAvailable?: boolean;
 }
 
 export interface VoorraadVoertuigDetail extends VoorraadVoertuig {
