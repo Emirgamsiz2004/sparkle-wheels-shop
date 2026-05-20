@@ -240,26 +240,28 @@ const PanelInner = ({
   setKenteken: (v: string) => void;
   onKentekenSubmit: (e: React.FormEvent) => void;
 }) => (
-  <div className="py-1">
+  <div className="p-3 space-y-3">
     {sections.map((sec) => (
-      <div key={sec.title} className="px-1 py-1">
-        <p className="px-3 py-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{sec.title}</p>
-        <div className="space-y-px">
+      <div key={sec.title}>
+        <p className="px-1 pb-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">{sec.title}</p>
+        <div className="grid grid-cols-2 gap-1.5">
           {sec.items.map((it) => (
             <button
               key={it.label}
               onClick={it.onClick}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] text-foreground hover:bg-accent/60 transition-colors text-left"
+              className="group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12.5px] text-foreground bg-accent/20 hover:bg-accent/60 border border-border/40 hover:border-border transition-all duration-150 text-left active:scale-[0.98]"
             >
-              <it.icon className="w-4 h-4 text-muted-foreground" />
-              <span>{it.label}</span>
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-background/60 border border-border/40 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0">
+                <it.icon className="w-3.5 h-3.5" />
+              </span>
+              <span className="leading-tight">{it.label}</span>
             </button>
           ))}
         </div>
       </div>
     ))}
-    <div className="px-3 pt-2 pb-3 border-t border-border/60">
-      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-2">Kenteken opzoeken</p>
+    <div className="pt-2 border-t border-border/60">
+      <p className="px-1 pb-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Kenteken opzoeken</p>
       <form onSubmit={onKentekenSubmit} className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -267,10 +269,10 @@ const PanelInner = ({
             value={kenteken}
             onChange={(e) => setKenteken(e.target.value.toUpperCase())}
             placeholder="AB-12-CD"
-            className="w-full pl-8 pr-2 h-9 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60 uppercase"
+            className="w-full pl-8 pr-2 h-9 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60 uppercase tracking-wider"
           />
         </div>
-        <button type="submit" className="h-9 px-3 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors">Ga</button>
+        <button type="submit" className="h-9 px-4 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors">Ga</button>
       </form>
     </div>
   </div>
