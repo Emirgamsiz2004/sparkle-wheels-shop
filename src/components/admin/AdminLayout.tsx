@@ -203,9 +203,6 @@ const AdminLayoutInner = ({
         </nav>
 
         <div className="p-2 border-t border-[hsl(var(--sidebar-border))] space-y-1.5">
-          <div className="px-1">
-            <SidebarQuickActions variant="rail" />
-          </div>
           <Link
             to="/admin/instellingen"
             title="Instellingen"
@@ -272,6 +269,11 @@ const AdminLayoutInner = ({
 
       <MobileSidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
       <ProefritExpiryWatcher />
+
+      {/* Floating snelstart-knop — altijd bereikbaar, duim-vriendelijk rechtsonder */}
+      <div className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
+        <SidebarQuickActions variant="fab" />
+      </div>
     </div>
   );
 };
