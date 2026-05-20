@@ -57,7 +57,7 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md rounded-2xl p-6">
+      <DialogContent className="max-w-md rounded-2xl p-0 md:p-6">
         <DialogHeader>
           <DialogTitle className="text-base font-medium">
             Proefrit starten — {vehicle.merk} {vehicle.model}
@@ -75,7 +75,8 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                 value={kmVoor}
                 onChange={(e) => setKmVoor(e.target.value)}
                 placeholder="bijv. 45230"
-                className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
+                inputMode="numeric"
+                className="w-full h-12 px-4 text-base bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
               />
             </div>
             <div>
@@ -87,13 +88,13 @@ const StartProefritDialog = ({ open, onClose, vehicle }: Props) => {
                 value={medewerker}
                 onChange={(e) => setMedewerker(e.target.value)}
                 placeholder="Naam medewerker"
-                className="w-full px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
+                className="w-full h-12 px-4 text-base bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-foreground placeholder:text-muted-foreground transition-all"
               />
             </div>
             <button
               onClick={handleStart}
               disabled={loading || !kmVoor}
-              className="w-full py-3 text-sm font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="w-full h-12 text-base font-medium border border-border rounded-xl hover:bg-accent/20 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {loading ? "Bezig..." : "Proefrit starten"}
             </button>

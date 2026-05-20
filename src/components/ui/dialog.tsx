@@ -3,6 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { keepFocusedFieldVisible, useKeyboardSafeViewport } from "@/hooks/use-keyboard-safe-viewport";
 
 const Dialog = DialogPrimitive.Root;
 
@@ -112,8 +113,9 @@ interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof Dialo
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, hideClose, ...props }, ref) => {
+>(({ className, children, hideClose, style, ...props }, ref) => {
   const isMobile = useIsMobileViewport();
+  const keyboardViewport = useKeyboardSafeViewport(isMobile);
   const swipeRef = useSwipeToClose(isMobile, () => {
     // Trigger Radix close by dispatching Escape
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
@@ -127,6 +129,11 @@ const DialogContent = React.forwardRef<
   };
 
   if (isMobile) {
+    const mobileBottom = Math.max(keyboardViewport.bottomInset, keyboardViewport.focusedInset);
+    const mobileMaxHeight = keyboardViewport.isInputFocused
+      ? `min(68vh, calc(${keyboardViewport.height}px - 18px))`
+      : `min(85vh, calc(${keyboardViewport.height}px - 16px))`;
+
     return (
       <DialogPortal>
         <DialogOverlay />
@@ -145,7 +152,11 @@ const DialogContent = React.forwardRef<
           style={{
             borderRadius: "20px 20px 0 0",
             willChange: "transform",
+            bottom: mobileBottom,
+            maxHeight: mobileMaxHeight,
+            transition: "bottom 220ms ease-out, transform 280ms cubic-bezier(0.32,0.72,0,1)",
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+            ...style,
           }}
           onAnimationEnd={(e) => {
             // strip will-change after animation to free GPU
@@ -157,7 +168,11 @@ const DialogContent = React.forwardRef<
           <div className="flex justify-center pt-3 pb-3 shrink-0 cursor-grab active:cursor-grabbing">
             <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)" }} />
           </div>
-          <div data-sheet-scroll className="overflow-y-auto px-5 pb-2 -mx-px">
+          <div
+            data-sheet-scroll
+            onFocusCapture={(e) => keepFocusedFieldVisible(e.target)}
+            className="overflow-y-auto overscroll-contain px-5 pb-2 -mx-px"
+          >
             {children}
           </div>
           {!hideClose && (
