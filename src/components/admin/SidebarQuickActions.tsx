@@ -279,10 +279,10 @@ const PanelInner = ({
             value={kenteken}
             onChange={(e) => setKenteken(e.target.value.toUpperCase())}
             placeholder="AB-12-CD"
-            className="w-full pl-8 pr-2 h-9 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60 uppercase tracking-wider"
+            className="w-full pl-8 pr-2 h-10 text-sm bg-background border border-border rounded-2xl focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60 uppercase tracking-wider"
           />
         </div>
-        <button type="submit" className="h-9 px-4 text-xs font-medium bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors">Ga</button>
+        <button type="submit" className="h-10 px-5 text-xs font-medium bg-foreground text-background rounded-2xl hover:bg-foreground/90 transition-colors">Ga</button>
       </form>
     </div>
   </div>
