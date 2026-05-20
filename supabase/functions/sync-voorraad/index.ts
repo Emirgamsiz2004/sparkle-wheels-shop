@@ -132,6 +132,9 @@ serve(async (req) => {
           updates.kilometerstand = fv.kilometerstand;
           updates.feed_kilometerstand = fv.kilometerstand;
         }
+        if (fv.feed_afbeelding) {
+          updates.feed_afbeelding = fv.feed_afbeelding;
+        }
         // Autodealers is leidend, behalve voor handmatige statussen.
         // Een verkoop wordt als "echt" beschouwd als er een koper bekend is.
         const isManualSale = match.status === "verkocht" && (match.koper_naam || match.koper_email);
