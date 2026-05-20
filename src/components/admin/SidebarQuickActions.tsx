@@ -259,9 +259,9 @@ const PanelInner = ({
             <button
               key={it.label}
               onClick={it.onClick}
-              className="group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12.5px] text-foreground bg-accent/20 hover:bg-accent/60 border border-border/40 hover:border-border transition-all duration-150 text-left active:scale-[0.98]"
+              className="group flex items-center gap-2.5 px-3 py-3 rounded-2xl text-[12.5px] text-foreground bg-accent/20 hover:bg-accent/60 border border-border/40 hover:border-border/80 transition-all duration-150 text-left active:scale-[0.97]"
             >
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-background/60 border border-border/40 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0">
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-background/70 border border-border/40 text-muted-foreground group-hover:text-foreground group-hover:bg-background transition-colors flex-shrink-0">
                 <it.icon className="w-3.5 h-3.5" />
               </span>
               <span className="leading-tight">{it.label}</span>
