@@ -2,13 +2,17 @@ import { useLayoutEffect, useState } from "react";
 
 type KeyboardSafeViewport = {
   bottomInset: number;
+  focusedInset: number;
   height: number;
+  isInputFocused: boolean;
 };
 
 export function useKeyboardSafeViewport(enabled = true): KeyboardSafeViewport {
   const [viewport, setViewport] = useState<KeyboardSafeViewport>(() => ({
     bottomInset: 0,
+    focusedInset: 0,
     height: typeof window === "undefined" ? 0 : window.innerHeight,
+    isInputFocused: false,
   }));
 
   useLayoutEffect(() => {
@@ -16,29 +20,39 @@ export function useKeyboardSafeViewport(enabled = true): KeyboardSafeViewport {
 
     const update = () => {
       const visualViewport = window.visualViewport;
+      const active = document.activeElement;
+      const isInputFocused = !!active?.matches?.("input, textarea, select, [contenteditable='true']");
 
       if (!visualViewport) {
-        setViewport({ bottomInset: 0, height: window.innerHeight });
+        setViewport({ bottomInset: 0, focusedInset: isInputFocused ? 260 : 0, height: window.innerHeight, isInputFocused });
         return;
       }
 
+      const detectedInset = Math.max(
+        0,
+        window.innerHeight - visualViewport.height - visualViewport.offsetTop
+      );
+
       setViewport({
-        bottomInset: Math.max(
-          0,
-          window.innerHeight - visualViewport.height - visualViewport.offsetTop
-        ),
+        bottomInset: detectedInset,
+        focusedInset: isInputFocused ? Math.max(detectedInset, 260) : 0,
         height: visualViewport.height,
+        isInputFocused,
       });
     };
 
     update();
     window.visualViewport?.addEventListener("resize", update);
     window.visualViewport?.addEventListener("scroll", update);
+    document.addEventListener("focusin", update);
+    document.addEventListener("focusout", update);
     window.addEventListener("orientationchange", update);
 
     return () => {
       window.visualViewport?.removeEventListener("resize", update);
       window.visualViewport?.removeEventListener("scroll", update);
+      document.removeEventListener("focusin", update);
+      document.removeEventListener("focusout", update);
       window.removeEventListener("orientationchange", update);
     };
   }, [enabled]);
