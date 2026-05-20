@@ -269,63 +269,53 @@ const AdminVoertuigenPage = () => {
               <Link
                 key={v.id}
                 to={`/admin/voertuigen/${v.id}`}
-                className="block bg-card border border-border rounded-[14px] active:bg-accent/30 transition-colors relative"
-                style={{ padding: "14px" }}
+                className="block bg-card border border-border rounded-[12px] active:bg-accent/30 transition-colors"
+                style={{ padding: "10px 12px" }}
               >
-                <button
-                  onClick={(e) => handleDeleteClick(e, v)}
-                  className="absolute top-2 right-2 p-2 rounded-md text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                  title="Verwijderen"
-                  aria-label="Verwijderen"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-                {/* Rij 1: merk/model | bouwjaar */}
-                <div className="flex items-baseline justify-between gap-2">
-                  <p className="text-[15px] font-semibold text-foreground truncate leading-tight">
+                {/* Rij 1: merk model bouwjaar | delete */}
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[14px] font-semibold text-foreground truncate leading-tight min-w-0">
                     {v.merk} {v.model}
+                    <span className="ml-1.5 text-[12px] font-normal text-muted-foreground tabular-nums">
+                      {v.bouwjaar}
+                    </span>
                   </p>
-                  <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
-                    {v.bouwjaar}
-                  </span>
+                  <button
+                    onClick={(e) => handleDeleteClick(e, v)}
+                    className="-mr-1.5 p-1.5 rounded-md text-muted-foreground/70 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
+                    title="Verwijderen"
+                    aria-label="Verwijderen"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
 
                 {/* Rij 2: kenteken | APK datum */}
-                {(v.kenteken || v.apkVervaldatum) && (
-                  <div className="flex items-center justify-between gap-2 mt-1.5">
-                    <span className="text-[11px] font-mono uppercase text-foreground/90 tracking-wide">
+                {(v.kenteken || apkInfo) && (
+                  <div className="flex items-center justify-between gap-2 mt-1">
+                    <span className="text-[11px] font-mono uppercase text-foreground/80 tracking-wide">
                       {v.kenteken || ""}
                     </span>
                     {apkInfo && (
-                      <span className={`text-[11px] tabular-nums ${apkInfo.expired ? "text-amber-400" : "text-muted-foreground"}`}>
+                      <span className={`text-[10px] tabular-nums ${apkInfo.expired ? "text-amber-400" : "text-muted-foreground"}`}>
                         {apkInfo.label}
                       </span>
                     )}
                   </div>
                 )}
 
-                {/* Rij 3: inkoop / consignatie | verkoop */}
-                <div className="flex items-end justify-between gap-3 mt-2">
-                  <div className="flex flex-col leading-tight min-w-0">
-                    <span className="text-[10px] uppercase tracking-wide text-muted-foreground/70">
-                      {consignatie ? "" : "Inkoop"}
-                    </span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {consignatie ? "Consignatie" : formatEuro(v.inkoopprijs)}
-                    </span>
-                  </div>
-                  {v.verkoopprijs > 0 && (
-                    <span className="text-sm font-semibold tabular-nums text-foreground">
-                      {formatEuro(v.verkoopprijs)}
-                    </span>
-                  )}
-                </div>
-
-                {/* Tags rechtsonder: status + APK-warning. Subtiel & compact. */}
-                {(statusLabels[v.status] || apkInfo?.warn) && (
-                  <div className="flex justify-end gap-1 mt-2">
+                {/* Rij 3: inkoop/consignatie | verkoopprijs + tags */}
+                <div className="flex items-center justify-between gap-2 mt-1.5">
+                  <span className="text-[11px] text-muted-foreground/80 tabular-nums truncate">
+                    {consignatie
+                      ? "Consignatie"
+                      : v.inkoopprijs > 0
+                        ? `Inkoop ${formatEuro(v.inkoopprijs)}`
+                        : ""}
+                  </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {apkInfo?.warn && (
-                      <span className={`inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border max-w-[70px] truncate ${
+                      <span className={`inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border ${
                         apkInfo.expired
                           ? "bg-red-500/10 text-red-400 border-red-500/25"
                           : "bg-amber-500/10 text-amber-400 border-amber-500/25"
@@ -334,12 +324,17 @@ const AdminVoertuigenPage = () => {
                       </span>
                     )}
                     {statusLabels[v.status] && (
-                      <span className={`inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border max-w-[70px] truncate ${statusColors[v.status]}`}>
+                      <span className={`inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border ${statusColors[v.status]}`}>
                         {statusLabels[v.status]}
                       </span>
                     )}
+                    {v.verkoopprijs > 0 && (
+                      <span className="text-[13px] font-semibold tabular-nums text-foreground ml-1">
+                        {formatEuro(v.verkoopprijs)}
+                      </span>
+                    )}
                   </div>
-                )}
+                </div>
               </Link>
             );
           })}
