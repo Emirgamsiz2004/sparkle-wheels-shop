@@ -200,19 +200,19 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
         ) : (
           <motion.div
             ref={popRef}
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{ type: "spring", damping: 28, stiffness: 360, mass: 0.7 }}
+            exit={{ opacity: 0, y: 4, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             style={pos ? { bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
-            className="fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_20px_50px_-12px_rgba(0,0,0,0.6)] origin-bottom-right"
+            className="fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-3xl border border-border/80 bg-card shadow-[0_24px_60px_-12px_rgba(0,0,0,0.65)] origin-bottom-right backdrop-blur-xl"
           >
-            <div className="px-4 py-3 border-b border-border/60 flex items-center justify-between sticky top-0 bg-card z-10">
+            <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between sticky top-0 bg-card/95 backdrop-blur-md z-10 rounded-t-3xl">
               <div>
                 <h3 className="text-sm font-semibold text-foreground tracking-tight">Snelstart</h3>
                 <p className="text-[11px] text-muted-foreground mt-0.5">Start direct een actie</p>
               </div>
-              <button onClick={() => setOpen(false)} className="p-1.5 -mr-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"><X className="w-4 h-4" /></button>
+              <button onClick={() => setOpen(false)} className="p-1.5 -mr-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"><X className="w-4 h-4" /></button>
             </div>
             <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
           </motion.div>
