@@ -28,15 +28,28 @@ interface Props {
 const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { addCustomer } = useCustomers();
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [kenteken, setKenteken] = useState("");
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
 
+  // Direct-action dialogs launched from the quick menu
+  const [proefritOpen, setProefritOpen] = useState(false);
+  const [klantOpen, setKlantOpen] = useState(false);
+  const [klantAnchor, setKlantAnchor] = useState<DOMRect | null>(null);
+  const [inkoopOpen, setInkoopOpen] = useState(false);
+
   const go = (path: string) => {
     setOpen(false);
     navigate(path);
+  };
+
+  const launch = (fn: () => void) => {
+    setOpen(false);
+    // Wait a tick so the popover close animation doesn't fight with the dialog opening
+    setTimeout(fn, 0);
   };
 
   const sections: Section[] = [
