@@ -10,16 +10,38 @@ import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
 import DetailingConfigurator from "@/components/DetailingConfigurator";
 import detailingImg from "@/assets/detailing.jpg";
+import polishImg from "@/assets/detailing/polish.webp";
+import foamWashImg from "@/assets/detailing/foam-wash.webp";
+import foamFrontImg from "@/assets/detailing/foam-front.webp";
+import interiorImg from "@/assets/detailing/interior.webp";
+import wheelImg from "@/assets/detailing/wheel.webp";
 
-const diensten = [
-  "Uitgebreide handwas",
-  "Polijsten & ontkrassen",
-  "Interieur dieptereiniging",
-  "Stoelen & bekleding reinigen",
-  "Leder behandeling",
-  "Velgen & banden dressing",
-  "Ramen & ruiten polijsten",
-  "Geur- & bacteriebehandeling",
+const behandelingen = [
+  {
+    img: foamWashImg,
+    title: "Handwas & foamwash",
+    desc: "pH-neutrale snowfoam en zachte microvezels — veilig voor uw lak.",
+  },
+  {
+    img: polishImg,
+    title: "Polijsten & ontkrassen",
+    desc: "Wegwerken van wervels, lichte krassen en holograms voor diepe glans.",
+  },
+  {
+    img: interiorImg,
+    title: "Interieur dieptereiniging",
+    desc: "Stoelen, bekleding en leder weer fris, zacht en als nieuw.",
+  },
+  {
+    img: wheelImg,
+    title: "Velgen & banden",
+    desc: "Grondige velgreiniging tot in de hoeken en bandendressing.",
+  },
+  {
+    img: foamFrontImg,
+    title: "Lakbescherming",
+    desc: "Sealants en keramische coatings voor langdurige glans en bescherming.",
+  },
 ];
 
 const AutoDetailing = () => {
