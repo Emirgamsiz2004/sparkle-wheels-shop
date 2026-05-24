@@ -211,11 +211,15 @@ const DetailingConfigurator = () => {
                   <p className="text-sm font-display font-semibold text-foreground">
                     {v.label}
                   </p>
+                  <p className="text-xs font-body text-muted-foreground mt-1 leading-snug">
+                    {v.example}
+                  </p>
                 </button>
               );
             })}
           </div>
         </div>
+
 
         {/* STEP 2 */}
         <AnimatePresence>
