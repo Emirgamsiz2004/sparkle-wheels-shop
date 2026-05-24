@@ -75,7 +75,7 @@ const AutoDetailing = () => {
       <FloatingCTA targetId="afspraak" label="Afspraak maken" />
 
       {/* Hero */}
-      <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+      <section className="relative h-[32vh] md:h-[38vh] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${polishImg})` }}
