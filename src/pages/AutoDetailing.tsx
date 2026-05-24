@@ -78,7 +78,7 @@ const AutoDetailing = () => {
       <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${detailingImg})` }}
+          style={{ backgroundImage: `url(${polishImg})` }}
         >
           <div className="absolute inset-0 bg-background/80" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
