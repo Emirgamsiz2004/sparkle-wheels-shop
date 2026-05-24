@@ -437,7 +437,18 @@ const AdminAdvertentiesPage = () => {
                 {parsed.opvaltekst && (
                   <Card className="overflow-hidden" style={{ border: `2px solid ${MARKTPLAATS_ORANGE}` }}>
                     <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: MARKTPLAATS_ORANGE }}>
-                      <span className="text-white font-bold text-xs uppercase tracking-wider">Opvaltekst (50-208 tekens)</span>
+                      <div className="flex items-center">
+                        <span className="text-white font-bold text-xs uppercase tracking-wider">Opvaltekst (50-208 tekens)</span>
+                        <InfoButton title="Wat is een opvaltekst?">
+                          <p>De opvaltekst is het eerste wat een bezoeker leest na de titel. Het bepaalt of iemand doorklikt naar je advertentie of doorgescrolt.</p>
+                          <ul className="list-disc pl-4 space-y-1.5">
+                            <li><strong>Lengte:</strong> minimaal 50, maximaal 208 tekens — te kort wordt afgekeurd, te lang wordt afgekapt.</li>
+                            <li><strong>Toon:</strong> enthousiast maar geloofwaardig; vermijd overdreven superlatieven.</li>
+                            <li><strong>Focus:</strong> noem 1-2 unieke pluspunten (bijv. "1e eigenaar, dealer onderhouden") in plaats van een opsomming.</li>
+                            <li><strong>Call-to-action:</strong> nodig uit tot contact of een proefrit.</li>
+                          </ul>
+                        </InfoButton>
+                      </div>
                       <button onClick={() => copyToClipboard(parsed.opvaltekst, "Opvaltekst")} className="text-white/70 hover:text-white transition-colors">
                         <Copy className="w-3.5 h-3.5" />
                       </button>
