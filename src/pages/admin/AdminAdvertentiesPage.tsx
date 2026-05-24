@@ -60,6 +60,25 @@ const parseMarktplaatsCaption = (text: string) => {
 
 const MARKTPLAATS_ORANGE = "#e05c00";
 
+const InfoButton = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <button className="text-white/70 hover:text-white transition-colors ml-2" title={title}>
+        <Info className="w-3.5 h-3.5" />
+      </button>
+    </DialogTrigger>
+    <DialogContent className="sm:max-w-md bg-background text-foreground">
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+        <DialogDescription className="text-muted-foreground" asChild>
+          <div className="pt-2 space-y-3 text-sm leading-relaxed">{children}</div>
+        </DialogDescription>
+      </DialogHeader>
+    </DialogContent>
+  </Dialog>
+);
+
+
 const AdminAdvertentiesPage = () => {
   const { vehicles } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState("");
