@@ -23,15 +23,15 @@ type VehicleKey =
 
 type PackageKey = "binnen" | "buiten" | "compleet";
 
-const vehicles: { key: VehicleKey; label: string; icon: typeof Car }[] = [
-  { key: "kleine", label: "Kleine auto", icon: Car },
-  { key: "grote", label: "Grote auto", icon: CarFront },
-  { key: "suv", label: "SUV / Crossover", icon: CarFront },
-  { key: "pickup", label: "Pick-up", icon: Truck },
-  { key: "bestelauto", label: "Bestelauto", icon: Truck },
-  { key: "bestelbus", label: "Bestelbus", icon: Truck },
-  { key: "caravan", label: "Caravan / Camper", icon: Caravan },
-  { key: "vrachtwagen", label: "Vrachtwagen", icon: Truck },
+const vehicles: { key: VehicleKey; label: string; example: string; icon: typeof Car }[] = [
+  { key: "kleine", label: "Normale auto", example: "bijv. Audi A2 / A3", icon: Car },
+  { key: "grote", label: "Grote auto", example: "bijv. Audi A4 / Opel Insignia", icon: CarFront },
+  { key: "suv", label: "SUV / Crossover", example: "bijv. Audi Q3 / Q5", icon: CarFront },
+  { key: "pickup", label: "Pick-up", example: "bijv. Dodge RAM", icon: Truck },
+  { key: "bestelauto", label: "Bestelauto", example: "bijv. VW Caddy", icon: Truck },
+  { key: "bestelbus", label: "Bestelbus", example: "bijv. VW Transporter", icon: Truck },
+  { key: "caravan", label: "Caravan / Camper", example: "tot 7 meter", icon: Caravan },
+  { key: "vrachtwagen", label: "Vrachtwagen", example: "op aanvraag", icon: Truck },
 ];
 
 const prices: Record<PackageKey, Record<VehicleKey, number>> = {
@@ -164,7 +164,7 @@ const DetailingConfigurator = () => {
     .filter(Boolean) as Extra[];
 
   return (
-    <section className="py-16 md:py-28 bg-background">
+    <section id="configurator" className="py-16 md:py-28 bg-background scroll-mt-24">
       <div className="container mx-auto px-6 lg:px-16">
         {/* Header */}
         <motion.div
@@ -211,11 +211,15 @@ const DetailingConfigurator = () => {
                   <p className="text-sm font-display font-semibold text-foreground">
                     {v.label}
                   </p>
+                  <p className="text-xs font-body text-muted-foreground mt-1 leading-snug">
+                    {v.example}
+                  </p>
                 </button>
               );
             })}
           </div>
         </div>
+
 
         {/* STEP 2 */}
         <AnimatePresence>
