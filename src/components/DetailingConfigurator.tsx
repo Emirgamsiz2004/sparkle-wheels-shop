@@ -52,12 +52,14 @@ const prices: Record<PackageKey, Record<VehicleKey, number>> = {
 const packages: {
   key: PackageKey;
   title: string;
+  subtitle: string;
   features: string[];
   badge?: string;
 }[] = [
   {
     key: "binnen",
-    title: "Alleen Binnenkant",
+    title: "Poetsbeurt Binnenkant",
+    subtitle: "Alleen interieur reinigen",
     features: [
       "Stofzuigen",
       "Matten reinigen",
@@ -69,7 +71,8 @@ const packages: {
   },
   {
     key: "buiten",
-    title: "Alleen Buitenkant",
+    title: "Poetsbeurt Buitenkant",
+    subtitle: "Wasbeurt + waxen buiten",
     features: [
       "Handwas buiten",
       "Velgen reinigen",
@@ -82,7 +85,8 @@ const packages: {
   },
   {
     key: "compleet",
-    title: "Compleet",
+    title: "Complete Poetsbeurt",
+    subtitle: "Binnen + buiten — alles in één",
     badge: "Meest gekozen",
     features: ["Alles van binnenkant", "Alles van buitenkant"],
   },
