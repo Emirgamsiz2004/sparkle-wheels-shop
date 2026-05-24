@@ -187,7 +187,12 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 32, stiffness: 320, mass: 0.8 }}
-              className="fixed bottom-0 inset-x-0 z-[61] bg-card border-t border-border rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,12px)] max-h-[85vh] overflow-y-auto"
+              style={{
+                transform: bottomInset > 0 ? `translateY(-${bottomInset}px)` : undefined,
+                transition: "transform 200ms ease-out",
+                maxHeight: `calc(85vh - ${bottomInset}px)`,
+              }}
+              className="fixed bottom-0 inset-x-0 z-[61] bg-card border-t border-border rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,12px)] overflow-y-auto"
             >
               <div className="pt-2 pb-1 flex justify-center">
                 <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
