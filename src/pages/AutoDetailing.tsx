@@ -85,6 +85,9 @@ const AutoDetailing = () => {
         </div>
       </section>
 
+      {/* Configurator (boven de fold na hero zodat CTA-bezoekers direct kunnen samenstellen) */}
+      <DetailingConfigurator />
+
       {/* Intro */}
       <section className="py-16 md:py-28 bg-card">
         <div className="container mx-auto px-6 lg:px-16">
