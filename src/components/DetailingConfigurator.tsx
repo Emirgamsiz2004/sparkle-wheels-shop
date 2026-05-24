@@ -142,6 +142,14 @@ const StepBadge = ({ n, label, active }: { n: number; label: string; active: boo
 
 const polishKeys = new Set(extrasPolijst.map((e) => e.key));
 
+// Groepen die elkaar uitsluiten (max 1 tegelijk selecteerbaar)
+const exclusiveGroups: string[][] = [
+  // Vlekverwijdering: standaard óf uitgebreid
+  ["vlek-std", "vlek-uitg"],
+  // Volledige polijst/coating-behandelingen: max 1
+  ["pol-1", "pol-2", "klei", "keramiek"],
+];
+
 const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => {
   const [vehicle, setVehicle] = useState<VehicleKey | null>(null);
   const [pkg, setPkg] = useState<PackageKey | null>(null);
@@ -150,9 +158,19 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
 
   const toggleExtra = (key: string) => {
     setSelectedExtras((s) => {
-      const next = s.includes(key) ? s.filter((k) => k !== key) : [...s, key];
+      const isOn = s.includes(key);
+      let next = isOn ? s.filter((k) => k !== key) : [...s, key];
+
+      // Verwijder conflicterende opties uit dezelfde exclusieve groep
+      if (!isOn) {
+        const group = exclusiveGroups.find((g) => g.includes(key));
+        if (group) {
+          next = next.filter((k) => k === key || !group.includes(k));
+        }
+      }
+
       // Polijsten vereist een exterieur-reiniging als basis
-      if (!s.includes(key) && polishKeys.has(key)) {
+      if (!isOn && polishKeys.has(key)) {
         if (pkg === "binnen" || pkg === null) {
           setPkg("compleet");
           setAutoUpgraded(true);
