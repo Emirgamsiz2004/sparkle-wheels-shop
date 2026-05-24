@@ -7,6 +7,17 @@ import { berekenLease, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
 import logoFinanciallease from "@/assets/logo-financiallease.png";
 
 const FinancieringSection = () => {
+  const [prijs, setPrijs] = useState(25000);
+  const [aanbetalingPct, setAanbetalingPct] = useState(10);
+  const [looptijd, setLooptijd] = useState(72);
+
+  const aanbetaling = useMemo(() => Math.round(prijs * (aanbetalingPct / 100)), [prijs, aanbetalingPct]);
+  const leasebedrag = useMemo(() => prijs - aanbetaling, [prijs, aanbetaling]);
+  const maandbedrag = useMemo(
+    () => berekenLease({ prijs, aanbetalingPct: aanbetalingPct / 100, looptijd, slottermijnPct: 0 }),
+    [prijs, aanbetalingPct, looptijd]
+  );
+
   return (
     <section className="py-16 md:py-28 lg:py-36 bg-card border-t border-border">
       <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
