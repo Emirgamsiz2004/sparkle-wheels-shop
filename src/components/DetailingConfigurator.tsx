@@ -140,15 +140,27 @@ const StepBadge = ({ n, label, active }: { n: number; label: string; active: boo
   </div>
 );
 
+const polishKeys = new Set(extrasPolijst.map((e) => e.key));
+
 const DetailingConfigurator = () => {
   const [vehicle, setVehicle] = useState<VehicleKey | null>(null);
   const [pkg, setPkg] = useState<PackageKey | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [autoUpgraded, setAutoUpgraded] = useState(false);
 
-  const toggleExtra = (key: string) =>
-    setSelectedExtras((s) =>
-      s.includes(key) ? s.filter((k) => k !== key) : [...s, key],
-    );
+  const toggleExtra = (key: string) => {
+    setSelectedExtras((s) => {
+      const next = s.includes(key) ? s.filter((k) => k !== key) : [...s, key];
+      // Polijsten vereist een exterieur-reiniging als basis
+      if (!s.includes(key) && polishKeys.has(key)) {
+        if (pkg === "binnen" || pkg === null) {
+          setPkg("compleet");
+          setAutoUpgraded(true);
+        }
+      }
+      return next;
+    });
+  };
 
   const basePrice = vehicle && pkg ? prices[pkg][vehicle] : 0;
   const extrasTotal = useMemo(
