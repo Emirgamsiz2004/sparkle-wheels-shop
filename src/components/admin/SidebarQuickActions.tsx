@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Car, FileSignature, BadgeDollarSign, CreditCard, UserPlus, ClipboardCheck, CalendarPlus, FileText, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useKeyboardSafeViewport } from "@/hooks/use-keyboard-safe-viewport";
 import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDialog";
 import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
 import InkoopverklaringWizard from "@/components/admin/inkoop/InkoopverklaringWizard";
