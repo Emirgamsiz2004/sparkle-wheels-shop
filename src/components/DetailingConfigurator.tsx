@@ -8,8 +8,17 @@ import {
   Truck,
   Caravan,
   Check,
+  Info,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type VehicleKey =
   | "kleine"
