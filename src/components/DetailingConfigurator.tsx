@@ -403,11 +403,11 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                               >
                                 {checked && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
                               </span>
-                              <span className={`flex-1 min-w-0 text-sm font-body leading-tight transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
+                              <span className={`flex-1 min-w-0 text-sm font-body leading-tight break-words transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
                                 {e.label}
                               </span>
                             </button>
-                            <span className={`w-16 text-right text-sm font-display font-semibold whitespace-nowrap tabular-nums ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
+                            <span className={`flex-shrink-0 text-sm font-display font-semibold whitespace-nowrap tabular-nums ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
                               +€{e.price}
                             </span>
                             {e.info ? (
@@ -416,7 +416,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                                   <button
                                     type="button"
                                     onClick={(ev) => ev.stopPropagation()}
-                                    className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full border border-border bg-card text-muted-foreground hover:text-amber-400 hover:border-amber-400/50 transition-colors"
+                                    className="flex-shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full border border-border bg-card text-muted-foreground hover:text-amber-400 hover:border-amber-400/50 transition-colors"
                                     aria-label={`Meer informatie over ${e.label}`}
                                   >
                                     <Info className="w-3.5 h-3.5" />
@@ -434,7 +434,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                                 </DialogContent>
                               </Dialog>
                             ) : (
-                              <span className="shrink-0 w-7 h-7" aria-hidden />
+                              <span className="flex-shrink-0 w-7 h-7" aria-hidden />
                             )}
                           </div>
                         );
