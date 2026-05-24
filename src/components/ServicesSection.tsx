@@ -70,7 +70,7 @@ const ServiceCard = ({ service, delay }: { service: Service; delay: number }) =>
     className="group bg-background transition-colors duration-500 hover:bg-card"
   >
     <Link to={service.href} className="block">
-      <div className="h-48 md:h-64 overflow-hidden relative">
+      <div className="h-32 md:h-40 overflow-hidden relative">
         <img
           src={service.image}
           alt={service.alt}
@@ -84,17 +84,17 @@ const ServiceCard = ({ service, delay }: { service: Service; delay: number }) =>
         )}
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-500" />
       </div>
-      <div className="p-5 md:p-8">
-        <div className="flex items-start justify-between mb-4">
+      <div className="p-4 md:p-5">
+        <div className="flex items-start justify-between mb-2">
           <span className="text-[10px] font-body font-medium text-muted-foreground tracking-wider">
             {service.num}
           </span>
           <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-accent group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all duration-500" />
         </div>
-        <h3 className="text-lg font-display font-semibold mb-3 text-foreground">
+        <h3 className="text-base font-display font-semibold mb-1.5 text-foreground">
           {service.title}
         </h3>
-        <p className="text-muted-foreground font-body font-light leading-relaxed text-sm">
+        <p className="text-muted-foreground font-body font-light leading-relaxed text-xs">
           {service.description}
         </p>
       </div>
@@ -104,7 +104,7 @@ const ServiceCard = ({ service, delay }: { service: Service; delay: number }) =>
 
 const ServicesSection = () => {
   return (
-    <section id="diensten" className="py-16 md:py-28 lg:py-36 bg-background">
+    <section id="diensten" className="py-12 md:py-20 bg-background">
       <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

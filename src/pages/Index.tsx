@@ -50,17 +50,12 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <InventorySection />
-      <ConsignatieSection />
-      <AfleveringSection />
-      <PartnerBanner />
-      <ServicesSection />
       <FinancieringSection />
       <GarantieSection />
-      <AboutSection />
+      <ServicesSection />
+      <ConsignatieSection />
       <ReviewsSection />
       <ContactSection />
-      <LatestBlogSection />
-      <FAQSection />
       <Footer />
     </div>
   );
