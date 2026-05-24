@@ -18,10 +18,8 @@ const NAV: NavItem[] = [
   { label: "Verkoop", icon: BadgeDollarSign, path: "/admin/verkopen" },
   { label: "Klanten", icon: Users, path: "/admin/klanten" },
   { label: "Proefritten", icon: ClipboardCheck, path: "/admin/proefriten", medewerker: true },
-  { label: "Planning", icon: CalendarDays, path: "/admin/planning", medewerker: true },
+  { label: "Afspraken", icon: CalendarDays, path: "/admin/planning", medewerker: true },
   { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
-  { label: "Uren", icon: Clock, path: "/admin/uren", medewerker: true },
-  { label: "Aanmeldingen", icon: Inbox, path: "/admin/aanmeldingen" },
   { label: "Instellingen", icon: Settings, path: "/admin/instellingen", medewerker: true },
 ];
 
