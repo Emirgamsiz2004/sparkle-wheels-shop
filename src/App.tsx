@@ -107,9 +107,7 @@ const App = () => (
                 <Route path="klanten/:id" element={<AdminKlantDetailPage />} />
                 <Route path="leads" element={<AdminLeadsPage />} />
                 <Route path="leads/:id" element={<AdminLeadDetailPage />} />
-                <Route path="uren" element={<AdminUrenPage />} />
                 <Route path="planning" element={<AdminPlanningPage />} />
-                <Route path="aanmeldingen" element={<AdminAanmeldingenPage />} />
               </Route>
               <Route path="*" element={<UnderConstruction />} />
             </Routes>
