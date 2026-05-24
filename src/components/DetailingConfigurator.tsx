@@ -8,8 +8,17 @@ import {
   Truck,
   Caravan,
   Check,
+  Info,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type VehicleKey =
   | "kleine"
@@ -92,33 +101,33 @@ const packages: {
   },
 ];
 
-type Extra = { key: string; label: string; price: number };
+type Extra = { key: string; label: string; price: number; info?: string };
 
 const extrasInterieur: Extra[] = [
-  { key: "vlek-std", label: "Vlekverwijdering standaard", price: 55 },
-  { key: "vlek-uitg", label: "Vlekverwijdering uitgebreid", price: 110 },
-  { key: "schimmel", label: "Schimmelreiniging", price: 65 },
-  { key: "geur", label: "Geurbehandeling", price: 69 },
-  { key: "rook", label: "Rookgeur verwijderen", price: 120 },
-  { key: "leer", label: "Leerbehandeling", price: 69 },
-  { key: "honden", label: "Hondenharen verwijderen", price: 45 },
-  { key: "hemel", label: "Hemel reinigen", price: 65 },
-  { key: "braak", label: "Braaksel/ontlasting reinigen", price: 65 },
-  { key: "kinderzitje", label: "Kinderzitje reinigen", price: 18 },
+  { key: "vlek-std", label: "Vlekverwijdering standaard", price: 55, info: "Verwijdering van lichte vlekken uit bekleding en tapijt. Geschikt voor recente vlekken zoals koffie, frisdrank of modder. Resultaat afhankelijk van vlektype en duur." },
+  { key: "vlek-uitg", label: "Vlekverwijdering uitgebreid", price: 110, info: "Intensieve behandeling voor hardnekkige, oudere of diep ingetrokken vlekken. We gebruiken professionele extractiemethoden en speciale reinigingsmiddelen voor het beste resultaat." },
+  { key: "schimmel", label: "Schimmelreiniging", price: 65, info: "Grondige verwijdering van schimmelsporen in het interieur. Essentieel bij vochtoverlast of lang stilgestaan voertuigen. Inclusief desinfectie van het ventilatiesysteem." },
+  { key: "geur", label: "Geurbehandeling", price: 69, info: "Neutralisatie van ongewenste geuren door ozon- of enzymbehandeling. Effectief tegen huisdiergeuren, rookresten en voedselgeuren. Laat uw auto weer fris ruiken." },
+  { key: "rook", label: "Rookgeur verwijderen", price: 120, info: "Specialistische behandeling voor rook- en nicotinegeur. Bevat dieptereiniging van alle stoffen oppervlakken plus ozonbehandeling om geurmoleculen te neutraliseren." },
+  { key: "leer", label: "Leerbehandeling", price: 69, info: "Reiniging, voeding en bescherming van lederen bekleding. Voorkomt uitdroging en scheuren. Geeft het leer een zachte, matte finish terug zonder glans." },
+  { key: "honden", label: "Hondenharen verwijderen", price: 45, info: "Complete verwijdering van honden- en kattenharen uit alle interieurdelen. We gebruiken speciale borstels en extractietechnieken zelfs uit de kleinste hoekjes." },
+  { key: "hemel", label: "Hemel reinigen", price: 65, info: "Voorzichtige reiniging van de hemelbekleding. Verwijdert vlekken, nicotine-aanslag en stof zonder het materiaal te beschadigen of los te laten." },
+  { key: "braak", label: "Braaksel/ontlasting reinigen", price: 65, info: "Hygiënische en grondige reiniging na braaksel, urine of ontlasting. Inclusief desinfectie en geurverwijdering. Uitermate geschikt voor ouders en dierenbezitters." },
+  { key: "kinderzitje", label: "Kinderzitje reinigen", price: 18, info: "Reiniging van stoffen en kunststof onderdelen van het kinderzitje. Verwijdert kruimels, vlekken en bacteriën voor een veilig en schoon zitje voor uw kind." },
 ];
 
 const extrasExterieur: Extra[] = [
-  { key: "motor", label: "Motorruimte reinigen", price: 35 },
-  { key: "dak", label: "Dak reinigen en waxen", price: 89 },
-  { key: "koplamp", label: "Koplampen polijsten", price: 55 },
+  { key: "motor", label: "Motorruimte reinigen", price: 35, info: "Voorzichtige reiniging van de motorruimte met ontvetter en beschermende coating. Maakt technische inspecties makkelijker en helpt corrosie te voorkomen." },
+  { key: "dak", label: "Dak reinigen en waxen", price: 89, info: "Dieptereiniging en bescherming van cabriodaken, panoramadaken en reguliere daken. Verwijdert mos, vuil en aanslag. Afsluitend met waterafstotende wax." },
+  { key: "koplamp", label: "Koplampen polijsten", price: 55, info: "Polijsten van vergeelde of mat geworden koplampen. Herstelt de helderheid en lichtopbrengst voor betere zichtbaarheid en een frissere uitstraling." },
 ];
 
 const extrasPolijst: Extra[] = [
-  { key: "pol-onderdeel", label: "Polijsten per onderdeel", price: 55 },
-  { key: "pol-1", label: "Polijsten gehele auto (1 staps)", price: 329 },
-  { key: "pol-2", label: "Polijsten gehele auto (2 staps)", price: 499 },
-  { key: "klei", label: "Kleien + polijsten", price: 499 },
-  { key: "keramiek", label: "Keramische coating", price: 549 },
+  { key: "pol-onderdeel", label: "Polijsten per onderdeel", price: 55, info: "Lokaal polijsten van één onderdeel zoals een deur, motorkap of bumper. Geschikt voor lichte krassen, wervels of matte plekken op een specifiek paneel." },
+  { key: "pol-1", label: "Polijsten gehele auto (1 staps)", price: 329, info: "Eenstaps polijstbehandeling van de gehele auto. Verwijdert lichte wervels en krassen en geeft de lak een diepe glans terug. Inclusief voor- en nabehandeling." },
+  { key: "pol-2", label: "Polijsten gehele auto (2 staps)", price: 499, info: "Tweestaps polijstbehandeling voor het beste resultaat. Eerst grof corrigeren, daarna fijn polijsten voor een spiegelgladde finish zonder holograms of wervels." },
+  { key: "klei", label: "Kleien + polijsten", price: 499, info: "Combinatie van klei-behandeling en polijsten. Eerst worden vervuiling en teer met klei verwijderd, daarna wordt de lak gecorrigeerd en gepolijst voor optimaal resultaat." },
+  { key: "keramiek", label: "Keramische coating", price: 549, info: "Professionele aanbrenging van een keramische coating. Biedt jarenlange bescherming tegen UV, chemicaliën en vuil. Extreem hydrofoob effect en diepe, langdurige glans." },
 ];
 
 const allExtras = [...extrasInterieur, ...extrasExterieur, ...extrasPolijst];
@@ -346,35 +355,63 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                       {col.items.map((e) => {
                         const checked = selectedExtras.includes(e.key);
                         return (
-                          <button
-                            type="button"
+                          <div
                             key={e.key}
-                            onClick={() => toggleExtra(e.key)}
-                            aria-pressed={checked}
-                            className={`w-full text-left flex items-center gap-3 px-3 py-3 border-2 transition-all ${
+                            className={`w-full text-left flex items-center gap-2 px-3 py-3 border-2 transition-all ${
                               checked
                                 ? "border-amber-400 bg-amber-400/10"
                                 : "border-border bg-background/40 hover:border-amber-400/50 hover:bg-card"
                             }`}
                           >
-                            <span
-                              className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 border-2 transition-colors ${
-                                checked
-                                  ? "bg-amber-400 border-amber-400 text-background"
-                                  : "border-muted-foreground/60 bg-background"
-                              }`}
+                            <button
+                              type="button"
+                              onClick={() => toggleExtra(e.key)}
+                              aria-pressed={checked}
+                              className="flex-1 flex items-center gap-3 text-left"
                             >
-                              {checked && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
-                            </span>
-                            <div className="flex-1 flex items-baseline justify-between gap-2">
-                              <span className={`text-sm font-body transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
-                                {e.label}
+                              <span
+                                className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 border-2 transition-colors ${
+                                  checked
+                                    ? "bg-amber-400 border-amber-400 text-background"
+                                    : "border-muted-foreground/60 bg-background"
+                                }`}
+                              >
+                                {checked && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
                               </span>
-                              <span className={`text-sm font-display font-semibold whitespace-nowrap ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
-                                +€{e.price}
-                              </span>
-                            </div>
-                          </button>
+                              <div className="flex-1 flex items-baseline justify-between gap-2">
+                                <span className={`text-sm font-body transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
+                                  {e.label}
+                                </span>
+                                <span className={`text-sm font-display font-semibold whitespace-nowrap ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
+                                  +€{e.price}
+                                </span>
+                              </div>
+                            </button>
+                            {e.info && (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <button
+                                    type="button"
+                                    onClick={(ev) => ev.stopPropagation()}
+                                    className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full border border-border bg-card text-muted-foreground hover:text-amber-400 hover:border-amber-400/50 transition-colors"
+                                    aria-label={`Meer informatie over ${e.label}`}
+                                  >
+                                    <Info className="w-3.5 h-3.5" />
+                                  </button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md bg-card border-border">
+                                  <DialogHeader>
+                                    <DialogTitle className="text-foreground font-display text-lg">
+                                      {e.label}
+                                    </DialogTitle>
+                                    <DialogDescription className="text-muted-foreground font-body text-sm leading-relaxed pt-2">
+                                      {e.info}
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          </div>
                         );
                       })}
                     </div>
