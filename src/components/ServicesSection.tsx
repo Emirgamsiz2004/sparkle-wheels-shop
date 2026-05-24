@@ -138,7 +138,7 @@ const ServicesSection = () => {
             <ServiceCard key={service.title} service={service} delay={i * 0.15} />
           ))}
         </div>
-        <div className="grid md:grid-cols-2 gap-px bg-border mt-px">
+        <div className="grid md:grid-cols-3 gap-px bg-border mt-px">
           {services.slice(3).map((service, i) => (
             <ServiceCard key={service.title} service={service} delay={(i + 3) * 0.15} />
           ))}
