@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Car, FileSignature, BadgeDollarSign, CreditCard, UserPlus, ClipboardCheck, CalendarPlus, FileText, Search, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useKeyboardSafeViewport } from "@/hooks/use-keyboard-safe-viewport";
 import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDialog";
 import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
 import InkoopverklaringWizard from "@/components/admin/inkoop/InkoopverklaringWizard";
@@ -30,6 +31,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { addCustomer } = useCustomers();
+  const { bottomInset } = useKeyboardSafeViewport(isMobile);
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ bottom: number; right: number } | null>(null);
   const [kenteken, setKenteken] = useState("");
@@ -185,7 +187,12 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 32, stiffness: 320, mass: 0.8 }}
-              className="fixed bottom-0 inset-x-0 z-[61] bg-card border-t border-border rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,12px)] max-h-[85vh] overflow-y-auto"
+              style={{
+                transform: bottomInset > 0 ? `translateY(-${bottomInset}px)` : undefined,
+                transition: "transform 200ms ease-out",
+                maxHeight: `calc(85vh - ${bottomInset}px)`,
+              }}
+              className="fixed bottom-0 inset-x-0 z-[61] bg-card border-t border-border rounded-t-2xl shadow-2xl pb-[env(safe-area-inset-bottom,12px)] overflow-y-auto"
             >
               <div className="pt-2 pb-1 flex justify-center">
                 <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
@@ -279,7 +286,12 @@ const PanelInner = ({
             value={kenteken}
             onChange={(e) => setKenteken(e.target.value.toUpperCase())}
             placeholder="AB-12-CD"
-            className="w-full pl-8 pr-2 h-10 text-sm bg-background border border-border rounded-2xl focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60 uppercase tracking-wider"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            inputMode="text"
+            className="w-full pl-8 pr-2 h-10 text-base bg-background border border-border rounded-2xl focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60 uppercase tracking-wider"
           />
         </div>
         <button type="submit" className="h-10 px-5 text-xs font-medium bg-foreground text-background rounded-2xl hover:bg-foreground/90 transition-colors">Ga</button>
