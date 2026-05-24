@@ -47,8 +47,6 @@ import AdminKlantDetailPage from "./pages/admin/AdminKlantDetailPage";
 import AdminLeadsPage from "./pages/admin/AdminLeadsPage";
 import AdminLeadDetailPage from "./pages/admin/AdminLeadDetailPage";
 import ProefritFormulier from "./pages/ProefritFormulier";
-import AdminUrenPage from "./pages/admin/AdminUrenPage";
-import AdminAanmeldingenPage from "./pages/admin/AdminAanmeldingenPage";
 import AdminPlanningPage from "./pages/admin/AdminPlanningPage";
 import OccasionsAlphen from "./pages/OccasionsAlphen";
 import OccasionsLeiden from "./pages/OccasionsLeiden";
