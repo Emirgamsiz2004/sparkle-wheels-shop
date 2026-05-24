@@ -490,13 +490,14 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                 </div>
 
                 <div className="flex flex-col items-start md:items-end gap-2">
-                  <Link
-                    to="/contact"
+                  <button
+                    type="button"
+                    onClick={() => setBookingOpen(true)}
                     className="inline-flex items-center gap-2 px-6 py-4 bg-amber-400 text-background font-display font-semibold text-sm hover:bg-amber-300 transition-colors"
                   >
-                    Afspraak maken
+                    Afspraak inplannen
                     <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  </button>
                   <p className="text-xs font-body text-muted-foreground">
                     Of bel direct:{" "}
                     <a href="tel:+31620686868" className="text-foreground hover:text-amber-400 transition-colors">
