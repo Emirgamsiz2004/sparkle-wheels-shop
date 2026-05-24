@@ -31,7 +31,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { addCustomer } = useCustomers();
-  const { bottomInset, isInputFocused } = useKeyboardSafeViewport(isMobile);
+  const { bottomInset } = useKeyboardSafeViewport(isMobile);
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ bottom: number; right: number } | null>(null);
   const [kenteken, setKenteken] = useState("");
