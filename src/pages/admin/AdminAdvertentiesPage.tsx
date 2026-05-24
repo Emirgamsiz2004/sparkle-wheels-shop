@@ -518,7 +518,19 @@ const AdminAdvertentiesPage = () => {
                 {/* VWE INVULHULP */}
                 <Card className="overflow-hidden" style={{ border: "2px solid #D98A3C" }}>
                   <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: "#D98A3C" }}>
-                    <span className="text-white font-bold text-xs uppercase tracking-wider">VWE Invulhulp</span>
+                    <div className="flex items-center">
+                      <span className="text-white font-bold text-xs uppercase tracking-wider">VWE Invulhulp</span>
+                      <InfoButton title="Wat is VWE en hoe werkt dit?">
+                        <p>VWE is het marktleidende voertuiginformatiesysteem voor de automotive branche in Nederland. Bijna alle professionele handelaren en portals gebruiken het om voertuiggegevens uit te wisselen.</p>
+                        <ul className="list-disc pl-4 space-y-1.5">
+                          <li><strong>Waarom:</strong> deze gegevens zijn nodig om een auto op professionele portals te plaatsen en voor het genereren van waardebepalingen.</li>
+                          <li><strong>Kenteken:</strong> wordt automatisch ingevuld via RDW koppeling.</li>
+                          <li><strong>Chassisnummer:</strong> controleer altijd handmatig — het is cruciaal voor identificatie en verzekering.</li>
+                          <li><strong>Metallic lak:</strong> invloed op waardebepaling, dus nauwkeurig aangeven.</li>
+                          <li><strong>NAP / schadevrij:</strong> verhoogt het vertrouwen bij kopers; vermeld het altijd expliciet.</li>
+                        </ul>
+                      </InfoButton>
+                    </div>
                     <button onClick={() => {
                       const vweText = [
                         `Kenteken: ${kenteken || "—"}`,
