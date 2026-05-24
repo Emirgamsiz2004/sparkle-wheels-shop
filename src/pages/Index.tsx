@@ -2,16 +2,10 @@ import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import InventorySection from "@/components/InventorySection";
-import ConsignatieSection from "@/components/ConsignatieSection";
 import ServicesSection from "@/components/ServicesSection";
-import AboutSection from "@/components/AboutSection";
 import ReviewsSection from "@/components/ReviewsSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
-import LatestBlogSection from "@/components/LatestBlogSection";
-import FAQSection from "@/components/FAQSection";
-import PartnerBanner from "@/components/PartnerBanner";
-import AfleveringSection from "@/components/AfleveringSection";
 import FinancieringSection from "@/components/FinancieringSection";
 import GarantieSection from "@/components/GarantieSection";
 
@@ -53,7 +47,6 @@ const Index = () => {
       <FinancieringSection />
       <GarantieSection />
       <ServicesSection />
-      <ConsignatieSection />
       <ReviewsSection />
       <ContactSection />
       <Footer />

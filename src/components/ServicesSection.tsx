@@ -6,6 +6,7 @@ import onderhoudImg from "@/assets/service-onderhoud.webp";
 import detailingImg from "@/assets/service-detailing.webp";
 import autoZoekenImg from "@/assets/service-zoeken.webp";
 import customizingImg from "@/assets/service-customizing.webp";
+import consignatieImg from "@/assets/service-verkoop.webp";
 
 interface Service {
   num: string;
@@ -58,6 +59,14 @@ const services: Service[] = [
     image: autoZoekenImg,
     alt: "Auto op aanvraag zoeken Nederland",
     href: "/diensten/auto-zoeken",
+  },
+  {
+    num: "06",
+    title: "Consignatie",
+    description: "Uw auto verkopen zonder gedoe? Wij regelen het volledige verkoopproces — van taxatie tot overdracht.",
+    image: consignatieImg,
+    alt: "Auto consignatie verkopen Roelofarendsveen",
+    href: "/consignatie",
   },
 ];
 
@@ -129,7 +138,7 @@ const ServicesSection = () => {
             <ServiceCard key={service.title} service={service} delay={i * 0.15} />
           ))}
         </div>
-        <div className="grid md:grid-cols-2 gap-px bg-border mt-px">
+        <div className="grid md:grid-cols-3 gap-px bg-border mt-px">
           {services.slice(3).map((service, i) => (
             <ServiceCard key={service.title} service={service} delay={(i + 3) * 0.15} />
           ))}
