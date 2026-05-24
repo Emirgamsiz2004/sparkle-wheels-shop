@@ -409,7 +409,18 @@ const AdminAdvertentiesPage = () => {
                 {/* TITEL */}
                 <Card className="overflow-hidden">
                   <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: MARKTPLAATS_ORANGE }}>
-                    <span className="text-white font-bold text-xs uppercase tracking-wider">Titel (max 60 tekens)</span>
+                    <div className="flex items-center">
+                      <span className="text-white font-bold text-xs uppercase tracking-wider">Titel (max 60 tekens)</span>
+                      <InfoButton title="Tips voor je titel">
+                        <ul className="list-disc pl-4 space-y-1.5">
+                          <li>Begin altijd met <strong>merk + model</strong> — zoekmachines en kopers scannen hier als eerste op.</li>
+                          <li>Vermeld het <strong>bouwjaar</strong> direct; het geeft context over leeftijd en generatie.</li>
+                          <li>Voeg een <strong>uitvoering of bijzonderheid</strong> toe (GTI, AMG, Panoramadak, etc.) om op te vallen.</li>
+                          <li>Houd het onder de <strong>60 tekens</strong> — langere titels worden afgekapt op Marktplaats.</li>
+                          <li>Gebruik geen overbodige woorden als "nette" of "zuinige"; dat neemt kostbare ruimte in.</li>
+                        </ul>
+                      </InfoButton>
+                    </div>
                     <button onClick={() => copyToClipboard(parsed.titel, "Titel")} className="text-white/70 hover:text-white transition-colors">
                       <Copy className="w-3.5 h-3.5" />
                     </button>
