@@ -164,6 +164,29 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   const [pkg, setPkg] = useState<PackageKey | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [autoUpgraded, setAutoUpgraded] = useState(false);
+  const step2Ref = useRef<HTMLDivElement>(null);
+  const step3Ref = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll naar volgend blok op desktop (>=768px)
+  useEffect(() => {
+    if (!vehicle) return;
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+    const t = setTimeout(() => {
+      step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [vehicle]);
+
+  useEffect(() => {
+    if (!vehicle || !pkg) return;
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+    const t = setTimeout(() => {
+      step3Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [pkg, vehicle]);
 
   const toggleExtra = (key: string) => {
     setSelectedExtras((s) => {
