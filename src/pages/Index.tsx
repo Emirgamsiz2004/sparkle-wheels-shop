@@ -8,6 +8,7 @@ import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import FinancieringSection from "@/components/FinancieringSection";
 import GarantieSection from "@/components/GarantieSection";
+import DetailingCTASection from "@/components/DetailingCTASection";
 
 const Index = () => {
   return (
