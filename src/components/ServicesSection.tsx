@@ -6,6 +6,7 @@ import onderhoudImg from "@/assets/service-onderhoud.webp";
 import detailingImg from "@/assets/service-detailing.webp";
 import autoZoekenImg from "@/assets/service-zoeken.webp";
 import customizingImg from "@/assets/service-customizing.webp";
+import consignatieImg from "@/assets/service-verkoop.webp";
 
 interface Service {
   num: string;
