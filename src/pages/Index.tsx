@@ -52,7 +52,6 @@ const Index = () => {
       <FinancieringSection />
       <GarantieSection />
       <ServicesSection />
-      <ConsignatieSection />
       <ReviewsSection />
       <ContactSection />
       <Footer />
