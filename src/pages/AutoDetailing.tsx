@@ -23,6 +23,18 @@ const diensten = [
 ];
 
 const AutoDetailing = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === "#configurator") {
+      // Wait a tick so the section is mounted, then snap to it without slow smooth scroll
+      requestAnimationFrame(() => {
+        const el = document.getElementById("configurator");
+        if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+      });
+    }
+  }, [location.hash]);
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
