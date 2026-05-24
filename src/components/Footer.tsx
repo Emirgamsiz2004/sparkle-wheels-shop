@@ -80,7 +80,7 @@ const Footer = () => {
             <p className="text-[10px] tracking-[0.3em] uppercase font-body font-semibold text-muted-foreground mb-1">Openingstijden</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Ma – Vr: 09:00 – 18:00</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Zaterdag: 10:00 – 17:00</p>
-            <p className="text-[11px] font-body text-muted-foreground/70">Zondag: Gesloten</p>
+            <p className="text-[11px] font-body text-muted-foreground/70">Zondag: 10:00 – 16:00</p>
 
             <div className="flex items-center gap-2.5 mt-3">
               <a href="https://www.instagram.com/platin_automotive/" target="_blank" rel="noopener noreferrer"

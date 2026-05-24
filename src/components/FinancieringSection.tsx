@@ -125,7 +125,7 @@ const FinancieringSection = () => {
                   value={[aanbetalingPct]}
                   onValueChange={(v) => setAanbetalingPct(v[0])}
                   min={0}
-                  max={50}
+                  max={95}
                   step={5}
                 />
               </div>
