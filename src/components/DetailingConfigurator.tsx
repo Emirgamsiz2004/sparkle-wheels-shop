@@ -164,7 +164,7 @@ const DetailingConfigurator = () => {
     .filter(Boolean) as Extra[];
 
   return (
-    <section className="py-16 md:py-28 bg-background">
+    <section id="configurator" className="py-16 md:py-28 bg-background scroll-mt-24">
       <div className="container mx-auto px-6 lg:px-16">
         {/* Header */}
         <motion.div
