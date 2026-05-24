@@ -52,12 +52,14 @@ const prices: Record<PackageKey, Record<VehicleKey, number>> = {
 const packages: {
   key: PackageKey;
   title: string;
+  subtitle: string;
   features: string[];
   badge?: string;
 }[] = [
   {
     key: "binnen",
-    title: "Alleen Binnenkant",
+    title: "Poetsbeurt Binnenkant",
+    subtitle: "Alleen interieur reinigen",
     features: [
       "Stofzuigen",
       "Matten reinigen",
@@ -69,7 +71,8 @@ const packages: {
   },
   {
     key: "buiten",
-    title: "Alleen Buitenkant",
+    title: "Poetsbeurt Buitenkant",
+    subtitle: "Wasbeurt + waxen buiten",
     features: [
       "Handwas buiten",
       "Velgen reinigen",
@@ -82,7 +85,8 @@ const packages: {
   },
   {
     key: "compleet",
-    title: "Compleet",
+    title: "Complete Poetsbeurt",
+    subtitle: "Binnen + buiten — alles in één",
     badge: "Meest gekozen",
     features: ["Alles van binnenkant", "Alles van buitenkant"],
   },
@@ -136,15 +140,27 @@ const StepBadge = ({ n, label, active }: { n: number; label: string; active: boo
   </div>
 );
 
+const polishKeys = new Set(extrasPolijst.map((e) => e.key));
+
 const DetailingConfigurator = () => {
   const [vehicle, setVehicle] = useState<VehicleKey | null>(null);
   const [pkg, setPkg] = useState<PackageKey | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [autoUpgraded, setAutoUpgraded] = useState(false);
 
-  const toggleExtra = (key: string) =>
-    setSelectedExtras((s) =>
-      s.includes(key) ? s.filter((k) => k !== key) : [...s, key],
-    );
+  const toggleExtra = (key: string) => {
+    setSelectedExtras((s) => {
+      const next = s.includes(key) ? s.filter((k) => k !== key) : [...s, key];
+      // Polijsten vereist een exterieur-reiniging als basis
+      if (!s.includes(key) && polishKeys.has(key)) {
+        if (pkg === "binnen" || pkg === null) {
+          setPkg("compleet");
+          setAutoUpgraded(true);
+        }
+      }
+      return next;
+    });
+  };
 
   const basePrice = vehicle && pkg ? prices[pkg][vehicle] : 0;
   const extrasTotal = useMemo(
@@ -240,7 +256,10 @@ const DetailingConfigurator = () => {
                     <button
                       key={p.key}
                       type="button"
-                      onClick={() => setPkg(p.key)}
+                      onClick={() => {
+                        setPkg(p.key);
+                        setAutoUpgraded(false);
+                      }}
                       className={`relative text-left p-6 md:p-7 transition-all duration-300 border flex flex-col ${
                         isSel
                           ? "border-amber-400 bg-amber-400/5 shadow-[0_0_0_1px_hsl(45_93%_55%/0.4)]"
@@ -252,9 +271,12 @@ const DetailingConfigurator = () => {
                           {p.badge}
                         </span>
                       )}
-                      <h4 className="text-lg font-display font-semibold text-foreground mb-2">
+                      <h4 className="text-lg font-display font-semibold text-foreground mb-1">
                         {p.title}
                       </h4>
+                      <p className="text-xs font-body text-muted-foreground mb-4">
+                        {p.subtitle}
+                      </p>
                       <p className="text-3xl md:text-4xl font-display font-bold text-foreground mb-5">
                         €{price}
                       </p>
@@ -292,10 +314,17 @@ const DetailingConfigurator = () => {
                   { title: "Polijsten & Coating", items: extrasPolijst },
                 ].map((col) => (
                   <div key={col.title} className="border border-border bg-card p-5 md:p-6">
-                    <p className="text-[10px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground mb-4">
+                    <p className="text-[10px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground mb-2">
                       {col.title}
                     </p>
-                    <div className="space-y-3">
+                    {col.title === "Polijsten & Coating" && (
+                      <p className="text-[11px] font-body text-amber-400/90 leading-snug mb-4">
+                        Let op: polijsten vereist een gewassen auto. We voegen
+                        automatisch een buitenkant-reiniging toe als die nog
+                        niet is gekozen.
+                      </p>
+                    )}
+                    <div className="space-y-3 mt-3">
                       {col.items.map((e) => {
                         const checked = selectedExtras.includes(e.key);
                         return (
@@ -345,6 +374,11 @@ const DetailingConfigurator = () => {
                   <p className="text-base md:text-lg font-display font-semibold text-foreground">
                     {selectedPackage?.title} — {selectedVehicle?.label}
                   </p>
+                  {autoUpgraded && (
+                    <p className="text-xs font-body text-amber-400 mt-2">
+                      ✓ Buitenkant-reiniging automatisch toegevoegd (vereist voor polijsten).
+                    </p>
+                  )}
                   {selectedExtraObjs.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {selectedExtraObjs.map((e) => (

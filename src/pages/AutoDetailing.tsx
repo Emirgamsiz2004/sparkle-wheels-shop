@@ -1,5 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { ArrowRight, Sparkles, Star, MessageCircle, Phone, CheckCircle, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -21,6 +23,18 @@ const diensten = [
 ];
 
 const AutoDetailing = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === "#configurator") {
+      // Wait a tick so the section is mounted, then snap to it without slow smooth scroll
+      requestAnimationFrame(() => {
+        const el = document.getElementById("configurator");
+        if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+      });
+    }
+  }, [location.hash]);
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -70,6 +84,9 @@ const AutoDetailing = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Configurator (boven de fold na hero zodat CTA-bezoekers direct kunnen samenstellen) */}
+      <DetailingConfigurator />
 
       {/* Intro */}
       <section className="py-16 md:py-28 bg-card">
@@ -169,8 +186,6 @@ const AutoDetailing = () => {
         </div>
       </section>
 
-      {/* Configurator */}
-      <DetailingConfigurator />
 
       {/* Afspraak + Quick contact */}
       <section id="afspraak" className="py-16 md:py-28 bg-card">
