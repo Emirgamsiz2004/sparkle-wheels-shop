@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Calculator, Briefcase, User, Percent } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Slider } from "@/components/ui/slider";
+import { berekenLease, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
 import logoFinanciallease from "@/assets/logo-financiallease.png";
 
 const FinancieringSection = () => {
