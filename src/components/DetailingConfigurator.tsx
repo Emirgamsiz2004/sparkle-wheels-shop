@@ -355,35 +355,63 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                       {col.items.map((e) => {
                         const checked = selectedExtras.includes(e.key);
                         return (
-                          <button
-                            type="button"
+                          <div
                             key={e.key}
-                            onClick={() => toggleExtra(e.key)}
-                            aria-pressed={checked}
-                            className={`w-full text-left flex items-center gap-3 px-3 py-3 border-2 transition-all ${
+                            className={`w-full text-left flex items-center gap-2 px-3 py-3 border-2 transition-all ${
                               checked
                                 ? "border-amber-400 bg-amber-400/10"
                                 : "border-border bg-background/40 hover:border-amber-400/50 hover:bg-card"
                             }`}
                           >
-                            <span
-                              className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 border-2 transition-colors ${
-                                checked
-                                  ? "bg-amber-400 border-amber-400 text-background"
-                                  : "border-muted-foreground/60 bg-background"
-                              }`}
+                            <button
+                              type="button"
+                              onClick={() => toggleExtra(e.key)}
+                              aria-pressed={checked}
+                              className="flex-1 flex items-center gap-3 text-left"
                             >
-                              {checked && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
-                            </span>
-                            <div className="flex-1 flex items-baseline justify-between gap-2">
-                              <span className={`text-sm font-body transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
-                                {e.label}
+                              <span
+                                className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 border-2 transition-colors ${
+                                  checked
+                                    ? "bg-amber-400 border-amber-400 text-background"
+                                    : "border-muted-foreground/60 bg-background"
+                                }`}
+                              >
+                                {checked && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
                               </span>
-                              <span className={`text-sm font-display font-semibold whitespace-nowrap ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
-                                +€{e.price}
-                              </span>
-                            </div>
-                          </button>
+                              <div className="flex-1 flex items-baseline justify-between gap-2">
+                                <span className={`text-sm font-body transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
+                                  {e.label}
+                                </span>
+                                <span className={`text-sm font-display font-semibold whitespace-nowrap ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
+                                  +€{e.price}
+                                </span>
+                              </div>
+                            </button>
+                            {e.info && (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <button
+                                    type="button"
+                                    onClick={(ev) => ev.stopPropagation()}
+                                    className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full border border-border bg-card text-muted-foreground hover:text-amber-400 hover:border-amber-400/50 transition-colors"
+                                    aria-label={`Meer informatie over ${e.label}`}
+                                  >
+                                    <Info className="w-3.5 h-3.5" />
+                                  </button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md bg-card border-border">
+                                  <DialogHeader>
+                                    <DialogTitle className="text-foreground font-display text-lg">
+                                      {e.label}
+                                    </DialogTitle>
+                                    <DialogDescription className="text-muted-foreground font-body text-sm leading-relaxed pt-2">
+                                      {e.info}
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          </div>
                         );
                       })}
                     </div>
