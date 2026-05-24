@@ -374,6 +374,11 @@ const DetailingConfigurator = () => {
                   <p className="text-base md:text-lg font-display font-semibold text-foreground">
                     {selectedPackage?.title} — {selectedVehicle?.label}
                   </p>
+                  {autoUpgraded && (
+                    <p className="text-xs font-body text-amber-400 mt-2">
+                      ✓ Buitenkant-reiniging automatisch toegevoegd (vereist voor polijsten).
+                    </p>
+                  )}
                   {selectedExtraObjs.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {selectedExtraObjs.map((e) => (
