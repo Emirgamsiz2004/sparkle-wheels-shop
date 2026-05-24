@@ -169,6 +169,9 @@ const AutoDetailing = () => {
         </div>
       </section>
 
+      {/* Configurator */}
+      <DetailingConfigurator />
+
       {/* Afspraak + Quick contact */}
       <section id="afspraak" className="py-16 md:py-28 bg-card">
         <div className="container mx-auto px-6 lg:px-16">
