@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
+import DetailingConfigurator from "@/components/DetailingConfigurator";
 import detailingImg from "@/assets/detailing.jpg";
 
 const diensten = [
@@ -167,6 +168,9 @@ const AutoDetailing = () => {
           </motion.p>
         </div>
       </section>
+
+      {/* Configurator */}
+      <DetailingConfigurator />
 
       {/* Afspraak + Quick contact */}
       <section id="afspraak" className="py-16 md:py-28 bg-card">
