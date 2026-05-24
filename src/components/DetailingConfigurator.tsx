@@ -516,6 +516,20 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
           Afspraak op locatie: Cilinderweg 99, Roelofarendsveen.
         </p>
       </div>
+
+      {vehicle && pkg && selectedPackage && selectedVehicle && (
+        <DetailingBookingDialog
+          open={bookingOpen}
+          onOpenChange={setBookingOpen}
+          summary={`${selectedPackage.title} — ${selectedVehicle.label}`}
+          diensten={[
+            `${selectedPackage.title} (${selectedVehicle.label}) — €${basePrice}`,
+            ...selectedExtraObjs.map((e) => `${e.label} — €${e.price}`),
+          ]}
+          totalPrice={total}
+          geschatteDuur={pkg === "compleet" ? 240 : 150}
+        />
+      )}
     </section>
   );
 };
