@@ -324,28 +324,39 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                         niet is gekozen.
                       </p>
                     )}
-                    <div className="space-y-3 mt-3">
+                    <div className="space-y-2 mt-3">
                       {col.items.map((e) => {
                         const checked = selectedExtras.includes(e.key);
                         return (
-                          <label
+                          <button
+                            type="button"
                             key={e.key}
-                            className="flex items-start gap-3 cursor-pointer group"
+                            onClick={() => toggleExtra(e.key)}
+                            aria-pressed={checked}
+                            className={`w-full text-left flex items-center gap-3 px-3 py-3 border-2 transition-all ${
+                              checked
+                                ? "border-amber-400 bg-amber-400/10"
+                                : "border-border bg-background/40 hover:border-amber-400/50 hover:bg-card"
+                            }`}
                           >
-                            <Checkbox
-                              checked={checked}
-                              onCheckedChange={() => toggleExtra(e.key)}
-                              className="mt-0.5 border-border data-[state=checked]:bg-amber-400 data-[state=checked]:border-amber-400 data-[state=checked]:text-background"
-                            />
+                            <span
+                              className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 border-2 transition-colors ${
+                                checked
+                                  ? "bg-amber-400 border-amber-400 text-background"
+                                  : "border-muted-foreground/60 bg-background"
+                              }`}
+                            >
+                              {checked && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
+                            </span>
                             <div className="flex-1 flex items-baseline justify-between gap-2">
-                              <span className="text-sm font-body text-foreground group-hover:text-amber-400 transition-colors">
+                              <span className={`text-sm font-body transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
                                 {e.label}
                               </span>
-                              <span className="text-sm font-display font-semibold text-muted-foreground whitespace-nowrap">
+                              <span className={`text-sm font-display font-semibold whitespace-nowrap ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
                                 +€{e.price}
                               </span>
                             </div>
-                          </label>
+                          </button>
                         );
                       })}
                     </div>
