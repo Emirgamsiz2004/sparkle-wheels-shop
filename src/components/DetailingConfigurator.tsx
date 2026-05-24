@@ -392,8 +392,8 @@ const DetailingConfigurator = () => {
                       ))}
                     </div>
                   )}
-                  <p className="text-3xl md:text-4xl font-display font-bold text-foreground mt-4">
-                    Totaalprijs: <span className="text-amber-400">€{total}</span>
+                  <p className="text-3xl md:text-4xl font-sans font-bold tracking-tight text-foreground mt-4">
+                    Totaalprijs: <span className="text-amber-400 font-extrabold">€{total}</span>
                   </p>
                 </div>
 
