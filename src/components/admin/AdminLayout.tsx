@@ -25,13 +25,11 @@ const navItems: NavItem[] = [
   { label: "Verkoop", icon: BadgeDollarSign, path: "/admin/verkopen" },
   { label: "Klanten", icon: Users, path: "/admin/klanten" },
   { label: "Proefritten", icon: ClipboardCheck, path: "/admin/proefriten", medewerker: true },
-  { label: "Planning", icon: CalendarDays, path: "/admin/planning", medewerker: true },
+  { label: "Afspraken", icon: CalendarDays, path: "/admin/planning", medewerker: true },
   { label: "Financiën", icon: Wallet, path: "/admin/financieel" },
-  { label: "Uren", icon: Clock, path: "/admin/uren", medewerker: true },
-  { label: "Aanmeldingen", icon: Inbox, path: "/admin/aanmeldingen" },
 ];
 
-const ALLOWED_MEDEWERKER_PREFIXES = ["/admin/dashboard", "/admin/inkoop", "/admin/proefriten", "/admin/planning", "/admin/uren"];
+const ALLOWED_MEDEWERKER_PREFIXES = ["/admin/dashboard", "/admin/inkoop", "/admin/proefriten", "/admin/planning"];
 
 const AdminLayout = () => {
   const { user, loading, signOut, isAdmin, isMedewerker, role } = useAuth();
