@@ -357,7 +357,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                         return (
                           <div
                             key={e.key}
-                            className={`w-full text-left flex items-center gap-2 px-3 py-3 border-2 transition-all ${
+                            className={`w-full text-left flex items-center gap-3 px-3 py-3 border-2 transition-all ${
                               checked
                                 ? "border-amber-400 bg-amber-400/10"
                                 : "border-border bg-background/40 hover:border-amber-400/50 hover:bg-card"
@@ -367,7 +367,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                               type="button"
                               onClick={() => toggleExtra(e.key)}
                               aria-pressed={checked}
-                              className="flex-1 flex items-center gap-3 text-left"
+                              className="flex-1 min-w-0 flex items-center gap-3 text-left"
                             >
                               <span
                                 className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 border-2 transition-colors ${
@@ -378,16 +378,14 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                               >
                                 {checked && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
                               </span>
-                              <div className="flex-1 flex items-baseline justify-between gap-2">
-                                <span className={`text-sm font-body transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
-                                  {e.label}
-                                </span>
-                                <span className={`text-sm font-display font-semibold whitespace-nowrap ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
-                                  +€{e.price}
-                                </span>
-                              </div>
+                              <span className={`flex-1 min-w-0 text-sm font-body leading-tight transition-colors ${checked ? "text-foreground font-medium" : "text-foreground"}`}>
+                                {e.label}
+                              </span>
                             </button>
-                            {e.info && (
+                            <span className={`w-16 text-right text-sm font-display font-semibold whitespace-nowrap tabular-nums ${checked ? "text-amber-400" : "text-muted-foreground"}`}>
+                              +€{e.price}
+                            </span>
+                            {e.info ? (
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <button
@@ -410,6 +408,8 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                                   </DialogHeader>
                                 </DialogContent>
                               </Dialog>
+                            ) : (
+                              <span className="shrink-0 w-7 h-7" aria-hidden />
                             )}
                           </div>
                         );
