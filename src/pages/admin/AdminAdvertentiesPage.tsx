@@ -5,12 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Copy, Sparkles, Loader2, Lock } from "lucide-react";
+import { Copy, Sparkles, Loader2, Lock, Info } from "lucide-react";
 import KentekenInput from "@/components/admin/KentekenInput";
 import { fetchRdwData } from "@/lib/rdw";
 import { cn } from "@/lib/utils";
@@ -51,6 +59,25 @@ const parseMarktplaatsCaption = (text: string) => {
 };
 
 const MARKTPLAATS_ORANGE = "#e05c00";
+
+const InfoButton = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <button className="text-white/70 hover:text-white transition-colors ml-2" title={title}>
+        <Info className="w-3.5 h-3.5" />
+      </button>
+    </DialogTrigger>
+    <DialogContent className="sm:max-w-md bg-background text-foreground">
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+        <DialogDescription className="text-muted-foreground" asChild>
+          <div className="pt-2 space-y-3 text-sm leading-relaxed">{children}</div>
+        </DialogDescription>
+      </DialogHeader>
+    </DialogContent>
+  </Dialog>
+);
+
 
 const AdminAdvertentiesPage = () => {
   const { vehicles } = useVehicles();
@@ -382,7 +409,18 @@ const AdminAdvertentiesPage = () => {
                 {/* TITEL */}
                 <Card className="overflow-hidden">
                   <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: MARKTPLAATS_ORANGE }}>
-                    <span className="text-white font-bold text-xs uppercase tracking-wider">Titel (max 60 tekens)</span>
+                    <div className="flex items-center">
+                      <span className="text-white font-bold text-xs uppercase tracking-wider">Titel (max 60 tekens)</span>
+                      <InfoButton title="Tips voor je titel">
+                        <ul className="list-disc pl-4 space-y-1.5">
+                          <li>Begin altijd met <strong>merk + model</strong> — zoekmachines en kopers scannen hier als eerste op.</li>
+                          <li>Vermeld het <strong>bouwjaar</strong> direct; het geeft context over leeftijd en generatie.</li>
+                          <li>Voeg een <strong>uitvoering of bijzonderheid</strong> toe (GTI, AMG, Panoramadak, etc.) om op te vallen.</li>
+                          <li>Houd het onder de <strong>60 tekens</strong> — langere titels worden afgekapt op Marktplaats.</li>
+                          <li>Gebruik geen overbodige woorden als "nette" of "zuinige"; dat neemt kostbare ruimte in.</li>
+                        </ul>
+                      </InfoButton>
+                    </div>
                     <button onClick={() => copyToClipboard(parsed.titel, "Titel")} className="text-white/70 hover:text-white transition-colors">
                       <Copy className="w-3.5 h-3.5" />
                     </button>
@@ -399,7 +437,18 @@ const AdminAdvertentiesPage = () => {
                 {parsed.opvaltekst && (
                   <Card className="overflow-hidden" style={{ border: `2px solid ${MARKTPLAATS_ORANGE}` }}>
                     <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: MARKTPLAATS_ORANGE }}>
-                      <span className="text-white font-bold text-xs uppercase tracking-wider">Opvaltekst (50-208 tekens)</span>
+                      <div className="flex items-center">
+                        <span className="text-white font-bold text-xs uppercase tracking-wider">Opvaltekst (50-208 tekens)</span>
+                        <InfoButton title="Wat is een opvaltekst?">
+                          <p>De opvaltekst is het eerste wat een bezoeker leest na de titel. Het bepaalt of iemand doorklikt naar je advertentie of doorgescrolt.</p>
+                          <ul className="list-disc pl-4 space-y-1.5">
+                            <li><strong>Lengte:</strong> minimaal 50, maximaal 208 tekens — te kort wordt afgekeurd, te lang wordt afgekapt.</li>
+                            <li><strong>Toon:</strong> enthousiast maar geloofwaardig; vermijd overdreven superlatieven.</li>
+                            <li><strong>Focus:</strong> noem 1-2 unieke pluspunten (bijv. "1e eigenaar, dealer onderhouden") in plaats van een opsomming.</li>
+                            <li><strong>Call-to-action:</strong> nodig uit tot contact of een proefrit.</li>
+                          </ul>
+                        </InfoButton>
+                      </div>
                       <button onClick={() => copyToClipboard(parsed.opvaltekst, "Opvaltekst")} className="text-white/70 hover:text-white transition-colors">
                         <Copy className="w-3.5 h-3.5" />
                       </button>
@@ -416,7 +465,19 @@ const AdminAdvertentiesPage = () => {
                 {/* ADVERTENTIETEKST */}
                 <Card className="overflow-hidden">
                   <div className="px-4 py-2.5 flex items-center justify-between bg-gray-800">
-                    <span className="text-white font-bold text-xs uppercase tracking-wider">Advertentietekst</span>
+                    <div className="flex items-center">
+                      <span className="text-white font-bold text-xs uppercase tracking-wider">Advertentietekst</span>
+                      <InfoButton title="Opbouw van de advertentietekst">
+                        <p>Een goede advertentietekst bouwt vertrouwen op en beantwoordt de vragen die een koper al heeft voordat die ze stelt.</p>
+                        <ul className="list-disc pl-4 space-y-1.5">
+                          <li><strong>Beschrijving:</strong> vertel het verhaal van de auto — hoe komt het aan, hoe is het onderhouden, waarom wordt het verkocht.</li>
+                          <li><strong>Specificaties:</strong> presenteer feiten gestructureerd (tabelvorm). Kopers scannen graag naar de kenmerken die hen interesseren.</li>
+                          <li><strong>Prijs:</strong> wees transparant. Vermeld "vraagprijs" of "bieden vanaf" duidelijk.</li>
+                          <li><strong>Contact:</strong> geef meerdere opties (bellen, WhatsApp, e-mail) en vermeld openingstijden.</li>
+                          <li><strong>Extra:</strong> vermeld garantie, inruilmogelijkheid of financiering als die beschikbaar zijn.</li>
+                        </ul>
+                      </InfoButton>
+                    </div>
                     <button onClick={() => {
                       const adText = [
                         parsed.beschrijving,
@@ -457,7 +518,19 @@ const AdminAdvertentiesPage = () => {
                 {/* VWE INVULHULP */}
                 <Card className="overflow-hidden" style={{ border: "2px solid #D98A3C" }}>
                   <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: "#D98A3C" }}>
-                    <span className="text-white font-bold text-xs uppercase tracking-wider">VWE Invulhulp</span>
+                    <div className="flex items-center">
+                      <span className="text-white font-bold text-xs uppercase tracking-wider">VWE Invulhulp</span>
+                      <InfoButton title="Wat is VWE en hoe werkt dit?">
+                        <p>VWE is het marktleidende voertuiginformatiesysteem voor de automotive branche in Nederland. Bijna alle professionele handelaren en portals gebruiken het om voertuiggegevens uit te wisselen.</p>
+                        <ul className="list-disc pl-4 space-y-1.5">
+                          <li><strong>Waarom:</strong> deze gegevens zijn nodig om een auto op professionele portals te plaatsen en voor het genereren van waardebepalingen.</li>
+                          <li><strong>Kenteken:</strong> wordt automatisch ingevuld via RDW koppeling.</li>
+                          <li><strong>Chassisnummer:</strong> controleer altijd handmatig — het is cruciaal voor identificatie en verzekering.</li>
+                          <li><strong>Metallic lak:</strong> invloed op waardebepaling, dus nauwkeurig aangeven.</li>
+                          <li><strong>NAP / schadevrij:</strong> verhoogt het vertrouwen bij kopers; vermeld het altijd expliciet.</li>
+                        </ul>
+                      </InfoButton>
+                    </div>
                     <button onClick={() => {
                       const vweText = [
                         `Kenteken: ${kenteken || "—"}`,
