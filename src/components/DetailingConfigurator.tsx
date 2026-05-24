@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Car,
@@ -19,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import DetailingBookingDialog from "./DetailingBookingDialog";
 
 type VehicleKey =
   | "kleine"
@@ -164,6 +164,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   const [pkg, setPkg] = useState<PackageKey | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [autoUpgraded, setAutoUpgraded] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
   const step2Ref = useRef<HTMLDivElement>(null);
   const step3Ref = useRef<HTMLDivElement>(null);
 
@@ -489,13 +490,14 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                 </div>
 
                 <div className="flex flex-col items-start md:items-end gap-2">
-                  <Link
-                    to="/contact"
+                  <button
+                    type="button"
+                    onClick={() => setBookingOpen(true)}
                     className="inline-flex items-center gap-2 px-6 py-4 bg-amber-400 text-background font-display font-semibold text-sm hover:bg-amber-300 transition-colors"
                   >
-                    Afspraak maken
+                    Afspraak inplannen
                     <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  </button>
                   <p className="text-xs font-body text-muted-foreground">
                     Of bel direct:{" "}
                     <a href="tel:+31620686868" className="text-foreground hover:text-amber-400 transition-colors">
@@ -514,6 +516,20 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
           Afspraak op locatie: Cilinderweg 99, Roelofarendsveen.
         </p>
       </div>
+
+      {vehicle && pkg && selectedPackage && selectedVehicle && (
+        <DetailingBookingDialog
+          open={bookingOpen}
+          onOpenChange={setBookingOpen}
+          summary={`${selectedPackage.title} — ${selectedVehicle.label}`}
+          diensten={[
+            `${selectedPackage.title} (${selectedVehicle.label}) — €${basePrice}`,
+            ...selectedExtraObjs.map((e) => `${e.label} — €${e.price}`),
+          ]}
+          totalPrice={total}
+          geschatteDuur={pkg === "compleet" ? 240 : 150}
+        />
+      )}
     </section>
   );
 };
