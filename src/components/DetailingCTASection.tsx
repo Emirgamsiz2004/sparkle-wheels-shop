@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Calculator, Info, X } from "lucide-react";
 import DetailingConfigurator from "./DetailingConfigurator";
+import polishImg from "@/assets/detailing/polish.webp";
+import foamFrontImg from "@/assets/detailing/foam-front.webp";
+import interiorImg from "@/assets/detailing/interior.webp";
 
 const DetailingCTASection = () => {
   const [expanded, setExpanded] = useState(false);
@@ -67,22 +70,31 @@ const DetailingCTASection = () => {
               </div>
 
               {!expanded && (
-                <div className="hidden lg:flex flex-col gap-3 min-w-[220px]">
-                  {[
-                    { n: "01", t: "Kies uw voertuig" },
-                    { n: "02", t: "Selecteer pakket" },
-                    { n: "03", t: "Voeg extras toe" },
-                  ].map((s) => (
-                    <div
-                      key={s.n}
-                      className="flex items-center gap-4 px-5 py-4 border border-border bg-background/50"
-                    >
-                      <span className="text-xs font-display font-bold text-amber-400 tracking-widest">
-                        {s.n}
-                      </span>
-                      <span className="text-sm font-body text-foreground">{s.t}</span>
-                    </div>
-                  ))}
+                <div className="hidden lg:grid grid-cols-2 grid-rows-2 gap-2 w-[320px] h-[320px]">
+                  <div className="row-span-2 overflow-hidden group">
+                    <img
+                      src={foamFrontImg}
+                      alt="Foamwash van een BMW in de detailing studio"
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="overflow-hidden group">
+                    <img
+                      src={polishImg}
+                      alt="Polijstmachine op zwarte autolak"
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="overflow-hidden group">
+                    <img
+                      src={interiorImg}
+                      alt="Gereinigd lederen interieur"
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
                 </div>
               )}
             </div>

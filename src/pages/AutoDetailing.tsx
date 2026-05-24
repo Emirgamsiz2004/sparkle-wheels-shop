@@ -10,16 +10,38 @@ import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
 import DetailingConfigurator from "@/components/DetailingConfigurator";
 import detailingImg from "@/assets/detailing.jpg";
+import polishImg from "@/assets/detailing/polish.webp";
+import foamWashImg from "@/assets/detailing/foam-wash.webp";
+import foamFrontImg from "@/assets/detailing/foam-front.webp";
+import interiorImg from "@/assets/detailing/interior.webp";
+import wheelImg from "@/assets/detailing/wheel.webp";
 
-const diensten = [
-  "Uitgebreide handwas",
-  "Polijsten & ontkrassen",
-  "Interieur dieptereiniging",
-  "Stoelen & bekleding reinigen",
-  "Leder behandeling",
-  "Velgen & banden dressing",
-  "Ramen & ruiten polijsten",
-  "Geur- & bacteriebehandeling",
+const behandelingen = [
+  {
+    img: foamWashImg,
+    title: "Handwas & foamwash",
+    desc: "pH-neutrale snowfoam en zachte microvezels — veilig voor uw lak.",
+  },
+  {
+    img: polishImg,
+    title: "Polijsten & ontkrassen",
+    desc: "Wegwerken van wervels, lichte krassen en holograms voor diepe glans.",
+  },
+  {
+    img: interiorImg,
+    title: "Interieur dieptereiniging",
+    desc: "Stoelen, bekleding en leder weer fris, zacht en als nieuw.",
+  },
+  {
+    img: wheelImg,
+    title: "Velgen & banden",
+    desc: "Grondige velgreiniging tot in de hoeken en bandendressing.",
+  },
+  {
+    img: foamFrontImg,
+    title: "Lakbescherming",
+    desc: "Sealants en keramische coatings voor langdurige glans en bescherming.",
+  },
 ];
 
 const AutoDetailing = () => {
@@ -158,19 +180,36 @@ const AutoDetailing = () => {
             </h2>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
-            {diensten.map((dienst, i) => (
-              <motion.div
-                key={dienst}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
+            {behandelingen.map((b, i) => (
+              <motion.article
+                key={b.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="bg-card p-5 md:p-6 flex items-center gap-3 group"
+                transition={{ duration: 0.6, delay: i * 0.08 }}
+                className="bg-card group overflow-hidden"
               >
-                <CheckCircle className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
-                <span className="text-sm font-body text-foreground">{dienst}</span>
-              </motion.div>
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img
+                    src={b.img}
+                    alt={b.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-5 md:p-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                    <h3 className="text-sm md:text-base font-display font-semibold text-foreground">
+                      {b.title}
+                    </h3>
+                  </div>
+                  <p className="text-xs md:text-sm font-body font-light text-muted-foreground leading-relaxed">
+                    {b.desc}
+                  </p>
+                </div>
+              </motion.article>
             ))}
           </div>
 
