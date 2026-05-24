@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Calculator, Info, X } from "lucide-react";
 import DetailingConfigurator from "./DetailingConfigurator";
+import polishImg from "@/assets/detailing/polish.webp";
+import foamFrontImg from "@/assets/detailing/foam-front.webp";
+import interiorImg from "@/assets/detailing/interior.webp";
 
 const DetailingCTASection = () => {
   const [expanded, setExpanded] = useState(false);
