@@ -60,6 +60,14 @@ const services: Service[] = [
     alt: "Auto op aanvraag zoeken Nederland",
     href: "/diensten/auto-zoeken",
   },
+  {
+    num: "06",
+    title: "Consignatie",
+    description: "Uw auto verkopen zonder gedoe? Wij regelen het volledige verkoopproces — van taxatie tot overdracht.",
+    image: consignatieImg,
+    alt: "Auto consignatie verkopen Roelofarendsveen",
+    href: "/consignatie",
+  },
 ];
 
 const ServiceCard = ({ service, delay }: { service: Service; delay: number }) => (
