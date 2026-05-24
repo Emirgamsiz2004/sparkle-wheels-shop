@@ -58,7 +58,7 @@ const packages: {
 }[] = [
   {
     key: "binnen",
-    title: "Poetsbeurt Binnenkant",
+    title: "Interieur Reiniging",
     subtitle: "Alleen interieur reinigen",
     features: [
       "Stofzuigen",
@@ -71,7 +71,7 @@ const packages: {
   },
   {
     key: "buiten",
-    title: "Poetsbeurt Buitenkant",
+    title: "Exterieur Reiniging",
     subtitle: "Wasbeurt + waxen buiten",
     features: [
       "Handwas buiten",
@@ -85,10 +85,10 @@ const packages: {
   },
   {
     key: "compleet",
-    title: "Complete Poetsbeurt",
+    title: "Complete Reiniging",
     subtitle: "Binnen + buiten — alles in één",
     badge: "Meest gekozen",
-    features: ["Alles van binnenkant", "Alles van buitenkant"],
+    features: ["Alles van interieur", "Alles van exterieur"],
   },
 ];
 
