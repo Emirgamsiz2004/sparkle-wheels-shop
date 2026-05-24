@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Car,
@@ -19,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import DetailingBookingDialog from "./DetailingBookingDialog";
 
 type VehicleKey =
   | "kleine"
