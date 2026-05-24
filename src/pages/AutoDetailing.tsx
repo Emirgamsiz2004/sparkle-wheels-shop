@@ -1,5 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { ArrowRight, Sparkles, Star, MessageCircle, Phone, CheckCircle, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
