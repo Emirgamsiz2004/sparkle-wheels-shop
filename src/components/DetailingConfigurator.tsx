@@ -164,6 +164,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   const [pkg, setPkg] = useState<PackageKey | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [autoUpgraded, setAutoUpgraded] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
   const step2Ref = useRef<HTMLDivElement>(null);
   const step3Ref = useRef<HTMLDivElement>(null);
 
