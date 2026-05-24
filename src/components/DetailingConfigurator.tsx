@@ -355,8 +355,9 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="mb-12"
+              className="mb-12 scroll-mt-24"
             >
+              <div ref={step3Ref} />
               <StepBadge n={3} label="Voeg extras toe (optioneel)" active={true} />
               <div className="grid md:grid-cols-3 gap-6 md:gap-8">
                 {[
