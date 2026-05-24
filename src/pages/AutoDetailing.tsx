@@ -9,7 +9,6 @@ import Footer from "@/components/Footer";
 import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
 import DetailingConfigurator from "@/components/DetailingConfigurator";
-import detailingImg from "@/assets/detailing.jpg";
 import polishImg from "@/assets/detailing/polish.webp";
 import foamWashImg from "@/assets/detailing/foam-wash.webp";
 import foamFrontImg from "@/assets/detailing/foam-front.webp";
@@ -79,7 +78,7 @@ const AutoDetailing = () => {
       <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${detailingImg})` }}
+          style={{ backgroundImage: `url(${polishImg})` }}
         >
           <div className="absolute inset-0 bg-background/80" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
