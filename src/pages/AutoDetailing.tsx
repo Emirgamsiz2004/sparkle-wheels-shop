@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
+import DetailingConfigurator from "@/components/DetailingConfigurator";
 import detailingImg from "@/assets/detailing.jpg";
 
 const diensten = [
