@@ -295,8 +295,9 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="mb-12"
+              className="mb-12 scroll-mt-24"
             >
+              <div ref={step2Ref} />
               <StepBadge n={2} label="Kies uw pakket" active={true} />
               <div className="grid md:grid-cols-3 gap-4 md:gap-5">
                 {packages.map((p) => {
