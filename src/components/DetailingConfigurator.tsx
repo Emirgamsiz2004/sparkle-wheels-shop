@@ -314,10 +314,17 @@ const DetailingConfigurator = () => {
                   { title: "Polijsten & Coating", items: extrasPolijst },
                 ].map((col) => (
                   <div key={col.title} className="border border-border bg-card p-5 md:p-6">
-                    <p className="text-[10px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground mb-4">
+                    <p className="text-[10px] tracking-[0.3em] uppercase font-body font-medium text-muted-foreground mb-2">
                       {col.title}
                     </p>
-                    <div className="space-y-3">
+                    {col.title === "Polijsten & Coating" && (
+                      <p className="text-[11px] font-body text-amber-400/90 leading-snug mb-4">
+                        Let op: polijsten vereist een gewassen auto. We voegen
+                        automatisch een buitenkant-reiniging toe als die nog
+                        niet is gekozen.
+                      </p>
+                    )}
+                    <div className="space-y-3 mt-3">
                       {col.items.map((e) => {
                         const checked = selectedExtras.includes(e.key);
                         return (
