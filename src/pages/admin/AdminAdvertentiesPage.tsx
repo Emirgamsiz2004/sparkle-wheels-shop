@@ -465,7 +465,19 @@ const AdminAdvertentiesPage = () => {
                 {/* ADVERTENTIETEKST */}
                 <Card className="overflow-hidden">
                   <div className="px-4 py-2.5 flex items-center justify-between bg-gray-800">
-                    <span className="text-white font-bold text-xs uppercase tracking-wider">Advertentietekst</span>
+                    <div className="flex items-center">
+                      <span className="text-white font-bold text-xs uppercase tracking-wider">Advertentietekst</span>
+                      <InfoButton title="Opbouw van de advertentietekst">
+                        <p>Een goede advertentietekst bouwt vertrouwen op en beantwoordt de vragen die een koper al heeft voordat die ze stelt.</p>
+                        <ul className="list-disc pl-4 space-y-1.5">
+                          <li><strong>Beschrijving:</strong> vertel het verhaal van de auto — hoe komt het aan, hoe is het onderhouden, waarom wordt het verkocht.</li>
+                          <li><strong>Specificaties:</strong> presenteer feiten gestructureerd (tabelvorm). Kopers scannen graag naar de kenmerken die hen interesseren.</li>
+                          <li><strong>Prijs:</strong> wees transparant. Vermeld "vraagprijs" of "bieden vanaf" duidelijk.</li>
+                          <li><strong>Contact:</strong> geef meerdere opties (bellen, WhatsApp, e-mail) en vermeld openingstijden.</li>
+                          <li><strong>Extra:</strong> vermeld garantie, inruilmogelijkheid of financiering als die beschikbaar zijn.</li>
+                        </ul>
+                      </InfoButton>
+                    </div>
                     <button onClick={() => {
                       const adText = [
                         parsed.beschrijving,
