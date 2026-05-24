@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -164,6 +164,29 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   const [pkg, setPkg] = useState<PackageKey | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [autoUpgraded, setAutoUpgraded] = useState(false);
+  const step2Ref = useRef<HTMLDivElement>(null);
+  const step3Ref = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll naar volgend blok op desktop (>=768px)
+  useEffect(() => {
+    if (!vehicle) return;
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+    const t = setTimeout(() => {
+      step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [vehicle]);
+
+  useEffect(() => {
+    if (!vehicle || !pkg) return;
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+    const t = setTimeout(() => {
+      step3Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [pkg, vehicle]);
 
   const toggleExtra = (key: string) => {
     setSelectedExtras((s) => {
@@ -272,8 +295,9 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="mb-12"
+              className="mb-12 scroll-mt-24"
             >
+              <div ref={step2Ref} />
               <StepBadge n={2} label="Kies uw pakket" active={true} />
               <div className="grid md:grid-cols-3 gap-4 md:gap-5">
                 {packages.map((p) => {
@@ -331,8 +355,9 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="mb-12"
+              className="mb-12 scroll-mt-24"
             >
+              <div ref={step3Ref} />
               <StepBadge n={3} label="Voeg extras toe (optioneel)" active={true} />
               <div className="grid md:grid-cols-3 gap-6 md:gap-8">
                 {[
