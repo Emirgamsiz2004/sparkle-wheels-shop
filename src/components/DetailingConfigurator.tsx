@@ -256,7 +256,10 @@ const DetailingConfigurator = () => {
                     <button
                       key={p.key}
                       type="button"
-                      onClick={() => setPkg(p.key)}
+                      onClick={() => {
+                        setPkg(p.key);
+                        setAutoUpgraded(false);
+                      }}
                       className={`relative text-left p-6 md:p-7 transition-all duration-300 border flex flex-col ${
                         isSel
                           ? "border-amber-400 bg-amber-400/5 shadow-[0_0_0_1px_hsl(45_93%_55%/0.4)]"
@@ -268,9 +271,12 @@ const DetailingConfigurator = () => {
                           {p.badge}
                         </span>
                       )}
-                      <h4 className="text-lg font-display font-semibold text-foreground mb-2">
+                      <h4 className="text-lg font-display font-semibold text-foreground mb-1">
                         {p.title}
                       </h4>
+                      <p className="text-xs font-body text-muted-foreground mb-4">
+                        {p.subtitle}
+                      </p>
                       <p className="text-3xl md:text-4xl font-display font-bold text-foreground mb-5">
                         €{price}
                       </p>
