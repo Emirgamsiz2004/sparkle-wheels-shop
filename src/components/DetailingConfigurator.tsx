@@ -142,7 +142,7 @@ const StepBadge = ({ n, label, active }: { n: number; label: string; active: boo
 
 const polishKeys = new Set(extrasPolijst.map((e) => e.key));
 
-const DetailingConfigurator = () => {
+const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => {
   const [vehicle, setVehicle] = useState<VehicleKey | null>(null);
   const [pkg, setPkg] = useState<PackageKey | null>(null);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
@@ -180,8 +180,8 @@ const DetailingConfigurator = () => {
     .filter(Boolean) as Extra[];
 
   return (
-    <section id="configurator" className="py-16 md:py-28 bg-background scroll-mt-24">
-      <div className="container mx-auto px-6 lg:px-16">
+    <section id="configurator" className={embedded ? "py-10 md:py-12 bg-background scroll-mt-24" : "py-16 md:py-28 bg-background scroll-mt-24"}>
+      <div className={embedded ? "px-6 md:px-12 lg:px-16" : "container mx-auto px-6 lg:px-16"}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
