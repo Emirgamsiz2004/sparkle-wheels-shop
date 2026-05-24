@@ -91,34 +91,74 @@ const FinancieringSection = () => {
               <Calculator className="w-6 h-6 text-foreground" />
               <div>
                 <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-1">
-                  Voorbeeldberekening
+                  Lease-calculator
                 </p>
                 <p className="text-sm font-display font-semibold text-foreground">
-                  Auto van € 25.000
+                  Bereken uw maandbedrag
                 </p>
               </div>
             </div>
 
-            <div className="space-y-3 mb-7">
-              {[
-                { label: "Aanbetaling (10%)", value: "€ 2.500" },
-                { label: "Leasebedrag", value: "€ 22.500" },
-                { label: "Looptijd", value: "72 mnd" },
-                { label: "Rente", value: "7,9% vast" },
-              ].map((row) => (
-                <div key={row.label} className="flex justify-between text-xs font-body">
-                  <span className="text-muted-foreground">{row.label}</span>
-                  <span className="text-foreground font-medium">{row.value}</span>
+            <div className="space-y-6 mb-7">
+              <div>
+                <div className="flex justify-between items-baseline mb-2">
+                  <label className="text-xs font-body text-muted-foreground">Aankoopprijs</label>
+                  <span className="text-sm font-display font-semibold text-foreground">{formatEuro(prijs)}</span>
                 </div>
-              ))}
+                <Slider
+                  value={[prijs]}
+                  onValueChange={(v) => setPrijs(v[0])}
+                  min={5000}
+                  max={75000}
+                  step={500}
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-baseline mb-2">
+                  <label className="text-xs font-body text-muted-foreground">Aanbetaling</label>
+                  <span className="text-sm font-display font-semibold text-foreground">
+                    {aanbetalingPct}% · {formatEuro(aanbetaling)}
+                  </span>
+                </div>
+                <Slider
+                  value={[aanbetalingPct]}
+                  onValueChange={(v) => setAanbetalingPct(v[0])}
+                  min={0}
+                  max={50}
+                  step={5}
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-baseline mb-2">
+                  <label className="text-xs font-body text-muted-foreground">Looptijd</label>
+                  <span className="text-sm font-display font-semibold text-foreground">{looptijd} mnd</span>
+                </div>
+                <Slider
+                  value={[looptijd]}
+                  onValueChange={(v) => setLooptijd(v[0])}
+                  min={12}
+                  max={84}
+                  step={12}
+                />
+              </div>
+
+              <div className="flex justify-between text-xs font-body pt-1">
+                <span className="text-muted-foreground">Leasebedrag · Rente</span>
+                <span className="text-foreground font-medium">
+                  {formatEuro(leasebedrag)} · {(LEASE_DEFAULTS.rente * 100).toFixed(1).replace(".", ",")}% vast
+                </span>
+              </div>
             </div>
 
             <div className="bg-card p-5 border border-border mb-5">
               <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
                 Maandbedrag
               </p>
-              <p className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                € 393<span className="text-base font-body font-normal text-muted-foreground"> /mnd</span>
+              <p className="font-display text-3xl md:text-4xl font-bold text-foreground transition-all">
+                {formatEuro(maandbedrag)}
+                <span className="text-base font-body font-normal text-muted-foreground"> /mnd</span>
               </p>
             </div>
 
