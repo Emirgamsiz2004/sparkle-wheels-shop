@@ -119,16 +119,16 @@ const DetailingBookingDialog = ({
       .then(({ data }) => setBookings((data as any) || []));
   }, [open]);
 
-  // Reset starttijd als de datum verandert
-  useEffect(() => { setStartMin(null); }, [date]);
-
   const dayBookings = useMemo(() => {
     if (!date) return [];
     const d = format(date, "yyyy-MM-dd");
     return bookings.filter((b) => b.datum === d);
   }, [bookings, date]);
 
-  // Bereken beschikbare tijdsloten
+  // Inlever-tijdsloten: elke 30 min binnen openingstijden.
+  // We blokkeren alleen het inlever-window (30 min) zelf, niet de hele werktijd —
+  // klanten leveren de auto in en halen 'm later (of de volgende dag) op.
+  const DROPOFF_WINDOW = 30;
   const slots = useMemo(() => {
     if (!date) return [];
     const dow = date.getDay();
@@ -136,24 +136,29 @@ const DetailingBookingDialog = ({
     if (!hours) return [];
 
     const result: { min: number; label: string; available: boolean }[] = [];
-    for (let s = hours.open; s + totalMinuten <= hours.close; s += SLOT_STEP) {
-      const slotEnd = s + totalMinuten;
-      // Overlap check
+    // Laatste inlevermoment = 1 uur voor sluit, zodat er nog ingenomen kan worden
+    const lastDropoff = hours.close - 60;
+    for (let s = hours.open; s <= lastDropoff; s += SLOT_STEP) {
       const overlap = dayBookings.some((b) => {
         const bs = timeToMin(b.starttijd);
-        const be = timeToMin(b.eindtijd);
-        return s < be && slotEnd > bs;
+        return Math.abs(bs - s) < DROPOFF_WINDOW;
       });
-      // Niet in het verleden
       let inPast = false;
       if (isSameDay(date, new Date())) {
         const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
-        if (s <= nowMin) inPast = true;
+        if (s <= nowMin + 30) inPast = true; // minimaal 30 min vooruit boeken
       }
       result.push({ min: s, label: minToTime(s), available: !overlap && !inPast });
     }
     return result;
-  }, [date, dayBookings, totalMinuten]);
+  }, [date, dayBookings]);
+
+  // Suggereer automatisch het eerste beschikbare slot
+  useEffect(() => {
+    if (!date) { setStartMin(null); return; }
+    const first = slots.find((s) => s.available);
+    setStartMin(first ? first.min : null);
+  }, [date, slots]);
 
   const validateCustomer = () => {
     const result = customerSchema.safeParse(form);
