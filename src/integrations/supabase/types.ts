@@ -557,6 +557,60 @@ export type Database = {
           },
         ]
       }
+      bookings: {
+        Row: {
+          aangemaakt_op: string
+          datum: string
+          eindtijd: string
+          email: string
+          extras: string[]
+          id: string
+          naam: string
+          opmerking: string | null
+          pakket: string
+          starttijd: string
+          status: string
+          telefoon: string
+          totaal_minuten: number
+          totaal_prijs: number
+          voertuig_type: string
+        }
+        Insert: {
+          aangemaakt_op?: string
+          datum: string
+          eindtijd: string
+          email: string
+          extras?: string[]
+          id?: string
+          naam: string
+          opmerking?: string | null
+          pakket: string
+          starttijd: string
+          status?: string
+          telefoon: string
+          totaal_minuten?: number
+          totaal_prijs?: number
+          voertuig_type: string
+        }
+        Update: {
+          aangemaakt_op?: string
+          datum?: string
+          eindtijd?: string
+          email?: string
+          extras?: string[]
+          id?: string
+          naam?: string
+          opmerking?: string | null
+          pakket?: string
+          starttijd?: string
+          status?: string
+          telefoon?: string
+          totaal_minuten?: number
+          totaal_prijs?: number
+          voertuig_type?: string
+        }
+        Relationships: []
+      }
       consignatie_aanmeldingen: {
         Row: {
           apk_geldig: boolean | null
