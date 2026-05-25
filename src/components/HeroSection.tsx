@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -94,16 +94,37 @@ const HeroSection = () => {
           Platin Automotive
         </motion.p>
 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="inline-flex items-center gap-2 bg-accent/10 border border-accent/20 px-4 py-2 mb-6"
+        >
+          <MapPin className="w-3 h-3 text-accent" />
+          <span className="text-[10px] md:text-xs font-body font-medium tracking-wider uppercase text-accent">
+            Direct aan de A4 · Roelofarendsveen
+          </span>
+        </motion.div>
+
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-extrabold leading-[0.95] mb-12 text-foreground tracking-tight"
+          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-extrabold leading-[0.95] mb-6 text-foreground tracking-tight"
         >
           Occasions kopen
           <br />
           & verkopen
         </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="text-xs md:text-sm font-body text-foreground/50 mb-8 max-w-md"
+        >
+          Snel en eenvoudig bereikbaar vanaf de A4. Kom langs voor eerlijke prijzen, persoonlijk advies en een betrouwd aanbod.
+        </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
