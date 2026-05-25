@@ -58,6 +58,21 @@ const prices: Record<PackageKey, Record<VehicleKey, number>> = {
   },
 };
 
+const durations: Record<PackageKey, Record<VehicleKey, number>> = {
+  binnen: {
+    kleine: 60, grote: 75, suv: 90, pickup: 90,
+    bestelauto: 75, bestelbus: 90, caravan: 120, vrachtwagen: 120,
+  },
+  buiten: {
+    kleine: 70, grote: 80, suv: 90, pickup: 100,
+    bestelauto: 80, bestelbus: 90, caravan: 150, vrachtwagen: 150,
+  },
+  compleet: {
+    kleine: 130, grote: 155, suv: 180, pickup: 190,
+    bestelauto: 155, bestelbus: 180, caravan: 270, vrachtwagen: 270,
+  },
+};
+
 const packages: {
   key: PackageKey;
   title: string;
@@ -101,33 +116,33 @@ const packages: {
   },
 ];
 
-type Extra = { key: string; label: string; price: number; info?: string };
+type Extra = { key: string; label: string; price: number; duur: number; info?: string };
 
 const extrasInterieur: Extra[] = [
-  { key: "vlek-std", label: "Vlekverwijdering standaard", price: 55, info: "Verwijdering van lichte vlekken uit bekleding en tapijt. Geschikt voor recente vlekken zoals koffie, frisdrank of modder. Resultaat afhankelijk van vlektype en duur." },
-  { key: "vlek-uitg", label: "Vlekverwijdering uitgebreid", price: 110, info: "Intensieve behandeling voor hardnekkige, oudere of diep ingetrokken vlekken. We gebruiken professionele extractiemethoden en speciale reinigingsmiddelen voor het beste resultaat." },
-  { key: "schimmel", label: "Schimmelreiniging", price: 65, info: "Grondige verwijdering van schimmelsporen in het interieur. Essentieel bij vochtoverlast of lang stilgestaan voertuigen. Inclusief desinfectie van het ventilatiesysteem." },
-  { key: "geur", label: "Geurbehandeling", price: 69, info: "Neutralisatie van ongewenste geuren door ozon- of enzymbehandeling. Effectief tegen huisdiergeuren, rookresten en voedselgeuren. Laat uw auto weer fris ruiken." },
-  { key: "rook", label: "Rookgeur verwijderen", price: 120, info: "Specialistische behandeling voor rook- en nicotinegeur. Bevat dieptereiniging van alle stoffen oppervlakken plus ozonbehandeling om geurmoleculen te neutraliseren." },
-  { key: "leer", label: "Leerbehandeling", price: 69, info: "Reiniging, voeding en bescherming van lederen bekleding. Voorkomt uitdroging en scheuren. Geeft het leer een zachte, matte finish terug zonder glans." },
-  { key: "honden", label: "Hondenharen verwijderen", price: 45, info: "Complete verwijdering van honden- en kattenharen uit alle interieurdelen. We gebruiken speciale borstels en extractietechnieken zelfs uit de kleinste hoekjes." },
-  { key: "hemel", label: "Hemel reinigen", price: 65, info: "Voorzichtige reiniging van de hemelbekleding. Verwijdert vlekken, nicotine-aanslag en stof zonder het materiaal te beschadigen of los te laten." },
-  { key: "braak", label: "Braaksel/ontlasting reinigen", price: 65, info: "Hygiënische en grondige reiniging na braaksel, urine of ontlasting. Inclusief desinfectie en geurverwijdering. Uitermate geschikt voor ouders en dierenbezitters." },
-  { key: "kinderzitje", label: "Kinderzitje reinigen", price: 18, info: "Reiniging van stoffen en kunststof onderdelen van het kinderzitje. Verwijdert kruimels, vlekken en bacteriën voor een veilig en schoon zitje voor uw kind." },
+  { key: "vlek-std", label: "Vlekverwijdering standaard", price: 55, duur: 40, info: "Verwijdering van lichte vlekken uit bekleding en tapijt. Geschikt voor recente vlekken zoals koffie, frisdrank of modder. Resultaat afhankelijk van vlektype en duur." },
+  { key: "vlek-uitg", label: "Vlekverwijdering uitgebreid", price: 110, duur: 80, info: "Intensieve behandeling voor hardnekkige, oudere of diep ingetrokken vlekken. We gebruiken professionele extractiemethoden en speciale reinigingsmiddelen voor het beste resultaat." },
+  { key: "schimmel", label: "Schimmelreiniging", price: 65, duur: 40, info: "Grondige verwijdering van schimmelsporen in het interieur. Essentieel bij vochtoverlast of lang stilgestaan voertuigen. Inclusief desinfectie van het ventilatiesysteem." },
+  { key: "geur", label: "Geurbehandeling", price: 69, duur: 20, info: "Neutralisatie van ongewenste geuren door ozon- of enzymbehandeling. Effectief tegen huisdiergeuren, rookresten en voedselgeuren. Laat uw auto weer fris ruiken." },
+  { key: "rook", label: "Rookgeur verwijderen", price: 120, duur: 80, info: "Specialistische behandeling voor rook- en nicotinegeur. Bevat dieptereiniging van alle stoffen oppervlakken plus ozonbehandeling om geurmoleculen te neutraliseren." },
+  { key: "leer", label: "Leerbehandeling", price: 69, duur: 45, info: "Reiniging, voeding en bescherming van lederen bekleding. Voorkomt uitdroging en scheuren. Geeft het leer een zachte, matte finish terug zonder glans." },
+  { key: "honden", label: "Hondenharen verwijderen", price: 45, duur: 30, info: "Complete verwijdering van honden- en kattenharen uit alle interieurdelen. We gebruiken speciale borstels en extractietechnieken zelfs uit de kleinste hoekjes." },
+  { key: "hemel", label: "Hemel reinigen", price: 65, duur: 40, info: "Voorzichtige reiniging van de hemelbekleding. Verwijdert vlekken, nicotine-aanslag en stof zonder het materiaal te beschadigen of los te laten." },
+  { key: "braak", label: "Braaksel/ontlasting reinigen", price: 65, duur: 40, info: "Hygiënische en grondige reiniging na braaksel, urine of ontlasting. Inclusief desinfectie en geurverwijdering. Uitermate geschikt voor ouders en dierenbezitters." },
+  { key: "kinderzitje", label: "Kinderzitje reinigen", price: 18, duur: 10, info: "Reiniging van stoffen en kunststof onderdelen van het kinderzitje. Verwijdert kruimels, vlekken en bacteriën voor een veilig en schoon zitje voor uw kind." },
 ];
 
 const extrasExterieur: Extra[] = [
-  { key: "motor", label: "Motorruimte reinigen", price: 35, info: "Voorzichtige reiniging van de motorruimte met ontvetter en beschermende coating. Maakt technische inspecties makkelijker en helpt corrosie te voorkomen." },
-  { key: "dak", label: "Dak reinigen en waxen", price: 89, info: "Dieptereiniging en bescherming van cabriodaken, panoramadaken en reguliere daken. Verwijdert mos, vuil en aanslag. Afsluitend met waterafstotende wax." },
-  { key: "koplamp", label: "Koplampen polijsten", price: 55, info: "Polijsten van vergeelde of mat geworden koplampen. Herstelt de helderheid en lichtopbrengst voor betere zichtbaarheid en een frissere uitstraling." },
+  { key: "motor", label: "Motorruimte reinigen", price: 35, duur: 25, info: "Voorzichtige reiniging van de motorruimte met ontvetter en beschermende coating. Maakt technische inspecties makkelijker en helpt corrosie te voorkomen." },
+  { key: "dak", label: "Dak reinigen en waxen", price: 89, duur: 60, info: "Dieptereiniging en bescherming van cabriodaken, panoramadaken en reguliere daken. Verwijdert mos, vuil en aanslag. Afsluitend met waterafstotende wax." },
+  { key: "koplamp", label: "Koplampen polijsten", price: 55, duur: 30, info: "Polijsten van vergeelde of mat geworden koplampen. Herstelt de helderheid en lichtopbrengst voor betere zichtbaarheid en een frissere uitstraling." },
 ];
 
 const extrasPolijst: Extra[] = [
-  { key: "pol-onderdeel", label: "Polijsten per onderdeel", price: 55, info: "Lokaal polijsten van één onderdeel zoals een deur, motorkap of bumper. Geschikt voor lichte krassen, wervels of matte plekken op een specifiek paneel." },
-  { key: "pol-1", label: "Polijsten gehele auto (1 staps)", price: 329, info: "Eenstaps polijstbehandeling van de gehele auto. Verwijdert lichte wervels en krassen en geeft de lak een diepe glans terug. Inclusief voor- en nabehandeling." },
-  { key: "pol-2", label: "Polijsten gehele auto (2 staps)", price: 499, info: "Tweestaps polijstbehandeling voor het beste resultaat. Eerst grof corrigeren, daarna fijn polijsten voor een spiegelgladde finish zonder holograms of wervels." },
-  { key: "klei", label: "Kleien + polijsten", price: 499, info: "Combinatie van klei-behandeling en polijsten. Eerst worden vervuiling en teer met klei verwijderd, daarna wordt de lak gecorrigeerd en gepolijst voor optimaal resultaat." },
-  { key: "keramiek", label: "Keramische coating", price: 549, info: "Professionele aanbrenging van een keramische coating. Biedt jarenlange bescherming tegen UV, chemicaliën en vuil. Extreem hydrofoob effect en diepe, langdurige glans." },
+  { key: "pol-onderdeel", label: "Polijsten per onderdeel", price: 55, duur: 30, info: "Lokaal polijsten van één onderdeel zoals een deur, motorkap of bumper. Geschikt voor lichte krassen, wervels of matte plekken op een specifiek paneel." },
+  { key: "pol-1", label: "Polijsten gehele auto (1 staps)", price: 329, duur: 210, info: "Eenstaps polijstbehandeling van de gehele auto. Verwijdert lichte wervels en krassen en geeft de lak een diepe glans terug. Inclusief voor- en nabehandeling." },
+  { key: "pol-2", label: "Polijsten gehele auto (2 staps)", price: 499, duur: 330, info: "Tweestaps polijstbehandeling voor het beste resultaat. Eerst grof corrigeren, daarna fijn polijsten voor een spiegelgladde finish zonder holograms of wervels." },
+  { key: "klei", label: "Kleien + polijsten", price: 499, duur: 330, info: "Combinatie van klei-behandeling en polijsten. Eerst worden vervuiling en teer met klei verwijderd, daarna wordt de lak gecorrigeerd en gepolijst voor optimaal resultaat." },
+  { key: "keramiek", label: "Keramische coating", price: 549, duur: 150, info: "Professionele aanbrenging van een keramische coating. Biedt jarenlange bescherming tegen UV, chemicaliën en vuil. Extreem hydrofoob effect en diepe, langdurige glans." },
 ];
 
 const allExtras = [...extrasInterieur, ...extrasExterieur, ...extrasPolijst];
@@ -214,6 +229,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   };
 
   const basePrice = vehicle && pkg ? prices[pkg][vehicle] : 0;
+  const baseDuur = vehicle && pkg ? durations[pkg][vehicle] : 0;
   const extrasTotal = useMemo(
     () =>
       selectedExtras.reduce((sum, key) => {
@@ -222,7 +238,16 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
       }, 0),
     [selectedExtras],
   );
+  const extrasDuur = useMemo(
+    () =>
+      selectedExtras.reduce((sum, key) => {
+        const e = allExtras.find((x) => x.key === key);
+        return sum + (e?.duur ?? 0);
+      }, 0),
+    [selectedExtras],
+  );
   const total = basePrice + extrasTotal;
+  const totalMinuten = baseDuur + extrasDuur;
 
   const selectedVehicle = vehicles.find((v) => v.key === vehicle);
   const selectedPackage = packages.find((p) => p.key === pkg);
@@ -522,12 +547,15 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
           open={bookingOpen}
           onOpenChange={setBookingOpen}
           summary={`${selectedPackage.title} — ${selectedVehicle.label}`}
+          voertuigType={selectedVehicle.label}
+          pakket={selectedPackage.title}
+          extras={selectedExtraObjs.map((e) => e.label)}
           diensten={[
             `${selectedPackage.title} (${selectedVehicle.label}) — €${basePrice}`,
             ...selectedExtraObjs.map((e) => `${e.label} — €${e.price}`),
           ]}
           totalPrice={total}
-          geschatteDuur={pkg === "compleet" ? 240 : 150}
+          totalMinuten={totalMinuten}
         />
       )}
     </section>
