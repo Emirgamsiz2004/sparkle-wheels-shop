@@ -229,6 +229,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   };
 
   const basePrice = vehicle && pkg ? prices[pkg][vehicle] : 0;
+  const baseDuur = vehicle && pkg ? durations[pkg][vehicle] : 0;
   const extrasTotal = useMemo(
     () =>
       selectedExtras.reduce((sum, key) => {
@@ -237,7 +238,16 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
       }, 0),
     [selectedExtras],
   );
+  const extrasDuur = useMemo(
+    () =>
+      selectedExtras.reduce((sum, key) => {
+        const e = allExtras.find((x) => x.key === key);
+        return sum + (e?.duur ?? 0);
+      }, 0),
+    [selectedExtras],
+  );
   const total = basePrice + extrasTotal;
+  const totalMinuten = baseDuur + extrasDuur;
 
   const selectedVehicle = vehicles.find((v) => v.key === vehicle);
   const selectedPackage = packages.find((p) => p.key === pkg);
