@@ -394,15 +394,15 @@ const DetailingBookingDialog = ({
                   </div>
                 </div>
                 <div>
-                  <Label>Tijdslot</Label>
+                  <Label>Inlevertijd</Label>
                   {!date && <p className="text-white/40 text-sm py-4">Kies eerst een datum.</p>}
                   {date && (
                     <>
                       <p className="text-xs text-white/55 mb-3">
-                        Verwachte duur: <span className="text-amber-400 font-medium">{fmtMin(totalMinuten)}</span>
+                        Werkduur: <span className="text-amber-400 font-medium">{fmtMin(totalMinuten)}</span> · ophalen in overleg (vaak dezelfde dag, anders de dag erna)
                       </p>
                       {slots.length === 0 ? (
-                        <p className="text-white/50 text-sm py-2">Geen tijden beschikbaar op deze dag voor de gekozen duur.</p>
+                        <p className="text-white/50 text-sm py-2">Geen tijden beschikbaar op deze dag.</p>
                       ) : (
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[300px] overflow-y-auto pr-1">
                           {slots.map((s) => {
