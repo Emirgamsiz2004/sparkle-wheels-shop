@@ -547,12 +547,15 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
           open={bookingOpen}
           onOpenChange={setBookingOpen}
           summary={`${selectedPackage.title} — ${selectedVehicle.label}`}
+          voertuigType={selectedVehicle.label}
+          pakket={selectedPackage.title}
+          extras={selectedExtraObjs.map((e) => e.label)}
           diensten={[
             `${selectedPackage.title} (${selectedVehicle.label}) — €${basePrice}`,
             ...selectedExtraObjs.map((e) => `${e.label} — €${e.price}`),
           ]}
           totalPrice={total}
-          geschatteDuur={pkg === "compleet" ? 240 : 150}
+          totalMinuten={totalMinuten}
         />
       )}
     </section>
