@@ -58,6 +58,21 @@ const prices: Record<PackageKey, Record<VehicleKey, number>> = {
   },
 };
 
+const durations: Record<PackageKey, Record<VehicleKey, number>> = {
+  binnen: {
+    kleine: 60, grote: 75, suv: 90, pickup: 90,
+    bestelauto: 75, bestelbus: 90, caravan: 120, vrachtwagen: 120,
+  },
+  buiten: {
+    kleine: 70, grote: 80, suv: 90, pickup: 100,
+    bestelauto: 80, bestelbus: 90, caravan: 150, vrachtwagen: 150,
+  },
+  compleet: {
+    kleine: 130, grote: 155, suv: 180, pickup: 190,
+    bestelauto: 155, bestelbus: 180, caravan: 270, vrachtwagen: 270,
+  },
+};
+
 const packages: {
   key: PackageKey;
   title: string;
