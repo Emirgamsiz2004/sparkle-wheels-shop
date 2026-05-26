@@ -23,8 +23,8 @@ const FacebookIcon = ({ className }: { className?: string }) => (
 
 // Opening hours schedule (Google Maps)
 const SCHEDULE: { open: number; close: number }[] = [
-  { open: -1, close: -1 },     // Zo: Gesloten
-  { open: 540, close: 1080 },  // Ma: 09:00–18:00
+  { open: 600, close: 1020 },  // Zo: 10:00–17:00
+  { open: 720, close: 1080 },  // Ma: 12:00–18:00
   { open: 540, close: 1080 },  // Di: 09:00–18:00
   { open: 540, close: 1080 },  // Wo: 09:00–18:00
   { open: 540, close: 1080 },  // Do: 09:00–18:00
