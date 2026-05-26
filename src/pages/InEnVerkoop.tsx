@@ -216,7 +216,8 @@ const InEnVerkoop = () => {
                   { label: "Adres", value: "Cilinderweg 99, 2371 DZ Roelofarendsveen" },
                   { label: "Telefoon", value: "06-12693825" },
                   { label: "E-mail", value: "info@platinautomotive.nl" },
-                  { label: "Ma t/m Vr", value: "09:00 - 18:00" },
+                  { label: "Maandag", value: "12:00 - 18:00" },
+                  { label: "Di t/m Vr", value: "09:00 - 18:00" },
                   { label: "Za & Zo", value: "10:00 - 17:00" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between py-3.5 border-b border-border last:border-0">
