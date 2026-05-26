@@ -45,24 +45,22 @@ const ProefritFormulier = () => {
   useEffect(() => {
     const fetchTestDrive = async () => {
       if (!token) { setError("Ongeldige link"); setLoading(false); return; }
-      
-      const { data, error: err } = await supabase
-        .from("test_drives")
-        .select("*")
-        .eq("token", token)
-        .single();
 
-      if (err || !data) {
+      const { data, error: err } = await (supabase.rpc as any)("get_test_drive_by_token", { p_token: token });
+
+      const row = Array.isArray(data) ? data[0] : data;
+
+      if (err || !row) {
         setError("Proefrit niet gevonden of link is verlopen");
         setLoading(false);
         return;
       }
 
-      if (data.formulier_ingevuld_op) {
+      if (row.formulier_ingevuld_op) {
         setSubmitted(true);
       }
 
-      setTestDrive(data);
+      setTestDrive(row);
       setLoading(false);
     };
 
