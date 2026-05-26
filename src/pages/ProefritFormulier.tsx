@@ -151,66 +151,6 @@ const ProefritFormulier = () => {
 
       const sanitizedRijbewijs = sanitizeRijbewijs(rijbewijsnummer);
 
-      // Upsert customer
-      const { data: existingCustomer } = await supabase
-        .from("test_drive_customers")
-        .select("id")
-        .eq("email", email)
-        .maybeSingle();
-
-      let customerId: string;
-
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
-        await supabase.from("test_drive_customers").update({
-          voornaam, achternaam, telefoon, adres: adres || null,
-          postcode: postcode || null, plaats: plaats || null,
-          geboortedatum: geboortedatum || null,
-          rijbewijsnummer: sanitizedRijbewijs, rijbewijscategorie,
-          rijbewijs_foto_path: filePath,
-        } as any).eq("id", customerId);
-      } else {
-        const { data: newCust, error: custErr } = await supabase
-          .from("test_drive_customers").insert({
-            voornaam, achternaam, email, telefoon,
-            adres: adres || null,
-            postcode: postcode || null, plaats: plaats || null,
-            geboortedatum: geboortedatum || null,
-            rijbewijsnummer: sanitizedRijbewijs, rijbewijscategorie,
-            rijbewijs_foto_path: filePath,
-          } as any).select().single();
-        if (custErr) throw custErr;
-        customerId = newCust.id;
-      }
-
-      // Auto-create/update customer in CRM customers table
-      try {
-        const { data: existingCrm } = await supabase
-          .from("customers")
-          .select("id")
-          .eq("email", email)
-          .maybeSingle();
-
-        if (existingCrm) {
-          await supabase.from("customers").update({
-            voornaam, achternaam, telefoon,
-            adres: adres || null, postcode: postcode || null, plaats: plaats || null,
-            geboortedatum: geboortedatum || null,
-            laatste_contact: new Date().toISOString(),
-          } as any).eq("id", existingCrm.id);
-        } else {
-          await supabase.from("customers").insert({
-            voornaam, achternaam, email, telefoon,
-            adres: adres || null, postcode: postcode || null, plaats: plaats || null,
-            geboortedatum: geboortedatum || null,
-            status: "prospect",
-            laatste_contact: new Date().toISOString(),
-          } as any);
-        }
-      } catch (crmErr) {
-        console.error("CRM customer sync error:", crmErr);
-      }
-
       // Get signature data
       const signatureData = sigPadRef.current.toDataURL();
 
@@ -222,19 +162,26 @@ const ProefritFormulier = () => {
         clientIp = ipData.ip || "";
       } catch { clientIp = "onbekend"; }
 
-      // Update test drive
-      const nowIso = new Date().toISOString();
-      const { error: tdErr } = await supabase.from("test_drives").update({
-        customer_id: customerId,
-        handtekening_data: signatureData,
-        opmerkingen_voor: opmerkingen || null,
-        formulier_ingevuld_op: nowIso,
-        vertrek_tijd: nowIso,
-        status: "actief",
-        ip_adres: clientIp,
-      } as any).eq("id", testDrive.id);
+      // Submit everything through a single secure RPC (token-scoped, server-side)
+      const { error: rpcErr } = await (supabase.rpc as any)("submit_proefrit_form", {
+        p_token: token,
+        p_voornaam: voornaam,
+        p_achternaam: achternaam,
+        p_email: email,
+        p_telefoon: telefoon,
+        p_adres: adres || null,
+        p_postcode: postcode || null,
+        p_plaats: plaats || null,
+        p_geboortedatum: geboortedatum || null,
+        p_rijbewijsnummer: sanitizedRijbewijs,
+        p_rijbewijscategorie: rijbewijscategorie,
+        p_rijbewijs_foto_path: filePath,
+        p_handtekening_data: signatureData,
+        p_opmerkingen: opmerkingen || null,
+        p_ip_adres: clientIp,
+      });
 
-      if (tdErr) throw tdErr;
+      if (rpcErr) throw rpcErr;
       setSubmitted(true);
     } catch (err: any) {
       console.error("Submit error:", err);
