@@ -298,8 +298,12 @@ const AutoDetailing = () => {
                 </p>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-body">
-                    <span className="text-muted-foreground">Ma t/m Vr</span>
-                    <span className="text-foreground">10:00 - 18:00</span>
+                    <span className="text-muted-foreground">Maandag</span>
+                    <span className="text-foreground">12:00 - 18:00</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-body">
+                    <span className="text-muted-foreground">Di t/m Vr</span>
+                    <span className="text-foreground">09:00 - 18:00</span>
                   </div>
                   <div className="flex justify-between text-sm font-body">
                     <span className="text-muted-foreground">Zaterdag</span>
@@ -307,7 +311,7 @@ const AutoDetailing = () => {
                   </div>
                   <div className="flex justify-between text-sm font-body">
                     <span className="text-muted-foreground">Zondag</span>
-                    <span className="text-foreground">Gesloten</span>
+                    <span className="text-foreground">10:00 - 17:00</span>
                   </div>
                 </div>
               </div>
