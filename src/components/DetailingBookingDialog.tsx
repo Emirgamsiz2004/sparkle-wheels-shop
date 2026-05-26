@@ -178,12 +178,8 @@ const DetailingBookingDialog = ({
       const starttijd = minToTime(startMin);
       const eindtijd = minToTime(startMin + totalMinuten);
 
-      // Re-check overlap (alleen inlever-window van 30 min)
-      const { data: latest } = await supabase
-        .from("bookings" as any)
-        .select("starttijd")
-        .eq("datum", datumStr)
-        .eq("status", "bevestigd");
+      // Re-check overlap (alleen inlever-window van 30 min) via secure RPC
+      const { data: latest } = await (supabase.rpc as any)("get_booked_slots", { p_date: datumStr });
       const conflict = (latest as any[] | null)?.some((b) => {
         const bs = timeToMin(b.starttijd);
         return Math.abs(bs - startMin) < 30;
@@ -191,10 +187,8 @@ const DetailingBookingDialog = ({
       if (conflict) {
         setErrors({ form: "Dit inlevermoment is zojuist geboekt. Kies een ander tijdstip." });
         setStartMin(null);
-        const { data } = await supabase
-          .from("bookings" as any).select("datum, starttijd, eindtijd")
-          .eq("status", "bevestigd").gte("datum", format(new Date(), "yyyy-MM-dd"));
-        setBookings((data as any) || []);
+        const { data } = await (supabase.rpc as any)("get_booked_slots", { p_date: datumStr });
+        setBookings(((data as any[]) || []).map((b: any) => ({ ...b, datum: datumStr })));
         setSubmitting(false);
         return;
       }
