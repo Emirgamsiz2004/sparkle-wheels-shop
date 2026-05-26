@@ -107,17 +107,15 @@ const DetailingBookingDialog = ({
     }
   }, [open]);
 
-  // Laad bestaande bookings vanaf vandaag
+  // Laad geboekte slots voor de geselecteerde datum (via secure RPC, alleen tijden — geen PII)
   useEffect(() => {
-    if (!open) return;
-    const today = format(new Date(), "yyyy-MM-dd");
-    supabase
-      .from("bookings" as any)
-      .select("datum, starttijd, eindtijd")
-      .eq("status", "bevestigd")
-      .gte("datum", today)
-      .then(({ data }) => setBookings((data as any) || []));
-  }, [open]);
+    if (!open || !date) { setBookings([]); return; }
+    const datumStr = format(date, "yyyy-MM-dd");
+    (supabase.rpc as any)("get_booked_slots", { p_date: datumStr })
+      .then(({ data }: { data: any }) => {
+        setBookings(((data as any[]) || []).map((b) => ({ ...b, datum: datumStr })));
+      });
+  }, [open, date]);
 
   const dayBookings = useMemo(() => {
     if (!date) return [];
