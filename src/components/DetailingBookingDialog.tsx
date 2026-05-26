@@ -107,17 +107,15 @@ const DetailingBookingDialog = ({
     }
   }, [open]);
 
-  // Laad bestaande bookings vanaf vandaag
+  // Laad geboekte slots voor de geselecteerde datum (via secure RPC, alleen tijden — geen PII)
   useEffect(() => {
-    if (!open) return;
-    const today = format(new Date(), "yyyy-MM-dd");
-    supabase
-      .from("bookings" as any)
-      .select("datum, starttijd, eindtijd")
-      .eq("status", "bevestigd")
-      .gte("datum", today)
-      .then(({ data }) => setBookings((data as any) || []));
-  }, [open]);
+    if (!open || !date) { setBookings([]); return; }
+    const datumStr = format(date, "yyyy-MM-dd");
+    (supabase.rpc as any)("get_booked_slots", { p_date: datumStr })
+      .then(({ data }: { data: any }) => {
+        setBookings(((data as any[]) || []).map((b) => ({ ...b, datum: datumStr })));
+      });
+  }, [open, date]);
 
   const dayBookings = useMemo(() => {
     if (!date) return [];
@@ -180,12 +178,8 @@ const DetailingBookingDialog = ({
       const starttijd = minToTime(startMin);
       const eindtijd = minToTime(startMin + totalMinuten);
 
-      // Re-check overlap (alleen inlever-window van 30 min)
-      const { data: latest } = await supabase
-        .from("bookings" as any)
-        .select("starttijd")
-        .eq("datum", datumStr)
-        .eq("status", "bevestigd");
+      // Re-check overlap (alleen inlever-window van 30 min) via secure RPC
+      const { data: latest } = await (supabase.rpc as any)("get_booked_slots", { p_date: datumStr });
       const conflict = (latest as any[] | null)?.some((b) => {
         const bs = timeToMin(b.starttijd);
         return Math.abs(bs - startMin) < 30;
@@ -193,10 +187,8 @@ const DetailingBookingDialog = ({
       if (conflict) {
         setErrors({ form: "Dit inlevermoment is zojuist geboekt. Kies een ander tijdstip." });
         setStartMin(null);
-        const { data } = await supabase
-          .from("bookings" as any).select("datum, starttijd, eindtijd")
-          .eq("status", "bevestigd").gte("datum", format(new Date(), "yyyy-MM-dd"));
-        setBookings((data as any) || []);
+        const { data } = await (supabase.rpc as any)("get_booked_slots", { p_date: datumStr });
+        setBookings(((data as any[]) || []).map((b: any) => ({ ...b, datum: datumStr })));
         setSubmitting(false);
         return;
       }

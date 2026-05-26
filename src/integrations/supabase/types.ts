@@ -3083,6 +3083,53 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_booked_slots: {
+        Args: { p_date: string }
+        Returns: {
+          eindtijd: string
+          starttijd: string
+        }[]
+      }
+      get_test_drive_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          begeleidende_medewerker: string | null
+          created_at: string
+          customer_id: string | null
+          document_nummer: string | null
+          eind_tijd: string | null
+          email_verzonden_op: string | null
+          formulier_ingevuld_op: string | null
+          gereden_km: number | null
+          handtekening_data: string | null
+          id: string
+          ip_adres: string | null
+          km_na: number | null
+          km_voor: number
+          max_duur_minuten: number
+          opmerkingen_na: string | null
+          opmerkingen_voor: string | null
+          pdf_definitief_path: string | null
+          pdf_path: string | null
+          schade_fotos: string[] | null
+          start_tijd: string
+          status: string
+          terugkomst_tijd: string | null
+          token: string
+          vehicle_id: string | null
+          vertrek_tijd: string | null
+          voertuig_bouwjaar: number | null
+          voertuig_kenteken: string | null
+          voertuig_merk: string | null
+          voertuig_model: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "test_drives"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -3106,6 +3153,26 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      submit_proefrit_form: {
+        Args: {
+          p_achternaam: string
+          p_adres: string
+          p_email: string
+          p_geboortedatum: string
+          p_handtekening_data: string
+          p_ip_adres: string
+          p_opmerkingen: string
+          p_plaats: string
+          p_postcode: string
+          p_rijbewijs_foto_path: string
+          p_rijbewijscategorie: string
+          p_rijbewijsnummer: string
+          p_telefoon: string
+          p_token: string
+          p_voornaam: string
+        }
+        Returns: string
       }
     }
     Enums: {
