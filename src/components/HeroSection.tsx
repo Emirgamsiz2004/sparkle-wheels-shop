@@ -94,17 +94,21 @@ const HeroSection = () => {
           Platin Automotive
         </motion.p>
 
-        <motion.div
+        <motion.a
+          href="https://www.google.com/maps/dir/?api=1&destination=Platin+Automotive+Cilinderweg+99+Roelofarendsveen"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open routebeschrijving naar Platin Automotive in Google Maps"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="inline-flex items-center gap-2 bg-accent/10 border border-accent/20 px-4 py-2 mb-6"
+          className="inline-flex items-center gap-2 bg-accent/10 border border-accent/20 hover:bg-accent/20 hover:border-accent/40 transition-colors px-4 py-2 mb-6 cursor-pointer"
         >
           <MapPin className="w-3 h-3 text-accent" />
           <span className="text-[10px] md:text-xs font-body font-medium tracking-wider uppercase text-accent">
             Direct aan de A4 · Roelofarendsveen
           </span>
-        </motion.div>
+        </motion.a>
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
