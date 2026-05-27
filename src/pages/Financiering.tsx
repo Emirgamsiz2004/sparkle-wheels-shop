@@ -12,6 +12,7 @@ import {
   Clock,
   FileCheck,
   Percent,
+  Moon,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -139,7 +140,7 @@ const Financiering = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-px bg-border">
+          <div className="grid md:grid-cols-3 gap-px bg-border">
             {/* Financial lease */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -230,6 +231,51 @@ const Financiering = () => {
                 Bereken private lease
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </a>
+            </motion.div>
+
+            {/* Halal lease */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-card p-8 md:p-10"
+            >
+              <Moon className="w-6 h-6 text-foreground mb-5" />
+              <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
+                Sharia-conform
+              </p>
+              <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-4">
+                Halal Lease
+              </h3>
+              <p className="text-sm font-body text-muted-foreground leading-relaxed mb-6">
+                Volledig rentevrij financieren volgens islamitische principes. In plaats
+                van rente betaalt u een vooraf vastgestelde{" "}
+                <span className="text-foreground font-medium">kredietvergoeding</span>{" "}
+                (murabaha): het totaalbedrag staat vast en wijzigt nooit.
+              </p>
+              <ul className="space-y-2.5 mb-6">
+                {[
+                  "100% rentevrij (geen riba)",
+                  "Vaste kredietvergoeding vooraf bekend",
+                  "Transparant — totaalbedrag staat vast",
+                  "Voor particulier én zakelijk",
+                  "Looptijd 12 tot 72 maanden",
+                  "Sharia-conforme partner",
+                ].map((p) => (
+                  <li key={p} className="flex items-start gap-2.5 text-sm font-body text-foreground/80">
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    {p}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/contact"
+                className="group inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase font-semibold text-foreground hover:text-primary transition-colors"
+              >
+                Halal lease aanvragen
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
             </motion.div>
           </div>
         </div>

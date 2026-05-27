@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Calculator, ExternalLink, X } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Calculator, ExternalLink, X, Info } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -9,9 +9,13 @@ import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/
 import { Slider } from "@/components/ui/slider";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
-  berekenLease,
+  berekenLeaseDetail,
   formatEuro,
   LEASE_DEFAULTS,
+  LOOPTIJDEN,
+  MAX_AANBETALING_PCT,
+  MAX_SLOTTERMIJN_PCT,
+  type LeaseMode,
 } from "@/lib/lease";
 
 interface Props {
@@ -19,10 +23,9 @@ interface Props {
   trigger?: React.ReactNode;
 }
 
-const LOOPTIJDEN = [24, 36, 48, 60, 72];
-
 const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
   const isMobile = useIsMobile();
+  const [mode, setMode] = useState<LeaseMode>("financial");
   const [aanbetalingPct, setAanbetalingPct] = useState<number>(
     LEASE_DEFAULTS.aanbetalingPct * 100
   );
@@ -31,22 +34,31 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
   );
   const [looptijd, setLooptijd] = useState<number>(LEASE_DEFAULTS.looptijd);
 
-  const maandbedrag = berekenLease({
-    prijs,
-    aanbetalingPct: aanbetalingPct / 100,
-    slottermijnPct: slottermijnPct / 100,
-    looptijd,
-  });
-  const aanbetalingBedrag = Math.round((prijs * aanbetalingPct) / 100);
-  const slottermijnBedrag = Math.round((prijs * slottermijnPct) / 100);
+  // Cap slottermijn dynamisch zodat aanbetaling + slottermijn nooit > 95% wordt
+  const maxSlot = Math.min(MAX_SLOTTERMIJN_PCT, Math.max(0, 95 - aanbetalingPct));
+  const effSlot = Math.min(slottermijnPct, maxSlot);
+
+  const result = useMemo(
+    () =>
+      berekenLeaseDetail({
+        prijs,
+        aanbetalingPct: aanbetalingPct / 100,
+        slottermijnPct: effSlot / 100,
+        looptijd,
+        mode,
+      }),
+    [prijs, aanbetalingPct, effSlot, looptijd, mode]
+  );
 
   const handleBedragChange = (
     raw: string,
-    setter: (pct: number) => void
+    setter: (pct: number) => void,
+    maxPct: number
   ) => {
     const digits = raw.replace(/[^\d]/g, "");
     const v = Math.max(0, Math.min(prijs, Number(digits) || 0));
-    setter((v / prijs) * 100);
+    const pct = prijs > 0 ? (v / prijs) * 100 : 0;
+    setter(Math.min(pct, maxPct));
   };
 
   const triggerNode = trigger ?? (
@@ -59,14 +71,36 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
     </button>
   );
 
+  const tarief = mode === "halal" ? LEASE_DEFAULTS.halalVergoeding : LEASE_DEFAULTS.rente;
+  const tariefLabel = mode === "halal" ? "Kredietvergoeding" : "Rente";
+  const kostenLabel = mode === "halal" ? "Totale kredietvergoeding" : "Totale rente";
+
   const body = (
     <div className="space-y-6">
+      {/* Mode switch */}
+      <div className="grid grid-cols-2 gap-1.5 p-1 bg-background border border-border">
+        {(["financial", "halal"] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => setMode(m)}
+            className={`h-9 text-[11px] font-body font-semibold tracking-[0.12em] uppercase transition-colors ${
+              mode === m
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {m === "financial" ? "Financial" : "Halal"} Lease
+          </button>
+        ))}
+      </div>
+
       <div>
         <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
-          Indicatie financial lease
+          Indicatie {mode === "halal" ? "halal lease" : "financial lease"}
         </p>
         <p className="font-display text-3xl font-bold text-foreground">
-          {formatEuro(maandbedrag)}
+          {formatEuro(result.maandbedrag)}
           <span className="text-base font-body font-normal text-muted-foreground ml-1.5">
             / maand
           </span>
@@ -88,8 +122,8 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              value={aanbetalingBedrag.toLocaleString("nl-NL")}
-              onChange={(e) => handleBedragChange(e.target.value, setAanbetalingPct)}
+              value={result.aanbetaling.toLocaleString("nl-NL")}
+              onChange={(e) => handleBedragChange(e.target.value, setAanbetalingPct, MAX_AANBETALING_PCT)}
               className="w-24 bg-transparent text-foreground font-medium text-right text-base focus:outline-none"
             />
           </div>
@@ -97,7 +131,7 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
         <Slider
           value={[aanbetalingPct]}
           min={0}
-          max={90}
+          max={MAX_AANBETALING_PCT}
           step={1}
           onValueChange={(v) => setAanbetalingPct(v[0])}
           className="py-2"
@@ -110,7 +144,7 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
           <label className="text-[13px] font-body font-medium text-foreground">
             Slottermijn
             <span className="ml-2 text-[12px] text-muted-foreground font-normal">
-              {slottermijnPct.toFixed(0)}%
+              {effSlot.toFixed(0)}%
             </span>
           </label>
           <div className="flex items-center bg-background border border-border focus-within:border-foreground transition-colors h-10 px-3">
@@ -119,16 +153,16 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              value={slottermijnBedrag.toLocaleString("nl-NL")}
-              onChange={(e) => handleBedragChange(e.target.value, setSlottermijnPct)}
+              value={result.slottermijn.toLocaleString("nl-NL")}
+              onChange={(e) => handleBedragChange(e.target.value, setSlottermijnPct, maxSlot)}
               className="w-24 bg-transparent text-foreground font-medium text-right text-base focus:outline-none"
             />
           </div>
         </div>
         <Slider
-          value={[slottermijnPct]}
+          value={[effSlot]}
           min={0}
-          max={50}
+          max={maxSlot}
           step={1}
           onValueChange={(v) => setSlottermijnPct(v[0])}
           className="py-2"
@@ -140,13 +174,13 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
         <p className="text-[13px] font-body font-medium text-foreground mb-2.5">
           Looptijd
         </p>
-        <div className="grid grid-cols-5 gap-1.5">
+        <div className="grid grid-cols-6 gap-1.5">
           {LOOPTIJDEN.map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => setLooptijd(m)}
-              className={`h-10 text-[12px] font-body border transition-colors ${
+              className={`h-10 text-[11px] font-body border transition-colors ${
                 looptijd === m
                   ? "border-foreground bg-foreground text-background"
                   : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/60"
@@ -161,9 +195,9 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
       {/* Overzicht */}
       <div className="border-t border-b border-border divide-y divide-border">
         {[
-          { label: "Leenbedrag", value: prijs - aanbetalingBedrag - slottermijnBedrag },
-          { label: "Totale rente", value: Math.max(0, maandbedrag * looptijd - (prijs - aanbetalingBedrag - slottermijnBedrag)) },
-          { label: "Slottermijn", value: slottermijnBedrag },
+          { label: "Leenbedrag", value: result.leasebedrag },
+          { label: kostenLabel, value: result.totaalKosten },
+          { label: "Slottermijn", value: result.slottermijn },
         ].map((row) => (
           <div key={row.label} className="flex justify-between items-center py-2.5">
             <span className="text-[13px] font-body text-muted-foreground">{row.label}</span>
@@ -175,8 +209,19 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
       </div>
 
       <p className="text-[12px] font-body text-muted-foreground">
-        Rente <span className="text-foreground/60">7,9% (vast)</span>
+        {tariefLabel} <span className="text-foreground/60">{(tarief * 100).toFixed(1).replace(".", ",")}% (vast)</span>
       </p>
+
+      {mode === "halal" && (
+        <div className="flex gap-2 p-3 bg-background border border-border">
+          <Info className="w-3.5 h-3.5 text-foreground/60 shrink-0 mt-0.5" />
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            Bij <span className="text-foreground font-medium">halal lease</span> betaal je geen
+            rente, maar een vooraf vastgestelde <span className="text-foreground font-medium">
+            kredietvergoeding</span> (murabaha-principe). Het totaalbedrag staat vast en wijzigt niet.
+          </p>
+        </div>
+      )}
 
       <a
         href={LEASE_DEFAULTS.partnerUrl}
@@ -189,8 +234,10 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
       </a>
 
       <p className="text-[10px] leading-relaxed text-muted-foreground/70">
-        Indicatief bedrag. Onder voorbehoud van kredietgoedkeuring door
-        financiallease.nl.
+        Indicatief bedrag. Onder voorbehoud van kredietgoedkeuring.{" "}
+        {mode === "financial"
+          ? "Lease via financiallease.nl."
+          : "Halal lease via een sharia-conforme partner."}
       </p>
     </div>
   );
