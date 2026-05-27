@@ -140,7 +140,7 @@ const Financiering = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-px bg-border">
+          <div className="grid md:grid-cols-3 gap-px bg-border">
             {/* Financial lease */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
