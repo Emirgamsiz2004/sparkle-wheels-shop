@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Calculator, Info, X } from "lucide-react";
@@ -9,6 +9,19 @@ import interiorImg from "@/assets/detailing/interior.webp";
 
 const DetailingCTASection = () => {
   const [expanded, setExpanded] = useState(false);
+  const configRef = useRef<HTMLDivElement>(null);
+
+  const handleToggle = () => {
+    setExpanded((v) => {
+      const next = !v;
+      if (next && typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches) {
+        setTimeout(() => {
+          configRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 350);
+      }
+      return next;
+    });
+  };
 
   return (
     <section className="py-16 md:py-24 bg-background border-t border-border">
@@ -43,7 +56,7 @@ const DetailingCTASection = () => {
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    onClick={() => setExpanded((v) => !v)}
+                    onClick={handleToggle}
                     className="group inline-flex items-center justify-center gap-2 px-6 py-4 bg-amber-400 text-background font-display font-semibold text-sm hover:bg-amber-300 transition-colors"
                   >
                     {expanded ? (
@@ -109,9 +122,9 @@ const DetailingCTASection = () => {
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="overflow-hidden border-t border-border"
+                className="overflow-hidden border-t border-border scroll-mt-24"
               >
-                <div className="relative">
+                <div ref={configRef} className="relative">
                   <DetailingConfigurator embedded />
                 </div>
               </motion.div>
