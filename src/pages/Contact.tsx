@@ -28,7 +28,7 @@ const contactDetails = [
     icon: Phone,
     label: "Werkplaats",
     value: "071-781 25 25",
-    href: "tel:+31620686868",
+    href: "tel:+31717812525",
     description: "Bel voor onderhoud, reparatie, detailing en customizing",
   },
   {
@@ -43,7 +43,7 @@ const contactDetails = [
     icon: MessageCircle,
     label: "WhatsApp Werkplaats",
     value: "071-781 25 25",
-    href: "https://wa.me/31620686868?text=Hallo%2C%20ik%20heb%20een%20vraag%20voor%20de%20werkplaats.",
+    href: "https://wa.me/31717812525?text=Hallo%2C%20ik%20heb%20een%20vraag%20voor%20de%20werkplaats.",
     description: "Stuur een berichtje voor onderhoud of service",
   },
   {

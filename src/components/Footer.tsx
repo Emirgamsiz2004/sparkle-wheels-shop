@@ -69,7 +69,7 @@ const Footer = () => {
             <a href="tel:+31717812525" className="text-[11px] font-body text-muted-foreground/70 hover:text-foreground transition-colors w-fit">
               <span className="text-muted-foreground/50">Verkoop:</span> 071-781 25 25
             </a>
-            <a href="tel:+31620686868" className="text-[11px] font-body text-muted-foreground/70 hover:text-foreground transition-colors w-fit">
+            <a href="tel:+31717812525" className="text-[11px] font-body text-muted-foreground/70 hover:text-foreground transition-colors w-fit">
               <span className="text-muted-foreground/50">Werkplaats:</span> 071-781 25 25
             </a>
             <a href="mailto:info@platinautomotive.nl" className="text-[11px] font-body text-muted-foreground/70 hover:text-foreground transition-colors w-fit">info@platinautomotive.nl</a>

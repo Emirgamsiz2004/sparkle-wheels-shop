@@ -73,7 +73,7 @@ const ContactSection = () => {
                 </p>
               </a>
               <a
-                href="tel:+31620686868"
+                href="tel:+31717812525"
                 className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
               >
                 <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
