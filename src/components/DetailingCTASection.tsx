@@ -11,13 +11,27 @@ const DetailingCTASection = () => {
   const [expanded, setExpanded] = useState(false);
   const configRef = useRef<HTMLDivElement>(null);
 
+  const scrollToConfiguratorCenter = () => {
+    const target = configRef.current?.querySelector<HTMLElement>('[data-configurator-step="vehicle"]') ?? configRef.current;
+    if (!target) return;
+
+    const rect = target.getBoundingClientRect();
+    const visualHeight = Math.min(rect.height, window.innerHeight * 0.5);
+    const top = rect.top + window.scrollY - (window.innerHeight - visualHeight) / 2;
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: "smooth",
+    });
+  };
+
   const handleToggle = () => {
     setExpanded((v) => {
       const next = !v;
       if (next && typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches) {
         setTimeout(() => {
-          configRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 350);
+          scrollToConfiguratorCenter();
+        }, 550);
       }
       return next;
     });
