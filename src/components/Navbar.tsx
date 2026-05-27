@@ -103,7 +103,7 @@ const Navbar = () => {
               )
             )}
             <a
-              href="tel:+31612693825"
+              href="tel:+31717812525"
               className="group/call relative flex items-center gap-2 bg-muted border border-border text-foreground px-5 py-2.5 text-[10px] font-semibold tracking-[0.2em] uppercase overflow-hidden h-[38px] transition-all duration-500 hover:border-accent hover:text-accent"
             >
               <span className="absolute inset-0 bg-accent/10 origin-left scale-x-0 group-hover/call:scale-x-100 transition-transform duration-500 ease-out" />
@@ -111,7 +111,7 @@ const Navbar = () => {
               <span className="relative z-10 overflow-hidden h-[14px]">
                 <span className="flex flex-col transition-transform duration-500 ease-out group-hover/call:-translate-y-[14px]">
                   <span className="h-[14px] flex items-center whitespace-nowrap">Neem Contact Op</span>
-                  <span className="h-[14px] flex items-center whitespace-nowrap">06-12693825</span>
+                  <span className="h-[14px] flex items-center whitespace-nowrap">071-781 25 25</span>
                 </span>
               </span>
             </a>
@@ -202,7 +202,7 @@ const Navbar = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.3, delay: navLinks.length * 0.05 }}
-              href="tel:+31612693825"
+              href="tel:+31717812525"
               className="group/call relative flex items-center gap-2 bg-muted border border-border text-foreground px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase overflow-hidden h-[42px] mt-4 transition-all duration-500 hover:border-accent hover:text-accent"
             >
               <span className="absolute inset-0 bg-accent/10 origin-left scale-x-0 group-hover/call:scale-x-100 transition-transform duration-500 ease-out" />
@@ -210,7 +210,7 @@ const Navbar = () => {
               <span className="relative z-10 overflow-hidden h-[14px]">
                 <span className="flex flex-col transition-transform duration-500 ease-out group-hover/call:-translate-y-[14px]">
                   <span className="h-[14px] flex items-center whitespace-nowrap">Neem Contact Op</span>
-                  <span className="h-[14px] flex items-center whitespace-nowrap">06-12693825</span>
+                  <span className="h-[14px] flex items-center whitespace-nowrap">071-781 25 25</span>
                 </span>
               </span>
             </motion.a>

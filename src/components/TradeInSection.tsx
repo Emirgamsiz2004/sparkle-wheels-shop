@@ -189,7 +189,7 @@ const TradeInSection = () => {
                 Dit is een indicatie op basis van marktgegevens. Kom langs voor een officiële taxatie.
               </p>
               <a
-                href={`https://wa.me/31612693825?text=${encodeURIComponent(
+                href={`https://wa.me/31717812525?text=${encodeURIComponent(
                   `Hallo, ik wil graag een taxatie inplannen voor mijn ${rdwData?.merk} ${rdwData?.model} (${rdwData?.bouwjaar}).`
                 )}`}
                 target="_blank"

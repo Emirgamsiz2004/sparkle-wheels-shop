@@ -58,7 +58,7 @@ const BookingForm = ({ dienst }: BookingFormProps) => {
     const tijdTekst = tijd || "Nog niet gekozen";
 
     const message = `Hallo, ik wil graag een afspraak maken voor ${dienst}.%0A%0ANaam: ${encodeURIComponent(result.data.naam)}%0ATelefoon: ${encodeURIComponent(result.data.telefoon)}%0AAuto: ${encodeURIComponent(result.data.auto)}%0AVoorkeursdatum: ${encodeURIComponent(datumTekst)}%0AVoorkeurstijd: ${encodeURIComponent(tijdTekst)}%0A%0A${encodeURIComponent(result.data.omschrijving)}`;
-    window.open(`https://wa.me/31612693825?text=${message}`, "_blank");
+    window.open(`https://wa.me/31717812525?text=${message}`, "_blank");
 
     setSubmitted(true);
     toast({ title: "Afspraak aangevraagd!", description: "We bevestigen uw afspraak zo snel mogelijk via WhatsApp." });

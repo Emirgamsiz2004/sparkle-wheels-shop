@@ -56,7 +56,7 @@ const AutoZoeken = () => {
     ].filter(Boolean).join("\n");
 
     const message = encodeURIComponent(parts);
-    window.open(`https://wa.me/31612693825?text=${message}`, "_blank");
+    window.open(`https://wa.me/31717812525?text=${message}`, "_blank");
 
     setSubmitted(true);
     toast({ title: "Zoekopdracht verstuurd!", description: "We gaan voor u op zoek." });
@@ -208,11 +208,11 @@ const AutoZoeken = () => {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-4">Liever direct contact?</h2>
             <p className="text-muted-foreground font-body font-light leading-relaxed mb-8">Bel ons of stuur een WhatsApp berichtje.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="tel:+31612693825" className="group inline-flex items-center justify-center gap-3 border border-border px-6 py-3.5 hover:border-foreground/30 transition-all duration-300">
+              <a href="tel:+31717812525" className="group inline-flex items-center justify-center gap-3 border border-border px-6 py-3.5 hover:border-foreground/30 transition-all duration-300">
                 <Phone className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                <span className="text-xs font-body font-medium text-foreground">06-12693825</span>
+                <span className="text-xs font-body font-medium text-foreground">071-781 25 25</span>
               </a>
-              <a href="https://wa.me/31612693825?text=Hallo%2C%20ik%20ben%20op%20zoek%20naar%20een%20auto." target="_blank" rel="noopener noreferrer" className="group inline-flex items-center justify-center gap-3 border border-border px-6 py-3.5 hover:border-foreground/30 transition-all duration-300">
+              <a href="https://wa.me/31717812525?text=Hallo%2C%20ik%20ben%20op%20zoek%20naar%20een%20auto." target="_blank" rel="noopener noreferrer" className="group inline-flex items-center justify-center gap-3 border border-border px-6 py-3.5 hover:border-foreground/30 transition-all duration-300">
                 <MessageCircle className="w-4 h-4 text-green-500" />
                 <span className="text-xs font-body font-medium text-foreground">WhatsApp</span>
               </a>

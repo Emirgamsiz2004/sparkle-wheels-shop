@@ -224,11 +224,11 @@ const ConsignatieVoorwaarden = () => {
               Maak een afspraak
             </Link>
             <a
-              href="tel:+31612693825"
+              href="tel:+31717812525"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[10px] tracking-[0.2em] uppercase font-body font-medium border border-border text-foreground hover:border-foreground/40 transition-all"
             >
               <Phone className="w-3.5 h-3.5" />
-              Bel ons: 06-12693825
+              Bel ons: 071-781 25 25
             </a>
           </div>
         </div>

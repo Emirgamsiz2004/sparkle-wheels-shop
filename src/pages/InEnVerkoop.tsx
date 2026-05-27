@@ -214,7 +214,7 @@ const InEnVerkoop = () => {
               <div className="space-y-0">
                 {[
                   { label: "Adres", value: "Cilinderweg 99, 2371 DZ Roelofarendsveen" },
-                  { label: "Telefoon", value: "06-12693825" },
+                  { label: "Telefoon", value: "071-781 25 25" },
                   { label: "E-mail", value: "info@platinautomotive.nl" },
                   { label: "Maandag", value: "12:00 - 18:00" },
                   { label: "Di t/m Vr", value: "09:00 - 18:00" },

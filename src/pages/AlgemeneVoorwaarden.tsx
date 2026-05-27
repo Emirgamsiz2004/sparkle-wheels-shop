@@ -116,7 +116,7 @@ const AlgemeneVoorwaarden = () => (
               Platin Automotive<br />
               Cilinderweg 99, 2371 DZ Roelofarendsveen<br />
               E-mail: <a href="mailto:info@platinautomotive.nl" className="text-primary hover:underline">info@platinautomotive.nl</a><br />
-              Telefoon: 06-12693825
+              Telefoon: 071-781 25 25
             </p>
           </section>
         </div>

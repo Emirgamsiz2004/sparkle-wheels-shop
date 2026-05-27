@@ -102,7 +102,7 @@ const CityLandingPage = ({
               </div>
               <div className="flex items-center gap-3 text-foreground font-body">
                 <Phone className="w-4 h-4 text-primary" />
-                <a href="tel:+31612693825" className="hover:text-primary transition-colors">06-12693825</a>
+                <a href="tel:+31717812525" className="hover:text-primary transition-colors">071-781 25 25</a>
               </div>
             </div>
 

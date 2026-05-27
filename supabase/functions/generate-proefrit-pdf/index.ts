@@ -12,7 +12,7 @@ const BEDRIJF = {
   naam: "Platin Automotive",
   adres: "Cilinderweg 99 · 2371 DZ Roelofarendsveen",
   kvk: "99146193",
-  telefoon: "06-12693825",
+  telefoon: "071-781 25 25",
   email: "info@platinautomotive.nl",
   website: "platinautomotive.nl",
 };

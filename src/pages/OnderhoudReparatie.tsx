@@ -218,7 +218,7 @@ const OnderhoudReparatie = () => {
                   <Phone className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                   <div>
                     <p className="text-sm font-display font-semibold text-foreground">Bel werkplaats</p>
-                    <p className="text-xs font-body text-muted-foreground">06-20686868</p>
+                    <p className="text-xs font-body text-muted-foreground">071-781 25 25</p>
                   </div>
                 </a>
                 <a

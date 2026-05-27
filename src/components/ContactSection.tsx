@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle } from "lucide-react";
 
 const contactInfo = [
-  { icon: MessageCircle, label: "WhatsApp", value: "Stuur een bericht", href: "https://wa.me/31612693825" },
+  { icon: MessageCircle, label: "WhatsApp", value: "Stuur een bericht", href: "https://wa.me/31717812525" },
   { icon: Mail, label: "E-mail", value: "info@platinautomotive.nl", href: "mailto:info@platinautomotive.nl" },
   { icon: MapPin, label: "Adres", value: "Cilinderweg 99\n2371 DZ Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+2371DZ+Roelofarendsveen" },
 ];
@@ -31,7 +31,7 @@ const ContactSection = () => {
             </p>
             <div className="flex flex-wrap gap-3">
               <a
-                href="tel:+31612693825"
+                href="tel:+31717812525"
                 className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
               >
                 <Phone className="w-3.5 h-3.5" />
@@ -39,7 +39,7 @@ const ContactSection = () => {
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </a>
               <a
-                href="https://wa.me/31612693825"
+                href="https://wa.me/31717812525"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-3 border border-border text-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
@@ -58,33 +58,19 @@ const ContactSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col gap-px bg-border"
           >
-            {/* Telefoon-tegel: gesplitst in Verkoop + Werkplaats */}
-            <div className="grid grid-cols-2 gap-px bg-border">
-              <a
-                href="tel:+31612693825"
-                className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
-              >
-                <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
-                <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
-                  Verkoop
-                </p>
-                <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
-                  06-12693825
-                </p>
-              </a>
-              <a
-                href="tel:+31620686868"
-                className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
-              >
-                <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
-                <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
-                  Werkplaats
-                </p>
-                <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
-                  06-20686868
-                </p>
-              </a>
-            </div>
+            {/* Telefoon */}
+            <a
+              href="tel:+31717812525"
+              className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
+            >
+              <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
+              <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
+                Telefoon
+              </p>
+              <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
+                071-781 25 25
+              </p>
+            </a>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
               {contactInfo.map((item) => (

@@ -19,32 +19,18 @@ const contactFormSchema = z.object({
 const contactDetails = [
   {
     icon: Phone,
-    label: "Verkoop",
-    value: "06-12693825",
-    href: "tel:+31612693825",
-    description: "Bel voor vragen over auto's, een afspraak of inruil",
-  },
-  {
-    icon: Phone,
-    label: "Werkplaats",
-    value: "06-20686868",
-    href: "tel:+31620686868",
-    description: "Bel voor onderhoud, reparatie, detailing en customizing",
+    label: "Telefoon",
+    value: "071-781 25 25",
+    href: "tel:+31717812525",
+    description: "Bel voor vragen over auto's, afspraken, inruil of werkplaats",
   },
   {
     icon: MessageCircle,
-    label: "WhatsApp Verkoop",
-    value: "06-12693825",
-    href: "https://wa.me/31612693825?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20auto.",
-    description: "Stuur een berichtje over een auto",
+    label: "WhatsApp",
+    value: "071-781 25 25",
+    href: "https://wa.me/31717812525?text=Hallo%2C%20ik%20heb%20een%20vraag.",
+    description: "Stuur een berichtje — we reageren zo snel mogelijk",
     highlight: true,
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp Werkplaats",
-    value: "06-20686868",
-    href: "https://wa.me/31620686868?text=Hallo%2C%20ik%20heb%20een%20vraag%20voor%20de%20werkplaats.",
-    description: "Stuur een berichtje voor onderhoud of service",
   },
   {
     icon: Mail,
@@ -184,15 +170,15 @@ const Contact = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Contact | Platin Automotive Roelofarendsveen</title>
-        <meta name="description" content="Neem contact op met Platin Automotive. Bel 06-12693825, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
+        <meta name="description" content="Neem contact op met Platin Automotive. Bel 071-781 25 25, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
         <link rel="canonical" href="https://platinautomotive.nl/contact" />
         <meta name="robots" content="index, follow" />
         <meta property="og:title" content="Contact | Platin Automotive Roelofarendsveen" />
-        <meta property="og:description" content="Neem contact op met Platin Automotive. Bel 06-12693825, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
+        <meta property="og:description" content="Neem contact op met Platin Automotive. Bel 071-781 25 25, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
         <meta property="og:url" content="https://platinautomotive.nl/contact" />
         <meta property="og:type" content="website" />
         <meta name="twitter:title" content="Contact | Platin Automotive Roelofarendsveen" />
-        <meta name="twitter:description" content="Neem contact op met Platin Automotive. Bel 06-12693825, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
+        <meta name="twitter:description" content="Neem contact op met Platin Automotive. Bel 071-781 25 25, stuur een WhatsApp of bezoek ons op Cilinderweg 99 in Roelofarendsveen. Ma–vr 10–18u." />
 
       </Helmet>
       <Navbar />
@@ -347,7 +333,7 @@ const Contact = () => {
                   Stuur ons een WhatsApp bericht en we reageren zo snel mogelijk.
                 </p>
                 <a
-                  href="https://wa.me/31612693825?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20auto."
+                  href="https://wa.me/31717812525?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20auto."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group inline-flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-xs font-semibold tracking-[0.15em] uppercase transition-all duration-300"

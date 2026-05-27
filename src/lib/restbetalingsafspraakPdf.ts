@@ -73,7 +73,7 @@ function buildDoc(data: RestbetalingPdfData) {
   setFont("normal", 9);
   doc.setTextColor(80, 80, 80);
   doc.text("Cilinderweg 99, 2371 DZ Roelofarendsveen", ml, y); y += 4;
-  doc.text("info@platinautomotive.nl  |  06-12693825", ml, y); y += 4;
+  doc.text("info@platinautomotive.nl  |  071-781 25 25", ml, y); y += 4;
   doc.text("KvK: 99146193", ml, y); y += 4;
   doc.text('Hierna te noemen: "Verkoper"', ml, y);
 
