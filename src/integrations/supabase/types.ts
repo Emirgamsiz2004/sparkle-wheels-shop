@@ -3154,6 +3154,28 @@ export type Database = {
           read_ct: number
         }[]
       }
+      submit_booking: {
+        Args: {
+          p_achternaam: string
+          p_datum: string
+          p_diensten: string[]
+          p_diensten_notitie: string
+          p_eindtijd: string
+          p_email: string
+          p_extras: Json
+          p_naam: string
+          p_onderwerp: string
+          p_opmerking: string
+          p_pakket: string
+          p_starttijd: string
+          p_telefoon: string
+          p_totaal_minuten: number
+          p_totaal_prijs: number
+          p_voertuig_type: string
+          p_voornaam: string
+        }
+        Returns: string
+      }
       submit_proefrit_form: {
         Args: {
           p_achternaam: string
