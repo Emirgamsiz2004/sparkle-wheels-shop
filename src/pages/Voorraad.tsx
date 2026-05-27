@@ -13,7 +13,9 @@ const Voorraad = () => {
   const { data: voertuigen, isLoading, isError, error } = useVoorraadFeed();
 
   const beschikbaar = voertuigen?.filter((v) => v.dbStatus !== "verkocht") ?? [];
-  const verkocht = voertuigen?.filter((v) => v.dbStatus === "verkocht") ?? [];
+  const verkocht = voertuigen
+    ?.filter((v) => v.dbStatus === "verkocht")
+    ?.sort((a, b) => b.prijs - a.prijs) ?? [];
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
