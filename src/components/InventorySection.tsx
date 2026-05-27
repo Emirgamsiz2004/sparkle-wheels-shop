@@ -8,8 +8,9 @@ import { useCallback } from "react";
 
 const InventorySection = () => {
   const { data: alleVoertuigen, isLoading } = useVoorraadFeed();
-  // Toon alle voertuigen (inclusief verkochte) op de homepage
-  const voertuigen = alleVoertuigen;
+  const voertuigen = alleVoertuigen
+    ?.filter((v) => v.dbStatus !== "verkocht")
+    ?.sort((a, b) => b.prijs - a.prijs);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     slidesToScroll: 1,
