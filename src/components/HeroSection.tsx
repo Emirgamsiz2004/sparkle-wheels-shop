@@ -33,6 +33,15 @@ const HeroSection = () => {
   const isMobile = useIsMobile();
   const [slideSrcs, setSlideSrcs] = useState<string[]>([heroSlide1]);
   const loaded = useRef(false);
+  const [reviewData, setReviewData] = useState<{ rating: number; totalRatings: number } | null>(null);
+
+  useEffect(() => {
+    supabase.functions.invoke("fetch-google-reviews")
+      .then(({ data }) => {
+        if (data?.rating) setReviewData({ rating: data.rating, totalRatings: data.totalRatings });
+      })
+      .catch(() => {});
+  }, []);
 
   // Load remaining slides after page is idle
   useEffect(() => {
