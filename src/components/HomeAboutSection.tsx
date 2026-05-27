@@ -6,74 +6,92 @@ const pillars = [
   {
     icon: ShieldCheck,
     title: "Betrouwbaar",
-    text: "RDW-erkend, eerlijke marges en transparante voertuighistorie.",
+    text: "RDW-erkend, eerlijke marges en een volledig transparante voertuighistorie.",
   },
   {
     icon: Sparkles,
     title: "Vakmanschap",
-    text: "Iedere auto wordt vooraf grondig nagelopen en gedetaild.",
+    text: "Iedere auto wordt vooraf grondig nagelopen en tot in de finesse gedetailleerd.",
   },
   {
     icon: Users,
     title: "Persoonlijk",
-    text: "Een familiair team dat de tijd neemt om je écht te helpen.",
+    text: "Een familiair team dat de tijd voor u neemt om u écht verder te helpen.",
   },
 ];
 
 const HomeAboutSection = () => {
   return (
-    <section id="over-ons-home" className="py-20 md:py-28 lg:py-36 bg-background">
-      <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left: Heading */}
+    <section className="py-20 md:py-28 bg-background border-t border-border">
+      <div className="container mx-auto px-6 lg:px-16">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          {/* Left — narrative */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="lg:col-span-5"
+            className="lg:col-span-6 space-y-8"
           >
-            <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-4">
-              Over ons
-            </p>
-            <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground tracking-tight leading-[1.05] mb-6">
-              Jong, ambitieus &amp; met passie voor auto's.
-            </h2>
-            <p className="text-base md:text-lg font-body font-light text-muted-foreground leading-relaxed mb-8">
+            <div className="space-y-4">
+              <span className="block text-[10px] tracking-[0.4em] uppercase font-body font-semibold text-amber-400">
+                Over ons
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground tracking-tight leading-[1.15]">
+                Jong, ambitieus &amp;
+                <br />
+                <span className="text-muted-foreground">
+                  met passie voor auto&apos;s.
+                </span>
+              </h2>
+            </div>
+
+            <p className="text-base md:text-lg font-body font-light text-muted-foreground leading-relaxed max-w-xl">
               Platin Automotive is een familiair autobedrijf uit Roelofarendsveen,
               direct aan de A4. We combineren in- en verkoop met detailing,
-              consignatie en onderhoud — altijd met een persoonlijke aanpak en
-              oog voor detail.
+              consignatie en onderhoud — altijd met een persoonlijke aanpak en oog
+              voor detail.
             </p>
+
             <Link
               to="/over-ons"
-              className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase text-foreground hover:text-primary transition-colors duration-500"
+              className="group inline-flex items-center gap-3 font-body font-medium"
             >
-              Leer ons kennen
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span className="text-sm tracking-[0.2em] uppercase italic text-foreground border-b border-foreground/20 pb-1 transition-colors duration-500 group-hover:border-amber-400 group-hover:text-amber-400">
+                Leer ons kennen
+              </span>
+              <ArrowRight className="w-4 h-4 text-amber-400 transition-transform duration-500 group-hover:translate-x-1" />
             </Link>
           </motion.div>
 
-          {/* Right: Pillars */}
-          <div className="lg:col-span-7 grid sm:grid-cols-3 gap-5">
-            {pillars.map((p, i) => (
-              <motion.div
-                key={p.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 + i * 0.1 }}
-                className="border border-border bg-card rounded-xl p-6 md:p-7 hover:border-primary/60 transition-colors duration-500"
-              >
-                <p.icon className="w-6 h-6 text-primary mb-5" strokeWidth={1.5} />
-                <h3 className="text-base md:text-lg font-display font-bold text-foreground mb-2">
-                  {p.title}
-                </h3>
-                <p className="text-sm font-body font-light text-muted-foreground leading-relaxed">
-                  {p.text}
-                </p>
-              </motion.div>
-            ))}
+          {/* Right — pillars */}
+          <div className="lg:col-span-6 flex flex-col gap-4">
+            {pillars.map((p, i) => {
+              const Icon = p.icon;
+              return (
+                <motion.div
+                  key={p.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="group p-6 flex gap-5 items-start bg-foreground/[0.02] border border-foreground/5 hover:bg-foreground/[0.04] transition-all duration-500"
+                >
+                  <Icon
+                    className="w-5 h-5 mt-1 shrink-0 text-muted-foreground group-hover:text-amber-400 transition-colors duration-500"
+                    strokeWidth={1.5}
+                  />
+                  <div>
+                    <h3 className="text-sm font-display font-semibold tracking-widest uppercase text-foreground mb-2">
+                      {p.title}
+                    </h3>
+                    <p className="text-sm font-body font-light text-muted-foreground leading-relaxed">
+                      {p.text}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </div>
