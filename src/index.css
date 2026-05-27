@@ -60,8 +60,8 @@ input[type="number"] {
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 50%;
 
-    --accent: 0 0% 78%;
-    --accent-foreground: 0 0% 5%;
+    --accent: 38 95% 55%;
+    --accent-foreground: 0 0% 8%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
