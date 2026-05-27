@@ -243,7 +243,11 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="max-w-lg max-h-[90dvh] overflow-y-auto"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Nieuwe inkoopverklaring</DialogTitle>
         </DialogHeader>
