@@ -70,7 +70,7 @@ const AfleveringSection = () => {
                   transition={{ duration: 0.4, delay: idx * 0.08 }}
                   className="bg-card p-3 md:p-4 flex gap-3 items-start"
                 >
-                  <feature.icon className="w-4 h-4 text-gold mt-0.5 flex-shrink-0" strokeWidth={1.5} />
+                  <feature.icon className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" strokeWidth={1.5} />
                   <div>
                     <h3 className="text-xs md:text-sm font-display font-semibold text-foreground mb-1">
                       {feature.title}
