@@ -7,9 +7,18 @@ import { toast } from "sonner";
 
 const HandtekeningUpload = () => {
   const { user } = useAuth();
+  const [path, setPath] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+
+  const refreshSignedUrl = async (p: string | null) => {
+    if (!p) { setUrl(null); return; }
+    // If legacy value is a full URL, fall back to it; otherwise sign the storage path.
+    if (/^https?:\/\//i.test(p)) { setUrl(p); return; }
+    const { data } = await supabase.storage.from("signatures").createSignedUrl(p, 60 * 60);
+    setUrl(data?.signedUrl || null);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -19,7 +28,9 @@ const HandtekeningUpload = () => {
         .select("signature_url")
         .eq("user_id", user.id)
         .maybeSingle();
-      setUrl((data as any)?.signature_url || null);
+      const p = (data as any)?.signature_url || null;
+      setPath(p);
+      await refreshSignedUrl(p);
       setLoading(false);
     })();
   }, [user]);
@@ -33,21 +44,20 @@ const HandtekeningUpload = () => {
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() || "png";
-      const path = `${user.id}/handtekening-${Date.now()}.${ext}`;
+      const storagePath = `${user.id}/handtekening-${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("signatures")
-        .upload(path, file, { contentType: file.type, upsert: true });
+        .upload(storagePath, file, { contentType: file.type, upsert: true });
       if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from("signatures").getPublicUrl(path);
-      const publicUrl = pub.publicUrl;
 
       const { error: profErr } = await supabase
         .from("profiles")
-        .update({ signature_url: publicUrl } as any)
+        .update({ signature_url: storagePath } as any)
         .eq("user_id", user.id);
       if (profErr) throw profErr;
 
-      setUrl(publicUrl);
+      setPath(storagePath);
+      await refreshSignedUrl(storagePath);
       toast.success("Handtekening opgeslagen");
     } catch (e: any) {
       console.error(e);
@@ -60,6 +70,7 @@ const HandtekeningUpload = () => {
   const handleRemove = async () => {
     if (!user) return;
     await supabase.from("profiles").update({ signature_url: null } as any).eq("user_id", user.id);
+    setPath(null);
     setUrl(null);
     toast.success("Handtekening verwijderd");
   };
