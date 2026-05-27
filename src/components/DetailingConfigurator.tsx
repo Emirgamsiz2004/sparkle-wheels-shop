@@ -183,14 +183,27 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   const step2Ref = useRef<HTMLDivElement>(null);
   const step3Ref = useRef<HTMLDivElement>(null);
 
+  const scrollElementToVisualCenter = (element: HTMLElement | null) => {
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const visualHeight = Math.min(rect.height, window.innerHeight * 0.5);
+    const top = rect.top + window.scrollY - (window.innerHeight - visualHeight) / 2;
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: "smooth",
+    });
+  };
+
   // Auto-scroll naar volgend blok op desktop (>=768px)
   useEffect(() => {
     if (!vehicle) return;
     if (typeof window === "undefined") return;
     if (!window.matchMedia("(min-width: 768px)").matches) return;
     const t = setTimeout(() => {
-      step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 250);
+      scrollElementToVisualCenter(step2Ref.current);
+    }, 450);
     return () => clearTimeout(t);
   }, [vehicle]);
 
@@ -199,8 +212,8 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
     if (typeof window === "undefined") return;
     if (!window.matchMedia("(min-width: 768px)").matches) return;
     const t = setTimeout(() => {
-      step3Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 250);
+      scrollElementToVisualCenter(step3Ref.current);
+    }, 450);
     return () => clearTimeout(t);
   }, [pkg, vehicle]);
 
@@ -278,7 +291,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
         </motion.div>
 
         {/* STEP 1 */}
-        <div className="mb-12">
+        <div className="mb-12" data-configurator-step="vehicle">
           <StepBadge n={1} label="Selecteer uw voertuig" active={true} />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {vehicles.map((v) => {
@@ -321,9 +334,9 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
+              ref={step2Ref}
               className="mb-12 scroll-mt-24"
             >
-              <div ref={step2Ref} />
               <StepBadge n={2} label="Kies uw pakket" active={true} />
               <div className="grid md:grid-cols-3 gap-4 md:gap-5">
                 {packages.map((p) => {
@@ -381,9 +394,9 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
+              ref={step3Ref}
               className="mb-12 scroll-mt-24"
             >
-              <div ref={step3Ref} />
               <StepBadge n={3} label="Voeg extras toe (optioneel)" active={true} />
               <div className="grid md:grid-cols-3 gap-6 md:gap-8">
                 {[
