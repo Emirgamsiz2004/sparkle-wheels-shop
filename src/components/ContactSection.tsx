@@ -58,33 +58,19 @@ const ContactSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col gap-px bg-border"
           >
-            {/* Telefoon-tegel: gesplitst in Verkoop + Werkplaats */}
-            <div className="grid grid-cols-2 gap-px bg-border">
-              <a
-                href="tel:+31717812525"
-                className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
-              >
-                <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
-                <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
-                  Verkoop
-                </p>
-                <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
-                  071-781 25 25
-                </p>
-              </a>
-              <a
-                href="tel:+31717812525"
-                className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
-              >
-                <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
-                <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
-                  Werkplaats
-                </p>
-                <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
-                  071-781 25 25
-                </p>
-              </a>
-            </div>
+            {/* Telefoon */}
+            <a
+              href="tel:+31717812525"
+              className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
+            >
+              <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
+              <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
+                Telefoon
+              </p>
+              <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
+                071-781 25 25
+              </p>
+            </a>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
               {contactInfo.map((item) => (
