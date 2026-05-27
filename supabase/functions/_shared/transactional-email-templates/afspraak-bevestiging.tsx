@@ -6,7 +6,7 @@ import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "Platin Automotive"
 const ADRES = "Cilinderweg 99, 2371DZ Roelofarendsveen"
-const TEL = "06-12693825"
+const TEL = "071-781 25 25"
 const EMAIL = "info@platinautomotive.nl"
 
 interface Props {

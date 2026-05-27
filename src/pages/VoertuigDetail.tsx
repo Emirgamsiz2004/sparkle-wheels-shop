@@ -269,14 +269,14 @@ const VoertuigDetail = () => {
                 {/* CTA Buttons */}
                 <div className="space-y-3">
                   <a
-                    href="tel:+31612693825"
+                    href="tel:+31717812525"
                     className="group/btn relative flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase overflow-hidden transition-all duration-500 hover:bg-primary hover:border-primary hover:text-primary-foreground"
                   >
                     <Phone className="w-4 h-4 relative z-10" />
-                    <span className="relative z-10">Bel Direct — 06-12693825</span>
+                    <span className="relative z-10">Bel Direct — 071-781 25 25</span>
                   </a>
                   <a
-                    href={`https://wa.me/31612693825?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
+                    href={`https://wa.me/31717812525?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group/wa relative flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase overflow-hidden bg-transparent transition-all duration-500 hover:border-foreground hover:bg-foreground hover:text-background"

@@ -232,8 +232,8 @@ const OverOns = () => {
             </div>
             <div className="bg-card p-6 text-center group">
               <Phone className="w-4 h-4 text-muted-foreground mx-auto mb-3 group-hover:text-foreground transition-colors" />
-              <a href="tel:+31612693825" className="text-xs font-body font-light text-muted-foreground hover:text-foreground transition-colors">
-                06-12693825
+              <a href="tel:+31717812525" className="text-xs font-body font-light text-muted-foreground hover:text-foreground transition-colors">
+                071-781 25 25
               </a>
             </div>
             <div className="bg-card p-6 text-center group">

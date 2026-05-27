@@ -95,11 +95,11 @@ const AnnouncementBar = () => {
 
           {/* Phone Verkoop */}
           <a
-            href="tel:+31612693825"
+            href="tel:+31717812525"
             className="hidden sm:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-500 whitespace-nowrap"
           >
             <Phone className="w-3 h-3 shrink-0" />
-            <span className="text-muted-foreground/60">Verkoop:</span> 06-12693825
+            <span className="text-muted-foreground/60">Verkoop:</span> 071-781 25 25
           </a>
 
           {/* Phone Werkplaats */}
@@ -108,7 +108,7 @@ const AnnouncementBar = () => {
             className="hidden md:flex items-center gap-1.5 text-[10px] md:text-[11px] font-body text-muted-foreground hover:text-foreground transition-all duration-500 whitespace-nowrap"
           >
             <Phone className="w-3 h-3 shrink-0" />
-            <span className="text-muted-foreground/60">Werkplaats:</span> 06-20686868
+            <span className="text-muted-foreground/60">Werkplaats:</span> 071-781 25 25
           </a>
 
           {/* Address */}
@@ -121,7 +121,7 @@ const AnnouncementBar = () => {
         {/* Right: social icons */}
         <div className="flex items-center gap-2">
           <a
-            href="https://wa.me/31612693825"
+            href="https://wa.me/31717812525"
             target="_blank"
             rel="noopener noreferrer"
             className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-500"

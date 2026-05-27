@@ -19,7 +19,7 @@ const PrivacyPolicy = () => (
         <div className="prose-legal space-y-6 text-sm text-muted-foreground leading-relaxed">
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-3">1. Wie zijn wij?</h2>
-            <p>Platin Automotive is gevestigd aan de Cilinderweg 99, 2371 DZ Roelofarendsveen. Voor vragen over dit privacybeleid kunt u contact opnemen via <a href="mailto:info@platinautomotive.nl" className="text-primary hover:underline">info@platinautomotive.nl</a> of telefonisch via 06-12693825.</p>
+            <p>Platin Automotive is gevestigd aan de Cilinderweg 99, 2371 DZ Roelofarendsveen. Voor vragen over dit privacybeleid kunt u contact opnemen via <a href="mailto:info@platinautomotive.nl" className="text-primary hover:underline">info@platinautomotive.nl</a> of telefonisch via 071-781 25 25.</p>
           </section>
 
           <section>

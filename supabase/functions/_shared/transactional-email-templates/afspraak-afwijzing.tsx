@@ -18,7 +18,7 @@ const Afwijzing = ({ naam }: Props) => (
         <Text style={text}>Beste {naam || 'klant'},</Text>
         <Text style={text}>
           Helaas kunnen we uw aanvraag op dit moment niet inplannen. Neem gerust
-          contact met ons op via 06-12693825 om de mogelijkheden te bespreken.
+          contact met ons op via 071-781 25 25 om de mogelijkheden te bespreken.
         </Text>
         <Text style={footer}>Met vriendelijke groet,<br />{SITE_NAME}</Text>
       </Container>

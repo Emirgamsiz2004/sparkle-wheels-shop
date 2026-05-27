@@ -363,7 +363,7 @@ const DetailingBookingDialog = ({
               </div>
               <div className="text-xs text-white/60 space-y-1.5 mb-6">
                 <p className="flex items-center justify-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Cilinderweg 99, Roelofarendsveen</p>
-                <p className="flex items-center justify-center gap-1.5"><Phone className="w-3.5 h-3.5" /> Wij nemen contact met u op ter bevestiging via 06-20686868</p>
+                <p className="flex items-center justify-center gap-1.5"><Phone className="w-3.5 h-3.5" /> Wij nemen contact met u op ter bevestiging via 071-781 25 25</p>
               </div>
               <button onClick={() => onOpenChange(false)} className="px-6 py-2.5 bg-amber-400 text-background rounded-[10px] font-semibold text-sm hover:bg-amber-300 transition-colors">
                 Sluiten
@@ -472,7 +472,7 @@ const DetailingBookingDialog = ({
 
           <p className="text-[11px] text-white/40 mt-6 leading-relaxed text-center">
             Alle prijzen zijn inclusief 21% BTW · Locatie: Cilinderweg 99, Roelofarendsveen · Vragen? Bel{" "}
-            <a href="tel:+31620686868" className="text-white/70 hover:text-amber-400">06-20686868</a>
+            <a href="tel:+31620686868" className="text-white/70 hover:text-amber-400">071-781 25 25</a>
           </p>
         </div>
       </DialogContent>

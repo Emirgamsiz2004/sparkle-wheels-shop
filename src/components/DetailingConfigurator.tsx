@@ -526,7 +526,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
                   <p className="text-xs font-body text-muted-foreground">
                     Of bel direct:{" "}
                     <a href="tel:+31620686868" className="text-foreground hover:text-amber-400 transition-colors">
-                      06-20686868
+                      071-781 25 25
                     </a>
                   </p>
                 </div>

@@ -260,7 +260,7 @@ function buildHtml(data: KoopovereenkomstData): string {
   </div>
   <div class="company-info">
     <span>Cilinderweg 99, 2371 DZ Roelofarendsveen</span>
-    <span>06-12693825</span>
+    <span>071-781 25 25</span>
     <span>info@platinautomotive.nl</span>
     <span>KVK ${escapeHtml(data.bedrijf?.kvk || "99146193")}</span>
   </div>
@@ -272,7 +272,7 @@ function buildHtml(data: KoopovereenkomstData): string {
       <div class="name">Platin Automotive</div>
       <p>Cilinderweg 99</p>
       <p>2371 DZ Roelofarendsveen</p>
-      <p>Tel: 06-12693825</p>
+      <p>Tel: 071-781 25 25</p>
       <p>info@platinautomotive.nl</p>
     </div>
     <div class="party">

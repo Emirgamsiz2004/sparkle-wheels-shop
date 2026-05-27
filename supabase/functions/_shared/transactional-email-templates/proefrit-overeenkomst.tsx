@@ -85,7 +85,7 @@ const ProefritOvereenkomstEmail: React.FC<Props> = ({
         <Section style={{ borderTop: '1px solid #eee', padding: '20px 40px' }}>
           <Text style={{ fontSize: '11px', color: '#999', textAlign: 'center', lineHeight: '1.6', margin: 0 }}>
             Platin Automotive · Cilinderweg 99 · 2371 DZ Roelofarendsveen{'\n'}
-            06-12693825 · info@platinautomotive.nl · KvK 99146193
+            071-781 25 25 · info@platinautomotive.nl · KvK 99146193
           </Text>
         </Section>
       </Container>
