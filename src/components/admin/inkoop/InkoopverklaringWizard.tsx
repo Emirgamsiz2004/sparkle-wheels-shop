@@ -40,26 +40,60 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
   const { vehicles } = useVehicles();
   const [linkVehicleId, setLinkVehicleId] = useState<string>("");
 
-  // Form state
-  const [verkoper, setVerkoper] = useState({ naam: "", email: "", telefoon: "", adres: "", woonplaats: "" });
-  const [voertuig, setVoertuig] = useState({ kenteken: "", merk: "", model: "", bouwjaar: "", kilometerstand: "", chassisnummer: "" });
-  const [legType, setLegType] = useState<string>("paspoort");
-  const [legNummer, setLegNummer] = useState("");
-  const [transactie, setTransactie] = useState({ inkoopprijs: "", datum: new Date().toISOString().split("T")[0] });
+  // Form state — gepersisteerd naar localStorage zodat data niet verloren gaat op mobiel
+  const STORAGE_KEY = "ikv-wizard-draft";
+  const loadDraft = () => {
+    if (typeof window === "undefined") return null;
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); } catch { return null; }
+  };
+  const draft = loadDraft();
+
+  const [verkoper, setVerkoper] = useState(draft?.verkoper ?? { naam: "", email: "", telefoon: "", adres: "", woonplaats: "" });
+  const [voertuig, setVoertuig] = useState(draft?.voertuig ?? { kenteken: "", merk: "", model: "", bouwjaar: "", kilometerstand: "", chassisnummer: "" });
+  const [legType, setLegType] = useState<string>(draft?.legType ?? "paspoort");
+  const [legNummer, setLegNummer] = useState<string>(draft?.legNummer ?? "");
+  const [transactie, setTransactie] = useState(draft?.transactie ?? { inkoopprijs: "", datum: new Date().toISOString().split("T")[0] });
+
+  useEffect(() => {
+    if (done) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ verkoper, voertuig, legType, legNummer, transactie }));
+    } catch {}
+  }, [verkoper, voertuig, legType, legNummer, transactie, done]);
 
   // Signature
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sigPadRef = useRef<SignaturePad | null>(null);
 
+  // Robuuste init + resize: behoudt bestaande tekening bij viewport/keyboard wijzigingen
   useEffect(() => {
-    if (step === 2 && canvasRef.current && !sigPadRef.current) {
-      const canvas = canvasRef.current;
+    if (step !== 2 || !canvasRef.current) return;
+    const canvas = canvasRef.current;
+
+    const resizeCanvas = () => {
       const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      const data = sigPadRef.current?.toData();
       canvas.width = canvas.offsetWidth * ratio;
       canvas.height = canvas.offsetHeight * ratio;
-      canvas.getContext("2d")?.scale(ratio, ratio);
-      sigPadRef.current = new SignaturePad(canvas, { backgroundColor: "rgb(255,255,255)" });
-    }
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.scale(ratio, ratio);
+        ctx.fillStyle = "rgb(255,255,255)";
+        ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+      }
+      if (!sigPadRef.current) {
+        sigPadRef.current = new SignaturePad(canvas, { backgroundColor: "rgb(255,255,255)" });
+      }
+      if (data && data.length) sigPadRef.current.fromData(data);
+    };
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    window.visualViewport?.addEventListener("resize", resizeCanvas);
+    return () => {
+      window.removeEventListener("resize", resizeCanvas);
+      window.visualViewport?.removeEventListener("resize", resizeCanvas);
+    };
   }, [step]);
 
   const resetAll = useCallback(() => {
@@ -74,10 +108,11 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
     setTransactie({ inkoopprijs: "", datum: new Date().toISOString().split("T")[0] });
     setLinkVehicleId("");
     if (sigPadRef.current) { sigPadRef.current.clear(); sigPadRef.current = null; }
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
   }, []);
 
+  // Sluit dialog zonder data te wissen — gebruiker kan verder waar hij gebleven was
   const handleClose = (v: boolean) => {
-    if (!v) resetAll();
     onOpenChange(v);
   };
 
