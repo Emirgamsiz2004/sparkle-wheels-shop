@@ -2,7 +2,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 let cached: { url: string | null; dataUrl: string | null } = { url: null, dataUrl: null };
 
-/** Haal signature_url op uit profiles van de huidig ingelogde admin. */
+/** Haal een bruikbare signature URL op voor de ingelogde admin.
+ *  signature_url bevat sinds privacy-hardening een storage path. Legacy
+ *  records met een volledige URL worden ook ondersteund.
+ */
 export async function getCurrentUserSignatureUrl(): Promise<string | null> {
   const { data: auth } = await supabase.auth.getUser();
   const uid = auth?.user?.id;
@@ -12,7 +15,13 @@ export async function getCurrentUserSignatureUrl(): Promise<string | null> {
     .select("signature_url")
     .eq("user_id", uid)
     .maybeSingle();
-  return (data as any)?.signature_url || null;
+  const raw = (data as any)?.signature_url || null;
+  if (!raw) return null;
+  if (/^https?:\/\//i.test(raw)) return raw; // legacy
+  const { data: signed } = await supabase.storage
+    .from("signatures")
+    .createSignedUrl(raw, 60 * 60);
+  return signed?.signedUrl || null;
 }
 
 /** Convert URL → PNG dataURL voor embedding in PDF (jsPDF.addImage of <img>). */
