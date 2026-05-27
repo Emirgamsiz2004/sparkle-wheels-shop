@@ -55,7 +55,7 @@ const openingHours = [
   { day: "Donderdag", time: "09:00 - 18:00" },
   { day: "Vrijdag", time: "09:00 - 18:00" },
   { day: "Zaterdag", time: "10:00 - 17:00" },
-  { day: "Zondag", time: "10:00 - 17:00" },
+  { day: "Zondag", time: "10:00 - 16:00" },
 ];
 
 const ContactForm = () => {
