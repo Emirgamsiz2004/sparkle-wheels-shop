@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Calculator, Info, X } from "lucide-react";
@@ -9,6 +9,19 @@ import interiorImg from "@/assets/detailing/interior.webp";
 
 const DetailingCTASection = () => {
   const [expanded, setExpanded] = useState(false);
+  const configRef = useRef<HTMLDivElement>(null);
+
+  const handleToggle = () => {
+    setExpanded((v) => {
+      const next = !v;
+      if (next && typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches) {
+        setTimeout(() => {
+          configRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 350);
+      }
+      return next;
+    });
+  };
 
   return (
     <section className="py-16 md:py-24 bg-background border-t border-border">
