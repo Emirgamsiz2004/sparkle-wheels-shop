@@ -23,7 +23,7 @@ const GarantieSection = () => {
         >
           {/* Left — logo block */}
           <div className="bg-card p-8 md:p-12 flex flex-col justify-center items-start gap-5">
-            <ShieldCheck className="w-7 h-7 text-primary" />
+            <ShieldCheck className="w-7 h-7 text-gold" />
             <img
               src={logoAutotrust}
               alt="AutoTrust garantie"
@@ -53,7 +53,7 @@ const GarantieSection = () => {
             <ul className="grid sm:grid-cols-2 gap-2.5 mb-8">
               {punten.map((p) => (
                 <li key={p} className="flex items-start gap-2.5 text-sm font-body text-foreground/85">
-                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-4 h-4 text-gold shrink-0 mt-0.5" />
                   {p}
                 </li>
               ))}
