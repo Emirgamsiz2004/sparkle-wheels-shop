@@ -34,7 +34,7 @@ const HomeAboutSection = () => {
             className="lg:col-span-6 space-y-8"
           >
             <div className="space-y-4">
-              <span className="block text-[10px] tracking-[0.4em] uppercase font-body font-semibold text-amber-400">
+              <span className="block text-[10px] tracking-[0.4em] uppercase font-body font-semibold text-gold">
                 Over ons
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground tracking-tight leading-[1.15]">
@@ -57,10 +57,10 @@ const HomeAboutSection = () => {
               to="/over-ons"
               className="group inline-flex items-center gap-3 font-body font-medium"
             >
-              <span className="text-sm tracking-[0.2em] uppercase italic text-foreground border-b border-foreground/20 pb-1 transition-colors duration-500 group-hover:border-amber-400 group-hover:text-amber-400">
+              <span className="text-sm tracking-[0.2em] uppercase italic text-foreground border-b border-foreground/20 pb-1 transition-colors duration-500 group-hover:border-gold group-hover:text-gold">
                 Leer ons kennen
               </span>
-              <ArrowRight className="w-4 h-4 text-amber-400 transition-transform duration-500 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 text-gold transition-transform duration-500 group-hover:translate-x-1" />
             </Link>
           </motion.div>
 
@@ -78,7 +78,7 @@ const HomeAboutSection = () => {
                   className="group p-6 flex gap-5 items-start bg-foreground/[0.02] border border-foreground/5 hover:bg-foreground/[0.04] transition-all duration-500"
                 >
                   <Icon
-                    className="w-5 h-5 mt-1 shrink-0 text-muted-foreground group-hover:text-amber-400 transition-colors duration-500"
+                    className="w-5 h-5 mt-1 shrink-0 text-muted-foreground group-hover:text-gold transition-colors duration-500"
                     strokeWidth={1.5}
                   />
                   <div>
