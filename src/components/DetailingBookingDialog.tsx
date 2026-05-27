@@ -194,54 +194,31 @@ const DetailingBookingDialog = ({
       }
 
       const naam = `${form.voornaam} ${form.achternaam}`.trim();
-      const { data: inserted, error } = await (supabase
-        .from("bookings" as any) as any)
-        .insert({
-          naam,
-          telefoon: form.telefoon,
-          email: form.email,
-          voertuig_type: voertuigType,
-          pakket,
-          extras,
-          totaal_prijs: totalPrice,
-          totaal_minuten: totalMinuten,
-          datum: datumStr,
-          starttijd,
-          eindtijd,
-          status: "bevestigd",
-          opmerking: form.opmerking || null,
-        })
-        .select("id")
-        .single();
-
-      if (error) throw error;
-
-      // Mirror naar appointments tabel (admin dashboard)
-      const dtStart = new Date(date);
-      dtStart.setHours(Math.floor(startMin / 60), startMin % 60, 0, 0);
-      const dtEnd = new Date(dtStart);
-      dtEnd.setMinutes(dtEnd.getMinutes() + totalMinuten);
-
       const dienstenNotitie = `${summary}\nTotaalprijs: €${totalPrice} incl. BTW\nDuur: ${fmtMin(totalMinuten)}\n\nOnderdelen:\n- ${diensten.join("\n- ")}${form.opmerking ? `\n\nOpmerking klant: ${form.opmerking}` : ""}`;
 
-      await (supabase.from("appointments") as any).insert({
-        type: "poetsbeurt",
-        datum_tijd: dtStart.toISOString(),
-        eind_datum_tijd: dtEnd.toISOString(),
-        status: "gepland",
-        bron: "website",
-        is_aanvraag: false,
-        diensten: [pakket, ...extras],
-        diensten_notitie: dienstenNotitie,
-        geschatte_duur_minuten: totalMinuten,
-        betalingsstatus: "openstaand",
-        aanvrager_voornaam: form.voornaam,
-        aanvrager_achternaam: form.achternaam,
-        aanvrager_telefoon: form.telefoon,
-        aanvrager_email: form.email,
-        notities: form.opmerking || null,
-        onderwerp: summary,
+      // Single server-side validated RPC creates booking + mirrors appointment
+      const { data: newId, error } = await (supabase.rpc as any)("submit_booking", {
+        p_naam: naam,
+        p_telefoon: form.telefoon,
+        p_email: form.email,
+        p_voertuig_type: voertuigType,
+        p_pakket: pakket,
+        p_extras: extras,
+        p_totaal_prijs: totalPrice,
+        p_totaal_minuten: totalMinuten,
+        p_datum: datumStr,
+        p_starttijd: starttijd,
+        p_eindtijd: eindtijd,
+        p_opmerking: form.opmerking || null,
+        p_voornaam: form.voornaam,
+        p_achternaam: form.achternaam,
+        p_diensten: [pakket, ...extras],
+        p_diensten_notitie: dienstenNotitie,
+        p_onderwerp: summary,
       });
+
+      if (error) throw error;
+      const inserted = { id: newId as string };
 
       const datumLabel = format(date, "EEEE d MMMM yyyy", { locale: nl });
 
