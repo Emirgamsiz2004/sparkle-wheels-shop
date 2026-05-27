@@ -162,6 +162,40 @@ const HeroSection = () => {
           </Link>
         </motion.div>
 
+        {/* Subtle Google reviews */}
+        {reviewData && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+            className="mt-6"
+          >
+            <Link
+              to="/reviews"
+              className="group inline-flex items-center gap-2.5 text-foreground/60 hover:text-foreground transition-colors"
+              aria-label={`Beoordeeld met ${reviewData.rating.toFixed(1)} sterren op Google`}
+            >
+              <GoogleG />
+              <div className="flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-3 h-3 ${
+                      i < Math.round(reviewData.rating)
+                        ? "fill-gold text-gold"
+                        : "text-foreground/20"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] md:text-xs font-body tracking-wider uppercase">
+                <span className="font-semibold text-foreground/80">{reviewData.rating.toFixed(1)}</span>
+                <span className="text-foreground/40"> · {reviewData.totalRatings} reviews</span>
+              </span>
+            </Link>
+          </motion.div>
+        )}
+
         {/* Slide indicators */}
         <div className="flex gap-2 mt-10">
           {slidePositions.map((_, i) => (
