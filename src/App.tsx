@@ -60,6 +60,7 @@ import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
 import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
+import SmoothScroll from "./components/SmoothScroll";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import AlgemeneVoorwaarden from "./pages/AlgemeneVoorwaarden";
@@ -80,6 +81,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <SmoothScroll />
           <AnnouncementBar />
           {UNDER_CONSTRUCTION ? (
             <Routes>
