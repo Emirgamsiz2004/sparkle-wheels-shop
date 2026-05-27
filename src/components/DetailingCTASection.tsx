@@ -16,7 +16,7 @@ const DetailingCTASection = () => {
       const next = !v;
       if (next && typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches) {
         setTimeout(() => {
-          configRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          configRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
         }, 350);
       }
       return next;

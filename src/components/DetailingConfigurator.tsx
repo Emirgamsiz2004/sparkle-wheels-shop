@@ -189,7 +189,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
     if (typeof window === "undefined") return;
     if (!window.matchMedia("(min-width: 768px)").matches) return;
     const t = setTimeout(() => {
-      step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 250);
     return () => clearTimeout(t);
   }, [vehicle]);
@@ -199,7 +199,7 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
     if (typeof window === "undefined") return;
     if (!window.matchMedia("(min-width: 768px)").matches) return;
     const t = setTimeout(() => {
-      step3Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      step3Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 250);
     return () => clearTimeout(t);
   }, [pkg, vehicle]);
