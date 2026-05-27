@@ -245,7 +245,7 @@ const OverOns = () => {
             <div className="bg-card p-6 text-center group">
               <Clock className="w-4 h-4 text-muted-foreground mx-auto mb-3 group-hover:text-foreground transition-colors" />
               <p className="text-xs font-body font-light text-muted-foreground leading-relaxed">
-                Ma: 12:00–18:00<br />Di–vr: 09:00–18:00<br />Za & zo: 10:00–17:00
+                Ma: 12:00–18:00<br />Di–vr: 09:00–18:00<br />Za: 10:00–17:00<br />Zo: 10:00–16:00
               </p>
             </div>
           </motion.div>

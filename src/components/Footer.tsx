@@ -78,7 +78,7 @@ const Footer = () => {
             <p className="text-[11px] font-body text-muted-foreground/70">Maandag: 12:00 – 18:00</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Di – Vr: 09:00 – 18:00</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Zaterdag: 10:00 – 17:00</p>
-            <p className="text-[11px] font-body text-muted-foreground/70">Zondag: 10:00 – 17:00</p>
+            <p className="text-[11px] font-body text-muted-foreground/70">Zondag: 10:00 – 16:00</p>
 
             <div className="flex items-center gap-2.5 mt-3">
               <a href="https://www.instagram.com/platin_automotive/" target="_blank" rel="noopener noreferrer"
