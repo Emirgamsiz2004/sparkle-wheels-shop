@@ -217,6 +217,7 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
 
     setSaving(false);
     setDone(true);
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
   };
 
   const handleDownload = () => {
