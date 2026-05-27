@@ -19,32 +19,18 @@ const contactFormSchema = z.object({
 const contactDetails = [
   {
     icon: Phone,
-    label: "Verkoop",
+    label: "Telefoon",
     value: "071-781 25 25",
     href: "tel:+31717812525",
-    description: "Bel voor vragen over auto's, een afspraak of inruil",
-  },
-  {
-    icon: Phone,
-    label: "Werkplaats",
-    value: "071-781 25 25",
-    href: "tel:+31717812525",
-    description: "Bel voor onderhoud, reparatie, detailing en customizing",
+    description: "Bel voor vragen over auto's, afspraken, inruil of werkplaats",
   },
   {
     icon: MessageCircle,
-    label: "WhatsApp Verkoop",
+    label: "WhatsApp",
     value: "071-781 25 25",
-    href: "https://wa.me/31717812525?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20een%20auto.",
-    description: "Stuur een berichtje over een auto",
+    href: "https://wa.me/31717812525?text=Hallo%2C%20ik%20heb%20een%20vraag.",
+    description: "Stuur een berichtje — we reageren zo snel mogelijk",
     highlight: true,
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp Werkplaats",
-    value: "071-781 25 25",
-    href: "https://wa.me/31717812525?text=Hallo%2C%20ik%20heb%20een%20vraag%20voor%20de%20werkplaats.",
-    description: "Stuur een berichtje voor onderhoud of service",
   },
   {
     icon: Mail,
