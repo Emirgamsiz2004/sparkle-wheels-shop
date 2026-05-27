@@ -378,8 +378,16 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
                 </div>
                 <div>
                   <Label className="text-xs mb-2 block">Handtekening verkoper *</Label>
-                  <div className="border border-border rounded-lg overflow-hidden bg-white">
-                    <canvas ref={canvasRef} className="w-full" style={{ height: 150, touchAction: "none" }} />
+                  <div
+                    className="border border-border rounded-lg overflow-hidden bg-white"
+                    style={{ touchAction: "none" }}
+                    onTouchMove={(e) => e.preventDefault()}
+                  >
+                    <canvas
+                      ref={canvasRef}
+                      className="w-full block"
+                      style={{ height: 200, touchAction: "none" }}
+                    />
                   </div>
                   <Button variant="ghost" size="sm" className="mt-1 text-xs text-muted-foreground" onClick={() => sigPadRef.current?.clear()}>
                     Wissen
