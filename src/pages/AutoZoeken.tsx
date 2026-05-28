@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ServiceSEOContent from "@/components/ServiceSEOContent";
 import verkoopImg from "@/assets/verkoop.jpg";
 
 const zoekSchema = z.object({
