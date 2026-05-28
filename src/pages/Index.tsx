@@ -18,8 +18,8 @@ const Index = () => {
         <title>Platin Automotive | Occasions & Garage Roelofarendsveen</title>
         <meta name="description" content="Platin Automotive in Roelofarendsveen. Betrouwbare occasions, auto detailing, onderhoud & consignatie. RDW-erkend familiebedrijf. Bel of WhatsApp!" />
         <link rel="canonical" href="https://platinautomotive.nl/" />
-        <meta property="og:title" content="Occasions & Detailing Roelofarendsveen | Platin Automotive" />
-        <meta property="og:description" content="Betrouwbare occasions, detailing en consignatie in Roelofarendsveen. Eerlijke prijzen, persoonlijk advies." />
+        <meta property="og:title" content="Platin Automotive | Occasions & Garage Roelofarendsveen" />
+        <meta property="og:description" content="Platin Automotive in Roelofarendsveen. Betrouwbare occasions, detailing en consignatie. Eerlijke prijzen, persoonlijk advies." />
         <meta property="og:image" content="https://platinautomotive.nl/images/platin-og-logo-v2.jpg?v=2" />
         <meta property="og:image:secure_url" content="https://platinautomotive.nl/images/platin-og-logo-v2.jpg?v=2" />
         <meta property="og:image:width" content="1200" />
