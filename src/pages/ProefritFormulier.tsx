@@ -185,7 +185,8 @@ const ProefritFormulier = () => {
       setSubmitted(true);
     } catch (err: any) {
       console.error("Submit error:", err);
-      setError("Er ging iets mis. Probeer het opnieuw.");
+      const msg = err?.message || err?.error_description || "Er ging iets mis. Probeer het opnieuw.";
+      setError(msg);
     }
     setSubmitting(false);
   };
