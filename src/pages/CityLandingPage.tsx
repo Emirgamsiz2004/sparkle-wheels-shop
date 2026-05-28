@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Check } from "lucide-react";
+import { MapPin, Phone, Check, Route, Wrench, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,18 @@ interface CityPageProps {
   bulletHeading?: string;
   bullets: string[];
   outro?: string;
+  driveMinutes: number;
+  routeDescription: string;
+  services?: { label: string; to: string }[];
+  whyChooseText?: string;
 }
+
+const defaultServices = [
+  { label: "Occasions", to: "/voorraad" },
+  { label: "Auto Detailing", to: "/auto-detailing" },
+  { label: "Onderhoud & Reparatie", to: "/onderhoud-reparatie" },
+  { label: "Financiering", to: "/contact" },
+];
 
 const CityLandingPage = ({
   city,
@@ -28,7 +39,15 @@ const CityLandingPage = ({
   bulletHeading,
   bullets,
   outro,
+  driveMinutes,
+  routeDescription,
+  services = defaultServices,
+  whyChooseText,
 }: CityPageProps) => {
+  const whyText =
+    whyChooseText ??
+    `Platin Automotive is een RDW-erkend familiebedrijf. U praat direct met de eigenaar — geen verkoopafdeling, geen tussenpersonen. Elke auto die we verkopen wordt geleverd met officiële AutoTrust garantie (BOVAG), zodat klanten uit ${city} met een gerust hart de weg op gaan.`;
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -43,7 +62,7 @@ const CityLandingPage = ({
       </Helmet>
       <Navbar />
 
-      <section className="pt-32 pb-16 md:pt-40 md:pb-28">
+      <section className="pt-32 pb-16 md:pt-40 md:pb-20">
         <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -91,10 +110,6 @@ const CityLandingPage = ({
               </p>
             )}
 
-            <p className="text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
-              Liever niet zelf rijden? Wij bezorgen de auto ook bij u thuis of op het werk. Vraag naar de mogelijkheden en bezorgkosten tijdens uw bezoek of via telefoon.
-            </p>
-
             <div className="border border-border rounded-lg p-6 bg-card mt-8 space-y-3">
               <div className="flex items-center gap-3 text-foreground font-body">
                 <MapPin className="w-4 h-4 text-primary" />
@@ -115,6 +130,79 @@ const CityLandingPage = ({
               </Button>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Hoe werkt het */}
+      <section className="py-16 border-t border-border">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6">
+            Occasions kopen bij {city} — hoe werkt het?
+          </h2>
+          <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+            <p>
+              Wij zijn gevestigd in Roelofarendsveen, op slechts {driveMinutes} minuten rijden van {city}. U maakt vrijblijvend een afspraak, komt langs voor een bezichtiging en neemt rustig de tijd om de auto te bekijken.
+            </p>
+            <p>
+              Gratis proefrit en thuisbezorging zijn mogelijk. Past de auto bij u? Dan regelen we de financiering, garantie en eventuele inruil van uw huidige auto in één afspraak.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Diensten */}
+      <section className="py-16 border-t border-border bg-card/30">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6">
+            Onze diensten voor klanten uit {city}
+          </h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {services.map((s, i) => (
+              <li key={i}>
+                <Link
+                  to={s.to}
+                  className="flex items-center gap-3 p-4 border border-border rounded-lg bg-background hover:border-primary transition-colors text-foreground font-body"
+                >
+                  <Wrench className="w-4 h-4 text-primary shrink-0" />
+                  <span>{s.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Rijroute */}
+      <section className="py-16 border-t border-border">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6 flex items-center gap-3">
+            <Route className="w-6 h-6 text-primary" />
+            Rijroute vanuit {city}
+          </h2>
+          <p className="text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+            {routeDescription}
+          </p>
+        </div>
+      </section>
+
+      {/* Waarom Platin */}
+      <section className="py-16 border-t border-border bg-card/30">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6 flex items-center gap-3">
+            <ShieldCheck className="w-6 h-6 text-primary" />
+            Waarom klanten uit {city} voor Platin kiezen
+          </h2>
+          <p className="text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+            {whyText}
+          </p>
+          <div className="flex flex-wrap gap-4 pt-8">
+            <Button asChild>
+              <Link to="/voorraad">Bekijk ons aanbod</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/contact">Plan een afspraak</Link>
+            </Button>
+          </div>
         </div>
       </section>
 

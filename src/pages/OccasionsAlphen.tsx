@@ -17,6 +17,8 @@ const OccasionsAlphen = () => (
       "Altijd welkom zonder afspraak",
     ]}
     outro="Roelofarendsveen ligt direct aan de N11 vanuit Alphen aan den Rijn. U bent er zo."
+    driveMinutes={10}
+    routeDescription="Vanuit Alphen aan den Rijn rijdt u in ca. 10 minuten via de N207 en N446 naar Roelofarendsveen. Een korte, directe route met goede bewegwijzering."
   />
 );
 

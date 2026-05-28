@@ -17,6 +17,8 @@ const OccasionsDenHaag = () => (
       "Geen verkoopdruk — u beslist zelf",
     ]}
     outro="Wilt u een auto komen bekijken? Laat het ons even weten dan staat hij klaar voor u."
+    driveMinutes={30}
+    routeDescription="Vanuit Den Haag rijdt u in ca. 30 minuten via de A4 richting Amsterdam, afslag Roelofarendsveen. De route is vrijwel volledig snelweg."
   />
 );
 
