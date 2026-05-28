@@ -17,6 +17,8 @@ const OccasionsLeiden = () => (
       "Onderhoud en reparaties",
     ]}
     outro="Kom gerust langs tijdens onze openingstijden. Wilt u een specifieke auto bekijken? Laat het ons even weten zodat we hem voor u klaar zetten."
+    driveMinutes={15}
+    routeDescription="Vanuit Leiden centrum bent u in ca. 15 minuten bij ons. Neem de N11 richting Alphen aan den Rijn en volg de borden naar Roelofarendsveen."
   />
 );
 
