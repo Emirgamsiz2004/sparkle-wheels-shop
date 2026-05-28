@@ -116,7 +116,7 @@ const BlogPost = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>{post.meta_title || post.title}</title>
+        <title>{`${post.meta_title || post.title} | Platin Automotive`}</title>
         <meta name="description" content={post.meta_description || post.excerpt || ""} />
         <link rel="canonical" href={`https://platinautomotive.nl/blog/${post.slug}`} />
         <meta property="og:title" content={post.meta_title || post.title} />
