@@ -4,6 +4,7 @@ import { ArrowRight, ShieldCheck, FileCheck, Eye, Handshake, MapPin } from "luci
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ServiceSEOContent from "@/components/ServiceSEOContent";
 import verkoopImg from "@/assets/verkoop.jpg";
 
 const usps = [
