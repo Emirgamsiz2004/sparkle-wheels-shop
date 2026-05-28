@@ -16,6 +16,8 @@ const OccasionsZoetermeer = () => (
       "Inkoop van uw huidige voertuig",
       "Eerlijk advies zonder verkoopdruk",
     ]}
+    driveMinutes={25}
+    routeDescription="Vanuit Zoetermeer rijdt u in ca. 25 minuten via de N206 en A4 naar Roelofarendsveen. Een vlotte route, grotendeels via de snelweg."
   />
 );
 
