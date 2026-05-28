@@ -142,11 +142,11 @@ const ProefritFormulier = () => {
 
     try {
       // Upload rijbewijs foto
-      const fileExt = rijbewijsFoto.name.split(".").pop() || "jpg";
-      const filePath = `${testDrive.id}/rijbewijs.${fileExt}`;
+      const fileExt = (rijbewijsFoto.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const filePath = `${testDrive.id}/rijbewijs-${Date.now()}.${fileExt}`;
       const { error: uploadErr } = await supabase.storage
         .from("test-drive-files")
-        .upload(filePath, rijbewijsFoto, { upsert: true });
+        .upload(filePath, rijbewijsFoto, { upsert: false, contentType: rijbewijsFoto.type || "image/jpeg" });
       if (uploadErr) throw uploadErr;
 
       const sanitizedRijbewijs = sanitizeRijbewijs(rijbewijsnummer);
@@ -185,7 +185,8 @@ const ProefritFormulier = () => {
       setSubmitted(true);
     } catch (err: any) {
       console.error("Submit error:", err);
-      setError("Er ging iets mis. Probeer het opnieuw.");
+      const msg = err?.message || err?.error_description || "Er ging iets mis. Probeer het opnieuw.";
+      setError(msg);
     }
     setSubmitting(false);
   };
