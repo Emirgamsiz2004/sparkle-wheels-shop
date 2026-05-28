@@ -3,7 +3,7 @@ import CityLandingPage from "./CityLandingPage";
 const OccasionsLeiden = () => (
   <CityLandingPage
     city="Leiden"
-    metaTitle="Occasions Kopen Leiden | Platin Automotive"
+    metaTitle="Occasions kopen bij Leiden | Platin Automotive"
     metaDescription="Occasion kopen in de buurt van Leiden? Platin Automotive in Roelofarendsveen is 20 minuten rijden. Erkend bedrijf, AutoTrust garantie, eerlijke prijzen."
     canonical="https://platinautomotive.nl/occasions-leiden"
     heading="Occasions kopen in de buurt van Leiden"

@@ -23,16 +23,16 @@ const OnderhoudReparatie = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Auto Onderhoud & Reparatie | Platin Automotive</title>
-        <meta name="description" content="Betrouwbaar onderhoud en reparatie voor alle merken bij Platin Automotive. Snelle service, eerlijke prijs in Roelofarendsveen. Maak vandaag een afspraak." />
+        <title>Auto Onderhoud &amp; Reparatie Roelofarendsveen | Platin Automotive</title>
+        <meta name="description" content="Auto onderhoud en reparatie in Roelofarendsveen. Olie, remmen, banden, airco en meer. Eerlijke prijzen, snelle service. Maak vandaag een afspraak." />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/onderhoud-reparatie" />
         <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Auto Onderhoud & Reparatie | Platin Automotive" />
-        <meta property="og:description" content="Betrouwbaar onderhoud en reparatie voor alle merken bij Platin Automotive. Snelle service, eerlijke prijs in Roelofarendsveen. Maak vandaag een afspraak." />
+        <meta property="og:title" content="Auto Onderhoud &amp; Reparatie Roelofarendsveen | Platin Automotive" />
+        <meta property="og:description" content="Auto onderhoud en reparatie in Roelofarendsveen. Olie, remmen, banden, airco en meer. Eerlijke prijzen, snelle service. Maak vandaag een afspraak." />
         <meta property="og:url" content="https://platinautomotive.nl/diensten/onderhoud-reparatie" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:title" content="Auto Onderhoud & Reparatie | Platin Automotive" />
-        <meta name="twitter:description" content="Betrouwbaar onderhoud en reparatie voor alle merken bij Platin Automotive. Snelle service, eerlijke prijs in Roelofarendsveen. Maak vandaag een afspraak." />
+        <meta name="twitter:title" content="Auto Onderhoud &amp; Reparatie Roelofarendsveen | Platin Automotive" />
+        <meta name="twitter:description" content="Auto onderhoud en reparatie in Roelofarendsveen. Olie, remmen, banden, airco en meer. Eerlijke prijzen, snelle service. Maak vandaag een afspraak." />
 
       </Helmet>
       <Navbar />

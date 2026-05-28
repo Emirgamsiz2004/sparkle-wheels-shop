@@ -11,16 +11,16 @@ const OverOns = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Over Ons | Platin Automotive Roelofarendsveen</title>
-        <meta name="description" content="Platin Automotive is een eerlijk en persoonlijk autobedrijf in Roelofarendsveen. RDW-erkend, topbeoordeeld door klanten uit heel Zuid-Holland." />
+        <title>Over Platin Automotive | Garage Roelofarendsveen</title>
+        <meta name="description" content="Leer Platin Automotive kennen. Een RDW-erkend familiebedrijf in Roelofarendsveen gespecialiseerd in occasions, detailing en persoonlijk contact." />
         <link rel="canonical" href="https://platinautomotive.nl/over-ons" />
         <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Over Ons | Platin Automotive Roelofarendsveen" />
-        <meta property="og:description" content="Platin Automotive is een eerlijk en persoonlijk autobedrijf in Roelofarendsveen. RDW-erkend, topbeoordeeld door klanten uit heel Zuid-Holland." />
+        <meta property="og:title" content="Over Platin Automotive | Garage Roelofarendsveen" />
+        <meta property="og:description" content="Leer Platin Automotive kennen. Een RDW-erkend familiebedrijf in Roelofarendsveen gespecialiseerd in occasions, detailing en persoonlijk contact." />
         <meta property="og:url" content="https://platinautomotive.nl/over-ons" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:title" content="Over Ons | Platin Automotive Roelofarendsveen" />
-        <meta name="twitter:description" content="Platin Automotive is een eerlijk en persoonlijk autobedrijf in Roelofarendsveen. RDW-erkend, topbeoordeeld door klanten uit heel Zuid-Holland." />
+        <meta name="twitter:title" content="Over Platin Automotive | Garage Roelofarendsveen" />
+        <meta name="twitter:description" content="Leer Platin Automotive kennen. Een RDW-erkend familiebedrijf in Roelofarendsveen gespecialiseerd in occasions, detailing en persoonlijk contact." />
 
       </Helmet>
       <Navbar />

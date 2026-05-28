@@ -3,7 +3,7 @@ import CityLandingPage from "./CityLandingPage";
 const OccasionsAlphen = () => (
   <CityLandingPage
     city="Alphen aan den Rijn"
-    metaTitle="Occasions Kopen Alphen aan den Rijn | Platin Automotive"
+    metaTitle="Occasions kopen bij Alphen aan den Rijn | Platin Automotive"
     metaDescription="Op zoek naar een betrouwbare occasion in de buurt van Alphen aan den Rijn? Platin Automotive staat op slechts 10 minuten rijden. Bekijk ons aanbod."
     canonical="https://platinautomotive.nl/occasions-alphen-aan-den-rijn"
     heading="Occasions kopen vlakbij Alphen aan den Rijn"

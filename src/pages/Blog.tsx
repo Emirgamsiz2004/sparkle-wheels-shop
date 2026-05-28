@@ -26,15 +26,15 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Auto Tips & Nieuws | Blog Platin Automotive Roelofarendsveen</title>
-        <meta name="description" content="Lees onze blogs over occasions kopen, auto detailing, onderhoud en consignatie. Handige tips van Platin Automotive in Roelofarendsveen." />
+        <title>Automotive Blog | Tips &amp; Occasions | Platin Automotive</title>
+        <meta name="description" content="Lees onze automotive blog. Tips voor occasions kopen, auto detailing, onderhoud en meer. Actueel advies van Platin Automotive in Roelofarendsveen." />
         <link rel="canonical" href="https://platinautomotive.nl/blog" />
-        <meta property="og:title" content="Auto Tips & Nieuws | Blog Platin Automotive Roelofarendsveen" />
-        <meta property="og:description" content="Lees onze blogs over occasions kopen, auto detailing, onderhoud en consignatie. Handige tips van Platin Automotive in Roelofarendsveen." />
+        <meta property="og:title" content="Automotive Blog | Tips &amp; Occasions | Platin Automotive" />
+        <meta property="og:description" content="Lees onze automotive blog. Tips voor occasions kopen, auto detailing, onderhoud en meer. Actueel advies van Platin Automotive in Roelofarendsveen." />
         <meta property="og:url" content="https://platinautomotive.nl/blog" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:title" content="Auto Tips & Nieuws | Blog Platin Automotive Roelofarendsveen" />
-        <meta name="twitter:description" content="Lees onze blogs over occasions kopen, auto detailing, onderhoud en consignatie. Handige tips van Platin Automotive in Roelofarendsveen." />
+        <meta name="twitter:title" content="Automotive Blog | Tips &amp; Occasions | Platin Automotive" />
+        <meta name="twitter:description" content="Lees onze automotive blog. Tips voor occasions kopen, auto detailing, onderhoud en meer. Actueel advies van Platin Automotive in Roelofarendsveen." />
 
       </Helmet>
       <Navbar />
