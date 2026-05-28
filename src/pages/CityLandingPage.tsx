@@ -47,6 +47,10 @@ const CityLandingPage = ({
   routeDescription,
   services = defaultServices,
   whyChooseText,
+  detailingSection,
+  onderhoudSection,
+  occasionsSection,
+  appointmentSection,
 }: CityPageProps) => {
   const whyText =
     whyChooseText ??
