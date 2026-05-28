@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Check, Route, Wrench, ShieldCheck } from "lucide-react";
+import { MapPin, Phone, Check, Route, Wrench, ShieldCheck, Sparkles, Settings, Car, Calendar } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
