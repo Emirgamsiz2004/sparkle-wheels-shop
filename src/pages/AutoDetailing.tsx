@@ -48,7 +48,6 @@ const AutoDetailing = () => {
 
   useEffect(() => {
     if (location.hash === "#configurator") {
-      // Wait a tick so the section is mounted, then snap to it without slow smooth scroll
       requestAnimationFrame(() => {
         const el = document.getElementById("configurator");
         if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
@@ -60,16 +59,15 @@ const AutoDetailing = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Auto Detailing Roelofarendsveen | Poetsen &amp; Polijsten | Platin Automotive</title>
-        <meta name="description" content="Professioneel auto detailing in Roelofarendsveen. Poetsen, polijsten, keramische coating en meer. Plan direct uw afspraak bij Platin Automotive." />
+        <meta name="description" content="Professionele auto detailing in Roelofarendsveen. Handwas, polijsten, interieur reiniging en lakbescherming. Klanten uit Alphen, Leiden en omgeving welkom. Bel 071-781 25 25." />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-detailing" />
         <meta name="robots" content="index, follow" />
         <meta property="og:title" content="Auto Detailing Roelofarendsveen | Poetsen &amp; Polijsten | Platin Automotive" />
-        <meta property="og:description" content="Professioneel auto detailing in Roelofarendsveen. Poetsen, polijsten, keramische coating en meer. Plan direct uw afspraak bij Platin Automotive." />
+        <meta property="og:description" content="Professionele auto detailing in Roelofarendsveen. Handwas, polijsten, interieur reiniging en lakbescherming. Klanten uit Alphen, Leiden en omgeving welkom. Bel 071-781 25 25." />
         <meta property="og:url" content="https://platinautomotive.nl/diensten/auto-detailing" />
         <meta property="og:type" content="website" />
         <meta name="twitter:title" content="Auto Detailing Roelofarendsveen | Poetsen &amp; Polijsten | Platin Automotive" />
-        <meta name="twitter:description" content="Professioneel auto detailing in Roelofarendsveen. Poetsen, polijsten, keramische coating en meer. Plan direct uw afspraak bij Platin Automotive." />
-
+        <meta name="twitter:description" content="Professionele auto detailing in Roelofarendsveen. Handwas, polijsten, interieur reiniging en lakbescherming. Klanten uit Alphen, Leiden en omgeving welkom. Bel 071-781 25 25." />
       </Helmet>
       <Navbar />
       <FloatingCTA targetId="afspraak" label="Afspraak maken" />
@@ -100,14 +98,76 @@ const AutoDetailing = () => {
               Diensten
             </p>
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-foreground tracking-tight">
-              Auto Detailing
+              Auto Detailing Roelofarendsveen | Professioneel Poetsen &amp; Polijsten
             </h1>
           </motion.div>
         </div>
       </section>
 
-      {/* Configurator (boven de fold na hero zodat CTA-bezoekers direct kunnen samenstellen) */}
+      {/* Configurator */}
       <DetailingConfigurator />
+
+      {/* Waarom professionele detailing? */}
+      <section className="py-16 md:py-28 bg-background">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
+              Waarom professionele detailing?
+            </h2>
+            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+              <p>Een professionele poetsbeurt is meer dan alleen een schone auto.</p>
+              <p>Het beschermt je lak, verhoogt de waarde van je auto en zorgt dat hij er altijd als nieuw uitziet. Bij Platin Automotive behandelen we elke auto met dezelfde zorg — of het nu een dagelijkse rijder is of een topmodel.</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Onze detailing diensten */}
+      <section className="py-16 md:py-28 bg-card">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
+              Onze detailing diensten
+            </h2>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
+                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <span><strong className="text-foreground font-medium">Handwas &amp; foamwash</strong> — grondige reiniging van buiten</span>
+              </li>
+              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
+                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <span><strong className="text-foreground font-medium">Polijsten &amp; ontkrassen</strong> — krassen en matte lak herstellen</span>
+              </li>
+              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
+                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <span><strong className="text-foreground font-medium">Interieur dieptereiniging</strong> — stoelen, tapijt, dashboard</span>
+              </li>
+              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
+                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <span><strong className="text-foreground font-medium">Velgen &amp; banden behandeling</strong></span>
+              </li>
+              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
+                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <span><strong className="text-foreground font-medium">Lakbescherming &amp; keramische coating</strong></span>
+              </li>
+              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
+                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <span><strong className="text-foreground font-medium">Voor &amp; na foto's</strong> van elk werk</span>
+              </li>
+            </ul>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Intro */}
       <section className="py-16 md:py-28 bg-card">
@@ -126,13 +186,13 @@ const AutoDetailing = () => {
               </h2>
               <div className="space-y-4">
                 <p className="text-muted-foreground font-body font-light leading-relaxed">
-                  Bij Platin Automotive geven we uw auto de behandeling die het verdient. 
-                  Van een uitgebreide handwas tot een complete interieur- en exterieurreiniging — 
+                  Bij Platin Automotive geven we uw auto de behandeling die het verdient.
+                  Van een uitgebreide handwas tot een complete interieur- en exterieurreiniging —
                   wij maken uw auto zo goed als nieuw.
                 </p>
                 <p className="text-muted-foreground font-body font-light leading-relaxed">
-                  Of uw auto nu toe is aan een grondige poetsbeurt of u wilt hem in showroom-conditie 
-                  brengen: wij pakken het professioneel aan. Elke auto wordt met de hand behandeld 
+                  Of uw auto nu toe is aan een grondige poetsbeurt of u wilt hem in showroom-conditie
+                  brengen: wij pakken het professioneel aan. Elke auto wordt met de hand behandeld
                   en krijgt de aandacht die het verdient.
                 </p>
               </div>
@@ -158,6 +218,26 @@ const AutoDetailing = () => {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Voor particulieren en bedrijven */}
+      <section className="py-16 md:py-28 bg-background">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
+              Voor particulieren en bedrijven
+            </h2>
+            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+              <p>Wij detailen zowel particuliere auto's als bedrijfswagens en lease-auto's.</p>
+              <p>Klanten komen naar ons toe vanuit Alphen aan den Rijn, Leiden, Lisse, Sassenheim en de wijde omgeving.</p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -224,6 +304,63 @@ const AutoDetailing = () => {
         </div>
       </section>
 
+      {/* Wat kost een detailing */}
+      <section className="py-16 md:py-28 bg-card">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
+              Wat kost een detailing bij Platin Automotive?
+            </h2>
+            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+              <p>De prijs hangt af van het voertuig en het pakket.</p>
+              <p>Neem contact op voor een vrijblijvende prijsopgave op maat. Wij denken altijd eerlijk met je mee.</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Maak een afspraak voor detailing */}
+      <section className="py-16 md:py-28 bg-background">
+        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
+              Maak een afspraak voor detailing
+            </h2>
+            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+              <p>Bel of WhatsApp 071-781 25 25 of boek direct online via onze website.</p>
+              <p>Wij zijn gevestigd op Cilinderweg 99 in Roelofarendsveen, goed bereikbaar vanuit de hele regio.</p>
+            </div>
+            <div className="flex flex-wrap gap-4 pt-6">
+              <a
+                href="tel:+31717812525"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md font-body font-medium hover:bg-primary/90 transition-colors"
+              >
+                <Phone className="w-4 h-4" />
+                Bel 071-781 25 25
+              </a>
+              <a
+                href="https://wa.me/31620686868?text=Hallo%2C%20ik%20wil%20graag%20informatie%20over%20auto%20detailing."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 border border-border text-foreground rounded-md font-body font-medium hover:border-foreground/30 transition-all"
+              >
+                <MessageCircle className="w-4 h-4 text-green-500" />
+                WhatsApp
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Afspraak + Quick contact */}
       <section id="afspraak" className="py-16 md:py-28 bg-card">
