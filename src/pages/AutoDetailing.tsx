@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
 import DetailingConfigurator from "@/components/DetailingConfigurator";
+import ServiceSEOContent from "@/components/ServiceSEOContent";
 import polishImg from "@/assets/detailing/polish.webp";
 import foamWashImg from "@/assets/detailing/foam-wash.webp";
 import foamFrontImg from "@/assets/detailing/foam-front.webp";
@@ -361,6 +362,74 @@ const AutoDetailing = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Afspraak + Quick contact */}
+      <ServiceSEOContent
+        sections={[
+          {
+            heading: "Auto detailing in Roelofarendsveen door specialisten",
+            paragraphs: [
+              "Platin Automotive is een gespecialiseerd auto detailing bedrijf in Roelofarendsveen, centraal gelegen in het Groene Hart van Zuid-Holland. Onze werkplaats aan de Cilinderweg 99 is uitgerust met professionele poetsapparatuur, gefilterd water, LED-inspectielampen en hoogwaardige producten van topmerken zoals Koch-Chemie, Gyeon en Sonax. Of u nu een dagelijkse rijder, een lease-auto, een youngtimer of een exclusieve sportwagen heeft — wij behandelen iedere auto met dezelfde passie en aandacht voor detail.",
+              "Detailing is veel meer dan een grondige wasbeurt. Het is een ambacht waarbij elk paneel, elke kier en elk onderdeel van het interieur stap voor stap wordt behandeld. Onze detailers werken volgens een vast protocol: van veilige voorwas en contactloze foamwash, tot decontaminatie van lak met clay bar, lakcorrectie met roterende en excentrische polijstmachines, en als laatste de bescherming met sealants of een keramische coating. Het resultaat is een auto die er niet alleen uitziet als nieuw, maar ook beschermd is tegen wind, regen, vuil, vogelpoep, boomhars en UV-straling.",
+            ],
+          },
+          {
+            heading: "Het verschil tussen wassen, poetsen en detailing",
+            paragraphs: [
+              "Een doorsnee wasstraat verwijdert oppervlakkig vuil, maar veroorzaakt vaak ook microkrasjes door harde borstels en gerecycled water. Bij een professionele handwas gebruiken wij twee-emmer methodes, microvezel washandschoenen en pH-neutrale shampoo om de lak veilig te reinigen. Poetsen gaat een stap verder: hierbij worden swirls, holograms en lichte krassen mechanisch verwijderd met polish en pads.",
+              "Detailing combineert dit alles met een complete behandeling van het interieur, de motorruimte, de velgen, de banden, de ramen en de kunststof delen. Het is de meest grondige manier om uw auto in topconditie te brengen en de waarde te behouden. Veel klanten kiezen voor detailing wanneer ze hun auto willen verkopen, inruilen of gewoon weer trots achter het stuur willen zitten.",
+            ],
+          },
+          {
+            heading: "Lakcorrectie en polijsten in detail",
+            paragraphs: [
+              "Bij lakcorrectie meten wij eerst de laklaagdikte met een digitale lakdiktemeter. Op basis daarvan bepalen we welke pad-polish combinatie veilig is. Lichte krassen, draaicirkels van borstels in de wasstraat en holograms van eerdere foutieve polijstbeurten zijn meestal in één of twee stappen te corrigeren. Diepere krassen kunnen we tot een bepaalde diepte wegwerken zonder de lak te beschadigen.",
+              "Na de polijstbeurt wordt de lak ontvet en gecontroleerd onder een LED-zwanenhalslamp. Pas dan wordt de bescherming aangebracht. Wij werken bewust niet met sneltrucs of glansmiddelen die krassen tijdelijk vullen — onze resultaten zijn blijvend en zichtbaar.",
+            ],
+          },
+          {
+            heading: "Keramische coating: bescherming die jaren meegaat",
+            paragraphs: [
+              "Een keramische coating vormt een keiharde, transparante beschermlaag op de lak die water, vuil en chemicaliën afstoot. De coating heeft een hydrofobe werking waardoor regen letterlijk van de auto afparelt. Hierdoor blijft uw auto langer schoon, is hij makkelijker te onderhouden en behoudt hij zijn diepe glans.",
+              "Wij bieden coatings aan met een levensduur van 2 tot 7 jaar, afhankelijk van het pakket. Naast lakcoating kunnen wij ook velgen, ramen, leder en textiel coaten. Voor klanten die maximale bescherming willen combineren we de coating met paint protection film (PPF) op de meest kwetsbare delen zoals de motorkap, spiegels en zijschermen.",
+            ],
+          },
+          {
+            heading: "Interieur detailing: van leer tot textiel",
+            paragraphs: [
+              "Het interieur van een auto vangt dagelijks veel te verduren: stof, kruimels, vlekken, transpiratie, huisdierenharen en geuren hopen zich op. Bij een interieur detailing zuigen we eerst grondig stof en vuil, behandelen we kunststof en leder met speciale reinigers, en pakken we vlekken in stoffering aan met extractie-apparatuur. Leer wordt gevoed met pH-neutrale conditioner zodat het zacht en soepel blijft en niet uitdroogt of scheurt.",
+              "Ook ventilatieroosters, dakhemel, deurpanelen, gordels, knoppen en het stuurwiel worden meegenomen. Geuren — bijvoorbeeld van rook of huisdieren — pakken we aan met ozonbehandeling. Na onze interieur detailing stapt u letterlijk in een andere auto.",
+            ],
+          },
+          {
+            heading: "Detailing voor klassiekers, youngtimers en exclusieve auto's",
+            paragraphs: [
+              "Eigenaren van klassiekers, youngtimers en exclusieve auto's zoals Porsche, Mercedes-AMG, BMW M, Audi RS, Tesla en Range Rover vertrouwen ons hun auto graag toe. Wij begrijpen dat juist bij deze auto's elke handeling met de grootste zorg moet gebeuren. Originele lak van een klassieker, een matgrijze wrap of een carbon dakhemel vragen om specifieke producten en technieken.",
+              "Onze werkplaats is afgesloten, droog en stofvrij. Tijdens de behandeling staat uw auto veilig binnen en wordt deze nooit onbeheerd buiten gezet. Op verzoek leveren wij ook haal- en brengservice in de regio.",
+            ],
+          },
+          {
+            heading: "Detailing voor bedrijfsauto's, lease en wagenparken",
+            paragraphs: [
+              "Voor zakelijke klanten verzorgen wij periodiek onderhoud van bedrijfsauto's, leasewagens en complete wagenparken. Een verzorgde auto draagt bij aan een professionele uitstraling, beschermt de restwaarde en voorkomt schadekosten bij inlevering van de leaseauto. Wij maken graag afspraken op maat met vaste tarieven en korte doorlooptijden.",
+              "Klanten uit Alphen aan den Rijn, Leiden, Leiderdorp, Zoetermeer, Lisse, Sassenheim, Nieuwkoop, Hoofddorp, Mijdrecht en de hele Randstad weten ons al jaren te vinden. De ligging direct aan de N446 en N207 maakt ons makkelijk bereikbaar.",
+            ],
+          },
+          {
+            heading: "Veelgestelde vragen over auto detailing",
+            paragraphs: [
+              "Hoe lang duurt een detailing? Een express poetsbeurt is in 2 tot 3 uur klaar, een volledige detailing met lakcorrectie en coating kan 1 tot 3 dagen duren afhankelijk van de staat van de auto. Krijg ik voor- en na-foto's? Ja, op verzoek documenteren wij de behandeling met foto's onder verschillende lichtsoorten zodat u het resultaat duidelijk ziet.",
+              "Hoe vaak moet ik mijn auto laten detailen? Voor optimale bescherming adviseren wij minimaal één grote detailing per jaar, eventueel aangevuld met een onderhoudsbeurt elke 6 maanden. Is de bescherming voor de winter belangrijk? Absoluut — strooizout, vocht en wisselende temperaturen zijn de grootste vijanden van uw lak. Een goede coating voor de winter bespaart u veel ellende.",
+            ],
+          },
+          {
+            heading: "Direct een afspraak maken voor detailing",
+            paragraphs: [
+              "Wij plannen graag een vrijblijvende afspraak met u in. Tijdens dit kennismakingsgesprek inspecteren we uw auto, bespreken we uw wensen en geven we een eerlijke prijsopgave. Bel of WhatsApp 071-781 25 25, mail naar info@platinautomotive.nl of gebruik het online formulier hieronder. Onze werkplaats vindt u aan de Cilinderweg 99 in Roelofarendsveen — gratis parkeren voor de deur.",
+            ],
+          },
+        ]}
+      />
 
       {/* Afspraak + Quick contact */}
       <section id="afspraak" className="py-16 md:py-28 bg-card">

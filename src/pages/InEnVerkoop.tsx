@@ -4,6 +4,7 @@ import { ArrowRight, ShieldCheck, FileCheck, Eye, Handshake, MapPin } from "luci
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ServiceSEOContent from "@/components/ServiceSEOContent";
 import verkoopImg from "@/assets/verkoop.jpg";
 
 const usps = [
@@ -231,6 +232,65 @@ const InEnVerkoop = () => {
           </motion.div>
         </div>
       </section>
+
+      <ServiceSEOContent
+        sections={[
+          {
+            heading: "Auto in- en verkoop in Roelofarendsveen",
+            paragraphs: [
+              "Platin Automotive is een RDW erkend autobedrijf gespecialiseerd in de in- en verkoop van premium occasions in Roelofarendsveen. Wij selecteren onze auto's persoonlijk, hebben elke auto zelf onder handen gehad en leveren standaard rijklaar af met geldige APK, beurt, schone in- en exterieur, AutoTrust garantie en nieuwe set sleutels indien beschikbaar. Geen tussenhandel, geen tweede levens — alleen auto's waar wij zelf in zouden rijden.",
+              "Onze klanten komen uit heel de Randstad: Alphen aan den Rijn, Leiden, Leiderdorp, Hoofddorp, Nieuwkoop, Lisse, Zoetermeer, Den Haag, Amsterdam-Zuid en verder. Dankzij onze ligging direct aan de N446 zijn wij snel bereikbaar en bieden wij gratis parkeren voor de deur.",
+            ],
+          },
+          {
+            heading: "Uw auto verkopen aan Platin Automotive",
+            paragraphs: [
+              "Wilt u uw auto verkopen zonder gedoe? Wij kopen dagelijks auto's in van particulieren, ondernemers en collega-bedrijven. U krijgt een eerlijk taxatievoorstel op basis van actuele marktwaarde, RDW-data, kilometerstand, onderhoudshistorie en de algemene staat. Bij akkoord regelen wij direct de RDW vrijwaring, betalen wij contant of per bank en u rijdt zorgeloos naar huis.",
+              "Heeft u nog een lopende financiering of leaseovereenkomst? Wij lossen die voor u af. Ook auto's met schade, hoge kilometerstand of import zijn welkom — wij doen altijd een eerlijk bod. Vraag een vrijblijvende taxatie aan via WhatsApp, telefoon of het formulier op deze website.",
+            ],
+          },
+          {
+            heading: "Premium occasions met garantie",
+            paragraphs: [
+              "In onze voorraad vindt u zorgvuldig geselecteerde occasions van merken als Audi, BMW, Mercedes-Benz, Volkswagen, Volvo, Land Rover, Porsche, Tesla en Lexus. Wij richten ons bewust op auto's met een rijke uitrusting, lage tot gemiddelde kilometerstand en een complete onderhoudshistorie. Elke auto wordt door onze monteurs gecontroleerd op 60+ punten voordat hij in de verkoop gaat.",
+              "Standaard krijgt u 6 maanden AutoTrust garantie, optioneel uitbreidbaar tot 12 of 24 maanden. AutoTrust is een onafhankelijke garantieverstrekker met landelijke dekking — u kunt dus ook bij een garage bij u in de buurt terecht voor service onder garantie.",
+            ],
+          },
+          {
+            heading: "Inruil mogelijk — eerlijk en snel",
+            paragraphs: [
+              "Bij de aankoop van een auto bij Platin Automotive kunt u uw huidige auto inruilen. Wij waarderen uw inruilauto realistisch op basis van actuele marktdata en de staat van de auto. Hierdoor ontvangt u een eerlijke inruilwaarde en bespaart u tijd en moeite die u anders kwijt zou zijn aan particuliere verkoop.",
+              "Heeft u een auto met restschuld? Geen probleem — wij regelen de aflossing en verrekenen dit transparant in de aankoopsom van uw nieuwe auto.",
+            ],
+          },
+          {
+            heading: "Financiering en private lease",
+            paragraphs: [
+              "Naast contante aankoop bieden wij verschillende financieringsoplossingen aan via gerenommeerde partners. Of u nu kiest voor een traditioneel autokrediet, een doorlopend krediet of private lease — wij helpen u bij het vinden van de beste vorm met de scherpste rente. De aanvraag verloopt snel en u krijgt vaak binnen één werkdag uitsluitsel.",
+              "Voor zakelijke klanten regelen wij financial lease en operational lease. Profiteer van fiscale voordelen, vrij rijden en een vast maandbedrag. Vraag vrijblijvend een berekening aan via onze lease-calculator of bel ons direct.",
+            ],
+          },
+          {
+            heading: "RDW erkend, AutoTrust en BOVAG-waardig",
+            paragraphs: [
+              "Platin Automotive is officieel RDW erkend (KvK 99146193) en werkt volgens de hoogste normen in de branche. Wij hanteren transparante prijzen — geen verborgen kosten, geen onverwachte facturen. Op verzoek leveren wij een complete dossier mee inclusief NAP-historie, onderhoudshistorie, eventuele schadehistorie en aankoopfactuur.",
+              "Onze werkwijze is gestoeld op vertrouwen, langdurige relaties en service. Veel van onze klanten komen voor hun volgende auto terug en bevelen ons aan bij vrienden en familie. Lees onze Google reviews om te zien wat klanten over ons zeggen.",
+            ],
+          },
+          {
+            heading: "Werkgebied: Roelofarendsveen en wijde omgeving",
+            paragraphs: [
+              "Wij verzorgen verkoop en aankoop van auto's voor klanten uit Roelofarendsveen, Alphen aan den Rijn, Leiden, Leiderdorp, Lisse, Sassenheim, Nieuwkoop, Mijdrecht, Hoofddorp, Zoetermeer, Den Haag, Amsterdam en de hele Randstad. Indien gewenst leveren wij uw nieuwe auto bij u thuis af — bespreek de mogelijkheden direct met ons team.",
+            ],
+          },
+          {
+            heading: "Plan een bezoek of taxatie",
+            paragraphs: [
+              "Kom langs in onze showroom aan de Cilinderweg 99 in Roelofarendsveen, of bel/WhatsApp 071-781 25 25 voor een afspraak. Wij staan voor u klaar van maandag t/m zondag — zie de openingstijden hierboven. Bekijk onze actuele voorraad online of laat uw auto vrijblijvend taxeren via ons formulier.",
+            ],
+          },
+        ]}
+      />
 
       <Footer />
     </div>

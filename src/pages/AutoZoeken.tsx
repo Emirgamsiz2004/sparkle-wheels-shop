@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ServiceSEOContent from "@/components/ServiceSEOContent";
 import verkoopImg from "@/assets/verkoop.jpg";
 
 const zoekSchema = z.object({
@@ -220,6 +221,59 @@ const AutoZoeken = () => {
           </motion.div>
         </div>
       </section>
+
+      <ServiceSEOContent
+        sections={[
+          {
+            heading: "Auto op aanvraag — wij vinden uw droomauto",
+            paragraphs: [
+              "Zoekt u een specifieke auto die u nergens kunt vinden? Of wilt u juist niet zelf eindeloos doorklikken op Marktplaats en AutoScout24? Bij Platin Automotive in Roelofarendsveen nemen wij de zoektocht uit handen. Wij gebruiken onze brede contacten, taxatie-tools en jarenlange ervaring om binnen uw budget de perfecte auto voor u te vinden — vaak sneller en goedkoper dan u zelf zou kunnen.",
+              "Of het nu gaat om een nieuwe Audi A6 Avant met luchtvering, een Porsche 911 met handbak, een BMW M3 Touring, een degelijke gezinsauto of een specifieke kleurstelling in een Range Rover Sport — vertel ons uw wensen en wij gaan op zoek. Werkgebied: heel Nederland, met levering en aflevering in Roelofarendsveen, Alphen, Leiden, Den Haag, Amsterdam en de rest van de Randstad.",
+            ],
+          },
+          {
+            heading: "Hoe werkt 'auto zoeken' bij Platin Automotive?",
+            paragraphs: [
+              "Stap 1 — Wensen in kaart brengen: tijdens een persoonlijk gesprek bespreken wij merk, model, bouwjaar, kilometerstand, uitvoering, opties, kleur en uw maximale budget. Hoe concreter uw wens, hoe sneller wij een match vinden. Twijfelt u tussen modellen? Wij adviseren u graag over restwaarde, onderhoudskosten en betrouwbaarheid.",
+              "Stap 2 — Actief zoeken: wij doorzoeken openbare platformen én ons eigen handelsnetwerk van importeurs, dealers, leasemaatschappijen en collega's. Veel auto's verkopen wij voordat ze ooit publiek te koop staan.",
+              "Stap 3 — Inspectie en aankoop: zodra wij een potentiële match vinden, controleren wij de auto fysiek op staat, RDW-historie, NAP, schadeverleden en originaliteit. Pas na uw goedkeuring kopen wij de auto namens u in. U weet dus altijd vooraf wat u krijgt.",
+              "Stap 4 — Aflevering: wij maken de auto rijklaar, voorzien hem van een poetsbeurt, regelen de tenaamstelling en leveren hem bij u thuis af of u haalt hem op in onze showroom.",
+            ],
+          },
+          {
+            heading: "Wat zoeken klanten zoal aan ons over te laten?",
+            paragraphs: [
+              "Onze klanten vragen ons regelmatig om specifieke uitvoeringen: handbak in een tijd waarin alles automaat wordt, youngtimers tussen 15 en 25 jaar oud, importauto's uit Duitsland of België, low-mileage exemplaren, eerste-eigenaar occasions, of juist een specifiek opbouwjaar met een gewilde optie zoals panoramadak of head-up display.",
+              "Ook voor elektrische auto's zoals Tesla Model 3, Polestar 2 en Hyundai Ioniq 5 zoeken wij regelmatig op aanvraag, inclusief informatie over de actuele batterijgezondheid en laadcapaciteit.",
+            ],
+          },
+          {
+            heading: "Persoonlijk advies en eerlijke prijzen",
+            paragraphs: [
+              "U betaalt geen verborgen kosten — onze marge is transparant en wij geven van tevoren aan welke vergoeding wij rekenen. Daarmee voorkomt u onverwachte tegenvallers. Dankzij ons inkoopnetwerk en bulkkortingen bij detailing, RDW-keuringen en transport komen wij vaak op een totaalprijs uit die lager ligt dan particuliere aankoop.",
+              "Wij denken bovendien mee over financiering, lease, inruil van uw huidige auto en garantie. Een complete service onder één dak.",
+            ],
+          },
+          {
+            heading: "Garantie en service inbegrepen",
+            paragraphs: [
+              "Elke auto die wij voor u inkopen, krijgt standaard AutoTrust garantie (6 tot 24 maanden) en wordt door onze monteurs rijklaar afgeleverd. Eventuele technische onvolkomenheden worden vooraf opgelost. Zo voorkomt u verrassingen achteraf en geniet u vanaf dag één zorgeloos van uw nieuwe auto.",
+            ],
+          },
+          {
+            heading: "Werkgebied en bereikbaarheid",
+            paragraphs: [
+              "Wij zoeken auto's in heel Nederland, België en Duitsland. Onze klanten komen uit Roelofarendsveen, Alphen aan den Rijn, Leiden, Hoofddorp, Amsterdam, Den Haag, Utrecht, Zoetermeer, Haarlem en verder. Levering op locatie is altijd mogelijk in overleg.",
+            ],
+          },
+          {
+            heading: "Start vandaag uw zoekopdracht",
+            paragraphs: [
+              "Vul het formulier op deze pagina in met uw wensen of bel/WhatsApp 071-781 25 25 voor een snel persoonlijk gesprek. U kunt ook langskomen in onze showroom aan de Cilinderweg 99 in Roelofarendsveen om kennis te maken. Wij reageren altijd binnen één werkdag.",
+            ],
+          },
+        ]}
+      />
 
       <Footer />
     </div>

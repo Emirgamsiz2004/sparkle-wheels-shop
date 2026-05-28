@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
+import ServiceSEOContent from "@/components/ServiceSEOContent";
 
 const customOptions = [
   "Sterrenhemels",
@@ -161,6 +162,66 @@ const AutoCustomizing = () => {
           </motion.p>
         </div>
       </section>
+
+      {/* Afspraak + Quick contact */}
+      <ServiceSEOContent
+        sections={[
+          {
+            heading: "Auto customizing in Roelofarendsveen",
+            paragraphs: [
+              "Wilt u uw auto laten opvallen, persoonlijker maken of een unieke styling geven? Bij Platin Automotive in Roelofarendsveen verzorgen wij professionele auto customizing op maat. Van een subtiele upgrade tot een complete metamorfose: onze specialisten denken met u mee, adviseren over wat technisch en visueel werkt, en voeren alles met grote zorg uit in onze werkplaats aan de Cilinderweg 99.",
+              "Customizing is meer dan alleen styling — het is het verlengstuk van uw persoonlijkheid. Wij combineren ambacht met moderne technieken zoals digitale plotting, hoogwaardige folies, custom stiksels en geprogrammeerde LED-systemen. Elk project wordt vooraf in overleg uitgewerkt zodat het eindresultaat exact aansluit bij uw wensen.",
+            ],
+          },
+          {
+            heading: "Sterrenhemel laten plaatsen",
+            paragraphs: [
+              "Een sterrenhemel in uw dakhemel is een van de meest opvallende interieur-upgrades. Wij plaatsen sterrenhemels met glasvezelpunten, eventueel met meteoor-effect, kleurwissel en bluetooth-bediening. De installatie gebeurt door demontage van de originele dakhemel, opnieuw bekleden met hoogwaardige alcantara of textiel, en het zorgvuldig plaatsen van honderden tot duizenden vezels.",
+              "Het resultaat is een dakhemel die u 's avonds in een sprookjessfeer onderdompelt — perfect voor exclusieve auto's zoals Rolls-Royce, Mercedes-Maybach en luxe SUV's, maar ook prachtig in een dagelijkse rijder die u écht uw eigen wilt maken.",
+            ],
+          },
+          {
+            heading: "Interieur op maat: bekleding, stiksel en stuurwiel",
+            paragraphs: [
+              "Het interieur is waar u dagelijks zit — en juist hier maakt customizing het grootste verschil. Wij bekleden stoelen, deurpanelen, dashboard en hemelbekleding opnieuw in nappa leder, alcantara of premium textiel naar keuze. Stiksels in contrasterende kleur, geborduurde initialen, perforaties en kwartdiamant patronen behoren tot de mogelijkheden.",
+              "Ook stuurwielen worden door ons opnieuw bekleed of vervangen door custom modellen met platte onderkant, dik leder en eventueel carbon inleg. Schakelpookknoppen, handremgrepen en armleuningen passen we daar naadloos op aan.",
+            ],
+          },
+          {
+            heading: "Ambient verlichting en custom LED",
+            paragraphs: [
+              "Ambient verlichting verandert de sfeer in uw auto compleet. Wij installeren meerkleurige LED-strips in dashboard, deurpanelen, voetenruimtes en zelfs in het plafond. Met een app of via het multimediasysteem kiest u de kleur, intensiteit en het effect — van rustig wit tot een dynamische lichtshow die op de muziek meedeint.",
+              "Daarnaast bieden wij upgrades zoals welcome lights met logo-projectie in de portieren, LED-binnenverlichting, kentekenplaatverlichting en LED-velgverlichting. Alles wordt vakkundig en netjes weggewerkt zonder beschadiging van het origineel.",
+            ],
+          },
+          {
+            heading: "Wrap, folie en raamtinten",
+            paragraphs: [
+              "Een wrap geeft uw auto in één klap een nieuwe kleur of textuur — denk aan satin black, chrome delete, mat grijs of zelfs unieke camouflage patronen. Wij werken met premium folies van 3M, Avery Dennison en KPMF, met garantie tot 7 jaar. Een wrap is volledig omkeerbaar en beschermt bovendien de originele lak.",
+              "Raamtinten verlagen de zonbelasting in de cabine, beschermen het interieur tegen UV en geven uw auto een afgewerkte uitstraling. Wij plaatsen tinten in verschillende donkergradaties, geheel volgens de geldende Nederlandse wetgeving.",
+            ],
+          },
+          {
+            heading: "Velgen, bodykits en exterieur styling",
+            paragraphs: [
+              "Nieuwe velgen veranderen de uitstraling van uw auto direct. Wij monteren velgen van topmerken zoals BBS, Vossen, OZ Racing, Rotiform en Borbet, in maten van 17 tot 23 inch. Naast montage en balanceren verzorgen wij ook spacers, naafringen en TPMS sensoren.",
+              "Voor exterieur styling plaatsen wij spoilers, diffusers, side skirts, complete bodykits en carbon onderdelen. Of het nu een M-pakket, AMG-look, RS-style of een aftermarket merk is — wij zorgen voor een nette pasvorm en duurzame bevestiging.",
+            ],
+          },
+          {
+            heading: "Customizing voor alle merken en stijlen",
+            paragraphs: [
+              "Wij customizen Audi, BMW, Mercedes, Volkswagen, Porsche, Range Rover, Tesla, Ford Mustang, Dodge en veel andere merken. Of u nu een retro JDM-look wilt, een Stance project, een luxe Maybach-style interieur of een subtiele upgrade — wij denken met u mee. Vraag een vrijblijvend ontwerpgesprek aan en wij maken een voorstel op maat.",
+            ],
+          },
+          {
+            heading: "Plan een vrijblijvend adviesgesprek",
+            paragraphs: [
+              "Customizing begint altijd met een goed gesprek. Bel of WhatsApp 071-781 25 25, mail naar info@platinautomotive.nl of plan een afspraak via het formulier hieronder. U bent welkom in onze showroom en werkplaats aan de Cilinderweg 99 in Roelofarendsveen. Tijdens uw bezoek kijken we samen naar uw auto, uw inspiratiebeelden en bespreken we het tijdpad en budget.",
+            ],
+          },
+        ]}
+      />
 
       {/* Afspraak + Quick contact */}
       <section id="afspraak" className="py-16 md:py-28 bg-card">
