@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
 import DetailingConfigurator from "@/components/DetailingConfigurator";
+import ServiceSEOContent from "@/components/ServiceSEOContent";
 import polishImg from "@/assets/detailing/polish.webp";
 import foamWashImg from "@/assets/detailing/foam-wash.webp";
 import foamFrontImg from "@/assets/detailing/foam-front.webp";
