@@ -170,8 +170,8 @@ const polishKeys = new Set(extrasPolijst.map((e) => e.key));
 const exclusiveGroups: string[][] = [
   // Vlekverwijdering: standaard óf uitgebreid
   ["vlek-std", "vlek-uitg"],
-  // Volledige polijst/coating-behandelingen: max 1
-  ["pol-1", "pol-2", "klei", "keramiek"],
+  // Verschillende polijst-types sluiten elkaar uit (keramische coating mag wel samen)
+  ["pol-1", "pol-2", "klei"],
 ];
 
 const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => {
