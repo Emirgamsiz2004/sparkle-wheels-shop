@@ -42,7 +42,7 @@ const Blog = () => {
       <section className="pt-32 pb-20 px-5 md:px-[90px] max-w-[1920px] mx-auto">
         <div className="mb-12">
           <p className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary mb-3">Nieuws & Blog</p>
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">Laatste artikelen</h1>
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">Automotive Blog — Tips, Occasions &amp; Onderhoud | Platin Automotive</h1>
         </div>
 
         {isLoading ? (
