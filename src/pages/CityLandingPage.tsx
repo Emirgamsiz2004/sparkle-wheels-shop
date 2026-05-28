@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Check, Route, Wrench, ShieldCheck } from "lucide-react";
+import { MapPin, Phone, Check, Route, Wrench, ShieldCheck, Sparkles, Settings, Car, Calendar } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,10 @@ interface CityPageProps {
   routeDescription: string;
   services?: { label: string; to: string }[];
   whyChooseText?: string;
+  detailingSection?: { title: string; text: string };
+  onderhoudSection?: { title: string; text: string };
+  occasionsSection?: { title: string; text: string };
+  appointmentSection?: { title: string; text: string };
 }
 
 const defaultServices = [
@@ -43,6 +47,10 @@ const CityLandingPage = ({
   routeDescription,
   services = defaultServices,
   whyChooseText,
+  detailingSection,
+  onderhoudSection,
+  occasionsSection,
+  appointmentSection,
 }: CityPageProps) => {
   const whyText =
     whyChooseText ??
@@ -133,19 +141,62 @@ const CityLandingPage = ({
         </div>
       </section>
 
-      {/* Hoe werkt het */}
+      {/* Auto Detailing */}
+      {detailingSection && (
+        <section className="py-16 border-t border-border">
+          <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6 flex items-center gap-3">
+              <Sparkles className="w-6 h-6 text-primary" />
+              {detailingSection.title}
+            </h2>
+            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+              {detailingSection.text.split("\n\n").map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Onderhoud & Reparatie */}
+      {onderhoudSection && (
+        <section className="py-16 border-t border-border bg-card/30">
+          <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6 flex items-center gap-3">
+              <Settings className="w-6 h-6 text-primary" />
+              {onderhoudSection.title}
+            </h2>
+            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+              {onderhoudSection.text.split("\n\n").map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Occasions kopen */}
       <section className="py-16 border-t border-border">
         <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
-          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6">
-            Occasions kopen bij {city} — hoe werkt het?
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6 flex items-center gap-3">
+            <Car className="w-6 h-6 text-primary" />
+            {occasionsSection?.title ?? `Occasions kopen bij ${city} — hoe werkt het?`}
           </h2>
           <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
-            <p>
-              Wij zijn gevestigd in Roelofarendsveen, op slechts {driveMinutes} minuten rijden van {city}. U maakt vrijblijvend een afspraak, komt langs voor een bezichtiging en neemt rustig de tijd om de auto te bekijken.
-            </p>
-            <p>
-              Gratis proefrit en thuisbezorging zijn mogelijk. Past de auto bij u? Dan regelen we de financiering, garantie en eventuele inruil van uw huidige auto in één afspraak.
-            </p>
+            {occasionsSection ? (
+              occasionsSection.text.split("\n\n").map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))
+            ) : (
+              <>
+                <p>
+                  Wij zijn gevestigd in Roelofarendsveen, op slechts {driveMinutes} minuten rijden van {city}. U maakt vrijblijvend een afspraak, komt langs voor een bezichtiging en neemt rustig de tijd om de auto te bekijken.
+                </p>
+                <p>
+                  Gratis proefrit en thuisbezorging zijn mogelijk. Past de auto bij u? Dan regelen we de financiering, garantie en eventuele inruil van uw huidige auto in één afspraak.
+                </p>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -205,6 +256,31 @@ const CityLandingPage = ({
           </div>
         </div>
       </section>
+
+      {/* Maak een afspraak */}
+      {appointmentSection && (
+        <section className="py-16 border-t border-border">
+          <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground tracking-tight mb-6 flex items-center gap-3">
+              <Calendar className="w-6 h-6 text-primary" />
+              {appointmentSection.title}
+            </h2>
+            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
+              {appointmentSection.text.split("\n\n").map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-4 pt-8">
+              <Button asChild>
+                <a href="tel:+31717812525">Bel 071-781 25 25</a>
+              </Button>
+              <Button variant="outline" asChild>
+                <a href="https://wa.me/31717812525" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </div>
