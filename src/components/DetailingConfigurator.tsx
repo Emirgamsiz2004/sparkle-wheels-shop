@@ -196,11 +196,10 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
     });
   };
 
-  // Auto-scroll naar volgend blok op desktop (>=768px)
+  // Auto-scroll naar volgend blok (desktop én mobiel)
   useEffect(() => {
     if (!vehicle) return;
     if (typeof window === "undefined") return;
-    if (!window.matchMedia("(min-width: 768px)").matches) return;
     const t = setTimeout(() => {
       scrollElementToVisualCenter(step2Ref.current);
     }, 450);
@@ -210,7 +209,6 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   useEffect(() => {
     if (!vehicle || !pkg) return;
     if (typeof window === "undefined") return;
-    if (!window.matchMedia("(min-width: 768px)").matches) return;
     const t = setTimeout(() => {
       scrollElementToVisualCenter(step3Ref.current);
     }, 450);
