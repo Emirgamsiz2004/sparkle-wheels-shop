@@ -170,6 +170,66 @@ const OnderhoudReparatie = () => {
       </section>
 
       {/* Afspraak + Quick contact */}
+      <ServiceSEOContent
+        sections={[
+          {
+            heading: "Auto onderhoud en reparatie in Roelofarendsveen",
+            paragraphs: [
+              "Platin Automotive is uw vertrouwde adres voor klein onderhoud en reparaties aan personenauto's in Roelofarendsveen en omgeving. Onze monteurs zijn gespecialiseerd in periodiek onderhoud, slijtagedelen en kleine technische ingrepen waarmee uw auto betrouwbaar en veilig blijft rijden. Met moderne apparatuur, OBD-uitleesapparatuur en originele of gelijkwaardige onderdelen werken wij efficiënt, transparant en eerlijk.",
+              "Wij bedienen klanten uit Roelofarendsveen, Alphen aan den Rijn, Leiden, Leiderdorp, Nieuwkoop, Lisse, Sassenheim, Hoofddorp, Zoetermeer en de bredere Randstad. Dankzij onze ligging direct aan de N446 en op enkele minuten van de A4 en N11 zijn wij snel en goed bereikbaar.",
+            ],
+          },
+          {
+            heading: "Klein onderhoud: olie, filters en vloeistoffen",
+            paragraphs: [
+              "Periodiek onderhoud is de basis voor een lange levensduur van uw auto. Wij vervangen de motorolie volgens fabrieksvoorschrift, vernieuwen olie-, lucht-, brandstof- en interieurfilters en controleren alle vloeistofniveaus zoals koelvloeistof, remvloeistof, ruitensproeiervloeistof en stuurbekrachtigingsolie. Wij gebruiken hoogwaardige merkolie passend bij uw motor en uw rijstijl.",
+              "Tijdens elke onderhoudsbeurt voeren wij ook een visuele inspectie uit van de onderzijde, de banden, de remmen, de uitlaat en de ophanging. Zo signaleren wij problemen voordat ze duur worden. U ontvangt altijd een eerlijk advies — geen verkooppraatjes, alleen wat écht nodig is.",
+            ],
+          },
+          {
+            heading: "Remmen, banden en ophanging",
+            paragraphs: [
+              "Remblokken, remschijven en remvloeistof horen tot de meest veiligheidskritische onderdelen van uw auto. Wij meten remblokdiktes nauwkeurig en vervangen ze tijdig met kwalitatieve onderdelen. Ook remschijven, remklauwen en de handremkabel pakken wij aan wanneer nodig.",
+              "Voor uw banden bieden wij montage, balanceren, uitlijnen, reparatie van lekke banden en seizoenswissel van winter- naar zomerbanden en omgekeerd. Wij adviseren u graag over het juiste bandenmerk en het juiste profiel voor uw rijstijl. Slijtage aan schokdempers, fuseekogels, stabilisatorstangen en draagarmen pakken wij eveneens aan.",
+            ],
+          },
+          {
+            heading: "Airco service en seizoensonderhoud",
+            paragraphs: [
+              "Een goed werkende airco zorgt niet alleen voor comfort in de zomer, maar voorkomt ook beslagen ruiten in de winter. Wij voeren een complete aircoservice uit: bijvullen van koudemiddel R134a of R1234yf, vervangen van de interieurfilter, controleren van het systeem op lekkage en desinfecteren van het ventilatiesysteem tegen schimmel en bacteriën.",
+              "Daarnaast bieden wij seizoensgebonden controles aan: voor de winter checken wij accu, antivries, ruitenwissers en banden; voor de zomer richten wij ons op airco, koeling en bandenspanning. Zo bent u in elk seizoen veilig op weg.",
+            ],
+          },
+          {
+            heading: "Accu, bougies en startproblemen",
+            paragraphs: [
+              "Een auto die niet wil starten staat altijd op het verkeerde moment stil. Wij testen accu, dynamo en startmotor en vervangen accu's van topkwaliteit met aangepaste codering voor moderne start-stop systemen. Bougies, gloeibougies en bobines worden vervangen volgens fabrieksvoorschrift.",
+              "Met onze OBD-uitleesapparatuur lezen wij foutcodes uit en stellen we problemen snel vast. Bij motorstoringslampjes, vermogensverlies of vreemde geluiden kunt u altijd vrijblijvend langskomen voor een diagnose.",
+            ],
+          },
+          {
+            heading: "Eerlijke prijzen, geen verrassingen",
+            paragraphs: [
+              "Bij Platin Automotive werken wij met scherpe, transparante tarieven. U krijgt vooraf een duidelijke prijsindicatie en wij voeren nooit werkzaamheden uit zonder uw akkoord. Onze werkplaatstarieven zijn aanzienlijk lager dan die van dealers, terwijl wij dezelfde kwaliteit leveren en uw fabrieksgarantie behouden.",
+              "Onderhoud aan uw auto bij een onafhankelijke garage zoals de onze tast de fabrieksgarantie niet aan, mits het werk volgens voorschrift wordt uitgevoerd. Wij stempelen het onderhoudsboekje en bewaren alle bonnen digitaal voor uw administratie.",
+            ],
+          },
+          {
+            heading: "Onderhoud voor alle merken en modellen",
+            paragraphs: [
+              "Wij werken aan vrijwel alle merken: Volkswagen, Audi, BMW, Mercedes-Benz, Opel, Ford, Toyota, Renault, Peugeot, Citroën, Skoda, SEAT, Volvo, Mini, Tesla en meer. Of u nu een benzine-, diesel-, hybride- of volledig elektrische auto rijdt — onze monteurs hebben de kennis en de juiste apparatuur. Voor specialistische werkzaamheden buiten onze focus verwijzen we eerlijk door.",
+            ],
+          },
+          {
+            heading: "Maak vandaag nog een afspraak",
+            paragraphs: [
+              "Heeft u een reparatie of onderhoudsbeurt nodig? Bel of WhatsApp ons op 071-781 25 25, mail naar info@platinautomotive.nl of plan online direct een afspraak via het formulier hieronder. Wij zitten aan de Cilinderweg 99 in Roelofarendsveen — gratis parkeren voor de deur, en op loopafstand een bakker en koffiezaak voor het geval u wacht.",
+            ],
+          },
+        ]}
+      />
+
+      {/* Afspraak + Quick contact */}
       <section id="afspraak" className="py-16 md:py-28 bg-card">
         <div className="container mx-auto px-6 lg:px-16">
           <div className="grid lg:grid-cols-2 gap-px bg-border">
