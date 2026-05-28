@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ServiceForm from "@/components/ServiceForm";
 import FloatingCTA from "@/components/FloatingCTA";
+import ServiceSEOContent from "@/components/ServiceSEOContent";
 
 const customOptions = [
   "Sterrenhemels",
