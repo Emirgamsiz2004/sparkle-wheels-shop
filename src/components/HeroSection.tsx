@@ -182,7 +182,7 @@ const HeroSection = () => {
                     key={i}
                     className={`w-3 h-3 ${
                       i < Math.round(reviewData.rating)
-                        ? "fill-gold text-gold"
+                        ? "fill-amber-400 text-amber-400"
                         : "text-foreground/20"
                     }`}
                   />

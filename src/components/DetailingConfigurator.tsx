@@ -170,8 +170,8 @@ const polishKeys = new Set(extrasPolijst.map((e) => e.key));
 const exclusiveGroups: string[][] = [
   // Vlekverwijdering: standaard óf uitgebreid
   ["vlek-std", "vlek-uitg"],
-  // Volledige polijst/coating-behandelingen: max 1
-  ["pol-1", "pol-2", "klei", "keramiek"],
+  // Verschillende polijst-types sluiten elkaar uit (keramische coating mag wel samen)
+  ["pol-1", "pol-2", "klei"],
 ];
 
 const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => {
@@ -196,11 +196,10 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
     });
   };
 
-  // Auto-scroll naar volgend blok op desktop (>=768px)
+  // Auto-scroll naar volgend blok (desktop én mobiel)
   useEffect(() => {
     if (!vehicle) return;
     if (typeof window === "undefined") return;
-    if (!window.matchMedia("(min-width: 768px)").matches) return;
     const t = setTimeout(() => {
       scrollElementToVisualCenter(step2Ref.current);
     }, 450);
@@ -210,7 +209,6 @@ const DetailingConfigurator = ({ embedded = false }: { embedded?: boolean }) => 
   useEffect(() => {
     if (!vehicle || !pkg) return;
     if (typeof window === "undefined") return;
-    if (!window.matchMedia("(min-width: 768px)").matches) return;
     const t = setTimeout(() => {
       scrollElementToVisualCenter(step3Ref.current);
     }, 450);
