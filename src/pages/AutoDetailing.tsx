@@ -59,16 +59,16 @@ const AutoDetailing = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Auto Detailing Roelofarendsveen | Platin Automotive</title>
-        <meta name="description" content="Professionele auto detailing bij Platin Automotive. Interieur- en exterieurreiniging, polijsten, lakbescherming. Resultaat gegarandeerd – maak een afspraak!" />
+        <title>Auto Detailing Roelofarendsveen | Poetsen &amp; Polijsten | Platin Automotive</title>
+        <meta name="description" content="Professioneel auto detailing in Roelofarendsveen. Poetsen, polijsten, keramische coating en meer. Plan direct uw afspraak bij Platin Automotive." />
         <link rel="canonical" href="https://platinautomotive.nl/diensten/auto-detailing" />
         <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Auto Detailing Roelofarendsveen | Platin Automotive" />
-        <meta property="og:description" content="Professionele auto detailing bij Platin Automotive. Interieur- en exterieurreiniging, polijsten, lakbescherming. Resultaat gegarandeerd – maak een afspraak!" />
+        <meta property="og:title" content="Auto Detailing Roelofarendsveen | Poetsen &amp; Polijsten | Platin Automotive" />
+        <meta property="og:description" content="Professioneel auto detailing in Roelofarendsveen. Poetsen, polijsten, keramische coating en meer. Plan direct uw afspraak bij Platin Automotive." />
         <meta property="og:url" content="https://platinautomotive.nl/diensten/auto-detailing" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:title" content="Auto Detailing Roelofarendsveen | Platin Automotive" />
-        <meta name="twitter:description" content="Professionele auto detailing bij Platin Automotive. Interieur- en exterieurreiniging, polijsten, lakbescherming. Resultaat gegarandeerd – maak een afspraak!" />
+        <meta name="twitter:title" content="Auto Detailing Roelofarendsveen | Poetsen &amp; Polijsten | Platin Automotive" />
+        <meta name="twitter:description" content="Professioneel auto detailing in Roelofarendsveen. Poetsen, polijsten, keramische coating en meer. Plan direct uw afspraak bij Platin Automotive." />
 
       </Helmet>
       <Navbar />
