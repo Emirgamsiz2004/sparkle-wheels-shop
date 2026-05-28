@@ -41,61 +41,30 @@
       {
         "@context": "https://schema.org",
         "@type": "AutoDealer",
-        "@id": "https://platinautomotive.nl/#business",
         "name": "Platin Automotive",
         "url": "https://platinautomotive.nl",
-        "description": "Platin Automotive is een erkende autohandelaar in Roelofarendsveen, gespecialiseerd in occasions, auto detailing, onderhoud en consignatie verkoop. Wij bedienen klanten uit Alphen aan den Rijn, Leiden, Zoetermeer en de wijde regio.",
-        "telephone": "+31612693825",
+        "telephone": "071-781 25 25",
         "email": "info@platinautomotive.nl",
-        "priceRange": "€€",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Cilinderweg 99",
-          "addressLocality": "Roelofarendsveen",
-          "addressRegion": "Zuid-Holland",
           "postalCode": "2371 DZ",
+          "addressLocality": "Roelofarendsveen",
           "addressCountry": "NL"
         },
+        "openingHoursSpecification": [
+          {"@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "12:00", "closes": "18:00"},
+          {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday"], "opens": "09:00", "closes": "18:00"},
+          {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:00", "closes": "17:00"},
+          {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "10:00", "closes": "16:00"}
+        ],
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": 52.20183,
-          "longitude": 4.64412
+          "latitude": 52.2003,
+          "longitude": 4.6344
         },
-        "openingHoursSpecification": [
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-            "opens": "09:00",
-            "closes": "18:00"
-          },
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Saturday"],
-            "opens": "10:00",
-            "closes": "17:00"
-          },
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Sunday"],
-            "opens": "10:00",
-            "closes": "16:00"
-          }
-        ],
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": 5.0,
-          "reviewCount": 10,
-          "bestRating": 5,
-          "worstRating": 1
-        },
-        "areaServed": [
-          {"@type": "City", "name": "Roelofarendsveen"},
-          {"@type": "City", "name": "Alphen aan den Rijn"},
-          {"@type": "City", "name": "Leiden"},
-          {"@type": "City", "name": "Zoetermeer"}
-        ],
         "sameAs": [
-          "https://www.facebook.com/platinautomotive"
+          "https://www.marktplaats.nl/shops/platin-automotive"
         ]
       }
     </script>
