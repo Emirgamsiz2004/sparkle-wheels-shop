@@ -20,6 +20,10 @@ interface CityPageProps {
   routeDescription: string;
   services?: { label: string; to: string }[];
   whyChooseText?: string;
+  detailingSection?: { title: string; text: string };
+  onderhoudSection?: { title: string; text: string };
+  occasionsSection?: { title: string; text: string };
+  appointmentSection?: { title: string; text: string };
 }
 
 const defaultServices = [
