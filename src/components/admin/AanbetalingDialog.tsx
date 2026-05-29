@@ -49,6 +49,8 @@ interface FormData {
 const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) => {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [customers, setCustomers] = useState<CustomerOption[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
 
   const [form, setForm] = useState<FormData>({
     voornaam: "",
@@ -67,6 +69,56 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
     betaalwijze: "bank",
     contantBedrag: 0,
   });
+
+  useEffect(() => {
+    if (!open) return;
+    (async () => {
+      // Combine customers + test_drive_customers
+      const [crm, td] = await Promise.all([
+        supabase.from("customers").select("id, voornaam, achternaam, email, telefoon, adres, postcode, plaats, woonplaats:plaats").order("achternaam", { ascending: true }).limit(500),
+        supabase.from("test_drive_customers").select("id, voornaam, achternaam, email, telefoon, adres, postcode, plaats").order("achternaam", { ascending: true }).limit(500),
+      ]);
+      const list: CustomerOption[] = [];
+      const seen = new Set<string>();
+      const push = (c: any) => {
+        const key = (c.email || "").toLowerCase() + "|" + (c.telefoon || "");
+        if (seen.has(key) || !c.email) return;
+        seen.add(key);
+        list.push({
+          id: c.id,
+          voornaam: c.voornaam || "",
+          achternaam: c.achternaam || "",
+          email: c.email || "",
+          telefoon: c.telefoon || "",
+          adres: c.adres || "",
+          postcode: c.postcode || "",
+          plaats: c.plaats || "",
+          woonplaats: c.plaats || "",
+        });
+      };
+      (crm.data || []).forEach(push);
+      (td.data || []).forEach(push);
+      list.sort((a, b) => `${a.achternaam} ${a.voornaam}`.localeCompare(`${b.achternaam} ${b.voornaam}`));
+      setCustomers(list);
+    })();
+  }, [open]);
+
+  const selectCustomer = (id: string) => {
+    setSelectedCustomerId(id);
+    if (!id) return;
+    const c = customers.find((x) => x.id === id);
+    if (!c) return;
+    setForm((f) => ({
+      ...f,
+      voornaam: c.voornaam,
+      achternaam: c.achternaam,
+      email: c.email,
+      telefoon: c.telefoon || "",
+      adres: c.adres || "",
+      postcode: c.postcode || "",
+      woonplaats: c.plaats || c.woonplaats || "",
+    }));
+  };
 
   const update = (key: keyof FormData, value: any) => {
     setForm((f) => ({ ...f, [key]: value }));
