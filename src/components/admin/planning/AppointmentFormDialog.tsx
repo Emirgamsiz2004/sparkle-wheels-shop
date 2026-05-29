@@ -504,8 +504,19 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                 {/* Voertuig (voorraad) */}
                 {requiresVoorraadVehicle(type) && (
                   <div>
-                    <Label className="text-xs text-muted-foreground mb-1.5 block">Voertuig *</Label>
-                    <Select value={form.vehicle_id} onValueChange={(v) => setForm({ ...form, vehicle_id: v })}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <Label className="text-xs text-muted-foreground block">Voertuig *</Label>
+                      {form.vehicle_id && (
+                        <button
+                          type="button"
+                          onClick={() => setForm({ ...form, vehicle_id: "" })}
+                          className="text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          Verwijderen
+                        </button>
+                      )}
+                    </div>
+                    <Select value={form.vehicle_id || undefined} onValueChange={(v) => setForm({ ...form, vehicle_id: v })}>
                       <SelectTrigger className="rounded-[3px] h-10">
                         <SelectValue placeholder="Selecteer voertuig" />
                       </SelectTrigger>
