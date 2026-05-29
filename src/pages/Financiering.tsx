@@ -288,6 +288,12 @@ const Financiering = () => {
               >
                 Halal lease aanvragen
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Calculator */}
       <section className="py-16 md:py-24 bg-background border-y border-border">
         <div className="container mx-auto px-6 lg:px-16 max-w-6xl">
