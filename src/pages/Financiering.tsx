@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useState, useMemo } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -16,8 +17,9 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Slider } from "@/components/ui/slider";
 import logoFinanciallease from "@/assets/logo-financiallease.png";
-import { LEASE_DEFAULTS } from "@/lib/lease";
+import { berekenLease, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
 
 const voordelen = [
   {
