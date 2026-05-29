@@ -21,11 +21,6 @@ const FinancieringSection = ({ showCalculator = true }: FinancieringSectionProps
     () => berekenLease({ prijs, aanbetalingPct: aanbetalingPct / 100, looptijd, slottermijnPct: 0 }),
     [prijs, aanbetalingPct, looptijd]
   );
-  const leasebedrag = useMemo(() => prijs - aanbetaling, [prijs, aanbetaling]);
-  const maandbedrag = useMemo(
-    () => berekenLease({ prijs, aanbetalingPct: aanbetalingPct / 100, looptijd, slottermijnPct: 0 }),
-    [prijs, aanbetalingPct, looptijd]
-  );
 
   return (
     <section className="py-16 md:py-28 lg:py-36 bg-card border-t border-border">
