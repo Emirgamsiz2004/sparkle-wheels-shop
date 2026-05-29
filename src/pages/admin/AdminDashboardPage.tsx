@@ -156,6 +156,10 @@ const AdminDashboardPage = () => {
       {/* ═══ Lopende verkopen ═══ */}
       <DashboardLopendeVerkopenCard />
 
+      {/* ═══ Aflever-taken kaart ═══ */}
+      <DashboardAfleveringCard />
+
+
       {/* ═══ Afspraken kaart ═══ */}
       <DashboardAppointmentsCard />
 
