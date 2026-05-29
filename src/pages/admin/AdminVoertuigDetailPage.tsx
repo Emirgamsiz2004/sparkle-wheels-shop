@@ -11,12 +11,13 @@ import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog
 import VehicleDetailHeader from "@/components/admin/detail/VehicleDetailHeader";
 import VehicleOverzichtTab from "@/components/admin/detail/VehicleOverzichtTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
+import VehicleAfleveringTab from "@/components/admin/detail/VehicleAfleveringTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useAppointments } from "@/hooks/useAppointments";
 
-const tabItems = [
+const baseTabs = [
   { key: "overzicht", label: "Overzicht" },
   { key: "taken", label: "Activiteit" },
 ];
