@@ -25,7 +25,7 @@ const FinancieringSection = ({ showCalculator = true }: FinancieringSectionProps
   return (
     <section className="py-16 md:py-28 lg:py-36 bg-card border-t border-border">
       <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+        <div className={`grid gap-10 lg:gap-20 items-center ${showCalculator ? "lg:grid-cols-2" : ""}`}>
           {/* Left — copy */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -84,99 +84,101 @@ const FinancieringSection = ({ showCalculator = true }: FinancieringSectionProps
           </motion.div>
 
           {/* Right — partner card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="bg-background border border-border p-8 md:p-10"
-          >
-            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border">
-              <Calculator className="w-6 h-6 text-foreground" />
-              <div>
-                <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-1">
-                  Lease-calculator
-                </p>
-                <p className="text-sm font-display font-semibold text-foreground">
-                  Bereken uw maandbedrag
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-6 mb-7">
-              <div>
-                <div className="flex justify-between items-baseline mb-2">
-                  <label className="text-xs font-body text-muted-foreground">Aankoopprijs</label>
-                  <span className="text-sm font-display font-semibold text-foreground">{formatEuro(prijs)}</span>
+          {showCalculator && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="bg-background border border-border p-8 md:p-10"
+            >
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border">
+                <Calculator className="w-6 h-6 text-foreground" />
+                <div>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-1">
+                    Lease-calculator
+                  </p>
+                  <p className="text-sm font-display font-semibold text-foreground">
+                    Bereken uw maandbedrag
+                  </p>
                 </div>
-                <Slider
-                  value={[prijs]}
-                  onValueChange={(v) => setPrijs(v[0])}
-                  min={5000}
-                  max={75000}
-                  step={500}
-                />
               </div>
 
-              <div>
-                <div className="flex justify-between items-baseline mb-2">
-                  <label className="text-xs font-body text-muted-foreground">Aanbetaling</label>
-                  <span className="text-sm font-display font-semibold text-foreground">
-                    {aanbetalingPct}% · {formatEuro(aanbetaling)}
+              <div className="space-y-6 mb-7">
+                <div>
+                  <div className="flex justify-between items-baseline mb-2">
+                    <label className="text-xs font-body text-muted-foreground">Aankoopprijs</label>
+                    <span className="text-sm font-display font-semibold text-foreground">{formatEuro(prijs)}</span>
+                  </div>
+                  <Slider
+                    value={[prijs]}
+                    onValueChange={(v) => setPrijs(v[0])}
+                    min={5000}
+                    max={75000}
+                    step={500}
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-baseline mb-2">
+                    <label className="text-xs font-body text-muted-foreground">Aanbetaling</label>
+                    <span className="text-sm font-display font-semibold text-foreground">
+                      {aanbetalingPct}% · {formatEuro(aanbetaling)}
+                    </span>
+                  </div>
+                  <Slider
+                    value={[aanbetalingPct]}
+                    onValueChange={(v) => setAanbetalingPct(v[0])}
+                    min={0}
+                    max={95}
+                    step={5}
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-baseline mb-2">
+                    <label className="text-xs font-body text-muted-foreground">Looptijd</label>
+                    <span className="text-sm font-display font-semibold text-foreground">{looptijd} mnd</span>
+                  </div>
+                  <Slider
+                    value={[looptijd]}
+                    onValueChange={(v) => setLooptijd(v[0])}
+                    min={12}
+                    max={84}
+                    step={12}
+                  />
+                </div>
+
+                <div className="flex justify-between text-xs font-body pt-1">
+                  <span className="text-muted-foreground">Leasebedrag · Rente</span>
+                  <span className="text-foreground font-medium">
+                    {formatEuro(leasebedrag)} · {(LEASE_DEFAULTS.rente * 100).toFixed(1).replace(".", ",")}% vast
                   </span>
                 </div>
-                <Slider
-                  value={[aanbetalingPct]}
-                  onValueChange={(v) => setAanbetalingPct(v[0])}
-                  min={0}
-                  max={95}
-                  step={5}
+              </div>
+
+              <div className="bg-card p-5 border border-border mb-5">
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
+                  Maandbedrag
+                </p>
+                <p className="font-display text-3xl md:text-4xl font-bold text-foreground transition-all">
+                  {formatEuro(maandbedrag)}
+                  <span className="text-base font-body font-normal text-muted-foreground"> /mnd</span>
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <img
+                  src={logoFinanciallease}
+                  alt="financiallease.nl"
+                  className="h-8 w-auto object-contain opacity-80"
                 />
+                <p className="text-[10px] text-muted-foreground/70 leading-snug">
+                  In samenwerking met financiallease.nl. Indicatief, onder voorbehoud van goedkeuring.
+                </p>
               </div>
-
-              <div>
-                <div className="flex justify-between items-baseline mb-2">
-                  <label className="text-xs font-body text-muted-foreground">Looptijd</label>
-                  <span className="text-sm font-display font-semibold text-foreground">{looptijd} mnd</span>
-                </div>
-                <Slider
-                  value={[looptijd]}
-                  onValueChange={(v) => setLooptijd(v[0])}
-                  min={12}
-                  max={84}
-                  step={12}
-                />
-              </div>
-
-              <div className="flex justify-between text-xs font-body pt-1">
-                <span className="text-muted-foreground">Leasebedrag · Rente</span>
-                <span className="text-foreground font-medium">
-                  {formatEuro(leasebedrag)} · {(LEASE_DEFAULTS.rente * 100).toFixed(1).replace(".", ",")}% vast
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-card p-5 border border-border mb-5">
-              <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
-                Maandbedrag
-              </p>
-              <p className="font-display text-3xl md:text-4xl font-bold text-foreground transition-all">
-                {formatEuro(maandbedrag)}
-                <span className="text-base font-body font-normal text-muted-foreground"> /mnd</span>
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              <img
-                src={logoFinanciallease}
-                alt="financiallease.nl"
-                className="h-8 w-auto object-contain opacity-80"
-              />
-              <p className="text-[10px] text-muted-foreground/70 leading-snug">
-                In samenwerking met financiallease.nl. Indicatief, onder voorbehoud van goedkeuring.
-              </p>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </div>
       </div>
     </section>
