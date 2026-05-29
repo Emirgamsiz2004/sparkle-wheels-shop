@@ -11,12 +11,13 @@ import StartProefritDialog from "@/components/admin/proefrit/StartProefritDialog
 import VehicleDetailHeader from "@/components/admin/detail/VehicleDetailHeader";
 import VehicleOverzichtTab from "@/components/admin/detail/VehicleOverzichtTab";
 import VehicleTakenTab from "@/components/admin/detail/VehicleTakenTab";
+import VehicleAfleveringTab from "@/components/admin/detail/VehicleAfleveringTab";
 import AddCostDialog from "@/components/admin/detail/AddCostDialog";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useAppointments } from "@/hooks/useAppointments";
 
-const tabItems = [
+const baseTabs = [
   { key: "overzicht", label: "Overzicht" },
   { key: "taken", label: "Activiteit" },
 ];
@@ -112,16 +113,23 @@ const AdminVoertuigDetailPage = () => {
         onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
         onOpenVerkoop={() => navigate(`/admin/verkopen/nieuw/${vehicle.id}`)}
       />
-
       {/* Tabs */}
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <SlidingTabs
-          tabs={tabItems.map(t => ({ label: t.label, value: t.key }))}
-          value={activeTab}
-          onChange={setActiveTab}
-          className="min-w-max"
-        />
-      </div>
+      {(() => {
+        const tabItems = [
+          ...baseTabs,
+          ...(vehicle.status === "gereserveerd" ? [{ key: "aflevering", label: "Aflevering" }] : []),
+        ];
+        return (
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <SlidingTabs
+              tabs={tabItems.map(t => ({ label: t.label, value: t.key }))}
+              value={activeTab}
+              onChange={setActiveTab}
+              className="min-w-max"
+            />
+          </div>
+        );
+      })()}
 
       {/* Tab content */}
       <div>
@@ -130,6 +138,9 @@ const AdminVoertuigDetailPage = () => {
         )}
         {activeTab === "taken" && (
           <VehicleTakenTab vehicleId={vehicle.id} />
+        )}
+        {activeTab === "aflevering" && (
+          <VehicleAfleveringTab vehicle={vehicle} onVehicleUpdate={refetch} />
         )}
       </div>
 

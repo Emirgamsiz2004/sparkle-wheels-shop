@@ -130,6 +130,42 @@ export type Database = {
           },
         ]
       }
+      aflevering_taken: {
+        Row: {
+          created_at: string
+          deadline: string | null
+          id: string
+          klaar: boolean
+          klaar_op: string | null
+          notitie: string | null
+          titel: string
+          vehicle_id: string
+          volgorde: number
+        }
+        Insert: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          klaar?: boolean
+          klaar_op?: string | null
+          notitie?: string | null
+          titel: string
+          vehicle_id: string
+          volgorde?: number
+        }
+        Update: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          klaar?: boolean
+          klaar_op?: string | null
+          notitie?: string | null
+          titel?: string
+          vehicle_id?: string
+          volgorde?: number
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string
@@ -2446,6 +2482,8 @@ export type Database = {
       vehicles: {
         Row: {
           aanbetalingsbedrag: number | null
+          aflever_datum: string | null
+          aflever_notities: string | null
           afleverkosten: number | null
           apk_vervaldatum: string | null
           betaalmethode: string | null
@@ -2505,6 +2543,8 @@ export type Database = {
         }
         Insert: {
           aanbetalingsbedrag?: number | null
+          aflever_datum?: string | null
+          aflever_notities?: string | null
           afleverkosten?: number | null
           apk_vervaldatum?: string | null
           betaalmethode?: string | null
@@ -2564,6 +2604,8 @@ export type Database = {
         }
         Update: {
           aanbetalingsbedrag?: number | null
+          aflever_datum?: string | null
+          aflever_notities?: string | null
           afleverkosten?: number | null
           apk_vervaldatum?: string | null
           betaalmethode?: string | null
