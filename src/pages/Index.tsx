@@ -48,7 +48,7 @@ const Index = () => {
       <InventorySection />
       <DetailingCTASection />
       <HomeAboutSection />
-      <FinancieringSection />
+      <FinancieringSection showCalculator={false} />
       <GarantieSection />
       <ServicesSection />
       <ReviewsSection />

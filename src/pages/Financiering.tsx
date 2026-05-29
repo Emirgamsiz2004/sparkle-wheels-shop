@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useState, useMemo } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -16,8 +17,9 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Slider } from "@/components/ui/slider";
 import logoFinanciallease from "@/assets/logo-financiallease.png";
-import { LEASE_DEFAULTS } from "@/lib/lease";
+import { berekenLease, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
 
 const voordelen = [
   {
@@ -43,6 +45,17 @@ const voordelen = [
 ];
 
 const Financiering = () => {
+  const [prijs, setPrijs] = useState(25000);
+  const [aanbetalingPct, setAanbetalingPct] = useState(10);
+  const [looptijd, setLooptijd] = useState(72);
+
+  const aanbetaling = useMemo(() => Math.round(prijs * (aanbetalingPct / 100)), [prijs, aanbetalingPct]);
+  const leasebedrag = useMemo(() => prijs - aanbetaling, [prijs, aanbetaling]);
+  const maandbedrag = useMemo(
+    () => berekenLease({ prijs, aanbetalingPct: aanbetalingPct / 100, looptijd, slottermijnPct: 0 }),
+    [prijs, aanbetalingPct, looptijd]
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -280,6 +293,126 @@ const Financiering = () => {
           </div>
         </div>
       </section>
+
+      {/* Calculator */}
+      <section className="py-16 md:py-24 bg-background border-y border-border">
+        <div className="container mx-auto px-6 lg:px-16 max-w-6xl">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-muted-foreground mb-3">
+                Lease-calculator
+              </p>
+              <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
+                Bereken uw maandbedrag
+              </h2>
+              <p className="text-muted-foreground font-body font-light leading-relaxed mb-8 max-w-lg">
+                Speel met aanbetaling en looptijd om een indicatie van uw maandbedrag te zien. 
+                Alle bedragen zijn indicatief en onder voorbehoud van kredietgoedkeuring via{" "}
+                <span className="text-foreground font-medium">financiallease.nl</span>.
+              </p>
+
+              <div className="flex items-center gap-3">
+                <img
+                  src={logoFinanciallease}
+                  alt="financiallease.nl"
+                  className="h-8 w-auto object-contain opacity-80"
+                />
+                <p className="text-[10px] text-muted-foreground/70 leading-snug max-w-xs">
+                  In samenwerking met financiallease.nl
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="bg-card border border-border p-8 md:p-10"
+            >
+              <div className="space-y-6 mb-7">
+                <div>
+                  <div className="flex justify-between items-baseline mb-2">
+                    <label className="text-xs font-body text-muted-foreground">Aankoopprijs</label>
+                    <span className="text-sm font-display font-semibold text-foreground">{formatEuro(prijs)}</span>
+                  </div>
+                  <Slider
+                    value={[prijs]}
+                    onValueChange={(v) => setPrijs(v[0])}
+                    min={5000}
+                    max={75000}
+                    step={500}
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-baseline mb-2">
+                    <label className="text-xs font-body text-muted-foreground">Aanbetaling</label>
+                    <span className="text-sm font-display font-semibold text-foreground">
+                      {aanbetalingPct}% · {formatEuro(aanbetaling)}
+                    </span>
+                  </div>
+                  <Slider
+                    value={[aanbetalingPct]}
+                    onValueChange={(v) => setAanbetalingPct(v[0])}
+                    min={0}
+                    max={95}
+                    step={5}
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-baseline mb-2">
+                    <label className="text-xs font-body text-muted-foreground">Looptijd</label>
+                    <span className="text-sm font-display font-semibold text-foreground">{looptijd} mnd</span>
+                  </div>
+                  <Slider
+                    value={[looptijd]}
+                    onValueChange={(v) => setLooptijd(v[0])}
+                    min={12}
+                    max={84}
+                    step={12}
+                  />
+                </div>
+
+                <div className="flex justify-between text-xs font-body pt-1">
+                  <span className="text-muted-foreground">Leasebedrag · Rente</span>
+                  <span className="text-foreground font-medium">
+                    {formatEuro(leasebedrag)} · {(LEASE_DEFAULTS.rente * 100).toFixed(1).replace(".", ",")}% vast
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-background p-5 border border-border mb-5">
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
+                  Maandbedrag
+                </p>
+                <p className="font-display text-3xl md:text-4xl font-bold text-foreground transition-all">
+                  {formatEuro(maandbedrag)}
+                  <span className="text-base font-body font-normal text-muted-foreground"> /mnd</span>
+                </p>
+              </div>
+
+              <a
+                href={LEASE_DEFAULTS.partnerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center justify-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300 w-full"
+              >
+                Vraag lease aan bij financiallease.nl
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Voordelen */}
 
       {/* Voordelen */}
       <section className="py-16 md:py-24 bg-card">
