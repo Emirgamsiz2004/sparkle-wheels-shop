@@ -75,7 +75,7 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
     (async () => {
       // Combine customers + test_drive_customers
       const [crm, td] = await Promise.all([
-        supabase.from("customers").select("id, voornaam, achternaam, email, telefoon, adres, postcode, plaats, woonplaats:plaats").order("achternaam", { ascending: true }).limit(500),
+        supabase.from("customers").select("id, voornaam, achternaam, email, telefoon, adres, postcode, plaats, woonplaats").order("achternaam", { ascending: true }).limit(500),
         supabase.from("test_drive_customers").select("id, voornaam, achternaam, email, telefoon, adres, postcode, plaats").order("achternaam", { ascending: true }).limit(500),
       ]);
       const list: CustomerOption[] = [];
