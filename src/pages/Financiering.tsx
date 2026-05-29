@@ -413,10 +413,6 @@ const Financiering = () => {
       </section>
 
       {/* Voordelen */}
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
       {/* Voordelen */}
       <section className="py-16 md:py-24 bg-card">
