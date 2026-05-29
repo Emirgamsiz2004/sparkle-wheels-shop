@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +6,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Loader2, X, Download } from "lucide-react";
 import { generateAanbetalingPDF, generateAanbetalingBlob } from "@/lib/aanbetalingPdf";
+
+interface CustomerOption {
+  id: string;
+  voornaam: string;
+  achternaam: string;
+  email: string;
+  telefoon: string | null;
+  adres: string | null;
+  postcode: string | null;
+  plaats: string | null;
+  woonplaats: string | null;
+}
 
 interface Props {
   open: boolean;
