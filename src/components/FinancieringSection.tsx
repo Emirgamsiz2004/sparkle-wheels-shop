@@ -6,12 +6,21 @@ import { Slider } from "@/components/ui/slider";
 import { berekenLease, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
 import logoFinanciallease from "@/assets/logo-financiallease.png";
 
-const FinancieringSection = () => {
+interface FinancieringSectionProps {
+  showCalculator?: boolean;
+}
+
+const FinancieringSection = ({ showCalculator = true }: FinancieringSectionProps) => {
   const [prijs, setPrijs] = useState(25000);
   const [aanbetalingPct, setAanbetalingPct] = useState(10);
   const [looptijd, setLooptijd] = useState(72);
 
   const aanbetaling = useMemo(() => Math.round(prijs * (aanbetalingPct / 100)), [prijs, aanbetalingPct]);
+  const leasebedrag = useMemo(() => prijs - aanbetaling, [prijs, aanbetaling]);
+  const maandbedrag = useMemo(
+    () => berekenLease({ prijs, aanbetalingPct: aanbetalingPct / 100, looptijd, slottermijnPct: 0 }),
+    [prijs, aanbetalingPct, looptijd]
+  );
   const leasebedrag = useMemo(() => prijs - aanbetaling, [prijs, aanbetaling]);
   const maandbedrag = useMemo(
     () => berekenLease({ prijs, aanbetalingPct: aanbetalingPct / 100, looptijd, slottermijnPct: 0 }),
