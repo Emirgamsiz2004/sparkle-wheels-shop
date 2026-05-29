@@ -284,6 +284,22 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
 
           {/* Klantgegevens */}
           <Section title="Klantgegevens">
+            <div>
+              <label className="block text-xs text-muted-foreground mb-1.5">Bestaande klant selecteren</label>
+              <select
+                value={selectedCustomerId}
+                onChange={(e) => selectCustomer(e.target.value)}
+                className={inputCls}
+              >
+                <option value="">— Nieuwe klant / handmatig invullen —</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.achternaam}, {c.voornaam} — {c.email}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-muted-foreground mt-1">Klanten van eerdere proefritten en CRM worden automatisch geladen.</p>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Voornaam *" value={form.voornaam} onChange={(v) => update("voornaam", v)} cls={inputCls} />
               <Field label="Achternaam *" value={form.achternaam} onChange={(v) => update("achternaam", v)} cls={inputCls} />
