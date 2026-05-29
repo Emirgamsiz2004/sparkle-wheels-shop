@@ -91,9 +91,9 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
           email: c.email || "",
           telefoon: c.telefoon || "",
           adres: c.adres || "",
+          postcode: c.postcode || "",
           plaats: c.plaats || c.woonplaats || "",
           woonplaats: c.woonplaats || c.plaats || "",
-          woonplaats: c.plaats || "",
         });
       };
       (crm.data || []).forEach(push);
