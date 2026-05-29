@@ -17,6 +17,7 @@ import {
 } from "recharts";
 import DashboardAppointmentsCard from "@/components/admin/DashboardAppointmentsCard";
 import DashboardLopendeVerkopenCard from "@/components/admin/DashboardLopendeVerkopenCard";
+import DashboardAfleveringCard from "@/components/admin/DashboardAfleveringCard";
 import DashboardLeadSourcesCard from "@/components/admin/DashboardLeadSourcesCard";
 import ShopifyPeriodSelector, { type PeriodRange as ShopifyRange } from "@/components/admin/ShopifyPeriodSelector";
 
