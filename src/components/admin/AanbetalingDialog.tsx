@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Vehicle, formatEuroDecimal } from "@/types/vehicle";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +6,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Loader2, X, Download } from "lucide-react";
 import { generateAanbetalingPDF, generateAanbetalingBlob } from "@/lib/aanbetalingPdf";
+
+interface CustomerOption {
+  id: string;
+  voornaam: string;
+  achternaam: string;
+  email: string;
+  telefoon: string | null;
+  adres: string | null;
+  postcode: string | null;
+  plaats: string | null;
+  woonplaats: string | null;
+}
 
 interface Props {
   open: boolean;
@@ -37,6 +49,8 @@ interface FormData {
 const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) => {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [customers, setCustomers] = useState<CustomerOption[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
 
   const [form, setForm] = useState<FormData>({
     voornaam: "",
@@ -55,6 +69,56 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
     betaalwijze: "bank",
     contantBedrag: 0,
   });
+
+  useEffect(() => {
+    if (!open) return;
+    (async () => {
+      // Combine customers + test_drive_customers
+      const [crm, td] = await Promise.all([
+        supabase.from("customers").select("id, voornaam, achternaam, email, telefoon, adres, postcode, plaats, woonplaats").order("achternaam", { ascending: true }).limit(500),
+        supabase.from("test_drive_customers").select("id, voornaam, achternaam, email, telefoon, adres, postcode, plaats").order("achternaam", { ascending: true }).limit(500),
+      ]);
+      const list: CustomerOption[] = [];
+      const seen = new Set<string>();
+      const push = (c: any) => {
+        const key = (c.email || "").toLowerCase() + "|" + (c.telefoon || "");
+        if (seen.has(key) || !c.email) return;
+        seen.add(key);
+        list.push({
+          id: c.id,
+          voornaam: c.voornaam || "",
+          achternaam: c.achternaam || "",
+          email: c.email || "",
+          telefoon: c.telefoon || "",
+          adres: c.adres || "",
+          postcode: c.postcode || "",
+          plaats: c.plaats || c.woonplaats || "",
+          woonplaats: c.woonplaats || c.plaats || "",
+        });
+      };
+      (crm.data || []).forEach(push);
+      (td.data || []).forEach(push);
+      list.sort((a, b) => `${a.achternaam} ${a.voornaam}`.localeCompare(`${b.achternaam} ${b.voornaam}`));
+      setCustomers(list);
+    })();
+  }, [open]);
+
+  const selectCustomer = (id: string) => {
+    setSelectedCustomerId(id);
+    if (!id) return;
+    const c = customers.find((x) => x.id === id);
+    if (!c) return;
+    setForm((f) => ({
+      ...f,
+      voornaam: c.voornaam,
+      achternaam: c.achternaam,
+      email: c.email,
+      telefoon: c.telefoon || "",
+      adres: c.adres || "",
+      postcode: c.postcode || "",
+      woonplaats: c.plaats || c.woonplaats || "",
+    }));
+  };
 
   const update = (key: keyof FormData, value: any) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -220,6 +284,22 @@ const AanbetalingDialog = ({ open, onClose, vehicle, onStatusChange }: Props) =>
 
           {/* Klantgegevens */}
           <Section title="Klantgegevens">
+            <div>
+              <label className="block text-xs text-muted-foreground mb-1.5">Bestaande klant selecteren</label>
+              <select
+                value={selectedCustomerId}
+                onChange={(e) => selectCustomer(e.target.value)}
+                className={inputCls}
+              >
+                <option value="">— Nieuwe klant / handmatig invullen —</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.achternaam}, {c.voornaam} — {c.email}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-muted-foreground mt-1">Klanten van eerdere proefritten en CRM worden automatisch geladen.</p>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Voornaam *" value={form.voornaam} onChange={(v) => update("voornaam", v)} cls={inputCls} />
               <Field label="Achternaam *" value={form.achternaam} onChange={(v) => update("achternaam", v)} cls={inputCls} />
