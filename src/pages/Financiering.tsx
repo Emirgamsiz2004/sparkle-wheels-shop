@@ -45,6 +45,17 @@ const voordelen = [
 ];
 
 const Financiering = () => {
+  const [prijs, setPrijs] = useState(25000);
+  const [aanbetalingPct, setAanbetalingPct] = useState(10);
+  const [looptijd, setLooptijd] = useState(72);
+
+  const aanbetaling = useMemo(() => Math.round(prijs * (aanbetalingPct / 100)), [prijs, aanbetalingPct]);
+  const leasebedrag = useMemo(() => prijs - aanbetaling, [prijs, aanbetaling]);
+  const maandbedrag = useMemo(
+    () => berekenLease({ prijs, aanbetalingPct: aanbetalingPct / 100, looptijd, slottermijnPct: 0 }),
+    [prijs, aanbetalingPct, looptijd]
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
