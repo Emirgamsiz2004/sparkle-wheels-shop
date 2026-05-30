@@ -139,7 +139,7 @@ const AdminDashboardPage = () => {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+            <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
             <p className="text-xs text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
           </div>
           <div className="flex items-center gap-3">
