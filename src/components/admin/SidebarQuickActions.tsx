@@ -23,7 +23,7 @@ interface Section {
 
 interface Props {
   /** Visual style for the trigger button. */
-  variant?: "rail" | "wide" | "fab" | "sidebar-pill";
+  variant?: "rail" | "wide" | "fab";
   className?: string;
 }
 
@@ -140,8 +140,6 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       className={
         variant === "fab"
           ? `inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_10px_30px_-6px_rgba(16,185,129,0.55)] ring-1 ring-emerald-300/30 transition-transform duration-200 ease-out active:scale-95 ${className}`
-          : variant === "sidebar-pill"
-          ? `inline-flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-white/90 text-black shadow-[0_4px_12px_-2px_rgba(0,0,0,0.4)] ring-1 ring-black/10 transition-transform duration-200 ease-out active:scale-95 ${className}`
           : variant === "rail"
           ? `flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap text-foreground hover:bg-accent/60 border border-border/60 ${
               open ? "bg-accent" : ""
@@ -161,8 +159,6 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
         >
           {open ? <X className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
         </motion.span>
-      ) : variant === "sidebar-pill" ? (
-        open ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />
       ) : (
         <Plus className="w-4 h-4 flex-shrink-0" />
       )}

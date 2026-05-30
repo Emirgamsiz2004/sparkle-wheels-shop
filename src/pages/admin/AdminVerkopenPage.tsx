@@ -169,14 +169,14 @@ const AdminVerkopenPage = () => {
   const FilterButton = ({ active, onClick, label, count }: { active: boolean; onClick: () => void; label: string; count: number }) => (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
         active
-          ? "bg-foreground/10 border-foreground/20 text-foreground"
-          : "border-transparent text-muted-foreground hover:text-foreground"
+          ? "bg-foreground text-background border-foreground"
+          : "bg-card text-muted-foreground border-border hover:bg-accent hover:text-foreground"
       }`}
     >
       {label}
-      <span className="bg-accent/60 px-1.5 py-0.5 rounded-full text-[10px]">{count}</span>
+      <span className={`tabular-nums ${active ? "opacity-70" : "opacity-60"}`}>{count}</span>
     </button>
   );
 

@@ -89,44 +89,44 @@ input[type="number"] {
 
   /* Admin panel — deep dark, Cloud-inspired */
   .admin-theme {
-    --background: 30 4% 7%;
+    --background: 220 4% 7%;
     --foreground: 40 6% 80%;
 
-    --card: 30 4% 10%;
+    --card: 220 4% 10%;
     --card-foreground: 40 6% 80%;
 
-    --popover: 30 4% 10%;
+    --popover: 220 4% 10%;
     --popover-foreground: 40 6% 80%;
 
     --primary: 40 6% 80%;
-    --primary-foreground: 30 4% 7%;
+    --primary-foreground: 220 4% 7%;
 
-    --secondary: 30 3% 12%;
+    --secondary: 220 4% 12%;
     --secondary-foreground: 40 4% 60%;
 
-    --muted: 30 3% 13%;
-    --muted-foreground: 40 3% 55%;
+    --muted: 220 3% 14%;
+    --muted-foreground: 40 3% 45%;
 
-    --accent: 30 4% 13%;
+    --accent: 220 4% 13%;
     --accent-foreground: 40 6% 80%;
 
     --destructive: 0 55% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 3% 14%;
-    --input: 30 3% 14%;
-    --ring: 30 4% 25%;
+    --border: 220 4% 14%;
+    --input: 220 4% 14%;
+    --ring: 220 4% 25%;
 
     --radius: 10px;
 
-    --sidebar-background: 30 4% 5.5%;
+    --sidebar-background: 220 4% 5.5%;
     --sidebar-foreground: 40 4% 60%;
     --sidebar-primary: 40 6% 80%;
-    --sidebar-primary-foreground: 30 4% 5.5%;
-    --sidebar-accent: 30 4% 10%;
+    --sidebar-primary-foreground: 220 4% 5.5%;
+    --sidebar-accent: 220 4% 10%;
     --sidebar-accent-foreground: 40 6% 80%;
-    --sidebar-border: 30 3% 10%;
-    --sidebar-ring: 30 4% 25%;
+    --sidebar-border: 220 4% 11%;
+    --sidebar-ring: 220 4% 25%;
 
     font-family: 'DM Sans', sans-serif;
   }
@@ -159,7 +159,7 @@ input[type="number"] {
   /* Cards */
   .admin-theme .rounded-lg,
   body:has(.admin-theme) [data-radix-portal] .rounded-lg {
-    border-radius: 18px;
+    border-radius: 14px;
   }
   /* Modals */
   .admin-theme [role="dialog"],
@@ -207,8 +207,35 @@ input[type="number"] {
                 box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Fade-in animations removed to prevent re-animation on data refresh */
+  /* Smooth content appear for admin sections */
+  .admin-theme .space-y-1\.5 > *,
+  .admin-theme .space-y-2 > *,
+  .admin-theme .space-y-3 > *,
+  .admin-theme .space-y-4 > *,
+  .admin-theme table tbody tr {
+    animation: admin-fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
 
+  .admin-theme .space-y-1\.5 > *:nth-child(1),
+  .admin-theme .space-y-2 > *:nth-child(1),
+  .admin-theme .space-y-3 > *:nth-child(1),
+  .admin-theme .space-y-4 > *:nth-child(1),
+  .admin-theme table tbody tr:nth-child(1) { animation-delay: 0ms; }
+  .admin-theme .space-y-1\.5 > *:nth-child(2),
+  .admin-theme .space-y-2 > *:nth-child(2),
+  .admin-theme .space-y-3 > *:nth-child(2),
+  .admin-theme .space-y-4 > *:nth-child(2),
+  .admin-theme table tbody tr:nth-child(2) { animation-delay: 30ms; }
+  .admin-theme .space-y-1\.5 > *:nth-child(3),
+  .admin-theme .space-y-2 > *:nth-child(3),
+  .admin-theme .space-y-3 > *:nth-child(3),
+  .admin-theme .space-y-4 > *:nth-child(3),
+  .admin-theme table tbody tr:nth-child(3) { animation-delay: 60ms; }
+  .admin-theme .space-y-1\.5 > *:nth-child(n+4),
+  .admin-theme .space-y-2 > *:nth-child(n+4),
+  .admin-theme .space-y-3 > *:nth-child(n+4),
+  .admin-theme .space-y-4 > *:nth-child(n+4),
+  .admin-theme table tbody tr:nth-child(n+4) { animation-delay: 80ms; }
 
   /* Smoother dialog animations */
   body:has(.admin-theme) [data-radix-portal] [data-state="open"][role="dialog"],
@@ -324,27 +351,6 @@ input[type="number"] {
     backdrop-filter: blur(2px);
     animation-duration: 0.22s !important;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  /* Admin cards — subtle depth shadow */
-  .admin-theme .bg-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  /* Admin header — translucent blur with glow border */
-  .admin-theme .admin-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-    backdrop-filter: blur(12px);
-    background: rgba(14, 15, 17, 0.85) !important;
-  }
-
-  /* Admin primary buttons — emerald gradient */
-  .admin-theme button[class*="bg-foreground"][class*="text-background"],
-  .admin-theme [role="button"][class*="bg-foreground"][class*="text-background"] {
-    background: linear-gradient(135deg, #10b981, #059669) !important;
-    color: #ffffff !important;
-    border-color: transparent !important;
   }
 }
 
