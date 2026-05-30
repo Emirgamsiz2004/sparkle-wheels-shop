@@ -148,7 +148,7 @@ const AdminLayoutInner = ({
     <div className="admin-theme min-h-screen bg-background overflow-x-hidden">
       {/* Sidebar — desktop-only. Verborgen op mobiel; bottombar vervangt navigatie. */}
       <aside
-        className="group/sidebar hidden lg:flex fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex-col transition-[width] duration-200 ease-out overflow-hidden w-[56px] hover:w-[220px]"
+        className="group/sidebar hidden lg:flex fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex-col transition-[width] duration-200 ease-out overflow-hidden w-16 hover:w-[220px]"
       >
         <div className="h-14 px-3 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
           <Link to="/admin/dashboard" className="flex items-center gap-2.5 min-w-0">
@@ -166,7 +166,7 @@ const AdminLayoutInner = ({
                 title={item.label}
                 className={`relative flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
                   isActive(item.path)
-                    ? "bg-accent text-foreground font-medium"
+                    ? "bg-accent text-foreground font-medium before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-emerald-500 before:rounded-full"
                     : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
                 }`}
               >
@@ -204,9 +204,9 @@ const AdminLayoutInner = ({
           <Link
             to="/admin/instellingen"
             title="Instellingen"
-            className={`flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
+            className={`relative flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
               isActive("/admin/instellingen")
-                ? "bg-accent text-foreground font-medium"
+                ? "bg-accent text-foreground font-medium before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-emerald-500 before:rounded-full"
                 : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
             }`}
           >
@@ -228,8 +228,8 @@ const AdminLayoutInner = ({
       </aside>
 
       {/* Main content — geen left margin op mobiel */}
-      <div className="flex flex-col min-h-screen min-w-0 lg:ml-[56px]">
-        <header className="sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 bg-background border-b border-border gap-3">
+      <div className="flex flex-col min-h-screen min-w-0 lg:ml-16">
+        <header className="admin-header sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 border-b gap-3">
           {/* Mobiel: hamburger + titel/logo */}
           <div className="flex items-center gap-2 lg:hidden min-w-0 flex-1">
             <button

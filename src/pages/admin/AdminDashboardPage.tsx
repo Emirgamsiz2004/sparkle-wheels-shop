@@ -139,7 +139,7 @@ const AdminDashboardPage = () => {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+            <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
             <p className="text-xs text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
           </div>
           <div className="flex items-center gap-3">
@@ -172,12 +172,14 @@ const AdminDashboardPage = () => {
           </>
         ) : (
           <>
-            <div className="bg-card border border-border rounded-md p-4 sm:p-5">
+            <div className="bg-card border border-border rounded-md p-4 sm:p-5 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               <p className="text-[11px] text-muted-foreground mb-1">Totale omzet</p>
               <p className="text-2xl font-bold tabular-nums text-foreground">{formatEuro(kpis.omzet)}</p>
               {compare && <div className="mt-1.5"><Trend current={kpis.omzet} previous={kpis.omzetPrev ?? 0} /></div>}
             </div>
-            <div className="bg-card border border-border rounded-md p-4 sm:p-5">
+            <div className="bg-card border border-border rounded-md p-4 sm:p-5 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               <p className="text-[11px] text-muted-foreground mb-1">Totale winst</p>
               <p className="text-2xl font-bold tabular-nums text-emerald-500">{formatEuro(kpis.brutowinst)}</p>
               {compare && <div className="mt-1.5"><Trend current={kpis.brutowinst} previous={kpis.brutwinstPrev ?? 0} /></div>}
@@ -189,7 +191,7 @@ const AdminDashboardPage = () => {
       {/* ═══ BLOK 1 — Omzet grafiek ═══ */}
       <div className="bg-card border border-border rounded-md p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <h2 className="text-[13px] font-semibold text-foreground">Omzet</h2>
+          <h2 className="text-sm font-semibold text-foreground">Omzet</h2>
           <div className="flex items-center gap-4 sm:gap-6">
             {loading ? (
               <><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-16" /></>
@@ -219,7 +221,7 @@ const AdminDashboardPage = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
               <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} width={40} />
-              <RechartsTooltip formatter={euroFormatter} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 3, fontSize: 12 }} />
+              <RechartsTooltip formatter={euroFormatter} contentStyle={{ background: 'hsl(220 5% 13%)', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
               <Line type="monotone" dataKey="omzet" stroke="#10b981" strokeWidth={2} dot={false} name="Omzet" />
             </LineChart>
           </ResponsiveContainer>
@@ -242,7 +244,7 @@ const AdminDashboardPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Meest verkochte merken */}
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Meest verkochte merken</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Meest verkochte merken</h2>
           {loading ? <Skeleton className="h-[140px]" /> : populariteit.merkVerkopen.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Geen data</p>
           ) : (
@@ -265,7 +267,7 @@ const AdminDashboardPage = () => {
 
         {/* Brandstofverdeling */}
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Brandstofverdeling</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Brandstofverdeling</h2>
           {loading ? <Skeleton className="h-[140px]" /> : brandstofData.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Geen data</p>
           ) : (
@@ -299,7 +301,7 @@ const AdminDashboardPage = () => {
       {/* ═══ BLOK 4 — Voorraad overzicht ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[13px] font-semibold text-foreground">Voorraad overzicht</h2>
+          <h2 className="text-sm font-semibold text-foreground">Voorraad overzicht</h2>
           <Link to="/admin/voertuigen" className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors">
             Bekijk alle voorraad <ChevronRight className="w-3 h-3" />
           </Link>
@@ -355,7 +357,7 @@ const AdminDashboardPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Beste verkopen */}
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Beste verkopen</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Beste verkopen</h2>
           {loading ? <Skeleton className="h-[140px]" /> : margeAnalyse.top5.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Geen data</p>
           ) : (
@@ -388,7 +390,7 @@ const AdminDashboardPage = () => {
 
         {/* Marge per merk */}
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Marge per merk</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Marge per merk</h2>
           {loading ? <Skeleton className="h-[140px]" /> : margeAnalyse.margePerMerk.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Geen data</p>
           ) : (
@@ -415,7 +417,7 @@ const AdminDashboardPage = () => {
       {/* ═══ BLOK 7 — Inkoop grafiek + getallen ═══ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Inkoop per periode</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Inkoop per periode</h2>
           {loading ? <Skeleton className="h-[180px]" /> : inkoopChartData.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-12">Geen inkopen in deze periode</p>
           ) : (
@@ -450,7 +452,7 @@ const AdminDashboardPage = () => {
 
       {/* ═══ BLOK 8 — Proefritten ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
-        <h2 className="text-[13px] font-semibold text-foreground mb-4">Proefritten</h2>
+        <h2 className="text-sm font-semibold text-foreground mb-4">Proefritten</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
           {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[72px] rounded-lg" />) : (
             <>
@@ -516,7 +518,7 @@ const AdminDashboardPage = () => {
 
       {/* ═══ BLOK 9 — Recente activiteit ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
-        <h2 className="text-[13px] font-semibold text-foreground mb-4">Recente activiteit</h2>
+        <h2 className="text-sm font-semibold text-foreground mb-4">Recente activiteit</h2>
         {loading ? <Skeleton className="h-[200px]" /> : activities.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-8">Geen recente activiteit</p>
         ) : (
