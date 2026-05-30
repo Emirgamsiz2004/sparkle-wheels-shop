@@ -207,35 +207,8 @@ input[type="number"] {
                 box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Smooth content appear for admin sections */
-  .admin-theme .space-y-1\.5 > *,
-  .admin-theme .space-y-2 > *,
-  .admin-theme .space-y-3 > *,
-  .admin-theme .space-y-4 > *,
-  .admin-theme table tbody tr {
-    animation: admin-fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
-  }
+  /* Fade-in animations removed to prevent re-animation on data refresh */
 
-  .admin-theme .space-y-1\.5 > *:nth-child(1),
-  .admin-theme .space-y-2 > *:nth-child(1),
-  .admin-theme .space-y-3 > *:nth-child(1),
-  .admin-theme .space-y-4 > *:nth-child(1),
-  .admin-theme table tbody tr:nth-child(1) { animation-delay: 0ms; }
-  .admin-theme .space-y-1\.5 > *:nth-child(2),
-  .admin-theme .space-y-2 > *:nth-child(2),
-  .admin-theme .space-y-3 > *:nth-child(2),
-  .admin-theme .space-y-4 > *:nth-child(2),
-  .admin-theme table tbody tr:nth-child(2) { animation-delay: 30ms; }
-  .admin-theme .space-y-1\.5 > *:nth-child(3),
-  .admin-theme .space-y-2 > *:nth-child(3),
-  .admin-theme .space-y-3 > *:nth-child(3),
-  .admin-theme .space-y-4 > *:nth-child(3),
-  .admin-theme table tbody tr:nth-child(3) { animation-delay: 60ms; }
-  .admin-theme .space-y-1\.5 > *:nth-child(n+4),
-  .admin-theme .space-y-2 > *:nth-child(n+4),
-  .admin-theme .space-y-3 > *:nth-child(n+4),
-  .admin-theme .space-y-4 > *:nth-child(n+4),
-  .admin-theme table tbody tr:nth-child(n+4) { animation-delay: 80ms; }
 
   /* Smoother dialog animations */
   body:has(.admin-theme) [data-radix-portal] [data-state="open"][role="dialog"],
