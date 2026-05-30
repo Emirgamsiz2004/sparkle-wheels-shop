@@ -37,7 +37,7 @@ export const AFLEVER_PRESETS = [
 const inputCls =
   "w-full px-3 py-2 text-sm bg-secondary/40 border border-border rounded-[3px] text-foreground focus:outline-none focus:ring-1 focus:ring-accent/60";
 
-const AfleverChecklist = ({ vehicleId, compact = false, hideWhenAllDone = false, onChange }: Props) => {
+const AfleverChecklist = ({ vehicleId, compact = false, hideWhenAllDone = false, hideWhenEmpty = false, onChange }: Props) => {
   const [taken, setTaken] = useState<Taak[]>([]);
   const [loading, setLoading] = useState(true);
   const [newTitel, setNewTitel] = useState("");
