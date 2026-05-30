@@ -151,8 +151,8 @@ const AdminDashboardPage = () => {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
           </div>
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer">
@@ -162,6 +162,22 @@ const AdminDashboardPage = () => {
             </label>
             <ShopifyPeriodSelector value={periodRange} onChange={setPeriodRange} />
           </div>
+        </div>
+
+        {/* ─── Live stats strip ─── */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="bg-card border border-border/60 rounded-full px-3 py-1 text-xs font-medium flex items-center gap-1.5">
+            <Car className="w-3.5 h-3.5 text-muted-foreground" />
+            {vLoading ? <span className="w-4 h-4 inline-block">…</span> : stats.voorraad} in voorraad
+          </span>
+          <span className="bg-card border border-border/60 rounded-full px-3 py-1 text-xs font-medium flex items-center gap-1.5">
+            <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
+            {tdLoading ? <span className="w-4 h-4 inline-block">…</span> : stats.actieveProefritten} actieve proefritten
+          </span>
+          <span className="bg-card border border-border/60 rounded-full px-3 py-1 text-xs font-medium flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+            {apptLoading ? <span className="w-4 h-4 inline-block">…</span> : stats.afsprakenVandaag} afspraken vandaag
+          </span>
         </div>
       </div>
 
