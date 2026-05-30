@@ -92,7 +92,7 @@ input[type="number"] {
     --background: 220 4% 7%;
     --foreground: 40 6% 80%;
 
-    --card: 220 4% 10%;
+    --card: 220 5% 11%;
     --card-foreground: 40 6% 80%;
 
     --popover: 220 4% 10%;
@@ -105,7 +105,7 @@ input[type="number"] {
     --secondary-foreground: 40 4% 60%;
 
     --muted: 220 3% 14%;
-    --muted-foreground: 40 3% 45%;
+    --muted-foreground: 40 3% 55%;
 
     --accent: 220 4% 13%;
     --accent-foreground: 40 6% 80%;
