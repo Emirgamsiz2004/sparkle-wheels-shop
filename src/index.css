@@ -325,6 +325,26 @@ input[type="number"] {
     animation-duration: 0.22s !important;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
+
+  /* Admin cards — subtle depth shadow */
+  .admin-theme .bg-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  /* Admin header — translucent blur with glow border */
+  .admin-theme .admin-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    backdrop-filter: blur(12px);
+    background: rgba(14, 15, 17, 0.85) !important;
+  }
+
+  /* Admin primary buttons — emerald gradient */
+  .admin-theme button[class*="bg-foreground"][class*="text-background"],
+  .admin-theme [role="button"][class*="bg-foreground"][class*="text-background"] {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+  }
 }
 
 @keyframes admin-fade-in {
