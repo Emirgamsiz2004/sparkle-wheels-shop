@@ -259,7 +259,7 @@ const VehicleAfleveringTab = ({ vehicle, onVehicleUpdate }: Props) => {
             className={inputCls + " sm:w-44"}
           />
           <button
-            onClick={addTaak}
+            onClick={() => addTaak()}
             disabled={!newTitel.trim()}
             className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-medium border border-border rounded-[3px] hover:bg-accent/20 transition-all disabled:opacity-40"
           >
