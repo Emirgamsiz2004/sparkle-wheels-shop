@@ -255,13 +255,25 @@ const AdminVoertuigenPage = () => {
             </div>
           )}
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full sm:w-auto px-2 h-9 text-[13px] sm:text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
-        >
-          {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {STATUS_OPTIONS.map((o) => {
+            const active = statusFilter === o.value;
+            return (
+              <button
+                key={o.value}
+                onClick={() => setStatusFilter(o.value)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  active
+                    ? "bg-foreground/10 border-foreground/20 text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {o.label}
+                <span className="bg-accent/60 px-1.5 py-0.5 rounded-full text-[10px]">{statusCounts[o.value] ?? 0}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {filtered.length === 0 ? (

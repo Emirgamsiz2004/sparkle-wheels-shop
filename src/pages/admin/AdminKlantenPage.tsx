@@ -6,7 +6,6 @@ import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover"
 import ConfirmPopover from "@/components/admin/ConfirmPopover";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import SlidingTabs from "@/components/admin/SlidingTabs";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
 import { deleteCustomerSafely } from "@/lib/customerDelete";
 
