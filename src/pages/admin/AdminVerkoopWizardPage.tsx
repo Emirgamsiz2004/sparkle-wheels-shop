@@ -18,6 +18,7 @@ import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
+import AfleverChecklist from "@/components/admin/AfleverChecklist";
 import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
 import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
 import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
