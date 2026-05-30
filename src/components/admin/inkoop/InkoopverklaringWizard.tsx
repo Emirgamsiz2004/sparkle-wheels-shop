@@ -244,25 +244,26 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className="max-w-lg max-h-[90dvh] overflow-y-auto"
+        className="p-0 gap-0 max-sm:w-screen max-sm:h-[100dvh] max-sm:max-w-none max-sm:max-h-none max-sm:rounded-none max-sm:border-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:left-0 max-sm:top-0 sm:max-w-lg sm:max-h-[90dvh] flex flex-col"
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <DialogHeader>
-          <DialogTitle>Nieuwe inkoopverklaring</DialogTitle>
-        </DialogHeader>
-
-        {!done ? (
-          <div className="space-y-5">
-            {/* Progress */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs text-muted-foreground">
+        <DialogHeader className="px-5 pt-5 pb-3 border-b border-border/50 shrink-0">
+          <DialogTitle className="text-base font-semibold">Nieuwe inkoopverklaring</DialogTitle>
+          {!done && (
+            <div className="space-y-2 pt-3">
+              <div className="flex justify-between text-[11px] uppercase tracking-wide text-muted-foreground">
                 {STEPS.map((s, i) => (
                   <span key={s} className={cn(i === step && "text-foreground font-medium")}>{s}</span>
                 ))}
               </div>
-              <Progress value={((step + 1) / STEPS.length) * 100} className="h-1.5" />
+              <Progress value={((step + 1) / STEPS.length) * 100} className="h-1" />
             </div>
+          )}
+        </DialogHeader>
+
+        {!done ? (
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
 
             {/* Step 1: Verkoper */}
             {step === 0 && (
@@ -395,25 +396,26 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
                 </div>
               </div>
             )}
+          </div>
+        ) : null}
 
-            {/* Navigation */}
-            <div className="flex justify-between pt-2">
-              <Button variant="outline" size="sm" onClick={() => step > 0 ? setStep(step - 1) : handleClose(false)}>
-                {step === 0 ? "Annuleren" : "Vorige"}
+        {!done ? (
+          <div className="shrink-0 flex justify-between gap-2 px-5 py-3 border-t border-border/50 bg-background">
+            <Button variant="outline" size="sm" onClick={() => step > 0 ? setStep(step - 1) : handleClose(false)}>
+              {step === 0 ? "Annuleren" : "Vorige"}
+            </Button>
+            {step < 2 ? (
+              <Button size="sm" onClick={() => setStep(step + 1)} disabled={!canNext()}>Volgende</Button>
+            ) : (
+              <Button size="sm" onClick={handleGenerate} disabled={!canNext() || saving}>
+                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Genereren
               </Button>
-              {step < 2 ? (
-                <Button size="sm" onClick={() => setStep(step + 1)} disabled={!canNext()}>Volgende</Button>
-              ) : (
-                <Button size="sm" onClick={handleGenerate} disabled={!canNext() || saving}>
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Inkoopverklaring genereren
-                </Button>
-              )}
-            </div>
+            )}
           </div>
         ) : (
           /* Done screen */
-          <div className="space-y-4 text-center py-4">
+          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4 text-center">
             <div className="w-12 h-12 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto">
               <Check className="w-6 h-6 text-emerald-500" />
             </div>
@@ -422,8 +424,8 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
               <p className="text-sm text-muted-foreground mt-1">{voertuig.merk} {voertuig.model} — {verkoper.naam}</p>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Button onClick={handleDownload} className="gap-2">
+            <div className="flex flex-col gap-2 text-left">
+              <Button onClick={handleDownload} className="gap-2 w-full">
                 <Download className="w-4 h-4" /> PDF downloaden
               </Button>
 
@@ -441,7 +443,7 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
               </div>
             </div>
 
-            <Button variant="ghost" size="sm" onClick={() => handleClose(false)} className="text-muted-foreground">
+            <Button variant="ghost" size="sm" onClick={() => handleClose(false)} className="text-muted-foreground w-full">
               Sluiten
             </Button>
           </div>
