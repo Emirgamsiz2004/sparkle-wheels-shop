@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
 import { toast } from "sonner";
 import KoppelKlantBlock from "./KoppelKlantBlock";
+import AfleverChecklist from "@/components/admin/AfleverChecklist";
 
 interface Props {
   vehicle: Vehicle;
@@ -114,6 +115,9 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
 
   return (
     <div className="space-y-4">
+      {/* Aflevering-checklist: verschijnt alleen als er taken zijn, verdwijnt zodra alles voldaan */}
+      <AfleverChecklist vehicleId={vehicle.id} compact hideWhenAllDone hideWhenEmpty />
+
       {/* KPI card - alleen Inkoop op de voertuigpagina (verkoopcijfers staan in de Verkoop module) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard

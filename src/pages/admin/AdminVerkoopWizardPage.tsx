@@ -18,6 +18,7 @@ import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import AddressAutocomplete from "@/components/admin/AddressAutocomplete";
+import AfleverChecklist from "@/components/admin/AfleverChecklist";
 import Stap6InruilDocument from "@/components/admin/verkoop/Stap6InruilDocument";
 import Stap7FactuurMoneybird from "@/components/admin/verkoop/Stap7FactuurMoneybird";
 import Stap8Betaling from "@/components/admin/verkoop/Stap8Betaling";
@@ -2404,6 +2405,11 @@ const Stap2Aflevering = (p: Stap2Props) => {
           </div>
         </div>
       </div>
+
+      {/* Sectie 3 — Extra voorbereiding (checklist tot aflevering) */}
+      <AfleverChecklist vehicleId={p.vehicle.id} />
+
+
 
       {laterOphalen && (
         <p className="text-xs text-muted-foreground text-center pt-1">

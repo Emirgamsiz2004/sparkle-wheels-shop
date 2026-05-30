@@ -117,7 +117,7 @@ const AdminVoertuigDetailPage = () => {
       {(() => {
         const tabItems = [
           ...baseTabs,
-          { key: "aflevering", label: "Aflevering" },
+          ...(vehicle.status === "gereserveerd" ? [{ key: "aflevering", label: "Aflevering" }] : []),
         ];
         return (
           <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
