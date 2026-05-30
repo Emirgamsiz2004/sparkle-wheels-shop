@@ -23,7 +23,7 @@ interface Section {
 
 interface Props {
   /** Visual style for the trigger button. */
-  variant?: "rail" | "wide" | "fab";
+  variant?: "rail" | "wide" | "fab" | "sidebar-pill";
   className?: string;
 }
 
