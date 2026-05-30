@@ -1,14 +1,16 @@
 import { useState, useMemo } from "react";
 import { useVehicles } from "@/hooks/useVehicles";
 import { useTestDrives } from "@/hooks/useTestDrives";
+import { useAppointments } from "@/hooks/useAppointments";
 import { useDashboardData, getPeriodRange, calcTrend, PeriodKey } from "@/hooks/useDashboardData";
 import { formatEuro, isConsignatie } from "@/types/vehicle";
 import {
   Loader2, TrendingUp, TrendingDown, Minus, Download,
   Calendar as CalendarIcon, ChevronDown, ChevronRight,
+  Car, ClipboardList, Clock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { format, parseISO, startOfMonth as startOfM, endOfMonth, startOfYear as startOfY, endOfYear, startOfDay, endOfDay } from "date-fns";
+import { format, parseISO, startOfMonth as startOfM, endOfMonth, startOfYear as startOfY, endOfYear, startOfDay, endOfDay, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
