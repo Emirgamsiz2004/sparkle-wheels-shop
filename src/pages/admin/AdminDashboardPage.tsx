@@ -172,12 +172,14 @@ const AdminDashboardPage = () => {
           </>
         ) : (
           <>
-            <div className="bg-card border border-border rounded-md p-4 sm:p-5">
+            <div className="bg-card border border-border rounded-md p-4 sm:p-5 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               <p className="text-[11px] text-muted-foreground mb-1">Totale omzet</p>
               <p className="text-2xl font-bold tabular-nums text-foreground">{formatEuro(kpis.omzet)}</p>
               {compare && <div className="mt-1.5"><Trend current={kpis.omzet} previous={kpis.omzetPrev ?? 0} /></div>}
             </div>
-            <div className="bg-card border border-border rounded-md p-4 sm:p-5">
+            <div className="bg-card border border-border rounded-md p-4 sm:p-5 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               <p className="text-[11px] text-muted-foreground mb-1">Totale winst</p>
               <p className="text-2xl font-bold tabular-nums text-emerald-500">{formatEuro(kpis.brutowinst)}</p>
               {compare && <div className="mt-1.5"><Trend current={kpis.brutowinst} previous={kpis.brutwinstPrev ?? 0} /></div>}
