@@ -396,25 +396,26 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
                 </div>
               </div>
             )}
+          </div>
+        ) : null}
 
-            {/* Navigation */}
-            <div className="flex justify-between pt-2">
-              <Button variant="outline" size="sm" onClick={() => step > 0 ? setStep(step - 1) : handleClose(false)}>
-                {step === 0 ? "Annuleren" : "Vorige"}
+        {!done ? (
+          <div className="shrink-0 flex justify-between gap-2 px-5 py-3 border-t border-border/50 bg-background">
+            <Button variant="outline" size="sm" onClick={() => step > 0 ? setStep(step - 1) : handleClose(false)}>
+              {step === 0 ? "Annuleren" : "Vorige"}
+            </Button>
+            {step < 2 ? (
+              <Button size="sm" onClick={() => setStep(step + 1)} disabled={!canNext()}>Volgende</Button>
+            ) : (
+              <Button size="sm" onClick={handleGenerate} disabled={!canNext() || saving}>
+                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Genereren
               </Button>
-              {step < 2 ? (
-                <Button size="sm" onClick={() => setStep(step + 1)} disabled={!canNext()}>Volgende</Button>
-              ) : (
-                <Button size="sm" onClick={handleGenerate} disabled={!canNext() || saving}>
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Inkoopverklaring genereren
-                </Button>
-              )}
-            </div>
+            )}
           </div>
         ) : (
           /* Done screen */
-          <div className="space-y-4 text-center py-4">
+          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4 text-center">
             <div className="w-12 h-12 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto">
               <Check className="w-6 h-6 text-emerald-500" />
             </div>
@@ -423,8 +424,8 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
               <p className="text-sm text-muted-foreground mt-1">{voertuig.merk} {voertuig.model} — {verkoper.naam}</p>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Button onClick={handleDownload} className="gap-2">
+            <div className="flex flex-col gap-2 text-left">
+              <Button onClick={handleDownload} className="gap-2 w-full">
                 <Download className="w-4 h-4" /> PDF downloaden
               </Button>
 
@@ -442,7 +443,7 @@ export default function InkoopverklaringWizard({ open, onOpenChange, onComplete 
               </div>
             </div>
 
-            <Button variant="ghost" size="sm" onClick={() => handleClose(false)} className="text-muted-foreground">
+            <Button variant="ghost" size="sm" onClick={() => handleClose(false)} className="text-muted-foreground w-full">
               Sluiten
             </Button>
           </div>
