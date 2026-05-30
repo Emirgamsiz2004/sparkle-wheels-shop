@@ -92,6 +92,7 @@ const AfleverChecklist = ({ vehicleId, compact = false, hideWhenAllDone = false,
   const bestaande = new Set(taken.map((t) => t.titel.toLowerCase()));
 
   if (hideWhenAllDone && taken.length > 0 && allesKlaar) return null;
+  if (hideWhenEmpty && !loading && taken.length === 0) return null;
 
   return (
     <div className={`bg-card border border-border rounded-lg ${compact ? "p-3" : "p-5"} space-y-3`}>
@@ -115,47 +116,52 @@ const AfleverChecklist = ({ vehicleId, compact = false, hideWhenAllDone = false,
         )}
       </div>
 
-      {/* Presets */}
-      <div className="flex flex-wrap gap-1.5">
-        {AFLEVER_PRESETS.map((p) => {
-          const reeds = bestaande.has(p.toLowerCase());
-          return (
-            <button
-              key={p}
-              type="button"
-              onClick={() => !reeds && add(p)}
-              disabled={reeds}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-[3px] border transition-all ${
-                reeds
-                  ? "border-border/40 text-muted-foreground/50 cursor-not-allowed"
-                  : "border-border text-foreground/80 hover:border-accent hover:bg-accent/10"
-              }`}
-            >
-              {reeds ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />} {p}
-            </button>
-          );
-        })}
-      </div>
+      {/* Presets — alleen in volle modus */}
+      {!compact && (
+        <div className="flex flex-wrap gap-1.5">
+          {AFLEVER_PRESETS.map((p) => {
+            const reeds = bestaande.has(p.toLowerCase());
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => !reeds && add(p)}
+                disabled={reeds}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-[3px] border transition-all ${
+                  reeds
+                    ? "border-border/40 text-muted-foreground/50 cursor-not-allowed"
+                    : "border-border text-foreground/80 hover:border-accent hover:bg-accent/10"
+                }`}
+              >
+                {reeds ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />} {p}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Eigen invoer */}
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Eigen taak toevoegen…"
-          value={newTitel}
-          onChange={(e) => setNewTitel(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add(newTitel))}
-          className={inputCls + " flex-1"}
-        />
-        <button
-          type="button"
-          onClick={() => add(newTitel)}
-          disabled={!newTitel.trim()}
-          className="inline-flex items-center gap-1.5 px-3 py-2 text-xs border border-border rounded-[3px] hover:bg-accent/20 disabled:opacity-40"
-        >
-          <Plus className="w-3.5 h-3.5" /> Toevoegen
-        </button>
-      </div>
+      {/* Eigen invoer — alleen in volle modus */}
+      {!compact && (
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Eigen taak toevoegen…"
+            value={newTitel}
+            onChange={(e) => setNewTitel(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add(newTitel))}
+            className={inputCls + " flex-1"}
+          />
+          <button
+            type="button"
+            onClick={() => add(newTitel)}
+            disabled={!newTitel.trim()}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs border border-border rounded-[3px] hover:bg-accent/20 disabled:opacity-40"
+          >
+            <Plus className="w-3.5 h-3.5" /> Toevoegen
+          </button>
+        </div>
+      )}
+
 
       {/* Lijst */}
       {loading ? (
