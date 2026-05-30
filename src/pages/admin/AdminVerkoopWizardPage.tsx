@@ -2405,6 +2405,11 @@ const Stap2Aflevering = (p: Stap2Props) => {
         </div>
       </div>
 
+      {/* Sectie 3 — Extra voorbereiding (checklist tot aflevering) */}
+      <AfleverChecklist vehicleId={p.vehicle.id} />
+
+
+
       {laterOphalen && (
         <p className="text-xs text-muted-foreground text-center pt-1">
           Wijzigingen worden automatisch bewaard
