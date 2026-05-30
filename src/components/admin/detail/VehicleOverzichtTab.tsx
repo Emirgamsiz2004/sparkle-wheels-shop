@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitalize";
 import { toast } from "sonner";
 import KoppelKlantBlock from "./KoppelKlantBlock";
+import AfleverChecklist from "@/components/admin/AfleverChecklist";
 
 interface Props {
   vehicle: Vehicle;
