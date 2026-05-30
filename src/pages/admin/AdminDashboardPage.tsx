@@ -221,7 +221,7 @@ const AdminDashboardPage = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
               <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} width={40} />
-              <RechartsTooltip formatter={euroFormatter} contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 3, fontSize: 12 }} />
+              <RechartsTooltip formatter={euroFormatter} contentStyle={{ background: 'hsl(220 5% 13%)', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
               <Line type="monotone" dataKey="omzet" stroke="#10b981" strokeWidth={2} dot={false} name="Omzet" />
             </LineChart>
           </ResponsiveContainer>
