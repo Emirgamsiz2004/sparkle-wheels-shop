@@ -5,10 +5,12 @@ import { Plus, Check, Trash2, Loader2, CheckCircle2, ClipboardList } from "lucid
 
 interface Props {
   vehicleId: string;
-  /** Compact-modus: kleinere card, geen titel-uppercase, gebruikt op overzichtspagina */
+  /** Compact-modus: kleinere card, zonder presets/invoer — alleen lijst en afvinken */
   compact?: boolean;
   /** Verberg automatisch wanneer alles voldaan is (en er minimaal 1 taak was) */
   hideWhenAllDone?: boolean;
+  /** Verberg component volledig wanneer er nog geen taken zijn */
+  hideWhenEmpty?: boolean;
   /** Optionele callback wanneer er iets verandert */
   onChange?: () => void;
 }
