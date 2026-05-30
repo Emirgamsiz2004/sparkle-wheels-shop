@@ -89,44 +89,44 @@ input[type="number"] {
 
   /* Admin panel — deep dark, Cloud-inspired */
   .admin-theme {
-    --background: 220 4% 7%;
+    --background: 30 4% 7%;
     --foreground: 40 6% 80%;
 
-    --card: 220 5% 11%;
+    --card: 30 4% 10%;
     --card-foreground: 40 6% 80%;
 
-    --popover: 220 4% 10%;
+    --popover: 30 4% 10%;
     --popover-foreground: 40 6% 80%;
 
     --primary: 40 6% 80%;
-    --primary-foreground: 220 4% 7%;
+    --primary-foreground: 30 4% 7%;
 
-    --secondary: 220 4% 12%;
+    --secondary: 30 3% 12%;
     --secondary-foreground: 40 4% 60%;
 
-    --muted: 220 3% 14%;
+    --muted: 30 3% 13%;
     --muted-foreground: 40 3% 55%;
 
-    --accent: 220 4% 13%;
+    --accent: 30 4% 13%;
     --accent-foreground: 40 6% 80%;
 
     --destructive: 0 55% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 4% 14%;
-    --input: 220 4% 14%;
-    --ring: 220 4% 25%;
+    --border: 30 3% 14%;
+    --input: 30 3% 14%;
+    --ring: 30 4% 25%;
 
     --radius: 10px;
 
-    --sidebar-background: 220 4% 5.5%;
+    --sidebar-background: 30 4% 5.5%;
     --sidebar-foreground: 40 4% 60%;
     --sidebar-primary: 40 6% 80%;
-    --sidebar-primary-foreground: 220 4% 5.5%;
-    --sidebar-accent: 220 4% 10%;
+    --sidebar-primary-foreground: 30 4% 5.5%;
+    --sidebar-accent: 30 4% 10%;
     --sidebar-accent-foreground: 40 6% 80%;
-    --sidebar-border: 220 4% 11%;
-    --sidebar-ring: 220 4% 25%;
+    --sidebar-border: 30 3% 10%;
+    --sidebar-ring: 30 4% 25%;
 
     font-family: 'DM Sans', sans-serif;
   }
