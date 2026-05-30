@@ -242,8 +242,34 @@ const VehicleAfleveringTab = ({ vehicle, onVehicleUpdate }: Props) => {
           Voorbereiding ({openTaken.length} open / {taken.length} totaal)
         </h4>
 
+        {/* Snel toevoegen presets */}
+        <div className="mb-3">
+          <p className="text-[11px] text-muted-foreground mb-1.5">Snel toevoegen:</p>
+          <div className="flex flex-wrap gap-1.5">
+            {PRESETS.map((p) => {
+              const reeds = bestaandeTitels.has(p.toLowerCase());
+              return (
+                <button
+                  key={p}
+                  onClick={() => addTaak(p)}
+                  disabled={reeds}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-[3px] border transition-all ${
+                    reeds
+                      ? "border-border/40 text-muted-foreground/50 cursor-not-allowed"
+                      : "border-border text-foreground/80 hover:border-accent hover:bg-accent/10"
+                  }`}
+                  title={reeds ? "Al toegevoegd" : `+ ${p}`}
+                >
+                  {reeds ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />} {p}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Nieuwe taak */}
         <div className="flex flex-col sm:flex-row gap-2 mb-4">
+
           <input
             type="text"
             placeholder="Bijv. banden vervangen, ruit vervangen, poetsen…"
