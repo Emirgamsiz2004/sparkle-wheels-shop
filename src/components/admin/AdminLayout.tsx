@@ -148,7 +148,7 @@ const AdminLayoutInner = ({
     <div className="admin-theme min-h-screen bg-background overflow-x-hidden">
       {/* Sidebar — desktop-only. Verborgen op mobiel; bottombar vervangt navigatie. */}
       <aside
-        className="group/sidebar hidden lg:flex fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex-col transition-[width] duration-200 ease-out overflow-hidden w-[56px] hover:w-[220px]"
+        className="group/sidebar hidden lg:flex fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex-col transition-[width] duration-200 ease-out overflow-hidden w-16 hover:w-[220px]"
       >
         <div className="h-14 px-3 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
           <Link to="/admin/dashboard" className="flex items-center gap-2.5 min-w-0">
