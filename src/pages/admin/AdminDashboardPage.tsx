@@ -518,7 +518,7 @@ const AdminDashboardPage = () => {
 
       {/* ═══ BLOK 9 — Recente activiteit ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
-        <h2 className="text-[13px] font-semibold text-foreground mb-4">Recente activiteit</h2>
+        <h2 className="text-sm font-semibold text-foreground mb-4">Recente activiteit</h2>
         {loading ? <Skeleton className="h-[200px]" /> : activities.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-8">Geen recente activiteit</p>
         ) : (
