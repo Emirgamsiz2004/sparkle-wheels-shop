@@ -128,6 +128,16 @@ const AdminVoertuigenPage = () => {
     [vehicles]
   );
 
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { alle: visibleVehicles.length };
+    for (const opt of STATUS_OPTIONS) {
+      if (opt.value !== "alle") {
+        counts[opt.value] = visibleVehicles.filter((v) => v.status === opt.value).length;
+      }
+    }
+    return counts;
+  }, [visibleVehicles]);
+
   const normalizePlate = (s: string) => s.replace(/[-\s]/g, "").toUpperCase();
 
   const filtered = visibleVehicles.filter((v) => {
