@@ -228,8 +228,8 @@ const AdminLayoutInner = ({
       </aside>
 
       {/* Main content — geen left margin op mobiel */}
-      <div className="flex flex-col min-h-screen min-w-0 lg:ml-[56px]">
-        <header className="sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 bg-background border-b border-border gap-3">
+      <div className="flex flex-col min-h-screen min-w-0 lg:ml-16">
+        <header className="admin-header sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 border-b gap-3">
           {/* Mobiel: hamburger + titel/logo */}
           <div className="flex items-center gap-2 lg:hidden min-w-0 flex-1">
             <button
