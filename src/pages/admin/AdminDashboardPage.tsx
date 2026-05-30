@@ -60,6 +60,7 @@ const euroFormatter = (val: number) => formatEuro(val);
 const AdminDashboardPage = () => {
   const { vehicles, loading: vLoading } = useVehicles();
   const { testDrives, loading: tdLoading } = useTestDrives();
+  const { appointments, loading: apptLoading } = useAppointments();
   const [compare, setCompare] = useState(true);
 
   // Default: deze maand tot nu
@@ -78,6 +79,15 @@ const AdminDashboardPage = () => {
   );
   const data = useDashboardData(vehicles, testDrives, range, compare);
   const loading = vLoading || tdLoading;
+
+  // Live top stats
+  const stats = useMemo(() => {
+    const now = new Date();
+    const voorraad = vehicles.filter(v => v.status !== 'verkocht').length;
+    const actieveProefritten = testDrives.filter(td => td.status === 'actief').length;
+    const afsprakenVandaag = appointments.filter(a => a.status !== 'geannuleerd' && isSameDay(new Date(a.datum_tijd), now)).length;
+    return { voorraad, actieveProefritten, afsprakenVandaag };
+  }, [vehicles, testDrives, appointments]);
 
   const { kpis, chartData, voorraadStats, populariteit, margeAnalyse, inkoopAnalyse, proefritStats, proefritAnalyse, financieel, activities } = data;
 
