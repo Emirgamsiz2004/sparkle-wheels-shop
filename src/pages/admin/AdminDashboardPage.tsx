@@ -267,7 +267,7 @@ const AdminDashboardPage = () => {
 
         {/* Brandstofverdeling */}
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Brandstofverdeling</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Brandstofverdeling</h2>
           {loading ? <Skeleton className="h-[140px]" /> : brandstofData.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Geen data</p>
           ) : (
@@ -301,7 +301,7 @@ const AdminDashboardPage = () => {
       {/* ═══ BLOK 4 — Voorraad overzicht ═══ */}
       <div className="bg-card border border-border rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[13px] font-semibold text-foreground">Voorraad overzicht</h2>
+          <h2 className="text-sm font-semibold text-foreground">Voorraad overzicht</h2>
           <Link to="/admin/voertuigen" className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors">
             Bekijk alle voorraad <ChevronRight className="w-3 h-3" />
           </Link>
@@ -357,7 +357,7 @@ const AdminDashboardPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Beste verkopen */}
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Beste verkopen</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Beste verkopen</h2>
           {loading ? <Skeleton className="h-[140px]" /> : margeAnalyse.top5.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Geen data</p>
           ) : (
@@ -390,7 +390,7 @@ const AdminDashboardPage = () => {
 
         {/* Marge per merk */}
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Marge per merk</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Marge per merk</h2>
           {loading ? <Skeleton className="h-[140px]" /> : margeAnalyse.margePerMerk.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Geen data</p>
           ) : (
@@ -417,7 +417,7 @@ const AdminDashboardPage = () => {
       {/* ═══ BLOK 7 — Inkoop grafiek + getallen ═══ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Inkoop per periode</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Inkoop per periode</h2>
           {loading ? <Skeleton className="h-[180px]" /> : inkoopChartData.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-12">Geen inkopen in deze periode</p>
           ) : (
