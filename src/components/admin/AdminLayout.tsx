@@ -159,18 +159,25 @@ const AdminLayoutInner = ({
 
         <nav className="flex-1 px-2 py-3 overflow-y-auto overflow-x-hidden">
           <div className="space-y-px">
-            {visibleNavItems.map((item) => (
+            {visibleNavItems.map((item) => {
+              const active = isActive(item.path);
+              return (
               <Link
                 key={item.path}
                 to={item.path}
                 title={item.label}
                 className={`relative flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
-                  isActive(item.path)
-                    ? "bg-accent text-foreground font-medium before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-emerald-500 before:rounded-full"
+                  active
+                    ? "border-l-2 border-emerald-500 bg-emerald-500/[0.08] text-foreground font-medium pl-[10px]"
                     : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
                 }`}
               >
-                <item.icon className="w-4 h-4 flex-shrink-0 opacity-70" />
+                <span className="relative flex-shrink-0">
+                  <item.icon className="w-4 h-4 opacity-70" />
+                  {active && (
+                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-[hsl(var(--sidebar-background))]" />
+                  )}
+                </span>
                 <span className="flex-1 transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">{item.label}</span>
                 {item.path === "/admin/leads" && overdueLeads > 0 && (
                   <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">
@@ -196,21 +203,30 @@ const AdminLayoutInner = ({
                   </span>
                 )}
               </Link>
-            ))}
+              );
+            })}
           </div>
         </nav>
 
         <div className="p-2 border-t border-[hsl(var(--sidebar-border))] space-y-1.5">
+          <div className="flex justify-center pb-1">
+            <SidebarQuickActions variant="sidebar-pill" />
+          </div>
           <Link
             to="/admin/instellingen"
             title="Instellingen"
             className={`relative flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
               isActive("/admin/instellingen")
-                ? "bg-accent text-foreground font-medium before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-emerald-500 before:rounded-full"
+                ? "border-l-2 border-emerald-500 bg-emerald-500/[0.08] text-foreground font-medium pl-[10px]"
                 : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
             }`}
           >
-            <Settings className="w-4 h-4 flex-shrink-0 opacity-70" />
+            <span className="relative flex-shrink-0">
+              <Settings className="w-4 h-4 opacity-70" />
+              {isActive("/admin/instellingen") && (
+                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-[hsl(var(--sidebar-background))]" />
+              )}
+            </span>
             <span className="transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">Instellingen</span>
           </Link>
           <div className="mt-1.5 pt-1.5 border-t border-[hsl(var(--sidebar-border))]">
@@ -269,7 +285,7 @@ const AdminLayoutInner = ({
       <ProefritExpiryWatcher />
 
       {/* Floating snelstart-knop — altijd bereikbaar, duim-vriendelijk rechtsonder */}
-      <div className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
+      <div className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)] lg:hidden">
         <SidebarQuickActions variant="fab" />
       </div>
     </div>
