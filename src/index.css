@@ -159,7 +159,7 @@ input[type="number"] {
   /* Cards */
   .admin-theme .rounded-lg,
   body:has(.admin-theme) [data-radix-portal] .rounded-lg {
-    border-radius: 14px;
+    border-radius: 18px;
   }
   /* Modals */
   .admin-theme [role="dialog"],
@@ -328,7 +328,8 @@ input[type="number"] {
 
   /* Admin cards — subtle depth shadow */
   .admin-theme .bg-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   /* Admin header — translucent blur with glow border */
