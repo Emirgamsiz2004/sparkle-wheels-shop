@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Car, ShoppingCart, Wallet,
-  Settings, LogOut, Users, Clock, CalendarDays, BadgeDollarSign, Inbox, ClipboardCheck, Menu,
+  Settings, LogOut, Users, Clock, CalendarDays, BadgeDollarSign, Inbox, ClipboardCheck, Menu, Plus,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
@@ -147,105 +147,76 @@ const AdminLayoutInner = ({
 
   return (
     <div className="admin-theme min-h-screen bg-background overflow-x-hidden">
-      {/* Sidebar — desktop-only. Verborgen op mobiel; bottombar vervangt navigatie. */}
-      <aside
-        className="group/sidebar hidden lg:flex fixed inset-y-0 left-0 z-50 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] flex-col transition-[width] duration-200 ease-out overflow-hidden w-16 hover:w-[220px]"
-      >
-        <div className="h-14 px-3 flex items-center justify-between border-b border-[hsl(var(--sidebar-border))]">
-          <Link to="/admin/dashboard" className="flex items-center gap-2.5 min-w-0">
-            <img src={logo} alt="Platin" className="h-7 w-auto object-contain flex-shrink-0" loading="eager" decoding="sync" />
-            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground whitespace-nowrap transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">Admin</span>
-          </Link>
-        </div>
+      {/* Floating rail sidebar — desktop only */}
+      <aside className="hidden lg:flex fixed left-3 top-1/2 -translate-y-1/2 z-50 flex-col items-center gap-2 px-2 py-3 rounded-full bg-[hsl(var(--sidebar-background))]/95 backdrop-blur border border-border/60 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)]">
+        {/* Top: quick action (yellow plus) */}
+        <Link
+          to="/admin/dashboard"
+          title="Platin"
+          className="w-10 h-10 rounded-full bg-lime-400 hover:bg-lime-300 text-black flex items-center justify-center shadow-[0_4px_12px_-2px_rgba(163,230,53,0.4)] transition-colors mb-1"
+        >
+          <Plus className="w-4 h-4" strokeWidth={2.5} />
+        </Link>
 
-        <nav className="flex-1 px-2 py-3 overflow-y-auto overflow-x-hidden">
-          <div className="space-y-px">
-            {visibleNavItems.map((item) => {
-              const active = isActive(item.path);
-              return (
+        {/* Nav icons as circles */}
+        <nav className="flex flex-col items-center gap-1.5">
+          {visibleNavItems.map((item) => {
+            const active = isActive(item.path);
+            const hasBadge =
+              (item.path === "/admin/planning" && upcomingAppts > 0) ||
+              (item.path === "/admin/leads" && overdueLeads > 0) ||
+              (item.path === "/admin/proefriten" && proefritTimer.active);
+            return (
               <Link
                 key={item.path}
                 to={item.path}
                 title={item.label}
-                className={`relative flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
+                aria-label={item.label}
+                className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                   active
-                    ? "border-l-2 border-emerald-500 bg-emerald-500/[0.08] text-foreground font-medium pl-[10px]"
-                    : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
+                    ? "bg-white text-black shadow-[0_4px_12px_-2px_rgba(255,255,255,0.25)]"
+                    : "bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card"
                 }`}
               >
-                <span className="relative flex-shrink-0">
-                  <item.icon className="w-4 h-4 opacity-70" />
-                  {active && (
-                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-[hsl(var(--sidebar-background))]" />
-                  )}
-                </span>
-                <span className="flex-1 transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">{item.label}</span>
-                {item.path === "/admin/leads" && overdueLeads > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">
-                    {overdueLeads}
-                  </span>
-                )}
-                {item.path === "/admin/planning" && upcomingAppts > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-accent text-accent-foreground transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">
-                    {upcomingAppts}
-                  </span>
-                )}
-                {item.path === "/admin/proefriten" && proefritTimer.active && (
-                  <span
-                    className={`inline-flex items-center justify-center px-1.5 h-[18px] text-[10px] font-mono font-semibold rounded-full border ${
-                      proefritTimer.tone === "expired" ? "bg-red-500/20 text-red-300 border-red-500/50 animate-pulse"
-                      : proefritTimer.tone === "red" ? "bg-red-500/15 text-red-400 border-red-500/30"
-                      : proefritTimer.tone === "amber" ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-                      : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                    } transition-opacity duration-200 opacity-100`}
-                    title="Actieve proefrit — resterende tijd"
-                  >
-                    {proefritTimer.mmss}
-                  </span>
+                <item.icon className="w-[18px] h-[18px]" strokeWidth={active ? 2 : 1.75} />
+                {hasBadge && (
+                  <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-[hsl(var(--sidebar-background))]" />
                 )}
               </Link>
-              );
-            })}
-          </div>
+            );
+          })}
         </nav>
 
-        <div className="p-2 border-t border-[hsl(var(--sidebar-border))] space-y-1.5">
-          <div className="flex justify-center pb-1">
-            <SidebarQuickActions variant="sidebar-pill" />
-          </div>
+        {/* Spacer */}
+        <div className="flex-1 min-h-6" />
+
+        {/* Bottom: utility icons */}
+        <div className="flex flex-col items-center gap-1.5 pt-2 border-t border-border/60 w-full">
           <Link
             to="/admin/instellingen"
             title="Instellingen"
-            className={`relative flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
               isActive("/admin/instellingen")
-                ? "border-l-2 border-emerald-500 bg-emerald-500/[0.08] text-foreground font-medium pl-[10px]"
-                : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
+                ? "bg-white text-black"
+                : "bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card"
             }`}
           >
-            <span className="relative flex-shrink-0">
-              <Settings className="w-4 h-4 opacity-70" />
-              {isActive("/admin/instellingen") && (
-                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-[hsl(var(--sidebar-background))]" />
-              )}
-            </span>
-            <span className="transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">Instellingen</span>
+            <Settings className="w-[18px] h-[18px]" strokeWidth={1.75} />
           </Link>
-          <div className="mt-1.5 pt-1.5 border-t border-[hsl(var(--sidebar-border))]">
-            <p className="text-[11px] text-muted-foreground truncate mb-1 px-3 whitespace-nowrap transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">{user.email}</p>
-            <button
-              onClick={signOut}
-              title="Uitloggen"
-              className="flex items-center gap-2.5 px-3 py-[7px] text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors w-full whitespace-nowrap"
-            >
-              <LogOut className="w-4 h-4 flex-shrink-0 opacity-70" />
-              <span className="transition-opacity duration-200 opacity-0 group-hover/sidebar:opacity-100">Uitloggen</span>
-            </button>
-          </div>
+          <button
+            onClick={signOut}
+            title="Uitloggen"
+            aria-label="Uitloggen"
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card transition-all"
+          >
+            <LogOut className="w-[18px] h-[18px]" strokeWidth={1.75} />
+          </button>
         </div>
       </aside>
 
+
       {/* Main content — geen left margin op mobiel */}
-      <div className="flex flex-col min-h-screen min-w-0 lg:ml-16">
+      <div className="flex flex-col min-h-screen min-w-0 lg:ml-20">
         <header className="admin-header sticky top-0 z-30 flex items-center justify-between h-14 lg:h-12 px-4 border-b gap-3">
           {/* Mobiel: hamburger + titel/logo */}
           <div className="flex items-center gap-2 lg:hidden min-w-0 flex-1">
