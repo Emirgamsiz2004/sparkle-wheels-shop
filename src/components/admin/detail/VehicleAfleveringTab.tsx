@@ -97,22 +97,39 @@ const VehicleAfleveringTab = ({ vehicle, onVehicleUpdate }: Props) => {
     loadKlant();
   }, [load, loadKlant]);
 
-  const addTaak = async () => {
-    if (!newTitel.trim()) return;
+  const addTaak = async (titelOverride?: string) => {
+    const titel = (titelOverride ?? newTitel).trim();
+    if (!titel) return;
     const { error } = await (supabase as any).from("aflevering_taken").insert({
       vehicle_id: vehicle.id,
-      titel: newTitel.trim(),
-      deadline: newDeadline || null,
+      titel,
+      deadline: titelOverride ? null : (newDeadline || null),
       volgorde: taken.length,
     });
     if (error) {
       toast.error("Toevoegen mislukt");
       return;
     }
-    setNewTitel("");
-    setNewDeadline("");
+    if (!titelOverride) {
+      setNewTitel("");
+      setNewDeadline("");
+    }
     load();
   };
+
+  const PRESETS = [
+    "APK keuren",
+    "Grote beurt / onderhoud",
+    "Kleine beurt",
+    "Banden vervangen",
+    "Remmen controleren",
+    "Poetsen & detailing",
+    "Tanken",
+    "Ruit / steenslag herstellen",
+    "Reparatie",
+  ];
+  const bestaandeTitels = new Set(taken.map((t) => t.titel.toLowerCase()));
+
 
   const toggleKlaar = async (t: Taak) => {
     await (supabase as any)
