@@ -244,7 +244,7 @@ const AdminDashboardPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Meest verkochte merken */}
         <div className="bg-card border border-border rounded-lg p-5">
-          <h2 className="text-[13px] font-semibold text-foreground mb-4">Meest verkochte merken</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-4">Meest verkochte merken</h2>
           {loading ? <Skeleton className="h-[140px]" /> : populariteit.merkVerkopen.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Geen data</p>
           ) : (
