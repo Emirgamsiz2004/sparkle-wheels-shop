@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import NotificationBell from "@/components/admin/NotificationBell";
+import HeaderProfile from "@/components/admin/HeaderProfile";
 import GlobalActiveBar from "@/components/admin/GlobalActiveBar";
 import GlobalSearch from "@/components/admin/GlobalSearch";
 import MobileSidebar, { getMobilePageTitle } from "@/components/admin/MobileSidebar";
@@ -266,11 +267,13 @@ const AdminLayoutInner = ({
           <div className="flex-1 hidden lg:flex justify-center">
             <GlobalSearch />
           </div>
-          <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
+          <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
             <div className="lg:hidden">
               <GlobalSearch />
             </div>
             <NotificationBell />
+            <div className="hidden lg:block w-px h-6 bg-border/60 mx-1" />
+            <HeaderProfile />
           </div>
         </header>
 

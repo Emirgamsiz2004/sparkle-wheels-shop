@@ -152,7 +152,9 @@ const AdminDashboardPage = () => {
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Overzicht van je bedrijf</p>
+            <p className="text-sm text-muted-foreground mt-0.5 capitalize">
+              {format(new Date(), "EEEE, d MMMM yyyy", { locale: nl })} · Real-time overzicht
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer">
