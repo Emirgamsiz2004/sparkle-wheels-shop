@@ -159,7 +159,7 @@ input[type="number"] {
   /* Cards */
   .admin-theme .rounded-lg,
   body:has(.admin-theme) [data-radix-portal] .rounded-lg {
-    border-radius: 14px;
+    border-radius: 18px;
   }
   /* Modals */
   .admin-theme [role="dialog"],
