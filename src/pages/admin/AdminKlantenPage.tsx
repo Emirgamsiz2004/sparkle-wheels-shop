@@ -6,7 +6,6 @@ import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover"
 import ConfirmPopover from "@/components/admin/ConfirmPopover";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import SlidingTabs from "@/components/admin/SlidingTabs";
 import { BADGE_BASE } from "@/components/admin/StatusBadge";
 import { deleteCustomerSafely } from "@/lib/customerDelete";
 
@@ -43,6 +42,14 @@ const AdminKlantenPage = () => {
     }
     return list;
   }, [customers, search, statusFilter]);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { alle: customers.length };
+    for (const s of allStatuses) {
+      counts[s] = customers.filter((c) => c.status === s).length;
+    }
+    return counts;
+  }, [customers]);
 
   const handleAdd = async (data: { voornaam: string; achternaam: string; email: string; telefoon: string }) => {
     await addCustomer({ ...data, status: "prospect" } as any);
@@ -90,8 +97,24 @@ const AdminKlantenPage = () => {
 
       {/* Filters */}
       <div className="space-y-3">
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-          <SlidingTabs tabs={statusTabs} value={statusFilter} onChange={setStatusFilter} className="min-w-max" />
+        <div className="flex flex-wrap items-center gap-1.5">
+          {statusTabs.map((t) => {
+            const active = statusFilter === t.value;
+            return (
+              <button
+                key={t.value}
+                onClick={() => setStatusFilter(t.value)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  active
+                    ? "bg-foreground/10 border-foreground/20 text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t.label}
+                <span className="bg-accent/60 px-1.5 py-0.5 rounded-full text-[10px]">{statusCounts[t.value] ?? 0}</span>
+              </button>
+            );
+          })}
         </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
