@@ -166,7 +166,7 @@ const AdminLayoutInner = ({
                 title={item.label}
                 className={`relative flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap ${
                   isActive(item.path)
-                    ? "bg-accent text-foreground font-medium"
+                    ? "bg-accent text-foreground font-medium before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-emerald-500 before:rounded-full"
                     : "text-[hsl(var(--sidebar-foreground))] hover:text-foreground hover:bg-accent/50"
                 }`}
               >
