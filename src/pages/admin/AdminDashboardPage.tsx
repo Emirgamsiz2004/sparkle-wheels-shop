@@ -189,7 +189,7 @@ const AdminDashboardPage = () => {
       {/* ═══ BLOK 1 — Omzet grafiek ═══ */}
       <div className="bg-card border border-border rounded-md p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <h2 className="text-[13px] font-semibold text-foreground">Omzet</h2>
+          <h2 className="text-sm font-semibold text-foreground">Omzet</h2>
           <div className="flex items-center gap-4 sm:gap-6">
             {loading ? (
               <><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-16" /></>
