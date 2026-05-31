@@ -326,9 +326,17 @@ Deno.serve(async (req) => {
       case "get_receipts": {
         const { page, filter } = params;
         const normalizedFilter = normalizeMoneybirdFilter(filter);
-        let path = `receipts.json?per_page=100&page=${page || 1}`;
+        let path = `documents/receipts.json?per_page=100&page=${page || 1}`;
         if (normalizedFilter) path += `&filter=${encodeURIComponent(normalizedFilter)}`;
-        result = await mbFetch(path);
+        try {
+          result = await mbFetch(path);
+        } catch (e: any) {
+          if (String(e?.message || "").includes("404")) {
+            result = [];
+          } else {
+            throw e;
+          }
+        }
         break;
       }
 
