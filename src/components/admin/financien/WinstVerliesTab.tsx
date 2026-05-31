@@ -240,6 +240,27 @@ const WinstVerliesTab = () => {
     setInkoopverklaringBedragen((data || []).map((r: any) => Number(r.inkoopprijs) || 0).filter(n => n > 0));
   };
 
+  const loadSoldVehicles = async () => {
+    const dateFrom = `${year}-${pad(month + 1)}-01`;
+    const dateTo = `${year}-${pad(month + 1)}-${pad(lastDay)}`;
+    const { data } = await supabase
+      .from("vehicles" as any)
+      .select("id, merk, model, kenteken, verkoop_datum, inkoopprijs, verkoopprijs, kosten")
+      .gte("verkoop_datum", dateFrom)
+      .lte("verkoop_datum", dateTo);
+    const mapped = (data || []).map((v: any) => ({
+      id: v.id,
+      merk: v.merk || "",
+      model: v.model || "",
+      kenteken: v.kenteken || "",
+      verkoop_datum: v.verkoop_datum,
+      inkoopprijs: Number(v.inkoopprijs) || 0,
+      verkoopprijs: Number(v.verkoopprijs) || 0,
+      kostenTotaal: (v.kosten || []).reduce((s: number, k: any) => s + (Number(k.amount) || 0), 0),
+    }));
+    setSoldVehicles(mapped);
+  };
+
   const load = async () => {
     setError(null);
     try {
@@ -251,7 +272,7 @@ const WinstVerliesTab = () => {
       setInvoices(inv);
       setReceipts(rec);
       setPurchaseInvoices(pi);
-      await Promise.all([loadPlatinKosten(), loadInkoopverklaringen()]);
+      await Promise.all([loadPlatinKosten(), loadInkoopverklaringen(), loadSoldVehicles()]);
     } catch (e: any) {
       setError(e.message || "Onbekende fout");
     }
