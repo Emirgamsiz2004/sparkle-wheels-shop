@@ -477,39 +477,114 @@ const WinstVerliesTab = () => {
         </CardContent>
       </Card>
 
-      {/* KOSTEN TOTAAL + BRON */}
+      {/* RESULTAAT */}
+      <Card className="border-emerald-500/30">
+        <CardContent className="p-6 space-y-5">
+          <div className="flex items-center gap-2">
+            <Calculator className="h-4 w-4 text-emerald-500" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
+              Resultaat (matching: COGS bij verkoop)
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Stat label="Omzet" value={formatEuroDecimal(omzet.incl)} color="emerald" />
+            <Stat label="− COGS" value={formatEuroDecimal(cogs.totaal)} color="red" />
+            <Stat label="= Brutowinst" value={formatEuroDecimal(brutowinst)} color={brutowinst >= 0 ? "emerald" : "red"} />
+            <Stat label="− Operationele kosten" value={formatEuroDecimal(operationeleKosten)} color="red" />
+          </div>
+          <div className="pt-3 border-t border-border">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Nettoresultaat (incl. BTW — marge-BTW correctie volgt in stap 5)</div>
+            <div className={cn("text-4xl font-bold tabular-nums", nettoResultaat >= 0 ? "text-emerald-500" : "text-red-500")}>
+              {nettoResultaat >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(nettoResultaat))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* COGS — Verkochte auto's deze maand */}
+      <Card>
+        <CardContent className="p-6 space-y-5">
+          <div className="flex items-center gap-2">
+            <Car className="h-4 w-4 text-foreground" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
+              Kostprijs verkochte auto's
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Stat label="Inkoopprijs" value={formatEuroDecimal(cogs.inkoop)} small />
+            <Stat label="Bijkomende kosten" value={formatEuroDecimal(cogs.voertuigKosten)} small />
+            <Stat label="Totaal COGS" value={formatEuroDecimal(cogs.totaal)} color="red" small />
+          </div>
+          <div className="pt-3 border-t border-border">
+            {soldVehicles.length === 0 ? (
+              <div className="text-xs text-muted-foreground py-2 text-center">Geen voertuigen verkocht deze maand</div>
+            ) : (
+              <div className="divide-y divide-border">
+                {soldVehicles.map(v => {
+                  const totaalKost = v.inkoopprijs + v.kostenTotaal;
+                  const marge = v.verkoopprijs - totaalKost;
+                  return (
+                    <div key={v.id} className="py-2 grid grid-cols-12 gap-2 items-center text-xs">
+                      <div className="col-span-5">
+                        <div className="text-foreground font-medium truncate">{v.merk} {v.model}</div>
+                        <div className="text-[10px] text-muted-foreground">{v.kenteken} · verkocht {v.verkoop_datum}</div>
+                      </div>
+                      <div className="col-span-2 text-right text-muted-foreground tabular-nums">
+                        <div className="text-[10px]">Inkoop</div>
+                        <div>{formatEuroDecimal(v.inkoopprijs)}</div>
+                      </div>
+                      <div className="col-span-2 text-right text-muted-foreground tabular-nums">
+                        <div className="text-[10px]">+ Kosten</div>
+                        <div>{formatEuroDecimal(v.kostenTotaal)}</div>
+                      </div>
+                      <div className="col-span-3 text-right tabular-nums">
+                        <div className="text-[10px] text-muted-foreground">Marge</div>
+                        <div className={cn("font-semibold", marge >= 0 ? "text-emerald-500" : "text-red-500")}>
+                          {marge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(marge))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* OPERATIONELE KOSTEN */}
       <Card>
         <CardContent className="p-6 space-y-5">
           <div className="flex items-center gap-2">
             <TrendingDown className="h-4 w-4 text-red-500" />
             <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Kosten
+              Operationele kosten
             </h2>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Totaal kosten (incl. BTW)</div>
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Totaal (excl. voertuig-inkoop & voertuig-kosten)</div>
             <div className="text-3xl font-bold text-red-500 tabular-nums">
-              {formatEuroDecimal(totaalKosten)}
+              {formatEuroDecimal(operationeleKosten)}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-border">
             <SourceStat
               icon={<Receipt className="h-4 w-4" />}
               label="Bonnetjes (MB)"
-              value={formatEuroDecimal(receipts.reduce((s, r) => s + parseFloat(r.total_price_incl_tax || "0"), 0))}
-              count={receipts.length}
+              value={formatEuroDecimal(operationeleKostPosten.filter(p => p.bron === "bonnetje").reduce((s, p) => s + p.bedrag, 0))}
+              count={operationeleKostPosten.filter(p => p.bron === "bonnetje").length}
             />
             <SourceStat
               icon={<FileText className="h-4 w-4" />}
               label="Inkoopfacturen (MB)"
-              value={formatEuroDecimal(purchaseInvoices.reduce((s, p) => s + parseFloat(p.total_price_incl_tax || "0"), 0))}
-              count={purchaseInvoices.length}
+              value={formatEuroDecimal(operationeleKostPosten.filter(p => p.bron === "inkoopfactuur").reduce((s, p) => s + p.bedrag, 0))}
+              count={operationeleKostPosten.filter(p => p.bron === "inkoopfactuur").length}
             />
             <SourceStat
               icon={<Wrench className="h-4 w-4" />}
-              label="Platin kosten"
-              value={formatEuroDecimal(platinKosten.reduce((s, k) => s + k.bedrag, 0))}
-              count={platinKosten.length}
+              label="Platin algemeen"
+              value={formatEuroDecimal(operationeleKostPosten.filter(p => p.bron === "platin_alg").reduce((s, p) => s + p.bedrag, 0))}
+              count={operationeleKostPosten.filter(p => p.bron === "platin_alg").length}
             />
           </div>
         </CardContent>
@@ -521,18 +596,17 @@ const WinstVerliesTab = () => {
           <div className="flex items-center gap-2">
             <Tag className="h-4 w-4 text-foreground" />
             <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Verdeling per categorie
+              Verdeling operationele kosten
             </h2>
           </div>
 
-          {/* Stacked bar */}
-          {totaalKosten > 0 && (
+          {operationeleKosten > 0 && (
             <div className="flex h-2 w-full overflow-hidden rounded-[3px] bg-muted">
               {perCategorie.map(({ cat, totaal }) => (
                 <div
                   key={cat}
                   className={CATEGORIE_KLEUREN[cat]}
-                  style={{ width: `${(totaal / totaalKosten) * 100}%` }}
+                  style={{ width: `${(totaal / operationeleKosten) * 100}%` }}
                   title={`${CATEGORIE_LABELS[cat]}: ${formatEuroDecimal(totaal)}`}
                 />
               ))}
@@ -541,10 +615,10 @@ const WinstVerliesTab = () => {
 
           <div className="divide-y divide-border">
             {perCategorie.length === 0 && (
-              <div className="text-xs text-muted-foreground py-4 text-center">Geen kosten in deze periode</div>
+              <div className="text-xs text-muted-foreground py-4 text-center">Geen operationele kosten in deze periode</div>
             )}
             {perCategorie.map(({ cat, totaal, posten }) => {
-              const pct = totaalKosten > 0 ? (totaal / totaalKosten) * 100 : 0;
+              const pct = operationeleKosten > 0 ? (totaal / operationeleKosten) * 100 : 0;
               const isOpen = openCat === cat;
               return (
                 <div key={cat}>
@@ -583,8 +657,25 @@ const WinstVerliesTab = () => {
         </CardContent>
       </Card>
 
+      {/* VOORRAAD-MUTATIE (informatief, niet in P&L) */}
+      <Card className="border-blue-500/20">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <Package className="h-4 w-4 text-blue-400" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
+              Voorraad-mutatie deze maand <span className="text-[10px] text-muted-foreground normal-case ml-2">(informatief — telt niet mee in resultaat)</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Stat label="Voertuiginkoop (MB)" value={formatEuroDecimal(voorraadAankopen.mbInkoop)} small />
+            <Stat label="Kosten op auto's" value={formatEuroDecimal(voorraadAankopen.voertuigKostenMaand)} small />
+            <Stat label="Totaal toegevoegd" value={formatEuroDecimal(voorraadAankopen.totaal)} small color="amber" />
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="text-xs text-muted-foreground text-center">
-        Stap 3 van 6 — Hybride categorisatie. Klik op een categorie voor de posten. Daarna: winst & BTW.
+        Stap 4 van 6 — Matching principle: voertuig-inkoop telt pas mee als COGS in de maand waarin de auto verkocht is. Voorraad-aankopen worden apart getoond. Daarna: marge-BTW (21/121) correctie + voorraadwaarde.
       </div>
     </div>
   );
