@@ -224,6 +224,17 @@ const WinstVerliesTab = () => {
     setPlatinKosten([...vehicleKosten, ...algemeenKosten]);
   };
 
+  const loadInkoopverklaringen = async () => {
+    const dateFrom = `${year}-${pad(month + 1)}-01`;
+    const dateTo = `${year}-${pad(month + 1)}-${pad(lastDay)}`;
+    const { data } = await supabase
+      .from("inkoopverklaringen")
+      .select("inkoopprijs")
+      .gte("datum", dateFrom)
+      .lte("datum", dateTo);
+    setInkoopverklaringBedragen((data || []).map((r: any) => Number(r.inkoopprijs) || 0).filter(n => n > 0));
+  };
+
   const load = async () => {
     setError(null);
     try {
@@ -235,7 +246,7 @@ const WinstVerliesTab = () => {
       setInvoices(inv);
       setReceipts(rec);
       setPurchaseInvoices(pi);
-      await loadPlatinKosten();
+      await Promise.all([loadPlatinKosten(), loadInkoopverklaringen()]);
     } catch (e: any) {
       setError(e.message || "Onbekende fout");
     }
