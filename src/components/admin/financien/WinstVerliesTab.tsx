@@ -741,26 +741,64 @@ const WinstVerliesTab = () => {
         </CardContent>
       </Card>
 
-      {/* VOORRAAD-MUTATIE (informatief, niet in P&L) */}
-      <Card className="border-blue-500/20">
-        <CardContent className="p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <Package className="h-4 w-4 text-blue-400" />
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Voorraad-mutatie deze maand <span className="text-[10px] text-muted-foreground normal-case ml-2">(informatief — telt niet mee in resultaat)</span>
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Stat label="Voertuiginkoop (MB)" value={formatEuroDecimal(voorraadAankopen.mbInkoop)} small />
-            <Stat label="Kosten op auto's" value={formatEuroDecimal(voorraadAankopen.voertuigKostenMaand)} small />
-            <Stat label="Totaal toegevoegd" value={formatEuroDecimal(voorraadAankopen.totaal)} small color="amber" />
-          </div>
-        </CardContent>
-      </Card>
+      {/* VERMOGENSGROEI — papieren winst + voorraadgroei */}
+      {(() => {
+        const voorraadGroei = voorraadAankopen.totaal - cogs.totaal;
+        const vermogensGroei = nettoResultaat + voorraadGroei;
+        const voorraadWaarde = voorraad.inkoop + voorraad.kosten;
+        return (
+          <Card className="border-blue-500/30">
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4 text-blue-400" />
+                <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
+                  Vermogensgroei <span className="text-[10px] text-muted-foreground normal-case ml-2">(papieren winst + waarde nieuwe voorraad)</span>
+                </h2>
+              </div>
+
+              {/* Mutatie deze maand */}
+              <div className="space-y-2">
+                <div className="text-xs text-muted-foreground uppercase tracking-wider">Voorraad-mutatie deze maand</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Stat label="+ Ingekocht (auto's + kosten)" value={formatEuroDecimal(voorraadAankopen.totaal)} color="emerald" small />
+                  <Stat label="− Verkocht (COGS)" value={formatEuroDecimal(cogs.totaal)} color="red" small />
+                  <Stat label="= Voorraadgroei" value={`${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} color={voorraadGroei >= 0 ? "emerald" : "amber"} small />
+                </div>
+              </div>
+
+              {/* Vermogensgroei = papier + voorraad */}
+              <div className="space-y-2 pt-3 border-t border-border">
+                <div className="text-xs text-muted-foreground uppercase tracking-wider">Werkelijke vermogensgroei</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Stat label="Nettowinst (papier)" value={`${nettoResultaat >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(nettoResultaat))}`} color={nettoResultaat >= 0 ? "emerald" : "red"} small />
+                  <Stat label="+ Voorraadgroei" value={`${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} color={voorraadGroei >= 0 ? "emerald" : "amber"} small />
+                  <Stat label="= Vermogensgroei" value={`${vermogensGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(vermogensGroei))}`} color={vermogensGroei >= 0 ? "emerald" : "red"} small />
+                </div>
+              </div>
+
+              {/* Huidige voorraadwaarde (snapshot nu) */}
+              <div className="space-y-2 pt-3 border-t border-border">
+                <div className="text-xs text-muted-foreground uppercase tracking-wider">Huidige voorraad (snapshot nu)</div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <Stat label="Aantal auto's" value={String(voorraad.aantal)} small />
+                  <Stat label="Inkoopwaarde" value={formatEuroDecimal(voorraad.inkoop)} small />
+                  <Stat label="Bijkomende kosten" value={formatEuroDecimal(voorraad.kosten)} small />
+                  <Stat label="Totale voorraadwaarde" value={formatEuroDecimal(voorraadWaarde)} color="emerald" small />
+                </div>
+              </div>
+
+              <div className="text-[11px] text-muted-foreground italic pt-2 border-t border-border">
+                💡 Een lage papieren winst betekent niet weinig groei. Als je in deze maand meer auto's inkocht dan je verkocht, zit je winst in je voorraad — die waarde komt vrij zodra die auto's verkocht worden.
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       <div className="text-xs text-muted-foreground text-center">
-        Stap 4 van 6 — Matching principle: voertuig-inkoop telt pas mee als COGS in de maand waarin de auto verkocht is. Voorraad-aankopen worden apart getoond. Daarna: marge-BTW (21/121) correctie + voorraadwaarde.
+        COGS-matching: alleen voertuigen die deze maand verkocht zijn tellen mee. Nieuwe inkoop verhoogt voorraad (vermogen), niet de papierwinst.
       </div>
+
     </div>
   );
 };
