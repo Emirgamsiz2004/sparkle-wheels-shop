@@ -59,9 +59,12 @@ interface PlatinKost {
 type Categorie =
   | "huur"
   | "inkoop_voertuigen"
+  | "transport"
+  | "onderdelen"
   | "voertuigkosten"
   | "marketing"
   | "abonnementen"
+  | "energie"
   | "personeel"
   | "kantoor"
   | "brandstof"
@@ -72,9 +75,12 @@ type Categorie =
 const CATEGORIE_LABELS: Record<Categorie, string> = {
   huur: "Huur",
   inkoop_voertuigen: "Inkoop voertuigen",
+  transport: "Transport voertuigen",
+  onderdelen: "Onderdelen",
   voertuigkosten: "Voertuigkosten",
   marketing: "Marketing & advertenties",
   abonnementen: "Abonnementen",
+  energie: "Energie",
   personeel: "Personeel",
   kantoor: "Kantoor & materiaal",
   brandstof: "Brandstof",
@@ -86,9 +92,12 @@ const CATEGORIE_LABELS: Record<Categorie, string> = {
 const CATEGORIE_KLEUREN: Record<Categorie, string> = {
   huur: "bg-purple-500",
   inkoop_voertuigen: "bg-blue-500",
+  transport: "bg-sky-400",
+  onderdelen: "bg-violet-500",
   voertuigkosten: "bg-cyan-500",
   marketing: "bg-pink-500",
   abonnementen: "bg-indigo-500",
+  energie: "bg-yellow-500",
   personeel: "bg-orange-500",
   kantoor: "bg-teal-500",
   brandstof: "bg-amber-500",
@@ -97,16 +106,34 @@ const CATEGORIE_KLEUREN: Record<Categorie, string> = {
   overig: "bg-slate-500",
 };
 
-// Keyword-based classifier voor MB items
-const classify = (text: string): Categorie => {
+// Keyword-based classifier voor MB items (gebruikt leverancier + omschrijving + bedrag)
+const classify = (text: string, bedrag = 0): Categorie => {
   const t = text.toLowerCase();
-  if (/\bmito\b|huur|verhuur|rent/.test(t)) return "huur";
-  if (/inkoop|aankoop voertuig|auto inkoop|car purchase/.test(t)) return "inkoop_voertuigen";
-  if (/marktplaats|autoscout|autotrack|google ads|meta ads|facebook|advertentie|advert|marketing/.test(t)) return "marketing";
-  if (/abonnement|subscription|spotify|adobe|microsoft|google workspace|saas|vwe|rdw/.test(t)) return "abonnementen";
+
+  // Specifieke leveranciers (eerst — meest betrouwbaar)
+  if (/\balliance automotive\b|partspoint/.test(t)) return "onderdelen";
+  if (/\belix\b/.test(t)) return "energie";
+  if (/\bvwe\b|\brdw\b/.test(t)) return "abonnementen";
+  if (/\bmito\b/.test(t)) return "huur";
+
+  // "Auto 1" → inkoop OF transport afhankelijk van bedrag
+  if (/\bauto\s*1\b|\bauto1\b/.test(t)) {
+    return bedrag > 0 && bedrag < 250 ? "transport" : "inkoop_voertuigen";
+  }
+
+  // Advertentiekanalen
+  if (/marktplaats|autoscout|autotrack|gaspedaal|google ads|meta ads|facebook ads|advertentie|advert|marketing/.test(t)) return "marketing";
+
+  // Algemene patronen
+  if (/huur|verhuur|rent|lease pand/.test(t)) return "huur";
+  if (/inkoop voertuig|aankoop voertuig|auto inkoop|car purchase/.test(t)) return "inkoop_voertuigen";
+  if (/transport|sleep|berging|takelen|vervoer auto/.test(t)) return "transport";
+  if (/energie|stroom|gas|electric|eneco|essent|vattenfall|greenchoice/.test(t)) return "energie";
+  if (/abonnement|subscription|spotify|adobe|microsoft|google workspace|google\b|saas|hosting/.test(t)) return "abonnementen";
   if (/salaris|loon|personeel|payroll|uitzend/.test(t)) return "personeel";
+  if (/onderdeel|onderdelen|parts/.test(t)) return "onderdelen";
   if (/onderhoud|apk|reparatie|banden|olie|carwash|wasstraat|poets|detailing|reinig/.test(t)) return "voertuigkosten";
-  if (/benzine|diesel|tank|shell|bp|esso|tinq|tango|brandstof/.test(t)) return "brandstof";
+  if (/benzine|diesel|tank|shell\b|\bbp\b|esso|tinq|tango|brandstof/.test(t)) return "brandstof";
   if (/verzeker|insurance|polis/.test(t)) return "verzekering";
   if (/belasting|btw|mrb|wegenbelasting|fiscus/.test(t)) return "belasting";
   if (/kantoor|papier|printer|koffie|schoonmaak|inventaris/.test(t)) return "kantoor";
