@@ -273,28 +273,30 @@ const WinstVerliesTab = () => {
     for (const r of receipts) {
       const lev = r.contact?.company_name || [r.contact?.firstname, r.contact?.lastname].filter(Boolean).join(" ") || "";
       const text = `${lev} ${r.reference || ""}`;
+      const bedrag = parseFloat(r.total_price_incl_tax || "0");
       posts.push({
         id: `rec-${r.id}`,
         bron: "bonnetje",
         naam: r.reference || "Bonnetje",
         leverancier: lev || "—",
         datum: r.date,
-        bedrag: parseFloat(r.total_price_incl_tax || "0"),
-        categorie: classify(text),
+        bedrag,
+        categorie: classify(text, bedrag),
       });
     }
 
     for (const p of purchaseInvoices) {
       const lev = p.contact?.company_name || [p.contact?.firstname, p.contact?.lastname].filter(Boolean).join(" ") || "";
       const text = `${lev} ${p.reference || ""}`;
+      const bedrag = parseFloat(p.total_price_incl_tax || "0");
       posts.push({
         id: `pi-${p.id}`,
         bron: "inkoopfactuur",
         naam: p.reference || "Inkoopfactuur",
         leverancier: lev || "—",
         datum: p.date,
-        bedrag: parseFloat(p.total_price_incl_tax || "0"),
-        categorie: classify(text),
+        bedrag,
+        categorie: classify(text, bedrag),
       });
     }
 
