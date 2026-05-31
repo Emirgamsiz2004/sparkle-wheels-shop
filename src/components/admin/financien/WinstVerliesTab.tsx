@@ -570,35 +570,41 @@ const WinstVerliesTab = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Stat label="Brutowinst" value={formatEuroDecimal(brutowinst)} color={brutowinst >= 0 ? "emerald" : "red"} small />
               <Stat label={`− BTW (incl. marge-BTW ${formatEuroDecimal(margeBTW)})`} value={formatEuroDecimal(totaalBTW)} color="red" small />
-              <Stat label="= Nettowinst" value={formatEuroDecimal(nettoResultaat)} color={nettoResultaat >= 0 ? "emerald" : "red"} small />
+              <Stat label="= Nettowinst (papier)" value={formatEuroDecimal(nettoResultaat)} color={nettoResultaat >= 0 ? "emerald" : "red"} small />
             </div>
           </div>
 
-          {/* Eindresultaat — nettowinst + vermogensgroei naast elkaar */}
+          {/* 4. Voorraadgroei telt mee als winst (waardestijging vermogen) */}
           {(() => {
             const voorraadGroei = voorraadAankopen.totaal - cogs.totaal;
-            const vermogensGroei = nettoResultaat + voorraadGroei;
+            const totaleWinst = nettoResultaat + voorraadGroei;
             return (
-              <div className="pt-4 border-t border-border grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Nettowinst (papier) {MONTHS[month]} {year}</div>
-                  <div className={cn("text-4xl font-bold tabular-nums", nettoResultaat >= 0 ? "text-emerald-500" : "text-red-500")}>
-                    {nettoResultaat >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(nettoResultaat))}
+              <>
+                <div className="space-y-2 pt-3 border-t border-border">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                    <Package className="h-3 w-3 text-blue-400" />
+                    4. Voorraadgroei (vermogen in auto's)
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Stat label="+ Ingekocht deze maand" value={formatEuroDecimal(voorraadAankopen.totaal)} color="emerald" small />
+                    <Stat label="− COGS verkochte auto's" value={formatEuroDecimal(cogs.totaal)} color="red" small />
+                    <Stat label="= Voorraadgroei" value={`${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} color={voorraadGroei >= 0 ? "emerald" : "amber"} small />
                   </div>
                 </div>
-                <div className="md:border-l md:border-border md:pl-6">
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <Package className="h-3 w-3 text-blue-400" />
-                    Vermogensgroei (incl. voorraad)
+
+                {/* Eindresultaat — totale winst (nettowinst + voorraadgroei) */}
+                <div className="pt-4 border-t border-border">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                    Totale winst {MONTHS[month]} {year} <span className="normal-case text-muted-foreground/70">(nettowinst + voorraadgroei)</span>
                   </div>
-                  <div className={cn("text-4xl font-bold tabular-nums", vermogensGroei >= 0 ? "text-emerald-500" : "text-red-500")}>
-                    {vermogensGroei >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(vermogensGroei))}
+                  <div className={cn("text-4xl font-bold tabular-nums", totaleWinst >= 0 ? "text-emerald-500" : "text-red-500")}>
+                    {totaleWinst >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(totaleWinst))}
                   </div>
-                  <div className="text-[10px] text-muted-foreground mt-1">
+                  <div className="text-[11px] text-muted-foreground mt-1">
                     Nettowinst {nettoResultaat >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(nettoResultaat))} {voorraadGroei >= 0 ? "+" : "−"} voorraadgroei {formatEuroDecimal(Math.abs(voorraadGroei))}
                   </div>
                 </div>
-              </div>
+              </>
             );
           })()}
 
