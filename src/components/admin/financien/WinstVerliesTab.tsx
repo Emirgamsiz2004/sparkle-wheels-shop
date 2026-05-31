@@ -243,12 +243,26 @@ const WinstVerliesTab = () => {
   const loadSoldVehicles = async () => {
     const dateFrom = `${year}-${pad(month + 1)}-01`;
     const dateTo = `${year}-${pad(month + 1)}-${pad(lastDay)}`;
-    const { data } = await supabase
+    const { data, error: vErr } = await supabase
       .from("vehicles" as any)
-      .select("id, merk, model, kenteken, verkoop_datum, inkoopprijs, verkoopprijs, kosten")
+      .select("id, merk, model, kenteken, verkoop_datum, inkoopprijs, verkoopprijs")
       .gte("verkoop_datum", dateFrom)
       .lte("verkoop_datum", dateTo);
-    const mapped = (data || []).map((v: any) => ({
+    if (vErr) console.error("loadSoldVehicles vehicles err", vErr);
+    const vehicles = (data || []) as any[];
+    const ids = vehicles.map(v => v.id);
+    let costsByVehicle: Record<string, number> = {};
+    if (ids.length > 0) {
+      const { data: costs, error: cErr } = await supabase
+        .from("vehicle_costs" as any)
+        .select("vehicle_id, amount")
+        .in("vehicle_id", ids);
+      if (cErr) console.error("loadSoldVehicles costs err", cErr);
+      for (const c of (costs || []) as any[]) {
+        costsByVehicle[c.vehicle_id] = (costsByVehicle[c.vehicle_id] || 0) + (Number(c.amount) || 0);
+      }
+    }
+    const mapped = vehicles.map((v: any) => ({
       id: v.id,
       merk: v.merk || "",
       model: v.model || "",
@@ -256,10 +270,11 @@ const WinstVerliesTab = () => {
       verkoop_datum: v.verkoop_datum,
       inkoopprijs: Number(v.inkoopprijs) || 0,
       verkoopprijs: Number(v.verkoopprijs) || 0,
-      kostenTotaal: (v.kosten || []).reduce((s: number, k: any) => s + (Number(k.amount) || 0), 0),
+      kostenTotaal: costsByVehicle[v.id] || 0,
     }));
     setSoldVehicles(mapped);
   };
+
 
   const load = async () => {
     setError(null);
