@@ -175,8 +175,12 @@ const AdminInstellingenPage = () => {
         </CardContent>
       </Card>
 
+      {/* Connectors */}
+      <ConnectorsBeheer />
+
       {/* Handtekening */}
       <HandtekeningUpload />
+
 
       {/* Diensten Beheer */}
       <DienstenBeheer />
