@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, RefreshCw, TrendingUp, TrendingDown, Receipt, FileText, Wrench } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, TrendingUp, TrendingDown, Receipt, FileText, Wrench, Tag } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useMoneybird } from "@/hooks/useMoneybird";
@@ -44,7 +44,7 @@ interface PurchaseInvoice {
   contact?: { company_name?: string; firstname?: string; lastname?: string };
 }
 
-interface PlatinaKost {
+interface PlatinKost {
   id: string;
   naam: string;
   bedrag: number;
@@ -55,6 +55,74 @@ interface PlatinaKost {
   voertuig?: string;
 }
 
+// === Hybride categorisatie ===
+type Categorie =
+  | "huur"
+  | "inkoop_voertuigen"
+  | "voertuigkosten"
+  | "marketing"
+  | "abonnementen"
+  | "personeel"
+  | "kantoor"
+  | "brandstof"
+  | "verzekering"
+  | "belasting"
+  | "overig";
+
+const CATEGORIE_LABELS: Record<Categorie, string> = {
+  huur: "Huur",
+  inkoop_voertuigen: "Inkoop voertuigen",
+  voertuigkosten: "Voertuigkosten",
+  marketing: "Marketing & advertenties",
+  abonnementen: "Abonnementen",
+  personeel: "Personeel",
+  kantoor: "Kantoor & materiaal",
+  brandstof: "Brandstof",
+  verzekering: "Verzekeringen",
+  belasting: "Belastingen",
+  overig: "Overig",
+};
+
+const CATEGORIE_KLEUREN: Record<Categorie, string> = {
+  huur: "bg-purple-500",
+  inkoop_voertuigen: "bg-blue-500",
+  voertuigkosten: "bg-cyan-500",
+  marketing: "bg-pink-500",
+  abonnementen: "bg-indigo-500",
+  personeel: "bg-orange-500",
+  kantoor: "bg-teal-500",
+  brandstof: "bg-amber-500",
+  verzekering: "bg-emerald-500",
+  belasting: "bg-red-500",
+  overig: "bg-slate-500",
+};
+
+// Keyword-based classifier voor MB items
+const classify = (text: string): Categorie => {
+  const t = text.toLowerCase();
+  if (/\bmito\b|huur|verhuur|rent/.test(t)) return "huur";
+  if (/inkoop|aankoop voertuig|auto inkoop|car purchase/.test(t)) return "inkoop_voertuigen";
+  if (/marktplaats|autoscout|autotrack|google ads|meta ads|facebook|advertentie|advert|marketing/.test(t)) return "marketing";
+  if (/abonnement|subscription|spotify|adobe|microsoft|google workspace|saas|vwe|rdw/.test(t)) return "abonnementen";
+  if (/salaris|loon|personeel|payroll|uitzend/.test(t)) return "personeel";
+  if (/onderhoud|apk|reparatie|banden|olie|carwash|wasstraat|poets|detailing|reinig/.test(t)) return "voertuigkosten";
+  if (/benzine|diesel|tank|shell|bp|esso|tinq|tango|brandstof/.test(t)) return "brandstof";
+  if (/verzeker|insurance|polis/.test(t)) return "verzekering";
+  if (/belasting|btw|mrb|wegenbelasting|fiscus/.test(t)) return "belasting";
+  if (/kantoor|papier|printer|koffie|schoonmaak|inventaris/.test(t)) return "kantoor";
+  return "overig";
+};
+
+const mapPlatinCategorie = (c: string): Categorie => {
+  const t = (c || "").toLowerCase();
+  if (t === "vaste_kosten") return "huur";
+  if (t === "advertentiekosten") return "marketing";
+  if (t === "abonnementen") return "abonnementen";
+  if (t === "personeelskosten") return "personeel";
+  if (t === "voertuigkosten") return "voertuigkosten";
+  return classify(t);
+};
+
 const WinstVerliesTab = () => {
   const { getSalesInvoices, getReceipts, getPurchaseInvoices, loading } = useMoneybird();
   const now = new Date();
@@ -63,7 +131,7 @@ const WinstVerliesTab = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [purchaseInvoices, setPurchaseInvoices] = useState<PurchaseInvoice[]>([]);
-  const [platinaKosten, setPlatinaKosten] = useState<PlatinaKost[]>([]);
+  const [platinKosten, setPlatinKosten] = useState<PlatinKost[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const periodStart = `${year}${pad(month + 1)}01`;
@@ -82,23 +150,21 @@ const WinstVerliesTab = () => {
     return all;
   };
 
-  const loadPlatinaKosten = async () => {
+  const loadPlatinKosten = async () => {
     const dateFrom = `${year}-${pad(month + 1)}-01`;
     const dateTo = `${year}-${pad(month + 1)}-${pad(lastDay)}`;
 
-    // Algemene kosten tabel
     const { data: kostenData } = await supabase
       .from("kosten")
       .select("id, naam, bedrag, datum, categorie, leverancier")
       .gte("datum", dateFrom)
       .lte("datum", dateTo);
 
-    // Auto-gebonden kosten (uit vehicles.kosten JSON array)
     const { data: vehiclesData } = await supabase
       .from("vehicles" as any)
       .select("id, merk, model, kenteken, kosten");
 
-    const vehicleKosten: PlatinaKost[] = [];
+    const vehicleKosten: PlatinKost[] = [];
     (vehiclesData || []).forEach((v: any) => {
       (v.kosten || []).forEach((k: any) => {
         if (!k.date) return;
@@ -108,7 +174,7 @@ const WinstVerliesTab = () => {
             naam: k.description || "Kost",
             bedrag: Number(k.amount) || 0,
             datum: k.date,
-            categorie: k.category || "overig",
+            categorie: k.category || "voertuigkosten",
             leverancier: k.leverancier || null,
             source: "vehicle",
             voertuig: `${v.merk || ""} ${v.model || ""} (${v.kenteken || "?"})`.trim(),
@@ -117,7 +183,7 @@ const WinstVerliesTab = () => {
       });
     });
 
-    const algemeenKosten: PlatinaKost[] = (kostenData || []).map((k: any) => ({
+    const algemeenKosten: PlatinKost[] = (kostenData || []).map((k: any) => ({
       id: k.id,
       naam: k.naam,
       bedrag: Number(k.bedrag) || 0,
@@ -127,7 +193,7 @@ const WinstVerliesTab = () => {
       source: "kosten",
     }));
 
-    setPlatinaKosten([...vehicleKosten, ...algemeenKosten]);
+    setPlatinKosten([...vehicleKosten, ...algemeenKosten]);
   };
 
   const load = async () => {
@@ -141,7 +207,7 @@ const WinstVerliesTab = () => {
       setInvoices(inv);
       setReceipts(rec);
       setPurchaseInvoices(pi);
-      await loadPlatinaKosten();
+      await loadPlatinKosten();
     } catch (e: any) {
       setError(e.message || "Onbekende fout");
     }
@@ -163,24 +229,86 @@ const WinstVerliesTab = () => {
     return { incl, excl, btw: incl - excl, paid, open, count: invoices.length };
   }, [invoices]);
 
-  const kosten = useMemo(() => {
-    const recTotal = receipts.reduce((s, r) => s + parseFloat(r.total_price_incl_tax || "0"), 0);
-    const piTotal = purchaseInvoices.reduce((s, p) => s + parseFloat(p.total_price_incl_tax || "0"), 0);
-    const platinaTotal = platinaKosten.reduce((s, k) => s + k.bedrag, 0);
-    return {
-      receipts: recTotal,
-      purchaseInvoices: piTotal,
-      platina: platinaTotal,
-      total: recTotal + piTotal + platinaTotal,
-    };
-  }, [receipts, purchaseInvoices, platinaKosten]);
+  // Gecategoriseerde kosten posten (alles gecombineerd)
+  type KostPost = {
+    id: string;
+    bron: "bonnetje" | "inkoopfactuur" | "platin_alg" | "platin_voertuig";
+    naam: string;
+    leverancier: string;
+    datum: string;
+    bedrag: number;
+    categorie: Categorie;
+  };
+
+  const kostPosten: KostPost[] = useMemo(() => {
+    const posts: KostPost[] = [];
+
+    for (const r of receipts) {
+      const lev = r.contact?.company_name || [r.contact?.firstname, r.contact?.lastname].filter(Boolean).join(" ") || "";
+      const text = `${lev} ${r.reference || ""}`;
+      posts.push({
+        id: `rec-${r.id}`,
+        bron: "bonnetje",
+        naam: r.reference || "Bonnetje",
+        leverancier: lev || "—",
+        datum: r.date,
+        bedrag: parseFloat(r.total_price_incl_tax || "0"),
+        categorie: classify(text),
+      });
+    }
+
+    for (const p of purchaseInvoices) {
+      const lev = p.contact?.company_name || [p.contact?.firstname, p.contact?.lastname].filter(Boolean).join(" ") || "";
+      const text = `${lev} ${p.reference || ""}`;
+      posts.push({
+        id: `pi-${p.id}`,
+        bron: "inkoopfactuur",
+        naam: p.reference || "Inkoopfactuur",
+        leverancier: lev || "—",
+        datum: p.date,
+        bedrag: parseFloat(p.total_price_incl_tax || "0"),
+        categorie: classify(text),
+      });
+    }
+
+    for (const k of platinKosten) {
+      posts.push({
+        id: `plat-${k.id}`,
+        bron: k.source === "vehicle" ? "platin_voertuig" : "platin_alg",
+        naam: k.voertuig ? `${k.naam} · ${k.voertuig}` : k.naam,
+        leverancier: k.leverancier || "—",
+        datum: k.datum,
+        bedrag: k.bedrag,
+        categorie: mapPlatinCategorie(k.categorie),
+      });
+    }
+
+    return posts;
+  }, [receipts, purchaseInvoices, platinKosten]);
+
+  const totaalKosten = kostPosten.reduce((s, p) => s + p.bedrag, 0);
+
+  // Groepering per categorie
+  const perCategorie = useMemo(() => {
+    const map = new Map<Categorie, { totaal: number; posten: KostPost[] }>();
+    for (const p of kostPosten) {
+      const cur = map.get(p.categorie) || { totaal: 0, posten: [] };
+      cur.totaal += p.bedrag;
+      cur.posten.push(p);
+      map.set(p.categorie, cur);
+    }
+    return Array.from(map.entries())
+      .map(([cat, v]) => ({ cat, ...v }))
+      .sort((a, b) => b.totaal - a.totaal);
+  }, [kostPosten]);
+
+  const [openCat, setOpenCat] = useState<Categorie | null>(null);
 
   const prev = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const next = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
   return (
     <div className="space-y-6">
-      {/* Month selector */}
       <div className="flex items-center justify-between bg-card border border-border rounded-[3px] p-3">
         <Button variant="ghost" size="icon" onClick={prev} className="h-9 w-9">
           <ChevronLeft className="h-5 w-5" />
@@ -233,7 +361,7 @@ const WinstVerliesTab = () => {
         </CardContent>
       </Card>
 
-      {/* KOSTEN */}
+      {/* KOSTEN TOTAAL + BRON */}
       <Card>
         <CardContent className="p-6 space-y-5">
           <div className="flex items-center gap-2">
@@ -245,74 +373,115 @@ const WinstVerliesTab = () => {
           <div>
             <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Totaal kosten (incl. BTW)</div>
             <div className="text-3xl font-bold text-red-500 tabular-nums">
-              {formatEuroDecimal(kosten.total)}
+              {formatEuroDecimal(totaalKosten)}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-border">
             <SourceStat
               icon={<Receipt className="h-4 w-4" />}
               label="Bonnetjes (MB)"
-              value={formatEuroDecimal(kosten.receipts)}
+              value={formatEuroDecimal(receipts.reduce((s, r) => s + parseFloat(r.total_price_incl_tax || "0"), 0))}
               count={receipts.length}
             />
             <SourceStat
               icon={<FileText className="h-4 w-4" />}
               label="Inkoopfacturen (MB)"
-              value={formatEuroDecimal(kosten.purchaseInvoices)}
+              value={formatEuroDecimal(purchaseInvoices.reduce((s, p) => s + parseFloat(p.total_price_incl_tax || "0"), 0))}
               count={purchaseInvoices.length}
             />
             <SourceStat
               icon={<Wrench className="h-4 w-4" />}
-              label="Platina kosten"
-              value={formatEuroDecimal(kosten.platina)}
-              count={platinaKosten.length}
+              label="Platin kosten"
+              value={formatEuroDecimal(platinKosten.reduce((s, k) => s + k.bedrag, 0))}
+              count={platinKosten.length}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Detail lijsten */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <DetailList title="Verkoopfacturen" items={invoices.map(i => ({
-          id: i.id,
-          ref: i.invoice_id || i.reference || i.id.slice(0, 8),
-          name: i.contact?.company_name || [i.contact?.firstname, i.contact?.lastname].filter(Boolean).join(" ") || "—",
-          date: i.invoice_date,
-          amount: parseFloat(i.total_price_incl_tax || "0"),
-          state: i.state,
-        }))} positive />
+      {/* CATEGORISATIE */}
+      <Card>
+        <CardContent className="p-6 space-y-5">
+          <div className="flex items-center gap-2">
+            <Tag className="h-4 w-4 text-foreground" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
+              Verdeling per categorie
+            </h2>
+          </div>
 
-        <DetailList title="Bonnetjes" items={receipts.map(r => ({
-          id: r.id,
-          ref: r.reference || r.id.slice(0, 8),
-          name: r.contact?.company_name || [r.contact?.firstname, r.contact?.lastname].filter(Boolean).join(" ") || "—",
-          date: r.date,
-          amount: parseFloat(r.total_price_incl_tax || "0"),
-        }))} />
+          {/* Stacked bar */}
+          {totaalKosten > 0 && (
+            <div className="flex h-2 w-full overflow-hidden rounded-[3px] bg-muted">
+              {perCategorie.map(({ cat, totaal }) => (
+                <div
+                  key={cat}
+                  className={CATEGORIE_KLEUREN[cat]}
+                  style={{ width: `${(totaal / totaalKosten) * 100}%` }}
+                  title={`${CATEGORIE_LABELS[cat]}: ${formatEuroDecimal(totaal)}`}
+                />
+              ))}
+            </div>
+          )}
 
-        <DetailList title="Inkoopfacturen" items={purchaseInvoices.map(p => ({
-          id: p.id,
-          ref: p.reference || p.id.slice(0, 8),
-          name: p.contact?.company_name || [p.contact?.firstname, p.contact?.lastname].filter(Boolean).join(" ") || "—",
-          date: p.date,
-          amount: parseFloat(p.total_price_incl_tax || "0"),
-          state: p.state,
-        }))} />
-
-        <DetailList title="Platina kosten" items={platinaKosten.map(k => ({
-          id: k.id,
-          ref: k.categorie,
-          name: k.voertuig ? `${k.naam} · ${k.voertuig}` : k.naam,
-          date: k.datum,
-          amount: k.bedrag,
-        }))} />
-      </div>
+          <div className="divide-y divide-border">
+            {perCategorie.length === 0 && (
+              <div className="text-xs text-muted-foreground py-4 text-center">Geen kosten in deze periode</div>
+            )}
+            {perCategorie.map(({ cat, totaal, posten }) => {
+              const pct = totaalKosten > 0 ? (totaal / totaalKosten) * 100 : 0;
+              const isOpen = openCat === cat;
+              return (
+                <div key={cat}>
+                  <button
+                    onClick={() => setOpenCat(isOpen ? null : cat)}
+                    className="w-full py-3 flex items-center gap-3 hover:bg-muted/30 px-2 -mx-2 rounded-[3px] transition-colors"
+                  >
+                    <div className={cn("h-3 w-3 rounded-[2px] flex-shrink-0", CATEGORIE_KLEUREN[cat])} />
+                    <div className="flex-1 text-left">
+                      <div className="text-sm font-medium text-foreground">{CATEGORIE_LABELS[cat]}</div>
+                      <div className="text-[10px] text-muted-foreground">{posten.length} {posten.length === 1 ? "post" : "posten"} · {pct.toFixed(1)}%</div>
+                    </div>
+                    <div className="text-sm font-semibold text-red-500 tabular-nums">
+                      −{formatEuroDecimal(totaal)}
+                    </div>
+                  </button>
+                  {isOpen && (
+                    <div className="bg-muted/20 rounded-[3px] mb-2 divide-y divide-border">
+                      {posten.sort((a, b) => b.bedrag - a.bedrag).map(p => (
+                        <div key={p.id} className="px-3 py-2 flex items-center justify-between text-xs">
+                          <div className="flex-1 min-w-0 mr-3">
+                            <div className="text-foreground truncate">{p.leverancier} — {p.naam}</div>
+                            <div className="text-[10px] text-muted-foreground">
+                              {p.datum} · <span className="uppercase">{bronLabel(p.bron)}</span>
+                            </div>
+                          </div>
+                          <div className="text-red-400 tabular-nums font-medium">−{formatEuroDecimal(p.bedrag)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="text-xs text-muted-foreground text-center">
-        Stap 2 van 6 — Verifieer dat omzet én kosten matchen. Daarna: categorisatie.
+        Stap 3 van 6 — Hybride categorisatie. Klik op een categorie voor de posten. Daarna: winst & BTW.
       </div>
     </div>
   );
+};
+
+const bronLabel = (b: string) => {
+  switch (b) {
+    case "bonnetje": return "MB bonnetje";
+    case "inkoopfactuur": return "MB inkoopfactuur";
+    case "platin_alg": return "Platin algemeen";
+    case "platin_voertuig": return "Platin voertuig";
+    default: return b;
+  }
 };
 
 const Stat = ({ label, value, highlight, color, small }: {
@@ -340,42 +509,6 @@ const SourceStat = ({ icon, label, value, count }: { icon: React.ReactNode; labe
     <div className="text-lg font-bold text-foreground tabular-nums">{value}</div>
     <div className="text-xs text-muted-foreground mt-0.5">{count} {count === 1 ? "post" : "posten"}</div>
   </div>
-);
-
-const DetailList = ({ title, items, positive }: {
-  title: string;
-  items: { id: string; ref: string; name: string; date: string; amount: number; state?: string }[];
-  positive?: boolean;
-}) => (
-  <Card>
-    <CardContent className="p-0">
-      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
-          {title}
-        </h3>
-        <span className="text-xs text-muted-foreground">{items.length}</span>
-      </div>
-      {items.length === 0 ? (
-        <div className="p-6 text-center text-muted-foreground text-xs">Geen items</div>
-      ) : (
-        <div className="divide-y divide-border max-h-80 overflow-y-auto">
-          {items.map(it => (
-            <div key={it.id} className="px-4 py-2 flex items-center justify-between hover:bg-muted/30">
-              <div className="flex-1 min-w-0 mr-3">
-                <div className="text-xs font-medium text-foreground truncate">{it.ref} — {it.name}</div>
-                <div className="text-[10px] text-muted-foreground">
-                  {it.date}{it.state && <> · <span className="uppercase">{it.state}</span></>}
-                </div>
-              </div>
-              <div className={cn("text-xs font-semibold tabular-nums", positive ? "text-emerald-500" : "text-red-500")}>
-                {positive ? "+" : "−"}{formatEuroDecimal(it.amount)}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </CardContent>
-  </Card>
 );
 
 export default WinstVerliesTab;
