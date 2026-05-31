@@ -282,8 +282,21 @@ const WinstVerliesTab = () => {
   const kostPosten: KostPost[] = useMemo(() => {
     const posts: KostPost[] = [];
 
+    const matchesInkoopverklaring = (bedrag: number) =>
+      inkoopverklaringBedragen.some(iv => Math.abs(iv - bedrag) < 1);
+
+    const decideCategorie = (text: string, bedrag: number, isParticulier: boolean): Categorie => {
+      // 1. Match met bestaande inkoopverklaring in dezelfde maand → zeker inkoop voertuig
+      if (bedrag >= 500 && matchesInkoopverklaring(bedrag)) return "inkoop_voertuigen";
+      // 2. Particulier + groot bedrag → vermoedelijk voertuig inkoop
+      if (isParticulier && bedrag >= 1500) return "inkoop_voertuigen";
+      // 3. Standaard keyword classifier
+      return classify(text, bedrag);
+    };
+
     for (const r of receipts) {
-      const lev = r.contact?.company_name || [r.contact?.firstname, r.contact?.lastname].filter(Boolean).join(" ") || "";
+      const company = r.contact?.company_name;
+      const lev = company || [r.contact?.firstname, r.contact?.lastname].filter(Boolean).join(" ") || "";
       const text = `${lev} ${r.reference || ""}`;
       const bedrag = parseFloat(r.total_price_incl_tax || "0");
       posts.push({
@@ -293,12 +306,13 @@ const WinstVerliesTab = () => {
         leverancier: lev || "—",
         datum: r.date,
         bedrag,
-        categorie: classify(text, bedrag),
+        categorie: decideCategorie(text, bedrag, !company),
       });
     }
 
     for (const p of purchaseInvoices) {
-      const lev = p.contact?.company_name || [p.contact?.firstname, p.contact?.lastname].filter(Boolean).join(" ") || "";
+      const company = p.contact?.company_name;
+      const lev = company || [p.contact?.firstname, p.contact?.lastname].filter(Boolean).join(" ") || "";
       const text = `${lev} ${p.reference || ""}`;
       const bedrag = parseFloat(p.total_price_incl_tax || "0");
       posts.push({
@@ -308,7 +322,7 @@ const WinstVerliesTab = () => {
         leverancier: lev || "—",
         datum: p.date,
         bedrag,
-        categorie: classify(text, bedrag),
+        categorie: decideCategorie(text, bedrag, !company),
       });
     }
 
@@ -325,7 +339,7 @@ const WinstVerliesTab = () => {
     }
 
     return posts;
-  }, [receipts, purchaseInvoices, platinKosten]);
+  }, [receipts, purchaseInvoices, platinKosten, inkoopverklaringBedragen]);
 
   const totaalKosten = kostPosten.reduce((s, p) => s + p.bedrag, 0);
 
