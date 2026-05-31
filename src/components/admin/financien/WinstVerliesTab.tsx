@@ -394,17 +394,19 @@ const WinstVerliesTab = () => {
   );
   const operationeleKosten = operationeleKostPosten.reduce((s, p) => s + p.bedrag, 0);
 
-  // COGS van deze maand = voor elke deze maand verkochte auto: inkoopprijs + alle eraan gekoppelde kosten
+  // COGS = voor elke deze maand verkochte auto: inkoopprijs + alle eraan gekoppelde kosten
   const cogs = useMemo(() => {
-    let inkoop = 0, voertuigKosten = 0;
+    let inkoop = 0, voertuigKosten = 0, voertuigOmzet = 0, margeTotaal = 0;
     for (const v of soldVehicles) {
       inkoop += v.inkoopprijs;
       voertuigKosten += v.kostenTotaal;
+      voertuigOmzet += v.verkoopprijs;
+      margeTotaal += v.verkoopprijs - v.inkoopprijs - v.kostenTotaal;
     }
-    return { inkoop, voertuigKosten, totaal: inkoop + voertuigKosten };
+    return { inkoop, voertuigKosten, totaal: inkoop + voertuigKosten, voertuigOmzet, margeTotaal };
   }, [soldVehicles]);
 
-  // Informatief: hoeveel is deze maand aan voorraad toegevoegd (niet meegerekend in P&L)
+  // Informatief: hoeveel is deze maand aan voorraad toegevoegd
   const voorraadAankopen = useMemo(() => {
     const mbInkoop = kostPosten
       .filter(p => p.categorie === "inkoop_voertuigen")
@@ -415,9 +417,24 @@ const WinstVerliesTab = () => {
     return { mbInkoop, voertuigKostenMaand, totaal: mbInkoop + voertuigKostenMaand };
   }, [kostPosten]);
 
-  // Resultaat (alles incl BTW — BTW-correctie komt in stap 5)
-  const brutowinst = omzet.incl - cogs.totaal;
-  const nettoResultaat = brutowinst - operationeleKosten;
+  // === SIMPELE P&L ===
+  // 1. Voertuigwinst = verkoopprijs - inkoop - kosten (per voertuig)
+  const voertuigWinst = cogs.margeTotaal;
+
+  // 2. Diensten = alle omzet die NIET van voertuigverkoop komt
+  const dienstenOmzet = Math.max(0, omzet.incl - cogs.voertuigOmzet);
+  const dienstenWinst = dienstenOmzet - operationeleKosten;
+
+  // 3. Brutowinst = voertuigwinst + dienstenwinst
+  const brutowinst = voertuigWinst + dienstenWinst;
+
+  // 4. BTW: marge-BTW (21/121) over positieve voertuigmarge + BTW op diensten (uit Moneybird facturen)
+  const margeBTW = Math.max(0, voertuigWinst) * (21 / 121);
+  const totaalBTW = omzet.btw + margeBTW;
+
+  // 5. Nettowinst
+  const nettoResultaat = brutowinst - totaalBTW;
+
 
   // Groepering per categorie (alleen operationele)
   const perCategorie = useMemo(() => {
