@@ -574,13 +574,34 @@ const WinstVerliesTab = () => {
             </div>
           </div>
 
-          {/* Eindresultaat */}
-          <div className="pt-4 border-t border-border">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Nettowinst {MONTHS[month]} {year}</div>
-            <div className={cn("text-4xl font-bold tabular-nums", nettoResultaat >= 0 ? "text-emerald-500" : "text-red-500")}>
-              {nettoResultaat >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(nettoResultaat))}
-            </div>
-          </div>
+          {/* Eindresultaat — nettowinst + vermogensgroei naast elkaar */}
+          {(() => {
+            const voorraadGroei = voorraadAankopen.totaal - cogs.totaal;
+            const vermogensGroei = nettoResultaat + voorraadGroei;
+            return (
+              <div className="pt-4 border-t border-border grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Nettowinst (papier) {MONTHS[month]} {year}</div>
+                  <div className={cn("text-4xl font-bold tabular-nums", nettoResultaat >= 0 ? "text-emerald-500" : "text-red-500")}>
+                    {nettoResultaat >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(nettoResultaat))}
+                  </div>
+                </div>
+                <div className="md:border-l md:border-border md:pl-6">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                    <Package className="h-3 w-3 text-blue-400" />
+                    Vermogensgroei (incl. voorraad)
+                  </div>
+                  <div className={cn("text-4xl font-bold tabular-nums", vermogensGroei >= 0 ? "text-emerald-500" : "text-red-500")}>
+                    {vermogensGroei >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(vermogensGroei))}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground mt-1">
+                    Nettowinst {nettoResultaat >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(nettoResultaat))} {voorraadGroei >= 0 ? "+" : "−"} voorraadgroei {formatEuroDecimal(Math.abs(voorraadGroei))}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
         </CardContent>
       </Card>
 
