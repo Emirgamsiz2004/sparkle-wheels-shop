@@ -165,7 +165,9 @@ const WinstVerliesTab = () => {
     verkoop_datum: string; inkoopprijs: number; verkoopprijs: number;
     kostenTotaal: number;
   }>>([]);
+  const [voorraad, setVoorraad] = useState<{ aantal: number; inkoop: number; kosten: number }>({ aantal: 0, inkoop: 0, kosten: 0 });
   const [error, setError] = useState<string | null>(null);
+
 
   const periodStart = `${year}${pad(month + 1)}01`;
   const lastDay = new Date(year, month + 1, 0).getDate();
