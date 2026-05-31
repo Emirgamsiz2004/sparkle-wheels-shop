@@ -338,7 +338,16 @@ Deno.serve(async (req) => {
         const normalizedFilter = normalizeMoneybirdFilter(piFilter);
         let piPath = `documents/purchase_invoices.json?per_page=100&page=${piPage || 1}`;
         if (normalizedFilter) piPath += `&filter=${encodeURIComponent(normalizedFilter)}`;
-        result = await mbFetch(piPath);
+        try {
+          result = await mbFetch(piPath);
+        } catch (e: any) {
+          // Niet alle Moneybird-administraties hebben purchase_invoices ingeschakeld → val terug op lege lijst
+          if (String(e?.message || "").includes("404")) {
+            result = [];
+          } else {
+            throw e;
+          }
+        }
         break;
       }
 
