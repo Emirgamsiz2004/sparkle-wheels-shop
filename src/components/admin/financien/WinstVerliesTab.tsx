@@ -160,6 +160,11 @@ const WinstVerliesTab = () => {
   const [purchaseInvoices, setPurchaseInvoices] = useState<PurchaseInvoice[]>([]);
   const [platinKosten, setPlatinKosten] = useState<PlatinKost[]>([]);
   const [inkoopverklaringBedragen, setInkoopverklaringBedragen] = useState<number[]>([]);
+  const [soldVehicles, setSoldVehicles] = useState<Array<{
+    id: string; merk: string; model: string; kenteken: string;
+    verkoop_datum: string; inkoopprijs: number; verkoopprijs: number;
+    kostenTotaal: number;
+  }>>([]);
   const [error, setError] = useState<string | null>(null);
 
   const periodStart = `${year}${pad(month + 1)}01`;
