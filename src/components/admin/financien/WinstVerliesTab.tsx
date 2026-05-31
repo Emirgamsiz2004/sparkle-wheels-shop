@@ -244,6 +244,41 @@ const WinstVerliesTab = () => {
 
   return (
     <div className="space-y-5">
+      {/* Voorraadwaarde — niet periode-gebonden, altijd zichtbaar */}
+      <div className="bg-gradient-to-br from-card to-secondary/20 border border-border rounded-[16px] p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Package className="w-4 h-4 text-primary" />
+            <h3 className="text-sm font-semibold text-foreground">Voorraadwaarde</h3>
+            <span className="text-[11px] text-muted-foreground">— huidige stock</span>
+          </div>
+          <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{voorraad.aantal} voertuigen</span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Inkoopwaarde</p>
+            <p className="text-2xl font-bold tabular-nums text-foreground">{formatEuro(voorraad.inkoopwaarde)}</p>
+            <p className="text-[11px] text-muted-foreground mt-1">geld vastgelegd in voorraad</p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Verwachte omzet</p>
+            <p className="text-2xl font-bold tabular-nums text-foreground">{formatEuro(voorraad.verwachteOmzet)}</p>
+            <p className="text-[11px] text-muted-foreground mt-1">bij verkoop tegen vraagprijs</p>
+          </div>
+          <div className="col-span-2 md:col-span-1">
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Potentiële marge</p>
+            <p className={cn("text-2xl font-bold tabular-nums", voorraad.verwachteMarge >= 0 ? "text-emerald-400" : "text-red-400")}>
+              {formatEuro(voorraad.verwachteMarge)}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {voorraad.inkoopwaarde > 0
+                ? `${((voorraad.verwachteMarge / voorraad.inkoopwaarde) * 100).toFixed(1)}% rendement`
+                : "—"}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Periode bar */}
       <div className="flex flex-wrap items-center gap-2 justify-between">
         <div className="flex items-center gap-2 bg-card border border-border rounded-[12px] p-1">
