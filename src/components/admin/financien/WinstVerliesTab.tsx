@@ -277,6 +277,29 @@ const WinstVerliesTab = () => {
     setSoldVehicles(mapped);
   };
 
+  // Huidige voorraad: alle voertuigen die nog niet verkocht zijn (live snapshot)
+  const loadVoorraad = async () => {
+    const { data: vs, error: vErr } = await supabase
+      .from("vehicles" as any)
+      .select("id, inkoopprijs, status, verkoop_datum");
+    if (vErr) { console.error("loadVoorraad err", vErr); return; }
+    const inStock = (vs || []).filter((v: any) =>
+      !v.verkoop_datum && (v.status || "").toLowerCase() !== "verkocht"
+    );
+    const ids = inStock.map((v: any) => v.id);
+    let costSum = 0;
+    if (ids.length > 0) {
+      const { data: costs } = await supabase
+        .from("vehicle_costs" as any)
+        .select("amount, vehicle_id")
+        .in("vehicle_id", ids);
+      for (const c of (costs || []) as any[]) costSum += Number(c.amount) || 0;
+    }
+    const inkoopSum = inStock.reduce((s: number, v: any) => s + (Number(v.inkoopprijs) || 0), 0);
+    setVoorraad({ aantal: inStock.length, inkoop: inkoopSum, kosten: costSum });
+  };
+
+
 
   const load = async () => {
     setError(null);
