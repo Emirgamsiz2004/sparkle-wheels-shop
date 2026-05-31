@@ -91,6 +91,9 @@ const WinstVerliesTab = () => {
   const [categorieen, setCategorieen] = useState<Categorie[]>([]);
   const [vehicleKentekens, setVehicleKentekens] = useState<Set<string>>(new Set());
   const [adminId, setAdminId] = useState<string>("");
+  const [voorraad, setVoorraad] = useState<{ inkoopwaarde: number; aantal: number; verwachteOmzet: number; verwachteMarge: number }>({
+    inkoopwaarde: 0, aantal: 0, verwachteOmzet: 0, verwachteMarge: 0,
+  });
 
   const now = new Date();
   const [periodType, setPeriodType] = useState<PeriodType>("maand");
@@ -103,18 +106,28 @@ const WinstVerliesTab = () => {
     [periodType, year, month, quarter]
   );
 
-  // Load categorieen + voertuig kentekens (once)
+  // Load categorieen + voertuig kentekens + voorraadwaarde (once)
   useEffect(() => {
     (async () => {
       const [{ data: cats }, { data: vehs }, admin] = await Promise.all([
         supabase.from("kosten_categorieen").select("id, naam, moneybird_contact_ids"),
-        supabase.from("vehicles").select("kenteken"),
+        supabase.from("vehicles").select("kenteken, status, inkoopprijs, verkoopprijs"),
         invoke("get_administration").catch(() => null),
       ]);
       setCategorieen((cats as Categorie[]) || []);
+      const allVehs = (vehs as any[]) || [];
       setVehicleKentekens(
-        new Set(((vehs as any[]) || []).map((v) => (v.kenteken || "").toUpperCase().replace(/[-\s]/g, "")))
+        new Set(allVehs.map((v) => (v.kenteken || "").toUpperCase().replace(/[-\s]/g, "")))
       );
+      const inStock = allVehs.filter((v) => v.status && v.status !== "verkocht");
+      const inkoopwaarde = inStock.reduce((s, v) => s + num(v.inkoopprijs), 0);
+      const verwachteOmzet = inStock.reduce((s, v) => s + num(v.verkoopprijs), 0);
+      setVoorraad({
+        inkoopwaarde,
+        aantal: inStock.length,
+        verwachteOmzet,
+        verwachteMarge: verwachteOmzet - inkoopwaarde,
+      });
       if (admin?.id) setAdminId(String(admin.id));
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
