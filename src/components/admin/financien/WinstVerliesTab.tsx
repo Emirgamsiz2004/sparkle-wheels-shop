@@ -511,27 +511,54 @@ const WinstVerliesTab = () => {
 
       {/* RESULTAAT */}
       <Card className="border-emerald-500/30">
-        <CardContent className="p-6 space-y-5">
+        <CardContent className="p-6 space-y-6">
           <div className="flex items-center gap-2">
             <Calculator className="h-4 w-4 text-emerald-500" />
             <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Resultaat (matching: COGS bij verkoop)
+              Winst &amp; Verlies
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Stat label="Omzet" value={formatEuroDecimal(omzet.incl)} color="emerald" />
-            <Stat label="− COGS" value={formatEuroDecimal(cogs.totaal)} color="red" />
-            <Stat label="= Brutowinst" value={formatEuroDecimal(brutowinst)} color={brutowinst >= 0 ? "emerald" : "red"} />
-            <Stat label="− Operationele kosten" value={formatEuroDecimal(operationeleKosten)} color="red" />
+
+          {/* 1. Voertuigverkoop */}
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider">1. Voertuigverkoop</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Stat label="Omzet voertuigen" value={formatEuroDecimal(cogs.voertuigOmzet)} color="emerald" small />
+              <Stat label="− COGS (inkoop + kosten)" value={formatEuroDecimal(cogs.totaal)} color="red" small />
+              <Stat label="= Voertuigwinst" value={formatEuroDecimal(voertuigWinst)} color={voertuigWinst >= 0 ? "emerald" : "red"} small />
+            </div>
           </div>
-          <div className="pt-3 border-t border-border">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Nettoresultaat (incl. BTW — marge-BTW correctie volgt in stap 5)</div>
+
+          {/* 2. Diensten */}
+          <div className="space-y-2 pt-3 border-t border-border">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider">2. Diensten &amp; overig</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Stat label="Omzet diensten" value={formatEuroDecimal(dienstenOmzet)} color="emerald" small />
+              <Stat label="− Operationele kosten" value={formatEuroDecimal(operationeleKosten)} color="red" small />
+              <Stat label="= Dienstenwinst" value={formatEuroDecimal(dienstenWinst)} color={dienstenWinst >= 0 ? "emerald" : "red"} small />
+            </div>
+          </div>
+
+          {/* 3. Totaal */}
+          <div className="space-y-2 pt-3 border-t border-border">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider">3. Totaal</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Stat label="Brutowinst" value={formatEuroDecimal(brutowinst)} color={brutowinst >= 0 ? "emerald" : "red"} small />
+              <Stat label={`− BTW (incl. marge-BTW ${formatEuroDecimal(margeBTW)})`} value={formatEuroDecimal(totaalBTW)} color="red" small />
+              <Stat label="= Nettowinst" value={formatEuroDecimal(nettoResultaat)} color={nettoResultaat >= 0 ? "emerald" : "red"} small />
+            </div>
+          </div>
+
+          {/* Eindresultaat */}
+          <div className="pt-4 border-t border-border">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Nettowinst {MONTHS[month]} {year}</div>
             <div className={cn("text-4xl font-bold tabular-nums", nettoResultaat >= 0 ? "text-emerald-500" : "text-red-500")}>
               {nettoResultaat >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(nettoResultaat))}
             </div>
           </div>
         </CardContent>
       </Card>
+
 
       {/* COGS — Verkochte auto's deze maand */}
       <Card>
