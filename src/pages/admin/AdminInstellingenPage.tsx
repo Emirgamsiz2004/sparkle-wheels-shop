@@ -8,6 +8,8 @@ import { Loader2, Copy, Check, Bell } from "lucide-react";
 import { toast } from "sonner";
 import DienstenBeheer from "@/components/admin/instellingen/DienstenBeheer";
 import HandtekeningUpload from "@/components/admin/instellingen/HandtekeningUpload";
+import ConnectorsBeheer from "@/components/admin/instellingen/ConnectorsBeheer";
+
 
 const WEBHOOK_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID || "leykexzdvatuyitkxdxs"}.supabase.co/functions/v1/make-webhook-handler`;
 
@@ -173,8 +175,12 @@ const AdminInstellingenPage = () => {
         </CardContent>
       </Card>
 
+      {/* Connectors */}
+      <ConnectorsBeheer />
+
       {/* Handtekening */}
       <HandtekeningUpload />
+
 
       {/* Diensten Beheer */}
       <DienstenBeheer />

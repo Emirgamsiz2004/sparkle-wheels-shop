@@ -1,5 +1,9 @@
 project_id = "leykexzdvatuyitkxdxs"
 
+[functions.list-connectors-status]
+verify_jwt = false
+
+
 [functions.send-whatsapp-notification]
 verify_jwt = false
 
