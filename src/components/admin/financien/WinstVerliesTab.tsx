@@ -312,7 +312,7 @@ const WinstVerliesTab = () => {
       setInvoices(inv);
       setReceipts(rec);
       setPurchaseInvoices(pi);
-      await Promise.all([loadPlatinKosten(), loadInkoopverklaringen(), loadSoldVehicles()]);
+      await Promise.all([loadPlatinKosten(), loadInkoopverklaringen(), loadSoldVehicles(), loadVoorraad()]);
     } catch (e: any) {
       setError(e.message || "Onbekende fout");
     }
