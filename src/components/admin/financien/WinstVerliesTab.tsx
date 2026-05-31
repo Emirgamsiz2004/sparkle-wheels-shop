@@ -367,12 +367,47 @@ const WinstVerliesTab = () => {
     return posts;
   }, [receipts, purchaseInvoices, platinKosten, inkoopverklaringBedragen]);
 
-  const totaalKosten = kostPosten.reduce((s, p) => s + p.bedrag, 0);
+  // === Matching principle (COGS): voertuiginkoop hoort bij de maand waarin de auto verkocht is ===
+  // Operationele kosten = alles BEHALVE voertuiginkoop (MB) en voertuig-gebonden Platin kosten.
+  // Die laatste twee zijn voorraad/COGS en horen niet thuis in de maandelijkse periode-kosten.
+  const operationeleKostPosten = useMemo(
+    () => kostPosten.filter(p =>
+      p.categorie !== "inkoop_voertuigen" &&
+      p.bron !== "platin_voertuig"
+    ),
+    [kostPosten]
+  );
+  const operationeleKosten = operationeleKostPosten.reduce((s, p) => s + p.bedrag, 0);
 
-  // Groepering per categorie
+  // COGS van deze maand = voor elke deze maand verkochte auto: inkoopprijs + alle eraan gekoppelde kosten
+  const cogs = useMemo(() => {
+    let inkoop = 0, voertuigKosten = 0;
+    for (const v of soldVehicles) {
+      inkoop += v.inkoopprijs;
+      voertuigKosten += v.kostenTotaal;
+    }
+    return { inkoop, voertuigKosten, totaal: inkoop + voertuigKosten };
+  }, [soldVehicles]);
+
+  // Informatief: hoeveel is deze maand aan voorraad toegevoegd (niet meegerekend in P&L)
+  const voorraadAankopen = useMemo(() => {
+    const mbInkoop = kostPosten
+      .filter(p => p.categorie === "inkoop_voertuigen")
+      .reduce((s, p) => s + p.bedrag, 0);
+    const voertuigKostenMaand = kostPosten
+      .filter(p => p.bron === "platin_voertuig")
+      .reduce((s, p) => s + p.bedrag, 0);
+    return { mbInkoop, voertuigKostenMaand, totaal: mbInkoop + voertuigKostenMaand };
+  }, [kostPosten]);
+
+  // Resultaat (alles incl BTW — BTW-correctie komt in stap 5)
+  const brutowinst = omzet.incl - cogs.totaal;
+  const nettoResultaat = brutowinst - operationeleKosten;
+
+  // Groepering per categorie (alleen operationele)
   const perCategorie = useMemo(() => {
     const map = new Map<Categorie, { totaal: number; posten: KostPost[] }>();
-    for (const p of kostPosten) {
+    for (const p of operationeleKostPosten) {
       const cur = map.get(p.categorie) || { totaal: 0, posten: [] };
       cur.totaal += p.bedrag;
       cur.posten.push(p);
@@ -381,7 +416,7 @@ const WinstVerliesTab = () => {
     return Array.from(map.entries())
       .map(([cat, v]) => ({ cat, ...v }))
       .sort((a, b) => b.totaal - a.totaal);
-  }, [kostPosten]);
+  }, [operationeleKostPosten]);
 
   const [openCat, setOpenCat] = useState<Categorie | null>(null);
 
