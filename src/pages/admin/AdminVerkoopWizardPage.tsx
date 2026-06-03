@@ -809,7 +809,7 @@ const AdminVerkoopWizardPage = () => {
   const afleverkostenNum = afleverkosten === "" ? 0 : Number(afleverkosten);
   const legesNum = leges === "" ? 0 : Number(leges);
   const garantiePrijsNum = garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0;
-  const aanbetalingNum = aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag);
+  const aanbetalingNum = aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 ? Number(aanbetalingBedrag) : lastAanbetalingRef.current;
   const inruilWaardeNum = inruil && inruilWaarde !== "" ? Number(inruilWaarde) : 0;
   const restbedragGlobal = Math.max(
     0,
