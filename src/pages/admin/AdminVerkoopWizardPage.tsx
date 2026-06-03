@@ -3215,6 +3215,67 @@ const Stap4Garantie = ({
   );
 };
 
+interface Stap12AutotrustAanvraagProps {
+  voertuig: string;
+  kenteken: string;
+  klant: string;
+  pakket: string;
+  looptijd: number;
+  prijs: number;
+  aangevraagd: boolean;
+  setAangevraagd: (v: boolean) => void;
+  onSaved: (extra: Record<string, any>) => Promise<void>;
+}
+
+const Stap12AutotrustAanvraag = (p: Stap12AutotrustAanvraagProps) => {
+  const fmtEur = (n: number) =>
+    new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(n || 0);
+
+  const handleToggle = async (checked: boolean) => {
+    p.setAangevraagd(checked);
+    await p.onSaved({ stap12_afgerond: checked });
+    toast.success(checked ? "AutoTrust aanvraag bevestigd" : "AutoTrust aanvraag opengezet");
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+        <div className="flex items-start gap-4">
+          <div className="h-10 w-10 rounded-[10px] bg-foreground/10 flex items-center justify-center shrink-0">
+            <ShieldCheck className="h-5 w-5 text-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold text-foreground">AutoTrust garantie aanvragen</div>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              Vraag de garantie pas aan nadat de betaling is bevestigd. Daarna kun je verder met tenaamstelling en aflevering.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-3 rounded-[10px] border border-border bg-background/40 p-4 text-sm">
+          <InfoRow label="Voertuig" value={[p.kenteken, p.voertuig].filter(Boolean).join(" — ") || "—"} mono={!!p.kenteken} />
+          <InfoRow label="Klant" value={p.klant || "—"} />
+          <InfoRow label="Pakket" value={p.pakket || "AutoTrust"} />
+          <InfoRow label="Looptijd" value={p.looptijd ? `${p.looptijd} maanden` : "—"} />
+          <InfoRow label="Garantieprijs" value={fmtEur(p.prijs)} />
+          <InfoRow label="Status" value={p.aangevraagd ? "Aangevraagd" : "Nog aanvragen"} />
+        </div>
+
+        <label className={cn(
+          "flex items-start gap-4 rounded-[14px] border p-5 cursor-pointer transition-colors",
+          p.aangevraagd ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-background/30",
+        )}>
+          <Switch checked={p.aangevraagd} onCheckedChange={handleToggle} />
+          <span className="flex-1">
+            <span className="block text-sm font-medium text-foreground">AutoTrust garantie is aangevraagd in het portaal</span>
+            <span className="block text-xs text-muted-foreground mt-1">Deze bevestiging opent de volgende stappen in de verkoopwizard.</span>
+          </span>
+        </label>
+      </div>
+    </div>
+  );
+};
+
 // ─────────────────────────────────────────────────────────────
 // Stap 5 — Koopovereenkomst
 // ─────────────────────────────────────────────────────────────
