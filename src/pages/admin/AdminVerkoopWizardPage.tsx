@@ -778,6 +778,7 @@ const AdminVerkoopWizardPage = () => {
       if (completed[5]) {
         const missing: string[] = [];
         if (!completed[8]) missing.push("stap 8 (betaling bevestigen)");
+        if (garantieType === "autotrust" && stap >= 9 && stap <= 11 && !completed[12]) missing.push("AutoTrust aanvraag afronden");
         if (stap >= 10 && inruil && !completed[9]) missing.push("stap 9 (inruil op naam zetten)");
         if (stap === 11 && !completed[10]) missing.push("stap 10 (tenaamstelling)");
         if (missing.length > 0) {
