@@ -3197,7 +3197,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
   const restbedrag = totaal - (p.aanbetalingBedrag || 0) - inruilWaarde;
 
   // Auto-clean: "aanbetaling" is geen geldige betaalwijze meer (wordt automatisch van restbedrag afgetrokken)
-  React.useEffect(() => {
+  useEffect(() => {
     if (p.betaalwijzeDetails.some((d) => (d.methode as string) === "aanbetaling")) {
       p.setBetaalwijzeDetails(p.betaalwijzeDetails.filter((d) => (d.methode as string) !== "aanbetaling"));
     }
