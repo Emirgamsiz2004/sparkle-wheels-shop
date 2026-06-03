@@ -613,8 +613,8 @@ const WinstVerliesTab = () => {
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
             <Row k="Voorraad ingekocht" v={formatEuroDecimal(voorraadAankopen.totaal)} />
-            <Row k="Voorraad verkocht (COGS)" v={formatEuroDecimal(cogs.totaal)} />
-            <Row k="= Voorraadgroei" v={`${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} bold />
+            <Row k="Voorraad verkocht (inkoopwaarde)" v={formatEuroDecimal(cogs.inkoop)} />
+            <Row k="= Voorraadmutatie" v={`${voorraadMutatie >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadMutatie))}`} bold />
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
             <Row k="Huidige voorraad" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop + voorraad.kosten)}`} />
