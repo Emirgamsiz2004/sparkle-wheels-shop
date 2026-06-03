@@ -357,7 +357,7 @@ function buildHtml(data: KoopovereenkomstData): string {
       <tr class="rest"><td>Restbedrag</td><td class="amt">${formatEur(restbedrag)}</td></tr>
       ${(data.financieel.betalingen && data.financieel.betalingen.length > 0)
         ? data.financieel.betalingen.map(b => {
-            const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering" };
+            const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering", aanbetaling: "Aanbetaling" };
             const label = labels[b.methode] || b.methode;
             const suffix = b.methode === "financiering" && b.maatschappij ? ` (${escapeHtml(b.maatschappij)})` : "";
             return `<tr class="pay"><td>${escapeHtml(label)}${suffix}</td><td class="amt">${formatEur(b.bedrag || 0)}</td></tr>`;
