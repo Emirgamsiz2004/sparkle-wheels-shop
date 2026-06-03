@@ -125,33 +125,33 @@ const VerkopenSheet = ({ vehicles, monthLabel }: Props) => {
       </div>
 
       <div className="overflow-x-auto border border-border rounded-[3px]">
-        <table className="w-full text-xs tabular-nums table-fixed">
+        <table className="w-full text-[13px] tabular-nums table-fixed">
           <colgroup>
-            <col className="w-[92px]" />
-            <col className="w-[92px]" />
-            <col />
-            <col className="w-[52px]" />
-            <col className="w-[76px]" />
             <col className="w-[110px]" />
-            <col className="w-[92px]" />
-            <col className="w-[88px]" />
-            <col className="w-[80px]" />
-            <col className="w-[96px]" />
+            <col className="w-[110px]" />
+            <col />
+            <col className="w-[64px]" />
+            <col className="w-[90px]" />
+            <col className="w-[120px]" />
+            <col className="w-[110px]" />
             <col className="w-[100px]" />
+            <col className="w-[90px]" />
+            <col className="w-[110px]" />
+            <col className="w-[120px]" />
           </colgroup>
-          <thead className="bg-muted/40 text-muted-foreground border-b border-border">
+          <thead className="bg-muted/30 text-muted-foreground border-b border-border">
             <tr className="text-left">
-              <th className="px-3 h-10 font-medium whitespace-nowrap">Datum</th>
-              <th className="px-3 h-10 font-medium whitespace-nowrap">Kenteken</th>
-              <th className="px-3 h-10 font-medium whitespace-nowrap">Voertuig</th>
-              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Bj.</th>
-              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">KM</th>
-              <th className="px-3 h-10 font-medium whitespace-nowrap">Type</th>
-              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Inkoop</th>
-              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Kosten</th>
-              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Inruil</th>
-              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Verkoop</th>
-              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Marge</th>
+              <th className="px-4 h-12 font-medium whitespace-nowrap">Datum</th>
+              <th className="px-4 h-12 font-medium whitespace-nowrap">Kenteken</th>
+              <th className="px-4 h-12 font-medium whitespace-nowrap">Voertuig</th>
+              <th className="px-4 h-12 font-medium text-right whitespace-nowrap">Bj.</th>
+              <th className="px-4 h-12 font-medium text-right whitespace-nowrap">KM</th>
+              <th className="px-4 h-12 font-medium whitespace-nowrap">Type</th>
+              <th className="px-4 h-12 font-medium text-right whitespace-nowrap">Inkoop</th>
+              <th className="px-4 h-12 font-medium text-right whitespace-nowrap">Kosten</th>
+              <th className="px-4 h-12 font-medium text-right whitespace-nowrap">Inruil</th>
+              <th className="px-4 h-12 font-medium text-right whitespace-nowrap">Verkoop</th>
+              <th className="px-4 h-12 font-medium text-right whitespace-nowrap">Marge</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/60">
@@ -159,24 +159,24 @@ const VerkopenSheet = ({ vehicles, monthLabel }: Props) => {
               const totaalKost = v.inkoopprijs + v.kostenTotaal;
               const marge = v.verkoopprijs - totaalKost;
               return (
-                <tr key={v.id} className="h-11 hover:bg-muted/20 transition-colors">
-                  <td className="px-3 whitespace-nowrap text-muted-foreground">{formatDate(v.verkoop_datum)}</td>
-                  <td className="px-3 whitespace-nowrap font-mono uppercase text-foreground">{v.kenteken || "—"}</td>
-                  <td className="px-3 truncate text-foreground" title={`${v.merk} ${v.model}${v.koper_naam ? ` · ${v.koper_naam}` : ""}`}>
+                <tr key={v.id} className="h-14 hover:bg-muted/20 transition-colors">
+                  <td className="px-4 whitespace-nowrap text-muted-foreground">{formatDate(v.verkoop_datum)}</td>
+                  <td className="px-4 whitespace-nowrap font-mono uppercase text-foreground">{v.kenteken || "—"}</td>
+                  <td className="px-4 truncate text-foreground" title={`${v.merk} ${v.model}${v.koper_naam ? ` · ${v.koper_naam}` : ""}`}>
                     <span className="font-medium">{v.merk} {v.model}</span>
                     {v.koper_naam && <span className="text-muted-foreground"> · {v.koper_naam}</span>}
                   </td>
-                  <td className="px-3 text-right text-muted-foreground whitespace-nowrap">{v.bouwjaar ?? "—"}</td>
-                  <td className="px-3 text-right text-muted-foreground whitespace-nowrap">{v.kilometerstand ? v.kilometerstand.toLocaleString("nl-NL") : "—"}</td>
-                  <td className="px-3 text-muted-foreground capitalize whitespace-nowrap truncate">
+                  <td className="px-4 text-right text-muted-foreground whitespace-nowrap">{v.bouwjaar ?? "—"}</td>
+                  <td className="px-4 text-right text-muted-foreground whitespace-nowrap">{v.kilometerstand ? v.kilometerstand.toLocaleString("nl-NL") : "—"}</td>
+                  <td className="px-4 text-muted-foreground capitalize whitespace-nowrap truncate">
                     {(v.verkoop_type || "regulier").replace(/_/g, " ")}
                     {v.btw_marge_type && <span className="ml-1 text-[10px] uppercase text-muted-foreground/70">· {v.btw_marge_type}</span>}
                   </td>
-                  <td className="px-3 text-right text-foreground whitespace-nowrap">{formatEuroDecimal(v.inkoopprijs)}</td>
-                  <td className="px-3 text-right text-muted-foreground whitespace-nowrap">{formatEuroDecimal(v.kostenTotaal)}</td>
-                  <td className="px-3 text-right text-muted-foreground whitespace-nowrap">{v.inruil_waarde ? formatEuroDecimal(Number(v.inruil_waarde)) : "—"}</td>
-                  <td className="px-3 text-right text-foreground font-medium whitespace-nowrap">{formatEuroDecimal(v.verkoopprijs)}</td>
-                  <td className={cn("px-3 text-right font-semibold whitespace-nowrap", marge >= 0 ? "text-emerald-500" : "text-red-500")}>
+                  <td className="px-4 text-right text-foreground whitespace-nowrap">{formatEuroDecimal(v.inkoopprijs)}</td>
+                  <td className="px-4 text-right text-muted-foreground whitespace-nowrap">{formatEuroDecimal(v.kostenTotaal)}</td>
+                  <td className="px-4 text-right text-muted-foreground whitespace-nowrap">{v.inruil_waarde ? formatEuroDecimal(Number(v.inruil_waarde)) : "—"}</td>
+                  <td className="px-4 text-right text-foreground font-medium whitespace-nowrap">{formatEuroDecimal(v.verkoopprijs)}</td>
+                  <td className={cn("px-4 text-right font-semibold whitespace-nowrap", marge >= 0 ? "text-emerald-500" : "text-red-500")}>
                     {marge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(marge))}
                   </td>
                 </tr>
@@ -184,13 +184,13 @@ const VerkopenSheet = ({ vehicles, monthLabel }: Props) => {
             })}
           </tbody>
           <tfoot>
-            <tr className="h-11 bg-muted/50 font-semibold text-foreground border-t border-border">
-              <td className="px-3 whitespace-nowrap" colSpan={6}>TOTAAL · {vehicles.length} auto{vehicles.length === 1 ? "" : "'s"}</td>
-              <td className="px-3 text-right whitespace-nowrap">{formatEuroDecimal(totals.inkoop)}</td>
-              <td className="px-3 text-right whitespace-nowrap">{formatEuroDecimal(totals.kosten)}</td>
-              <td className="px-3 text-right whitespace-nowrap">{formatEuroDecimal(totals.inruil)}</td>
-              <td className="px-3 text-right whitespace-nowrap">{formatEuroDecimal(totals.verkoop)}</td>
-              <td className={cn("px-3 text-right whitespace-nowrap", totals.marge >= 0 ? "text-emerald-500" : "text-red-500")}>
+            <tr className="h-14 bg-muted/40 font-semibold text-foreground border-t border-border">
+              <td className="px-4 whitespace-nowrap" colSpan={6}>TOTAAL · {vehicles.length} auto{vehicles.length === 1 ? "" : "'s"}</td>
+              <td className="px-4 text-right whitespace-nowrap">{formatEuroDecimal(totals.inkoop)}</td>
+              <td className="px-4 text-right whitespace-nowrap">{formatEuroDecimal(totals.kosten)}</td>
+              <td className="px-4 text-right whitespace-nowrap">{formatEuroDecimal(totals.inruil)}</td>
+              <td className="px-4 text-right whitespace-nowrap">{formatEuroDecimal(totals.verkoop)}</td>
+              <td className={cn("px-4 text-right whitespace-nowrap", totals.marge >= 0 ? "text-emerald-500" : "text-red-500")}>
                 {totals.marge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(totals.marge))}
               </td>
             </tr>
