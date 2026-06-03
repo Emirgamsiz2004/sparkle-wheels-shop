@@ -3256,6 +3256,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
   const totaal = p.verkoopprijs + (p.afleverkosten || 0) + (p.leges || 0) + garantieKosten;
   const inruilWaarde = p.inruil?.waarde || 0;
   const restbedrag = totaal - (p.aanbetalingBedrag || 0) - inruilWaarde;
+  const [showAanbetalingEditor, setShowAanbetalingEditor] = useState((p.aanbetalingBedrag || 0) > 0);
 
   // Auto-clean: "aanbetaling" is geen geldige betaalwijze meer (wordt automatisch van restbedrag afgetrokken)
   useEffect(() => {
@@ -3263,6 +3264,21 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       p.setBetaalwijzeDetails(p.betaalwijzeDetails.filter((d) => (d.methode as string) !== "aanbetaling"));
     }
   }, [p.betaalwijzeDetails]);
+
+  useEffect(() => {
+    if ((p.aanbetalingBedrag || 0) > 0) setShowAanbetalingEditor(true);
+  }, [p.aanbetalingBedrag]);
+
+  useEffect(() => {
+    if (p.betaalwijzeDetails.length === 0) return;
+    const totaalIngevuld = p.betaalwijzeDetails.reduce((s, d) => s + (Number(d.bedrag) || 0), 0);
+    const verschil = +(restbedrag - totaalIngevuld).toFixed(2);
+    if (Math.abs(verschil) < 0.01) return;
+    const next = [...p.betaalwijzeDetails];
+    const idx = next.length - 1;
+    next[idx] = { ...next[idx], bedrag: Math.max(0, +((Number(next[idx].bedrag) || 0) + verschil).toFixed(2)) };
+    p.setBetaalwijzeDetails(next);
+  }, [restbedrag, p.betaalwijzeDetails]);
 
   const klantNaam = p.klant.zakelijk && p.klant.bedrijfsnaam
     ? p.klant.bedrijfsnaam
