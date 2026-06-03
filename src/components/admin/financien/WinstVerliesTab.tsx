@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, RefreshCw, TrendingUp, TrendingDown, Receipt, FileText, Wrench, Tag, Car, Calculator, Package } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { formatEuroDecimal } from "@/types/vehicle";
