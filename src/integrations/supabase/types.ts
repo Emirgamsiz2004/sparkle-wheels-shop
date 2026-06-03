@@ -3238,6 +3238,7 @@ export type Database = {
         }
         Returns: string
       }
+      test_drive_exists: { Args: { p_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "medewerker"
