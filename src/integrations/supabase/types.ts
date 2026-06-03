@@ -1310,6 +1310,60 @@ export type Database = {
         }
         Relationships: []
       }
+      handmatige_verkopen: {
+        Row: {
+          bouwjaar: number | null
+          brandstof: string | null
+          created_at: string
+          id: string
+          inkoopprijs: number
+          kenteken: string | null
+          kilometerstand: number | null
+          koper_naam: string | null
+          merk: string
+          model: string
+          notitie: string | null
+          updated_at: string
+          user_id: string | null
+          verkoop_datum: string
+          verkoopprijs: number
+        }
+        Insert: {
+          bouwjaar?: number | null
+          brandstof?: string | null
+          created_at?: string
+          id?: string
+          inkoopprijs?: number
+          kenteken?: string | null
+          kilometerstand?: number | null
+          koper_naam?: string | null
+          merk?: string
+          model?: string
+          notitie?: string | null
+          updated_at?: string
+          user_id?: string | null
+          verkoop_datum?: string
+          verkoopprijs?: number
+        }
+        Update: {
+          bouwjaar?: number | null
+          brandstof?: string | null
+          created_at?: string
+          id?: string
+          inkoopprijs?: number
+          kenteken?: string | null
+          kilometerstand?: number | null
+          koper_naam?: string | null
+          merk?: string
+          model?: string
+          notitie?: string | null
+          updated_at?: string
+          user_id?: string | null
+          verkoop_datum?: string
+          verkoopprijs?: number
+        }
+        Relationships: []
+      }
       inkoop_candidates: {
         Row: {
           bouwjaar: number
