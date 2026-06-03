@@ -43,6 +43,7 @@ const Stap10Vrijwaring = ({
   voertuigMerk,
   voertuigModel,
   voertuigBouwjaar,
+  voertuigChassisnummer,
   initialMachtigingsnummer,
   initialMachtigingDatum,
   initialMachtigingOntvangen,
