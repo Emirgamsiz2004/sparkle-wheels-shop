@@ -174,12 +174,23 @@ const VerkopenSheet = ({ vehicles, monthLabel }: Props) => {
                   <td className="px-4 text-right text-muted-foreground whitespace-nowrap">{v.kilometerstand ? v.kilometerstand.toLocaleString("nl-NL") : "—"}</td>
                   <td className="px-4 text-muted-foreground capitalize whitespace-nowrap truncate">
                     {(v.verkoop_type || "regulier").replace(/_/g, " ")}
-                    {v.btw_marge_type && <span className="ml-1 text-[10px] uppercase text-muted-foreground/70">· {v.btw_marge_type}</span>}
+                    {v.isConsignatie && v.consignatie_perc ? (
+                      <span className="ml-1 text-[10px] uppercase text-muted-foreground/70">· {v.consignatie_perc}%</span>
+                    ) : v.btw_marge_type ? (
+                      <span className="ml-1 text-[10px] uppercase text-muted-foreground/70">· {v.btw_marge_type}</span>
+                    ) : null}
                   </td>
-                  <td className="px-4 text-right text-foreground whitespace-nowrap">{formatEuroDecimal(v.inkoopprijs)}</td>
+                  <td className="px-4 text-right text-foreground whitespace-nowrap">{v.isConsignatie ? "—" : formatEuroDecimal(v.inkoopprijs)}</td>
                   <td className="px-4 text-right text-muted-foreground whitespace-nowrap">{formatEuroDecimal(v.kostenTotaal)}</td>
                   <td className="px-4 text-right text-muted-foreground whitespace-nowrap">{v.inruil_waarde ? formatEuroDecimal(Number(v.inruil_waarde)) : "—"}</td>
-                  <td className="px-4 text-right text-foreground font-medium whitespace-nowrap">{formatEuroDecimal(v.verkoopprijs)}</td>
+                  <td
+                    className="px-4 text-right text-foreground font-medium whitespace-nowrap"
+                    title={v.isConsignatie && v.bruto_verkoopprijs ? `Bruto verkoop ${formatEuroDecimal(v.bruto_verkoopprijs)} · commissie ${v.consignatie_perc}%` : undefined}
+                  >
+                    {formatEuroDecimal(v.verkoopprijs)}
+                    {v.isConsignatie && <span className="ml-1 text-[10px] text-muted-foreground/70">comm.</span>}
+                  </td>
+
                   <td className={cn("px-4 text-right font-semibold whitespace-nowrap", marge >= 0 ? "text-emerald-500" : "text-red-500")}>
                     {marge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(marge))}
                   </td>
