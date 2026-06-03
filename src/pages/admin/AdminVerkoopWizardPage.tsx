@@ -3196,6 +3196,13 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
   const inruilWaarde = p.inruil?.waarde || 0;
   const restbedrag = totaal - (p.aanbetalingBedrag || 0) - inruilWaarde;
 
+  // Auto-clean: "aanbetaling" is geen geldige betaalwijze meer (wordt automatisch van restbedrag afgetrokken)
+  React.useEffect(() => {
+    if (p.betaalwijzeDetails.some((d) => (d.methode as string) === "aanbetaling")) {
+      p.setBetaalwijzeDetails(p.betaalwijzeDetails.filter((d) => (d.methode as string) !== "aanbetaling"));
+    }
+  }, [p.betaalwijzeDetails]);
+
   const klantNaam = p.klant.zakelijk && p.klant.bedrijfsnaam
     ? p.klant.bedrijfsnaam
     : `${p.klant.voornaam} ${p.klant.achternaam}`.trim();
