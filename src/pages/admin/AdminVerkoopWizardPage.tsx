@@ -3244,7 +3244,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           leges: p.leges,
           betaalwijze: (p.betaalwijzeDetails && p.betaalwijzeDetails.length > 0)
             ? p.betaalwijzeDetails.map(d => {
-                const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering" };
+                const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering", aanbetaling: "Aanbetaling" };
                 return `${labels[d.methode] || d.methode}: ${new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(d.bedrag || 0)}`;
               }).join(" + ") + (p.betaalwijzeDetails.some(d => d.methode === "financiering") && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : "")
             : p.restBetaalwijze + (p.restBetaalwijze === "financiering" && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : ""),
