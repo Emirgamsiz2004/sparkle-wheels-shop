@@ -920,10 +920,10 @@ const AdminVerkoopWizardPage = () => {
               // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/tenaamstelling)
               const lockedByPrereq =
                 blocked &&
-                step.num >= 9 &&
-                step.num <= 11 &&
+                (step.num === 12 || (step.num >= 9 && step.num <= 11)) &&
                 !!completed[5] &&
                 ((!completed[8]) ||
+                  (garantieType === "autotrust" && step.num >= 9 && step.num <= 11 && !completed[12]) ||
                   (step.num >= 10 && inruil && !completed[9]) ||
                   (step.num === 11 && !completed[10]));
 
