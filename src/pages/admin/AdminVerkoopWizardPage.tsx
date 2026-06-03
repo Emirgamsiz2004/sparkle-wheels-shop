@@ -3205,6 +3205,8 @@ interface Stap5Props {
   leges: number;
   aanbetalingBedrag: number;
   aanbetalingBetaalwijze: Betaalwijze;
+  setAanbetalingBedrag: (v: number | "") => void;
+  setAanbetalingBetaalwijze: (v: Betaalwijze) => void;
   leverdatum: string;
   klant: {
     voornaam: string;
