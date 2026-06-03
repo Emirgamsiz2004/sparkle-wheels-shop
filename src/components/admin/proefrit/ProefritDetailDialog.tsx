@@ -184,6 +184,9 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Resterende proefritduur</p>
                 <ProefritCountdown testDrive={td} size="lg" />
                 <p className="text-[11px] text-muted-foreground">Max. 30 minuten</p>
+                {elapsed && (
+                  <p className="text-[11px] font-medium text-blue-400">Actief: {elapsed}</p>
+                )}
               </div>
             )}
             <section>
