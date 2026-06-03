@@ -113,7 +113,7 @@ const VerkopenSheet = ({ vehicles, monthLabel }: Props) => {
       <div className="flex items-center justify-between">
         <div className="text-xs text-muted-foreground">
           <span className="text-foreground font-semibold tabular-nums">{vehicles.length}</span> voertuig{vehicles.length === 1 ? "" : "en"} verkocht ·
-          gemiddelde marge <span className={cn("font-medium tabular-nums", avgMarge >= 0 ? "text-emerald-500" : "text-red-500")}>{avgMarge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(avgMarge))}</span>
+          gem. marge <span className={cn("font-medium tabular-nums", avgMarge >= 0 ? "text-emerald-500" : "text-red-500")}>{avgMarge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(avgMarge))}</span>
         </div>
         <button
           onClick={downloadCsv}
@@ -125,45 +125,58 @@ const VerkopenSheet = ({ vehicles, monthLabel }: Props) => {
       </div>
 
       <div className="overflow-x-auto border border-border rounded-[3px]">
-        <table className="w-full text-xs tabular-nums">
-          <thead className="bg-muted/40 text-muted-foreground">
+        <table className="w-full text-xs tabular-nums table-fixed">
+          <colgroup>
+            <col className="w-[92px]" />
+            <col className="w-[92px]" />
+            <col />
+            <col className="w-[52px]" />
+            <col className="w-[76px]" />
+            <col className="w-[110px]" />
+            <col className="w-[92px]" />
+            <col className="w-[88px]" />
+            <col className="w-[80px]" />
+            <col className="w-[96px]" />
+            <col className="w-[100px]" />
+          </colgroup>
+          <thead className="bg-muted/40 text-muted-foreground border-b border-border">
             <tr className="text-left">
-              <th className="px-2.5 py-2 font-medium whitespace-nowrap">Datum</th>
-              <th className="px-2.5 py-2 font-medium whitespace-nowrap">Kenteken</th>
-              <th className="px-2.5 py-2 font-medium">Voertuig</th>
-              <th className="px-2.5 py-2 font-medium text-right">Bj.</th>
-              <th className="px-2.5 py-2 font-medium text-right">KM</th>
-              <th className="px-2.5 py-2 font-medium">Type</th>
-              <th className="px-2.5 py-2 font-medium text-right">Inkoop</th>
-              <th className="px-2.5 py-2 font-medium text-right">+ Kosten</th>
-              <th className="px-2.5 py-2 font-medium text-right">Inruil</th>
-              <th className="px-2.5 py-2 font-medium text-right">Verkoop</th>
-              <th className="px-2.5 py-2 font-medium text-right">Marge</th>
+              <th className="px-3 h-10 font-medium whitespace-nowrap">Datum</th>
+              <th className="px-3 h-10 font-medium whitespace-nowrap">Kenteken</th>
+              <th className="px-3 h-10 font-medium whitespace-nowrap">Voertuig</th>
+              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Bj.</th>
+              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">KM</th>
+              <th className="px-3 h-10 font-medium whitespace-nowrap">Type</th>
+              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Inkoop</th>
+              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Kosten</th>
+              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Inruil</th>
+              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Verkoop</th>
+              <th className="px-3 h-10 font-medium text-right whitespace-nowrap">Marge</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border/60">
             {vehicles.map(v => {
               const totaalKost = v.inkoopprijs + v.kostenTotaal;
               const marge = v.verkoopprijs - totaalKost;
               return (
-                <tr key={v.id} className="hover:bg-muted/20 transition-colors">
-                  <td className="px-2.5 py-2 whitespace-nowrap text-muted-foreground">{formatDate(v.verkoop_datum)}</td>
-                  <td className="px-2.5 py-2 whitespace-nowrap font-mono uppercase text-foreground">{v.kenteken || "—"}</td>
-                  <td className="px-2.5 py-2">
-                    <div className="text-foreground font-medium">{v.merk} {v.model}</div>
-                    {v.koper_naam && <div className="text-[10px] text-muted-foreground truncate max-w-[180px]">{v.koper_naam}</div>}
+                <tr key={v.id} className="h-11 hover:bg-muted/20 transition-colors">
+                  <td className="px-3 whitespace-nowrap text-muted-foreground">{formatDate(v.verkoop_datum)}</td>
+                  <td className="px-3 whitespace-nowrap font-mono uppercase text-foreground">{v.kenteken || "—"}</td>
+                  <td className="px-3 truncate text-foreground" title={`${v.merk} ${v.model}${v.koper_naam ? ` · ${v.koper_naam}` : ""}`}>
+                    <span className="font-medium">{v.merk} {v.model}</span>
+                    {v.koper_naam && <span className="text-muted-foreground"> · {v.koper_naam}</span>}
                   </td>
-                  <td className="px-2.5 py-2 text-right text-muted-foreground">{v.bouwjaar ?? "—"}</td>
-                  <td className="px-2.5 py-2 text-right text-muted-foreground">{v.kilometerstand ? v.kilometerstand.toLocaleString("nl-NL") : "—"}</td>
-                  <td className="px-2.5 py-2 text-muted-foreground capitalize whitespace-nowrap">
+                  <td className="px-3 text-right text-muted-foreground whitespace-nowrap">{v.bouwjaar ?? "—"}</td>
+                  <td className="px-3 text-right text-muted-foreground whitespace-nowrap">{v.kilometerstand ? v.kilometerstand.toLocaleString("nl-NL") : "—"}</td>
+                  <td className="px-3 text-muted-foreground capitalize whitespace-nowrap truncate">
                     {(v.verkoop_type || "regulier").replace(/_/g, " ")}
-                    {v.btw_marge_type && <span className="ml-1 text-[10px] uppercase">· {v.btw_marge_type}</span>}
+                    {v.btw_marge_type && <span className="ml-1 text-[10px] uppercase text-muted-foreground/70">· {v.btw_marge_type}</span>}
                   </td>
-                  <td className="px-2.5 py-2 text-right text-foreground">{formatEuroDecimal(v.inkoopprijs)}</td>
-                  <td className="px-2.5 py-2 text-right text-muted-foreground">{formatEuroDecimal(v.kostenTotaal)}</td>
-                  <td className="px-2.5 py-2 text-right text-muted-foreground">{v.inruil_waarde ? formatEuroDecimal(Number(v.inruil_waarde)) : "—"}</td>
-                  <td className="px-2.5 py-2 text-right text-foreground font-medium">{formatEuroDecimal(v.verkoopprijs)}</td>
-                  <td className={cn("px-2.5 py-2 text-right font-semibold", marge >= 0 ? "text-emerald-500" : "text-red-500")}>
+                  <td className="px-3 text-right text-foreground whitespace-nowrap">{formatEuroDecimal(v.inkoopprijs)}</td>
+                  <td className="px-3 text-right text-muted-foreground whitespace-nowrap">{formatEuroDecimal(v.kostenTotaal)}</td>
+                  <td className="px-3 text-right text-muted-foreground whitespace-nowrap">{v.inruil_waarde ? formatEuroDecimal(Number(v.inruil_waarde)) : "—"}</td>
+                  <td className="px-3 text-right text-foreground font-medium whitespace-nowrap">{formatEuroDecimal(v.verkoopprijs)}</td>
+                  <td className={cn("px-3 text-right font-semibold whitespace-nowrap", marge >= 0 ? "text-emerald-500" : "text-red-500")}>
                     {marge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(marge))}
                   </td>
                 </tr>
@@ -171,13 +184,13 @@ const VerkopenSheet = ({ vehicles, monthLabel }: Props) => {
             })}
           </tbody>
           <tfoot>
-            <tr className="bg-muted/60 font-semibold text-foreground border-t-2 border-border">
-              <td className="px-2.5 py-2.5" colSpan={6}>TOTAAL · {vehicles.length} auto{vehicles.length === 1 ? "" : "'s"}</td>
-              <td className="px-2.5 py-2.5 text-right">{formatEuroDecimal(totals.inkoop)}</td>
-              <td className="px-2.5 py-2.5 text-right">{formatEuroDecimal(totals.kosten)}</td>
-              <td className="px-2.5 py-2.5 text-right">{formatEuroDecimal(totals.inruil)}</td>
-              <td className="px-2.5 py-2.5 text-right">{formatEuroDecimal(totals.verkoop)}</td>
-              <td className={cn("px-2.5 py-2.5 text-right", totals.marge >= 0 ? "text-emerald-500" : "text-red-500")}>
+            <tr className="h-11 bg-muted/50 font-semibold text-foreground border-t border-border">
+              <td className="px-3 whitespace-nowrap" colSpan={6}>TOTAAL · {vehicles.length} auto{vehicles.length === 1 ? "" : "'s"}</td>
+              <td className="px-3 text-right whitespace-nowrap">{formatEuroDecimal(totals.inkoop)}</td>
+              <td className="px-3 text-right whitespace-nowrap">{formatEuroDecimal(totals.kosten)}</td>
+              <td className="px-3 text-right whitespace-nowrap">{formatEuroDecimal(totals.inruil)}</td>
+              <td className="px-3 text-right whitespace-nowrap">{formatEuroDecimal(totals.verkoop)}</td>
+              <td className={cn("px-3 text-right whitespace-nowrap", totals.marge >= 0 ? "text-emerald-500" : "text-red-500")}>
                 {totals.marge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(totals.marge))}
               </td>
             </tr>
