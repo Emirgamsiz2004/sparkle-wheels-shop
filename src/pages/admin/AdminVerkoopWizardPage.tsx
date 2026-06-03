@@ -1414,6 +1414,26 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
+            {activeStap === 12 && (
+              <Stap12AutotrustAanvraag
+                voertuig={`${vehicle?.merk || ""} ${vehicle?.model || ""}`.trim()}
+                kenteken={vehicle?.kenteken || ""}
+                klant={`${klantVoornaam || ""} ${klantAchternaam || ""}`.trim()}
+                pakket={garantiePakket}
+                looptijd={garantieLooptijd === "" ? 0 : Number(garantieLooptijd)}
+                prijs={garantiePrijsNum}
+                aangevraagd={autotrustAangevraagd}
+                setAangevraagd={setAutotrustAangevraagd}
+                onSaved={async (extra) => {
+                  if (extra.stap12_afgerond !== undefined) {
+                    setAutotrustAangevraagd(!!extra.stap12_afgerond);
+                    setCompleted((p) => ({ ...p, 12: !!extra.stap12_afgerond }));
+                  }
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
             {activeStap === 9 && (
               <Stap9InruilOpNaam
                 inruil={inruil}
