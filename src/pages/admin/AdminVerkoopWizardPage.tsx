@@ -761,9 +761,10 @@ const AdminVerkoopWizardPage = () => {
   const legesNum = leges === "" ? 0 : Number(leges);
   const garantiePrijsNum = garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0;
   const aanbetalingNum = aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag);
+  const inruilWaardeNum = inruil && inruilWaarde !== "" ? Number(inruilWaarde) : 0;
   const restbedragGlobal = Math.max(
     0,
-    verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum,
+    verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum - inruilWaardeNum,
   );
 
   const wizardState: WizardState = useMemo(
@@ -1265,6 +1266,12 @@ const AdminVerkoopWizardPage = () => {
                 garantiePakket={garantiePakket}
                 garantieLooptijd={garantieLooptijd}
                 garantiePrijs={garantiePrijs}
+                inruil={inruil ? {
+                  kenteken: inruilKenteken,
+                  merk: inruilMerk,
+                  model: inruilModel,
+                  waarde: inruilWaardeNum,
+                } : null}
                 klantVoornaam={klantVoornaam}
                 klantAchternaam={klantAchternaam}
                 klantBedrijfsnaam={klantBedrijfsnaam}
@@ -1318,6 +1325,7 @@ const AdminVerkoopWizardPage = () => {
                   verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum
                 }
                 aanbetalingBedrag={aanbetalingNum}
+                inruilBedrag={inruilWaardeNum}
                 initialBetaaldatum={betalingDatum}
                 initialBetaalwijze={restBetaalwijze}
                 initialBetaalwijzeDetails={betaalwijzeDetails as any}

@@ -69,6 +69,12 @@ export interface Stap7Props {
   leges: number | "";
   aanbetalingBedrag: number | "";
   aanbetalingBetaalwijze?: string | null;
+  inruil?: {
+    kenteken: string;
+    merk: string;
+    model: string;
+    waarde: number;
+  } | null;
 
   // Garantie (uit stap 4)
   garantieType: GarantieType;
@@ -153,7 +159,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const num = (v: number | "" | null | undefined) => (typeof v === "number" ? v : 0);
 
   // ─── Bewerkbare factuurregels (preview) ───
-  type RegelKind = "voertuig" | "garantie" | "aanbetaling" | "extra";
+  type RegelKind = "voertuig" | "garantie" | "inruil" | "aanbetaling" | "extra";
   type Regel = {
     id: string;
     kind: RegelKind;
@@ -185,6 +191,17 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         description: `Garantie ${pakket}${looptijd ? ` · ${looptijd} maanden` : ""} via Autotrust`,
         price: num(p.garantiePrijs),
         btwPercent: 0,
+      });
+    }
+    if (p.inruil && num(p.inruil.waarde) > 0) {
+      const inruilOmschrijving = [p.inruil.merk, p.inruil.model].filter(Boolean).join(" ").trim();
+      list.push({
+        id: "inruil",
+        kind: "inruil",
+        description: `Inruil${inruilOmschrijving ? ` ${inruilOmschrijving}` : ""}${p.inruil.kenteken ? ` (${formatKenteken(p.inruil.kenteken)})` : ""}`,
+        price: -num(p.inruil.waarde),
+        btwPercent: 0,
+        locked: true,
       });
     }
     if (num(p.aanbetalingBedrag) > 0) {
@@ -661,7 +678,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             </thead>
             <tbody>
               {regels.map((r) => {
-                const btwLocked = r.kind === "garantie" || r.kind === "aanbetaling";
+                const btwLocked = r.kind === "garantie" || r.kind === "inruil" || r.kind === "aanbetaling";
                 return (
                   <tr key={r.id} className="border-t border-border">
                     <td className="px-3 py-2">
