@@ -678,7 +678,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             </thead>
             <tbody>
               {regels.map((r) => {
-                const btwLocked = r.kind === "garantie" || r.kind === "aanbetaling";
+                const btwLocked = r.kind === "garantie" || r.kind === "inruil" || r.kind === "aanbetaling";
                 return (
                   <tr key={r.id} className="border-t border-border">
                     <td className="px-3 py-2">
