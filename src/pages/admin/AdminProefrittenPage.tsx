@@ -12,6 +12,19 @@ import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDial
 import ProefritCountdown from "@/components/admin/proefrit/ProefritCountdown";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 
+function getElapsedTime(td: TestDrive): string | null {
+  if (td.status !== "actief") return null;
+  const startStr = (td as any).vertrek_tijd || td.formulier_ingevuld_op || td.start_tijd;
+  if (!startStr) return null;
+  const start = new Date(startStr);
+  const dur = intervalToDuration({ start, end: new Date() });
+  const parts: string[] = [];
+  if (dur.hours) parts.push(`${dur.hours}u`);
+  if (dur.minutes != null) parts.push(`${dur.minutes}m`);
+  if (!parts.length) parts.push("0m");
+  return parts.join(" ");
+}
+
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
   wacht_op_klant: { label: "Wacht op klant", icon: Clock, color: "text-amber-400 bg-amber-400/10 border-amber-400/20" },
   actief: { label: "Actief", icon: Car, color: "text-blue-400 bg-blue-400/10 border-blue-400/20" },
