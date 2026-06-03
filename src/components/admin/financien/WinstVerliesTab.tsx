@@ -169,7 +169,9 @@ const WinstVerliesTab = () => {
     brandstof?: string | null; verkoop_type?: string | null;
     btw_marge_type?: string | null; koper_naam?: string | null;
     inruil_waarde?: number | null;
+    isConsignatie?: boolean; consignatie_perc?: number; bruto_verkoopprijs?: number;
   }>>([]);
+
   const [voorraad, setVoorraad] = useState<{ aantal: number; inkoop: number; kosten: number }>({ aantal: 0, inkoop: 0, kosten: 0 });
   const [error, setError] = useState<string | null>(null);
 
@@ -252,7 +254,7 @@ const WinstVerliesTab = () => {
     const dateTo = `${year}-${pad(month + 1)}-${pad(lastDay)}`;
     const { data, error: vErr } = await supabase
       .from("vehicles" as any)
-      .select("id, merk, model, kenteken, verkoop_datum, inkoopprijs, verkoopprijs, bouwjaar, kilometerstand, brandstof, verkoop_type, btw_marge_type, koper_naam, inruil_waarde")
+      .select("id, merk, model, kenteken, verkoop_datum, inkoopprijs, verkoopprijs, bouwjaar, kilometerstand, brandstof, verkoop_type, btw_marge_type, koper_naam, inruil_waarde, consignatie_commissie_perc")
       .gte("verkoop_datum", dateFrom)
       .lte("verkoop_datum", dateTo)
       .order("verkoop_datum", { ascending: true });
@@ -270,25 +272,38 @@ const WinstVerliesTab = () => {
         costsByVehicle[c.vehicle_id] = (costsByVehicle[c.vehicle_id] || 0) + (Number(c.amount) || 0);
       }
     }
-    const mapped = vehicles.map((v: any) => ({
-      id: v.id,
-      merk: v.merk || "",
-      model: v.model || "",
-      kenteken: v.kenteken || "",
-      verkoop_datum: v.verkoop_datum,
-      inkoopprijs: Number(v.inkoopprijs) || 0,
-      verkoopprijs: Number(v.verkoopprijs) || 0,
-      kostenTotaal: costsByVehicle[v.id] || 0,
-      bouwjaar: v.bouwjaar,
-      kilometerstand: v.kilometerstand,
-      brandstof: v.brandstof,
-      verkoop_type: v.verkoop_type,
-      btw_marge_type: v.btw_marge_type,
-      koper_naam: v.koper_naam,
-      inruil_waarde: Number(v.inruil_waarde) || 0,
-    }));
+    const mapped = vehicles.map((v: any) => {
+      const isConsignatie = (v.verkoop_type || "").toLowerCase() === "consignatie";
+      const rawVerkoop = Number(v.verkoopprijs) || 0;
+      const rawInkoop = Number(v.inkoopprijs) || 0;
+      const commPerc = Number(v.consignatie_commissie_perc) || 0;
+      // Bij consignatie: wij verdienen alleen de commissie, geen voertuig-omzet en geen inkoop
+      const verkoopEff = isConsignatie ? rawVerkoop * (commPerc / 100) : rawVerkoop;
+      const inkoopEff = isConsignatie ? 0 : rawInkoop;
+      return {
+        id: v.id,
+        merk: v.merk || "",
+        model: v.model || "",
+        kenteken: v.kenteken || "",
+        verkoop_datum: v.verkoop_datum,
+        inkoopprijs: inkoopEff,
+        verkoopprijs: verkoopEff,
+        kostenTotaal: costsByVehicle[v.id] || 0,
+        bouwjaar: v.bouwjaar,
+        kilometerstand: v.kilometerstand,
+        brandstof: v.brandstof,
+        verkoop_type: v.verkoop_type,
+        btw_marge_type: v.btw_marge_type,
+        koper_naam: v.koper_naam,
+        inruil_waarde: Number(v.inruil_waarde) || 0,
+        isConsignatie,
+        consignatie_perc: commPerc,
+        bruto_verkoopprijs: rawVerkoop,
+      };
+    });
     setSoldVehicles(mapped);
   };
+
 
   // Huidige voorraad: alle voertuigen die nog niet verkocht zijn (live snapshot)
   const loadVoorraad = async () => {
