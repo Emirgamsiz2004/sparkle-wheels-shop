@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, RefreshCw, TrendingUp, TrendingDown, Receipt, FileText, Wrench, Tag, Car, Calculator, Package } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { useMoneybird } from "@/hooks/useMoneybird";
 import { formatEuroDecimal } from "@/types/vehicle";
@@ -493,223 +493,60 @@ const WinstVerliesTab = () => {
   const prev = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const next = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
+  const voorraadGroei = voorraadAankopen.totaal - cogs.totaal;
+  const vermogensGroei = nettoResultaat + voorraadGroei;
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between bg-card border border-border rounded-[3px] p-3">
-        <Button variant="ghost" size="icon" onClick={prev} className="h-9 w-9">
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-        <div className="text-center">
-          <div className="text-lg font-semibold text-foreground font-['Poppins']">
+    <div className="space-y-8 max-w-5xl mx-auto">
+      {/* Header — month switcher + refresh, plat */}
+      <div className="flex items-center justify-between border-b border-border pb-3">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={prev} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <div className="text-sm font-medium text-foreground min-w-[140px] text-center tabular-nums">
             {MONTHS[month]} {year}
           </div>
-          <div className="text-xs text-muted-foreground">
-            {periodStart.slice(6, 8)}-{periodStart.slice(4, 6)} t/m {periodEnd.slice(6, 8)}-{periodEnd.slice(4, 6)}
-          </div>
+          <Button variant="ghost" size="icon" onClick={next} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
-        <Button variant="ghost" size="icon" onClick={next} className="h-9 w-9">
-          <ChevronRight className="h-5 w-5" />
-        </Button>
+        <button
+          onClick={load}
+          disabled={loading}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <RefreshCw className={cn("h-3 w-3", loading && "animate-spin")} />
+          Ververs
+        </button>
       </div>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm p-3 rounded-[3px]">
-          {error}
-        </div>
+        <div className="text-xs text-red-400 border-l-2 border-red-500/60 pl-3">{error}</div>
       )}
 
-      <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={load} disabled={loading}>
-          <RefreshCw className={cn("h-3.5 w-3.5 mr-1.5", loading && "animate-spin")} />
-          Refresh
-        </Button>
+      {/* KPI strip — 4 getallen, geen kaders */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6">
+        <Metric label="Omzet" value={formatEuroDecimal(omzet.incl)} />
+        <Metric label="Kosten" value={formatEuroDecimal(operationeleKosten + cogs.totaal)} />
+        <Metric label="Nettowinst" value={formatEuroDecimal(nettoResultaat)} tone={nettoResultaat >= 0 ? "pos" : "neg"} />
+        <Metric label="Vermogensgroei" value={formatEuroDecimal(vermogensGroei)} tone={vermogensGroei >= 0 ? "pos" : "neg"} subtle={`incl. voorraad ${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} />
       </div>
 
-      {/* OMZET */}
-      <Card>
-        <CardContent className="p-6 space-y-5">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Omzet (Moneybird verkoopfacturen)
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Stat label="Totaal incl. BTW" value={formatEuroDecimal(omzet.incl)} highlight color="emerald" />
-            <Stat label="Totaal excl. BTW" value={formatEuroDecimal(omzet.excl)} />
-            <Stat label="BTW" value={formatEuroDecimal(omzet.btw)} />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-border">
-            <Stat label="Betaald" value={formatEuroDecimal(omzet.paid)} color="emerald" small />
-            <Stat label="Openstaand" value={formatEuroDecimal(omzet.open)} color="amber" small />
-            <Stat label="Aantal facturen" value={String(omzet.count)} small />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Verkochte voertuigen — de Excel-sheet */}
+      <Section title="Verkochte voertuigen" hint={`${soldVehicles.length} deze maand`}>
+        <VerkopenSheet vehicles={soldVehicles} monthLabel={`${MONTHS[month]} ${year}`} />
+      </Section>
 
-      {/* RESULTAAT */}
-      <Card className="border-emerald-500/30">
-        <CardContent className="p-6 space-y-6">
-          <div className="flex items-center gap-2">
-            <Calculator className="h-4 w-4 text-emerald-500" />
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Winst &amp; Verlies
-            </h2>
-          </div>
-
-          {/* 1. Voertuigverkoop */}
-          <div className="space-y-2">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">1. Voertuigverkoop</div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Stat label="Omzet voertuigen" value={formatEuroDecimal(cogs.voertuigOmzet)} color="emerald" small />
-              <Stat label="− COGS (inkoop + kosten)" value={formatEuroDecimal(cogs.totaal)} color="red" small />
-              <Stat label="= Voertuigwinst" value={formatEuroDecimal(voertuigWinst)} color={voertuigWinst >= 0 ? "emerald" : "red"} small />
-            </div>
-          </div>
-
-          {/* 2. Diensten */}
-          <div className="space-y-2 pt-3 border-t border-border">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">2. Diensten &amp; overig</div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Stat label="Omzet diensten" value={formatEuroDecimal(dienstenOmzet)} color="emerald" small />
-              <Stat label="− Operationele kosten" value={formatEuroDecimal(operationeleKosten)} color="red" small />
-              <Stat label="= Dienstenwinst" value={formatEuroDecimal(dienstenWinst)} color={dienstenWinst >= 0 ? "emerald" : "red"} small />
-            </div>
-          </div>
-
-          {/* 3. Totaal */}
-          <div className="space-y-2 pt-3 border-t border-border">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">3. Totaal</div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Stat label="Brutowinst" value={formatEuroDecimal(brutowinst)} color={brutowinst >= 0 ? "emerald" : "red"} small />
-              <Stat label={`− BTW (incl. marge-BTW ${formatEuroDecimal(margeBTW)})`} value={formatEuroDecimal(totaalBTW)} color="red" small />
-              <Stat label="= Nettowinst (papier)" value={formatEuroDecimal(nettoResultaat)} color={nettoResultaat >= 0 ? "emerald" : "red"} small />
-            </div>
-          </div>
-
-          {/* 4. Voorraadgroei telt mee als winst (waardestijging vermogen) */}
-          {(() => {
-            const voorraadGroei = voorraadAankopen.totaal - cogs.totaal;
-            const totaleWinst = nettoResultaat + voorraadGroei;
-            return (
-              <>
-                <div className="space-y-2 pt-3 border-t border-border">
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                    <Package className="h-3 w-3 text-blue-400" />
-                    4. Voorraadgroei (vermogen in auto's)
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Stat label="+ Ingekocht deze maand" value={formatEuroDecimal(voorraadAankopen.totaal)} color="emerald" small />
-                    <Stat label="− COGS verkochte auto's" value={formatEuroDecimal(cogs.totaal)} color="red" small />
-                    <Stat label="= Voorraadgroei" value={`${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} color={voorraadGroei >= 0 ? "emerald" : "amber"} small />
-                  </div>
-                </div>
-
-                {/* Eindresultaat — totale winst (nettowinst + voorraadgroei) */}
-                <div className="pt-4 border-t border-border">
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                    Totale winst {MONTHS[month]} {year} <span className="normal-case text-muted-foreground/70">(nettowinst + voorraadgroei)</span>
-                  </div>
-                  <div className={cn("text-4xl font-bold tabular-nums", totaleWinst >= 0 ? "text-emerald-500" : "text-red-500")}>
-                    {totaleWinst >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(totaleWinst))}
-                  </div>
-                  <div className="text-[11px] text-muted-foreground mt-1">
-                    Nettowinst {nettoResultaat >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(nettoResultaat))} {voorraadGroei >= 0 ? "+" : "−"} voorraadgroei {formatEuroDecimal(Math.abs(voorraadGroei))}
-                  </div>
-                </div>
-              </>
-            );
-          })()}
-
-        </CardContent>
-      </Card>
-
-
-      {/* COGS — Verkochte auto's deze maand */}
-      <Card>
-        <CardContent className="p-6 space-y-5">
-          <div className="flex items-center gap-2">
-            <Car className="h-4 w-4 text-foreground" />
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Kostprijs verkochte auto's
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Stat label="Inkoopprijs" value={formatEuroDecimal(cogs.inkoop)} small />
-            <Stat label="Bijkomende kosten" value={formatEuroDecimal(cogs.voertuigKosten)} small />
-            <Stat label="Totaal COGS" value={formatEuroDecimal(cogs.totaal)} color="red" small />
-          </div>
-          <div className="pt-3 border-t border-border">
-            <VerkopenSheet vehicles={soldVehicles} monthLabel={`${MONTHS[month]} ${year}`} />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* OPERATIONELE KOSTEN */}
-      <Card>
-        <CardContent className="p-6 space-y-5">
-          <div className="flex items-center gap-2">
-            <TrendingDown className="h-4 w-4 text-red-500" />
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Operationele kosten
-            </h2>
-          </div>
-          <div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Totaal (excl. voertuig-inkoop & voertuig-kosten)</div>
-            <div className="text-3xl font-bold text-red-500 tabular-nums">
-              {formatEuroDecimal(operationeleKosten)}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-border">
-            <SourceStat
-              icon={<Receipt className="h-4 w-4" />}
-              label="Bonnetjes (MB)"
-              value={formatEuroDecimal(operationeleKostPosten.filter(p => p.bron === "bonnetje").reduce((s, p) => s + p.bedrag, 0))}
-              count={operationeleKostPosten.filter(p => p.bron === "bonnetje").length}
-            />
-            <SourceStat
-              icon={<FileText className="h-4 w-4" />}
-              label="Inkoopfacturen (MB)"
-              value={formatEuroDecimal(operationeleKostPosten.filter(p => p.bron === "inkoopfactuur").reduce((s, p) => s + p.bedrag, 0))}
-              count={operationeleKostPosten.filter(p => p.bron === "inkoopfactuur").length}
-            />
-            <SourceStat
-              icon={<Wrench className="h-4 w-4" />}
-              label="Platin algemeen"
-              value={formatEuroDecimal(operationeleKostPosten.filter(p => p.bron === "platin_alg").reduce((s, p) => s + p.bedrag, 0))}
-              count={operationeleKostPosten.filter(p => p.bron === "platin_alg").length}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* CATEGORISATIE */}
-      <Card>
-        <CardContent className="p-6 space-y-5">
-          <div className="flex items-center gap-2">
-            <Tag className="h-4 w-4 text-foreground" />
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-              Verdeling operationele kosten
-            </h2>
-          </div>
-
-          {operationeleKosten > 0 && (
-            <div className="flex h-2 w-full overflow-hidden rounded-[3px] bg-muted">
-              {perCategorie.map(({ cat, totaal }) => (
-                <div
-                  key={cat}
-                  className={CATEGORIE_KLEUREN[cat]}
-                  style={{ width: `${(totaal / operationeleKosten) * 100}%` }}
-                  title={`${CATEGORIE_LABELS[cat]}: ${formatEuroDecimal(totaal)}`}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="divide-y divide-border">
-            {perCategorie.length === 0 && (
-              <div className="text-xs text-muted-foreground py-4 text-center">Geen operationele kosten in deze periode</div>
-            )}
+      {/* Operationele kosten — compacte lijst */}
+      <Section
+        title="Operationele kosten"
+        hint={`${formatEuroDecimal(operationeleKosten)} totaal`}
+      >
+        {perCategorie.length === 0 ? (
+          <div className="text-xs text-muted-foreground py-2">Geen kosten in deze periode</div>
+        ) : (
+          <div className="divide-y divide-border/60">
             {perCategorie.map(({ cat, totaal, posten }) => {
               const pct = operationeleKosten > 0 ? (totaal / operationeleKosten) * 100 : 0;
               const isOpen = openCat === cat;
@@ -717,28 +554,18 @@ const WinstVerliesTab = () => {
                 <div key={cat}>
                   <button
                     onClick={() => setOpenCat(isOpen ? null : cat)}
-                    className="w-full py-3 flex items-center gap-3 hover:bg-muted/30 px-2 -mx-2 rounded-[3px] transition-colors"
+                    className="w-full py-2.5 flex items-center gap-3 text-left hover:text-foreground transition-colors"
                   >
-                    <div className={cn("h-3 w-3 rounded-[2px] flex-shrink-0", CATEGORIE_KLEUREN[cat])} />
-                    <div className="flex-1 text-left">
-                      <div className="text-sm font-medium text-foreground">{CATEGORIE_LABELS[cat]}</div>
-                      <div className="text-[10px] text-muted-foreground">{posten.length} {posten.length === 1 ? "post" : "posten"} · {pct.toFixed(1)}%</div>
-                    </div>
-                    <div className="text-sm font-semibold text-red-500 tabular-nums">
-                      −{formatEuroDecimal(totaal)}
-                    </div>
+                    <div className="flex-1 text-sm text-foreground">{CATEGORIE_LABELS[cat]}</div>
+                    <div className="text-[11px] text-muted-foreground tabular-nums w-12 text-right">{pct.toFixed(0)}%</div>
+                    <div className="text-sm text-foreground tabular-nums w-24 text-right">{formatEuroDecimal(totaal)}</div>
                   </button>
                   {isOpen && (
-                    <div className="bg-muted/20 rounded-[3px] mb-2 divide-y divide-border">
+                    <div className="pb-3 pl-1 space-y-1.5">
                       {posten.sort((a, b) => b.bedrag - a.bedrag).map(p => (
-                        <div key={p.id} className="px-3 py-2 flex items-center justify-between text-xs">
-                          <div className="flex-1 min-w-0 mr-3">
-                            <div className="text-foreground truncate">{p.leverancier} — {p.naam}</div>
-                            <div className="text-[10px] text-muted-foreground">
-                              {p.datum} · <span className="uppercase">{bronLabel(p.bron)}</span>
-                            </div>
-                          </div>
-                          <div className="text-red-400 tabular-nums font-medium">−{formatEuroDecimal(p.bedrag)}</div>
+                        <div key={p.id} className="flex items-center justify-between text-xs text-muted-foreground">
+                          <div className="truncate mr-3">{p.leverancier} — {p.naam}</div>
+                          <div className="tabular-nums">{formatEuroDecimal(p.bedrag)}</div>
                         </div>
                       ))}
                     </div>
@@ -747,106 +574,78 @@ const WinstVerliesTab = () => {
               );
             })}
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </Section>
 
-      {/* VERMOGENSGROEI — papieren winst + voorraadgroei */}
-      {(() => {
-        const voorraadGroei = voorraadAankopen.totaal - cogs.totaal;
-        const vermogensGroei = nettoResultaat + voorraadGroei;
-        const voorraadWaarde = voorraad.inkoop + voorraad.kosten;
-        return (
-          <Card className="border-blue-500/30">
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-blue-400" />
-                <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-                  Vermogensgroei <span className="text-[10px] text-muted-foreground normal-case ml-2">(papieren winst + waarde nieuwe voorraad)</span>
-                </h2>
-              </div>
-
-              {/* Mutatie deze maand */}
-              <div className="space-y-2">
-                <div className="text-xs text-muted-foreground uppercase tracking-wider">Voorraad-mutatie deze maand</div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Stat label="+ Ingekocht (auto's + kosten)" value={formatEuroDecimal(voorraadAankopen.totaal)} color="emerald" small />
-                  <Stat label="− Verkocht (COGS)" value={formatEuroDecimal(cogs.totaal)} color="red" small />
-                  <Stat label="= Voorraadgroei" value={`${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} color={voorraadGroei >= 0 ? "emerald" : "amber"} small />
-                </div>
-              </div>
-
-              {/* Vermogensgroei = papier + voorraad */}
-              <div className="space-y-2 pt-3 border-t border-border">
-                <div className="text-xs text-muted-foreground uppercase tracking-wider">Werkelijke vermogensgroei</div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Stat label="Nettowinst (papier)" value={`${nettoResultaat >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(nettoResultaat))}`} color={nettoResultaat >= 0 ? "emerald" : "red"} small />
-                  <Stat label="+ Voorraadgroei" value={`${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} color={voorraadGroei >= 0 ? "emerald" : "amber"} small />
-                  <Stat label="= Vermogensgroei" value={`${vermogensGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(vermogensGroei))}`} color={vermogensGroei >= 0 ? "emerald" : "red"} small />
-                </div>
-              </div>
-
-              {/* Huidige voorraadwaarde (snapshot nu) */}
-              <div className="space-y-2 pt-3 border-t border-border">
-                <div className="text-xs text-muted-foreground uppercase tracking-wider">Huidige voorraad (snapshot nu)</div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <Stat label="Aantal auto's" value={String(voorraad.aantal)} small />
-                  <Stat label="Inkoopwaarde" value={formatEuroDecimal(voorraad.inkoop)} small />
-                  <Stat label="Bijkomende kosten" value={formatEuroDecimal(voorraad.kosten)} small />
-                  <Stat label="Totale voorraadwaarde" value={formatEuroDecimal(voorraadWaarde)} color="emerald" small />
-                </div>
-              </div>
-
-              <div className="text-[11px] text-muted-foreground italic pt-2 border-t border-border">
-                💡 Een lage papieren winst betekent niet weinig groei. Als je in deze maand meer auto's inkocht dan je verkocht, zit je winst in je voorraad — die waarde komt vrij zodra die auto's verkocht worden.
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })()}
-
-      <div className="text-xs text-muted-foreground text-center">
-        COGS-matching: alleen voertuigen die deze maand verkocht zijn tellen mee. Nieuwe inkoop verhoogt voorraad (vermogen), niet de papierwinst.
-      </div>
-
+      {/* Detail toggle — optioneel uitklappen */}
+      <Details summary="Toon volledige berekening">
+        <div className="space-y-4 text-xs">
+          <Row k="Omzet voertuigen" v={formatEuroDecimal(cogs.voertuigOmzet)} />
+          <Row k="− COGS (inkoop + kosten)" v={formatEuroDecimal(cogs.totaal)} />
+          <Row k="= Voertuigwinst" v={formatEuroDecimal(voertuigWinst)} bold />
+          <div className="border-t border-border/60 pt-3 space-y-2">
+            <Row k="Omzet diensten" v={formatEuroDecimal(dienstenOmzet)} />
+            <Row k="− Operationele kosten" v={formatEuroDecimal(operationeleKosten)} />
+            <Row k="= Dienstenwinst" v={formatEuroDecimal(dienstenWinst)} bold />
+          </div>
+          <div className="border-t border-border/60 pt-3 space-y-2">
+            <Row k="Brutowinst" v={formatEuroDecimal(brutowinst)} />
+            <Row k={`− BTW (incl. marge-BTW ${formatEuroDecimal(margeBTW)})`} v={formatEuroDecimal(totaalBTW)} />
+            <Row k="= Nettowinst" v={formatEuroDecimal(nettoResultaat)} bold />
+          </div>
+          <div className="border-t border-border/60 pt-3 space-y-2">
+            <Row k="Voorraad ingekocht" v={formatEuroDecimal(voorraadAankopen.totaal)} />
+            <Row k="Voorraad verkocht (COGS)" v={formatEuroDecimal(cogs.totaal)} />
+            <Row k="= Voorraadgroei" v={`${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} bold />
+          </div>
+          <div className="border-t border-border/60 pt-3 space-y-2">
+            <Row k="Huidige voorraad" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop + voorraad.kosten)}`} />
+          </div>
+        </div>
+      </Details>
     </div>
   );
 };
 
-const bronLabel = (b: string) => {
-  switch (b) {
-    case "bonnetje": return "MB bonnetje";
-    case "inkoopfactuur": return "MB inkoopfactuur";
-    case "platin_alg": return "Platin algemeen";
-    case "platin_voertuig": return "Platin voertuig";
-    default: return b;
-  }
-};
-
-const Stat = ({ label, value, highlight, color, small }: {
-  label: string; value: string; highlight?: boolean; color?: "emerald" | "amber" | "red"; small?: boolean;
-}) => (
+const Metric = ({ label, value, tone, subtle }: { label: string; value: string; tone?: "pos" | "neg"; subtle?: string }) => (
   <div>
-    <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{label}</div>
+    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">{label}</div>
     <div className={cn(
-      "font-bold tabular-nums",
-      small ? "text-lg" : highlight ? "text-3xl" : "text-2xl",
-      color === "emerald" && "text-emerald-500",
-      color === "amber" && "text-amber-500",
-      color === "red" && "text-red-500",
-      !color && "text-foreground",
+      "text-2xl font-semibold tabular-nums",
+      tone === "pos" && "text-emerald-500",
+      tone === "neg" && "text-red-500",
+      !tone && "text-foreground",
     )}>{value}</div>
+    {subtle && <div className="text-[10px] text-muted-foreground mt-1">{subtle}</div>}
   </div>
 );
 
-const SourceStat = ({ icon, label, value, count }: { icon: React.ReactNode; label: string; value: string; count: number }) => (
-  <div>
-    <div className="flex items-center gap-1.5 text-xs text-muted-foreground uppercase tracking-wider mb-1">
-      {icon}
-      {label}
+const Section = ({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) => (
+  <section className="space-y-3">
+    <div className="flex items-baseline justify-between border-b border-border/60 pb-1.5">
+      <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{title}</h3>
+      {hint && <span className="text-[10px] text-muted-foreground tabular-nums">{hint}</span>}
     </div>
-    <div className="text-lg font-bold text-foreground tabular-nums">{value}</div>
-    <div className="text-xs text-muted-foreground mt-0.5">{count} {count === 1 ? "post" : "posten"}</div>
+    {children}
+  </section>
+);
+
+const Row = ({ k, v, bold }: { k: string; v: string; bold?: boolean }) => (
+  <div className="flex items-center justify-between">
+    <span className={cn("text-muted-foreground", bold && "text-foreground font-medium")}>{k}</span>
+    <span className={cn("tabular-nums text-foreground", bold && "font-semibold")}>{v}</span>
   </div>
 );
+
+const Details = ({ summary, children }: { summary: string; children: React.ReactNode }) => (
+  <details className="group border-t border-border/60 pt-3">
+    <summary className="cursor-pointer list-none text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5">
+      <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
+      {summary}
+    </summary>
+    <div className="mt-4">{children}</div>
+  </details>
+);
+
 
 export default WinstVerliesTab;
