@@ -1196,7 +1196,7 @@ const AdminVerkoopWizardPage = () => {
                 verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
                 afleverkosten={afleverkosten === "" ? 0 : Number(afleverkosten)}
                 leges={leges === "" ? 0 : Number(leges)}
-                aanbetalingBedrag={aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag)}
+                aanbetalingBedrag={aanbetalingNum}
                 aanbetalingBetaalwijze={aanbetalingBetaalwijze}
                 setAanbetalingBedrag={setAanbetalingBedrag}
                 setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
