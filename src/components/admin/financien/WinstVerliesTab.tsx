@@ -639,38 +639,7 @@ const WinstVerliesTab = () => {
             <Stat label="Totaal COGS" value={formatEuroDecimal(cogs.totaal)} color="red" small />
           </div>
           <div className="pt-3 border-t border-border">
-            {soldVehicles.length === 0 ? (
-              <div className="text-xs text-muted-foreground py-2 text-center">Geen voertuigen verkocht deze maand</div>
-            ) : (
-              <div className="divide-y divide-border">
-                {soldVehicles.map(v => {
-                  const totaalKost = v.inkoopprijs + v.kostenTotaal;
-                  const marge = v.verkoopprijs - totaalKost;
-                  return (
-                    <div key={v.id} className="py-2 grid grid-cols-12 gap-2 items-center text-xs">
-                      <div className="col-span-5">
-                        <div className="text-foreground font-medium truncate">{v.merk} {v.model}</div>
-                        <div className="text-[10px] text-muted-foreground">{v.kenteken} · verkocht {v.verkoop_datum}</div>
-                      </div>
-                      <div className="col-span-2 text-right text-muted-foreground tabular-nums">
-                        <div className="text-[10px]">Inkoop</div>
-                        <div>{formatEuroDecimal(v.inkoopprijs)}</div>
-                      </div>
-                      <div className="col-span-2 text-right text-muted-foreground tabular-nums">
-                        <div className="text-[10px]">+ Kosten</div>
-                        <div>{formatEuroDecimal(v.kostenTotaal)}</div>
-                      </div>
-                      <div className="col-span-3 text-right tabular-nums">
-                        <div className="text-[10px] text-muted-foreground">Marge</div>
-                        <div className={cn("font-semibold", marge >= 0 ? "text-emerald-500" : "text-red-500")}>
-                          {marge >= 0 ? "+" : "−"}{formatEuroDecimal(Math.abs(marge))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <VerkopenSheet vehicles={soldVehicles} monthLabel={`${MONTHS[month]} ${year}`} />
           </div>
         </CardContent>
       </Card>
