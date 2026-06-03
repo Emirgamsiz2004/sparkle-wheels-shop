@@ -3497,11 +3497,56 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
                   <span className="text-[14px] text-foreground">{fmtEur(garantieKosten)}</span>
                 </div>
               )}
+              {inruilWaarde > 0 && (
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Inruil {p.inruil?.kenteken ? `(${p.inruil.kenteken})` : ""}</span>
+                  <span className="text-[14px] text-foreground">- {fmtEur(inruilWaarde)}</span>
+                </div>
+              )}
               {(p.aanbetalingBedrag || 0) > 0 && (
                 <div className="flex justify-between items-baseline">
                   <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Aanbetaling</span>
                   <span className="text-[14px] text-foreground">- {fmtEur(p.aanbetalingBedrag)}</span>
                 </div>
+              )}
+              {showAanbetalingEditor && (
+                <div className="grid grid-cols-[1fr_auto] gap-2 items-end rounded-[10px] border border-border bg-background/40 p-3">
+                  <div>
+                    <label className={labelCls}>Aanbetaling herstellen/toevoegen (€)</label>
+                    <input
+                      autoComplete="off"
+                      type="number"
+                      inputMode="numeric"
+                      value={p.aanbetalingBedrag || ""}
+                      onChange={(e) => p.setAanbetalingBedrag(e.target.value === "" ? "" : Number(e.target.value))}
+                      onBlur={p.onAutoSave}
+                      className={inputCls}
+                      placeholder="0"
+                    />
+                  </div>
+                  <select
+                    autoComplete="off"
+                    value={p.aanbetalingBetaalwijze || ""}
+                    onChange={(e) => p.setAanbetalingBetaalwijze(e.target.value as Betaalwijze)}
+                    onBlur={p.onAutoSave}
+                    className={cn(inputCls, "w-36")}
+                  >
+                    <option value="">Methode</option>
+                    <option value="cash">Cash</option>
+                    <option value="pin">Pin</option>
+                    <option value="ideal">iDEAL</option>
+                    <option value="overboeking">Overboeking</option>
+                  </select>
+                </div>
+              )}
+              {!showAanbetalingEditor && (
+                <button
+                  type="button"
+                  onClick={() => setShowAanbetalingEditor(true)}
+                  className="inline-flex items-center gap-1.5 text-[12px] font-medium text-foreground hover:text-foreground/70 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Aanbetaling toevoegen
+                </button>
               )}
               <div className="border-t border-border pt-2.5 mt-1 flex justify-between items-baseline">
                 <span className="text-[12px] font-semibold text-foreground uppercase tracking-wide">Restbedrag</span>
