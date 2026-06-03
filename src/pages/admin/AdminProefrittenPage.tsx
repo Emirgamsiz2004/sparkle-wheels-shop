@@ -201,6 +201,11 @@ const AdminProefrittenPage = () => {
                       <Icon className="w-3 h-3" />
                       {sc.label}
                     </span>
+                    {td.status === "actief" && (
+                      <span className="text-[10px] text-blue-400 font-medium">
+                        {getElapsedTime(td)}
+                      </span>
+                    )}
                     <span className="text-xs text-muted-foreground truncate">
                       {td.customer ? `${td.customer.voornaam} ${td.customer.achternaam}` : "Klant nog niet ingevuld"}
                     </span>
