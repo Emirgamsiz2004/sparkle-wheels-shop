@@ -89,6 +89,7 @@ const Stap8Betaling = ({
     () => Math.max(0, factuurTotaal - aanbetalingBedrag - inruilBedrag),
     [factuurTotaal, aanbetalingBedrag, inruilBedrag],
   );
+  const totaalVerrekend = aanbetalingBedrag + inruilBedrag;
 
   // ─── State ───
   const normalizeMethode = (raw: unknown): Methode => {
@@ -358,7 +359,7 @@ const Stap8Betaling = ({
           postcode: klantPostcode,
           woonplaats: klantWoonplaats,
         },
-        reedsVoldaan: aanbetalingBedrag,
+        reedsVoldaan: totaalVerrekend,
         restbedrag: nogTeOntvangen,
         uiterlijkeDatum: verwachteDatum,
         betaalwijze: primaryMethode === "cash" ? "cash" : "bank",
@@ -436,6 +437,12 @@ const Stap8Betaling = ({
           <Row label="Reeds voldaan via aanbetaling">
             <span className="text-foreground">{fmtEur(aanbetalingBedrag)}</span>
           </Row>
+
+          {inruilBedrag > 0 && (
+            <Row label="Verrekend via inruil">
+              <span className="text-foreground">{fmtEur(inruilBedrag)}</span>
+            </Row>
+          )}
 
           <div className="h-px bg-border my-2" />
 
