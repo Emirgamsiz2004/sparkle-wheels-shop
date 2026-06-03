@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Info } from "lucide-react";
+import { Copy, Info } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import { formatKenteken } from "@/lib/kenteken";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
   voertuigMerk: string;
   voertuigModel: string;
   voertuigBouwjaar: number | null;
+  voertuigChassisnummer?: string;
   initialMachtigingsnummer: string | null;
   initialMachtigingDatum: string | null; // ISO timestamp
   initialMachtigingOntvangen: boolean;
@@ -41,6 +43,7 @@ const Stap10Vrijwaring = ({
   voertuigMerk,
   voertuigModel,
   voertuigBouwjaar,
+  voertuigChassisnummer,
   initialMachtigingsnummer,
   initialMachtigingDatum,
   initialMachtigingOntvangen,
@@ -121,6 +124,32 @@ const Stap10Vrijwaring = ({
           </Row>
           <Row label="Bouwjaar">
             <span className="text-foreground">{voertuigBouwjaar || "—"}</span>
+          </Row>
+          <Row label="Chassisnummer (VIN)">
+            {voertuigChassisnummer ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="font-mono text-foreground tracking-wide">
+                  {voertuigChassisnummer}
+                </span>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(voertuigChassisnummer);
+                      toast({ title: "Chassisnummer gekopieerd" });
+                    } catch {
+                      /* ignore */
+                    }
+                  }}
+                  className="p-1 rounded hover:bg-white/10 text-muted-foreground hover:text-foreground transition"
+                  title="Kopieer chassisnummer"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            )}
           </Row>
         </div>
       </div>
