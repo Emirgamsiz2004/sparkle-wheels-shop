@@ -45,7 +45,7 @@ export interface WizardState {
   // Stap 5
   pdfGenereerd: boolean;
   contractGetekend: boolean;
-  restBetaalwijze: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "";
+  restBetaalwijze: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling" | "";
   betaalwijzeDetails: Array<{ methode: string; bedrag: number }>;
   restbedrag: number;
 
