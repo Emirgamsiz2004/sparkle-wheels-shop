@@ -18,7 +18,11 @@ export interface SoldVehicleRow {
   btw_marge_type?: string | null;
   koper_naam?: string | null;
   inruil_waarde?: number | null;
+  isConsignatie?: boolean;
+  consignatie_perc?: number;
+  bruto_verkoopprijs?: number;
 }
+
 
 interface Props {
   vehicles: SoldVehicleRow[];
