@@ -3193,7 +3193,8 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
 
   const garantieKosten = p.garantie.type === "autotrust" ? (p.garantie.prijs || 0) : 0;
   const totaal = p.verkoopprijs + (p.afleverkosten || 0) + (p.leges || 0) + garantieKosten;
-  const restbedrag = totaal - (p.aanbetalingBedrag || 0);
+  const inruilWaarde = p.inruil?.waarde || 0;
+  const restbedrag = totaal - (p.aanbetalingBedrag || 0) - inruilWaarde;
 
   const klantNaam = p.klant.zakelijk && p.klant.bedrijfsnaam
     ? p.klant.bedrijfsnaam
