@@ -176,6 +176,13 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
         visible: true,
       },
       {
+        num: 12,
+        title: "AutoTrust aanvraag",
+        detail: p.completed[12] ? "Aangevraagd" : "Nog aanvragen",
+        done: !!p.completed[12],
+        visible: p.garantieType === "autotrust",
+      },
+      {
         num: 9,
         title: "Inruil op naam",
         detail: p.inruil ? "Inruil overgenomen" : "—",
