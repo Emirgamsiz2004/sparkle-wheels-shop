@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
 import { useAppointments, typeColors, typeLabels } from "@/hooks/useAppointments";
 import { Loader2, Search, ChevronRight, CheckCircle2, Clock, XCircle, Car, StopCircle, Plus, Play, CalendarDays } from "lucide-react";
-import { format, isSameDay, isFuture } from "date-fns";
+import { format, isSameDay, isFuture, intervalToDuration } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import ProefritDetailDialog from "@/components/admin/proefrit/ProefritDetailDialog";
