@@ -40,6 +40,13 @@ export interface KoopovereenkomstData {
     aanbetalingBetaalwijze?: string;
     restbedrag?: number;
   };
+  inruil?: {
+    kenteken: string;
+    merk: string;
+    model: string;
+    km?: number;
+    waarde: number;
+  } | null;
   garantie: {
     type: string;
     maanden?: number;
