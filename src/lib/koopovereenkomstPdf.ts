@@ -94,6 +94,13 @@ function buildHtml(data: KoopovereenkomstData): string {
     data.financieel.restbedrag != null
       ? data.financieel.restbedrag
       : totaal - aanbetaling - inruilWaarde;
+
+  let garantieTekst = "";
+  if (data.garantie.type === "geen") {
+    garantieTekst =
+      "Het voertuig wordt verkocht zonder garantie, in de staat zoals bezichtigd en geaccepteerd door koper.";
+  } else if (data.garantie.type === "autotrust") {
+    garantieTekst = `Op het voertuig is een AutoTrust garantie van toepassing voor een periode van ${
       data.garantie.maanden || 12
     } maanden na aflevering. De voorwaarden zijn vastgelegd in een separaat AutoTrust garantiecertificaat.`;
   } else {
