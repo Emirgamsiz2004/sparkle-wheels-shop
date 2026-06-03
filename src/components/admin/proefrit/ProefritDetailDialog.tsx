@@ -51,6 +51,7 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
   const [deleting, setDeleting] = useState(false);
   const [rijbewijsFotoUrl, setRijbewijsFotoUrl] = useState<string | null>(null);
   const [fotoFullscreen, setFotoFullscreen] = useState(false);
+  const [elapsed, setElapsed] = useState<string>("");
 
   useEffect(() => {
     if (!open) return;
