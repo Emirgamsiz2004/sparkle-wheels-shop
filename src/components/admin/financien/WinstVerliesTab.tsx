@@ -548,7 +548,7 @@ const WinstVerliesTab = () => {
         <Metric label="Omzet" value={formatEuroDecimal(omzet.incl)} />
         <Metric label="Kosten" value={formatEuroDecimal(operationeleKosten + cogs.totaal)} />
         <Metric label="Nettowinst" value={formatEuroDecimal(nettoResultaat)} tone={nettoResultaat >= 0 ? "pos" : "neg"} />
-        <Metric label="Vermogensgroei" value={formatEuroDecimal(vermogensGroei)} tone={vermogensGroei >= 0 ? "pos" : "neg"} subtle={`incl. voorraad ${voorraadGroei >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadGroei))}`} />
+        <Metric label="Vermogensgroei" value={formatEuroDecimal(vermogensGroei)} tone={vermogensGroei >= 0 ? "pos" : "neg"} subtle={`voorraad ${voorraadMutatie >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadMutatie))}`} />
       </div>
 
       {/* Verkochte voertuigen — de Excel-sheet */}
