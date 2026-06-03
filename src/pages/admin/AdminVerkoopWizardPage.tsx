@@ -648,7 +648,7 @@ const AdminVerkoopWizardPage = () => {
       garantieType, garantiePakket, garantieLooptijd, garantiePrijs,
       pdfGenereerd, contractGetekend, restBetaalwijze, betaalwijzeDetails, restbedrag: restbedragGlobal,
       inrVerkVoornaam, inrVerkAchternaam, inrVerkAdres, inrBetaalwijze, inkoopverklaringId,
-      factuurMbId, factuurVerstuurd,
+      factuurMbId, factuurVerstuurd, autotrustAangevraagd,
     });
     if (errors.length > 0) {
       setShowErrorsForStap((s) => new Set(s).add(activeStap));
@@ -862,6 +862,7 @@ const AdminVerkoopWizardPage = () => {
       inkoopverklaringId,
       factuurMbId,
       factuurVerstuurd,
+      autotrustAangevraagd,
     }),
     [
       verkoopprijs, voertuigType, kmStand, inruil, inruilKenteken, inruilMerk, inruilModel,
@@ -872,7 +873,7 @@ const AdminVerkoopWizardPage = () => {
       garantieType, garantiePakket, garantieLooptijd, garantiePrijs,
       pdfGenereerd, contractGetekend, restBetaalwijze, betaalwijzeDetails, restbedragGlobal,
       inrVerkVoornaam, inrVerkAchternaam, inrVerkAdres, inrBetaalwijze, inkoopverklaringId,
-      factuurMbId, factuurVerstuurd,
+      factuurMbId, factuurVerstuurd, autotrustAangevraagd,
     ],
   );
 
