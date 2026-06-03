@@ -647,41 +647,5 @@ const Details = ({ summary, children }: { summary: string; children: React.React
   </details>
 );
 
-const bronLabel = (b: string) => {
-  switch (b) {
-    case "bonnetje": return "MB bonnetje";
-    case "inkoopfactuur": return "MB inkoopfactuur";
-    case "platin_alg": return "Platin algemeen";
-    case "platin_voertuig": return "Platin voertuig";
-    default: return b;
-  }
-};
-
-const Stat = ({ label, value, highlight, color, small }: {
-  label: string; value: string; highlight?: boolean; color?: "emerald" | "amber" | "red"; small?: boolean;
-}) => (
-  <div>
-    <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{label}</div>
-    <div className={cn(
-      "font-bold tabular-nums",
-      small ? "text-lg" : highlight ? "text-3xl" : "text-2xl",
-      color === "emerald" && "text-emerald-500",
-      color === "amber" && "text-amber-500",
-      color === "red" && "text-red-500",
-      !color && "text-foreground",
-    )}>{value}</div>
-  </div>
-);
-
-const SourceStat = ({ icon, label, value, count }: { icon: React.ReactNode; label: string; value: string; count: number }) => (
-  <div>
-    <div className="flex items-center gap-1.5 text-xs text-muted-foreground uppercase tracking-wider mb-1">
-      {icon}
-      {label}
-    </div>
-    <div className="text-lg font-bold text-foreground tabular-nums">{value}</div>
-    <div className="text-xs text-muted-foreground mt-0.5">{count} {count === 1 ? "post" : "posten"}</div>
-  </div>
-);
 
 export default WinstVerliesTab;
