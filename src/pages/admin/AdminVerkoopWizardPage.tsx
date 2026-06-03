@@ -1462,6 +1462,7 @@ const AdminVerkoopWizardPage = () => {
                 voertuigMerk={vehicle?.merk || ""}
                 voertuigModel={vehicle?.model || ""}
                 voertuigBouwjaar={vehicle?.bouwjaar || null}
+                voertuigChassisnummer={vehicle?.chassisNummer || ""}
                 initialMachtigingsnummer={machtigingsnummer}
                 initialMachtigingDatum={machtigingDatum}
                 initialMachtigingOntvangen={machtigingOntvangen}
