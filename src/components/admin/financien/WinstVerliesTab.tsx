@@ -164,6 +164,10 @@ const WinstVerliesTab = () => {
     id: string; merk: string; model: string; kenteken: string;
     verkoop_datum: string; inkoopprijs: number; verkoopprijs: number;
     kostenTotaal: number;
+    bouwjaar?: number | null; kilometerstand?: number | null;
+    brandstof?: string | null; verkoop_type?: string | null;
+    btw_marge_type?: string | null; koper_naam?: string | null;
+    inruil_waarde?: number | null;
   }>>([]);
   const [voorraad, setVoorraad] = useState<{ aantal: number; inkoop: number; kosten: number }>({ aantal: 0, inkoop: 0, kosten: 0 });
   const [error, setError] = useState<string | null>(null);
