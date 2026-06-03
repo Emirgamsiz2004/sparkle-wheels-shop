@@ -593,7 +593,12 @@ const WinstVerliesTab = () => {
 
       {/* Verkochte voertuigen — de Excel-sheet */}
       <Section title="Verkochte voertuigen" hint={`${soldVehicles.length} deze maand`}>
-        <VerkopenSheet vehicles={soldVehicles} monthLabel={`${MONTHS[month]} ${year}`} />
+        <VerkopenSheet
+          vehicles={soldVehicles}
+          monthLabel={`${MONTHS[month]} ${year}`}
+          defaultDate={`${year}-${pad(month + 1)}-15`}
+          onChanged={loadSoldVehicles}
+        />
       </Section>
 
       {/* Operationele kosten — compacte lijst */}
