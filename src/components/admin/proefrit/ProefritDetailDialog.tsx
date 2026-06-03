@@ -69,6 +69,28 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
     }
   }, [open, td.id, td.customer?.rijbewijs_foto_path]);
 
+  // Live elapsed timer for active test drives
+  useEffect(() => {
+    if (td.status !== "actief") {
+      setElapsed("");
+      return;
+    }
+    const updateElapsed = () => {
+      const startStr = (td as any).vertrek_tijd || td.formulier_ingevuld_op || td.start_tijd;
+      if (!startStr) return;
+      const dur = intervalToDuration({ start: new Date(startStr), end: new Date() });
+      const parts: string[] = [];
+      if (dur.hours) parts.push(`${dur.hours}u`);
+      if (dur.minutes != null) parts.push(`${dur.minutes}m`);
+      if (dur.seconds != null) parts.push(`${String(dur.seconds).padStart(2, "0")}s`);
+      if (!parts.length) parts.push("0s");
+      setElapsed(parts.join(" "));
+    };
+    updateElapsed();
+    const id = setInterval(updateElapsed, 1000);
+    return () => clearInterval(id);
+  }, [td.status, (td as any).vertrek_tijd, td.formulier_ingevuld_op, td.start_tijd]);
+
   const handleDownloadPdf = async () => {
     setDownloading(true);
     try {
