@@ -125,6 +125,32 @@ const Stap10Vrijwaring = ({
           <Row label="Bouwjaar">
             <span className="text-foreground">{voertuigBouwjaar || "—"}</span>
           </Row>
+          <Row label="Chassisnummer (VIN)">
+            {voertuigChassisnummer ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="font-mono text-foreground tracking-wide">
+                  {voertuigChassisnummer}
+                </span>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(voertuigChassisnummer);
+                      toast({ title: "Chassisnummer gekopieerd" });
+                    } catch {
+                      /* ignore */
+                    }
+                  }}
+                  className="p-1 rounded hover:bg-white/10 text-muted-foreground hover:text-foreground transition"
+                  title="Kopieer chassisnummer"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            )}
+          </Row>
         </div>
       </div>
 
