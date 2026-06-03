@@ -251,9 +251,10 @@ const WinstVerliesTab = () => {
     const dateTo = `${year}-${pad(month + 1)}-${pad(lastDay)}`;
     const { data, error: vErr } = await supabase
       .from("vehicles" as any)
-      .select("id, merk, model, kenteken, verkoop_datum, inkoopprijs, verkoopprijs")
+      .select("id, merk, model, kenteken, verkoop_datum, inkoopprijs, verkoopprijs, bouwjaar, kilometerstand, brandstof, verkoop_type, btw_marge_type, koper_naam, inruil_waarde")
       .gte("verkoop_datum", dateFrom)
-      .lte("verkoop_datum", dateTo);
+      .lte("verkoop_datum", dateTo)
+      .order("verkoop_datum", { ascending: true });
     if (vErr) console.error("loadSoldVehicles vehicles err", vErr);
     const vehicles = (data || []) as any[];
     const ids = vehicles.map(v => v.id);
@@ -277,6 +278,13 @@ const WinstVerliesTab = () => {
       inkoopprijs: Number(v.inkoopprijs) || 0,
       verkoopprijs: Number(v.verkoopprijs) || 0,
       kostenTotaal: costsByVehicle[v.id] || 0,
+      bouwjaar: v.bouwjaar,
+      kilometerstand: v.kilometerstand,
+      brandstof: v.brandstof,
+      verkoop_type: v.verkoop_type,
+      btw_marge_type: v.btw_marge_type,
+      koper_naam: v.koper_naam,
+      inruil_waarde: Number(v.inruil_waarde) || 0,
     }));
     setSoldVehicles(mapped);
   };
