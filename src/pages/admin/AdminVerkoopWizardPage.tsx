@@ -1198,6 +1198,8 @@ const AdminVerkoopWizardPage = () => {
                 leges={leges === "" ? 0 : Number(leges)}
                 aanbetalingBedrag={aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag)}
                 aanbetalingBetaalwijze={aanbetalingBetaalwijze}
+                setAanbetalingBedrag={setAanbetalingBedrag}
+                setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
                 leverdatum={leverdatum}
                 klant={{
                   voornaam: klantVoornaam,
