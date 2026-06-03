@@ -221,6 +221,21 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
 
   const [regels, setRegels] = useState<Regel[]>(buildInitialRegels);
 
+  useEffect(() => {
+    const fresh = buildInitialRegels().filter((r) => ["voertuig", "garantie", "inruil", "aanbetaling"].includes(r.kind));
+    setRegels((prev) => {
+      const extras = prev.filter((r) => r.kind === "extra");
+      const same =
+        prev.length === fresh.length + extras.length &&
+        fresh.every((r) => {
+          const old = prev.find((p) => p.id === r.id);
+          return old && old.description === r.description && old.price === r.price && old.btwPercent === r.btwPercent;
+        });
+      return same ? prev : [...fresh, ...extras];
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.verkoopprijs, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow]);
+
   // Voertuig-BTW% volgt workflow live
   useEffect(() => {
     setRegels((prev) =>

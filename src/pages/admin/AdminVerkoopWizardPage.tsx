@@ -42,6 +42,7 @@ type StepKey =
   | "inruil_doc"
   | "factuur"
   | "betaling"
+  | "autotrust_aanvraag"
   | "inruil_naam"
   | "tenaamstelling"
   | "afsluiting";
@@ -63,6 +64,7 @@ const STEPS: StepDef[] = [
   { num: 6, key: "inruil_doc", title: "Inruil document", description: "Inruil overeenkomst (alleen bij inruil)", optional: true },
   { num: 7, key: "factuur", title: "Factuur", description: "Factuur opmaken en versturen" },
   { num: 8, key: "betaling", title: "Betaling", description: "Bevestig betaling van de koper" },
+  { num: 12, key: "autotrust_aanvraag", title: "AutoTrust aanvraag", description: "Vraag de garantie aan na betaling", optional: true },
   { num: 9, key: "inruil_naam", title: "Inruil op naam", description: "Inruil overzetten op eigen naam (alleen bij inruil)", optional: true },
   { num: 10, key: "tenaamstelling", title: "Tenaamstelling", description: "Machtiging aanvragen en voertuig overschrijven via VWE" },
   { num: 11, key: "afsluiting", title: "Afsluiting", description: "Uitlevering en verkoop afronden" },
@@ -73,18 +75,44 @@ const STEPS: StepDef[] = [
 // ─────────────────────────────────────────────────────────────
 const isStepDone = (stap: number, completed: Record<number, boolean>) => completed[stap] === true;
 
-const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean): boolean => {
+const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean, autotrust: boolean): boolean => {
   // Stap 6 (inruil document) en 9 (inruil op naam) volledig verbergen zonder inruil
   if ((stap === 6 || stap === 9) && !inruil) return true;
-  // Stappen 6-11 vereisen 5
-  if (stap >= 6 && stap <= 11 && !completed[5]) return true;
-  // Stappen 9-11 vereisen 8 (betaling bevestigd)
-  if (stap >= 9 && stap <= 11 && !completed[8]) return true;
+  // Stap 12 is alleen voor AutoTrust garantie
+  if (stap === 12 && !autotrust) return true;
+  // Stappen na de koopovereenkomst vereisen stap 5
+  if ((stap >= 6 || stap === 12) && !completed[5]) return true;
+  // Betaling moet bevestigd zijn vóór AutoTrust, inruil op naam, tenaamstelling en afsluiting
+  if ((stap === 12 || (stap >= 9 && stap <= 11)) && !completed[8]) return true;
+  // Bij AutoTrust eerst garantie aanvragen vóór tenaamstelling/afsluiting
+  if (autotrust && stap >= 9 && stap <= 11 && !completed[12]) return true;
   // Stap 10+ vereist 9 (inruil op naam) — alleen relevant bij inruil
   if (stap >= 10 && stap <= 11 && inruil && !completed[9]) return true;
   // Stap 11 (afsluiting) vereist 10 (tenaamstelling)
   if (stap === 11 && !completed[10]) return true;
   return false;
+};
+
+const getVisibleSteps = (inruil: boolean, autotrust: boolean) =>
+  STEPS.filter((s) => (inruil || (s.num !== 6 && s.num !== 9)) && (autotrust || s.num !== 12));
+
+const getNextAvailableStep = (current: number, completed: Record<number, boolean>, inruil: boolean, autotrust: boolean) => {
+  const visible = getVisibleSteps(inruil, autotrust);
+  const idx = visible.findIndex((s) => s.num === current);
+  for (const step of visible.slice(idx + 1)) {
+    if (!isStepBlocked(step.num, completed, inruil, autotrust)) return step.num;
+  }
+  return null;
+};
+
+const getPrevAvailableStep = (current: number, completed: Record<number, boolean>, inruil: boolean, autotrust: boolean) => {
+  const visible = getVisibleSteps(inruil, autotrust);
+  const idx = visible.findIndex((s) => s.num === current);
+  for (let i = idx - 1; i >= 0; i -= 1) {
+    const step = visible[i];
+    if (!isStepBlocked(step.num, completed, inruil, autotrust)) return step.num;
+  }
+  return null;
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -165,6 +193,7 @@ const AdminVerkoopWizardPage = () => {
   const [garantiePakket, setGarantiePakket] = useState("");
   const [garantieLooptijd, setGarantieLooptijd] = useState<number | "">("");
   const [garantiePrijs, setGarantiePrijs] = useState<number | "">("");
+  const [autotrustAangevraagd, setAutotrustAangevraagd] = useState(false);
 
   // Stap 5 state
   const [overeenkomstnummer, setOvereenkomstnummer] = useState<string>("");
@@ -209,6 +238,7 @@ const AdminVerkoopWizardPage = () => {
   const [restbedragLater, setRestbedragLater] = useState<boolean>(false);
   const [restbedragVerwachteDatum, setRestbedragVerwachteDatum] = useState<string | null>(null);
   const [openstaandRestbedrag, setOpenstaandRestbedrag] = useState<number | null>(null);
+  const lastAanbetalingRef = useRef<number>(0);
 
   // Aanbetaling op afstand (Moneybird)
   const [aanbetalingExtern, setAanbetalingExtern] = useState<{ id: string; bedrag: number; status: string; geannuleerd: boolean } | null>(null);
@@ -218,19 +248,22 @@ const AdminVerkoopWizardPage = () => {
     const fetchAanbet = async () => {
       const { data } = await supabase
         .from("aanbetalingen")
-        .select("id, aanbetalingsbedrag, status")
+        .select("id, aanbetalingsbedrag, status, bron")
         .eq("vehicle_id", vehicleId)
-        .eq("bron", "moneybird")
         .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .limit(5);
       if (cancelled) return;
-      if (data && (data.status === "open" || data.status === "betaald")) {
-        setAanbetalingExtern({ id: data.id, bedrag: Number(data.aanbetalingsbedrag), status: data.status, geannuleerd: false });
-        setAanbetalingBedrag(Number(data.aanbetalingsbedrag));
+      const rows = Array.isArray(data) ? data : [];
+      const active = rows.find((r: any) => r && (r.status === "open" || r.status === "betaald"));
+      const cancelledRow = rows.find((r: any) => r && r.status === "geannuleerd");
+      if (active) {
+        const bedrag = Number(active.aanbetalingsbedrag) || 0;
+        lastAanbetalingRef.current = bedrag;
+        setAanbetalingExtern({ id: active.id, bedrag, status: active.status, geannuleerd: false });
+        setAanbetalingBedrag(bedrag);
         setAanbetalingBetaalwijze("ideal");
-      } else if (data && data.status === "geannuleerd") {
-        setAanbetalingExtern({ id: data.id, bedrag: Number(data.aanbetalingsbedrag), status: "geannuleerd", geannuleerd: true });
+      } else if (cancelledRow) {
+        setAanbetalingExtern({ id: cancelledRow.id, bedrag: Number(cancelledRow.aanbetalingsbedrag), status: "geannuleerd", geannuleerd: true });
       }
     };
     fetchAanbet();
@@ -365,7 +398,13 @@ const AdminVerkoopWizardPage = () => {
         }
         setAfleveradres((existing as any).afleveradres || "");
         setLeverdatum(existing.leverdatum || "");
-        setAanbetalingBedrag(existing.aanbetaling_bedrag ?? "");
+        const existingAanbetaling = Number(existing.aanbetaling_bedrag || 0);
+        if (existingAanbetaling > 0) {
+          lastAanbetalingRef.current = existingAanbetaling;
+          setAanbetalingBedrag(existingAanbetaling);
+        } else if (lastAanbetalingRef.current <= 0) {
+          setAanbetalingBedrag("");
+        }
         if (["cash", "pin", "ideal", "overboeking"].includes(existing.aanbetaling_betaalwijze)) {
           setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze as Betaalwijze);
         }
@@ -406,6 +445,7 @@ const AdminVerkoopWizardPage = () => {
         setGarantiePakket(existing.garantie_pakket || "");
         setGarantieLooptijd(existing.garantie_looptijd ?? "");
         setGarantiePrijs(existing.garantie_prijs ?? "");
+        setAutotrustAangevraagd(!!(existing as any).stap12_afgerond);
         // Stap 5 hydration
         setOvereenkomstnummer((existing as any).overeenkomstnummer || "");
         setOpmerkingen((existing as any).opmerkingen || "");
@@ -518,10 +558,22 @@ const AdminVerkoopWizardPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vehicleId, vehicle?.id]);
 
+  useEffect(() => {
+    if (aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0) {
+      lastAanbetalingRef.current = Number(aanbetalingBedrag);
+    }
+  }, [aanbetalingBedrag]);
+
   // ─── Opslaan ───
   const saveCurrent = useCallback(async (extra: Record<string, any> = {}) => {
     if (!verkoopId) return;
     setSaving(true);
+    const aanbetalingTeBewaren =
+      aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0
+        ? Number(aanbetalingBedrag)
+        : lastAanbetalingRef.current > 0
+          ? lastAanbetalingRef.current
+          : 0;
     const payload: any = {
       wizard_stap: activeStap,
       verkoopprijs: verkoopprijs === "" ? 0 : Number(verkoopprijs),
@@ -541,9 +593,9 @@ const AdminVerkoopWizardPage = () => {
       afleverwijze,
       afleveradres: afleverwijze === "aflevering" ? (afleveradres || null) : null,
       leverdatum: laterOphalen ? (leverdatum || null) : new Date().toISOString().slice(0, 10),
-      aanbetaling_bedrag: aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 ? Number(aanbetalingBedrag) : null,
-      aanbetaling_betaalwijze: aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
-      aanbetaling_bankrekening: aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
+      aanbetaling_bedrag: aanbetalingTeBewaren > 0 ? aanbetalingTeBewaren : null,
+      aanbetaling_betaalwijze: aanbetalingTeBewaren > 0 && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
+      aanbetaling_bankrekening: aanbetalingTeBewaren > 0 && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
       customer_id: customerId,
       klant_type: klantZakelijk ? "zakelijk" : "particulier",
       lead_source: leadSource || null,
@@ -596,7 +648,7 @@ const AdminVerkoopWizardPage = () => {
       garantieType, garantiePakket, garantieLooptijd, garantiePrijs,
       pdfGenereerd, contractGetekend, restBetaalwijze, betaalwijzeDetails, restbedrag: restbedragGlobal,
       inrVerkVoornaam, inrVerkAchternaam, inrVerkAdres, inrBetaalwijze, inkoopverklaringId,
-      factuurMbId, factuurVerstuurd,
+      factuurMbId, factuurVerstuurd, autotrustAangevraagd,
     });
     if (errors.length > 0) {
       setShowErrorsForStap((s) => new Set(s).add(activeStap));
@@ -699,10 +751,9 @@ const AdminVerkoopWizardPage = () => {
       if (!ok) return;
       setShowErrorsForStap((s) => { const n = new Set(s); n.delete(activeStap); return n; });
       setCompleted((p) => ({ ...p, [activeStap]: true }));
-      let next = activeStap + 1;
       const nextCompleted = { ...completed, [activeStap]: true };
-      while (next <= 11 && isStepBlocked(next, nextCompleted, inruil)) next++;
-      if (next <= 11) setActiveStap(next);
+      const next = getNextAvailableStep(activeStap, nextCompleted, inruil, garantieType === "autotrust");
+      if (next) setActiveStap(next);
       return;
     }
 
@@ -711,24 +762,23 @@ const AdminVerkoopWizardPage = () => {
     setShowErrorsForStap((s) => { const n = new Set(s); n.delete(activeStap); return n; });
     setCompleted((p) => ({ ...p, [activeStap]: true }));
     // Volgende non-blocked stap zoeken
-    let next = activeStap + 1;
     const nextCompleted = { ...completed, [activeStap]: true };
-    while (next <= 11 && isStepBlocked(next, nextCompleted, inruil)) next++;
-    if (next <= 11) setActiveStap(next);
+    const next = getNextAvailableStep(activeStap, nextCompleted, inruil, garantieType === "autotrust");
+    if (next) setActiveStap(next);
     toast.success("Stap opgeslagen");
   };
 
   const handleVorige = () => {
-    let prev = activeStap - 1;
-    while (prev >= 1 && isStepBlocked(prev, completed, inruil)) prev--;
-    if (prev >= 1) setActiveStap(prev);
+    const prev = getPrevAvailableStep(activeStap, completed, inruil, garantieType === "autotrust");
+    if (prev) setActiveStap(prev);
   };
 
   const handleStepClick = (stap: number) => {
-    if (isStepBlocked(stap, completed, inruil)) {
+    if (isStepBlocked(stap, completed, inruil, garantieType === "autotrust")) {
       if (completed[5]) {
         const missing: string[] = [];
         if (!completed[8]) missing.push("stap 8 (betaling bevestigen)");
+        if (garantieType === "autotrust" && stap >= 9 && stap <= 11 && !completed[12]) missing.push("AutoTrust aanvraag afronden");
         if (stap >= 10 && inruil && !completed[9]) missing.push("stap 9 (inruil op naam zetten)");
         if (stap === 11 && !completed[10]) missing.push("stap 10 (tenaamstelling)");
         if (missing.length > 0) {
@@ -745,13 +795,13 @@ const AdminVerkoopWizardPage = () => {
     navigate(`/admin/voertuigen/${vehicleId}`);
   };
 
-  const totalSteps = STEPS.filter((s) => !s.optional || (s.optional && inruil)).length;
-  const doneCount = Object.values(completed).filter(Boolean).length;
-  const progressPct = Math.round((doneCount / totalSteps) * 100);
-
   const currentStep = STEPS.find((s) => s.num === activeStap)!;
-  const visibleSteps = STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9));
+  const visibleSteps = getVisibleSteps(inruil, garantieType === "autotrust");
+  const totalSteps = visibleSteps.length;
+  const doneCount = visibleSteps.filter((s) => completed[s.num]).length;
+  const progressPct = Math.round((doneCount / totalSteps) * 100);
   const currentDisplayNum = visibleSteps.findIndex((s) => s.num === activeStap) + 1;
+  const isLastVisibleStep = currentDisplayNum === visibleSteps.length;
 
   // ───────────────────────────────────────────────────────────
   // Centrale validatie
@@ -760,7 +810,7 @@ const AdminVerkoopWizardPage = () => {
   const afleverkostenNum = afleverkosten === "" ? 0 : Number(afleverkosten);
   const legesNum = leges === "" ? 0 : Number(leges);
   const garantiePrijsNum = garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0;
-  const aanbetalingNum = aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag);
+  const aanbetalingNum = aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 ? Number(aanbetalingBedrag) : lastAanbetalingRef.current;
   const inruilWaardeNum = inruil && inruilWaarde !== "" ? Number(inruilWaarde) : 0;
   const restbedragGlobal = Math.max(
     0,
@@ -812,6 +862,7 @@ const AdminVerkoopWizardPage = () => {
       inkoopverklaringId,
       factuurMbId,
       factuurVerstuurd,
+      autotrustAangevraagd,
     }),
     [
       verkoopprijs, voertuigType, kmStand, inruil, inruilKenteken, inruilMerk, inruilModel,
@@ -822,7 +873,7 @@ const AdminVerkoopWizardPage = () => {
       garantieType, garantiePakket, garantieLooptijd, garantiePrijs,
       pdfGenereerd, contractGetekend, restBetaalwijze, betaalwijzeDetails, restbedragGlobal,
       inrVerkVoornaam, inrVerkAchternaam, inrVerkAdres, inrBetaalwijze, inkoopverklaringId,
-      factuurMbId, factuurVerstuurd,
+      factuurMbId, factuurVerstuurd, autotrustAangevraagd,
     ],
   );
 
@@ -859,9 +910,9 @@ const AdminVerkoopWizardPage = () => {
           </div>
 
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            {STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9)).map((step, visibleIdx) => {
+            {visibleSteps.map((step, visibleIdx) => {
               const displayNum = visibleIdx + 1;
-              const blocked = isStepBlocked(step.num, completed, inruil);
+              const blocked = isStepBlocked(step.num, completed, inruil, garantieType === "autotrust");
               const doneRaw = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               const isTouched = touchedSteps.has(step.num) || doneRaw;
@@ -870,10 +921,10 @@ const AdminVerkoopWizardPage = () => {
               // Slot tonen bij prerequisite-blokkade (betaling/inruil-op-naam/tenaamstelling)
               const lockedByPrereq =
                 blocked &&
-                step.num >= 9 &&
-                step.num <= 11 &&
+                (step.num === 12 || (step.num >= 9 && step.num <= 11)) &&
                 !!completed[5] &&
                 ((!completed[8]) ||
+                  (garantieType === "autotrust" && step.num >= 9 && step.num <= 11 && !completed[12]) ||
                   (step.num >= 10 && inruil && !completed[9]) ||
                   (step.num === 11 && !completed[10]));
 
@@ -964,7 +1015,7 @@ const AdminVerkoopWizardPage = () => {
           <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 -mx-px scrollbar-hide" style={{ scrollbarWidth: "none" }}>
             {visibleSteps.map((step, idx) => {
               const displayNum = idx + 1;
-              const blocked = isStepBlocked(step.num, completed, inruil);
+              const blocked = isStepBlocked(step.num, completed, inruil, garantieType === "autotrust");
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               return (
@@ -1147,8 +1198,10 @@ const AdminVerkoopWizardPage = () => {
                 verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
                 afleverkosten={afleverkosten === "" ? 0 : Number(afleverkosten)}
                 leges={leges === "" ? 0 : Number(leges)}
-                aanbetalingBedrag={aanbetalingBedrag === "" ? 0 : Number(aanbetalingBedrag)}
+                aanbetalingBedrag={aanbetalingNum}
                 aanbetalingBetaalwijze={aanbetalingBetaalwijze}
+                setAanbetalingBedrag={setAanbetalingBedrag}
+                setAanbetalingBetaalwijze={setAanbetalingBetaalwijze}
                 leverdatum={leverdatum}
                 klant={{
                   voornaam: klantVoornaam,
@@ -1361,6 +1414,26 @@ const AdminVerkoopWizardPage = () => {
               />
             )}
 
+            {activeStap === 12 && (
+              <Stap12AutotrustAanvraag
+                voertuig={`${vehicle?.merk || ""} ${vehicle?.model || ""}`.trim()}
+                kenteken={vehicle?.kenteken || ""}
+                klant={`${klantVoornaam || ""} ${klantAchternaam || ""}`.trim()}
+                pakket={garantiePakket}
+                looptijd={garantieLooptijd === "" ? 0 : Number(garantieLooptijd)}
+                prijs={garantiePrijsNum}
+                aangevraagd={autotrustAangevraagd}
+                setAangevraagd={setAutotrustAangevraagd}
+                onSaved={async (extra) => {
+                  if (extra.stap12_afgerond !== undefined) {
+                    setAutotrustAangevraagd(!!extra.stap12_afgerond);
+                    setCompleted((p) => ({ ...p, 12: !!extra.stap12_afgerond }));
+                  }
+                  await saveCurrent(extra);
+                }}
+              />
+            )}
+
             {activeStap === 9 && (
               <Stap9InruilOpNaam
                 inruil={inruil}
@@ -1472,7 +1545,7 @@ const AdminVerkoopWizardPage = () => {
         <div className="hidden lg:block text-[11px] text-muted-foreground flex-1 text-center">
           {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
         </div>
-        {activeStap < 11 ? (
+        {!isLastVisibleStep ? (
           <button
             onClick={handleVolgende}
             disabled={saving}
@@ -3142,6 +3215,67 @@ const Stap4Garantie = ({
   );
 };
 
+interface Stap12AutotrustAanvraagProps {
+  voertuig: string;
+  kenteken: string;
+  klant: string;
+  pakket: string;
+  looptijd: number;
+  prijs: number;
+  aangevraagd: boolean;
+  setAangevraagd: (v: boolean) => void;
+  onSaved: (extra: Record<string, any>) => Promise<void>;
+}
+
+const Stap12AutotrustAanvraag = (p: Stap12AutotrustAanvraagProps) => {
+  const fmtEur = (n: number) =>
+    new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(n || 0);
+
+  const handleToggle = async (checked: boolean) => {
+    p.setAangevraagd(checked);
+    await p.onSaved({ stap12_afgerond: checked });
+    toast.success(checked ? "AutoTrust aanvraag bevestigd" : "AutoTrust aanvraag opengezet");
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
+        <div className="flex items-start gap-4">
+          <div className="h-10 w-10 rounded-[10px] bg-foreground/10 flex items-center justify-center shrink-0">
+            <ShieldCheck className="h-5 w-5 text-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold text-foreground">AutoTrust garantie aanvragen</div>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              Vraag de garantie pas aan nadat de betaling is bevestigd. Daarna kun je verder met tenaamstelling en aflevering.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-3 rounded-[10px] border border-border bg-background/40 p-4 text-sm">
+          <InfoRow label="Voertuig" value={[p.kenteken, p.voertuig].filter(Boolean).join(" — ") || "—"} mono={!!p.kenteken} />
+          <InfoRow label="Klant" value={p.klant || "—"} />
+          <InfoRow label="Pakket" value={p.pakket || "AutoTrust"} />
+          <InfoRow label="Looptijd" value={p.looptijd ? `${p.looptijd} maanden` : "—"} />
+          <InfoRow label="Garantieprijs" value={fmtEur(p.prijs)} />
+          <InfoRow label="Status" value={p.aangevraagd ? "Aangevraagd" : "Nog aanvragen"} />
+        </div>
+
+        <label className={cn(
+          "flex items-start gap-4 rounded-[14px] border p-5 cursor-pointer transition-colors",
+          p.aangevraagd ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-background/30",
+        )}>
+          <Switch checked={p.aangevraagd} onCheckedChange={handleToggle} />
+          <span className="flex-1">
+            <span className="block text-sm font-medium text-foreground">AutoTrust garantie is aangevraagd in het portaal</span>
+            <span className="block text-xs text-muted-foreground mt-1">Deze bevestiging opent de volgende stappen in de verkoopwizard.</span>
+          </span>
+        </label>
+      </div>
+    </div>
+  );
+};
+
 // ─────────────────────────────────────────────────────────────
 // Stap 5 — Koopovereenkomst
 // ─────────────────────────────────────────────────────────────
@@ -3154,6 +3288,8 @@ interface Stap5Props {
   leges: number;
   aanbetalingBedrag: number;
   aanbetalingBetaalwijze: Betaalwijze;
+  setAanbetalingBedrag: (v: number | "") => void;
+  setAanbetalingBetaalwijze: (v: Betaalwijze) => void;
   leverdatum: string;
   klant: {
     voornaam: string;
@@ -3203,6 +3339,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
   const totaal = p.verkoopprijs + (p.afleverkosten || 0) + (p.leges || 0) + garantieKosten;
   const inruilWaarde = p.inruil?.waarde || 0;
   const restbedrag = totaal - (p.aanbetalingBedrag || 0) - inruilWaarde;
+  const [showAanbetalingEditor, setShowAanbetalingEditor] = useState((p.aanbetalingBedrag || 0) > 0);
 
   // Auto-clean: "aanbetaling" is geen geldige betaalwijze meer (wordt automatisch van restbedrag afgetrokken)
   useEffect(() => {
@@ -3210,6 +3347,21 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       p.setBetaalwijzeDetails(p.betaalwijzeDetails.filter((d) => (d.methode as string) !== "aanbetaling"));
     }
   }, [p.betaalwijzeDetails]);
+
+  useEffect(() => {
+    if ((p.aanbetalingBedrag || 0) > 0) setShowAanbetalingEditor(true);
+  }, [p.aanbetalingBedrag]);
+
+  useEffect(() => {
+    if (p.betaalwijzeDetails.length === 0) return;
+    const totaalIngevuld = p.betaalwijzeDetails.reduce((s, d) => s + (Number(d.bedrag) || 0), 0);
+    const verschil = +(restbedrag - totaalIngevuld).toFixed(2);
+    if (Math.abs(verschil) < 0.01) return;
+    const next = [...p.betaalwijzeDetails];
+    const idx = next.length - 1;
+    next[idx] = { ...next[idx], bedrag: Math.max(0, +((Number(next[idx].bedrag) || 0) + verschil).toFixed(2)) };
+    p.setBetaalwijzeDetails(next);
+  }, [restbedrag, p.betaalwijzeDetails]);
 
   const klantNaam = p.klant.zakelijk && p.klant.bedrijfsnaam
     ? p.klant.bedrijfsnaam
@@ -3428,11 +3580,56 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
                   <span className="text-[14px] text-foreground">{fmtEur(garantieKosten)}</span>
                 </div>
               )}
+              {inruilWaarde > 0 && (
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Inruil {p.inruil?.kenteken ? `(${p.inruil.kenteken})` : ""}</span>
+                  <span className="text-[14px] text-foreground">- {fmtEur(inruilWaarde)}</span>
+                </div>
+              )}
               {(p.aanbetalingBedrag || 0) > 0 && (
                 <div className="flex justify-between items-baseline">
                   <span className="text-[11px] text-muted-foreground uppercase tracking-wide">Aanbetaling</span>
                   <span className="text-[14px] text-foreground">- {fmtEur(p.aanbetalingBedrag)}</span>
                 </div>
+              )}
+              {showAanbetalingEditor && (
+                <div className="grid grid-cols-[1fr_auto] gap-2 items-end rounded-[10px] border border-border bg-background/40 p-3">
+                  <div>
+                    <label className={labelCls}>Aanbetaling herstellen/toevoegen (€)</label>
+                    <input
+                      autoComplete="off"
+                      type="number"
+                      inputMode="numeric"
+                      value={p.aanbetalingBedrag || ""}
+                      onChange={(e) => p.setAanbetalingBedrag(e.target.value === "" ? "" : Number(e.target.value))}
+                      onBlur={p.onAutoSave}
+                      className={inputCls}
+                      placeholder="0"
+                    />
+                  </div>
+                  <select
+                    autoComplete="off"
+                    value={p.aanbetalingBetaalwijze || ""}
+                    onChange={(e) => p.setAanbetalingBetaalwijze(e.target.value as Betaalwijze)}
+                    onBlur={p.onAutoSave}
+                    className={cn(inputCls, "w-36")}
+                  >
+                    <option value="">Methode</option>
+                    <option value="cash">Cash</option>
+                    <option value="pin">Pin</option>
+                    <option value="ideal">iDEAL</option>
+                    <option value="overboeking">Overboeking</option>
+                  </select>
+                </div>
+              )}
+              {!showAanbetalingEditor && (
+                <button
+                  type="button"
+                  onClick={() => setShowAanbetalingEditor(true)}
+                  className="inline-flex items-center gap-1.5 text-[12px] font-medium text-foreground hover:text-foreground/70 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Aanbetaling toevoegen
+                </button>
               )}
               <div className="border-t border-border pt-2.5 mt-1 flex justify-between items-baseline">
                 <span className="text-[12px] font-semibold text-foreground uppercase tracking-wide">Restbedrag</span>

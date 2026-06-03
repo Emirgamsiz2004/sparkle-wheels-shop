@@ -59,6 +59,9 @@ export interface WizardState {
   // Stap 7
   factuurMbId: string | null;
   factuurVerstuurd: boolean;
+
+  // Stap 12 (alleen AutoTrust)
+  autotrustAangevraagd: boolean;
 }
 
 const isFilled = (s: string | undefined | null) => !!(s && s.trim().length > 0);
@@ -164,6 +167,14 @@ export function validateStap7(s: WizardState): string[] {
   return errors;
 }
 
+export function validateStap12(s: WizardState): string[] {
+  const errors: string[] = [];
+  if (s.garantieType === "autotrust" && !s.autotrustAangevraagd) {
+    errors.push("Bevestig dat de AutoTrust garantie is aangevraagd");
+  }
+  return errors;
+}
+
 export function validateStap(stap: number, s: WizardState): string[] {
   switch (stap) {
     case 1:
@@ -180,6 +191,8 @@ export function validateStap(stap: number, s: WizardState): string[] {
       return validateStap6(s);
     case 7:
       return validateStap7(s);
+    case 12:
+      return validateStap12(s);
     default:
       return [];
   }
