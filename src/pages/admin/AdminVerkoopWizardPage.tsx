@@ -3431,7 +3431,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
             {/* Betaalwijze restbedrag — meerdere methodes mogelijk */}
             {(() => {
               const methodeLabels: Record<string, string> = {
-                cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering",
+                cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering", aanbetaling: "Aanbetaling",
               };
               const totaalIngevuld = p.betaalwijzeDetails.reduce((s, d) => s + (Number(d.bedrag) || 0), 0);
               const verschil = +(restbedrag - totaalIngevuld).toFixed(2);
