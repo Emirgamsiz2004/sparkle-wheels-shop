@@ -171,9 +171,9 @@ const AdminVerkoopWizardPage = () => {
   const [opmerkingen, setOpmerkingen] = useState<string>("");
   const [contractGetekend, setContractGetekend] = useState<boolean>(false);
   const [pdfGenereerd, setPdfGenereerd] = useState<boolean>(false);
-  const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering">("overboeking");
+  const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling">("overboeking");
   const [financieringMaatschappij, setFinancieringMaatschappij] = useState<string>("");
-  const [betaalwijzeDetails, setBetaalwijzeDetails] = useState<Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>>([]);
+  const [betaalwijzeDetails, setBetaalwijzeDetails] = useState<Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>>([]);
 
   // Stap 6 state — Inruil document
   const [stap6DocType, setStap6DocType] = useState<"particulier" | "zakelijk">("particulier");
@@ -3177,12 +3177,12 @@ interface Stap5Props {
   setContractGetekend: (v: boolean) => void;
   pdfGenereerd: boolean;
   setPdfGenereerd: (v: boolean) => void;
-  restBetaalwijze: "cash" | "pin" | "ideal" | "overboeking" | "financiering";
-  setRestBetaalwijze: (v: "cash" | "pin" | "ideal" | "overboeking" | "financiering") => void;
+  restBetaalwijze: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling";
+  setRestBetaalwijze: (v: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling") => void;
   financieringMaatschappij: string;
   setFinancieringMaatschappij: (v: string) => void;
-  betaalwijzeDetails: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>;
-  setBetaalwijzeDetails: (v: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>) => void;
+  betaalwijzeDetails: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>;
+  setBetaalwijzeDetails: (v: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>) => void;
   onAutoSave: () => Promise<any>;
   verkoopId: string | null;
 }
