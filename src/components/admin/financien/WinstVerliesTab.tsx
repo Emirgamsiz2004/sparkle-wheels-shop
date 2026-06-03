@@ -170,6 +170,7 @@ const WinstVerliesTab = () => {
     btw_marge_type?: string | null; koper_naam?: string | null;
     inruil_waarde?: number | null;
     isConsignatie?: boolean; consignatie_perc?: number; bruto_verkoopprijs?: number;
+    isHandmatig?: boolean;
   }>>([]);
 
   const [voorraad, setVoorraad] = useState<{ aantal: number; inkoop: number; kosten: number }>({ aantal: 0, inkoop: 0, kosten: 0 });
