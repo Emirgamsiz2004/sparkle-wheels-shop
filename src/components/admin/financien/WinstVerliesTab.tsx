@@ -497,7 +497,7 @@ const WinstVerliesTab = () => {
   const vermogensGroei = nettoResultaat + voorraadGroei;
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-8 w-full">
       {/* Header — month switcher + refresh, plat */}
       <div className="flex items-center justify-between border-b border-border pb-3">
         <div className="flex items-center gap-1">
