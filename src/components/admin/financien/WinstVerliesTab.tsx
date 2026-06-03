@@ -170,6 +170,7 @@ const WinstVerliesTab = () => {
     btw_marge_type?: string | null; koper_naam?: string | null;
     inruil_waarde?: number | null;
     isConsignatie?: boolean; consignatie_perc?: number; bruto_verkoopprijs?: number;
+    isHandmatig?: boolean;
   }>>([]);
 
   const [voorraad, setVoorraad] = useState<{ aantal: number; inkoop: number; kosten: number }>({ aantal: 0, inkoop: 0, kosten: 0 });
@@ -301,7 +302,41 @@ const WinstVerliesTab = () => {
         bruto_verkoopprijs: rawVerkoop,
       };
     });
-    setSoldVehicles(mapped);
+
+    // Handmatig toegevoegde verkopen ophalen voor dezelfde maand
+    const { data: handmatig, error: hErr } = await supabase
+      .from("handmatige_verkopen" as any)
+      .select("*")
+      .gte("verkoop_datum", dateFrom)
+      .lte("verkoop_datum", dateTo)
+      .order("verkoop_datum", { ascending: true });
+    if (hErr) console.error("loadSoldVehicles handmatig err", hErr);
+    const handmatigMapped = ((handmatig || []) as any[]).map((h: any) => ({
+      id: `hm-${h.id}`,
+      merk: h.merk || "",
+      model: h.model || "",
+      kenteken: h.kenteken || "",
+      verkoop_datum: h.verkoop_datum,
+      inkoopprijs: Number(h.inkoopprijs) || 0,
+      verkoopprijs: Number(h.verkoopprijs) || 0,
+      kostenTotaal: 0,
+      bouwjaar: h.bouwjaar,
+      kilometerstand: h.kilometerstand,
+      brandstof: h.brandstof,
+      verkoop_type: "handmatig",
+      btw_marge_type: null,
+      koper_naam: h.koper_naam,
+      inruil_waarde: 0,
+      isConsignatie: false,
+      consignatie_perc: 0,
+      bruto_verkoopprijs: Number(h.verkoopprijs) || 0,
+      isHandmatig: true,
+    }));
+
+    const combined = [...mapped, ...handmatigMapped].sort((a, b) =>
+      (a.verkoop_datum || "").localeCompare(b.verkoop_datum || "")
+    );
+    setSoldVehicles(combined);
   };
 
 
@@ -558,7 +593,12 @@ const WinstVerliesTab = () => {
 
       {/* Verkochte voertuigen — de Excel-sheet */}
       <Section title="Verkochte voertuigen" hint={`${soldVehicles.length} deze maand`}>
-        <VerkopenSheet vehicles={soldVehicles} monthLabel={`${MONTHS[month]} ${year}`} />
+        <VerkopenSheet
+          vehicles={soldVehicles}
+          monthLabel={`${MONTHS[month]} ${year}`}
+          defaultDate={`${year}-${pad(month + 1)}-15`}
+          onChanged={loadSoldVehicles}
+        />
       </Section>
 
       {/* Operationele kosten — compacte lijst */}
