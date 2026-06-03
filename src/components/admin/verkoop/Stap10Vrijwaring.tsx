@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Info } from "lucide-react";
+import { Copy, Info } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import { formatKenteken } from "@/lib/kenteken";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
   voertuigMerk: string;
   voertuigModel: string;
   voertuigBouwjaar: number | null;
+  voertuigChassisnummer?: string;
   initialMachtigingsnummer: string | null;
   initialMachtigingDatum: string | null; // ISO timestamp
   initialMachtigingOntvangen: boolean;
