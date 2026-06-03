@@ -6,6 +6,7 @@ import { useMoneybird } from "@/hooks/useMoneybird";
 import { formatEuroDecimal } from "@/types/vehicle";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import VerkopenSheet from "./VerkopenSheet";
 
 const MONTHS = [
   "Januari", "Februari", "Maart", "April", "Mei", "Juni",
