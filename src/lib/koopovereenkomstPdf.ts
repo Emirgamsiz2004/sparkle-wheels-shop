@@ -324,6 +324,25 @@ function buildHtml(data: KoopovereenkomstData): string {
     </table>
   </div>
 
+  ${data.inruil ? `
+  <!-- INRUIL -->
+  <div class="section">
+    <h3>Inruilvoertuig</h3>
+    <table class="specs">
+      <tr>
+        <td class="lbl">Merk</td><td class="val">${escapeHtml(data.inruil.merk || "—")}</td>
+        <td class="lbl">Model</td><td class="val">${escapeHtml(data.inruil.model || "—")}</td>
+        <td class="lbl">Kenteken</td><td class="val">${escapeHtml(data.inruil.kenteken || "—")}</td>
+      </tr>
+      <tr>
+        <td class="lbl">KM-stand</td><td class="val">${(data.inruil.km || 0).toLocaleString("nl-NL")}</td>
+        <td class="lbl">Inruilwaarde</td><td class="val">${formatEur(data.inruil.waarde || 0)}</td>
+        <td class="lbl"></td><td class="val"></td>
+      </tr>
+    </table>
+  </div>
+  ` : ""}
+
   <!-- FINANCIEEL -->
   <div class="section">
     <h3>Financieel</h3>
@@ -333,6 +352,7 @@ function buildHtml(data: KoopovereenkomstData): string {
       ${(data.financieel.afleverkosten || 0) > 0 ? `<tr class="sub"><td>Afleverkosten</td><td class="amt">${formatEur(data.financieel.afleverkosten || 0)}</td></tr>` : ""}
       ${(data.financieel.leges || 0) > 0 ? `<tr class="sub"><td>Leges</td><td class="amt">${formatEur(data.financieel.leges || 0)}</td></tr>` : ""}
       <tr class="divider total"><td>Totaalbedrag</td><td class="amt">${formatEur(totaal)}</td></tr>
+      ${inruilWaarde > 0 ? `<tr class="sub"><td>Inruil ${escapeHtml([data.inruil?.merk, data.inruil?.model].filter(Boolean).join(" "))}${data.inruil?.kenteken ? ` (${escapeHtml(data.inruil.kenteken)})` : ""}</td><td class="amt">− ${formatEur(inruilWaarde)}</td></tr>` : ""}
       ${aanbetaling > 0 ? `<tr class="sub"><td>Aanbetaling${data.financieel.aanbetalingBetaalwijze ? ` (${escapeHtml(({cash:"Cash",pin:"Pin",ideal:"iDEAL",overboeking:"Overboeking",bank:"Bank",financiering:"Financiering"} as Record<string,string>)[data.financieel.aanbetalingBetaalwijze] || data.financieel.aanbetalingBetaalwijze)})` : ""} — reeds voldaan</td><td class="amt">− ${formatEur(aanbetaling)}</td></tr>` : ""}
       <tr class="rest"><td>Restbedrag</td><td class="amt">${formatEur(restbedrag)}</td></tr>
       ${(data.financieel.betalingen && data.financieel.betalingen.length > 0)
