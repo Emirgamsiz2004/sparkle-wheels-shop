@@ -171,9 +171,9 @@ const AdminVerkoopWizardPage = () => {
   const [opmerkingen, setOpmerkingen] = useState<string>("");
   const [contractGetekend, setContractGetekend] = useState<boolean>(false);
   const [pdfGenereerd, setPdfGenereerd] = useState<boolean>(false);
-  const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering">("overboeking");
+  const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling">("overboeking");
   const [financieringMaatschappij, setFinancieringMaatschappij] = useState<string>("");
-  const [betaalwijzeDetails, setBetaalwijzeDetails] = useState<Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>>([]);
+  const [betaalwijzeDetails, setBetaalwijzeDetails] = useState<Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>>([]);
 
   // Stap 6 state — Inruil document
   const [stap6DocType, setStap6DocType] = useState<"particulier" | "zakelijk">("particulier");
@@ -3177,12 +3177,12 @@ interface Stap5Props {
   setContractGetekend: (v: boolean) => void;
   pdfGenereerd: boolean;
   setPdfGenereerd: (v: boolean) => void;
-  restBetaalwijze: "cash" | "pin" | "ideal" | "overboeking" | "financiering";
-  setRestBetaalwijze: (v: "cash" | "pin" | "ideal" | "overboeking" | "financiering") => void;
+  restBetaalwijze: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling";
+  setRestBetaalwijze: (v: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling") => void;
   financieringMaatschappij: string;
   setFinancieringMaatschappij: (v: string) => void;
-  betaalwijzeDetails: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>;
-  setBetaalwijzeDetails: (v: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering"; bedrag: number }>) => void;
+  betaalwijzeDetails: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>;
+  setBetaalwijzeDetails: (v: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>) => void;
   onAutoSave: () => Promise<any>;
   verkoopId: string | null;
 }
@@ -3244,7 +3244,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           leges: p.leges,
           betaalwijze: (p.betaalwijzeDetails && p.betaalwijzeDetails.length > 0)
             ? p.betaalwijzeDetails.map(d => {
-                const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering" };
+                const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering", aanbetaling: "Aanbetaling" };
                 return `${labels[d.methode] || d.methode}: ${new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(d.bedrag || 0)}`;
               }).join(" + ") + (p.betaalwijzeDetails.some(d => d.methode === "financiering") && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : "")
             : p.restBetaalwijze + (p.restBetaalwijze === "financiering" && p.financieringMaatschappij ? ` (${p.financieringMaatschappij})` : ""),
@@ -3431,7 +3431,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
             {/* Betaalwijze restbedrag — meerdere methodes mogelijk */}
             {(() => {
               const methodeLabels: Record<string, string> = {
-                cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering",
+                cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering", aanbetaling: "Aanbetaling",
               };
               const totaalIngevuld = p.betaalwijzeDetails.reduce((s, d) => s + (Number(d.bedrag) || 0), 0);
               const verschil = +(restbedrag - totaalIngevuld).toFixed(2);
