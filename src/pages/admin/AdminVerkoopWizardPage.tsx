@@ -3273,6 +3273,15 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         afleverDatum: p.leverdatum,
         opmerkingen: p.opmerkingen,
         verkoperHandtekeningDataUrl,
+        inruil: p.inruil
+          ? {
+              kenteken: p.inruil.kenteken,
+              merk: p.inruil.merk,
+              model: p.inruil.model,
+              km: p.inruil.km,
+              waarde: p.inruil.waarde,
+            }
+          : null,
       });
 
       // Open PDF in nieuw tabblad
