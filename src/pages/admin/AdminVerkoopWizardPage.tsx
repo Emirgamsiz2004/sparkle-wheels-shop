@@ -42,6 +42,7 @@ type StepKey =
   | "inruil_doc"
   | "factuur"
   | "betaling"
+  | "autotrust_aanvraag"
   | "inruil_naam"
   | "tenaamstelling"
   | "afsluiting";
@@ -63,6 +64,7 @@ const STEPS: StepDef[] = [
   { num: 6, key: "inruil_doc", title: "Inruil document", description: "Inruil overeenkomst (alleen bij inruil)", optional: true },
   { num: 7, key: "factuur", title: "Factuur", description: "Factuur opmaken en versturen" },
   { num: 8, key: "betaling", title: "Betaling", description: "Bevestig betaling van de koper" },
+  { num: 12, key: "autotrust_aanvraag", title: "AutoTrust aanvraag", description: "Vraag de garantie aan na betaling", optional: true },
   { num: 9, key: "inruil_naam", title: "Inruil op naam", description: "Inruil overzetten op eigen naam (alleen bij inruil)", optional: true },
   { num: 10, key: "tenaamstelling", title: "Tenaamstelling", description: "Machtiging aanvragen en voertuig overschrijven via VWE" },
   { num: 11, key: "afsluiting", title: "Afsluiting", description: "Uitlevering en verkoop afronden" },
@@ -73,18 +75,44 @@ const STEPS: StepDef[] = [
 // ─────────────────────────────────────────────────────────────
 const isStepDone = (stap: number, completed: Record<number, boolean>) => completed[stap] === true;
 
-const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean): boolean => {
+const isStepBlocked = (stap: number, completed: Record<number, boolean>, inruil: boolean, autotrust: boolean): boolean => {
   // Stap 6 (inruil document) en 9 (inruil op naam) volledig verbergen zonder inruil
   if ((stap === 6 || stap === 9) && !inruil) return true;
-  // Stappen 6-11 vereisen 5
-  if (stap >= 6 && stap <= 11 && !completed[5]) return true;
-  // Stappen 9-11 vereisen 8 (betaling bevestigd)
-  if (stap >= 9 && stap <= 11 && !completed[8]) return true;
+  // Stap 12 is alleen voor AutoTrust garantie
+  if (stap === 12 && !autotrust) return true;
+  // Stappen na de koopovereenkomst vereisen stap 5
+  if ((stap >= 6 || stap === 12) && !completed[5]) return true;
+  // Betaling moet bevestigd zijn vóór AutoTrust, inruil op naam, tenaamstelling en afsluiting
+  if ((stap === 12 || (stap >= 9 && stap <= 11)) && !completed[8]) return true;
+  // Bij AutoTrust eerst garantie aanvragen vóór tenaamstelling/afsluiting
+  if (autotrust && stap >= 9 && stap <= 11 && !completed[12]) return true;
   // Stap 10+ vereist 9 (inruil op naam) — alleen relevant bij inruil
   if (stap >= 10 && stap <= 11 && inruil && !completed[9]) return true;
   // Stap 11 (afsluiting) vereist 10 (tenaamstelling)
   if (stap === 11 && !completed[10]) return true;
   return false;
+};
+
+const getVisibleSteps = (inruil: boolean, autotrust: boolean) =>
+  STEPS.filter((s) => (inruil || (s.num !== 6 && s.num !== 9)) && (autotrust || s.num !== 12));
+
+const getNextAvailableStep = (current: number, completed: Record<number, boolean>, inruil: boolean, autotrust: boolean) => {
+  const visible = getVisibleSteps(inruil, autotrust);
+  const idx = visible.findIndex((s) => s.num === current);
+  for (const step of visible.slice(idx + 1)) {
+    if (!isStepBlocked(step.num, completed, inruil, autotrust)) return step.num;
+  }
+  return null;
+};
+
+const getPrevAvailableStep = (current: number, completed: Record<number, boolean>, inruil: boolean, autotrust: boolean) => {
+  const visible = getVisibleSteps(inruil, autotrust);
+  const idx = visible.findIndex((s) => s.num === current);
+  for (let i = idx - 1; i >= 0; i -= 1) {
+    const step = visible[i];
+    if (!isStepBlocked(step.num, completed, inruil, autotrust)) return step.num;
+  }
+  return null;
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -165,6 +193,7 @@ const AdminVerkoopWizardPage = () => {
   const [garantiePakket, setGarantiePakket] = useState("");
   const [garantieLooptijd, setGarantieLooptijd] = useState<number | "">("");
   const [garantiePrijs, setGarantiePrijs] = useState<number | "">("");
+  const [autotrustAangevraagd, setAutotrustAangevraagd] = useState(false);
 
   // Stap 5 state
   const [overeenkomstnummer, setOvereenkomstnummer] = useState<string>("");
@@ -209,6 +238,7 @@ const AdminVerkoopWizardPage = () => {
   const [restbedragLater, setRestbedragLater] = useState<boolean>(false);
   const [restbedragVerwachteDatum, setRestbedragVerwachteDatum] = useState<string | null>(null);
   const [openstaandRestbedrag, setOpenstaandRestbedrag] = useState<number | null>(null);
+  const lastAanbetalingRef = useRef<number>(0);
 
   // Aanbetaling op afstand (Moneybird)
   const [aanbetalingExtern, setAanbetalingExtern] = useState<{ id: string; bedrag: number; status: string; geannuleerd: boolean } | null>(null);
@@ -218,19 +248,22 @@ const AdminVerkoopWizardPage = () => {
     const fetchAanbet = async () => {
       const { data } = await supabase
         .from("aanbetalingen")
-        .select("id, aanbetalingsbedrag, status")
+        .select("id, aanbetalingsbedrag, status, bron")
         .eq("vehicle_id", vehicleId)
-        .eq("bron", "moneybird")
         .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .limit(5);
       if (cancelled) return;
-      if (data && (data.status === "open" || data.status === "betaald")) {
-        setAanbetalingExtern({ id: data.id, bedrag: Number(data.aanbetalingsbedrag), status: data.status, geannuleerd: false });
-        setAanbetalingBedrag(Number(data.aanbetalingsbedrag));
+      const rows = Array.isArray(data) ? data : [];
+      const active = rows.find((r: any) => r && (r.status === "open" || r.status === "betaald"));
+      const cancelledRow = rows.find((r: any) => r && r.status === "geannuleerd");
+      if (active) {
+        const bedrag = Number(active.aanbetalingsbedrag) || 0;
+        lastAanbetalingRef.current = bedrag;
+        setAanbetalingExtern({ id: active.id, bedrag, status: active.status, geannuleerd: false });
+        setAanbetalingBedrag(bedrag);
         setAanbetalingBetaalwijze("ideal");
-      } else if (data && data.status === "geannuleerd") {
-        setAanbetalingExtern({ id: data.id, bedrag: Number(data.aanbetalingsbedrag), status: "geannuleerd", geannuleerd: true });
+      } else if (cancelledRow) {
+        setAanbetalingExtern({ id: cancelledRow.id, bedrag: Number(cancelledRow.aanbetalingsbedrag), status: "geannuleerd", geannuleerd: true });
       }
     };
     fetchAanbet();
@@ -365,7 +398,13 @@ const AdminVerkoopWizardPage = () => {
         }
         setAfleveradres((existing as any).afleveradres || "");
         setLeverdatum(existing.leverdatum || "");
-        setAanbetalingBedrag(existing.aanbetaling_bedrag ?? "");
+        const existingAanbetaling = Number(existing.aanbetaling_bedrag || 0);
+        if (existingAanbetaling > 0) {
+          lastAanbetalingRef.current = existingAanbetaling;
+          setAanbetalingBedrag(existingAanbetaling);
+        } else if (lastAanbetalingRef.current <= 0) {
+          setAanbetalingBedrag("");
+        }
         if (["cash", "pin", "ideal", "overboeking"].includes(existing.aanbetaling_betaalwijze)) {
           setAanbetalingBetaalwijze(existing.aanbetaling_betaalwijze as Betaalwijze);
         }
@@ -406,6 +445,7 @@ const AdminVerkoopWizardPage = () => {
         setGarantiePakket(existing.garantie_pakket || "");
         setGarantieLooptijd(existing.garantie_looptijd ?? "");
         setGarantiePrijs(existing.garantie_prijs ?? "");
+        setAutotrustAangevraagd(!!(existing as any).stap12_afgerond);
         // Stap 5 hydration
         setOvereenkomstnummer((existing as any).overeenkomstnummer || "");
         setOpmerkingen((existing as any).opmerkingen || "");
@@ -518,10 +558,22 @@ const AdminVerkoopWizardPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vehicleId, vehicle?.id]);
 
+  useEffect(() => {
+    if (aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0) {
+      lastAanbetalingRef.current = Number(aanbetalingBedrag);
+    }
+  }, [aanbetalingBedrag]);
+
   // ─── Opslaan ───
   const saveCurrent = useCallback(async (extra: Record<string, any> = {}) => {
     if (!verkoopId) return;
     setSaving(true);
+    const aanbetalingTeBewaren =
+      aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0
+        ? Number(aanbetalingBedrag)
+        : lastAanbetalingRef.current > 0
+          ? lastAanbetalingRef.current
+          : 0;
     const payload: any = {
       wizard_stap: activeStap,
       verkoopprijs: verkoopprijs === "" ? 0 : Number(verkoopprijs),
@@ -541,9 +593,9 @@ const AdminVerkoopWizardPage = () => {
       afleverwijze,
       afleveradres: afleverwijze === "aflevering" ? (afleveradres || null) : null,
       leverdatum: laterOphalen ? (leverdatum || null) : new Date().toISOString().slice(0, 10),
-      aanbetaling_bedrag: aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 ? Number(aanbetalingBedrag) : null,
-      aanbetaling_betaalwijze: aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
-      aanbetaling_bankrekening: aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
+      aanbetaling_bedrag: aanbetalingTeBewaren > 0 ? aanbetalingTeBewaren : null,
+      aanbetaling_betaalwijze: aanbetalingTeBewaren > 0 && aanbetalingBetaalwijze ? aanbetalingBetaalwijze : null,
+      aanbetaling_bankrekening: aanbetalingTeBewaren > 0 && aanbetalingBetaalwijze === "overboeking" ? (aanbetalingBankrekening || null) : null,
       customer_id: customerId,
       klant_type: klantZakelijk ? "zakelijk" : "particulier",
       lead_source: leadSource || null,
@@ -699,10 +751,9 @@ const AdminVerkoopWizardPage = () => {
       if (!ok) return;
       setShowErrorsForStap((s) => { const n = new Set(s); n.delete(activeStap); return n; });
       setCompleted((p) => ({ ...p, [activeStap]: true }));
-      let next = activeStap + 1;
       const nextCompleted = { ...completed, [activeStap]: true };
-      while (next <= 11 && isStepBlocked(next, nextCompleted, inruil)) next++;
-      if (next <= 11) setActiveStap(next);
+      const next = getNextAvailableStep(activeStap, nextCompleted, inruil, garantieType === "autotrust");
+      if (next) setActiveStap(next);
       return;
     }
 
@@ -711,21 +762,19 @@ const AdminVerkoopWizardPage = () => {
     setShowErrorsForStap((s) => { const n = new Set(s); n.delete(activeStap); return n; });
     setCompleted((p) => ({ ...p, [activeStap]: true }));
     // Volgende non-blocked stap zoeken
-    let next = activeStap + 1;
     const nextCompleted = { ...completed, [activeStap]: true };
-    while (next <= 11 && isStepBlocked(next, nextCompleted, inruil)) next++;
-    if (next <= 11) setActiveStap(next);
+    const next = getNextAvailableStep(activeStap, nextCompleted, inruil, garantieType === "autotrust");
+    if (next) setActiveStap(next);
     toast.success("Stap opgeslagen");
   };
 
   const handleVorige = () => {
-    let prev = activeStap - 1;
-    while (prev >= 1 && isStepBlocked(prev, completed, inruil)) prev--;
-    if (prev >= 1) setActiveStap(prev);
+    const prev = getPrevAvailableStep(activeStap, completed, inruil, garantieType === "autotrust");
+    if (prev) setActiveStap(prev);
   };
 
   const handleStepClick = (stap: number) => {
-    if (isStepBlocked(stap, completed, inruil)) {
+    if (isStepBlocked(stap, completed, inruil, garantieType === "autotrust")) {
       if (completed[5]) {
         const missing: string[] = [];
         if (!completed[8]) missing.push("stap 8 (betaling bevestigen)");
@@ -745,13 +794,13 @@ const AdminVerkoopWizardPage = () => {
     navigate(`/admin/voertuigen/${vehicleId}`);
   };
 
-  const totalSteps = STEPS.filter((s) => !s.optional || (s.optional && inruil)).length;
-  const doneCount = Object.values(completed).filter(Boolean).length;
-  const progressPct = Math.round((doneCount / totalSteps) * 100);
-
   const currentStep = STEPS.find((s) => s.num === activeStap)!;
-  const visibleSteps = STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9));
+  const visibleSteps = getVisibleSteps(inruil, garantieType === "autotrust");
+  const totalSteps = visibleSteps.length;
+  const doneCount = visibleSteps.filter((s) => completed[s.num]).length;
+  const progressPct = Math.round((doneCount / totalSteps) * 100);
   const currentDisplayNum = visibleSteps.findIndex((s) => s.num === activeStap) + 1;
+  const isLastVisibleStep = currentDisplayNum === visibleSteps.length;
 
   // ───────────────────────────────────────────────────────────
   // Centrale validatie
@@ -859,9 +908,9 @@ const AdminVerkoopWizardPage = () => {
           </div>
 
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            {STEPS.filter((s) => inruil || (s.num !== 6 && s.num !== 9)).map((step, visibleIdx) => {
+            {visibleSteps.map((step, visibleIdx) => {
               const displayNum = visibleIdx + 1;
-              const blocked = isStepBlocked(step.num, completed, inruil);
+              const blocked = isStepBlocked(step.num, completed, inruil, garantieType === "autotrust");
               const doneRaw = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               const isTouched = touchedSteps.has(step.num) || doneRaw;
@@ -964,7 +1013,7 @@ const AdminVerkoopWizardPage = () => {
           <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 -mx-px scrollbar-hide" style={{ scrollbarWidth: "none" }}>
             {visibleSteps.map((step, idx) => {
               const displayNum = idx + 1;
-              const blocked = isStepBlocked(step.num, completed, inruil);
+              const blocked = isStepBlocked(step.num, completed, inruil, garantieType === "autotrust");
               const done = isStepDone(step.num, completed);
               const active = step.num === activeStap;
               return (
@@ -1472,7 +1521,7 @@ const AdminVerkoopWizardPage = () => {
         <div className="hidden lg:block text-[11px] text-muted-foreground flex-1 text-center">
           {saving ? "Opslaan…" : "Wijzigingen worden automatisch bewaard"}
         </div>
-        {activeStap < 11 ? (
+        {!isLastVisibleStep ? (
           <button
             onClick={handleVolgende}
             disabled={saving}
