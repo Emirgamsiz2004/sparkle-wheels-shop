@@ -43,6 +43,7 @@ interface Props {
   factuurMbNummer: string | null;
   factuurTotaal: number;
   aanbetalingBedrag: number;
+  inruilBedrag: number;
   initialBetaaldatum: string | null;
   initialBetaalwijze: string | null;
   initialBetaalwijzeDetails: Array<{ methode: string; bedrag: number }> | null;
@@ -70,6 +71,7 @@ const Stap8Betaling = ({
   factuurMbNummer,
   factuurTotaal,
   aanbetalingBedrag,
+  inruilBedrag,
   initialBetaaldatum,
   initialBetaalwijze,
   initialBetaalwijzeDetails,
@@ -84,8 +86,8 @@ const Stap8Betaling = ({
   const { invoke, loading: mbLoading } = useMoneybird();
 
   const nogTeOntvangen = useMemo(
-    () => Math.max(0, factuurTotaal - aanbetalingBedrag),
-    [factuurTotaal, aanbetalingBedrag],
+    () => Math.max(0, factuurTotaal - aanbetalingBedrag - inruilBedrag),
+    [factuurTotaal, aanbetalingBedrag, inruilBedrag],
   );
 
   // ─── State ───
