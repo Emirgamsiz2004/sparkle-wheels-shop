@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
 import { useAppointments, typeColors, typeLabels } from "@/hooks/useAppointments";
 import { Loader2, Search, ChevronRight, CheckCircle2, Clock, XCircle, Car, StopCircle, Plus, Play, CalendarDays } from "lucide-react";
-import { format, isSameDay, isFuture } from "date-fns";
+import { format, isSameDay, isFuture, intervalToDuration } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import ProefritDetailDialog from "@/components/admin/proefrit/ProefritDetailDialog";
@@ -11,6 +11,19 @@ import EindProefritDialog from "@/components/admin/proefrit/EindProefritDialog";
 import NieuweProefritDialog from "@/components/admin/proefrit/NieuweProefritDialog";
 import ProefritCountdown from "@/components/admin/proefrit/ProefritCountdown";
 import SlidingTabs from "@/components/admin/SlidingTabs";
+
+function getElapsedTime(td: TestDrive): string | null {
+  if (td.status !== "actief") return null;
+  const startStr = (td as any).vertrek_tijd || td.formulier_ingevuld_op || td.start_tijd;
+  if (!startStr) return null;
+  const start = new Date(startStr);
+  const dur = intervalToDuration({ start, end: new Date() });
+  const parts: string[] = [];
+  if (dur.hours) parts.push(`${dur.hours}u`);
+  if (dur.minutes != null) parts.push(`${dur.minutes}m`);
+  if (!parts.length) parts.push("0m");
+  return parts.join(" ");
+}
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
   wacht_op_klant: { label: "Wacht op klant", icon: Clock, color: "text-amber-400 bg-amber-400/10 border-amber-400/20" },
@@ -188,6 +201,11 @@ const AdminProefrittenPage = () => {
                       <Icon className="w-3 h-3" />
                       {sc.label}
                     </span>
+                    {td.status === "actief" && (
+                      <span className="text-[10px] text-blue-400 font-medium">
+                        {getElapsedTime(td)}
+                      </span>
+                    )}
                     <span className="text-xs text-muted-foreground truncate">
                       {td.customer ? `${td.customer.voornaam} ${td.customer.achternaam}` : "Klant nog niet ingevuld"}
                     </span>

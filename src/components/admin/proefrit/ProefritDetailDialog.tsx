@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { TestDrive } from "@/hooks/useTestDrives";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { format } from "date-fns";
+import { format, intervalToDuration } from "date-fns";
 import { nl } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -51,6 +51,7 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
   const [deleting, setDeleting] = useState(false);
   const [rijbewijsFotoUrl, setRijbewijsFotoUrl] = useState<string | null>(null);
   const [fotoFullscreen, setFotoFullscreen] = useState(false);
+  const [elapsed, setElapsed] = useState<string>("");
 
   useEffect(() => {
     if (!open) return;
@@ -67,6 +68,28 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
         .then(({ data }) => setRijbewijsFotoUrl(data?.signedUrl || null));
     }
   }, [open, td.id, td.customer?.rijbewijs_foto_path]);
+
+  // Live elapsed timer for active test drives
+  useEffect(() => {
+    if (td.status !== "actief") {
+      setElapsed("");
+      return;
+    }
+    const updateElapsed = () => {
+      const startStr = (td as any).vertrek_tijd || td.formulier_ingevuld_op || td.start_tijd;
+      if (!startStr) return;
+      const dur = intervalToDuration({ start: new Date(startStr), end: new Date() });
+      const parts: string[] = [];
+      if (dur.hours) parts.push(`${dur.hours}u`);
+      if (dur.minutes != null) parts.push(`${dur.minutes}m`);
+      if (dur.seconds != null) parts.push(`${String(dur.seconds).padStart(2, "0")}s`);
+      if (!parts.length) parts.push("0s");
+      setElapsed(parts.join(" "));
+    };
+    updateElapsed();
+    const id = setInterval(updateElapsed, 1000);
+    return () => clearInterval(id);
+  }, [td.status, (td as any).vertrek_tijd, td.formulier_ingevuld_op, td.start_tijd]);
 
   const handleDownloadPdf = async () => {
     setDownloading(true);
@@ -161,6 +184,9 @@ const ProefritDetailDialog = ({ testDrive: td, open, onClose, onDeleted }: Props
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Resterende proefritduur</p>
                 <ProefritCountdown testDrive={td} size="lg" />
                 <p className="text-[11px] text-muted-foreground">Max. 30 minuten</p>
+                {elapsed && (
+                  <p className="text-[11px] font-medium text-blue-400">Actief: {elapsed}</p>
+                )}
               </div>
             )}
             <section>
