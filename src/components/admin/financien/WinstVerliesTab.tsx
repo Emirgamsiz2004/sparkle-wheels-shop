@@ -379,12 +379,17 @@ const WinstVerliesTab = () => {
     const matchesInkoopverklaring = (bedrag: number) =>
       inkoopverklaringBedragen.some(iv => Math.abs(iv - bedrag) < 1);
 
+    const isAutohandelaar = (text: string) =>
+      /\bcars?\b|\bauto'?s?\b|automotive|autohandel|autobedrijf|car ?trading|exclusive cars|motors\b|garage\b/i.test(text);
+
     const decideCategorie = (text: string, bedrag: number, isParticulier: boolean): Categorie => {
       // 1. Match met bestaande inkoopverklaring in dezelfde maand → zeker inkoop voertuig
       if (bedrag >= 500 && matchesInkoopverklaring(bedrag)) return "inkoop_voertuigen";
       // 2. Particulier + groot bedrag → vermoedelijk voertuig inkoop
       if (isParticulier && bedrag >= 1500) return "inkoop_voertuigen";
-      // 3. Standaard keyword classifier
+      // 3. Zakelijke leverancier met autohandel-naam + substantieel bedrag → voertuig inkoop
+      if (!isParticulier && bedrag >= 1500 && isAutohandelaar(text)) return "inkoop_voertuigen";
+      // 4. Standaard keyword classifier
       return classify(text, bedrag);
     };
 
