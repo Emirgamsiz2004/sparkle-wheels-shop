@@ -548,10 +548,10 @@ const WinstVerliesTab = () => {
   const prev = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const next = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
-  // Voorraadmutatie = puur informatief (aankopen − verkochte inkoopwaarde).
-  // Aankoop van voorraad is geen verlies: cash wordt voorraad, vermogen blijft gelijk.
-  // Vermogensgroei = nettowinst (de daadwerkelijke groei van het eigen vermogen deze maand).
-  const voorraadMutatie = voorraadAankopen.totaal - cogs.inkoop;
+  // Vermogensgroei = daadwerkelijke groei van het eigen vermogen deze maand.
+  // = winst op verkochte voertuigen (consignatie alleen commissie, geen inkoop)
+  //   + dienstenwinst − BTW
+  // Voorraad-aankoop is GEEN verlies (cash wordt voorraad, vermogen blijft gelijk).
   const vermogensGroei = nettoResultaat;
 
   return (
@@ -588,7 +588,7 @@ const WinstVerliesTab = () => {
         <Metric label="Omzet" value={formatEuroDecimal(omzet.incl)} />
         <Metric label="Kosten" value={formatEuroDecimal(operationeleKosten + cogs.totaal)} />
         <Metric label="Nettowinst" value={formatEuroDecimal(nettoResultaat)} tone={nettoResultaat >= 0 ? "pos" : "neg"} />
-        <Metric label="Vermogensgroei" value={formatEuroDecimal(vermogensGroei)} tone={vermogensGroei >= 0 ? "pos" : "neg"} subtle={`voorraad ${voorraadMutatie >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadMutatie))}`} />
+        <Metric label="Vermogensgroei" value={formatEuroDecimal(vermogensGroei)} tone={vermogensGroei >= 0 ? "pos" : "neg"} subtle={`voorraad ${formatEuroDecimal(voorraad.inkoop)}`} />
       </div>
 
       {/* Verkochte voertuigen — de Excel-sheet */}
@@ -657,12 +657,14 @@ const WinstVerliesTab = () => {
             <Row k="= Nettowinst" v={formatEuroDecimal(nettoResultaat)} bold />
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Voorraad ingekocht" v={formatEuroDecimal(voorraadAankopen.totaal)} />
-            <Row k="Voorraad verkocht (inkoopwaarde)" v={formatEuroDecimal(cogs.inkoop)} />
-            <Row k="= Voorraadmutatie" v={`${voorraadMutatie >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadMutatie))}`} bold />
+            <Row k="Voertuigwinst (verkochte auto's)" v={formatEuroDecimal(voertuigWinst)} />
+            <Row k="+ Dienstenwinst" v={formatEuroDecimal(dienstenWinst)} />
+            <Row k="− BTW" v={formatEuroDecimal(totaalBTW)} />
+            <Row k="= Vermogensgroei" v={formatEuroDecimal(vermogensGroei)} bold />
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Huidige voorraad" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop + voorraad.kosten)}`} />
+            <Row k="Huidige voorraad (inkoopwaarde, excl. consignatie)" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop)}`} />
+            <Row k="Voorraad ingekocht deze maand" v={formatEuroDecimal(voorraadAankopen.totaal)} />
           </div>
         </div>
       </Details>
