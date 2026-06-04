@@ -92,15 +92,10 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
 
   const handleStart = async () => {
     if (!selectedVehicle) return;
-    const km = parseInt(kmVoor);
-    if (!km || km < 0) {
-      toast.error("Voer een geldige kilometerstand in");
-      return;
-    }
     setLoading(true);
     const td = await startTestDrive(
       selectedVehicle.id || undefined as any,
-      km,
+      0,
       {
         merk: selectedVehicle.merk,
         model: selectedVehicle.model,
@@ -115,6 +110,7 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
       setStep("result");
     }
   };
+
 
   const handleCopy = () => {
     navigator.clipboard.writeText(proefritUrl);
