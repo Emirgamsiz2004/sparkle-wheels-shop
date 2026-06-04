@@ -92,15 +92,10 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
 
   const handleStart = async () => {
     if (!selectedVehicle) return;
-    const km = parseInt(kmVoor);
-    if (!km || km < 0) {
-      toast.error("Voer een geldige kilometerstand in");
-      return;
-    }
     setLoading(true);
     const td = await startTestDrive(
       selectedVehicle.id || undefined as any,
-      km,
+      0,
       {
         merk: selectedVehicle.merk,
         model: selectedVehicle.model,
@@ -115,6 +110,7 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
       setStep("result");
     }
   };
+
 
   const handleCopy = () => {
     navigator.clipboard.writeText(proefritUrl);
@@ -296,10 +292,6 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
           {step === "form" && (
             <motion.div key="form" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }} className="space-y-4">
               <div>
-                <label className="block text-[11px] text-muted-foreground mb-1">Kilometerstand voor de rit</label>
-                <input type="number" value={kmVoor} onChange={(e) => setKmVoor(e.target.value)} placeholder="bijv. 45230" className={inputCls} />
-              </div>
-              <div>
                 <label className="block text-[11px] text-muted-foreground mb-1">Begeleidende medewerker</label>
                 <input value={medewerker} onChange={(e) => setMedewerker(e.target.value)} placeholder="Naam medewerker" className={inputCls} />
               </div>
@@ -313,12 +305,13 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
                     Terug
                   </button>
                 )}
-                <button onClick={handleStart} disabled={loading || !kmVoor} className="flex-1 py-2.5 text-xs font-medium bg-foreground text-background rounded-[10px] hover:bg-foreground/90 transition-colors active:scale-[0.97] disabled:opacity-50">
+                <button onClick={handleStart} disabled={loading} className="flex-1 py-2.5 text-xs font-medium bg-foreground text-background rounded-[10px] hover:bg-foreground/90 transition-colors active:scale-[0.97] disabled:opacity-50">
                   {loading ? "Bezig..." : "Proefrit starten"}
                 </button>
               </div>
             </motion.div>
           )}
+
 
           {step === "result" && (
             <motion.div key="result" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }} className="space-y-4">
