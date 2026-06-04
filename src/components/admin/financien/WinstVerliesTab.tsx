@@ -548,10 +548,10 @@ const WinstVerliesTab = () => {
   const prev = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const next = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
-  // Voorraadmutatie = puur informatief (aankopen − verkochte inkoopwaarde).
-  // Aankoop van voorraad is geen verlies: cash wordt voorraad, vermogen blijft gelijk.
-  // Vermogensgroei = nettowinst (de daadwerkelijke groei van het eigen vermogen deze maand).
-  const voorraadMutatie = voorraadAankopen.totaal - cogs.inkoop;
+  // Vermogensgroei = daadwerkelijke groei van het eigen vermogen deze maand.
+  // = winst op verkochte voertuigen (consignatie alleen commissie, geen inkoop)
+  //   + dienstenwinst − BTW
+  // Voorraad-aankoop is GEEN verlies (cash wordt voorraad, vermogen blijft gelijk).
   const vermogensGroei = nettoResultaat;
 
   return (
