@@ -657,12 +657,14 @@ const WinstVerliesTab = () => {
             <Row k="= Nettowinst" v={formatEuroDecimal(nettoResultaat)} bold />
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Voorraad ingekocht" v={formatEuroDecimal(voorraadAankopen.totaal)} />
-            <Row k="Voorraad verkocht (inkoopwaarde)" v={formatEuroDecimal(cogs.inkoop)} />
-            <Row k="= Voorraadmutatie" v={`${voorraadMutatie >= 0 ? "+" : "−"}${formatEuroDecimal(Math.abs(voorraadMutatie))}`} bold />
+            <Row k="Voertuigwinst (verkochte auto's)" v={formatEuroDecimal(voertuigWinst)} />
+            <Row k="+ Dienstenwinst" v={formatEuroDecimal(dienstenWinst)} />
+            <Row k="− BTW" v={formatEuroDecimal(totaalBTW)} />
+            <Row k="= Vermogensgroei" v={formatEuroDecimal(vermogensGroei)} bold />
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Huidige voorraad" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop + voorraad.kosten)}`} />
+            <Row k="Huidige voorraad (inkoopwaarde, excl. consignatie)" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop)}`} />
+            <Row k="Voorraad ingekocht deze maand" v={formatEuroDecimal(voorraadAankopen.totaal)} />
           </div>
         </div>
       </Details>
