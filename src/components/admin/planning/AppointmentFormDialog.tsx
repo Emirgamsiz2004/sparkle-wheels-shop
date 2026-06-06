@@ -334,8 +334,12 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
         .map((id) => diensten.find((d) => d.id === id)?.naam)
         .filter(Boolean) as string[];
 
+      const checklistText = checklist.length
+        ? "Checklist:\n" + checklist.map((t) => `• ${t}`).join("\n")
+        : "";
       const noteParts = [
         showsAdres(type) && form.adres ? `Adres: ${form.adres}` : "",
+        checklistText,
         form.notities,
       ].filter(Boolean);
 
