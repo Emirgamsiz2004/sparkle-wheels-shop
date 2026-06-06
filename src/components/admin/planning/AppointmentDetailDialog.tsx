@@ -464,7 +464,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                             href={`https://wa.me/${waNumber}?text=${waMessage}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-1.5 py-2 rounded-[4px] border border-emerald-500/40 bg-emerald-500/10 text-xs text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+                            className="inline-flex items-center justify-center gap-1.5 py-2 rounded-[4px] border border-border/60 bg-background/40 text-xs text-foreground hover:bg-accent/40 hover:border-border transition-colors"
                           >
                             <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                           </a>
