@@ -198,7 +198,7 @@ const AdminPlanningPage = () => {
       </div>
 
       {view === "agenda" ? (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 lg:items-stretch">
           {/* LEFT: agenda */}
           <div className="space-y-3 min-w-0">
             {/* Week navigation */}
@@ -298,7 +298,7 @@ const AdminPlanningPage = () => {
 
           {/* RIGHT: detail panel (desktop only) */}
           {!isMobile && (
-            <aside className="lg:sticky lg:top-4">
+            <aside className="lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] flex flex-col">
               {selected ? (
                 <AppointmentDetailPanel
                   appointment={selected}
@@ -309,15 +309,15 @@ const AdminPlanningPage = () => {
                   showClose
                 />
               ) : (
-                <div className="bg-card border border-border rounded-[6px] p-5 space-y-3">
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="bg-card border border-border rounded-[6px] p-5 flex flex-col flex-1 min-h-0">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-3">
                     <Clock className="w-4 h-4" />
                     <h3 className="text-sm font-semibold text-foreground">Aankomende afspraken</h3>
                   </div>
                   {upcoming.length === 0 ? (
-                    <p className="text-xs text-muted-foreground py-6 text-center">Geen aankomende afspraken</p>
+                    <p className="text-xs text-muted-foreground py-6 text-center flex-1">Geen aankomende afspraken</p>
                   ) : (
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 flex-1 overflow-y-auto min-h-0 pr-1">
                       {upcoming.map((a) => (
                         <button key={a.id} onClick={() => openAppt(a)}
                           className="w-full text-left bg-background/40 hover:bg-accent/30 border border-border/40 rounded-[3px] px-3 py-2 transition-colors">
@@ -333,7 +333,7 @@ const AdminPlanningPage = () => {
                       ))}
                     </div>
                   )}
-                  <p className="text-[11px] text-muted-foreground/60 pt-2 border-t border-border/40 inline-flex items-center gap-1.5">
+                  <p className="text-[11px] text-muted-foreground/60 pt-3 mt-3 border-t border-border/40 inline-flex items-center gap-1.5">
                     <CalendarIcon className="w-3 h-3" /> Klik op een afspraak om details te zien
                   </p>
                 </div>
