@@ -76,22 +76,21 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   // Position popover near anchorRect (desktop)
   useLayoutEffect(() => {
     if (!open || isMobile || !anchorRect) { setPos(null); return; }
-    const POPOVER_W = 340;
-    const margin = 8;
+    const POPOVER_W = 360;
+    const margin = 12;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     let left = anchorRect.right + margin;
     if (left + POPOVER_W > vw - margin) left = anchorRect.left - POPOVER_W - margin;
-    if (left < margin) left = margin;
-    let top = anchorRect.top;
-    // Estimate height after mount
+    if (left < margin) left = Math.max(margin, Math.min(vw - POPOVER_W - margin, anchorRect.left + anchorRect.width / 2 - POPOVER_W / 2));
     requestAnimationFrame(() => {
-      const h = containerRef.current?.offsetHeight ?? 360;
-      let t = top;
-      if (t + h > vh - margin) t = Math.max(margin, vh - h - margin);
+      const h = containerRef.current?.offsetHeight ?? 420;
+      let t = anchorRect.top + anchorRect.height / 2 - h / 2;
+      if (t + h > vh - margin) t = vh - h - margin;
+      if (t < margin) t = margin;
       setPos({ top: t, left });
     });
-    setPos({ top, left });
+    setPos({ top: Math.max(margin, anchorRect.top - 40), left });
   }, [open, isMobile, anchorRect]);
 
   const [editing, setEditing] = useState(false);
@@ -258,7 +257,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
 
   const containerClass = isMobile
     ? "fixed left-0 right-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-[14px] border-t border-x border-border/70 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
-    : "fixed z-50 w-[340px] rounded-[10px] border border-border/70 bg-card shadow-[0_12px_40px_rgba(0,0,0,0.55)] animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden";
+    : "fixed z-50 w-[360px] rounded-[8px] border border-border/60 bg-[#0f0f10] shadow-[0_20px_60px_rgba(0,0,0,0.65)] animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden";
 
 
   const containerStyle: React.CSSProperties = isMobile
@@ -311,7 +310,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                 const isNow = !past && absMin <= 30;
                 const accent = localStatus === "voltooid" ? "bg-muted-foreground/40"
                   : localStatus === "geannuleerd" ? "bg-orange-500"
-                  : isNow ? "bg-emerald-400" : "bg-emerald-500/60";
+                  : isNow ? "bg-foreground" : "bg-foreground/40";
                 return (
                   <>
                     {/* HERO: type badge + countdown strip */}
@@ -325,8 +324,8 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                           · {countdown}
                         </span>
                         {isNow && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Nu
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-foreground uppercase tracking-wider">
+                            <span className="w-1.5 h-1.5 rounded-full bg-foreground animate-pulse" /> Nu
                           </span>
                         )}
                       </div>
@@ -376,10 +375,10 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                           className="group flex items-center gap-2.5 w-full text-left p-2 -m-2 rounded-[4px] hover:bg-accent/30 transition-colors"
                         >
                           <div className="w-7 h-7 rounded-[4px] bg-accent/40 border border-border/50 inline-flex items-center justify-center shrink-0">
-                            <Car className="w-3.5 h-3.5 text-muted-foreground group-hover:text-emerald-400 transition-colors" />
+                            <Car className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="text-sm text-foreground group-hover:text-emerald-400 transition-colors truncate">
+                            <div className="text-sm text-foreground group-hover:text-foreground transition-colors truncate">
                               {appointment.vehicle.merk} {appointment.vehicle.model}
                             </div>
                             {appointment.vehicle.kenteken && (
@@ -408,7 +407,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                       {appointment.diensten && appointment.diensten.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {appointment.diensten.map((d) => (
-                            <span key={d} className="inline-flex items-center px-2 py-0.5 rounded-[3px] bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300/90 uppercase tracking-wide font-medium">
+                            <span key={d} className="inline-flex items-center px-2 py-0.5 rounded-[3px] bg-foreground/[0.06] border border-border/60 text-[10px] text-foreground/80 uppercase tracking-wide font-medium">
                               {d}
                             </span>
                           ))}
@@ -417,7 +416,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
 
                       {/* Werkzaamheden / notitie */}
                       {(appointment.werkzaamheden_omschrijving || appointment.diensten_notitie || appointment.notities) && (
-                        <div className="text-[12px] text-foreground/85 bg-emerald-500/[0.06] rounded-[4px] p-2.5 border-l-2 border-emerald-500/50 whitespace-pre-wrap leading-relaxed">
+                        <div className="text-[12px] text-foreground/85 bg-foreground/[0.03] rounded-[4px] p-2.5 border-l-2 border-foreground/30 whitespace-pre-wrap leading-relaxed">
                           {appointment.werkzaamheden_omschrijving || appointment.diensten_notitie || appointment.notities}
                         </div>
                       )}
@@ -428,8 +427,8 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                       <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-1.5 font-medium">Status</div>
                       <div className="inline-flex w-full rounded-[4px] border border-border/60 bg-background/40 p-0.5">
                         {[
-                          { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-emerald-500/90 text-white" },
-                          { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/50 text-white" },
+                          { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-foreground text-background" },
+                          { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/60 text-background" },
                           { v: "geannuleerd" as AppointmentStatus, label: "No-show", active: "bg-orange-500/90 text-white" },
                         ].map(({ v, label, active }) => {
                           const isActive = localStatus === v;
@@ -465,7 +464,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                             href={`https://wa.me/${waNumber}?text=${waMessage}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-1.5 py-2 rounded-[4px] border border-emerald-500/40 bg-emerald-500/10 text-xs text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+                            className="inline-flex items-center justify-center gap-1.5 py-2 rounded-[4px] border border-border/60 bg-background/40 text-xs text-foreground hover:bg-accent/40 hover:border-border transition-colors"
                           >
                             <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                           </a>
