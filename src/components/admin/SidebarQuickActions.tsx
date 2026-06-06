@@ -23,9 +23,10 @@ interface Section {
 
 interface Props {
   /** Visual style for the trigger button. */
-  variant?: "rail" | "wide" | "fab";
+  variant?: "rail" | "wide" | "fab" | "header";
   className?: string;
 }
+
 
 const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const { addCustomer } = useCustomers();
   const { bottomInset } = useKeyboardSafeViewport(isMobile);
   const [open, setOpen] = useState(false);
-  const [pos, setPos] = useState<{ bottom: number; right: number } | null>(null);
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; right: number } | null>(null);
   const [kenteken, setKenteken] = useState("");
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
@@ -103,11 +104,17 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const computePos = () => {
     if (!btnRef.current) return;
     const r = btnRef.current.getBoundingClientRect();
-    // Anchor panel above the FAB, aligned to its right edge
-    const bottom = Math.max(8, window.innerHeight - r.top + 12);
     const right = Math.max(8, window.innerWidth - r.right);
-    setPos({ bottom, right });
+    if (variant === "header") {
+      // Anchor below the trigger
+      setPos({ top: r.bottom + 8, right });
+    } else {
+      // Anchor above (FAB / rail)
+      const bottom = Math.max(8, window.innerHeight - r.top + 12);
+      setPos({ bottom, right });
+    }
   };
+
 
   const handleToggle = () => {
     if (!open && !isMobile) computePos();
@@ -140,6 +147,10 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       className={
         variant === "fab"
           ? `inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_10px_30px_-6px_rgba(16,185,129,0.55)] ring-1 ring-emerald-300/30 transition-transform duration-200 ease-out active:scale-95 ${className}`
+          : variant === "header"
+          ? `inline-flex items-center gap-1.5 h-9 px-2.5 sm:px-3 rounded-md border border-border bg-card hover:bg-accent text-foreground transition-colors text-[12px] font-medium ${
+              open ? "bg-accent" : ""
+            } ${className}`
           : variant === "rail"
           ? `flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap text-foreground hover:bg-accent/60 border border-border/60 ${
               open ? "bg-accent" : ""
@@ -165,8 +176,12 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       {variant === "rail" && (
         <span className="transition-opacity duration-200 opacity-100 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Snelstart</span>
       )}
+      {variant === "header" && (
+        <span className="hidden sm:inline">Snelstart</span>
+      )}
     </button>
   );
+
 
   const panel = (
     <AnimatePresence>
@@ -211,8 +226,9 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            style={pos ? { bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
-            className="fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-3xl border border-border/80 bg-card shadow-[0_24px_60px_-12px_rgba(0,0,0,0.65)] origin-bottom-right backdrop-blur-xl"
+            style={pos ? { top: pos.top, bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
+            className={`fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-3xl border border-border/80 bg-card shadow-[0_24px_60px_-12px_rgba(0,0,0,0.65)] ${variant === "header" ? "origin-top-right" : "origin-bottom-right"} backdrop-blur-xl`}
+
           >
             <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between sticky top-0 bg-card/95 backdrop-blur-md z-10 rounded-t-3xl">
               <div>
