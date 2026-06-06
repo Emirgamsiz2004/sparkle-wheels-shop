@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, ArrowRight, MessageCircle } from "lucide-react";
 
 const contactInfo = [
+  { icon: Phone, label: "Telefoon", value: "071-781 25 25", href: "tel:+31717812525" },
   { icon: MessageCircle, label: "WhatsApp", value: "Stuur een bericht", href: "https://wa.me/31717812525" },
   { icon: Mail, label: "E-mail", value: "info@platinautomotive.nl", href: "mailto:info@platinautomotive.nl" },
   { icon: MapPin, label: "Adres", value: "Cilinderweg 99\n2371 DZ Roelofarendsveen", href: "https://maps.google.com/?q=Cilinderweg+99+2371DZ+Roelofarendsveen" },
@@ -58,20 +59,6 @@ const ContactSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col gap-px bg-border"
           >
-            {/* Telefoon */}
-            <a
-              href="tel:+31717812525"
-              className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
-            >
-              <Phone className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
-              <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
-                Telefoon
-              </p>
-              <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground transition-colors">
-                071-781 25 25
-              </p>
-            </a>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px">
               {contactInfo.map((item) => (
                 <a
@@ -79,13 +66,13 @@ const ContactSection = () => {
                   href={item.href}
                   target={item.href.startsWith("http") ? "_blank" : undefined}
                   rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300"
+                  className="group bg-card active:bg-primary md:hover:bg-primary p-6 md:p-8 transition-all duration-300 flex flex-col min-h-[180px]"
                 >
                   <item.icon className="w-5 h-5 text-muted-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground mb-6 transition-colors" />
                   <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground group-active:text-primary-foreground/70 md:group-hover:text-primary-foreground/70 mb-2 transition-colors">
                     {item.label}
                   </p>
-                  <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground whitespace-pre-line transition-colors">
+                  <p className="text-sm font-body font-medium text-foreground group-active:text-primary-foreground md:group-hover:text-primary-foreground whitespace-pre-line transition-colors mt-auto">
                     {item.value}
                   </p>
                 </a>
