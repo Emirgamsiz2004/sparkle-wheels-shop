@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Badge } from "@/components/ui/badge";
 import {
   Eye, Car, PackageCheck, CalendarIcon, Clock, Wrench, Truck, MoreHorizontal,
-  ArrowLeft, X, Mail, Sparkles, MapPin,
+  ArrowLeft, X, Mail, Sparkles, MapPin, Plus, Trash2, ListChecks,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
