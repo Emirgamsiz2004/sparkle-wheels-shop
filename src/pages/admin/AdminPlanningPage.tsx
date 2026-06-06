@@ -399,11 +399,12 @@ const AdminPlanningPage = () => {
         anchorRect={formAnchorRect}
       />
       <AppointmentDetailDialog
-        appointment={mobileDialogAppt}
-        open={!!mobileDialogAppt}
-        onOpenChange={(v) => { if (!v) setMobileDialogId(null); }}
+        appointment={selected}
+        open={!!selected}
+        onOpenChange={(v) => { if (!v) { setSelectedId(null); setDetailAnchorRect(null); } }}
         onUpdate={updateAppointment}
         onDelete={deleteAppointment}
+        anchorRect={detailAnchorRect}
       />
     </div>
   );
