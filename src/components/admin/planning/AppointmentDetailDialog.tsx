@@ -76,7 +76,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   // Position popover near anchorRect (desktop)
   useLayoutEffect(() => {
     if (!open || isMobile || !anchorRect) { setPos(null); return; }
-    const POPOVER_W = 300;
+    const POPOVER_W = 340;
     const margin = 8;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -257,8 +257,9 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   };
 
   const containerClass = isMobile
-    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-[16px] border-t border-x border-border/60 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
-    : "fixed z-50 w-[300px] rounded-[16px] border border-border/60 bg-card shadow-[0_8px_30px_rgba(0,0,0,0.35)] animate-in fade-in-0 zoom-in-95 duration-150";
+    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-[14px] border-t border-x border-border/70 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
+    : "fixed z-50 w-[340px] rounded-[10px] border border-border/70 bg-card shadow-[0_12px_40px_rgba(0,0,0,0.55)] animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden";
+
 
   const containerStyle: React.CSSProperties = isMobile
     ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" }
@@ -291,211 +292,242 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              style={{ padding: 18 }}
             >
-              {/* 1. Header — type badge */}
-              <div className="flex items-center justify-between gap-2 mb-3 pr-7">
-                <span className={cn("inline-flex items-center px-2.5 py-1 rounded-[8px] border text-[11px] font-medium", typeColors[appointment.type])}>
-                  {typeLabels[appointment.type]}
-                </span>
-              </div>
-
-              {/* 2. Datum + tijd */}
-              <div className="text-[15px] font-semibold text-foreground leading-tight mb-3">
-                {format(dt, "EEEE d MMMM", { locale: nl })}
-                <span className="text-muted-foreground font-normal"> · </span>
-                {format(dt, "HH:mm", { locale: nl })}
-                {appointment.eind_datum_tijd && (
-                  <span className="text-muted-foreground font-normal"> – {format(new Date(appointment.eind_datum_tijd), "HH:mm")}</span>
-                )}
-              </div>
-
-              {/* 3. Voertuig */}
-              {appointment.vehicle && (
-                <button
-                  onClick={goToVehicle}
-                  className="group flex items-center gap-2 text-sm text-foreground hover:text-emerald-400 transition-colors text-left mb-3 w-full"
-                >
-                  <Car className="w-4 h-4 text-muted-foreground group-hover:text-emerald-400 shrink-0 transition-colors" />
-                  <span className="truncate">
-                    {appointment.vehicle.merk} {appointment.vehicle.model}
-                    {appointment.vehicle.kenteken && <span className="text-muted-foreground group-hover:text-emerald-400/80"> · {appointment.vehicle.kenteken}</span>}
-                  </span>
-                </button>
-              )}
-
-              {/* 4. Klant */}
-              <div className="mb-1">
-                {customerName ? (
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <User className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="font-medium truncate">{customerName}</span>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground/70">Geen klant gekoppeld</div>
-                )}
-              </div>
-
-              {/* 4b. Diensten */}
-              {appointment.diensten && appointment.diensten.length > 0 && (
-                <div className="mt-3">
-                  <div className="flex flex-wrap gap-1.5">
-                    {appointment.diensten.map((d) => (
-                      <span key={d} className="inline-flex items-center px-2 py-0.5 rounded-[6px] bg-accent/40 border border-border/60 text-[11px] text-foreground">
-                        {d}
-                      </span>
-                    ))}
-                  </div>
-                  {appointment.geschatte_duur_minuten ? (
-                    <div className="text-[11px] text-muted-foreground mt-1.5 inline-flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {appointment.geschatte_duur_minuten} min geschat
+              {(() => {
+                const now = new Date();
+                const diffMs = dt.getTime() - now.getTime();
+                const absMin = Math.round(Math.abs(diffMs) / 60000);
+                const past = diffMs < 0;
+                const sameDay = dt.toDateString() === now.toDateString();
+                let countdown = "";
+                if (absMin < 60) countdown = past ? `${absMin} min geleden` : `over ${absMin} min`;
+                else if (absMin < 60 * 24) {
+                  const h = Math.round(absMin / 60);
+                  countdown = past ? `${h} uur geleden` : `over ${h} uur`;
+                } else {
+                  const d = Math.round(absMin / (60 * 24));
+                  countdown = past ? `${d} dagen geleden` : `over ${d} dagen`;
+                }
+                const isNow = !past && absMin <= 30;
+                const accent = localStatus === "voltooid" ? "bg-muted-foreground/40"
+                  : localStatus === "geannuleerd" ? "bg-orange-500"
+                  : isNow ? "bg-emerald-400" : "bg-emerald-500/60";
+                return (
+                  <>
+                    {/* HERO: type badge + countdown strip */}
+                    <div className="relative px-5 pt-5 pb-4 border-b border-border/40">
+                      <div className={cn("absolute left-0 top-0 bottom-0 w-[3px]", accent)} />
+                      <div className="flex items-center gap-2 mb-3 pr-7">
+                        <span className={cn("inline-flex items-center px-2 py-0.5 rounded-[4px] border text-[10px] font-medium uppercase tracking-wider", typeColors[appointment.type])}>
+                          {typeLabels[appointment.type]}
+                        </span>
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                          · {countdown}
+                        </span>
+                        {isNow && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Nu
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-baseline gap-2 leading-none">
+                        <span className="text-3xl font-bold text-foreground tabular-nums tracking-tight">
+                          {format(dt, "HH:mm")}
+                        </span>
+                        {appointment.eind_datum_tijd && (
+                          <span className="text-base text-muted-foreground tabular-nums">
+                            – {format(new Date(appointment.eind_datum_tijd), "HH:mm")}
+                          </span>
+                        )}
+                        {appointment.geschatte_duur_minuten ? (
+                          <span className="ml-auto text-[11px] text-muted-foreground inline-flex items-center gap-1">
+                            <Clock className="w-3 h-3" /> {appointment.geschatte_duur_minuten}m
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-1 text-[12px] text-muted-foreground capitalize">
+                        {sameDay ? "Vandaag" : format(dt, "EEEE d MMMM", { locale: nl })}
+                      </div>
                     </div>
-                  ) : null}
-                </div>
-              )}
 
-              {/* 4c. Klant-voertuig (onderhoud/poetsbeurt) */}
-              {(appointment.voertuig_klant_kenteken || appointment.voertuig_klant_omschrijving) && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-foreground">
-                  <Car className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <span className="truncate">
-                    {appointment.voertuig_klant_omschrijving || ""}
-                    {appointment.voertuig_klant_kenteken && (
-                      <span className="text-muted-foreground"> · {appointment.voertuig_klant_kenteken}</span>
-                    )}
-                  </span>
-                </div>
-              )}
-
-              {/* 4d. Werkzaamheden / notitie diensten */}
-              {(appointment.werkzaamheden_omschrijving || appointment.diensten_notitie) && (
-                <div className="mt-3 text-xs text-muted-foreground bg-accent/20 rounded-[8px] p-2 border border-border/40 whitespace-pre-wrap">
-                  {appointment.werkzaamheden_omschrijving || appointment.diensten_notitie}
-                </div>
-              )}
-
-              {/* 4e. Notities algemeen */}
-              {appointment.notities && (
-                <div className="mt-3 text-xs text-muted-foreground bg-accent/20 rounded-[8px] p-2 border border-border/40 whitespace-pre-wrap">
-                  {appointment.notities}
-                </div>
-              )}
-
-              {/* divider */}
-              <div className="my-4 h-px bg-border/40" />
-
-              {/* 6. Status knoppen */}
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-emerald-600/80 text-white border-emerald-500" },
-                  { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/40 text-white border-muted-foreground/60" },
-                  { v: "geannuleerd" as AppointmentStatus, label: "No-show", active: "bg-orange-600/80 text-white border-orange-500" },
-                ].map(({ v, label, active }) => {
-                  const isActive = localStatus === v;
-                  return (
-                    <button
-                      key={v}
-                      type="button"
-                      disabled={statusSaving}
-                      onClick={() => setStatus(v)}
-                      className={cn(
-                        "py-2 rounded-[10px] border text-[11px] font-medium transition-colors disabled:opacity-70",
-                        isActive ? active : "bg-transparent text-foreground/80 border-border/60 hover:bg-accent/30"
+                    {/* BODY */}
+                    <div className="px-5 py-4 space-y-3">
+                      {/* Klant */}
+                      {customerName ? (
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-accent/40 border border-border/50 inline-flex items-center justify-center shrink-0">
+                            <User className="w-3.5 h-3.5 text-muted-foreground" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium text-foreground truncate">{customerName}</div>
+                            {appointment.customer?.telefoon && (
+                              <div className="text-[11px] text-muted-foreground truncate">{appointment.customer.telefoon}</div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-xs text-muted-foreground/60 italic">Geen klant gekoppeld</div>
                       )}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
 
-              {/* divider */}
-              <div className="my-4 h-px bg-border/40" />
+                      {/* Voertuig (eigen voorraad) */}
+                      {appointment.vehicle && (
+                        <button
+                          onClick={goToVehicle}
+                          className="group flex items-center gap-2.5 w-full text-left p-2 -m-2 rounded-[4px] hover:bg-accent/30 transition-colors"
+                        >
+                          <div className="w-7 h-7 rounded-[4px] bg-accent/40 border border-border/50 inline-flex items-center justify-center shrink-0">
+                            <Car className="w-3.5 h-3.5 text-muted-foreground group-hover:text-emerald-400 transition-colors" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm text-foreground group-hover:text-emerald-400 transition-colors truncate">
+                              {appointment.vehicle.merk} {appointment.vehicle.model}
+                            </div>
+                            {appointment.vehicle.kenteken && (
+                              <div className="text-[11px] font-mono text-muted-foreground tracking-wider">{appointment.vehicle.kenteken}</div>
+                            )}
+                          </div>
+                        </button>
+                      )}
 
-              {/* 8. Acties */}
-              <div className="space-y-2.5">
-                {/* Bellen + WhatsApp */}
-                {appointment.customer?.telefoon && (
-                  <div className="grid grid-cols-2 gap-2">
-                    <a
-                      href={`tel:${appointment.customer.telefoon}`}
-                      className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-[10px] border border-border/60 text-xs text-foreground hover:bg-accent/40 transition-colors"
-                    >
-                      <Phone className="w-3.5 h-3.5" /> Bellen
-                    </a>
-                    {waNumber ? (
-                      <a
-                        href={`https://wa.me/${waNumber}?text=${waMessage}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-[10px] border border-emerald-500/40 text-xs text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+                      {/* Klant-voertuig */}
+                      {(appointment.voertuig_klant_kenteken || appointment.voertuig_klant_omschrijving) && (
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-[4px] bg-accent/40 border border-border/50 inline-flex items-center justify-center shrink-0">
+                            <Car className="w-3.5 h-3.5 text-muted-foreground" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm text-foreground truncate">{appointment.voertuig_klant_omschrijving || "Klant voertuig"}</div>
+                            {appointment.voertuig_klant_kenteken && (
+                              <div className="text-[11px] font-mono text-muted-foreground tracking-wider">{appointment.voertuig_klant_kenteken}</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Diensten chips */}
+                      {appointment.diensten && appointment.diensten.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {appointment.diensten.map((d) => (
+                            <span key={d} className="inline-flex items-center px-2 py-0.5 rounded-[3px] bg-accent/50 border border-border/40 text-[10px] text-foreground/80 uppercase tracking-wide">
+                              {d}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Werkzaamheden / notitie */}
+                      {(appointment.werkzaamheden_omschrijving || appointment.diensten_notitie || appointment.notities) && (
+                        <div className="text-[12px] text-foreground/80 bg-accent/25 rounded-[4px] p-2.5 border-l-2 border-border whitespace-pre-wrap leading-relaxed">
+                          {appointment.werkzaamheden_omschrijving || appointment.diensten_notitie || appointment.notities}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* STATUS — segmented */}
+                    <div className="px-5 pb-3">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-1.5 font-medium">Status</div>
+                      <div className="inline-flex w-full rounded-[4px] border border-border/60 bg-background/40 p-0.5">
+                        {[
+                          { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-emerald-500/90 text-white" },
+                          { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/50 text-white" },
+                          { v: "geannuleerd" as AppointmentStatus, label: "No-show", active: "bg-orange-500/90 text-white" },
+                        ].map(({ v, label, active }) => {
+                          const isActive = localStatus === v;
+                          return (
+                            <button
+                              key={v}
+                              type="button"
+                              disabled={statusSaving}
+                              onClick={() => setStatus(v)}
+                              className={cn(
+                                "flex-1 py-1.5 rounded-[3px] text-[11px] font-medium transition-all disabled:opacity-70",
+                                isActive ? active : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
+                              )}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* CONTACT ACTIES */}
+                    {appointment.customer?.telefoon && (
+                      <div className="px-5 pb-3 grid grid-cols-2 gap-2">
+                        <a
+                          href={`tel:${appointment.customer.telefoon}`}
+                          className="inline-flex items-center justify-center gap-1.5 py-2 rounded-[4px] border border-border/60 bg-background/40 text-xs text-foreground hover:bg-accent/40 hover:border-border transition-colors"
+                        >
+                          <Phone className="w-3.5 h-3.5" /> Bellen
+                        </a>
+                        {waNumber ? (
+                          <a
+                            href={`https://wa.me/${waNumber}?text=${waMessage}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-1.5 py-2 rounded-[4px] border border-emerald-500/40 bg-emerald-500/10 text-xs text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                          </a>
+                        ) : <span />}
+                      </div>
+                    )}
+
+                    {/* TYPE-SPECIFIEKE acties */}
+                    {((appointment.type === "bezichtiging" && appointment.vehicle) ||
+                      (appointment.type === "proefrit" && appointment.vehicle) ||
+                      ((appointment.type === "ophalen" || appointment.type === "aflevering") && appointment.vehicle) ||
+                      (appointment.type === "onderhoud" && appointment.vehicle)) && (
+                      <div className="px-5 pb-3 flex flex-wrap gap-x-3 gap-y-1.5">
+                        {appointment.type === "bezichtiging" && onCreate && (
+                          <button onClick={convertToProefrit} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                            <Repeat className="w-3 h-3" /> Naar proefrit
+                          </button>
+                        )}
+                        {(appointment.type === "bezichtiging" || appointment.type === "proefrit") && (
+                          <button onClick={startVerkoop} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                            <ShoppingCart className="w-3 h-3" /> Verkoop starten
+                          </button>
+                        )}
+                        {appointment.type === "proefrit" && (
+                          <button onClick={goToProefritDoc} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                            <FileText className="w-3 h-3" /> Proefrit document
+                          </button>
+                        )}
+                        {(appointment.type === "ophalen" || appointment.type === "aflevering") && (
+                          <button onClick={goToVerkoopList} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                            <ShoppingCart className="w-3 h-3" /> Naar verkoop
+                          </button>
+                        )}
+                        {appointment.type === "onderhoud" && (
+                          <button onClick={goToKosten} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                            <Receipt className="w-3 h-3" /> Kosten
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* FOOTER bar */}
+                    <div className="flex items-center justify-between px-3 py-2 border-t border-border/40 bg-background/30">
+                      <button
+                        onClick={startEdit}
+                        className="px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5 rounded-[3px] hover:bg-accent/40"
                       >
-                        <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
-                      </a>
-                    ) : <span />}
-                  </div>
-                )}
-
-                {/* Type-specifieke extra acties */}
-                {appointment.type === "bezichtiging" && appointment.vehicle && (
-                  <div className="flex flex-col gap-1.5 text-xs">
-                    {onCreate && (
-                      <button onClick={convertToProefrit} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                        <Repeat className="w-3.5 h-3.5" /> Omzetten naar proefrit
+                        <Pencil className="w-3 h-3" /> Bewerken
                       </button>
-                    )}
-                    <button onClick={startVerkoop} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                      <ShoppingCart className="w-3.5 h-3.5" /> Verkoop starten
-                    </button>
-                  </div>
-                )}
-                {appointment.type === "proefrit" && appointment.vehicle && (
-                  <div className="flex flex-col gap-1.5 text-xs">
-                    <button onClick={goToProefritDoc} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                      <FileText className="w-3.5 h-3.5" /> Proefrit document
-                    </button>
-                    <button onClick={startVerkoop} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                      <ShoppingCart className="w-3.5 h-3.5" /> Verkoop starten
-                    </button>
-                  </div>
-                )}
-                {(appointment.type === "ophalen" || appointment.type === "aflevering") && appointment.vehicle && (
-                  <div className="flex flex-col gap-1.5 text-xs">
-                    <button onClick={goToVerkoopList} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                      <ShoppingCart className="w-3.5 h-3.5" /> Naar verkoop
-                    </button>
-                  </div>
-                )}
-                {appointment.type === "onderhoud" && appointment.vehicle && (
-                  <div className="flex flex-col gap-1.5 text-xs">
-                    <button onClick={goToKosten} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                      <Receipt className="w-3.5 h-3.5" /> Kosten toevoegen
-                    </button>
-                  </div>
-                )}
-
-                {/* Onderste rij: Bewerken/Naar voertuig links — Verwijderen rechts */}
-                <div className="flex items-center justify-between gap-3 text-xs pt-1">
-                  <div className="flex items-center gap-3">
-                    <button onClick={startEdit} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                      <Pencil className="w-3.5 h-3.5" /> Bewerken
-                    </button>
-                    {appointment.vehicle && (
-                      <button onClick={goToVehicle} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                        <Car className="w-3.5 h-3.5" /> Naar voertuig
+                      <button
+                        onClick={() => setConfirmDelete(true)}
+                        className="px-2 py-1 text-[11px] text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1.5 rounded-[3px] hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-3 h-3" /> Verwijderen
                       </button>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => setConfirmDelete(true)}
-                    className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center gap-1"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" /> Verwijderen
-                  </button>
-                </div>
-              </div>
+                    </div>
+                  </>
+                );
+              })()}
             </motion.div>
           </AnimatePresence>
+
         ) : (
           <div className="p-4 space-y-4">
             <div className="mb-2 flex items-center gap-2 text-sm">
