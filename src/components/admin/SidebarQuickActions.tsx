@@ -222,23 +222,25 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
         ) : (
           <motion.div
             ref={popRef}
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            initial={{ opacity: 0, y: 6, scale: 0.985 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.98 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: 3, scale: 0.985 }}
+            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
             style={pos ? { top: pos.top, bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
-            className={`fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-3xl border border-border/80 bg-card shadow-[0_24px_60px_-12px_rgba(0,0,0,0.65)] ${variant === "header" ? "origin-top-right" : "origin-bottom-right"} backdrop-blur-xl`}
-
+            className={`fixed z-[60] w-[380px] max-h-[min(640px,80vh)] overflow-y-auto rounded-[6px] border border-border/70 bg-card shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7)] ${variant === "header" ? "origin-top-right" : "origin-bottom-right"}`}
           >
-            <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between sticky top-0 bg-card/95 backdrop-blur-md z-10 rounded-t-3xl">
+            <div className="px-5 pt-4 pb-3 border-b border-border/40 flex items-center justify-between sticky top-0 bg-card z-10">
               <div>
-                <h3 className="text-sm font-semibold text-foreground tracking-tight">Snelstart</h3>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Start direct een actie</p>
+                <h3 className="text-[13px] font-semibold text-foreground tracking-tight leading-none">Snelstart</h3>
+                <p className="text-[10.5px] text-muted-foreground mt-1.5 leading-none">Start direct een actie</p>
               </div>
-              <button onClick={() => setOpen(false)} className="p-1.5 -mr-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"><X className="w-4 h-4" /></button>
+              <button onClick={() => setOpen(false)} aria-label="Sluiten" className="h-7 w-7 inline-flex items-center justify-center rounded-[4px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
             <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
           </motion.div>
+
         )
       )}
     </AnimatePresence>
@@ -273,31 +275,31 @@ const PanelInner = ({
   setKenteken: (v: string) => void;
   onKentekenSubmit: (e: React.FormEvent) => void;
 }) => (
-  <div className="p-3 space-y-3">
+  <div className="p-4 space-y-4">
     {sections.map((sec) => (
       <div key={sec.title}>
-        <p className="px-1 pb-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">{sec.title}</p>
-        <div className="grid grid-cols-2 gap-1.5">
+        <p className="px-0.5 pb-2 text-[9.5px] font-semibold text-muted-foreground/70 uppercase tracking-[0.18em]">{sec.title}</p>
+        <div className="grid grid-cols-2 gap-1">
           {sec.items.map((it) => (
             <button
               key={it.label}
               onClick={it.onClick}
-              className="group flex items-center gap-2.5 px-3 py-3 rounded-2xl text-[12.5px] font-medium text-foreground bg-background border border-border/70 hover:border-foreground/40 hover:bg-accent/40 shadow-sm hover:shadow-md transition-all duration-150 text-left active:scale-[0.97]"
+              className="group relative flex items-center gap-2.5 px-2.5 py-2.5 rounded-[4px] text-[12px] font-medium text-foreground/90 hover:text-foreground hover:bg-accent/40 transition-colors duration-150 text-left"
             >
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-accent/40 border border-border/60 text-foreground group-hover:bg-foreground group-hover:text-background group-hover:border-foreground transition-colors flex-shrink-0">
-                <it.icon className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-[4px] border border-border/60 text-muted-foreground group-hover:text-foreground group-hover:border-foreground/40 transition-colors flex-shrink-0">
+                <it.icon className="w-3.5 h-3.5" strokeWidth={1.75} />
               </span>
-              <span className="leading-tight">{it.label}</span>
+              <span className="leading-tight truncate">{it.label}</span>
             </button>
           ))}
         </div>
       </div>
     ))}
-    <div className="pt-2 border-t border-border/60">
-      <p className="px-1 pb-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Kenteken opzoeken</p>
-      <form onSubmit={onKentekenSubmit} className="flex items-center gap-2">
+    <div className="pt-3 border-t border-border/40">
+      <p className="px-0.5 pb-2 text-[9.5px] font-semibold text-muted-foreground/70 uppercase tracking-[0.18em]">Kenteken opzoeken</p>
+      <form onSubmit={onKentekenSubmit} className="flex items-center gap-1.5">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/70" strokeWidth={1.75} />
           <input
             value={kenteken}
             onChange={(e) => setKenteken(e.target.value.toUpperCase())}
@@ -307,13 +309,14 @@ const PanelInner = ({
             autoCapitalize="characters"
             spellCheck={false}
             inputMode="text"
-            className="w-full pl-8 pr-2 h-10 text-base bg-background border border-border rounded-2xl focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60 uppercase tracking-wider"
+            className="w-full pl-8 pr-2 h-9 text-[13px] bg-background border border-border/60 rounded-[4px] focus:outline-none focus:border-foreground/50 text-foreground placeholder:text-muted-foreground/50 uppercase tracking-[0.15em] font-mono"
           />
         </div>
-        <button type="submit" className="h-10 px-5 text-xs font-medium bg-foreground text-background rounded-2xl hover:bg-foreground/90 transition-colors">Ga</button>
+        <button type="submit" className="h-9 px-4 text-[11px] font-semibold uppercase tracking-wider bg-foreground text-background rounded-[4px] hover:bg-foreground/90 transition-colors">Ga</button>
       </form>
     </div>
   </div>
 );
+
 
 export default SidebarQuickActions;
