@@ -352,7 +352,7 @@ const AdminPlanningPage = () => {
                     {filteredAppointments.map((a) => {
                       const isPast = new Date(a.datum_tijd) < new Date() && a.status === "gepland";
                       return (
-                        <tr key={a.id} onClick={() => setMobileDialogId(a.id)}
+                        <tr key={a.id} onClick={(e) => openAppt(a, (e.currentTarget as HTMLElement).getBoundingClientRect())}
                           className={cn("border-b border-border/50 hover:bg-accent/10 cursor-pointer transition-colors", isPast ? "opacity-60" : "")}>
                           <td className="px-4 py-2.5 whitespace-nowrap">
                             <p className="font-medium">{format(new Date(a.datum_tijd), "d MMM yyyy", { locale: nl })}</p>
