@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { useCustomers, Customer, statusLabels, statusColors } from "@/hooks/useCustomers";
+import { useCustomers, Customer, statusLabels, statusColors, bronLabels, bronColors, CustomerBron } from "@/hooks/useCustomers";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Loader2, ChevronRight, Trash2 } from "lucide-react";
 import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
@@ -11,11 +11,13 @@ import { BADGE_BASE } from "@/components/admin/StatusBadge";
 import { deleteCustomerSafely } from "@/lib/customerDelete";
 
 const allStatuses: Customer["status"][] = ["prospect", "klant", "inactief"];
+const allBronnen: CustomerBron[] = ["proefrit", "aanbetaling", "afspraak", "verkoop", "lead", "handmatig"];
 
 const statusTabs = [
   { label: "Alle", value: "alle" },
   ...allStatuses.map((s) => ({ label: statusLabels[s], value: s })),
 ];
+
 
 const AdminKlantenPage = () => {
   const { customers, loading, addCustomer, fetchCustomers } = useCustomers();
