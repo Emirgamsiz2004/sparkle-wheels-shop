@@ -76,7 +76,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   // Position popover near anchorRect (desktop)
   useLayoutEffect(() => {
     if (!open || isMobile || !anchorRect) { setPos(null); return; }
-    const POPOVER_W = 300;
+    const POPOVER_W = 340;
     const margin = 8;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
