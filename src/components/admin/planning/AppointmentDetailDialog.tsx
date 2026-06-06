@@ -407,7 +407,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                       {appointment.diensten && appointment.diensten.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {appointment.diensten.map((d) => (
-                            <span key={d} className="inline-flex items-center px-2 py-0.5 rounded-[3px] bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300/90 uppercase tracking-wide font-medium">
+                            <span key={d} className="inline-flex items-center px-2 py-0.5 rounded-[3px] bg-foreground/[0.06] border border-border/60 text-[10px] text-foreground/80 uppercase tracking-wide font-medium">
                               {d}
                             </span>
                           ))}
@@ -416,7 +416,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
 
                       {/* Werkzaamheden / notitie */}
                       {(appointment.werkzaamheden_omschrijving || appointment.diensten_notitie || appointment.notities) && (
-                        <div className="text-[12px] text-foreground/85 bg-emerald-500/[0.06] rounded-[4px] p-2.5 border-l-2 border-emerald-500/50 whitespace-pre-wrap leading-relaxed">
+                        <div className="text-[12px] text-foreground/85 bg-foreground/[0.03] rounded-[4px] p-2.5 border-l-2 border-foreground/30 whitespace-pre-wrap leading-relaxed">
                           {appointment.werkzaamheden_omschrijving || appointment.diensten_notitie || appointment.notities}
                         </div>
                       )}
