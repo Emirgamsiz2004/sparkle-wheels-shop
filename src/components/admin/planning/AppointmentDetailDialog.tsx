@@ -310,7 +310,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                 const isNow = !past && absMin <= 30;
                 const accent = localStatus === "voltooid" ? "bg-muted-foreground/40"
                   : localStatus === "geannuleerd" ? "bg-orange-500"
-                  : isNow ? "bg-emerald-400" : "bg-emerald-500/60";
+                  : isNow ? "bg-foreground" : "bg-foreground/40";
                 return (
                   <>
                     {/* HERO: type badge + countdown strip */}
