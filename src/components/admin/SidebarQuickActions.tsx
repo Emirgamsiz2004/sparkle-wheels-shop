@@ -226,8 +226,9 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            style={pos ? { bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
-            className="fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-3xl border border-border/80 bg-card shadow-[0_24px_60px_-12px_rgba(0,0,0,0.65)] origin-bottom-right backdrop-blur-xl"
+            style={pos ? { top: pos.top, bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
+            className={`fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-3xl border border-border/80 bg-card shadow-[0_24px_60px_-12px_rgba(0,0,0,0.65)] ${variant === "header" ? "origin-top-right" : "origin-bottom-right"} backdrop-blur-xl`}
+
           >
             <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between sticky top-0 bg-card/95 backdrop-blur-md z-10 rounded-t-3xl">
               <div>
