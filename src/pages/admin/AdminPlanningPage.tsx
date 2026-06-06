@@ -204,7 +204,7 @@ const AdminPlanningPage = () => {
       {view === "agenda" ? (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 lg:items-stretch">
           {/* LEFT: agenda */}
-          <div className="space-y-3 min-w-0">
+          <div className="flex flex-col gap-3 min-w-0">
             {/* Week navigation */}
             <div className="flex items-center gap-2">
               <button onClick={() => setWeekStart(subWeeks(weekStart, 1))} className="inline-flex items-center justify-center w-8 h-8 border border-border rounded-md hover:bg-accent transition-colors">
