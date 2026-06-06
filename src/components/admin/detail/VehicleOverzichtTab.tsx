@@ -107,6 +107,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
     toast.success("Inkoopprijs bijgewerkt");
   };
 
+  const handleSaveCommissie = async (val: number) => {
+    await onSave({ ...vehicle, consignatieCommissiePerc: val });
+    onLogActivity("commissie_gewijzigd", `Consignatie commissie bijgewerkt naar ${val}%`);
+    toast.success("Commissie bijgewerkt");
+  };
+
+  const isConsignatie = vehicle.status === "consignatie" || vehicle.verkoopType === "consignatie";
+
   const inputCls = "w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all";
 
   const hasPaymentInfo = !!(vehicle.contantBedrag || vehicle.overboekingBedrag || vehicle.aanbetalingsbedrag || vehicle.financieringActief || vehicle.inruilKenteken);
@@ -122,16 +130,28 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
       {/* Aanbetaling: tonen wanneer er een aanbetaling op dit voertuig is */}
       <AanbetalingBlock vehicleId={vehicle.id} />
 
-      {/* KPI card - alleen Inkoop op de voertuigpagina (verkoopcijfers staan in de Verkoop module) */}
+      {/* KPI card - Inkoop of Commissie% bij consignatie */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard
-          label="Inkoop"
-          value={formatEuroDecimal(vehicle.inkoopprijs || 0)}
-          editable
-          minValue={0}
-          rawValue={vehicle.inkoopprijs || 0}
-          onSave={handleSaveInkoopprijs}
-        />
+        {isConsignatie ? (
+          <KpiCard
+            label="Commissie %"
+            value={`${vehicle.consignatieCommissiePerc || 0}%`}
+            editable
+            minValue={0}
+            rawValue={vehicle.consignatieCommissiePerc || 0}
+            onSave={handleSaveCommissie}
+            isPercent
+          />
+        ) : (
+          <KpiCard
+            label="Inkoop"
+            value={formatEuroDecimal(vehicle.inkoopprijs || 0)}
+            editable
+            minValue={0}
+            rawValue={vehicle.inkoopprijs || 0}
+            onSave={handleSaveInkoopprijs}
+          />
+        )}
       </div>
 
       {/* Vehicle info - full width */}
@@ -232,7 +252,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   );
 };
 
-const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1 }: {
+const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1, isPercent = false }: {
   label: string;
   value: string;
   color?: string;
@@ -240,6 +260,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1
   rawValue?: number;
   onSave?: (val: number) => Promise<void>;
   minValue?: number;
+  isPercent?: boolean;
 }) => {
   const [editing, setEditing] = useState(false);
   const [editVal, setEditVal] = useState("");
@@ -261,7 +282,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1
     if (cleaned === "") return cancel();
     const num = Number(cleaned);
     if (isNaN(num) || num < minValue) {
-      toast.error(`Voer een geldig bedrag in (minimaal € ${minValue.toFixed(2).replace(".", ",")})`);
+      toast.error(isPercent ? `Voer een geldig percentage in (minimaal ${minValue}%)` : `Voer een geldig bedrag in (minimaal € ${minValue.toFixed(2).replace(".", ",")})`);
       return;
     }
     setSaving(true);
@@ -283,7 +304,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
       {editing ? (
         <div className="flex items-center gap-1.5">
-          <span className="text-sm text-muted-foreground">€</span>
+          <span className="text-sm text-muted-foreground">{isPercent ? "%" : "€"}</span>
           <input
             autoFocus
             type="text"
