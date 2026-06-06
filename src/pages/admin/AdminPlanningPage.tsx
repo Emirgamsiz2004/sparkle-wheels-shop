@@ -280,48 +280,35 @@ const AdminPlanningPage = () => {
             )}
           </div>
 
-          {/* RIGHT: detail panel (desktop only) */}
+          {/* RIGHT: upcoming sidebar (desktop only) */}
           {!isMobile && (
             <aside className="lg:sticky lg:top-4">
-              {selected ? (
-                <AppointmentDetailPanel
-                  appointment={selected}
-                  onUpdate={updateAppointment}
-                  onDelete={async (id) => { await deleteAppointment(id); setSelectedId(null); }}
-                  onEdit={() => setMobileDialogId(selected.id)}
-                  onClose={() => setSelectedId(null)}
-                  showClose
-                />
-              ) : (
-                <div className="bg-card border border-border rounded-[6px] p-5 space-y-3">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    <h3 className="text-sm font-semibold text-foreground">Aankomende afspraken</h3>
-                  </div>
-                  {upcoming.length === 0 ? (
-                    <p className="text-xs text-muted-foreground py-6 text-center">Geen aankomende afspraken</p>
-                  ) : (
-                    <div className="space-y-1.5">
-                      {upcoming.map((a) => (
-                        <button key={a.id} onClick={() => openAppt(a)}
-                          className="w-full text-left bg-background/40 hover:bg-accent/30 border border-border/40 rounded-[3px] px-3 py-2 transition-colors">
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", typeDotColors[a.type])} />
-                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                              {format(new Date(a.datum_tijd), "EEE d MMM · HH:mm", { locale: nl })}
-                            </span>
-                          </div>
-                          {a.customer && <p className="text-sm truncate text-foreground">{a.customer.voornaam} {a.customer.achternaam}</p>}
-                          {a.vehicle && <p className="text-[11px] text-muted-foreground truncate">{a.vehicle.merk} {a.vehicle.model}</p>}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-[11px] text-muted-foreground/60 pt-2 border-t border-border/40 inline-flex items-center gap-1.5">
-                    <CalendarIcon className="w-3 h-3" /> Klik op een afspraak om details te zien
-                  </p>
+              <div className="bg-card border border-border rounded-[3px] p-4 space-y-3">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="w-4 h-4" />
+                  <h3 className="text-sm font-semibold text-foreground">Aankomende afspraken</h3>
                 </div>
-              )}
+                {upcoming.length === 0 ? (
+                  <p className="text-xs text-muted-foreground py-6 text-center">Geen aankomende afspraken</p>
+                ) : (
+                  <div className="space-y-1.5">
+                    {upcoming.map((a) => (
+                      <button key={a.id}
+                        onClick={(e) => openAppt(a, (e.currentTarget as HTMLElement).getBoundingClientRect())}
+                        className="w-full text-left bg-background/40 hover:bg-accent/30 border border-border rounded-[3px] px-3 py-2 transition-colors">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", typeDotColors[a.type])} />
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                            {format(new Date(a.datum_tijd), "EEE d MMM · HH:mm", { locale: nl })}
+                          </span>
+                        </div>
+                        {a.customer && <p className="text-sm truncate text-foreground">{a.customer.voornaam} {a.customer.achternaam}</p>}
+                        {a.vehicle && <p className="text-[11px] text-muted-foreground truncate">{a.vehicle.merk} {a.vehicle.model}</p>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </aside>
           )}
         </div>
