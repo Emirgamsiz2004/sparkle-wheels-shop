@@ -130,16 +130,28 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
       {/* Aanbetaling: tonen wanneer er een aanbetaling op dit voertuig is */}
       <AanbetalingBlock vehicleId={vehicle.id} />
 
-      {/* KPI card - alleen Inkoop op de voertuigpagina (verkoopcijfers staan in de Verkoop module) */}
+      {/* KPI card - Inkoop of Commissie% bij consignatie */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard
-          label="Inkoop"
-          value={formatEuroDecimal(vehicle.inkoopprijs || 0)}
-          editable
-          minValue={0}
-          rawValue={vehicle.inkoopprijs || 0}
-          onSave={handleSaveInkoopprijs}
-        />
+        {isConsignatie ? (
+          <KpiCard
+            label="Commissie %"
+            value={`${vehicle.consignatieCommissiePerc || 0}%`}
+            editable
+            minValue={0}
+            rawValue={vehicle.consignatieCommissiePerc || 0}
+            onSave={handleSaveCommissie}
+            isPercent
+          />
+        ) : (
+          <KpiCard
+            label="Inkoop"
+            value={formatEuroDecimal(vehicle.inkoopprijs || 0)}
+            editable
+            minValue={0}
+            rawValue={vehicle.inkoopprijs || 0}
+            onSave={handleSaveInkoopprijs}
+          />
+        )}
       </div>
 
       {/* Vehicle info - full width */}
