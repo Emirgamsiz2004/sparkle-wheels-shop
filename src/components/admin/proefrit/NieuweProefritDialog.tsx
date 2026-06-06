@@ -21,7 +21,7 @@ interface Props {
 
 type Step = "select" | "form" | "result";
 
-const inputCls = "w-full h-12 px-4 text-base md:h-auto md:px-3 md:py-2.5 md:text-sm bg-background border border-border/60 rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground/60";
+const inputCls = "w-full h-12 px-4 text-base md:h-11 md:px-3.5 md:py-2.5 md:text-[13px] bg-[rgba(255,255,255,0.04)] border border-border/70 rounded-[10px] focus:outline-none focus:ring-1 focus:ring-foreground/40 focus:border-foreground/40 text-foreground placeholder:text-muted-foreground/80 transition-colors";
 
 const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }: Props) => {
   const { startTestDrive } = useTestDrives();
