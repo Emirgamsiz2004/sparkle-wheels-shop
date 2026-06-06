@@ -3292,6 +3292,10 @@ export type Database = {
         }
         Returns: string
       }
+      test_drive_accepts_anon_upload: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
       test_drive_exists: { Args: { p_id: string }; Returns: boolean }
     }
     Enums: {
