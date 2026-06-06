@@ -4,7 +4,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { QRCodeSVG } from "qrcode.react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
 import { useVehicles } from "@/hooks/useVehicles";
-import { Copy, Check, ExternalLink, Printer, Search, Car, X, Loader2 } from "lucide-react";
+import { useCustomers, Customer } from "@/hooks/useCustomers";
+import { Copy, Check, ExternalLink, Printer, Search, Car, X, Loader2, User, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { keepFocusedFieldVisible, useKeyboardSafeViewport } from "@/hooks/use-keyboard-safe-viewport";
@@ -25,6 +26,7 @@ const inputCls = "w-full h-12 px-4 text-base md:h-auto md:px-3 md:py-2.5 md:text
 const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }: Props) => {
   const { startTestDrive } = useTestDrives();
   const { vehicles } = useVehicles();
+  const { customers } = useCustomers();
   const isMobile = useIsMobile();
   const keyboardViewport = useKeyboardSafeViewport(open && isMobile);
   const [step, setStep] = useState<Step>(preselectedVehicle ? "form" : "select");
@@ -40,6 +42,22 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
   const [manualKenteken, setManualKenteken] = useState("");
   const [manualBouwjaar, setManualBouwjaar] = useState("");
   const [rdwLoading, setRdwLoading] = useState(false);
+
+  // Customer selection
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const customerInputRef = useRef<HTMLInputElement>(null);
+
+  const filteredCustomers = useMemo(() => {
+    if (!customerSearch.trim()) return customers.slice(0, 8);
+    const q = customerSearch.toLowerCase();
+    return customers.filter((c) =>
+      `${c.voornaam} ${c.achternaam}`.toLowerCase().includes(q) ||
+      c.email.toLowerCase().includes(q) ||
+      c.telefoon.includes(q)
+    ).slice(0, 8);
+  }, [customers, customerSearch]);
 
   const handleRdwLookup = async () => {
     const k = manualKenteken.trim();
@@ -137,7 +155,8 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
         kenteken: selectedVehicle.kenteken,
         bouwjaar: selectedVehicle.bouwjaar,
       },
-      medewerker || undefined
+      medewerker || undefined,
+      selectedCustomer?.id
     );
     setLoading(false);
     if (td) {
@@ -165,6 +184,9 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
     setManualKenteken("");
     setManualBouwjaar("");
     setKmVoor(preselectedVehicle?.kilometerstand?.toString() || "");
+    setCustomerSearch("");
+    setSelectedCustomer(null);
+    setShowCustomerDropdown(false);
     onClose();
   };
 
@@ -343,6 +365,82 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
 
           {step === "form" && (
             <motion.div key="form" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }} className="space-y-4">
+              {/* Customer selection */}
+              <div className="relative">
+                <label className="block text-[11px] text-muted-foreground mb-1">Klant (optioneel)</label>
+                {selectedCustomer ? (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-accent/20 border border-border/60 rounded-[10px]">
+                    <User className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-foreground truncate">{selectedCustomer.voornaam} {selectedCustomer.achternaam}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{selectedCustomer.email} · {selectedCustomer.telefoon}</p>
+                    </div>
+                    <button
+                      onClick={() => { setSelectedCustomer(null); setCustomerSearch(""); }}
+                      className="shrink-0 p-1 rounded-full hover:bg-accent/40 text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label="Verwijder selectie"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <input
+                      ref={customerInputRef}
+                      value={customerSearch}
+                      onChange={(e) => {
+                        setCustomerSearch(e.target.value);
+                        setShowCustomerDropdown(true);
+                      }}
+                      onFocus={() => setShowCustomerDropdown(true)}
+                      placeholder="Zoek bestaande klant..."
+                      className={`${inputCls} pl-8`}
+                    />
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  </div>
+                )}
+
+                {/* Customer dropdown */}
+                <AnimatePresence>
+                  {showCustomerDropdown && !selectedCustomer && (
+                    <>
+                      {/* Backdrop to close dropdown */}
+                      <div className="fixed inset-0 z-40" onClick={() => setShowCustomerDropdown(false)} />
+                      <motion.div
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.12 }}
+                        className="absolute z-50 left-0 right-0 mt-1 bg-card border border-border/60 rounded-[10px] shadow-lg max-h-[200px] overflow-y-auto py-1"
+                      >
+                        {filteredCustomers.length === 0 ? (
+                          <p className="text-xs text-muted-foreground text-center py-3">Geen klanten gevonden</p>
+                        ) : (
+                          filteredCustomers.map((c) => (
+                            <button
+                              key={c.id}
+                              onClick={() => {
+                                setSelectedCustomer(c);
+                                setCustomerSearch(`${c.voornaam} ${c.achternaam}`);
+                                setShowCustomerDropdown(false);
+                              }}
+                              className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+                            >
+                              <User className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm text-foreground truncate">{c.voornaam} {c.achternaam}</p>
+                                <p className="text-[10px] text-muted-foreground truncate">{c.email} · {c.telefoon}</p>
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <div>
                 <label className="block text-[11px] text-muted-foreground mb-1">Begeleidende medewerker</label>
                 <input value={medewerker} onChange={(e) => setMedewerker(e.target.value)} placeholder="Naam medewerker" className={inputCls} />
@@ -353,7 +451,7 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
               </p>
               <div className="flex gap-2">
                 {!preselectedVehicle && (
-                  <button onClick={() => { setStep("select"); setSelectedVehicle(null); }} className="flex-1 py-2.5 text-xs font-medium border border-border/60 rounded-[10px] hover:bg-accent/20 transition-colors">
+                  <button onClick={() => { setStep("select"); setSelectedVehicle(null); setSelectedCustomer(null); setCustomerSearch(""); }} className="flex-1 py-2.5 text-xs font-medium border border-border/60 rounded-[10px] hover:bg-accent/20 transition-colors">
                     Terug
                   </button>
                 )}

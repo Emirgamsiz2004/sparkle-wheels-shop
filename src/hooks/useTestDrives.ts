@@ -83,11 +83,12 @@ export function useTestDrives() {
 
   useEffect(() => { fetchTestDrives(); }, [fetchTestDrives]);
 
-  const startTestDrive = async (vehicleId: string, kmVoor: number, voertuigInfo: { merk: string; model: string; kenteken?: string; bouwjaar?: number }, begeleidendeMedewerker?: string) => {
+  const startTestDrive = async (vehicleId: string, kmVoor: number, voertuigInfo: { merk: string; model: string; kenteken?: string; bouwjaar?: number }, begeleidendeMedewerker?: string, customerId?: string) => {
     const token = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
     
     const { data, error } = await supabase.from('test_drives').insert({
       vehicle_id: vehicleId,
+      customer_id: customerId || null,
       token,
       km_voor: kmVoor,
       status: 'wacht_op_klant',
