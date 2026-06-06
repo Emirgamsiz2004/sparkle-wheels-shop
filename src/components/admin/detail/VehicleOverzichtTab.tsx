@@ -107,6 +107,14 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
     toast.success("Inkoopprijs bijgewerkt");
   };
 
+  const handleSaveCommissie = async (val: number) => {
+    await onSave({ ...vehicle, consignatieCommissiePerc: val });
+    onLogActivity("commissie_gewijzigd", `Consignatie commissie bijgewerkt naar ${val}%`);
+    toast.success("Commissie bijgewerkt");
+  };
+
+  const isConsignatie = vehicle.status === "consignatie" || vehicle.verkoopType === "consignatie";
+
   const inputCls = "w-full px-3 py-2.5 text-sm bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all";
 
   const hasPaymentInfo = !!(vehicle.contantBedrag || vehicle.overboekingBedrag || vehicle.aanbetalingsbedrag || vehicle.financieringActief || vehicle.inruilKenteken);
