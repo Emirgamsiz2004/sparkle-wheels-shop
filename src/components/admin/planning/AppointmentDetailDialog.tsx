@@ -324,8 +324,8 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                           · {countdown}
                         </span>
                         {isNow && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Nu
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-foreground uppercase tracking-wider">
+                            <span className="w-1.5 h-1.5 rounded-full bg-foreground animate-pulse" /> Nu
                           </span>
                         )}
                       </div>
