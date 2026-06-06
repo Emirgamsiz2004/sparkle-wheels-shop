@@ -41,6 +41,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
 
   // Direct-action dialogs launched from the quick menu
   const [proefritOpen, setProefritOpen] = useState(false);
+  const [proefritAnchor, setProefritAnchor] = useState<DOMRect | null>(null);
   const [klantOpen, setKlantOpen] = useState(false);
   const [klantAnchor, setKlantAnchor] = useState<DOMRect | null>(null);
   const [inkoopOpen, setInkoopOpen] = useState(false);
