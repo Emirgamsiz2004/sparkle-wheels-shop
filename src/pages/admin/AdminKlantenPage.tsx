@@ -245,7 +245,9 @@ const AdminKlantenPage = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
+
               </tbody>
             </table>
           </div>
