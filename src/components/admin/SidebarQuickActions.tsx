@@ -141,6 +141,10 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       className={
         variant === "fab"
           ? `inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_10px_30px_-6px_rgba(16,185,129,0.55)] ring-1 ring-emerald-300/30 transition-transform duration-200 ease-out active:scale-95 ${className}`
+          : variant === "header"
+          ? `inline-flex items-center gap-1.5 h-9 px-2.5 sm:px-3 rounded-md border border-border bg-card hover:bg-accent text-foreground transition-colors text-[12px] font-medium ${
+              open ? "bg-accent" : ""
+            } ${className}`
           : variant === "rail"
           ? `flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] transition-colors whitespace-nowrap text-foreground hover:bg-accent/60 border border-border/60 ${
               open ? "bg-accent" : ""
@@ -166,8 +170,12 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       {variant === "rail" && (
         <span className="transition-opacity duration-200 opacity-100 lg:opacity-0 lg:group-hover/sidebar:opacity-100">Snelstart</span>
       )}
+      {variant === "header" && (
+        <span className="hidden sm:inline">Snelstart</span>
+      )}
     </button>
   );
+
 
   const panel = (
     <AnimatePresence>
