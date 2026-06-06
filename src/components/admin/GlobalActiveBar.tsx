@@ -163,7 +163,15 @@ const GlobalActiveBar = () => {
           </motion.div>
         )}
 
-        {showTestDrive && (
+        {showTestDrive && (() => {
+          const td = testDrive!;
+          const ingevuld = !!td.formulier_ingevuld_op;
+          const wachten = td.status === "wacht_op_klant";
+          const tint = ingevuld
+            ? { bg: "bg-emerald-500/8", border: "border-emerald-500/25", dot: "bg-emerald-400", icon: "text-emerald-400", btn: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25" }
+            : { bg: "bg-amber-500/10", border: "border-amber-500/40", dot: "bg-amber-400", icon: "text-amber-400", btn: "bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/25" };
+          const formUrl = `${window.location.origin}/proefrit/${td.token}`;
+          return (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -171,22 +179,41 @@ const GlobalActiveBar = () => {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-2.5 bg-blue-500/8 border border-blue-500/25 rounded-[3px]">
+            <div className={`flex items-center justify-between px-4 py-2.5 ${tint.bg} border ${tint.border} rounded-[3px]`}>
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse shrink-0" />
-                <Car className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <div className={`w-1.5 h-1.5 ${tint.dot} rounded-full animate-pulse shrink-0`} />
+                {ingevuld
+                  ? <CheckCircle2 className={`w-3.5 h-3.5 ${tint.icon} shrink-0`} />
+                  : <AlertTriangle className={`w-3.5 h-3.5 ${tint.icon} shrink-0`} />}
                 <p className="text-xs text-foreground truncate">
-                  <span className="font-medium">Proefrit actief</span>
+                  <span className="font-medium">
+                    {ingevuld
+                      ? `Formulier ondertekend${td.formulier_ingevuld_op ? ` om ${format(new Date(td.formulier_ingevuld_op), "HH:mm", { locale: nl })}` : ""}`
+                      : "Formulier nog NIET ingevuld — klant moet eerst ondertekenen"}
+                  </span>
                   <span className="text-muted-foreground ml-1.5">
-                    · {testDrive!.voertuig_merk} {testDrive!.voertuig_model}
-                    {testDrive!.customer && ` — ${testDrive!.customer.voornaam} ${testDrive!.customer.achternaam}`}
+                    · {td.voertuig_merk} {td.voertuig_model}
+                    {td.customer && ` — ${td.customer.voornaam} ${td.customer.achternaam}`}
                   </span>
                 </p>
               </div>
               <div className="flex items-center gap-2 shrink-0 ml-3">
+                {!ingevuld && (
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(formUrl);
+                      toast.success("Formulier-link gekopieerd");
+                    }}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium border rounded-md transition-colors ${tint.btn}`}
+                  >
+                    <Copy className="w-3 h-3" /> Link kopiëren
+                  </button>
+                )}
                 <button
                   onClick={() => setEindProefritOpen(true)}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium bg-blue-500/15 text-blue-400 border border-blue-500/30 rounded-md hover:bg-blue-500/25 transition-colors"
+                  disabled={wachten}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium bg-blue-500/15 text-blue-400 border border-blue-500/30 rounded-md hover:bg-blue-500/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  title={wachten ? "Pas mogelijk na ondertekenen" : "Beëindig proefrit"}
                 >
                   <Square className="w-3 h-3" /> Beëindigen
                 </button>
@@ -200,7 +227,9 @@ const GlobalActiveBar = () => {
               </div>
             </div>
           </motion.div>
-        )}
+          );
+        })()}
+
       </AnimatePresence>
       </div>
 
