@@ -156,7 +156,7 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
         bouwjaar: selectedVehicle.bouwjaar,
       },
       medewerker || undefined,
-      selectedCustomer?.id
+      selectedCustomer || undefined
     );
     setLoading(false);
     if (td) {
