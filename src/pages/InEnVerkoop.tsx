@@ -220,7 +220,7 @@ const InEnVerkoop = () => {
                   { label: "Maandag", value: "12:00 - 18:00" },
                   { label: "Di t/m Vr", value: "09:00 - 18:00" },
                   { label: "Zaterdag", value: "10:00 - 17:00" },
-                  { label: "Zondag", value: "10:00 - 16:00" },
+                  { label: "Zondag", value: "12:00 - 16:00" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between py-3.5 border-b border-border last:border-0">
                     <span className="text-[10px] tracking-[0.2em] uppercase font-body font-medium text-muted-foreground">{item.label}</span>
