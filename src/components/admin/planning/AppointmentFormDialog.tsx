@@ -422,12 +422,12 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   if (!open) return null;
 
   const containerClass = isMobile
-    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto border-t border-x border-white/[0.08] bg-[hsl(0_0%_8%)] shadow-[0_-8px_32px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom duration-300"
-    : "fixed z-50 w-[420px] max-h-[85vh] overflow-y-auto border border-white/[0.08] bg-[hsl(0_0%_8%)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-in fade-in-0 zoom-in-[0.97] duration-200";
+    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto border-t border-x border-border bg-background shadow-[0_-8px_32px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom duration-300"
+    : "fixed z-50 w-[420px] max-h-[85vh] overflow-y-auto border border-border bg-background shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-in fade-in-0 zoom-in-[0.97] duration-200";
 
   const containerStyle: React.CSSProperties = isMobile
-    ? { borderRadius: "20px 20px 0 0", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }
-    : { borderRadius: 16, ...(pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 }) };
+    ? { borderRadius: "3px 3px 0 0", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }
+    : { borderRadius: 3, ...(pos ? { top: pos.top, left: pos.left } : { top: -9999, left: -9999 }) };
 
   // ---------- JSX helpers ----------
   const PillButton = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
