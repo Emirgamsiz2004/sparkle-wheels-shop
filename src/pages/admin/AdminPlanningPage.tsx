@@ -302,7 +302,7 @@ const AdminPlanningPage = () => {
 
           {/* RIGHT: detail panel (desktop only) */}
           {!isMobile && (
-            <aside className="lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] flex flex-col">
+            <aside className="lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] flex flex-col lg:pt-[44px]">
               {selected ? (
                 <AppointmentDetailPanel
                   appointment={selected}
