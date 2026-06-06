@@ -27,9 +27,13 @@ interface ActiveTestDrive {
   voertuig_kenteken: string | null;
   km_voor: number;
   start_tijd: string;
+  status: 'wacht_op_klant' | 'actief' | 'afgesloten' | 'onvolledig';
+  token: string;
+  formulier_ingevuld_op?: string | null;
   customer_id?: string | null;
   customer?: { voornaam: string; achternaam: string } | null;
 }
+
 
 const GlobalActiveBar = () => {
   const { user } = useAuth();
