@@ -677,7 +677,9 @@ const AdminVerkoopWizardPage = () => {
         kvk_nummer: klantZakelijk ? klantKvk.trim() : null,
         btw_nummer: klantZakelijk ? (klantBtw.trim() || null) : null,
         status: "klant",
+        bron: "verkoop",
       };
+
       let custId = customerId;
       let existingMbId: string | null = null;
       if (custId) {
