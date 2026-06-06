@@ -475,9 +475,18 @@ const WinstVerliesTab = () => {
     return posts;
   }, [receipts, purchaseInvoices, platinKosten, inkoopverklaringBedragen]);
 
-  // === Matching principle (COGS): voertuiginkoop hoort bij de maand waarin de auto verkocht is ===
-  // Operationele kosten = alles BEHALVE voertuiginkoop (MB) en voertuig-gebonden Platin kosten.
-  // Die laatste twee zijn voorraad/COGS en horen niet thuis in de maandelijkse periode-kosten.
+  // === SIMPELE P&L (Moneybird = bron van waarheid) ===
+  // Omzet  = alle verkoopfacturen die jij dit kwartaal/maand maakt
+  // Kosten = alle bonnetjes + inkoopfacturen + handmatige Platin-kosten
+  // (geen synthetische "diensten = omzet − voertuigomzet" meer)
+
+  // Alle kosten, ongeacht categorie
+  const totaleKosten = useMemo(
+    () => kostPosten.reduce((s, p) => s + p.bedrag, 0),
+    [kostPosten]
+  );
+
+  // Operationele kosten = alles BEHALVE voertuiginkoop (voor de categorie-uitsplitsing)
   const operationeleKostPosten = useMemo(
     () => kostPosten.filter(p =>
       p.categorie !== "inkoop_voertuigen" &&
@@ -487,7 +496,7 @@ const WinstVerliesTab = () => {
   );
   const operationeleKosten = operationeleKostPosten.reduce((s, p) => s + p.bedrag, 0);
 
-  // COGS = voor elke deze maand verkochte auto: inkoopprijs + alle eraan gekoppelde kosten
+  // Informatieve voertuig-marge (uit voertuigregistratie) — los van de P&L
   const cogs = useMemo(() => {
     let inkoop = 0, voertuigKosten = 0, voertuigOmzet = 0, margeTotaal = 0;
     for (const v of soldVehicles) {
@@ -499,7 +508,6 @@ const WinstVerliesTab = () => {
     return { inkoop, voertuigKosten, totaal: inkoop + voertuigKosten, voertuigOmzet, margeTotaal };
   }, [soldVehicles]);
 
-  // Informatief: hoeveel is deze maand aan voorraad toegevoegd
   const voorraadAankopen = useMemo(() => {
     const mbInkoop = kostPosten
       .filter(p => p.categorie === "inkoop_voertuigen")
@@ -510,24 +518,24 @@ const WinstVerliesTab = () => {
     return { mbInkoop, voertuigKostenMaand, totaal: mbInkoop + voertuigKostenMaand };
   }, [kostPosten]);
 
-  // === SIMPELE P&L ===
-  // 1. Voertuigwinst = verkoopprijs - inkoop - kosten (per voertuig)
-  const voertuigWinst = cogs.margeTotaal;
+  // Brutowinst = verkoopfacturen − alle kosten
+  const brutowinst = omzet.incl - totaleKosten;
 
-  // 2. Diensten = alle omzet die NIET van voertuigverkoop komt
-  const dienstenOmzet = Math.max(0, omzet.incl - cogs.voertuigOmzet);
-  const dienstenWinst = dienstenOmzet - operationeleKosten;
+  // BTW: alleen wat je op je verkoopfacturen aan BTW opneemt (Moneybird levert dit).
+  // Marge-BTW laten we hier weg — die hoort bij de marge-aangifte, niet bij de winst.
+  const totaalBTW = omzet.btw;
+  const margeBTW = Math.max(0, cogs.margeTotaal) * (21 / 121); // alleen informatief
 
-  // 3. Brutowinst = voertuigwinst + dienstenwinst
-  const brutowinst = voertuigWinst + dienstenWinst;
-
-  // 4. BTW: marge-BTW (21/121) over positieve voertuigmarge + BTW op diensten (uit Moneybird facturen)
-  const margeBTW = Math.max(0, voertuigWinst) * (21 / 121);
-  const totaalBTW = omzet.btw + margeBTW;
-
-  // 5. Nettowinst
+  // Nettowinst = brutowinst − BTW op verkoopfacturen
   const nettoResultaat = brutowinst - totaalBTW;
 
+  // Vermogensgroei = nettowinst (voorraad-aankoop is geen verlies, het is omgezet kapitaal)
+  const vermogensGroei = nettoResultaat;
+
+  // Voor de details-tabel
+  const voertuigWinst = cogs.margeTotaal;
+  const dienstenOmzet = Math.max(0, omzet.incl - cogs.voertuigOmzet);
+  const dienstenWinst = dienstenOmzet - operationeleKosten;
 
   // Groepering per categorie (alleen operationele)
   const perCategorie = useMemo(() => {
@@ -548,11 +556,7 @@ const WinstVerliesTab = () => {
   const prev = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const next = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
-  // Vermogensgroei = daadwerkelijke groei van het eigen vermogen deze maand.
-  // = winst op verkochte voertuigen (consignatie alleen commissie, geen inkoop)
-  //   + dienstenwinst − BTW
-  // Voorraad-aankoop is GEEN verlies (cash wordt voorraad, vermogen blijft gelijk).
-  const vermogensGroei = nettoResultaat;
+
 
   return (
     <div className="space-y-8 w-full">
@@ -586,9 +590,10 @@ const WinstVerliesTab = () => {
       {/* KPI strip — 4 getallen, geen kaders */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6">
         <Metric label="Omzet" value={formatEuroDecimal(omzet.incl)} />
-        <Metric label="Kosten" value={formatEuroDecimal(operationeleKosten + cogs.totaal)} />
-        <Metric label="Nettowinst" value={formatEuroDecimal(nettoResultaat)} tone={nettoResultaat >= 0 ? "pos" : "neg"} />
-        <Metric label="Vermogensgroei" value={formatEuroDecimal(vermogensGroei)} tone={vermogensGroei >= 0 ? "pos" : "neg"} subtle={`voorraad ${formatEuroDecimal(voorraad.inkoop)}`} />
+        <Metric label="Kosten" value={formatEuroDecimal(totaleKosten)} subtle={`${kostPosten.length} posten`} />
+        <Metric label="Brutowinst" value={formatEuroDecimal(brutowinst)} tone={brutowinst >= 0 ? "pos" : "neg"} subtle={`omzet − kosten`} />
+        <Metric label="Nettowinst" value={formatEuroDecimal(nettoResultaat)} tone={nettoResultaat >= 0 ? "pos" : "neg"} subtle={`na BTW ${formatEuroDecimal(totaalBTW)}`} />
+
       </div>
 
       {/* Verkochte voertuigen — de Excel-sheet */}
@@ -643,31 +648,37 @@ const WinstVerliesTab = () => {
       {/* Detail toggle — optioneel uitklappen */}
       <Details summary="Toon volledige berekening">
         <div className="space-y-4 text-xs">
-          <Row k="Omzet voertuigen" v={formatEuroDecimal(cogs.voertuigOmzet)} />
-          <Row k="− COGS (inkoop + kosten)" v={formatEuroDecimal(cogs.totaal)} />
-          <Row k="= Voertuigwinst" v={formatEuroDecimal(voertuigWinst)} bold />
-          <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Omzet diensten" v={formatEuroDecimal(dienstenOmzet)} />
-            <Row k="− Operationele kosten" v={formatEuroDecimal(operationeleKosten)} />
-            <Row k="= Dienstenwinst" v={formatEuroDecimal(dienstenWinst)} bold />
+          <div className="space-y-2">
+            <Row k={`Verkoopfacturen (${omzet.count})`} v={formatEuroDecimal(omzet.incl)} />
+            <Row k="− Alle kosten (bonnen + inkoopfacturen + Platin)" v={formatEuroDecimal(totaleKosten)} />
+            <Row k="= Brutowinst" v={formatEuroDecimal(brutowinst)} bold />
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Brutowinst" v={formatEuroDecimal(brutowinst)} />
-            <Row k={`− BTW (incl. marge-BTW ${formatEuroDecimal(margeBTW)})`} v={formatEuroDecimal(totaalBTW)} />
+            <Row k="− BTW op verkoopfacturen" v={formatEuroDecimal(totaalBTW)} />
             <Row k="= Nettowinst" v={formatEuroDecimal(nettoResultaat)} bold />
           </div>
+
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Voertuigwinst (verkochte auto's)" v={formatEuroDecimal(voertuigWinst)} />
-            <Row k="+ Dienstenwinst" v={formatEuroDecimal(dienstenWinst)} />
-            <Row k="− BTW" v={formatEuroDecimal(totaalBTW)} />
-            <Row k="= Vermogensgroei" v={formatEuroDecimal(vermogensGroei)} bold />
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Uitsplitsing kosten</div>
+            <Row k="Voertuiginkoop (Moneybird)" v={formatEuroDecimal(voorraadAankopen.mbInkoop)} />
+            <Row k="Voertuig-gebonden kosten (Platin)" v={formatEuroDecimal(voorraadAankopen.voertuigKostenMaand)} />
+            <Row k="Operationele kosten" v={formatEuroDecimal(operationeleKosten)} />
           </div>
+
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Huidige voorraad (inkoopwaarde, excl. consignatie)" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop)}`} />
-            <Row k="Voorraad ingekocht deze maand" v={formatEuroDecimal(voorraadAankopen.totaal)} />
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Voertuigmarge (informatief)</div>
+            <Row k="Omzet verkochte voertuigen (registratie)" v={formatEuroDecimal(cogs.voertuigOmzet)} />
+            <Row k="− Inkoop + voertuigkosten" v={formatEuroDecimal(cogs.totaal)} />
+            <Row k="= Marge op verkochte voertuigen" v={formatEuroDecimal(voertuigWinst)} bold />
+            <Row k="Marge-BTW (21/121, ter info)" v={formatEuroDecimal(margeBTW)} />
+          </div>
+
+          <div className="border-t border-border/60 pt-3 space-y-2">
+            <Row k="Huidige voorraad (inkoopwaarde)" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop)}`} />
           </div>
         </div>
       </Details>
+
     </div>
   );
 };
