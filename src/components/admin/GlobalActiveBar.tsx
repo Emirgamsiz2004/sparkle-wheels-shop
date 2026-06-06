@@ -64,7 +64,7 @@ const GlobalActiveBar = () => {
     // Active test drive
     const { data: tdData } = await supabase
       .from("test_drives")
-      .select("id, voertuig_merk, voertuig_model, voertuig_kenteken, km_voor, start_tijd, customer_id, test_drive_customers(voornaam, achternaam)")
+      .select("id, voertuig_merk, voertuig_model, voertuig_kenteken, km_voor, start_tijd, status, token, formulier_ingevuld_op, customer_id, test_drive_customers(voornaam, achternaam)")
       .in("status", ["actief", "wacht_op_klant"])
       .limit(1)
       .maybeSingle();
@@ -72,7 +72,8 @@ const GlobalActiveBar = () => {
     const newTd = tdData ? {
       ...tdData,
       customer: (tdData as any).test_drive_customers || null,
-    } as ActiveTestDrive : null;
+    } as unknown as ActiveTestDrive : null;
+
     if (newTd?.id !== testDrive?.id) setDismissedTestDrive(false);
     setTestDrive(newTd);
   }, [user]);
