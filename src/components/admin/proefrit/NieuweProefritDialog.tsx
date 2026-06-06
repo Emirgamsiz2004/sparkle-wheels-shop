@@ -155,7 +155,8 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
         kenteken: selectedVehicle.kenteken,
         bouwjaar: selectedVehicle.bouwjaar,
       },
-      medewerker || undefined
+      medewerker || undefined,
+      selectedCustomer?.id
     );
     setLoading(false);
     if (td) {
@@ -183,6 +184,9 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
     setManualKenteken("");
     setManualBouwjaar("");
     setKmVoor(preselectedVehicle?.kilometerstand?.toString() || "");
+    setCustomerSearch("");
+    setSelectedCustomer(null);
+    setShowCustomerDropdown(false);
     onClose();
   };
 
