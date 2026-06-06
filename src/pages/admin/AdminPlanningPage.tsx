@@ -44,7 +44,7 @@ const AdminPlanningPage = () => {
   const addBtnRef = useRef<HTMLButtonElement>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [mobileDialogId, setMobileDialogId] = useState<string | null>(null);
+  const [detailAnchorRect, setDetailAnchorRect] = useState<DOMRect | null>(null);
 
   const [view, setView] = useState<ViewMode>("agenda");
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>("deze_week");
@@ -55,14 +55,10 @@ const AdminPlanningPage = () => {
     () => appointments.find((a) => a.id === selectedId) || null,
     [appointments, selectedId]
   );
-  const mobileDialogAppt = useMemo(
-    () => appointments.find((a) => a.id === mobileDialogId) || null,
-    [appointments, mobileDialogId]
-  );
 
-  const openAppt = (a: Appointment) => {
-    if (isMobile || view === "lijst") setMobileDialogId(a.id);
-    else setSelectedId(a.id);
+  const openAppt = (a: Appointment, rect?: DOMRect) => {
+    setSelectedId(a.id);
+    setDetailAnchorRect(rect || null);
   };
 
   const weekDays = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
