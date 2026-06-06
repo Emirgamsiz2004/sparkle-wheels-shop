@@ -252,7 +252,7 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
   );
 };
 
-const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1 }: {
+const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1, isPercent = false }: {
   label: string;
   value: string;
   color?: string;
@@ -260,6 +260,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1
   rawValue?: number;
   onSave?: (val: number) => Promise<void>;
   minValue?: number;
+  isPercent?: boolean;
 }) => {
   const [editing, setEditing] = useState(false);
   const [editVal, setEditVal] = useState("");
