@@ -119,6 +119,9 @@ const VehicleOverzichtTab = ({ vehicle, onSave, onLogActivity }: Props) => {
       {/* Aflevering-checklist: verschijnt alleen als er taken zijn, verdwijnt zodra alles voldaan */}
       <AfleverChecklist vehicleId={vehicle.id} compact hideWhenAllDone hideWhenEmpty />
 
+      {/* Aanbetaling: tonen wanneer er een aanbetaling op dit voertuig is */}
+      <AanbetalingBlock vehicleId={vehicle.id} />
+
       {/* KPI card - alleen Inkoop op de voertuigpagina (verkoopcijfers staan in de Verkoop module) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard
