@@ -1,11 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { X, Square, Clock, Car } from "lucide-react";
+import { X, Square, Clock, Car, CheckCircle2, AlertTriangle, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
+import { toast } from "sonner";
 import StopTimerDialog from "./StopTimerDialog";
 import EindProefritDialog from "./proefrit/EindProefritDialog";
 import { TestDrive } from "@/hooks/useTestDrives";
+
 
 interface ActiveTimer {
   id: string;
