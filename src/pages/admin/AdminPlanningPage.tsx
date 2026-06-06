@@ -198,7 +198,7 @@ const AdminPlanningPage = () => {
       </div>
 
       {view === "agenda" ? (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 lg:items-stretch">
           {/* LEFT: agenda */}
           <div className="space-y-3 min-w-0">
             {/* Week navigation */}
