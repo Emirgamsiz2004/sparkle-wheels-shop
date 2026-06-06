@@ -108,6 +108,34 @@ const AdminKlantenPage = () => {
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
           <SlidingTabs tabs={statusTabs} value={statusFilter} onChange={setStatusFilter} className="min-w-max" />
         </div>
+
+        {/* Bron-overzicht: hoe is de klant ontstaan */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            onClick={() => setBronFilter("alle")}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border transition-colors ${
+              bronFilter === "alle"
+                ? "bg-foreground text-background border-foreground"
+                : "bg-card text-muted-foreground border-border hover:bg-accent hover:text-foreground"
+            }`}
+          >
+            Alle bronnen <span className="tabular-nums opacity-70">{bronCounts.alle}</span>
+          </button>
+          {allBronnen.map((b) => (
+            <button
+              key={b}
+              onClick={() => setBronFilter(b)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border transition-colors ${
+                bronFilter === b
+                  ? "bg-foreground text-background border-foreground"
+                  : `${bronColors[b]} hover:opacity-80`
+              }`}
+            >
+              {bronLabels[b]} <span className="tabular-nums opacity-70">{bronCounts[b] || 0}</span>
+            </button>
+          ))}
+        </div>
+
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -118,6 +146,7 @@ const AdminKlantenPage = () => {
           />
         </div>
       </div>
+
 
       {/* Content */}
       {loading ? (
