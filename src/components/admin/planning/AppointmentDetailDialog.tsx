@@ -107,9 +107,61 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   const [localStatus, setLocalStatus] = useState<AppointmentStatus | null>(appointment?.status ?? null);
   const [statusSaving, setStatusSaving] = useState(false);
 
+  // Inline checklist (reparatiepunten) editor — stored in notities
+  const parseNotities = (raw: string | null | undefined) => {
+    const text = raw || "";
+    const m = text.match(/^Checklist:\n((?:•\s.*(?:\n|$))+)\n?/);
+    if (!m) return { items: [] as string[], rest: text };
+    const items = m[1].split("\n").filter(Boolean).map((l) => l.replace(/^•\s/, "").trim()).filter(Boolean);
+    const rest = text.slice(m[0].length);
+    return { items, rest };
+  };
+  const composeNotities = (items: string[], rest: string) => {
+    const parts: string[] = [];
+    if (items.length) parts.push("Checklist:\n" + items.map((i) => `• ${i}`).join("\n"));
+    if (rest && rest.trim()) parts.push(rest.trim());
+    return parts.join("\n\n");
+  };
+  const [checklist, setChecklist] = useState<string[]>([]);
+  const [restNote, setRestNote] = useState("");
+  const [newItem, setNewItem] = useState("");
+  const [notesSaving, setNotesSaving] = useState(false);
+
   useEffect(() => {
     setLocalStatus(appointment?.status ?? null);
-  }, [appointment?.id, appointment?.status]);
+    const parsed = parseNotities(appointment?.notities);
+    setChecklist(parsed.items);
+    setRestNote(parsed.rest);
+    setNewItem("");
+  }, [appointment?.id, appointment?.status, appointment?.notities]);
+
+  const persistNotities = async (items: string[], rest: string) => {
+    if (!appointment) return;
+    const composed = composeNotities(items, rest);
+    setNotesSaving(true);
+    try {
+      await onUpdate(appointment.id, { notities: composed || null });
+    } finally {
+      setNotesSaving(false);
+    }
+  };
+
+  const addChecklistItem = async () => {
+    const v = newItem.trim();
+    if (!v) return;
+    const next = [...checklist, v];
+    setChecklist(next);
+    setNewItem("");
+    await persistNotities(next, restNote);
+  };
+  const removeChecklistItem = async (idx: number) => {
+    const next = checklist.filter((_, i) => i !== idx);
+    setChecklist(next);
+    await persistNotities(next, restNote);
+  };
+  const updateChecklistItem = (idx: number, v: string) => {
+    setChecklist((prev) => prev.map((x, i) => (i === idx ? v : x)));
+  };
 
   if (!appointment) return null;
 
