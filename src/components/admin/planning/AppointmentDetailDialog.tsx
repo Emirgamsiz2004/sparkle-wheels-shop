@@ -375,10 +375,10 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                           className="group flex items-center gap-2.5 w-full text-left p-2 -m-2 rounded-[4px] hover:bg-accent/30 transition-colors"
                         >
                           <div className="w-7 h-7 rounded-[4px] bg-accent/40 border border-border/50 inline-flex items-center justify-center shrink-0">
-                            <Car className="w-3.5 h-3.5 text-muted-foreground group-hover:text-emerald-400 transition-colors" />
+                            <Car className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="text-sm text-foreground group-hover:text-emerald-400 transition-colors truncate">
+                            <div className="text-sm text-foreground group-hover:text-foreground transition-colors truncate">
                               {appointment.vehicle.merk} {appointment.vehicle.model}
                             </div>
                             {appointment.vehicle.kenteken && (
