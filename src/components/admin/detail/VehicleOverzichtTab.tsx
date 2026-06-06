@@ -282,7 +282,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1
     if (cleaned === "") return cancel();
     const num = Number(cleaned);
     if (isNaN(num) || num < minValue) {
-      toast.error(`Voer een geldig bedrag in (minimaal € ${minValue.toFixed(2).replace(".", ",")})`);
+      toast.error(isPercent ? `Voer een geldig percentage in (minimaal ${minValue}%)` : `Voer een geldig bedrag in (minimaal € ${minValue.toFixed(2).replace(".", ",")})`);
       return;
     }
     setSaving(true);
