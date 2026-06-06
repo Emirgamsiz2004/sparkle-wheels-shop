@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+export type CustomerBron = "proefrit" | "aanbetaling" | "afspraak" | "verkoop" | "lead" | "handmatig";
+
 export interface Customer {
   id: string;
   voornaam: string;
@@ -13,6 +15,7 @@ export interface Customer {
   plaats?: string;
   geboortedatum?: string;
   status: "prospect" | "klant" | "inactief";
+  bron?: CustomerBron;
   notities?: string;
   laatste_contact?: string;
   created_at: string;
@@ -32,6 +35,25 @@ export const statusColors: Record<Customer["status"], string> = {
   klant: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
   inactief: "bg-muted text-muted-foreground border-border",
 };
+
+export const bronLabels: Record<CustomerBron, string> = {
+  proefrit: "Proefrit",
+  aanbetaling: "Aanbetaling",
+  afspraak: "Afspraak",
+  verkoop: "Verkoop",
+  lead: "Lead",
+  handmatig: "Handmatig",
+};
+
+export const bronColors: Record<CustomerBron, string> = {
+  proefrit: "bg-sky-500/10 text-sky-400 border-sky-500/30",
+  aanbetaling: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+  afspraak: "bg-violet-500/10 text-violet-400 border-violet-500/30",
+  verkoop: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+  lead: "bg-pink-500/10 text-pink-400 border-pink-500/30",
+  handmatig: "bg-muted text-muted-foreground border-border",
+};
+
 
 export const useCustomers = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
