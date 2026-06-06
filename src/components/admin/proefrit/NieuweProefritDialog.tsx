@@ -4,10 +4,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { QRCodeSVG } from "qrcode.react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
 import { useVehicles } from "@/hooks/useVehicles";
-import { Copy, Check, ExternalLink, Printer, Search, Car, X } from "lucide-react";
+import { Copy, Check, ExternalLink, Printer, Search, Car, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { keepFocusedFieldVisible, useKeyboardSafeViewport } from "@/hooks/use-keyboard-safe-viewport";
+import { fetchRdwData } from "@/lib/rdw";
 
 interface Props {
   open: boolean;
@@ -38,6 +39,40 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
   const [manualModel, setManualModel] = useState("");
   const [manualKenteken, setManualKenteken] = useState("");
   const [manualBouwjaar, setManualBouwjaar] = useState("");
+  const [rdwLoading, setRdwLoading] = useState(false);
+
+  const handleRdwLookup = async () => {
+    const k = manualKenteken.trim();
+    if (!k) { toast.error("Vul eerst een kenteken in"); return; }
+    setRdwLoading(true);
+    const data = await fetchRdwData(k);
+    setRdwLoading(false);
+    if (!data) return;
+    setManualMerk(data.merk || "");
+    setManualModel(data.model || "");
+    if (data.bouwjaar) setManualBouwjaar(String(data.bouwjaar));
+    toast.success("Gegevens opgehaald uit RDW");
+  };
+
+  const handleKentekenQuickStart = async () => {
+    const k = manualKenteken.trim();
+    if (!k) { toast.error("Vul een kenteken in"); return; }
+    setRdwLoading(true);
+    const data = await fetchRdwData(k);
+    setRdwLoading(false);
+    if (!data) return;
+    setSelectedVehicle({
+      id: "",
+      merk: data.merk || manualMerk || "Onbekend",
+      model: data.model || manualModel || "",
+      kenteken: k.toUpperCase(),
+      bouwjaar: data.bouwjaar || undefined,
+    });
+    setManualMerk(data.merk || "");
+    setManualModel(data.model || "");
+    if (data.bouwjaar) setManualBouwjaar(String(data.bouwjaar));
+    setStep("form");
+  };
 
   // Form fields
   const [kmVoor, setKmVoor] = useState(preselectedVehicle?.kilometerstand?.toString() || "");
