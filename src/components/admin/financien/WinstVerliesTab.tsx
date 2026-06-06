@@ -590,9 +590,10 @@ const WinstVerliesTab = () => {
       {/* KPI strip — 4 getallen, geen kaders */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6">
         <Metric label="Omzet" value={formatEuroDecimal(omzet.incl)} />
-        <Metric label="Kosten" value={formatEuroDecimal(operationeleKosten + cogs.totaal)} />
-        <Metric label="Nettowinst" value={formatEuroDecimal(nettoResultaat)} tone={nettoResultaat >= 0 ? "pos" : "neg"} />
-        <Metric label="Vermogensgroei" value={formatEuroDecimal(vermogensGroei)} tone={vermogensGroei >= 0 ? "pos" : "neg"} subtle={`voorraad ${formatEuroDecimal(voorraad.inkoop)}`} />
+        <Metric label="Kosten" value={formatEuroDecimal(totaleKosten)} subtle={`${kostPosten.length} posten`} />
+        <Metric label="Brutowinst" value={formatEuroDecimal(brutowinst)} tone={brutowinst >= 0 ? "pos" : "neg"} subtle={`omzet − kosten`} />
+        <Metric label="Nettowinst" value={formatEuroDecimal(nettoResultaat)} tone={nettoResultaat >= 0 ? "pos" : "neg"} subtle={`na BTW ${formatEuroDecimal(totaalBTW)}`} />
+
       </div>
 
       {/* Verkochte voertuigen — de Excel-sheet */}
