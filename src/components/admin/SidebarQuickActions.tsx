@@ -222,23 +222,25 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
         ) : (
           <motion.div
             ref={popRef}
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            initial={{ opacity: 0, y: 6, scale: 0.985 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.98 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: 3, scale: 0.985 }}
+            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
             style={pos ? { top: pos.top, bottom: pos.bottom, right: pos.right } : { bottom: -9999, right: -9999 }}
-            className={`fixed z-[60] w-[400px] max-h-[min(640px,80vh)] overflow-y-auto rounded-3xl border border-border/80 bg-card shadow-[0_24px_60px_-12px_rgba(0,0,0,0.65)] ${variant === "header" ? "origin-top-right" : "origin-bottom-right"} backdrop-blur-xl`}
-
+            className={`fixed z-[60] w-[380px] max-h-[min(640px,80vh)] overflow-y-auto rounded-[6px] border border-border/70 bg-card shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7)] ${variant === "header" ? "origin-top-right" : "origin-bottom-right"}`}
           >
-            <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between sticky top-0 bg-card/95 backdrop-blur-md z-10 rounded-t-3xl">
+            <div className="px-5 pt-4 pb-3 border-b border-border/40 flex items-center justify-between sticky top-0 bg-card z-10">
               <div>
-                <h3 className="text-sm font-semibold text-foreground tracking-tight">Snelstart</h3>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Start direct een actie</p>
+                <h3 className="text-[13px] font-semibold text-foreground tracking-tight leading-none">Snelstart</h3>
+                <p className="text-[10.5px] text-muted-foreground mt-1.5 leading-none">Start direct een actie</p>
               </div>
-              <button onClick={() => setOpen(false)} className="p-1.5 -mr-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"><X className="w-4 h-4" /></button>
+              <button onClick={() => setOpen(false)} aria-label="Sluiten" className="h-7 w-7 inline-flex items-center justify-center rounded-[4px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
             <PanelInner sections={sections} kenteken={kenteken} setKenteken={setKenteken} onKentekenSubmit={handleKentekenSearch} />
           </motion.div>
+
         )
       )}
     </AnimatePresence>
