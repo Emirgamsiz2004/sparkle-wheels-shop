@@ -290,7 +290,30 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
                 </>
               ) : (
                 <>
-                  <p className="text-xs text-muted-foreground">Vul de voertuiggegevens handmatig in</p>
+                  <p className="text-xs text-muted-foreground">Vul kenteken in en haal automatisch de gegevens op</p>
+                  <div>
+                    <label className="block text-[11px] text-muted-foreground mb-1">Kenteken</label>
+                    <div className="flex gap-2">
+                      <input
+                        value={manualKenteken}
+                        onChange={(e) => setManualKenteken(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleRdwLookup(); } }}
+                        placeholder="AB-123-CD"
+                        autoCapitalize="characters"
+                        spellCheck={false}
+                        className={`${inputCls} font-mono tracking-[0.15em] uppercase`}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRdwLookup}
+                        disabled={rdwLoading || !manualKenteken.trim()}
+                        className="shrink-0 h-12 md:h-auto md:py-2.5 px-3 text-xs font-medium border border-border/60 rounded-[10px] hover:bg-accent/20 transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+                      >
+                        {rdwLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+                        RDW
+                      </button>
+                    </div>
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[11px] text-muted-foreground mb-1">Merk *</label>
@@ -301,15 +324,9 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
                       <input value={manualModel} onChange={(e) => setManualModel(e.target.value)} placeholder="bijv. 320i" className={inputCls} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[11px] text-muted-foreground mb-1">Kenteken</label>
-                      <input value={manualKenteken} onChange={(e) => setManualKenteken(e.target.value.toUpperCase())} placeholder="AB-123-CD" className={inputCls} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] text-muted-foreground mb-1">Bouwjaar</label>
-                      <input type="number" value={manualBouwjaar} onChange={(e) => setManualBouwjaar(e.target.value)} placeholder="2020" className={inputCls} />
-                    </div>
+                  <div>
+                    <label className="block text-[11px] text-muted-foreground mb-1">Bouwjaar</label>
+                    <input type="number" value={manualBouwjaar} onChange={(e) => setManualBouwjaar(e.target.value)} placeholder="2020" className={inputCls} />
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => setUseManual(false)} className="flex-1 py-2.5 text-xs font-medium border border-border/60 rounded-[10px] hover:bg-accent/20 transition-colors">
