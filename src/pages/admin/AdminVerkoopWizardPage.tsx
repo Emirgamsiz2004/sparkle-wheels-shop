@@ -677,13 +677,17 @@ const AdminVerkoopWizardPage = () => {
         kvk_nummer: klantZakelijk ? klantKvk.trim() : null,
         btw_nummer: klantZakelijk ? (klantBtw.trim() || null) : null,
         status: "klant",
+        bron: "verkoop",
       };
+
       let custId = customerId;
       let existingMbId: string | null = null;
+      // Bron alleen zetten bij nieuwe klant — niet overschrijven bij update
+      const { bron: _bron, ...customerUpdatePayload } = customerPayload;
       if (custId) {
         const { data: prev } = await supabase.from("customers").select("moneybird_contact_id").eq("id", custId).maybeSingle();
         existingMbId = (prev as any)?.moneybird_contact_id ?? null;
-        const { error: updErr } = await supabase.from("customers").update(customerPayload).eq("id", custId);
+        const { error: updErr } = await supabase.from("customers").update(customerUpdatePayload).eq("id", custId);
         if (updErr) { toast.error("Opslaan klant mislukt"); console.error(updErr); return; }
       } else {
         const { data: created, error: insErr } = await supabase.from("customers").insert(customerPayload).select().single();
@@ -696,7 +700,8 @@ const AdminVerkoopWizardPage = () => {
             .eq("email", fallbackEmail)
             .maybeSingle();
           if (existing?.id) {
-            const { error: updErr2 } = await supabase.from("customers").update(customerPayload).eq("id", existing.id);
+            const { error: updErr2 } = await supabase.from("customers").update(customerUpdatePayload).eq("id", existing.id);
+
             if (updErr2) { toast.error("Bijwerken klant mislukt"); console.error(updErr2); return; }
             custId = existing.id;
             setCustomerId(custId);

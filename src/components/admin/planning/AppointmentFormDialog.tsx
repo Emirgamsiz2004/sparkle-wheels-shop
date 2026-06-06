@@ -318,7 +318,9 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
             email: form.klant_email || `${voornaam.toLowerCase()}.${Date.now()}@onbekend.nl`,
             telefoon: form.klant_telefoon || "",
             status: "prospect",
+            bron: "afspraak",
           } as any)
+
           .select("id")
           .maybeSingle();
         if (!custErr && newCust?.id) customerIdToUse = newCust.id;

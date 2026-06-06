@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { useCustomers, Customer, statusLabels, statusColors } from "@/hooks/useCustomers";
+import { useCustomers, Customer, statusLabels, statusColors, bronLabels, bronColors, CustomerBron } from "@/hooks/useCustomers";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Loader2, ChevronRight, Trash2 } from "lucide-react";
 import AddCustomerPopover from "@/components/admin/customers/AddCustomerPopover";
@@ -11,11 +11,13 @@ import { BADGE_BASE } from "@/components/admin/StatusBadge";
 import { deleteCustomerSafely } from "@/lib/customerDelete";
 
 const allStatuses: Customer["status"][] = ["prospect", "klant", "inactief"];
+const allBronnen: CustomerBron[] = ["proefrit", "aanbetaling", "afspraak", "verkoop", "lead", "handmatig"];
 
 const statusTabs = [
   { label: "Alle", value: "alle" },
   ...allStatuses.map((s) => ({ label: statusLabels[s], value: s })),
 ];
+
 
 const AdminKlantenPage = () => {
   const { customers, loading, addCustomer, fetchCustomers } = useCustomers();
@@ -23,15 +25,27 @@ const AdminKlantenPage = () => {
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("alle");
+  const [bronFilter, setBronFilter] = useState<string>("alle");
   const [addOpen, setAddOpen] = useState(false);
   const [addAnchor, setAddAnchor] = useState<DOMRect | null>(null);
   const addBtnRef = useRef<HTMLButtonElement>(null);
   const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
   const [deleteAnchor, setDeleteAnchor] = useState<DOMRect | null>(null);
 
+  const bronCounts = useMemo(() => {
+    const counts: Record<string, number> = { alle: customers.length };
+    allBronnen.forEach((b) => { counts[b] = 0; });
+    customers.forEach((c) => {
+      const b = (c.bron as CustomerBron) || "handmatig";
+      counts[b] = (counts[b] || 0) + 1;
+    });
+    return counts;
+  }, [customers]);
+
   const filtered = useMemo(() => {
     let list = customers;
     if (statusFilter !== "alle") list = list.filter((c) => c.status === statusFilter);
+    if (bronFilter !== "alle") list = list.filter((c) => ((c.bron as CustomerBron) || "handmatig") === bronFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -42,7 +56,8 @@ const AdminKlantenPage = () => {
       );
     }
     return list;
-  }, [customers, search, statusFilter]);
+  }, [customers, search, statusFilter, bronFilter]);
+
 
   const handleAdd = async (data: { voornaam: string; achternaam: string; email: string; telefoon: string }) => {
     await addCustomer({ ...data, status: "prospect" } as any);
@@ -93,6 +108,34 @@ const AdminKlantenPage = () => {
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
           <SlidingTabs tabs={statusTabs} value={statusFilter} onChange={setStatusFilter} className="min-w-max" />
         </div>
+
+        {/* Bron-overzicht: hoe is de klant ontstaan */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            onClick={() => setBronFilter("alle")}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border transition-colors ${
+              bronFilter === "alle"
+                ? "bg-foreground text-background border-foreground"
+                : "bg-card text-muted-foreground border-border hover:bg-accent hover:text-foreground"
+            }`}
+          >
+            Alle bronnen <span className="tabular-nums opacity-70">{bronCounts.alle}</span>
+          </button>
+          {allBronnen.map((b) => (
+            <button
+              key={b}
+              onClick={() => setBronFilter(b)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md border transition-colors ${
+                bronFilter === b
+                  ? "bg-foreground text-background border-foreground"
+                  : `${bronColors[b]} hover:opacity-80`
+              }`}
+            >
+              {bronLabels[b]} <span className="tabular-nums opacity-70">{bronCounts[b] || 0}</span>
+            </button>
+          ))}
+        </div>
+
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -103,6 +146,7 @@ const AdminKlantenPage = () => {
           />
         </div>
       </div>
+
 
       {/* Content */}
       {loading ? (
@@ -127,12 +171,16 @@ const AdminKlantenPage = () => {
               >
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-foreground">{c.voornaam} {c.achternaam}</p>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
                       {statusLabels[c.status]}
                     </span>
+                    <span className={`${BADGE_BASE} ${bronColors[(c.bron as CustomerBron) || "handmatig"]}`}>
+                      {bronLabels[(c.bron as CustomerBron) || "handmatig"]}
+                    </span>
                     <span className="text-xs text-muted-foreground truncate">{c.email}</span>
                   </div>
+
                   {c.telefoon && <p className="text-xs text-muted-foreground mt-0.5">{c.telefoon}</p>}
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
@@ -158,12 +206,15 @@ const AdminKlantenPage = () => {
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Telefoon</th>
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">E-mail</th>
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Laatste contact</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Bron</th>
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Status</th>
                   <th className="w-10 px-3 py-2"></th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((c) => (
+                {filtered.map((c) => {
+                  const bron = (c.bron as CustomerBron) || "handmatig";
+                  return (
                   <tr
                     key={c.id}
                     onClick={() => navigate(`/admin/klanten/${c.id}`)}
@@ -174,10 +225,16 @@ const AdminKlantenPage = () => {
                     <td className="px-3 py-2.5 text-muted-foreground text-xs">{c.email}</td>
                     <td className="px-3 py-2.5 text-muted-foreground text-xs">{formatDate(c.laatste_contact)}</td>
                     <td className="px-3 py-2.5">
+                      <span className={`${BADGE_BASE} ${bronColors[bron]}`}>
+                        {bronLabels[bron]}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5">
                       <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
                         {statusLabels[c.status]}
                       </span>
                     </td>
+
                     <td className="px-3 py-2.5 text-right">
                       <button
                         onClick={(e) => requestDelete(e, c)}
@@ -188,7 +245,9 @@ const AdminKlantenPage = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
+
               </tbody>
             </table>
           </div>

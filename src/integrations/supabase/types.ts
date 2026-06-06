@@ -870,6 +870,7 @@ export type Database = {
           achternaam: string
           adres: string | null
           bedrijfsnaam: string | null
+          bron: string | null
           btw_nummer: string | null
           created_at: string
           email: string
@@ -893,6 +894,7 @@ export type Database = {
           achternaam: string
           adres?: string | null
           bedrijfsnaam?: string | null
+          bron?: string | null
           btw_nummer?: string | null
           created_at?: string
           email: string
@@ -916,6 +918,7 @@ export type Database = {
           achternaam?: string
           adres?: string | null
           bedrijfsnaam?: string | null
+          bron?: string | null
           btw_nummer?: string | null
           created_at?: string
           email?: string
