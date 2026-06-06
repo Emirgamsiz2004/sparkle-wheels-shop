@@ -80,7 +80,8 @@ export const useCustomers = () => {
   }, [fetchCustomers]);
 
   const addCustomer = async (customer: Omit<Customer, "id" | "created_at" | "updated_at">) => {
-    const { error } = await supabase.from("customers").insert(customer as any);
+    const payload = { bron: "handmatig", ...customer };
+    const { error } = await supabase.from("customers").insert(payload as any);
     if (error) {
       toast.error("Fout bij toevoegen klant");
       throw error;
@@ -88,6 +89,7 @@ export const useCustomers = () => {
     toast.success("Klant toegevoegd");
     await fetchCustomers();
   };
+
 
   const updateCustomer = async (id: string, updates: Partial<Customer>) => {
     const { error } = await supabase.from("customers").update(updates as any).eq("id", id);
