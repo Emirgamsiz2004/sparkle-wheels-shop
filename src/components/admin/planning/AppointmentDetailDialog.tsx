@@ -37,7 +37,7 @@ const statusOptions: { value: AppointmentStatus; label: string }[] = [
   { value: "geannuleerd", label: "Geannuleerd" },
 ];
 
-const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, onDelete }: Props) => {
+const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, onDelete, anchorRect }: Props) => {
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
