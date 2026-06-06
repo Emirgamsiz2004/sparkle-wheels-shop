@@ -98,8 +98,10 @@ const AanbetalingMoneybirdDialog = ({ open, onClose, vehicle, onCreated }: Props
             telefoon: telefoon || "",
             moneybird_contact_id: contact?.id ? String(contact.id) : null,
             status: "klant",
+            bron: "aanbetaling",
             notities: `Automatisch aangemaakt via aanbetaling ${vehicle.merk} ${vehicle.model} ${vehicle.kenteken || ""}`.trim(),
           } as any);
+
         }
       } catch (e) {
         console.warn("Klant opslaan mislukt:", e);
