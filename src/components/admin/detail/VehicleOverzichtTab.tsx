@@ -8,6 +8,7 @@ import { capitalizeMerk, capitalizeModel, capitalizeKleur } from "@/lib/capitali
 import { toast } from "sonner";
 import KoppelKlantBlock from "./KoppelKlantBlock";
 import AfleverChecklist from "@/components/admin/AfleverChecklist";
+import AanbetalingBlock from "./AanbetalingBlock";
 
 interface Props {
   vehicle: Vehicle;
