@@ -211,10 +211,18 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
   }, [open]);
 
   useLayoutEffect(() => {
-    if (!open || isMobile || !anchorRect) { setPos(null); return; }
+    if (!open || isMobile) { setPos(null); return; }
     const W = 380;
     const margin = 8;
     const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    if (!anchorRect) {
+      // No anchor → center on screen
+      const left = Math.max(margin, Math.round((vw - W) / 2));
+      const top = Math.max(margin, Math.round(vh * 0.12));
+      setPos({ top, left });
+      return;
+    }
     let left = anchorRect.right - W;
     if (left < margin) left = margin;
     if (left + W > vw - margin) left = vw - W - margin;
