@@ -206,12 +206,15 @@ const AdminKlantenPage = () => {
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Telefoon</th>
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">E-mail</th>
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Laatste contact</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Bron</th>
                   <th className="text-left px-3 py-2 text-[11px] font-medium text-muted-foreground">Status</th>
                   <th className="w-10 px-3 py-2"></th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((c) => (
+                {filtered.map((c) => {
+                  const bron = (c.bron as CustomerBron) || "handmatig";
+                  return (
                   <tr
                     key={c.id}
                     onClick={() => navigate(`/admin/klanten/${c.id}`)}
@@ -222,10 +225,16 @@ const AdminKlantenPage = () => {
                     <td className="px-3 py-2.5 text-muted-foreground text-xs">{c.email}</td>
                     <td className="px-3 py-2.5 text-muted-foreground text-xs">{formatDate(c.laatste_contact)}</td>
                     <td className="px-3 py-2.5">
+                      <span className={`${BADGE_BASE} ${bronColors[bron]}`}>
+                        {bronLabels[bron]}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5">
                       <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
                         {statusLabels[c.status]}
                       </span>
                     </td>
+
                     <td className="px-3 py-2.5 text-right">
                       <button
                         onClick={(e) => requestDelete(e, c)}
