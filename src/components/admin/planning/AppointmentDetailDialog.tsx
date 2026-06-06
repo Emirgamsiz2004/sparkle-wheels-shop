@@ -104,8 +104,8 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
   };
 
   const wrapperClass = isMobile
-    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[88vh] overflow-y-auto rounded-t-[10px] border-t border-x border-border/70 bg-background shadow-2xl animate-in slide-in-from-bottom duration-200"
-    : "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[420px] max-h-[90vh] overflow-y-auto rounded-[6px] border border-border/60 bg-background shadow-[0_20px_60px_rgba(0,0,0,0.65)] animate-in fade-in-0 zoom-in-95 duration-150";
+    ? "fixed left-0 right-0 bottom-0 z-50 max-h-[88vh] overflow-y-auto rounded-t-[3px] border-t border-x border-border bg-background shadow-2xl animate-in slide-in-from-bottom duration-200"
+    : "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[400px] max-h-[90vh] overflow-y-auto rounded-[3px] border border-border bg-background shadow-[0_20px_60px_rgba(0,0,0,0.65)] animate-in fade-in-0 zoom-in-95 duration-150";
 
   return createPortal(
     <>
