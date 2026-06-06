@@ -312,9 +312,10 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
                   <div className="border-t border-border/40 pt-3">
                     <button
                       onClick={() => setUseManual(true)}
-                      className="w-full py-2.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      className="w-full inline-flex items-center justify-center gap-2 h-11 px-4 text-[12.5px] font-semibold uppercase tracking-wider text-foreground bg-[rgba(255,255,255,0.05)] border border-border/70 rounded-[10px] hover:bg-[rgba(255,255,255,0.09)] hover:border-foreground/40 transition-colors"
                     >
-                      Voertuig niet in voorraad? Handmatig invullen
+                      <Car className="w-3.5 h-3.5" />
+                      Voertuig niet in voorraad — handmatig
                     </button>
                   </div>
                 </>
