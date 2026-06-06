@@ -25,15 +25,27 @@ const AdminKlantenPage = () => {
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("alle");
+  const [bronFilter, setBronFilter] = useState<string>("alle");
   const [addOpen, setAddOpen] = useState(false);
   const [addAnchor, setAddAnchor] = useState<DOMRect | null>(null);
   const addBtnRef = useRef<HTMLButtonElement>(null);
   const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
   const [deleteAnchor, setDeleteAnchor] = useState<DOMRect | null>(null);
 
+  const bronCounts = useMemo(() => {
+    const counts: Record<string, number> = { alle: customers.length };
+    allBronnen.forEach((b) => { counts[b] = 0; });
+    customers.forEach((c) => {
+      const b = (c.bron as CustomerBron) || "handmatig";
+      counts[b] = (counts[b] || 0) + 1;
+    });
+    return counts;
+  }, [customers]);
+
   const filtered = useMemo(() => {
     let list = customers;
     if (statusFilter !== "alle") list = list.filter((c) => c.status === statusFilter);
+    if (bronFilter !== "alle") list = list.filter((c) => ((c.bron as CustomerBron) || "handmatig") === bronFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -44,7 +56,8 @@ const AdminKlantenPage = () => {
       );
     }
     return list;
-  }, [customers, search, statusFilter]);
+  }, [customers, search, statusFilter, bronFilter]);
+
 
   const handleAdd = async (data: { voornaam: string; achternaam: string; email: string; telefoon: string }) => {
     await addCustomer({ ...data, status: "prospect" } as any);
