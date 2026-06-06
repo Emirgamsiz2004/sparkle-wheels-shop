@@ -131,6 +131,8 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   const [selectedDiensten, setSelectedDiensten] = useState<string[]>([]);
   const [andersNotitie, setAndersNotitie] = useState("");
   const [eindtijdManueel, setEindtijdManueel] = useState(false);
+  const [checklist, setChecklist] = useState<string[]>([]);
+  const [checklistInput, setChecklistInput] = useState("");
 
   const [form, setForm] = useState({
     tijd: "10:00",
