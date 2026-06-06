@@ -11,6 +11,7 @@ export interface Dienst {
   duur_minuten: number;
   volgorde: number;
   actief: boolean;
+  standaard_prijs_cent?: number | null;
   created_at: string;
   updated_at: string;
 }
