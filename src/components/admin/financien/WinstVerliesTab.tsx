@@ -648,31 +648,37 @@ const WinstVerliesTab = () => {
       {/* Detail toggle — optioneel uitklappen */}
       <Details summary="Toon volledige berekening">
         <div className="space-y-4 text-xs">
-          <Row k="Omzet voertuigen" v={formatEuroDecimal(cogs.voertuigOmzet)} />
-          <Row k="− COGS (inkoop + kosten)" v={formatEuroDecimal(cogs.totaal)} />
-          <Row k="= Voertuigwinst" v={formatEuroDecimal(voertuigWinst)} bold />
-          <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Omzet diensten" v={formatEuroDecimal(dienstenOmzet)} />
-            <Row k="− Operationele kosten" v={formatEuroDecimal(operationeleKosten)} />
-            <Row k="= Dienstenwinst" v={formatEuroDecimal(dienstenWinst)} bold />
+          <div className="space-y-2">
+            <Row k={`Verkoopfacturen (${omzet.count})`} v={formatEuroDecimal(omzet.incl)} />
+            <Row k="− Alle kosten (bonnen + inkoopfacturen + Platin)" v={formatEuroDecimal(totaleKosten)} />
+            <Row k="= Brutowinst" v={formatEuroDecimal(brutowinst)} bold />
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Brutowinst" v={formatEuroDecimal(brutowinst)} />
-            <Row k={`− BTW (incl. marge-BTW ${formatEuroDecimal(margeBTW)})`} v={formatEuroDecimal(totaalBTW)} />
+            <Row k="− BTW op verkoopfacturen" v={formatEuroDecimal(totaalBTW)} />
             <Row k="= Nettowinst" v={formatEuroDecimal(nettoResultaat)} bold />
           </div>
+
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Voertuigwinst (verkochte auto's)" v={formatEuroDecimal(voertuigWinst)} />
-            <Row k="+ Dienstenwinst" v={formatEuroDecimal(dienstenWinst)} />
-            <Row k="− BTW" v={formatEuroDecimal(totaalBTW)} />
-            <Row k="= Vermogensgroei" v={formatEuroDecimal(vermogensGroei)} bold />
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Uitsplitsing kosten</div>
+            <Row k="Voertuiginkoop (Moneybird)" v={formatEuroDecimal(voorraadAankopen.mbInkoop)} />
+            <Row k="Voertuig-gebonden kosten (Platin)" v={formatEuroDecimal(voorraadAankopen.voertuigKostenMaand)} />
+            <Row k="Operationele kosten" v={formatEuroDecimal(operationeleKosten)} />
           </div>
+
           <div className="border-t border-border/60 pt-3 space-y-2">
-            <Row k="Huidige voorraad (inkoopwaarde, excl. consignatie)" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop)}`} />
-            <Row k="Voorraad ingekocht deze maand" v={formatEuroDecimal(voorraadAankopen.totaal)} />
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Voertuigmarge (informatief)</div>
+            <Row k="Omzet verkochte voertuigen (registratie)" v={formatEuroDecimal(cogs.voertuigOmzet)} />
+            <Row k="− Inkoop + voertuigkosten" v={formatEuroDecimal(cogs.totaal)} />
+            <Row k="= Marge op verkochte voertuigen" v={formatEuroDecimal(voertuigWinst)} bold />
+            <Row k="Marge-BTW (21/121, ter info)" v={formatEuroDecimal(margeBTW)} />
+          </div>
+
+          <div className="border-t border-border/60 pt-3 space-y-2">
+            <Row k="Huidige voorraad (inkoopwaarde)" v={`${voorraad.aantal} auto's · ${formatEuroDecimal(voorraad.inkoop)}`} />
           </div>
         </div>
       </Details>
+
     </div>
   );
 };
