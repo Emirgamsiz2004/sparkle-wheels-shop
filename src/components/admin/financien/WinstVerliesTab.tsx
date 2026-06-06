@@ -475,9 +475,18 @@ const WinstVerliesTab = () => {
     return posts;
   }, [receipts, purchaseInvoices, platinKosten, inkoopverklaringBedragen]);
 
-  // === Matching principle (COGS): voertuiginkoop hoort bij de maand waarin de auto verkocht is ===
-  // Operationele kosten = alles BEHALVE voertuiginkoop (MB) en voertuig-gebonden Platin kosten.
-  // Die laatste twee zijn voorraad/COGS en horen niet thuis in de maandelijkse periode-kosten.
+  // === SIMPELE P&L (Moneybird = bron van waarheid) ===
+  // Omzet  = alle verkoopfacturen die jij dit kwartaal/maand maakt
+  // Kosten = alle bonnetjes + inkoopfacturen + handmatige Platin-kosten
+  // (geen synthetische "diensten = omzet − voertuigomzet" meer)
+
+  // Alle kosten, ongeacht categorie
+  const totaleKosten = useMemo(
+    () => kostPosten.reduce((s, p) => s + p.bedrag, 0),
+    [kostPosten]
+  );
+
+  // Operationele kosten = alles BEHALVE voertuiginkoop (voor de categorie-uitsplitsing)
   const operationeleKostPosten = useMemo(
     () => kostPosten.filter(p =>
       p.categorie !== "inkoop_voertuigen" &&
@@ -487,7 +496,7 @@ const WinstVerliesTab = () => {
   );
   const operationeleKosten = operationeleKostPosten.reduce((s, p) => s + p.bedrag, 0);
 
-  // COGS = voor elke deze maand verkochte auto: inkoopprijs + alle eraan gekoppelde kosten
+  // Informatieve voertuig-marge (uit voertuigregistratie) — los van de P&L
   const cogs = useMemo(() => {
     let inkoop = 0, voertuigKosten = 0, voertuigOmzet = 0, margeTotaal = 0;
     for (const v of soldVehicles) {
@@ -499,7 +508,6 @@ const WinstVerliesTab = () => {
     return { inkoop, voertuigKosten, totaal: inkoop + voertuigKosten, voertuigOmzet, margeTotaal };
   }, [soldVehicles]);
 
-  // Informatief: hoeveel is deze maand aan voorraad toegevoegd
   const voorraadAankopen = useMemo(() => {
     const mbInkoop = kostPosten
       .filter(p => p.categorie === "inkoop_voertuigen")
@@ -510,49 +518,25 @@ const WinstVerliesTab = () => {
     return { mbInkoop, voertuigKostenMaand, totaal: mbInkoop + voertuigKostenMaand };
   }, [kostPosten]);
 
-  // === SIMPELE P&L ===
-  // 1. Voertuigwinst = verkoopprijs - inkoop - kosten (per voertuig)
-  const voertuigWinst = cogs.margeTotaal;
+  // Brutowinst = verkoopfacturen − alle kosten
+  const brutowinst = omzet.incl - totaleKosten;
 
-  // 2. Diensten = alle omzet die NIET van voertuigverkoop komt
+  // BTW: alleen wat je op je verkoopfacturen aan BTW opneemt (Moneybird levert dit).
+  // Marge-BTW laten we hier weg — die hoort bij de marge-aangifte, niet bij de winst.
+  const totaalBTW = omzet.btw;
+  const margeBTW = Math.max(0, cogs.margeTotaal) * (21 / 121); // alleen informatief
+
+  // Nettowinst = brutowinst − BTW op verkoopfacturen
+  const nettoResultaat = brutowinst - totaalBTW;
+
+  // Vermogensgroei = nettowinst (voorraad-aankoop is geen verlies, het is omgezet kapitaal)
+  const vermogensGroei = nettoResultaat;
+
+  // Voor de details-tabel
+  const voertuigWinst = cogs.margeTotaal;
   const dienstenOmzet = Math.max(0, omzet.incl - cogs.voertuigOmzet);
   const dienstenWinst = dienstenOmzet - operationeleKosten;
 
-  // 3. Brutowinst = voertuigwinst + dienstenwinst
-  const brutowinst = voertuigWinst + dienstenWinst;
-
-  // 4. BTW: marge-BTW (21/121) over positieve voertuigmarge + BTW op diensten (uit Moneybird facturen)
-  const margeBTW = Math.max(0, voertuigWinst) * (21 / 121);
-  const totaalBTW = omzet.btw + margeBTW;
-
-  // 5. Nettowinst
-  const nettoResultaat = brutowinst - totaalBTW;
-
-
-  // Groepering per categorie (alleen operationele)
-  const perCategorie = useMemo(() => {
-    const map = new Map<Categorie, { totaal: number; posten: KostPost[] }>();
-    for (const p of operationeleKostPosten) {
-      const cur = map.get(p.categorie) || { totaal: 0, posten: [] };
-      cur.totaal += p.bedrag;
-      cur.posten.push(p);
-      map.set(p.categorie, cur);
-    }
-    return Array.from(map.entries())
-      .map(([cat, v]) => ({ cat, ...v }))
-      .sort((a, b) => b.totaal - a.totaal);
-  }, [operationeleKostPosten]);
-
-  const [openCat, setOpenCat] = useState<Categorie | null>(null);
-
-  const prev = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
-  const next = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
-
-  // Vermogensgroei = daadwerkelijke groei van het eigen vermogen deze maand.
-  // = winst op verkochte voertuigen (consignatie alleen commissie, geen inkoop)
-  //   + dienstenwinst − BTW
-  // Voorraad-aankoop is GEEN verlies (cash wordt voorraad, vermogen blijft gelijk).
-  const vermogensGroei = nettoResultaat;
 
   return (
     <div className="space-y-8 w-full">
