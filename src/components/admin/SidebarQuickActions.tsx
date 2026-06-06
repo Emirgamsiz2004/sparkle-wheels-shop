@@ -71,7 +71,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       title: "Klanten & proefritten",
       items: [
         { icon: UserPlus, label: "Nieuwe klant", onClick: () => launch(() => { setKlantAnchor(btnRef.current?.getBoundingClientRect() || null); setKlantOpen(true); }) },
-        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => launch(() => setProefritOpen(true)) },
+        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => launch(() => { setProefritAnchor(btnRef.current?.getBoundingClientRect() || null); setProefritOpen(true); }) },
         { icon: CalendarPlus, label: "Afspraak plannen", onClick: () => go("/admin/planning?new=1") },
       ],
     },
