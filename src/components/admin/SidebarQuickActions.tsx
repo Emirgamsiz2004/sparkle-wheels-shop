@@ -104,11 +104,17 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const computePos = () => {
     if (!btnRef.current) return;
     const r = btnRef.current.getBoundingClientRect();
-    // Anchor panel above the FAB, aligned to its right edge
-    const bottom = Math.max(8, window.innerHeight - r.top + 12);
     const right = Math.max(8, window.innerWidth - r.right);
-    setPos({ bottom, right });
+    if (variant === "header") {
+      // Anchor below the trigger
+      setPos({ top: r.bottom + 8, right });
+    } else {
+      // Anchor above (FAB / rail)
+      const bottom = Math.max(8, window.innerHeight - r.top + 12);
+      setPos({ bottom, right });
+    }
   };
+
 
   const handleToggle = () => {
     if (!open && !isMobile) computePos();
