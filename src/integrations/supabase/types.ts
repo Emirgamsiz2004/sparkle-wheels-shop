@@ -218,9 +218,13 @@ export type Database = {
           klant_naam_los: string | null
           klant_telefoon_los: string | null
           medewerker: string | null
+          moneybird_invoice_id: string | null
+          moneybird_invoice_url: string | null
           notities: string | null
           onderwerp: string | null
+          prijs_regels: Json
           status: string
+          totaal_prijs_cent: number | null
           type: string
           updated_at: string
           vehicle_id: string | null
@@ -257,9 +261,13 @@ export type Database = {
           klant_naam_los?: string | null
           klant_telefoon_los?: string | null
           medewerker?: string | null
+          moneybird_invoice_id?: string | null
+          moneybird_invoice_url?: string | null
           notities?: string | null
           onderwerp?: string | null
+          prijs_regels?: Json
           status?: string
+          totaal_prijs_cent?: number | null
           type: string
           updated_at?: string
           vehicle_id?: string | null
@@ -296,9 +304,13 @@ export type Database = {
           klant_naam_los?: string | null
           klant_telefoon_los?: string | null
           medewerker?: string | null
+          moneybird_invoice_id?: string | null
+          moneybird_invoice_url?: string | null
           notities?: string | null
           onderwerp?: string | null
+          prijs_regels?: Json
           status?: string
+          totaal_prijs_cent?: number | null
           type?: string
           updated_at?: string
           vehicle_id?: string | null
@@ -1065,6 +1077,7 @@ export type Database = {
           duur_minuten: number
           id: string
           naam: string
+          standaard_prijs_cent: number | null
           updated_at: string
           volgorde: number
         }
@@ -1075,6 +1088,7 @@ export type Database = {
           duur_minuten?: number
           id?: string
           naam: string
+          standaard_prijs_cent?: number | null
           updated_at?: string
           volgorde?: number
         }
@@ -1085,6 +1099,7 @@ export type Database = {
           duur_minuten?: number
           id?: string
           naam?: string
+          standaard_prijs_cent?: number | null
           updated_at?: string
           volgorde?: number
         }
