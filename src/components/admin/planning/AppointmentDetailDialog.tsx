@@ -76,22 +76,21 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
   // Position popover near anchorRect (desktop)
   useLayoutEffect(() => {
     if (!open || isMobile || !anchorRect) { setPos(null); return; }
-    const POPOVER_W = 340;
-    const margin = 8;
+    const POPOVER_W = 360;
+    const margin = 12;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     let left = anchorRect.right + margin;
     if (left + POPOVER_W > vw - margin) left = anchorRect.left - POPOVER_W - margin;
-    if (left < margin) left = margin;
-    let top = anchorRect.top;
-    // Estimate height after mount
+    if (left < margin) left = Math.max(margin, Math.min(vw - POPOVER_W - margin, anchorRect.left + anchorRect.width / 2 - POPOVER_W / 2));
     requestAnimationFrame(() => {
-      const h = containerRef.current?.offsetHeight ?? 360;
-      let t = top;
-      if (t + h > vh - margin) t = Math.max(margin, vh - h - margin);
+      const h = containerRef.current?.offsetHeight ?? 420;
+      let t = anchorRect.top + anchorRect.height / 2 - h / 2;
+      if (t + h > vh - margin) t = vh - h - margin;
+      if (t < margin) t = margin;
       setPos({ top: t, left });
     });
-    setPos({ top, left });
+    setPos({ top: Math.max(margin, anchorRect.top - 40), left });
   }, [open, isMobile, anchorRect]);
 
   const [editing, setEditing] = useState(false);
