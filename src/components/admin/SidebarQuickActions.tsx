@@ -253,7 +253,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       {panel && createPortal(panel, document.body)}
 
       {/* Direct-action dialogs — opened from the snelstart menu */}
-      <NieuweProefritDialog open={proefritOpen} onClose={() => setProefritOpen(false)} />
+      <NieuweProefritDialog open={proefritOpen} onClose={() => setProefritOpen(false)} anchorRect={proefritAnchor} />
       <AddCustomerPopover
         open={klantOpen}
         onOpenChange={setKlantOpen}
