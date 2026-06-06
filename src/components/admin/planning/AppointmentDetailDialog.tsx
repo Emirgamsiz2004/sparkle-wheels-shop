@@ -22,7 +22,6 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onUpdate: (id: string, updates: Partial<Appointment>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  anchorRect?: DOMRect | null;
 }
 
 const timeSlots = Array.from({ length: 20 }, (_, i) => {
@@ -37,7 +36,7 @@ const statusOptions: { value: AppointmentStatus; label: string }[] = [
   { value: "geannuleerd", label: "Geannuleerd" },
 ];
 
-const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, onDelete, anchorRect }: Props) => {
+const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, onDelete }: Props) => {
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
@@ -104,33 +103,14 @@ const AppointmentDetailDialog = ({ appointment, open, onOpenChange, onUpdate, on
     }
   };
 
-  // Position popover near the clicked block (desktop). Mobile = bottom sheet.
-  const POPOVER_W = 400;
-  const POPOVER_MAX_H = Math.min(640, window.innerHeight - 32);
-  let popoverStyle: React.CSSProperties = {};
-  if (!isMobile && anchorRect) {
-    const margin = 8;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    // Prefer right of the block, fall back to left
-    let left = anchorRect.right + margin;
-    if (left + POPOVER_W > vw - margin) left = anchorRect.left - POPOVER_W - margin;
-    if (left < margin) left = margin;
-    let top = anchorRect.top;
-    if (top + POPOVER_MAX_H > vh - margin) top = Math.max(margin, vh - POPOVER_MAX_H - margin);
-    popoverStyle = { top, left, width: POPOVER_W, maxHeight: POPOVER_MAX_H };
-  }
-
   const wrapperClass = isMobile
     ? "fixed left-0 right-0 bottom-0 z-50 max-h-[88vh] overflow-y-auto rounded-t-[3px] border-t border-x border-border bg-background shadow-2xl animate-in slide-in-from-bottom duration-200"
-    : anchorRect
-      ? "fixed z-50 overflow-y-auto rounded-[3px] border border-border bg-background shadow-[0_20px_60px_rgba(0,0,0,0.65)] animate-in fade-in-0 zoom-in-95 duration-150"
-      : "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[400px] max-h-[90vh] overflow-y-auto rounded-[3px] border border-border bg-background shadow-[0_20px_60px_rgba(0,0,0,0.65)] animate-in fade-in-0 zoom-in-95 duration-150";
+    : "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[400px] max-h-[90vh] overflow-y-auto rounded-[3px] border border-border bg-background shadow-[0_20px_60px_rgba(0,0,0,0.65)] animate-in fade-in-0 zoom-in-95 duration-150";
 
   return createPortal(
     <>
       <div className="fixed inset-0 z-40 bg-black/40 animate-in fade-in-0 duration-150" />
-      <div ref={containerRef} className={wrapperClass} style={popoverStyle} role="dialog">
+      <div ref={containerRef} className={wrapperClass} role="dialog">
         {isMobile && (
           <div className="pt-2 pb-1 flex justify-center">
             <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
