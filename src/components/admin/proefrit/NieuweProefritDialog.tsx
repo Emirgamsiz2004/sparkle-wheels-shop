@@ -4,10 +4,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { QRCodeSVG } from "qrcode.react";
 import { useTestDrives, TestDrive } from "@/hooks/useTestDrives";
 import { useVehicles } from "@/hooks/useVehicles";
-import { Copy, Check, ExternalLink, Printer, Search, Car, X } from "lucide-react";
+import { Copy, Check, ExternalLink, Printer, Search, Car, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { keepFocusedFieldVisible, useKeyboardSafeViewport } from "@/hooks/use-keyboard-safe-viewport";
+import { fetchRdwData } from "@/lib/rdw";
 
 interface Props {
   open: boolean;
@@ -38,6 +39,40 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
   const [manualModel, setManualModel] = useState("");
   const [manualKenteken, setManualKenteken] = useState("");
   const [manualBouwjaar, setManualBouwjaar] = useState("");
+  const [rdwLoading, setRdwLoading] = useState(false);
+
+  const handleRdwLookup = async () => {
+    const k = manualKenteken.trim();
+    if (!k) { toast.error("Vul eerst een kenteken in"); return; }
+    setRdwLoading(true);
+    const data = await fetchRdwData(k);
+    setRdwLoading(false);
+    if (!data) return;
+    setManualMerk(data.merk || "");
+    setManualModel(data.model || "");
+    if (data.bouwjaar) setManualBouwjaar(String(data.bouwjaar));
+    toast.success("Gegevens opgehaald uit RDW");
+  };
+
+  const handleKentekenQuickStart = async () => {
+    const k = manualKenteken.trim();
+    if (!k) { toast.error("Vul een kenteken in"); return; }
+    setRdwLoading(true);
+    const data = await fetchRdwData(k);
+    setRdwLoading(false);
+    if (!data) return;
+    setSelectedVehicle({
+      id: "",
+      merk: data.merk || manualMerk || "Onbekend",
+      model: data.model || manualModel || "",
+      kenteken: k.toUpperCase(),
+      bouwjaar: data.bouwjaar || undefined,
+    });
+    setManualMerk(data.merk || "");
+    setManualModel(data.model || "");
+    if (data.bouwjaar) setManualBouwjaar(String(data.bouwjaar));
+    setStep("form");
+  };
 
   // Form fields
   const [kmVoor, setKmVoor] = useState(preselectedVehicle?.kilometerstand?.toString() || "");
@@ -255,7 +290,30 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
                 </>
               ) : (
                 <>
-                  <p className="text-xs text-muted-foreground">Vul de voertuiggegevens handmatig in</p>
+                  <p className="text-xs text-muted-foreground">Vul kenteken in en haal automatisch de gegevens op</p>
+                  <div>
+                    <label className="block text-[11px] text-muted-foreground mb-1">Kenteken</label>
+                    <div className="flex gap-2">
+                      <input
+                        value={manualKenteken}
+                        onChange={(e) => setManualKenteken(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleRdwLookup(); } }}
+                        placeholder="AB-123-CD"
+                        autoCapitalize="characters"
+                        spellCheck={false}
+                        className={`${inputCls} font-mono tracking-[0.15em] uppercase`}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRdwLookup}
+                        disabled={rdwLoading || !manualKenteken.trim()}
+                        className="shrink-0 h-12 md:h-auto md:py-2.5 px-3 text-xs font-medium border border-border/60 rounded-[10px] hover:bg-accent/20 transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+                      >
+                        {rdwLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+                        RDW
+                      </button>
+                    </div>
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[11px] text-muted-foreground mb-1">Merk *</label>
@@ -266,15 +324,9 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
                       <input value={manualModel} onChange={(e) => setManualModel(e.target.value)} placeholder="bijv. 320i" className={inputCls} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[11px] text-muted-foreground mb-1">Kenteken</label>
-                      <input value={manualKenteken} onChange={(e) => setManualKenteken(e.target.value.toUpperCase())} placeholder="AB-123-CD" className={inputCls} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] text-muted-foreground mb-1">Bouwjaar</label>
-                      <input type="number" value={manualBouwjaar} onChange={(e) => setManualBouwjaar(e.target.value)} placeholder="2020" className={inputCls} />
-                    </div>
+                  <div>
+                    <label className="block text-[11px] text-muted-foreground mb-1">Bouwjaar</label>
+                    <input type="number" value={manualBouwjaar} onChange={(e) => setManualBouwjaar(e.target.value)} placeholder="2020" className={inputCls} />
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => setUseManual(false)} className="flex-1 py-2.5 text-xs font-medium border border-border/60 rounded-[10px] hover:bg-accent/20 transition-colors">
