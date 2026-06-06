@@ -26,6 +26,7 @@ const inputCls = "w-full h-12 px-4 text-base md:h-auto md:px-3 md:py-2.5 md:text
 const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }: Props) => {
   const { startTestDrive } = useTestDrives();
   const { vehicles } = useVehicles();
+  const { customers } = useCustomers();
   const isMobile = useIsMobile();
   const keyboardViewport = useKeyboardSafeViewport(open && isMobile);
   const [step, setStep] = useState<Step>(preselectedVehicle ? "form" : "select");
@@ -41,6 +42,22 @@ const NieuweProefritDialog = ({ open, onClose, preselectedVehicle, anchorRect }:
   const [manualKenteken, setManualKenteken] = useState("");
   const [manualBouwjaar, setManualBouwjaar] = useState("");
   const [rdwLoading, setRdwLoading] = useState(false);
+
+  // Customer selection
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const customerInputRef = useRef<HTMLInputElement>(null);
+
+  const filteredCustomers = useMemo(() => {
+    if (!customerSearch.trim()) return customers.slice(0, 8);
+    const q = customerSearch.toLowerCase();
+    return customers.filter((c) =>
+      `${c.voornaam} ${c.achternaam}`.toLowerCase().includes(q) ||
+      c.email.toLowerCase().includes(q) ||
+      c.telefoon.includes(q)
+    ).slice(0, 8);
+  }, [customers, customerSearch]);
 
   const handleRdwLookup = async () => {
     const k = manualKenteken.trim();
