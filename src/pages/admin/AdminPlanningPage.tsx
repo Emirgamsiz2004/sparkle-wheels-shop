@@ -98,8 +98,12 @@ const AdminPlanningPage = () => {
   );
 
   const upcoming = useMemo(
-    () => appointments.filter((a) => a.status === "gepland" && new Date(a.datum_tijd) >= new Date())
-      .sort((a, b) => new Date(a.datum_tijd).getTime() - new Date(b.datum_tijd).getTime()).slice(0, 5),
+    () => {
+      const todayStart = startOfDay(new Date());
+      return appointments
+        .filter((a) => !a.is_aanvraag && a.status !== "geannuleerd" && new Date(a.datum_tijd) >= todayStart)
+        .sort((a, b) => new Date(a.datum_tijd).getTime() - new Date(b.datum_tijd).getTime());
+    },
     [appointments]
   );
 
