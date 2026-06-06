@@ -83,12 +83,58 @@ export function useTestDrives() {
 
   useEffect(() => { fetchTestDrives(); }, [fetchTestDrives]);
 
-  const startTestDrive = async (vehicleId: string, kmVoor: number, voertuigInfo: { merk: string; model: string; kenteken?: string; bouwjaar?: number }, begeleidendeMedewerker?: string, customerId?: string) => {
+  const startTestDrive = async (
+    vehicleId: string,
+    kmVoor: number,
+    voertuigInfo: { merk: string; model: string; kenteken?: string; bouwjaar?: number },
+    begeleidendeMedewerker?: string,
+    customer?: { id?: string; voornaam?: string; achternaam?: string; email?: string; telefoon?: string } | string,
+  ) => {
     const token = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
-    
+
+    // Resolve customer_id → must reference test_drive_customers(id).
+    // If a CRM customer object is passed, upsert into test_drive_customers by email.
+    let tdCustomerId: string | null = null;
+    try {
+      if (customer && typeof customer === 'object') {
+        const email = (customer.email || '').trim().toLowerCase();
+        if (email) {
+          const { data: existing } = await supabase
+            .from('test_drive_customers')
+            .select('id')
+            .eq('email', email)
+            .maybeSingle();
+          if (existing?.id) {
+            tdCustomerId = existing.id;
+          } else {
+            const { data: created, error: insErr } = await supabase
+              .from('test_drive_customers')
+              .insert({
+                voornaam: customer.voornaam || '',
+                achternaam: customer.achternaam || '',
+                email,
+                telefoon: customer.telefoon || '',
+              } as any)
+              .select('id')
+              .single();
+            if (insErr) {
+              console.error('test_drive_customers insert failed:', insErr);
+            } else {
+              tdCustomerId = created?.id || null;
+            }
+          }
+        }
+      } else if (typeof customer === 'string') {
+        // Legacy: a raw test_drive_customers id was passed
+        tdCustomerId = customer;
+      }
+    } catch (e) {
+      console.error('Resolving customer for test drive failed:', e);
+    }
+
     const { data, error } = await supabase.from('test_drives').insert({
       vehicle_id: vehicleId,
-      customer_id: customerId || null,
+      customer_id: tdCustomerId,
       token,
       km_voor: kmVoor,
       status: 'wacht_op_klant',
@@ -99,7 +145,11 @@ export function useTestDrives() {
       begeleidende_medewerker: begeleidendeMedewerker || null,
     } as any).select().single();
 
-    if (error) { toast.error('Fout bij starten proefrit'); return null; }
+    if (error) {
+      console.error('startTestDrive insert failed:', error);
+      toast.error('Fout bij starten proefrit');
+      return null;
+    }
     toast.success('Proefrit gestart');
     fetchTestDrives();
     return data as TestDrive;
