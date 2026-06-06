@@ -215,6 +215,8 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     setSelectedDiensten([]);
     setAndersNotitie("");
     setEindtijdManueel(false);
+    setChecklist([]);
+    setChecklistInput("");
     setForm({
       tijd: "10:00", eindtijd: "11:00", klant_naam: "", klant_telefoon: "", klant_email: "",
       vehicle_id: "", notities: "", onderwerp: "", werkzaamheden: "", adres: "",
