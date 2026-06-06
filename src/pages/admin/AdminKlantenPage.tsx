@@ -171,12 +171,16 @@ const AdminKlantenPage = () => {
               >
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-foreground">{c.voornaam} {c.achternaam}</p>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span className={`${BADGE_BASE} ${statusColors[c.status]}`}>
                       {statusLabels[c.status]}
                     </span>
+                    <span className={`${BADGE_BASE} ${bronColors[(c.bron as CustomerBron) || "handmatig"]}`}>
+                      {bronLabels[(c.bron as CustomerBron) || "handmatig"]}
+                    </span>
                     <span className="text-xs text-muted-foreground truncate">{c.email}</span>
                   </div>
+
                   {c.telefoon && <p className="text-xs text-muted-foreground mt-0.5">{c.telefoon}</p>}
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
