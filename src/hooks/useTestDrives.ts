@@ -95,17 +95,20 @@ export function useTestDrives() {
     // Resolve customer_id → must reference test_drive_customers(id).
     // If a CRM customer object is passed, upsert into test_drive_customers by email.
     let tdCustomerId: string | null = null;
+    let canSkipForm = false;
     try {
       if (customer && typeof customer === 'object') {
         const email = (customer.email || '').trim().toLowerCase();
         if (email) {
           const { data: existing } = await supabase
             .from('test_drive_customers')
-            .select('id')
+            .select('id, rijbewijsnummer')
             .eq('email', email)
             .maybeSingle();
           if (existing?.id) {
             tdCustomerId = existing.id;
+            // Klant heeft eerder formulier ingevuld (rijbewijs bekend) → formulier overslaan
+            canSkipForm = !!(existing as any).rijbewijsnummer;
           } else {
             const { data: created, error: insErr } = await supabase
               .from('test_drive_customers')
@@ -125,32 +128,45 @@ export function useTestDrives() {
           }
         }
       } else if (typeof customer === 'string') {
-        // Legacy: a raw test_drive_customers id was passed
         tdCustomerId = customer;
+        const { data: existing } = await supabase
+          .from('test_drive_customers')
+          .select('rijbewijsnummer')
+          .eq('id', customer)
+          .maybeSingle();
+        canSkipForm = !!(existing as any)?.rijbewijsnummer;
       }
     } catch (e) {
       console.error('Resolving customer for test drive failed:', e);
     }
 
-    const { data, error } = await supabase.from('test_drives').insert({
+    const nowIso = new Date().toISOString();
+    const insertPayload: any = {
       vehicle_id: vehicleId,
       customer_id: tdCustomerId,
       token,
       km_voor: kmVoor,
-      status: 'wacht_op_klant',
+      status: canSkipForm ? 'actief' : 'wacht_op_klant',
       voertuig_merk: voertuigInfo.merk,
       voertuig_model: voertuigInfo.model,
       voertuig_kenteken: voertuigInfo.kenteken || null,
       voertuig_bouwjaar: voertuigInfo.bouwjaar || null,
       begeleidende_medewerker: begeleidendeMedewerker || null,
-    } as any).select().single();
+    };
+    if (canSkipForm) {
+      insertPayload.formulier_ingevuld_op = nowIso;
+      insertPayload.vertrek_tijd = nowIso;
+      insertPayload.start_tijd = nowIso;
+    }
+
+    const { data, error } = await supabase.from('test_drives').insert(insertPayload).select().single();
 
     if (error) {
       console.error('startTestDrive insert failed:', error);
       toast.error('Fout bij starten proefrit');
       return null;
     }
-    toast.success('Proefrit gestart');
+    toast.success(canSkipForm ? 'Proefrit direct gestart (klant bekend)' : 'Proefrit gestart');
     fetchTestDrives();
     return data as TestDrive;
   };
