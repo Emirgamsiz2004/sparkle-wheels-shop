@@ -257,7 +257,7 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
 
   const containerClass = isMobile
     ? "fixed left-0 right-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-[14px] border-t border-x border-border/70 bg-card shadow-2xl animate-in slide-in-from-bottom duration-200"
-    : "fixed z-50 w-[340px] rounded-[10px] border border-border/70 bg-card shadow-[0_12px_40px_rgba(0,0,0,0.55)] animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden";
+    : "fixed z-50 w-[360px] rounded-[8px] border border-border/60 bg-[#0f0f10] shadow-[0_20px_60px_rgba(0,0,0,0.65)] animate-in fade-in-0 zoom-in-95 duration-150 overflow-hidden";
 
 
   const containerStyle: React.CSSProperties = isMobile
