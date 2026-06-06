@@ -23,9 +23,10 @@ interface Section {
 
 interface Props {
   /** Visual style for the trigger button. */
-  variant?: "rail" | "wide" | "fab";
+  variant?: "rail" | "wide" | "fab" | "header";
   className?: string;
 }
+
 
 const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
   const navigate = useNavigate();
