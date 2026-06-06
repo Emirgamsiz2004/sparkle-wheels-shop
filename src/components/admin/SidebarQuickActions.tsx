@@ -41,6 +41,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
 
   // Direct-action dialogs launched from the quick menu
   const [proefritOpen, setProefritOpen] = useState(false);
+  const [proefritAnchor, setProefritAnchor] = useState<DOMRect | null>(null);
   const [klantOpen, setKlantOpen] = useState(false);
   const [klantAnchor, setKlantAnchor] = useState<DOMRect | null>(null);
   const [inkoopOpen, setInkoopOpen] = useState(false);
@@ -70,7 +71,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       title: "Klanten & proefritten",
       items: [
         { icon: UserPlus, label: "Nieuwe klant", onClick: () => launch(() => { setKlantAnchor(btnRef.current?.getBoundingClientRect() || null); setKlantOpen(true); }) },
-        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => launch(() => setProefritOpen(true)) },
+        { icon: ClipboardCheck, label: "Proefrit starten", onClick: () => launch(() => { setProefritAnchor(btnRef.current?.getBoundingClientRect() || null); setProefritOpen(true); }) },
         { icon: CalendarPlus, label: "Afspraak plannen", onClick: () => go("/admin/planning?new=1") },
       ],
     },
@@ -252,7 +253,7 @@ const SidebarQuickActions = ({ variant = "rail", className = "" }: Props) => {
       {panel && createPortal(panel, document.body)}
 
       {/* Direct-action dialogs — opened from the snelstart menu */}
-      <NieuweProefritDialog open={proefritOpen} onClose={() => setProefritOpen(false)} />
+      <NieuweProefritDialog open={proefritOpen} onClose={() => setProefritOpen(false)} anchorRect={proefritAnchor} />
       <AddCustomerPopover
         open={klantOpen}
         onOpenChange={setKlantOpen}
