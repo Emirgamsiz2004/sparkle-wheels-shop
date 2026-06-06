@@ -9,7 +9,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import { useIsMobile } from "@/hooks/use-mobile";
 import AppointmentFormDialog from "@/components/admin/planning/AppointmentFormDialog";
 import AppointmentDetailDialog from "@/components/admin/planning/AppointmentDetailDialog";
-import AppointmentDetailPanel from "@/components/admin/planning/AppointmentDetailPanel";
+import WeekTimeGrid from "@/components/admin/planning/WeekTimeGrid";
 import OpenstaandeAanvragen from "@/components/admin/planning/OpenstaandeAanvragen";
 import SlidingTabs from "@/components/admin/SlidingTabs";
 import { cn } from "@/lib/utils";
@@ -44,7 +44,7 @@ const AdminPlanningPage = () => {
   const addBtnRef = useRef<HTMLButtonElement>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [mobileDialogId, setMobileDialogId] = useState<string | null>(null);
+  const [detailAnchorRect, setDetailAnchorRect] = useState<DOMRect | null>(null);
 
   const [view, setView] = useState<ViewMode>("agenda");
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>("deze_week");
@@ -55,14 +55,10 @@ const AdminPlanningPage = () => {
     () => appointments.find((a) => a.id === selectedId) || null,
     [appointments, selectedId]
   );
-  const mobileDialogAppt = useMemo(
-    () => appointments.find((a) => a.id === mobileDialogId) || null,
-    [appointments, mobileDialogId]
-  );
 
-  const openAppt = (a: Appointment) => {
-    if (isMobile || view === "lijst") setMobileDialogId(a.id);
-    else setSelectedId(a.id);
+  const openAppt = (a: Appointment, rect?: DOMRect) => {
+    setSelectedId(a.id);
+    setDetailAnchorRect(rect || null);
   };
 
   const weekDays = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
@@ -246,24 +242,12 @@ const AdminPlanningPage = () => {
                 })}
               </div>
             ) : (
-              <div className="grid grid-cols-7 gap-px bg-border rounded-md overflow-hidden border border-border">
-                {weekDays.map((day) => {
-                  const key = format(day, "yyyy-MM-dd");
-                  const dayAppts = appointmentsByDay.get(key) || [];
-                  const today = isToday(day);
-                  return (
-                    <div key={key} className={cn("bg-card min-h-[180px] flex flex-col", today ? "ring-1 ring-inset ring-foreground/40" : "")}>
-                      <div className={cn("px-2 py-1.5 text-center border-b border-border/60", today ? "bg-foreground/5" : "")}>
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{format(day, "EEE", { locale: nl })}</p>
-                        <p className={cn("text-sm font-semibold", today ? "text-foreground" : "")}>{format(day, "d")}</p>
-                      </div>
-                      <div className="flex-1 p-1 space-y-1 overflow-y-auto">
-                        {dayAppts.map((a) => <Tile key={a.id} a={a} dense />)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <WeekTimeGrid
+                weekDays={weekDays}
+                appointments={appointments}
+                selectedId={selectedId}
+                onAppointmentClick={(a, rect) => openAppt(a, rect)}
+              />
             )}
 
             <OpenstaandeAanvragen aanvragen={aanvragen} onUpdate={updateAppointment} />
@@ -296,48 +280,35 @@ const AdminPlanningPage = () => {
             )}
           </div>
 
-          {/* RIGHT: detail panel (desktop only) */}
+          {/* RIGHT: upcoming sidebar (desktop only) */}
           {!isMobile && (
             <aside className="lg:sticky lg:top-4">
-              {selected ? (
-                <AppointmentDetailPanel
-                  appointment={selected}
-                  onUpdate={updateAppointment}
-                  onDelete={async (id) => { await deleteAppointment(id); setSelectedId(null); }}
-                  onEdit={() => setMobileDialogId(selected.id)}
-                  onClose={() => setSelectedId(null)}
-                  showClose
-                />
-              ) : (
-                <div className="bg-card border border-border rounded-[6px] p-5 space-y-3">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    <h3 className="text-sm font-semibold text-foreground">Aankomende afspraken</h3>
-                  </div>
-                  {upcoming.length === 0 ? (
-                    <p className="text-xs text-muted-foreground py-6 text-center">Geen aankomende afspraken</p>
-                  ) : (
-                    <div className="space-y-1.5">
-                      {upcoming.map((a) => (
-                        <button key={a.id} onClick={() => openAppt(a)}
-                          className="w-full text-left bg-background/40 hover:bg-accent/30 border border-border/40 rounded-[3px] px-3 py-2 transition-colors">
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", typeDotColors[a.type])} />
-                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                              {format(new Date(a.datum_tijd), "EEE d MMM · HH:mm", { locale: nl })}
-                            </span>
-                          </div>
-                          {a.customer && <p className="text-sm truncate text-foreground">{a.customer.voornaam} {a.customer.achternaam}</p>}
-                          {a.vehicle && <p className="text-[11px] text-muted-foreground truncate">{a.vehicle.merk} {a.vehicle.model}</p>}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-[11px] text-muted-foreground/60 pt-2 border-t border-border/40 inline-flex items-center gap-1.5">
-                    <CalendarIcon className="w-3 h-3" /> Klik op een afspraak om details te zien
-                  </p>
+              <div className="bg-card border border-border rounded-[3px] p-4 space-y-3">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="w-4 h-4" />
+                  <h3 className="text-sm font-semibold text-foreground">Aankomende afspraken</h3>
                 </div>
-              )}
+                {upcoming.length === 0 ? (
+                  <p className="text-xs text-muted-foreground py-6 text-center">Geen aankomende afspraken</p>
+                ) : (
+                  <div className="space-y-1.5">
+                    {upcoming.map((a) => (
+                      <button key={a.id}
+                        onClick={(e) => openAppt(a, (e.currentTarget as HTMLElement).getBoundingClientRect())}
+                        className="w-full text-left bg-background/40 hover:bg-accent/30 border border-border rounded-[3px] px-3 py-2 transition-colors">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", typeDotColors[a.type])} />
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                            {format(new Date(a.datum_tijd), "EEE d MMM · HH:mm", { locale: nl })}
+                          </span>
+                        </div>
+                        {a.customer && <p className="text-sm truncate text-foreground">{a.customer.voornaam} {a.customer.achternaam}</p>}
+                        {a.vehicle && <p className="text-[11px] text-muted-foreground truncate">{a.vehicle.merk} {a.vehicle.model}</p>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </aside>
           )}
         </div>
@@ -381,7 +352,7 @@ const AdminPlanningPage = () => {
                     {filteredAppointments.map((a) => {
                       const isPast = new Date(a.datum_tijd) < new Date() && a.status === "gepland";
                       return (
-                        <tr key={a.id} onClick={() => setMobileDialogId(a.id)}
+                        <tr key={a.id} onClick={(e) => openAppt(a, (e.currentTarget as HTMLElement).getBoundingClientRect())}
                           className={cn("border-b border-border/50 hover:bg-accent/10 cursor-pointer transition-colors", isPast ? "opacity-60" : "")}>
                           <td className="px-4 py-2.5 whitespace-nowrap">
                             <p className="font-medium">{format(new Date(a.datum_tijd), "d MMM yyyy", { locale: nl })}</p>
@@ -428,11 +399,12 @@ const AdminPlanningPage = () => {
         anchorRect={formAnchorRect}
       />
       <AppointmentDetailDialog
-        appointment={mobileDialogAppt}
-        open={!!mobileDialogAppt}
-        onOpenChange={(v) => { if (!v) setMobileDialogId(null); }}
+        appointment={selected}
+        open={!!selected}
+        onOpenChange={(v) => { if (!v) { setSelectedId(null); setDetailAnchorRect(null); } }}
         onUpdate={updateAppointment}
         onDelete={deleteAppointment}
+        anchorRect={detailAnchorRect}
       />
     </div>
   );
