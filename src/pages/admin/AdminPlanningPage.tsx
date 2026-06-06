@@ -204,7 +204,7 @@ const AdminPlanningPage = () => {
       {view === "agenda" ? (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 lg:items-stretch">
           {/* LEFT: agenda */}
-          <div className="space-y-3 min-w-0">
+          <div className="flex flex-col gap-3 min-w-0">
             {/* Week navigation */}
             <div className="flex items-center gap-2">
               <button onClick={() => setWeekStart(subWeeks(weekStart, 1))} className="inline-flex items-center justify-center w-8 h-8 border border-border rounded-md hover:bg-accent transition-colors">
@@ -250,13 +250,13 @@ const AdminPlanningPage = () => {
                 })}
               </div>
             ) : (
-              <div className="grid grid-cols-7 gap-px bg-border rounded-md overflow-hidden border border-border">
+              <div className="grid grid-cols-7 gap-px bg-border rounded-md overflow-hidden border border-border flex-1 min-h-[420px]">
                 {weekDays.map((day) => {
                   const key = format(day, "yyyy-MM-dd");
                   const dayAppts = appointmentsByDay.get(key) || [];
                   const today = isToday(day);
                   return (
-                    <div key={key} className={cn("bg-card min-h-[180px] flex flex-col", today ? "ring-1 ring-inset ring-foreground/40" : "")}>
+                    <div key={key} className={cn("bg-card flex flex-col h-full", today ? "ring-1 ring-inset ring-foreground/40" : "")}>
                       <div className={cn("px-2 py-1.5 text-center border-b border-border/60", today ? "bg-foreground/5" : "")}>
                         <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{format(day, "EEE", { locale: nl })}</p>
                         <p className={cn("text-sm font-semibold", today ? "text-foreground" : "")}>{format(day, "d")}</p>
