@@ -39,9 +39,20 @@ export interface Appointment {
   klant_naam_los?: string | null;
   klant_telefoon_los?: string | null;
   klant_email_los?: string | null;
+  prijs_regels?: PrijsRegel[] | null;
+  totaal_prijs_cent?: number | null;
+  moneybird_invoice_id?: string | null;
+  moneybird_invoice_url?: string | null;
   // Joined
   customer?: { id: string; voornaam: string; achternaam: string; telefoon: string; email: string } | null;
   vehicle?: { id: string; merk: string; model: string; kenteken: string | null } | null;
+}
+
+export interface PrijsRegel {
+  omschrijving: string;
+  aantal: number;
+  prijs_cent: number;
+  btw_pct?: number;
 }
 
 export const typeLabels: Record<AppointmentType, string> = {
