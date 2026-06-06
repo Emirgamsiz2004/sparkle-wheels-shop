@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Badge } from "@/components/ui/badge";
 import {
   Eye, Car, PackageCheck, CalendarIcon, Clock, Wrench, Truck, MoreHorizontal,
-  ArrowLeft, X, Mail, Sparkles, MapPin,
+  ArrowLeft, X, Mail, Sparkles, MapPin, Plus, Trash2, ListChecks,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
@@ -131,6 +131,8 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
   const [selectedDiensten, setSelectedDiensten] = useState<string[]>([]);
   const [andersNotitie, setAndersNotitie] = useState("");
   const [eindtijdManueel, setEindtijdManueel] = useState(false);
+  const [checklist, setChecklist] = useState<string[]>([]);
+  const [checklistInput, setChecklistInput] = useState("");
 
   const [form, setForm] = useState({
     tijd: "10:00",
@@ -213,6 +215,8 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
     setSelectedDiensten([]);
     setAndersNotitie("");
     setEindtijdManueel(false);
+    setChecklist([]);
+    setChecklistInput("");
     setForm({
       tijd: "10:00", eindtijd: "11:00", klant_naam: "", klant_telefoon: "", klant_email: "",
       vehicle_id: "", notities: "", onderwerp: "", werkzaamheden: "", adres: "",
@@ -330,8 +334,12 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
         .map((id) => diensten.find((d) => d.id === id)?.naam)
         .filter(Boolean) as string[];
 
+      const checklistText = checklist.length
+        ? "Checklist:\n" + checklist.map((t) => `• ${t}`).join("\n")
+        : "";
       const noteParts = [
         showsAdres(type) && form.adres ? `Adres: ${form.adres}` : "",
+        checklistText,
         form.notities,
       ].filter(Boolean);
 
@@ -813,9 +821,72 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                   </div>
                 )}
 
+                {/* Checklist — wat moet er gedaan worden */}
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                    <ListChecks className="w-3.5 h-3.5" />
+                    Wat moet er gedaan worden? <span className="opacity-50">(checklist)</span>
+                  </Label>
+                  {checklist.length > 0 && (
+                    <ul className="mb-2 space-y-1">
+                      {checklist.map((item, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 px-2.5 py-1.5 rounded-[3px] bg-foreground/[0.04] border border-border/40 text-xs text-foreground"
+                        >
+                          <span className="text-muted-foreground mt-0.5">{i + 1}.</span>
+                          <span className="flex-1 break-words whitespace-pre-wrap">{item}</span>
+                          <button
+                            type="button"
+                            onClick={() => setChecklist((c) => c.filter((_, idx) => idx !== i))}
+                            className="text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                            aria-label="Verwijder"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <div className="flex gap-1.5">
+                    <Input
+                      value={checklistInput}
+                      onChange={(e) => setChecklistInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const v = checklistInput.trim();
+                          if (v) {
+                            setChecklist((c) => [...c, v]);
+                            setChecklistInput("");
+                          }
+                        }
+                      }}
+                      placeholder="Bijv. Banden controleren, sleutels meenemen…"
+                      className="rounded-[3px] h-9 text-xs"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="rounded-[3px] h-9 px-2 shrink-0"
+                      onClick={() => {
+                        const v = checklistInput.trim();
+                        if (v) {
+                          setChecklist((c) => [...c, v]);
+                          setChecklistInput("");
+                        }
+                      }}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground/70 mt-1">Druk Enter om toe te voegen</p>
+                </div>
+
                 {/* Notities */}
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">Notities <span className="opacity-50">(optioneel)</span></Label>
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">Extra notities <span className="opacity-50">(optioneel)</span></Label>
                   <Textarea
                     value={form.notities}
                     onChange={(e) => setForm({ ...form, notities: e.target.value })}
@@ -824,6 +895,7 @@ const AppointmentFormDialog = ({ open, onOpenChange, customers, vehicles, allVeh
                     className="rounded-[3px] resize-none min-h-[60px]"
                   />
                 </div>
+
 
                 {/* Toggle bevestigingsmail */}
                 {effectiveEmail && (
