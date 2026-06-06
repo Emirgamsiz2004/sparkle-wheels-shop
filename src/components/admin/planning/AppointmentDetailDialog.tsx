@@ -427,8 +427,8 @@ const AppointmentDetailDialog = ({ appointment, anchorRect, open, onOpenChange, 
                       <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-1.5 font-medium">Status</div>
                       <div className="inline-flex w-full rounded-[4px] border border-border/60 bg-background/40 p-0.5">
                         {[
-                          { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-emerald-500/90 text-white" },
-                          { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/50 text-white" },
+                          { v: "gepland" as AppointmentStatus, label: "Bevestigd", active: "bg-foreground text-background" },
+                          { v: "voltooid" as AppointmentStatus, label: "Afgerond", active: "bg-muted-foreground/60 text-background" },
                           { v: "geannuleerd" as AppointmentStatus, label: "No-show", active: "bg-orange-500/90 text-white" },
                         ].map(({ v, label, active }) => {
                           const isActive = localStatus === v;
