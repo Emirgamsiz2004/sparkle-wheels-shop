@@ -304,7 +304,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, minValue = 1
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
       {editing ? (
         <div className="flex items-center gap-1.5">
-          <span className="text-sm text-muted-foreground">€</span>
+          <span className="text-sm text-muted-foreground">{isPercent ? "%" : "€"}</span>
           <input
             autoFocus
             type="text"
