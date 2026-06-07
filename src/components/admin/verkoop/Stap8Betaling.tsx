@@ -132,6 +132,7 @@ const Stap8Betaling = ({
     typeof initialOpenstaandRestbedrag === "number" && initialOpenstaandRestbedrag > 0,
   );
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [lastBetalingsPdfUrl, setLastBetalingsPdfUrl] = useState<string | null>(null);
 
   // ─── Auto-fill laatste rij met restbedrag (alleen als niet handmatig bewerkt) ───
   const totaalIngevuld = rijen
