@@ -173,6 +173,7 @@ export default function Stap6InruilDocument(p: Stap6Props) {
           datum,
           documentNaam: `Inkoopverklaring inruil ${p.inruilKenteken || verkoperNaam}`,
         });
+        try { (doc as any).autoPrint?.(); } catch {}
         pdfBlob = doc.output("blob");
         documentNaam = `Inkoopverklaring ${p.inruilKenteken || verkoperNaam} ${datum}.pdf`;
 
