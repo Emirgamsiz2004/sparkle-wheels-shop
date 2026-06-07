@@ -3840,22 +3840,34 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           <div>
             <div className="text-sm font-medium text-foreground mb-1">Koopovereenkomst genereren</div>
             <p className="text-xs text-muted-foreground max-w-md">
-              Genereer een professionele PDF op basis van bovenstaande gegevens. De overeenkomst opent in een nieuw tabblad om te printen.
+              Genereer een professionele PDF op basis van bovenstaande gegevens. De overeenkomst opent in een nieuw tabblad — het printvenster wordt automatisch geopend.
               De klant ontvangt automatisch een kopie van de algemene voorwaarden per e-mail.
             </p>
           </div>
-          <button
-            onClick={handleGenereerPdf}
-            className="inline-flex items-center gap-2 px-5 py-3 bg-foreground text-background rounded-[10px] hover:bg-foreground/90 transition-colors text-sm font-medium"
-          >
-            <FileText className="w-4 h-4" />
-            Koopovereenkomst genereren (PDF)
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={handleGenereerPdf}
+              className="inline-flex items-center gap-2 px-5 py-3 bg-foreground text-background rounded-[10px] hover:bg-foreground/90 transition-colors text-sm font-medium"
+            >
+              <FileText className="w-4 h-4" />
+              Koopovereenkomst genereren (PDF)
+            </button>
+            {lastPdfUrl && (
+              <button
+                type="button"
+                onClick={() => window.open(lastPdfUrl, "_blank")}
+                className="inline-flex items-center gap-2 px-5 py-3 border border-border text-foreground rounded-[10px] hover:bg-muted transition-colors text-sm font-medium"
+              >
+                <FileText className="w-4 h-4" />
+                Printen
+              </button>
+            )}
+          </div>
         </div>
         {p.pdfGenereerd && (
           <div className="mt-4 flex items-center gap-2 text-xs text-emerald-400">
             <Check className="w-4 h-4" />
-            PDF is gegenereerd en geopend in nieuw tabblad
+            PDF is gegenereerd — het printvenster opent automatisch in het nieuwe tabblad
           </div>
         )}
       </div>
