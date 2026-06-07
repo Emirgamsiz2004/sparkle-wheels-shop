@@ -3346,7 +3346,6 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
   const inruilWaarde = p.inruil?.waarde || 0;
   const restbedrag = totaal - (p.aanbetalingBedrag || 0) - inruilWaarde;
   const [showAanbetalingEditor, setShowAanbetalingEditor] = useState((p.aanbetalingBedrag || 0) > 0);
-  const [lastPdfUrl, setLastPdfUrl] = useState<string | null>(null);
 
   // Auto-clean: "aanbetaling" is geen geldige betaalwijze meer (wordt automatisch van restbedrag afgetrokken)
   useEffect(() => {
@@ -3488,14 +3487,9 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           : null,
       });
 
-      // Open PDF in nieuw tabblad met automatisch printdialoog
-      try {
-        // @ts-ignore — jsPDF autoPrint is beschikbaar
-        doc.autoPrint();
-      } catch {}
+      // Open PDF in nieuw tabblad
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
-      setLastPdfUrl(url);
       window.open(url, "_blank");
 
       // Upload naar storage en koppel aan verkoop_documenten
@@ -3840,34 +3834,22 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           <div>
             <div className="text-sm font-medium text-foreground mb-1">Koopovereenkomst genereren</div>
             <p className="text-xs text-muted-foreground max-w-md">
-              Genereer een professionele PDF op basis van bovenstaande gegevens. De overeenkomst opent in een nieuw tabblad — het printvenster wordt automatisch geopend.
+              Genereer een professionele PDF op basis van bovenstaande gegevens. De overeenkomst opent in een nieuw tabblad om te printen.
               De klant ontvangt automatisch een kopie van de algemene voorwaarden per e-mail.
             </p>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={handleGenereerPdf}
-              className="inline-flex items-center gap-2 px-5 py-3 bg-foreground text-background rounded-[10px] hover:bg-foreground/90 transition-colors text-sm font-medium"
-            >
-              <FileText className="w-4 h-4" />
-              Koopovereenkomst genereren (PDF)
-            </button>
-            {lastPdfUrl && (
-              <button
-                type="button"
-                onClick={() => window.open(lastPdfUrl, "_blank")}
-                className="inline-flex items-center gap-2 px-5 py-3 border border-border text-foreground rounded-[10px] hover:bg-muted transition-colors text-sm font-medium"
-              >
-                <FileText className="w-4 h-4" />
-                Printen
-              </button>
-            )}
-          </div>
+          <button
+            onClick={handleGenereerPdf}
+            className="inline-flex items-center gap-2 px-5 py-3 bg-foreground text-background rounded-[10px] hover:bg-foreground/90 transition-colors text-sm font-medium"
+          >
+            <FileText className="w-4 h-4" />
+            Koopovereenkomst genereren (PDF)
+          </button>
         </div>
         {p.pdfGenereerd && (
           <div className="mt-4 flex items-center gap-2 text-xs text-emerald-400">
             <Check className="w-4 h-4" />
-            PDF is gegenereerd — het printvenster opent automatisch in het nieuwe tabblad
+            PDF is gegenereerd en geopend in nieuw tabblad
           </div>
         )}
       </div>
