@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, Check, X, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useVehicles } from "@/hooks/useVehicles";
-import { formatEuroDecimal, brandstofLabels } from "@/types/vehicle";
+import { formatEuroDecimal, brandstofLabels, isConsignatie } from "@/types/vehicle";
 import KoppelKlantBlock from "@/components/admin/detail/KoppelKlantBlock";
 import { toast } from "sonner";
 
@@ -35,9 +35,9 @@ const InfoRow = ({ label, value, isLast }: { label: string; value: string; isLas
   </tr>
 );
 
-const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint }: {
+const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint, unit = "€" }: {
   label: string; value: string; color?: string; editable?: boolean;
-  rawValue?: number; onSave?: (val: number) => Promise<void>; hint?: string;
+  rawValue?: number; onSave?: (val: number) => Promise<void>; hint?: string; unit?: string;
 }) => {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState("");
@@ -47,7 +47,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint }: {
   const commit = async () => {
     if (!onSave) return cancel();
     const n = parseEuro(val);
-    if (n === null || n < 0) { toast.error("Ongeldig bedrag"); return; }
+    if (n === null || n < 0) { toast.error("Ongeldige waarde"); return; }
     setSaving(true);
     try { await onSave(n); setEditing(false); } finally { setSaving(false); }
   };
@@ -56,7 +56,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint }: {
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
       {editing ? (
         <div className="flex items-center gap-1.5">
-          <span className="text-sm text-muted-foreground">€</span>
+          <span className="text-sm text-muted-foreground">{unit}</span>
           <input
             autoFocus type="text" inputMode="decimal" value={val} disabled={saving}
             onChange={(e) => setVal(e.target.value.replace(/[^0-9.,]/g, ""))}
@@ -211,8 +211,14 @@ const AdminVerkoopDetailPage = () => {
   const werkelijkBetaald = heeftInruilActueel ? Math.max(0, verkoopprijsActueel - inruilWaardeActueel) : verkoopprijsActueel;
   const aanbetalingActueel = Number(verkoopRow?.aanbetaling_bedrag || 0);
   const restbedrag = Math.max(0, werkelijkBetaald - aanbetalingActueel);
-  const brutoWinst = verkoopprijsActueel - inkoopprijsActueel;
-  const margePct = inkoopprijsActueel > 0 ? (brutoWinst / inkoopprijsActueel) * 100 : 0;
+  const isConsignatieVerkoop = isConsignatie(vehicle);
+  const commissiePercActueel = Number(vehicle.consignatieCommissiePerc) > 0 ? Number(vehicle.consignatieCommissiePerc) : 10;
+  const brutoWinst = isConsignatieVerkoop
+    ? verkoopprijsActueel * (commissiePercActueel / 100)
+    : verkoopprijsActueel - inkoopprijsActueel;
+  const margePct = isConsignatieVerkoop
+    ? commissiePercActueel
+    : (inkoopprijsActueel > 0 ? (brutoWinst / inkoopprijsActueel) * 100 : 0);
 
   // Helpers — KPI inline saves
   const ensureVerkoopRow = async (): Promise<string | null> => {
@@ -238,6 +244,13 @@ const AdminVerkoopDetailPage = () => {
     await updateVehicle({ ...vehicle, inkoopprijs: val });
     toast.success("Inkoopprijs bijgewerkt");
   };
+
+  const handleSaveCommissie = async (val: number) => {
+    if (val < 0 || val > 100) { toast.error("Percentage moet tussen 0 en 100 liggen"); return; }
+    await updateVehicle({ ...vehicle, consignatieCommissiePerc: val });
+    toast.success("Commissie bijgewerkt");
+  };
+
 
   const handleSaveVerkoop = async (val: number) => {
     const ok = await saveVerkoopFields({ verkoopprijs: val });
@@ -380,13 +393,25 @@ const AdminVerkoopDetailPage = () => {
 
       {/* KPI cards — Rij 1 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard
-          label="Inkoopprijs"
-          value={formatEuroDecimal(inkoopprijsActueel)}
-          editable
-          rawValue={inkoopprijsActueel}
-          onSave={handleSaveInkoop}
-        />
+        {isConsignatieVerkoop ? (
+          <KpiCard
+            label="Commissie %"
+            value={`${commissiePercActueel}%`}
+            editable
+            rawValue={commissiePercActueel}
+            onSave={handleSaveCommissie}
+            unit="%"
+            hint="Over verkoopprijs"
+          />
+        ) : (
+          <KpiCard
+            label="Inkoopprijs"
+            value={formatEuroDecimal(inkoopprijsActueel)}
+            editable
+            rawValue={inkoopprijsActueel}
+            onSave={handleSaveInkoop}
+          />
+        )}
         <KpiCard
           label="Verkoopprijs"
           value={formatEuroDecimal(verkoopprijsActueel)}
@@ -420,18 +445,22 @@ const AdminVerkoopDetailPage = () => {
       {/* KPI cards — Rij 2 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="bg-card border border-border rounded-lg p-3">
-          <p className="text-xs text-muted-foreground mb-1">Bruto winst</p>
+          <p className="text-xs text-muted-foreground mb-1">{isConsignatieVerkoop ? "Mijn commissie (excl. BTW)" : "Bruto winst"}</p>
           <p className={`text-base font-semibold tabular-nums ${brutoWinst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
             {verkoopprijsActueel > 0 ? formatEuroDecimal(brutoWinst) : "—"}
           </p>
-          <p className="text-[10px] text-muted-foreground/70 mt-1">Verkoop − inkoop</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-1">
+            {isConsignatieVerkoop ? `${commissiePercActueel}% × verkoopprijs` : "Verkoop − inkoop"}
+          </p>
         </div>
         <div className="bg-card border border-border rounded-lg p-3">
           <p className="text-xs text-muted-foreground mb-1">Marge %</p>
           <p className={`text-base font-semibold tabular-nums ${brutoWinst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-            {inkoopprijsActueel > 0 ? `${margePct.toFixed(1)}%` : "—"}
+            {isConsignatieVerkoop
+              ? `${margePct.toFixed(1)}%`
+              : (inkoopprijsActueel > 0 ? `${margePct.toFixed(1)}%` : "—")}
           </p>
-          <p className="text-[10px] text-muted-foreground/70 mt-1">Winst / inkoop</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-1">{isConsignatieVerkoop ? "Commissiepercentage" : "Winst / inkoop"}</p>
         </div>
       </div>
 
