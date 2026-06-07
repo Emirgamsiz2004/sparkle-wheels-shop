@@ -1,8 +1,7 @@
 import * as React from 'npm:react@18.3.1'
-import {
-  Body, Container, Head, Heading, Html, Preview, Text, Hr, Section, Button, Row, Column,
-} from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { EmailLayout, InfoCard, DetailRow, CtaButton, ButtonRow, styles } from './_layout.tsx'
+import { Text } from 'npm:@react-email/components@0.0.22'
 
 const SITE_NAME = "Platin Automotive"
 const ADRES = "Cilinderweg 99, 2371DZ Roelofarendsveen"
@@ -10,31 +9,25 @@ const TEL = "071-781 25 25"
 const EMAIL = "info@platinautomotive.nl"
 
 interface Props {
-  // Identificatie
   appointmentId?: string
-  // Persoonlijk
   voornaam?: string
-  naam?: string // backwards compat
-  // Detail velden
+  naam?: string
   type?: string
-  datum?: string // datum voluit, bv "maandag 5 mei 2026"
-  tijd?: string // begintijd "10:00"
-  eindtijd?: string // eindtijd "11:00"
+  datum?: string
+  tijd?: string
+  eindtijd?: string
   duurMinuten?: number
-  voertuig?: string // "BMW 3 Serie (12-AB-34)"
+  voertuig?: string
   kenteken?: string
   omschrijving?: string
   locatie?: string
-  // Calendar links (worden door Edge Function geprepareerd)
   googleCalendarUrl?: string
   icsUrl?: string
-  // Custom template overrides
   onderwerpRegel?: string
   aanhef?: string
   introTekst?: string
   slotTekst?: string
   footerTekst?: string
-  // Mode
   isHerinnering?: boolean
 }
 
@@ -51,11 +44,7 @@ const AfspraakBevestiging = (p: Props) => {
   const omschrijving = p.omschrijving || ''
 
   const vars = {
-    voornaam,
-    type,
-    datum,
-    tijd,
-    eindtijd,
+    voornaam, type, datum, tijd, eindtijd,
     kenteken: p.kenteken || '',
     voertuig: p.voertuig || '',
     locatie,
@@ -72,84 +61,39 @@ const AfspraakBevestiging = (p: Props) => {
     p.slotTekst || `Heeft u vragen? Bel ons op ${TEL} of mail naar ${EMAIL}.`,
     vars
   )
-  const footer = renderTemplate(
-    p.footerTekst || `${SITE_NAME} · Cilinderweg 99 · 2371DZ Roelofarendsveen`,
-    vars
-  )
 
   const titel = p.isHerinnering ? 'Herinnering: uw afspraak morgen' : 'Afspraakbevestiging'
+  const eyebrow = p.isHerinnering ? 'Herinnering' : 'Bevestiging'
 
   return (
-    <Html lang="nl" dir="ltr">
-      <Head />
-      <Preview>{titel} bij {SITE_NAME}</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Heading style={brand}>{SITE_NAME}</Heading>
-          <Hr style={brandHr} />
+    <EmailLayout preview={`${titel} bij ${SITE_NAME}`} eyebrow={eyebrow} title={titel}>
+      <Text style={styles.greeting}>{aanhef}</Text>
+      <Text style={styles.text}>{intro}</Text>
 
-          <Heading style={h1}>{titel}</Heading>
-          <Text style={text}>{aanhef}</Text>
-          <Text style={text}>{intro}</Text>
+      <InfoCard>
+        <DetailRow label="Type" value={type} />
+        <DetailRow label="Datum" value={datum || '-'} />
+        <DetailRow label="Tijd" value={`${tijd}${eindtijd ? ` – ${eindtijd}` : ''}`} />
+        <DetailRow label="Locatie" value={locatie} />
+        {p.voertuig && <DetailRow label="Voertuig" value={p.voertuig} />}
+        {omschrijving && <DetailRow label="Omschrijving" value={omschrijving} />}
+      </InfoCard>
 
-          <Section style={detailsBox}>
-            <Row>
-              <Column style={labelCol}><Text style={detailLabel}>Type</Text></Column>
-              <Column><Text style={detailValue}>{type}</Text></Column>
-            </Row>
-            <Row>
-              <Column style={labelCol}><Text style={detailLabel}>Datum</Text></Column>
-              <Column><Text style={detailValue}>{datum || '-'}</Text></Column>
-            </Row>
-            <Row>
-              <Column style={labelCol}><Text style={detailLabel}>Tijd</Text></Column>
-              <Column><Text style={detailValue}>{tijd}{eindtijd ? ` – ${eindtijd}` : ''}</Text></Column>
-            </Row>
-            <Row>
-              <Column style={labelCol}><Text style={detailLabel}>Locatie</Text></Column>
-              <Column><Text style={detailValue}>{locatie}</Text></Column>
-            </Row>
-            {p.voertuig && (
-              <Row>
-                <Column style={labelCol}><Text style={detailLabel}>Voertuig</Text></Column>
-                <Column><Text style={detailValue}>{p.voertuig}</Text></Column>
-              </Row>
-            )}
-            {omschrijving && (
-              <Row>
-                <Column style={labelCol}><Text style={detailLabel}>Omschrijving</Text></Column>
-                <Column><Text style={detailValue}>{omschrijving}</Text></Column>
-              </Row>
-            )}
-          </Section>
-
-          {(p.googleCalendarUrl || p.icsUrl) && (
-            <Section style={{ margin: '24px 0' }}>
-              <Row>
-                {p.googleCalendarUrl && (
-                  <Column style={{ paddingRight: '6px' }}>
-                    <Button href={p.googleCalendarUrl} style={btnPrimary}>
-                      Toevoegen aan Google Calendar
-                    </Button>
-                  </Column>
-                )}
-                {p.icsUrl && (
-                  <Column style={{ paddingLeft: '6px' }}>
-                    <Button href={p.icsUrl} style={btnSecondary}>
-                      Toevoegen aan Apple / Outlook
-                    </Button>
-                  </Column>
-                )}
-              </Row>
-            </Section>
+      {(p.googleCalendarUrl || p.icsUrl) && (
+        <ButtonRow>
+          {p.googleCalendarUrl && (
+            <span style={{ marginRight: '8px', display: 'inline-block' }}>
+              <CtaButton href={p.googleCalendarUrl} label="Google Calendar" variant="primary" />
+            </span>
           )}
+          {p.icsUrl && (
+            <CtaButton href={p.icsUrl} label="Apple / Outlook" variant="secondary" />
+          )}
+        </ButtonRow>
+      )}
 
-          <Text style={text}>{slot}</Text>
-          <Hr style={hr} />
-          <Text style={footerStyle}>{footer}</Text>
-        </Container>
-      </Body>
-    </Html>
+      <Text style={styles.text}>{slot}</Text>
+    </EmailLayout>
   )
 }
 
@@ -187,18 +131,3 @@ export const template = {
     icsUrl: 'https://example.com/ics',
   },
 } satisfies TemplateEntry
-
-const main = { backgroundColor: '#ffffff', fontFamily: "'DM Sans', Arial, sans-serif" }
-const container = { padding: '32px 28px', maxWidth: '600px' }
-const brand = { fontSize: '14px', fontWeight: '700' as const, color: '#1e1e1a', margin: '0 0 8px', letterSpacing: '0.05em', textTransform: 'uppercase' as const }
-const brandHr = { borderColor: '#1e1e1a', margin: '0 0 24px' }
-const h1 = { fontSize: '22px', fontWeight: '700' as const, color: '#0a0a0a', margin: '0 0 18px' }
-const text = { fontSize: '14px', color: '#444', lineHeight: '1.6', margin: '0 0 16px' }
-const detailsBox = { backgroundColor: '#f6f6f4', borderRadius: '6px', padding: '18px 20px', margin: '20px 0' }
-const labelCol = { width: '120px', verticalAlign: 'top' as const }
-const detailLabel = { fontSize: '11px', color: '#888', letterSpacing: '0.08em', textTransform: 'uppercase' as const, margin: '6px 0', fontWeight: '600' as const }
-const detailValue = { fontSize: '14px', color: '#1a1a1a', margin: '6px 0', lineHeight: '1.5' }
-const hr = { borderColor: '#e5e5e5', margin: '28px 0 16px' }
-const footerStyle = { fontSize: '11px', color: '#999', margin: '0', textAlign: 'center' as const }
-const btnPrimary = { backgroundColor: '#1e1e1a', color: '#ffffff', padding: '12px 18px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' as const, textDecoration: 'none', textAlign: 'center' as const, display: 'block' }
-const btnSecondary = { backgroundColor: '#ffffff', color: '#1e1e1a', padding: '11px 18px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' as const, textDecoration: 'none', textAlign: 'center' as const, display: 'block', border: '1px solid #1e1e1a' }
