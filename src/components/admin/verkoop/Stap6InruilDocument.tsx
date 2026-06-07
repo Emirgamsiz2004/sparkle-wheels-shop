@@ -227,16 +227,16 @@ export default function Stap6InruilDocument(p: Stap6Props) {
         documentNaam = `Inkoopfactuur ${p.bedrijfsnaam} ${datum}.pdf`;
       }
 
-      // Download
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = documentNaam;
-      a.click();
-      URL.revokeObjectURL(url);
+      // Print direct vanuit verborgen iframe — geen nieuw tabblad
+      try {
+        // @ts-ignore — jsPDF autoPrint
+        (pdfBlob as any).autoPrint?.();
+      } catch {}
+      const url = printPdfBlob(pdfBlob, "inruil-print-frame");
+      setLastPdfUrl(url);
 
       setGeneratedAt(new Date().toISOString());
-      toast.success("Document gegenereerd");
+      toast.success("Document gegenereerd — printvenster opent automatisch");
     } catch (err: any) {
       console.error(err);
       toast.error("Kon document niet genereren: " + (err.message || "onbekende fout"));
