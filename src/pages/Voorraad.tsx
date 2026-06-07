@@ -16,7 +16,7 @@ const Voorraad = () => {
     ?.filter((v) => v.dbStatus !== "verkocht")
     ?.sort((a, b) => b.prijs - a.prijs) ?? [];
   const verkocht = voertuigen
-    ?.filter((v) => v.dbStatus === "verkocht")
+    ?.filter((v) => v.dbStatus === "verkocht" && !!v.afbeelding)
     ?.sort((a, b) => b.prijs - a.prijs) ?? [];
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
