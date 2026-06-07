@@ -62,6 +62,8 @@ const mapDbToVehicle = (row: any, costs: any[]): Vehicle => ({
   financieringActief: row.financiering_actief || false,
   financieringBedrag: Number(row.financiering_bedrag) || 0,
   aanbetalingsbedrag: Number(row.aanbetalingsbedrag) || 0,
+  herkomst: row.herkomst || 'inkoop',
+  inruilVanVerkoopId: row.inruil_van_verkoop_id || undefined,
 });
 
 export function useVehicles() {
