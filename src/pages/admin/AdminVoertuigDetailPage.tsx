@@ -134,6 +134,22 @@ const AdminVoertuigDetailPage = () => {
 
   return (
     <div className="space-y-5">
+      {vehicle.herkomst === "inruil" && (
+        <div className="flex items-center justify-between gap-3 px-3 py-2 text-xs rounded-md border border-amber-500/25 bg-amber-500/10 text-amber-300">
+          <span className="font-medium">
+            Binnengekomen via inruil
+            {inruilBron ? ` op verkoop van ${inruilBron.merk} ${inruilBron.model}${inruilBron.kenteken ? ` (${inruilBron.kenteken})` : ""}` : ""}
+          </span>
+          {inruilBron && (
+            <button
+              onClick={() => navigate(`/admin/verkopen/${inruilBron.vehicleId}`)}
+              className="underline hover:text-amber-200 shrink-0"
+            >
+              Bekijk verkoop →
+            </button>
+          )}
+        </div>
+      )}
       <VehicleDetailHeader
         vehicle={vehicle}
         onStatusChange={handleStatusChange}
@@ -142,6 +158,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
         onOpenVerkoop={() => navigate(`/admin/verkopen/nieuw/${vehicle.id}`)}
       />
+
       {/* Tabs */}
       {(() => {
         const tabItems = [
