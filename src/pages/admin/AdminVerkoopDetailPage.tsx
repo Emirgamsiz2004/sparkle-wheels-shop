@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, Check, X, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useVehicles } from "@/hooks/useVehicles";
-import { formatEuroDecimal, brandstofLabels } from "@/types/vehicle";
+import { formatEuroDecimal, brandstofLabels, isConsignatie } from "@/types/vehicle";
 import KoppelKlantBlock from "@/components/admin/detail/KoppelKlantBlock";
 import { toast } from "sonner";
 
