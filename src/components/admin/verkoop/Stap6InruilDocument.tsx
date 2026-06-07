@@ -224,6 +224,7 @@ export default function Stap6InruilDocument(p: Stap6Props) {
           datum,
           factuurnummer,
         });
+        try { (doc as any).autoPrint?.(); } catch {}
         pdfBlob = doc.output("blob");
         documentNaam = `Inkoopfactuur ${p.bedrijfsnaam} ${datum}.pdf`;
       }
