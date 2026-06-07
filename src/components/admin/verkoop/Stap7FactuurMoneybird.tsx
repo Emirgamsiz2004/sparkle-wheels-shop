@@ -468,6 +468,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
               price: r.price,
               amount: "1",
               ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
+              ...(r.ledgerAccountId ? { ledger_account_id: r.ledgerAccountId } : {}),
             };
           }),
         custom_fields_attributes: customFields,
