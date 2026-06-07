@@ -45,6 +45,7 @@ const AdminVoertuigenPage = () => {
   };
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("alle");
+  const [herkomstFilter, setHerkomstFilter] = useState<"alle" | "inruil">("alle");
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
   const [apkRefreshing, setApkRefreshing] = useState(false);
@@ -132,6 +133,7 @@ const AdminVoertuigenPage = () => {
 
   const filtered = visibleVehicles.filter((v) => {
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
+    if (herkomstFilter === "inruil" && v.herkomst !== "inruil") return false;
     if (search) {
       const q = search.toLowerCase();
       const qPlate = normalizePlate(search);
@@ -140,6 +142,7 @@ const AdminVoertuigenPage = () => {
     }
     return true;
   });
+
 
   const suggestions = useMemo(() => {
     if (!search.trim()) return [];
@@ -252,7 +255,20 @@ const AdminVoertuigenPage = () => {
         >
           {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
+        <button
+          type="button"
+          onClick={() => setHerkomstFilter(herkomstFilter === "inruil" ? "alle" : "inruil")}
+          className={`w-full sm:w-auto px-2.5 h-9 text-[13px] sm:text-sm rounded-md border transition-colors ${
+            herkomstFilter === "inruil"
+              ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
+              : "bg-card border-border text-muted-foreground hover:text-foreground"
+          }`}
+          title="Toon alleen voertuigen die via inruil zijn binnengekomen"
+        >
+          Inruil
+        </button>
       </div>
+
 
       {filtered.length === 0 ? (
         <div className="bg-card rounded-lg border border-border px-4 py-12 text-center text-sm text-muted-foreground">
@@ -323,11 +339,17 @@ const AdminVoertuigenPage = () => {
                         APK
                       </span>
                     )}
+                    {v.herkomst === "inruil" && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border bg-amber-500/10 text-amber-400 border-amber-500/25">
+                        Inruil
+                      </span>
+                    )}
                     {statusLabels[v.status] && (
                       <span className={`inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border ${statusColors[v.status]}`}>
                         {statusLabels[v.status]}
                       </span>
                     )}
+
                     {v.verkoopprijs > 0 && (
                       <span className="text-[13px] font-semibold tabular-nums text-foreground ml-1">
                         {formatEuro(v.verkoopprijs)}
@@ -362,6 +384,12 @@ const AdminVoertuigenPage = () => {
                     >
                       <td className="px-3 py-2.5 text-foreground">
                         {v.merk} {v.model} <span className="text-muted-foreground text-xs">({v.bouwjaar})</span>
+                        {v.herkomst === "inruil" && (
+                          <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded border bg-amber-500/10 text-amber-400 border-amber-500/25">
+                            Inruil
+                          </span>
+                        )}
+
                       </td>
                       <td className="px-3 py-2.5">
                         <span className="text-muted-foreground text-[11px] font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>

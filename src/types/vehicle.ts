@@ -67,7 +67,11 @@ export interface Vehicle {
   financieringBedrag?: number;
   aanbetalingsbedrag?: number;
   createdAt?: string;
+  // Herkomst-tracering
+  herkomst?: 'inkoop' | 'inruil' | string;
+  inruilVanVerkoopId?: string;
 }
+
 
 export const isConsignatie = (vehicle: Vehicle): boolean =>
   vehicle.verkoopType === 'consignatie' || vehicle.status === 'consignatie';

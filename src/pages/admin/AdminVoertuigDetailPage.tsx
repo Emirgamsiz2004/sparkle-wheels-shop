@@ -33,8 +33,37 @@ const AdminVoertuigDetailPage = () => {
   const [kostenOpen, setKostenOpen] = useState(false);
   const [afspraakOpen, setAfspraakOpen] = useState(false);
   const [afspraakType, setAfspraakType] = useState<string | undefined>();
+  const [inruilBron, setInruilBron] = useState<{ vehicleId: string; merk: string; model: string; kenteken: string | null } | null>(null);
 
   const vehicle = vehicles.find((v) => v.id === id);
+
+  // Inruil-herkomst: zoek de oorspronkelijke verkoop + bijbehorend voertuig
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (!vehicle || vehicle.herkomst !== "inruil" || !vehicle.inruilVanVerkoopId) {
+        setInruilBron(null);
+        return;
+      }
+      const { data: vr } = await supabase
+        .from("verkopen" as any)
+        .select("vehicle_id")
+        .eq("id", vehicle.inruilVanVerkoopId)
+        .maybeSingle();
+      const verkoopVehicleId = (vr as any)?.vehicle_id;
+      if (!verkoopVehicleId) { if (!cancelled) setInruilBron(null); return; }
+      const { data: vh } = await supabase
+        .from("vehicles")
+        .select("id, merk, model, kenteken")
+        .eq("id", verkoopVehicleId)
+        .maybeSingle();
+      if (cancelled || !vh) return;
+      setInruilBron({ vehicleId: (vh as any).id, merk: (vh as any).merk, model: (vh as any).model, kenteken: (vh as any).kenteken });
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [vehicle?.id, vehicle?.herkomst, vehicle?.inruilVanVerkoopId]);
+
 
   // Verkochte voertuigen horen niet thuis op de voertuigpagina — stuur door naar verkoop-detail
   useEffect(() => {
@@ -105,6 +134,22 @@ const AdminVoertuigDetailPage = () => {
 
   return (
     <div className="space-y-5">
+      {vehicle.herkomst === "inruil" && (
+        <div className="flex items-center justify-between gap-3 px-3 py-2 text-xs rounded-md border border-amber-500/25 bg-amber-500/10 text-amber-300">
+          <span className="font-medium">
+            Binnengekomen via inruil
+            {inruilBron ? ` op verkoop van ${inruilBron.merk} ${inruilBron.model}${inruilBron.kenteken ? ` (${inruilBron.kenteken})` : ""}` : ""}
+          </span>
+          {inruilBron && (
+            <button
+              onClick={() => navigate(`/admin/verkopen/${inruilBron.vehicleId}`)}
+              className="underline hover:text-amber-200 shrink-0"
+            >
+              Bekijk verkoop →
+            </button>
+          )}
+        </div>
+      )}
       <VehicleDetailHeader
         vehicle={vehicle}
         onStatusChange={handleStatusChange}
@@ -113,6 +158,7 @@ const AdminVoertuigDetailPage = () => {
         onOpenAfspraak={(type?: string) => { setAfspraakType(type); setAfspraakOpen(true); }}
         onOpenVerkoop={() => navigate(`/admin/verkopen/nieuw/${vehicle.id}`)}
       />
+
       {/* Tabs */}
       {(() => {
         const tabItems = [
