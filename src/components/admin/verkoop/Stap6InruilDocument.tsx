@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { User, Building2, FileText, Loader2, Check, Download, Info as InfoIcon } from "lucide-react";
+import { User, Building2, FileText, Loader2, Check, Download, Printer, Info as InfoIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { buildInkoopverklaringPdf } from "@/lib/inkoopverklaringPdf";
 import { buildInkoopfactuurPdf } from "@/lib/inkoopfactuurPdf";
+import { printPdfBlob, reprintPdf } from "@/lib/printPdf";
 import { formatKenteken } from "@/lib/kenteken";
 import { GeboortedatumInputs } from "@/components/admin/GeboortedatumInputs";
 
