@@ -221,6 +221,29 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   };
 
   const [regels, setRegels] = useState<Regel[]>(buildInitialRegels);
+  const [ledgerAccounts, setLedgerAccounts] = useState<Array<{ id: string; name: string }>>([]);
+
+  // Haal grootboekrekeningen op uit Moneybird
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await invoke("get_ledger_accounts", {});
+        const list: any[] = Array.isArray(res) ? res : (res?.ledger_accounts || []);
+        if (!cancelled) {
+          setLedgerAccounts(
+            list
+              .filter((a) => a?.id && a?.name)
+              .map((a) => ({ id: String(a.id), name: String(a.name) }))
+              .sort((a, b) => a.name.localeCompare(b.name))
+          );
+        }
+      } catch (e) {
+        console.error("Ophalen grootboekrekeningen mislukt:", e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [invoke]);
 
   useEffect(() => {
     const fresh = buildInitialRegels().filter((r) => ["voertuig", "garantie", "inruil", "aanbetaling"].includes(r.kind));
@@ -230,7 +253,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         prev.length === fresh.length + extras.length &&
         fresh.every((r) => {
           const old = prev.find((p) => p.id === r.id);
-          return old && old.description === r.description && old.price === r.price && old.btwPercent === r.btwPercent;
+          return old && old.description === r.description && old.price === r.price && old.btwPercent === r.btwPercent && old.ledgerAccountId === r.ledgerAccountId;
         });
       return same ? prev : [...fresh, ...extras];
     });
