@@ -2582,12 +2582,14 @@ export type Database = {
           google_drive_folder_url: string | null
           google_drive_synced: boolean | null
           heeft_aanbetaling: boolean
+          herkomst: string
           id: string
           inkoop_datum: string | null
           inkoopprijs: number | null
           inruil_kenteken: string | null
           inruil_merk: string | null
           inruil_model: string | null
+          inruil_van_verkoop_id: string | null
           inruil_waarde: number | null
           kenteken: string | null
           kilometerstand: number | null
@@ -2643,12 +2645,14 @@ export type Database = {
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
           heeft_aanbetaling?: boolean
+          herkomst?: string
           id?: string
           inkoop_datum?: string | null
           inkoopprijs?: number | null
           inruil_kenteken?: string | null
           inruil_merk?: string | null
           inruil_model?: string | null
+          inruil_van_verkoop_id?: string | null
           inruil_waarde?: number | null
           kenteken?: string | null
           kilometerstand?: number | null
@@ -2704,12 +2708,14 @@ export type Database = {
           google_drive_folder_url?: string | null
           google_drive_synced?: boolean | null
           heeft_aanbetaling?: boolean
+          herkomst?: string
           id?: string
           inkoop_datum?: string | null
           inkoopprijs?: number | null
           inruil_kenteken?: string | null
           inruil_merk?: string | null
           inruil_model?: string | null
+          inruil_van_verkoop_id?: string | null
           inruil_waarde?: number | null
           kenteken?: string | null
           kilometerstand?: number | null
@@ -2741,6 +2747,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_inruil_van_verkoop_id_fkey"
+            columns: ["inruil_van_verkoop_id"]
+            isOneToOne: false
+            referencedRelation: "verkopen"
             referencedColumns: ["id"]
           },
         ]
