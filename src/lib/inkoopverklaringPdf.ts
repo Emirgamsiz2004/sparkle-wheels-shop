@@ -26,6 +26,12 @@ export interface InkoopverklaringPdfData {
   documentNaam: string;
 }
 
+const DARK = { r: 45, g: 45, b: 45 };
+const BODY = { r: 80, g: 80, b: 80 };
+const LIGHT = { r: 140, g: 140, b: 140 };
+const LINE = { r: 190, g: 190, b: 190 };
+const PAGE_BG = { r: 245, g: 245, b: 243 };
+
 const formatEur = (n: number) =>
   new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(n);
 
@@ -43,96 +49,131 @@ export function buildInkoopverklaringPdf(data: InkoopverklaringPdfData): jsPDF {
   const mr = 22;
   const cw = pw - ml - mr;
 
-  const setFont = (style: "normal" | "bold", size: number) => {
+  const setColor = (c: { r: number; g: number; b: number }) => doc.setTextColor(c.r, c.g, c.b);
+  const setFont = (style: "normal" | "bold" | "italic", size: number) => {
     doc.setFont("helvetica", style);
     doc.setFontSize(size);
   };
 
-  doc.setTextColor(0, 0, 0);
-  let y = 26;
+  // Background
+  doc.setFillColor(PAGE_BG.r, PAGE_BG.g, PAGE_BG.b);
+  doc.rect(0, 0, pw, 297, "F");
 
-  // ───── Titel
-  setFont("bold", 30);
-  doc.text("INKOOP-", ml, y);
-  y += 11;
-  doc.text("VERKLARING", ml, y);
+  let y = 20;
+
+  // Header
+  setFont("bold", 18);
+  setColor(DARK);
+  doc.text("INKOOPVERKLARING", ml, y);
+  
+  setFont("normal", 9);
+  setColor(LIGHT);
+  doc.text("Platin Automotive", pw - mr, y - 4, { align: "right" });
+  doc.text("Cilinderweg 99, 2371 DZ Roelofarendsveen", pw - mr, y, { align: "right" });
+  
+  y += 4;
+  doc.setDrawColor(LINE.r, LINE.g, LINE.b);
+  doc.setLineWidth(0.3);
+  doc.line(ml, y, pw - mr, y);
   y += 10;
 
+  // Document info
   setFont("normal", 9);
-  doc.text(`Document ${data.documentNaam}   ·   Datum ${formatDate(data.datum)}   ·   Roelofarendsveen`, ml, y);
+  setColor(LIGHT);
+  doc.text(`Document: ${data.documentNaam}`, ml, y);
+  doc.text(`Datum: ${formatDate(data.datum)}`, pw - mr, y, { align: "right" });
   y += 12;
 
-  // ───── Inleidende alinea
-  setFont("normal", 10);
-  const intro = `Ondergetekende verklaart hierbij het hieronder omschreven voertuig te hebben verkocht en geleverd aan Platin Automotive, Cilinderweg 99, 2371 DZ Roelofarendsveen, ingeschreven bij de Kamer van Koophandel onder nummer 99146193.`;
-  const introLines = doc.splitTextToSize(intro, cw);
-  doc.text(introLines, ml, y);
-  y += introLines.length * 5 + 4;
-
-  const h2 = (label: string) => {
-    y += 4;
-    setFont("bold", 11);
-    doc.text(label.toUpperCase(), ml, y);
-    y += 7;
-    setFont("normal", 10);
-  };
-
-  const kv = (label: string, value: string) => {
-    setFont("normal", 10);
-    doc.text(label, ml, y);
-    setFont("bold", 10);
-    doc.text(value || "—", ml + 55, y);
-    y += 5.5;
-  };
-
-  // ───── ARTIKEL 1 — Verkoper
-  h2("Artikel 1 – Verkoper");
-  kv("Naam", data.verkoper.naam);
-  kv("Adres", data.verkoper.adres);
-  kv("Woonplaats", data.verkoper.woonplaats);
-  kv("Telefoon", data.verkoper.telefoon);
-  if (data.verkoper.email) kv("E-mail", data.verkoper.email);
-  kv("Legitimatie", `${data.legitimatie.type} — nr. ${data.legitimatie.nummer}`);
-
-  // ───── ARTIKEL 2 — Voertuig
-  h2("Artikel 2 – Voertuig");
-  kv("Merk & model", `${data.voertuig.merk} ${data.voertuig.model}`.trim());
-  if (data.voertuig.bouwjaar) kv("Bouwjaar", String(data.voertuig.bouwjaar));
-  if (data.voertuig.kenteken) kv("Kenteken", data.voertuig.kenteken);
-  if (data.voertuig.kilometerstand) kv("Kilometerstand", `${data.voertuig.kilometerstand.toLocaleString("nl-NL")} km`);
-  if (data.voertuig.chassisnummer) kv("Chassisnummer", data.voertuig.chassisnummer);
-
-  // ───── ARTIKEL 3 — Inkoopprijs
-  h2("Artikel 3 – Inkoopprijs");
-  kv("Inkoopprijs", formatEur(data.inkoopprijs));
-  kv("Datum transactie", formatDate(data.datum));
-
-  // ───── ARTIKEL 4 — Verklaring
-  h2("Artikel 4 – Verklaring");
-  setFont("normal", 10);
-  const verklaring = `Ondergetekende verklaart dat het voertuig zijn/haar eigendom is en vrij is van financiële verplichtingen, beslagen, eigendomsvoorbehoud of andere zakelijke rechten van derden. Alle opgegeven gegevens zijn naar waarheid ingevuld. Het voertuig maakt geen onderdeel uit van enig geschil of juridische procedure.`;
-  const vLines = doc.splitTextToSize(verklaring, cw);
-  doc.text(vLines, ml, y);
-  y += vLines.length * 5 + 12;
-
-  // ───── Handtekening
+  // Section: Verkoper
   setFont("bold", 11);
-  doc.text("VERKOPER", ml, y);
-  y += 14;
+  setColor(DARK);
+  doc.text("GEGEVENS VERKOPER", ml, y);
+  y += 7;
+
+  const labelVal = (label: string, value: string, yPos: number) => {
+    setFont("normal", 9);
+    setColor(LIGHT);
+    doc.text(label, ml, yPos);
+    setColor(BODY);
+    doc.text(value || "—", ml + 45, yPos);
+  };
+
+  labelVal("Naam", data.verkoper.naam, y); y += 6;
+  labelVal("Adres", data.verkoper.adres, y); y += 6;
+  labelVal("Woonplaats", data.verkoper.woonplaats, y); y += 6;
+  labelVal("Telefoon", data.verkoper.telefoon, y); y += 6;
+  if (data.verkoper.email) { labelVal("E-mail", data.verkoper.email, y); y += 6; }
+  labelVal("Legitimatie", `${data.legitimatie.type} — nr. ${data.legitimatie.nummer}`, y); y += 10;
+
+  // Section: Voertuig
+  doc.setDrawColor(LINE.r, LINE.g, LINE.b);
+  doc.line(ml, y, pw - mr, y);
+  y += 8;
+
+  setFont("bold", 11);
+  setColor(DARK);
+  doc.text("GEGEVENS VOERTUIG", ml, y);
+  y += 7;
+
+  labelVal("Merk", data.voertuig.merk, y); y += 6;
+  labelVal("Model", data.voertuig.model, y); y += 6;
+  if (data.voertuig.bouwjaar) { labelVal("Bouwjaar", String(data.voertuig.bouwjaar), y); y += 6; }
+  if (data.voertuig.kenteken) { labelVal("Kenteken", data.voertuig.kenteken, y); y += 6; }
+  if (data.voertuig.kilometerstand) { labelVal("Kilometerstand", `${data.voertuig.kilometerstand.toLocaleString("nl-NL")} km`, y); y += 6; }
+  if (data.voertuig.chassisnummer) { labelVal("Chassisnummer", data.voertuig.chassisnummer, y); y += 6; }
+  y += 4;
+
+  // Section: Transactie
+  doc.line(ml, y, pw - mr, y);
+  y += 8;
+
+  setFont("bold", 11);
+  setColor(DARK);
+  doc.text("TRANSACTIE", ml, y);
+  y += 7;
+
+  labelVal("Inkoopprijs", formatEur(data.inkoopprijs), y); y += 6;
+  labelVal("Datum", formatDate(data.datum), y); y += 12;
+
+  // Wettelijke verklaring
+  doc.line(ml, y, pw - mr, y);
+  y += 8;
+
+  setFont("bold", 10);
+  setColor(DARK);
+  doc.text("VERKLARING", ml, y);
+  y += 7;
+
+  setFont("normal", 8.5);
+  setColor(BODY);
+  const verklaring = `Ondergetekende verklaart hierbij dat het hierboven beschreven voertuig zijn/haar eigendom is en vrij is van financiële verplichtingen, beslagen, eigendomsvoorbehoud of andere zakelijke rechten van derden. Ondergetekende verklaart dat alle opgegeven gegevens naar waarheid zijn ingevuld en dat het voertuig geen onderdeel uitmaakt van enig geschil of juridische procedure.`;
+  const lines = doc.splitTextToSize(verklaring, cw);
+  doc.text(lines, ml, y);
+  y += lines.length * 4.5 + 10;
+
+  // Handtekening
+  setFont("normal", 9);
+  setColor(LIGHT);
+  doc.text("Handtekening verkoper:", ml, y);
+  y += 3;
 
   if (data.handtekeningDataUrl) {
     try {
-      doc.addImage(data.handtekeningDataUrl, "PNG", ml, y - 12, 60, 22);
-    } catch {
-      // ignore
+      doc.addImage(data.handtekeningDataUrl, "PNG", ml, y, 60, 25);
+    } catch (e) {
+      console.warn("Kon handtekening niet toevoegen aan PDF");
     }
+    y += 28;
+  } else {
+    // Lege lijn voor handtekening
+    doc.line(ml, y + 20, ml + 60, y + 20);
+    y += 25;
   }
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.5);
-  doc.line(ml, y, ml + 90, y);
-  y += 5;
-  setFont("normal", 9);
-  doc.text("Naam & handtekening", ml, y);
+
+  // Datumstempel onderaan
+  setFont("normal", 8);
+  setColor(LIGHT);
+  doc.text(`Opgemaakt te Roelofarendsveen, ${formatDate(data.datum)}`, ml, y);
 
   return doc;
 }
