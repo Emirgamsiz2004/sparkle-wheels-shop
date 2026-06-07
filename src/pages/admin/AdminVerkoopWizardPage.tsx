@@ -3494,37 +3494,11 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         doc.autoPrint();
       } catch {}
       const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      setLastPdfUrl(url);
 
-      // Print direct vanuit een verborgen iframe — geen nieuw tabblad nodig
-      try {
-        const existing = document.getElementById("koopovereenkomst-print-frame") as HTMLIFrameElement | null;
-        if (existing) existing.remove();
-        const iframe = document.createElement("iframe");
-        iframe.id = "koopovereenkomst-print-frame";
-        iframe.style.position = "fixed";
-        iframe.style.right = "0";
-        iframe.style.bottom = "0";
-        iframe.style.width = "0";
-        iframe.style.height = "0";
-        iframe.style.border = "0";
-        iframe.src = url;
-        iframe.onload = () => {
-          setTimeout(() => {
-            try {
-              iframe.contentWindow?.focus();
-              iframe.contentWindow?.print();
-            } catch {
-              // Fallback: open in nieuw tabblad als printen via iframe niet lukt
-              window.open(url, "_blank");
-            }
-          }, 400);
-        };
-        document.body.appendChild(iframe);
-      } catch {
-        window.open(url, "_blank");
-      }
+      // Print direct vanuit verborgen iframe — geen nieuw tabblad
+      const { printPdfBlob } = await import("@/lib/printPdf");
+      const url = printPdfBlob(blob, "koopovereenkomst-print-frame");
+      setLastPdfUrl(url);
 
       // Upload naar storage en koppel aan verkoop_documenten
       if (p.verkoopId) {
