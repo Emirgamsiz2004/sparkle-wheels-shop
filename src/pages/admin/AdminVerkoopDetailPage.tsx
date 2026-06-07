@@ -35,9 +35,9 @@ const InfoRow = ({ label, value, isLast }: { label: string; value: string; isLas
   </tr>
 );
 
-const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint }: {
+const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint, unit = "€" }: {
   label: string; value: string; color?: string; editable?: boolean;
-  rawValue?: number; onSave?: (val: number) => Promise<void>; hint?: string;
+  rawValue?: number; onSave?: (val: number) => Promise<void>; hint?: string; unit?: string;
 }) => {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState("");
@@ -47,7 +47,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint }: {
   const commit = async () => {
     if (!onSave) return cancel();
     const n = parseEuro(val);
-    if (n === null || n < 0) { toast.error("Ongeldig bedrag"); return; }
+    if (n === null || n < 0) { toast.error("Ongeldige waarde"); return; }
     setSaving(true);
     try { await onSave(n); setEditing(false); } finally { setSaving(false); }
   };
@@ -56,7 +56,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint }: {
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
       {editing ? (
         <div className="flex items-center gap-1.5">
-          <span className="text-sm text-muted-foreground">€</span>
+          <span className="text-sm text-muted-foreground">{unit}</span>
           <input
             autoFocus type="text" inputMode="decimal" value={val} disabled={saving}
             onChange={(e) => setVal(e.target.value.replace(/[^0-9.,]/g, ""))}
