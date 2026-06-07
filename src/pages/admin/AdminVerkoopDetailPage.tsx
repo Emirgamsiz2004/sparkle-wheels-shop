@@ -146,6 +146,8 @@ const AdminVerkoopDetailPage = () => {
   const [koperEmail, setKoperEmail] = useState("");
   const [savingKoper, setSavingKoper] = useState(false);
 
+  const [inruilVehicle, setInruilVehicle] = useState<{ id: string; merk: string; model: string; kenteken: string | null } | null>(null);
+
   const fetchVerkoop = useCallback(async () => {
     if (!id) return;
     setVerkoopLoading(true);
@@ -158,9 +160,20 @@ const AdminVerkoopDetailPage = () => {
       .maybeSingle();
     setVerkoopRow(data || null);
     setVerkoopLoading(false);
+    if (data?.id) {
+      const { data: iv } = await supabase
+        .from("vehicles")
+        .select("id, merk, model, kenteken")
+        .eq("inruil_van_verkoop_id", data.id)
+        .maybeSingle();
+      setInruilVehicle(iv as any || null);
+    } else {
+      setInruilVehicle(null);
+    }
   }, [id]);
 
   useEffect(() => { fetchVerkoop(); }, [fetchVerkoop]);
+
 
   // Sync state from vehicle + verkoopRow into edit form whenever data ververst
   useEffect(() => {
