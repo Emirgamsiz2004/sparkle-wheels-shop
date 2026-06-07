@@ -3488,7 +3488,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           : null,
       });
 
-      // Open PDF in nieuw tabblad met automatisch printdialoog
+      // PDF voorbereiden met autoPrint zodat het printdialoog meteen opent
       try {
         // @ts-ignore — jsPDF autoPrint is beschikbaar
         doc.autoPrint();
@@ -3496,7 +3496,35 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       setLastPdfUrl(url);
-      window.open(url, "_blank");
+
+      // Print direct vanuit een verborgen iframe — geen nieuw tabblad nodig
+      try {
+        const existing = document.getElementById("koopovereenkomst-print-frame") as HTMLIFrameElement | null;
+        if (existing) existing.remove();
+        const iframe = document.createElement("iframe");
+        iframe.id = "koopovereenkomst-print-frame";
+        iframe.style.position = "fixed";
+        iframe.style.right = "0";
+        iframe.style.bottom = "0";
+        iframe.style.width = "0";
+        iframe.style.height = "0";
+        iframe.style.border = "0";
+        iframe.src = url;
+        iframe.onload = () => {
+          setTimeout(() => {
+            try {
+              iframe.contentWindow?.focus();
+              iframe.contentWindow?.print();
+            } catch {
+              // Fallback: open in nieuw tabblad als printen via iframe niet lukt
+              window.open(url, "_blank");
+            }
+          }, 400);
+        };
+        document.body.appendChild(iframe);
+      } catch {
+        window.open(url, "_blank");
+      }
 
       // Upload naar storage en koppel aan verkoop_documenten
       if (p.verkoopId) {
