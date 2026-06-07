@@ -372,6 +372,15 @@ function buildHtml(data: KoopovereenkomstData): string {
   <!-- GARANTIE -->
   <div class="garantie">${escapeHtml(garantieTekst)}</div>
 
+  <!-- AKKOORD ALGEMENE VOORWAARDEN -->
+  <div class="garantie" style="border-left-color:#1a1a1a;background:#f4f4f4;margin-top:10px;">
+    <strong style="color:#1a1a1a;">Akkoord algemene voorwaarden.</strong>
+    Door ondertekening van deze koopovereenkomst verklaart de koper de algemene voorwaarden van
+    Platin Automotive (versie 7 juni 2026) voorafgaand aan de ondertekening te hebben ontvangen,
+    gelezen en hiermee onvoorwaardelijk akkoord te gaan. De voorwaarden zijn tevens te raadplegen
+    via platinautomotive.nl/algemene-voorwaarden en zijn op verzoek kosteloos verkrijgbaar.
+  </div>
+
   ${data.opmerkingen ? `<div class="opm"><strong>Opmerkingen:</strong> ${escapeHtml(data.opmerkingen)}</div>` : ""}
 
   <!-- HANDTEKENINGEN -->
