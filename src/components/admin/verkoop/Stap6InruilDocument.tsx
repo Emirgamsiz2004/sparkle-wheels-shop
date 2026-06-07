@@ -71,6 +71,7 @@ const formatEur = (n: number) =>
 export default function Stap6InruilDocument(p: Stap6Props) {
   const [generating, setGenerating] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+  const [lastPdfUrl, setLastPdfUrl] = useState<string | null>(null);
   const autoFilledRef = useRef(false);
 
   // Auto-fill verkoper-velden (particulier) met klantgegevens uit stap 3 — slechts één keer,
