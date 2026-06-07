@@ -3495,6 +3495,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       } catch {}
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
+      setLastPdfUrl(url);
       window.open(url, "_blank");
 
       // Upload naar storage en koppel aan verkoop_documenten
