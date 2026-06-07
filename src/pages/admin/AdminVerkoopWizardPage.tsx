@@ -3488,17 +3488,15 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           : null,
       });
 
-      // PDF voorbereiden met autoPrint zodat het printdialoog meteen opent
+      // Open PDF in nieuw tabblad met automatisch printdialoog
       try {
         // @ts-ignore — jsPDF autoPrint is beschikbaar
         doc.autoPrint();
       } catch {}
       const blob = doc.output("blob");
-
-      // Print direct vanuit verborgen iframe — geen nieuw tabblad
-      const { printPdfBlob } = await import("@/lib/printPdf");
-      const url = printPdfBlob(blob, "koopovereenkomst-print-frame");
+      const url = URL.createObjectURL(blob);
       setLastPdfUrl(url);
+      window.open(url, "_blank");
 
       // Upload naar storage en koppel aan verkoop_documenten
       if (p.verkoopId) {
@@ -3842,7 +3840,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           <div>
             <div className="text-sm font-medium text-foreground mb-1">Koopovereenkomst genereren</div>
             <p className="text-xs text-muted-foreground max-w-md">
-              Genereer een professionele PDF op basis van bovenstaande gegevens. Het printvenster opent automatisch — geen nieuw tabblad nodig.
+              Genereer een professionele PDF op basis van bovenstaande gegevens. De overeenkomst opent in een nieuw tabblad — het printvenster wordt automatisch geopend.
               De klant ontvangt automatisch een kopie van de algemene voorwaarden per e-mail.
             </p>
           </div>
@@ -3852,24 +3850,16 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
               className="inline-flex items-center gap-2 px-5 py-3 bg-foreground text-background rounded-[10px] hover:bg-foreground/90 transition-colors text-sm font-medium"
             >
               <FileText className="w-4 h-4" />
-              Genereren & Printen
+              Koopovereenkomst genereren (PDF)
             </button>
             {lastPdfUrl && (
               <button
                 type="button"
-                onClick={() => {
-                  const iframe = document.getElementById("koopovereenkomst-print-frame") as HTMLIFrameElement | null;
-                  if (iframe?.contentWindow) {
-                    iframe.contentWindow.focus();
-                    iframe.contentWindow.print();
-                  } else {
-                    window.open(lastPdfUrl, "_blank");
-                  }
-                }}
+                onClick={() => window.open(lastPdfUrl, "_blank")}
                 className="inline-flex items-center gap-2 px-5 py-3 border border-border text-foreground rounded-[10px] hover:bg-muted transition-colors text-sm font-medium"
               >
                 <FileText className="w-4 h-4" />
-                Opnieuw printen
+                Printen
               </button>
             )}
           </div>
@@ -3877,7 +3867,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         {p.pdfGenereerd && (
           <div className="mt-4 flex items-center gap-2 text-xs text-emerald-400">
             <Check className="w-4 h-4" />
-            PDF is gegenereerd — het printvenster opent automatisch
+            PDF is gegenereerd — het printvenster opent automatisch in het nieuwe tabblad
           </div>
         )}
       </div>

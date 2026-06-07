@@ -132,7 +132,6 @@ const Stap8Betaling = ({
     typeof initialOpenstaandRestbedrag === "number" && initialOpenstaandRestbedrag > 0,
   );
   const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [lastBetalingsPdfUrl, setLastBetalingsPdfUrl] = useState<string | null>(null);
 
   // ─── Auto-fill laatste rij met restbedrag (alleen als niet handmatig bewerkt) ───
   const totaalIngevuld = rijen
@@ -369,9 +368,8 @@ const Stap8Betaling = ({
         verkoperHandtekeningDataUrl,
       });
 
-      const { printPdfBlob } = await import("@/lib/printPdf");
-      const localUrl = printPdfBlob(blob, "betalingsafspraak-print-frame");
-      setLastBetalingsPdfUrl(localUrl);
+      const localUrl = URL.createObjectURL(blob);
+      window.open(localUrl, "_blank");
 
       try {
         const path = `verkopen/${verkoopId}/${fileName}`;
@@ -705,34 +703,19 @@ const Stap8Betaling = ({
               </Popover>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={handleGenerateRestbetalingPdf}
-                disabled={generatingPdf || !verwachteDatum || nogTeOntvangen <= 0}
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-              >
-                {generatingPdf ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <FileText className="w-4 h-4" />
-                )}
-                Restbetalingsafspraak genereren & printen
-              </button>
-              {lastBetalingsPdfUrl && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const { reprintPdf } = await import("@/lib/printPdf");
-                    reprintPdf(lastBetalingsPdfUrl, "betalingsafspraak-print-frame");
-                  }}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm border border-border text-foreground rounded-[10px] hover:bg-muted transition-colors font-medium"
-                >
-                  <FileText className="w-4 h-4" />
-                  Opnieuw printen
-                </button>
+            <button
+              type="button"
+              onClick={handleGenerateRestbetalingPdf}
+              disabled={generatingPdf || !verwachteDatum || nogTeOntvangen <= 0}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm bg-foreground text-background rounded-[10px] hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              {generatingPdf ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <FileText className="w-4 h-4" />
               )}
-            </div>
+              Restbetalingsafspraak genereren als PDF
+            </button>
           </>
         )}
       </div>
