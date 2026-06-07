@@ -211,8 +211,14 @@ const AdminVerkoopDetailPage = () => {
   const werkelijkBetaald = heeftInruilActueel ? Math.max(0, verkoopprijsActueel - inruilWaardeActueel) : verkoopprijsActueel;
   const aanbetalingActueel = Number(verkoopRow?.aanbetaling_bedrag || 0);
   const restbedrag = Math.max(0, werkelijkBetaald - aanbetalingActueel);
-  const brutoWinst = verkoopprijsActueel - inkoopprijsActueel;
-  const margePct = inkoopprijsActueel > 0 ? (brutoWinst / inkoopprijsActueel) * 100 : 0;
+  const isConsignatieVerkoop = isConsignatie(vehicle);
+  const commissiePercActueel = Number(vehicle.consignatieCommissiePerc) > 0 ? Number(vehicle.consignatieCommissiePerc) : 10;
+  const brutoWinst = isConsignatieVerkoop
+    ? verkoopprijsActueel * (commissiePercActueel / 100)
+    : verkoopprijsActueel - inkoopprijsActueel;
+  const margePct = isConsignatieVerkoop
+    ? commissiePercActueel
+    : (inkoopprijsActueel > 0 ? (brutoWinst / inkoopprijsActueel) * 100 : 0);
 
   // Helpers — KPI inline saves
   const ensureVerkoopRow = async (): Promise<string | null> => {
