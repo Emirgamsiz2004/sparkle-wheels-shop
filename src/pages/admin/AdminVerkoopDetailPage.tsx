@@ -393,13 +393,25 @@ const AdminVerkoopDetailPage = () => {
 
       {/* KPI cards — Rij 1 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard
-          label="Inkoopprijs"
-          value={formatEuroDecimal(inkoopprijsActueel)}
-          editable
-          rawValue={inkoopprijsActueel}
-          onSave={handleSaveInkoop}
-        />
+        {isConsignatieVerkoop ? (
+          <KpiCard
+            label="Commissie %"
+            value={`${commissiePercActueel}%`}
+            editable
+            rawValue={commissiePercActueel}
+            onSave={handleSaveCommissie}
+            unit="%"
+            hint="Over verkoopprijs"
+          />
+        ) : (
+          <KpiCard
+            label="Inkoopprijs"
+            value={formatEuroDecimal(inkoopprijsActueel)}
+            editable
+            rawValue={inkoopprijsActueel}
+            onSave={handleSaveInkoop}
+          />
+        )}
         <KpiCard
           label="Verkoopprijs"
           value={formatEuroDecimal(verkoopprijsActueel)}
@@ -433,18 +445,22 @@ const AdminVerkoopDetailPage = () => {
       {/* KPI cards — Rij 2 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="bg-card border border-border rounded-lg p-3">
-          <p className="text-xs text-muted-foreground mb-1">Bruto winst</p>
+          <p className="text-xs text-muted-foreground mb-1">{isConsignatieVerkoop ? "Mijn commissie (excl. BTW)" : "Bruto winst"}</p>
           <p className={`text-base font-semibold tabular-nums ${brutoWinst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
             {verkoopprijsActueel > 0 ? formatEuroDecimal(brutoWinst) : "—"}
           </p>
-          <p className="text-[10px] text-muted-foreground/70 mt-1">Verkoop − inkoop</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-1">
+            {isConsignatieVerkoop ? `${commissiePercActueel}% × verkoopprijs` : "Verkoop − inkoop"}
+          </p>
         </div>
         <div className="bg-card border border-border rounded-lg p-3">
           <p className="text-xs text-muted-foreground mb-1">Marge %</p>
           <p className={`text-base font-semibold tabular-nums ${brutoWinst >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-            {inkoopprijsActueel > 0 ? `${margePct.toFixed(1)}%` : "—"}
+            {isConsignatieVerkoop
+              ? `${margePct.toFixed(1)}%`
+              : (inkoopprijsActueel > 0 ? `${margePct.toFixed(1)}%` : "—")}
           </p>
-          <p className="text-[10px] text-muted-foreground/70 mt-1">Winst / inkoop</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-1">{isConsignatieVerkoop ? "Commissiepercentage" : "Winst / inkoop"}</p>
         </div>
       </div>
 
