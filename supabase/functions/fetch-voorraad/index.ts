@@ -301,15 +301,11 @@ Deno.serve(async (req) => {
     const feedKentekens = new Set(
       vehicles.map((v: any) => normalizeKenteken(v.kenteken)).filter(Boolean)
     );
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 30);
-
     const { data: soldDbVehicles } = await supabase
       .from("vehicles")
       .select("id, feed_id, kenteken, merk, model, bouwjaar, brandstof, kilometerstand, kleur, verkoopprijs, feed_verkoopprijs, verkoop_datum, feed_afbeelding")
       .eq("status", "verkocht")
-      .gte("verkoop_datum", cutoff.toISOString().slice(0, 10))
-      .order("verkoop_datum", { ascending: false });
+      .order("verkoop_datum", { ascending: false, nullsFirst: false });
 
     const extras: any[] = [];
     for (const v of soldDbVehicles || []) {
