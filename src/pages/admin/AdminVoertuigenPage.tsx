@@ -339,11 +339,17 @@ const AdminVoertuigenPage = () => {
                         APK
                       </span>
                     )}
+                    {v.herkomst === "inruil" && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border bg-amber-500/10 text-amber-400 border-amber-500/25">
+                        Inruil
+                      </span>
+                    )}
                     {statusLabels[v.status] && (
                       <span className={`inline-flex items-center px-1.5 py-0.5 text-[9px] font-medium rounded border ${statusColors[v.status]}`}>
                         {statusLabels[v.status]}
                       </span>
                     )}
+
                     {v.verkoopprijs > 0 && (
                       <span className="text-[13px] font-semibold tabular-nums text-foreground ml-1">
                         {formatEuro(v.verkoopprijs)}
