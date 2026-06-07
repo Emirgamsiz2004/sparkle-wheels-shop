@@ -128,7 +128,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
             </div>
 
             <span className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 border border-border text-[10px] tracking-[0.15em] uppercase font-body font-semibold text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors duration-300">
-              {isSold ? (hasDetail ? "Bekijk details →" : "Verkocht") : "Meer info →"}
+              {isSold ? "Verkocht" : "Meer info →"}
             </span>
           </div>
         </div>
