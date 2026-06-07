@@ -158,19 +158,21 @@ const AdminVerkoopDetailPage = () => {
       .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    setVerkoopRow(data || null);
+    const vrow: any = data || null;
+    setVerkoopRow(vrow);
     setVerkoopLoading(false);
-    if (data?.id) {
+    if (vrow?.id) {
       const { data: iv } = await supabase
         .from("vehicles")
         .select("id, merk, model, kenteken")
-        .eq("inruil_van_verkoop_id", data.id)
+        .eq("inruil_van_verkoop_id", vrow.id)
         .maybeSingle();
-      setInruilVehicle(iv as any || null);
+      setInruilVehicle((iv as any) || null);
     } else {
       setInruilVehicle(null);
     }
   }, [id]);
+
 
   useEffect(() => { fetchVerkoop(); }, [fetchVerkoop]);
 
