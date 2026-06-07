@@ -133,6 +133,7 @@ const AdminVoertuigenPage = () => {
 
   const filtered = visibleVehicles.filter((v) => {
     if (statusFilter !== "alle" && v.status !== statusFilter) return false;
+    if (herkomstFilter === "inruil" && v.herkomst !== "inruil") return false;
     if (search) {
       const q = search.toLowerCase();
       const qPlate = normalizePlate(search);
@@ -141,6 +142,7 @@ const AdminVoertuigenPage = () => {
     }
     return true;
   });
+
 
   const suggestions = useMemo(() => {
     if (!search.trim()) return [];
