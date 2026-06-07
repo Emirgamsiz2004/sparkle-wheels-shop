@@ -28,7 +28,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
   const title = [voertuig.merk, voertuig.model].filter(Boolean).join(" ");
   const badge = voertuig.dbStatus ? statusBadge[voertuig.dbStatus] : null;
   const isSold = voertuig.dbStatus === "verkocht";
-  const hasDetail = voertuig.detailAvailable !== false;
+  const hasDetail = !isSold && voertuig.detailAvailable !== false;
 
   const cardClass =
     "group flex flex-col overflow-hidden rounded-lg border border-border bg-card hover:border-accent/40 transition-colors duration-300";
