@@ -260,6 +260,27 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.verkoopprijs, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow]);
 
+  // Auto-suggest grootboekrekening voor inruil-regel zodra accounts geladen zijn
+  useEffect(() => {
+    if (ledgerAccounts.length === 0 || factuurId) return;
+    setRegels((prev) => {
+      let changed = false;
+      const next = prev.map((r) => {
+        if (r.kind === "inruil" && !r.ledgerAccountId) {
+          const match =
+            ledgerAccounts.find((a) => /inruil.*verreken/i.test(a.name)) ||
+            ledgerAccounts.find((a) => /inruil/i.test(a.name));
+          if (match) {
+            changed = true;
+            return { ...r, ledgerAccountId: match.id };
+          }
+        }
+        return r;
+      });
+      return changed ? next : prev;
+    });
+  }, [ledgerAccounts, factuurId]);
+
   // Voertuig-BTW% volgt workflow live
   useEffect(() => {
     setRegels((prev) =>
