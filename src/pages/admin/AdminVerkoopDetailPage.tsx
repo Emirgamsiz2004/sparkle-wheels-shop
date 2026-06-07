@@ -533,11 +533,25 @@ const AdminVerkoopDetailPage = () => {
                   <ReadRow label="Inruil voertuig" value={[verkoopRow?.inruil_merk, verkoopRow?.inruil_model].filter(Boolean).join(" ") || "—"} />
                   <ReadRow label="Inruil KM" value={verkoopRow?.inruil_km ? Number(verkoopRow.inruil_km).toLocaleString("nl-NL") : "—"} />
                   <ReadRow label="Inruilwaarde" value={formatEuroDecimal(inruilWaardeActueel)} />
+                  {inruilVehicle && (
+                    <div className="flex items-center justify-between py-1.5 border-b border-border/50">
+                      <span className="text-xs text-muted-foreground">Inruil in voorraad</span>
+                      <Link
+                        to={`/admin/voertuigen/${inruilVehicle.id}`}
+                        className="text-sm text-foreground hover:underline inline-flex items-center gap-1"
+                      >
+                        {inruilVehicle.merk} {inruilVehicle.model}
+                        {inruilVehicle.kenteken ? ` · ${inruilVehicle.kenteken}` : ""}
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  )}
                 </>
               )}
               <ReadRow label="Werkelijk betaald" value={formatEuroDecimal(werkelijkBetaald)} />
               <ReadRow label="Aanbetaling" value={aanbetalingActueel > 0 ? formatEuroDecimal(aanbetalingActueel) : "—"} />
               <ReadRow label="Restbedrag" value={formatEuroDecimal(restbedrag)} />
+
             </div>
             <div>
               <ReadRow label="Verkoopdatum" value={formatDateNl(vehicle.verkoopDatum)} />
