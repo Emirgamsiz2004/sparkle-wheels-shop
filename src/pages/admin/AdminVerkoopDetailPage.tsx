@@ -245,6 +245,13 @@ const AdminVerkoopDetailPage = () => {
     toast.success("Inkoopprijs bijgewerkt");
   };
 
+  const handleSaveCommissie = async (val: number) => {
+    if (val < 0 || val > 100) { toast.error("Percentage moet tussen 0 en 100 liggen"); return; }
+    await updateVehicle({ ...vehicle, consignatieCommissiePerc: val });
+    toast.success("Commissie bijgewerkt");
+  };
+
+
   const handleSaveVerkoop = async (val: number) => {
     const ok = await saveVerkoopFields({ verkoopprijs: val });
     if (ok) {
