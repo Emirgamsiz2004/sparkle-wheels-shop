@@ -401,18 +401,30 @@ export default function Stap6InruilDocument(p: Stap6Props) {
             {p.docType === "particulier" ? "Inkoopverklaring genereren" : "Inkoopfactuur genereren"}
           </div>
           <div className="text-xs text-muted-foreground mt-0.5">
-            PDF wordt gedownload {p.docType === "particulier" ? "en gearchiveerd" : ""}
+            Het printvenster opent automatisch — geen nieuw tabblad nodig
           </div>
         </div>
-        <button
-          type="button"
-          onClick={handleGenerate}
-          disabled={generating}
-          className="inline-flex items-center gap-2 h-10 px-4 text-sm rounded-[10px] bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
-        >
-          {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : generatedAt ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
-          {generating ? "Genereren…" : generatedAt ? "Opnieuw genereren" : "Genereren (PDF)"}
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={generating}
+            className="inline-flex items-center gap-2 h-10 px-4 text-sm rounded-[10px] bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 transition-colors font-medium"
+          >
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : generatedAt ? <Check className="w-4 h-4" /> : <Printer className="w-4 h-4" />}
+            {generating ? "Genereren…" : generatedAt ? "Opnieuw genereren & printen" : "Genereren & printen"}
+          </button>
+          {lastPdfUrl && (
+            <button
+              type="button"
+              onClick={() => reprintPdf(lastPdfUrl, "inruil-print-frame")}
+              className="inline-flex items-center gap-2 h-10 px-4 text-sm rounded-[10px] border border-border text-foreground hover:bg-muted transition-colors font-medium"
+            >
+              <Printer className="w-4 h-4" />
+              Opnieuw printen
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
