@@ -177,7 +177,7 @@ const VoertuigDetail = () => {
                 <img
                   src={mainPhoto}
                   alt={title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="w-full h-full object-cover transition-transform duration-500"
                 />
                 {photoUrls.length > 1 && (
                   <span className="absolute bottom-3 right-3 bg-background/80 backdrop-blur-sm px-3 py-1.5 text-[10px] font-body tracking-wider uppercase text-foreground">
