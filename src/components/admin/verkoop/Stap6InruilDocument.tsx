@@ -228,10 +228,6 @@ export default function Stap6InruilDocument(p: Stap6Props) {
       }
 
       // Print direct vanuit verborgen iframe — geen nieuw tabblad
-      try {
-        // @ts-ignore — jsPDF autoPrint
-        (pdfBlob as any).autoPrint?.();
-      } catch {}
       const url = printPdfBlob(pdfBlob, "inruil-print-frame");
       setLastPdfUrl(url);
 
