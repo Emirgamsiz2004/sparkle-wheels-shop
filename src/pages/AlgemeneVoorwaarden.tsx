@@ -28,7 +28,7 @@ const AlgemeneVoorwaarden = () => (
           <Section title="Artikel 1 — Definities">
             <p>In deze algemene voorwaarden wordt verstaan onder:</p>
             <ol className="list-decimal pl-5 space-y-1">
-              <li><strong className="text-foreground">Platin Automotive:</strong> de eenmanszaak geregistreerd onder KvK-nummer 99146193, gevestigd aan de Cilinderweg 99, 2371 DZ Roelofarendsveen, hierna ook te noemen 'verkoper'.</li>
+              <li><strong className="text-foreground">Platin Automotive:</strong> de vennootschap onder firma (V.O.F.) geregistreerd onder KvK-nummer 99146193, gevestigd aan de Cilinderweg 99, 2371 DZ Roelofarendsveen, hierna ook te noemen 'verkoper'.</li>
               <li><strong className="text-foreground">Koper:</strong> de natuurlijke of rechtspersoon die met Platin Automotive een overeenkomst aangaat.</li>
               <li><strong className="text-foreground">Consument:</strong> een koper die handelt buiten de uitoefening van zijn beroep of bedrijf (art. 6:230g BW).</li>
               <li><strong className="text-foreground">Voertuig:</strong> het motorvoertuig dat onderwerp is van de overeenkomst.</li>
