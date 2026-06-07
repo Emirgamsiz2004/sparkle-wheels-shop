@@ -384,6 +384,12 @@ const AdminVoertuigenPage = () => {
                     >
                       <td className="px-3 py-2.5 text-foreground">
                         {v.merk} {v.model} <span className="text-muted-foreground text-xs">({v.bouwjaar})</span>
+                        {v.herkomst === "inruil" && (
+                          <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded border bg-amber-500/10 text-amber-400 border-amber-500/25">
+                            Inruil
+                          </span>
+                        )}
+
                       </td>
                       <td className="px-3 py-2.5">
                         <span className="text-muted-foreground text-[11px] font-mono uppercase whitespace-nowrap">{v.kenteken || "—"}</span>
