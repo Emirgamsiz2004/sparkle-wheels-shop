@@ -45,6 +45,7 @@ const AdminVoertuigenPage = () => {
   };
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("alle");
+  const [herkomstFilter, setHerkomstFilter] = useState<"alle" | "inruil">("alle");
   const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
   const [apkRefreshing, setApkRefreshing] = useState(false);
