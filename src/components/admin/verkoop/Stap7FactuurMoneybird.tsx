@@ -167,6 +167,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     price: number; // incl. BTW (prijs zoals in wizard)
     btwPercent: 0 | 21;
     locked?: boolean; // bedrag niet aanpasbaar (aanbetaling)
+    ledgerAccountId?: string; // Moneybird grootboekrekening
   };
 
   const buildInitialRegels = (): Regel[] => {
