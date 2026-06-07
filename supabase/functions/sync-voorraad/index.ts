@@ -137,11 +137,23 @@ serve(async (req) => {
         }
         // Autodealers is leidend, behalve voor handmatige statussen.
         // Een verkoop wordt als "echt" beschouwd als er een koper bekend is.
+        // 'inkoop' wordt NIET als beschermd beschouwd: zodra een (inruil)voertuig
+        // in de feed verschijnt mag het automatisch promoten naar te_koop / gereserveerd / verkocht.
         const isManualSale = match.status === "verkocht" && (match.koper_naam || match.koper_email);
-        const manualStatuses = ["consignatie", "in_behandeling", "inkoop"];
+        const manualStatuses = ["consignatie", "in_behandeling"];
         const isManualStatus = manualStatuses.includes(match.status) || isManualSale;
 
         if (fv.feed_status !== match.status && !isManualStatus) {
+          // Promoot 'inkoop' → 'te_koop' wanneer de auto in de feed verschijnt
+          if (fv.feed_status === "te_koop" && match.status === "inkoop") {
+            updates.status = "te_koop";
+            await supabase.from("vehicle_activity_log").insert({
+              vehicle_id: match.id,
+              actie_type: "status_gewijzigd",
+              beschrijving: "Automatisch op te koop gezet (verschenen in advertentie-feed)",
+            });
+          } else
+
           if (fv.feed_status === "verkocht" || fv.feed_status === "gereserveerd") {
             const wasNotVerkocht = match.status !== "verkocht";
             updates.status = fv.feed_status;
