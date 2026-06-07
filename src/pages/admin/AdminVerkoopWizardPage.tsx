@@ -3380,6 +3380,36 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       // Eerst opslaan
       await p.onAutoSave();
 
+      // Verstuur algemene voorwaarden naar klant vóór genereren koopovereenkomst
+      if (p.klant.email) {
+        try {
+          const { error: mailErr } = await supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "algemene-voorwaarden",
+              recipientEmail: p.klant.email,
+              idempotencyKey: `av-${p.verkoopId || p.overeenkomstnummer || Date.now()}`,
+              templateData: {
+                klantNaam: klantNaam || "klant",
+                voertuig: `${p.vehicle.merk || ""} ${p.vehicle.model || ""}`.trim(),
+                kenteken: p.vehicle.kenteken || "",
+                voorwaardenUrl: "https://platinautomotive.nl/algemene-voorwaarden",
+              },
+            },
+          });
+          if (mailErr) {
+            console.warn("Versturen algemene voorwaarden mislukt", mailErr);
+            toast.warning("Koopovereenkomst wordt gegenereerd, maar het versturen van de algemene voorwaarden naar de klant is mislukt.");
+          } else {
+            toast.success(`Algemene voorwaarden verstuurd naar ${p.klant.email}`);
+          }
+        } catch (err) {
+          console.warn("Versturen algemene voorwaarden fout", err);
+        }
+      } else {
+        toast.warning("Geen e-mailadres bekend — algemene voorwaarden zijn niet verstuurd naar de klant.");
+      }
+
+
       const { buildKoopovereenkomstDoc } = await import("@/lib/koopovereenkomstPdf");
       const { getCurrentUserSignatureDataUrl } = await import("@/lib/userSignature");
       const verkoperHandtekeningDataUrl = (await getCurrentUserSignatureDataUrl()) || undefined;
