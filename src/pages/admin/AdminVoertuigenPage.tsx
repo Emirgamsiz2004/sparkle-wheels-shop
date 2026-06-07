@@ -255,7 +255,20 @@ const AdminVoertuigenPage = () => {
         >
           {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
+        <button
+          type="button"
+          onClick={() => setHerkomstFilter(herkomstFilter === "inruil" ? "alle" : "inruil")}
+          className={`w-full sm:w-auto px-2.5 h-9 text-[13px] sm:text-sm rounded-md border transition-colors ${
+            herkomstFilter === "inruil"
+              ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
+              : "bg-card border-border text-muted-foreground hover:text-foreground"
+          }`}
+          title="Toon alleen voertuigen die via inruil zijn binnengekomen"
+        >
+          Inruil
+        </button>
       </div>
+
 
       {filtered.length === 0 ? (
         <div className="bg-card rounded-lg border border-border px-4 py-12 text-center text-sm text-muted-foreground">
