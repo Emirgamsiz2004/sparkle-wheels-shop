@@ -70,7 +70,7 @@ const KpiCard = ({ label, value, color, editable, rawValue, onSave, hint, unit =
         <div className="flex items-center gap-1.5">
           <p className={`text-base font-semibold tabular-nums ${color || ""}`}>{value}</p>
           {editable && (
-            <button onClick={start} className="p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="Bewerken">
+            <button onClick={start} className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-foreground transition-opacity" title="Bewerken">
               <Pencil className="w-3 h-3" />
             </button>
           )}
