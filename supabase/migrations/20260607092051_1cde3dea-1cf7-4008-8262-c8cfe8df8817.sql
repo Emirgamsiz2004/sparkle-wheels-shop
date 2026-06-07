@@ -1,0 +1,2 @@
+CREATE POLICY "Authenticated can update consignatie aanmeldingen" ON public.consignatie_aanmeldingen FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Authenticated can delete consignatie aanmeldingen" ON public.consignatie_aanmeldingen FOR DELETE TO authenticated USING (true);
