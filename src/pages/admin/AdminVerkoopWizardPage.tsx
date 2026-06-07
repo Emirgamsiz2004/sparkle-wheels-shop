@@ -3903,7 +3903,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         {p.pdfGenereerd && (
           <div className="mt-4 flex items-center gap-2 text-xs text-emerald-400">
             <Check className="w-4 h-4" />
-            PDF is gegenereerd — het printvenster opent automatisch in het nieuwe tabblad
+            PDF is gegenereerd — het printvenster opent automatisch
           </div>
         )}
       </div>
