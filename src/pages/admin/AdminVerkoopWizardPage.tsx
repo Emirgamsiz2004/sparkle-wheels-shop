@@ -3346,6 +3346,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
   const inruilWaarde = p.inruil?.waarde || 0;
   const restbedrag = totaal - (p.aanbetalingBedrag || 0) - inruilWaarde;
   const [showAanbetalingEditor, setShowAanbetalingEditor] = useState((p.aanbetalingBedrag || 0) > 0);
+  const [lastPdfUrl, setLastPdfUrl] = useState<string | null>(null);
 
   // Auto-clean: "aanbetaling" is geen geldige betaalwijze meer (wordt automatisch van restbedrag afgetrokken)
   useEffect(() => {
