@@ -369,8 +369,9 @@ const Stap8Betaling = ({
         verkoperHandtekeningDataUrl,
       });
 
-      const localUrl = URL.createObjectURL(blob);
-      window.open(localUrl, "_blank");
+      const { printPdfBlob } = await import("@/lib/printPdf");
+      const localUrl = printPdfBlob(blob, "betalingsafspraak-print-frame");
+      setLastBetalingsPdfUrl(localUrl);
 
       try {
         const path = `verkopen/${verkoopId}/${fileName}`;
