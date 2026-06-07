@@ -3487,7 +3487,11 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           : null,
       });
 
-      // Open PDF in nieuw tabblad
+      // Open PDF in nieuw tabblad met automatisch printdialoog
+      try {
+        // @ts-ignore — jsPDF autoPrint is beschikbaar
+        doc.autoPrint();
+      } catch {}
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
