@@ -433,6 +433,7 @@ Deno.serve(async (req) => {
             price: String(d.price ?? 0),
             amount: String(d.amount ?? "1"),
             ...(d.tax_rate_id ? { tax_rate_id: String(d.tax_rate_id) } : {}),
+            ...(d.ledger_account_id ? { ledger_account_id: String(d.ledger_account_id) } : {}),
           })),
         };
         if (workflow_id) invoiceBody.workflow_id = String(workflow_id);

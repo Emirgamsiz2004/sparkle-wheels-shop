@@ -167,6 +167,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     price: number; // incl. BTW (prijs zoals in wizard)
     btwPercent: 0 | 21;
     locked?: boolean; // bedrag niet aanpasbaar (aanbetaling)
+    ledgerAccountId?: string; // Moneybird grootboekrekening
   };
 
   const buildInitialRegels = (): Regel[] => {
@@ -220,6 +221,29 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   };
 
   const [regels, setRegels] = useState<Regel[]>(buildInitialRegels);
+  const [ledgerAccounts, setLedgerAccounts] = useState<Array<{ id: string; name: string }>>([]);
+
+  // Haal grootboekrekeningen op uit Moneybird
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await invoke("get_ledger_accounts", {});
+        const list: any[] = Array.isArray(res) ? res : (res?.ledger_accounts || []);
+        if (!cancelled) {
+          setLedgerAccounts(
+            list
+              .filter((a) => a?.id && a?.name)
+              .map((a) => ({ id: String(a.id), name: String(a.name) }))
+              .sort((a, b) => a.name.localeCompare(b.name))
+          );
+        }
+      } catch (e) {
+        console.error("Ophalen grootboekrekeningen mislukt:", e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [invoke]);
 
   useEffect(() => {
     const fresh = buildInitialRegels().filter((r) => ["voertuig", "garantie", "inruil", "aanbetaling"].includes(r.kind));
@@ -229,7 +253,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         prev.length === fresh.length + extras.length &&
         fresh.every((r) => {
           const old = prev.find((p) => p.id === r.id);
-          return old && old.description === r.description && old.price === r.price && old.btwPercent === r.btwPercent;
+          return old && old.description === r.description && old.price === r.price && old.btwPercent === r.btwPercent && old.ledgerAccountId === r.ledgerAccountId;
         });
       return same ? prev : [...fresh, ...extras];
     });
@@ -444,6 +468,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
               price: r.price,
               amount: "1",
               ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
+              ...(r.ledgerAccountId ? { ledger_account_id: r.ledgerAccountId } : {}),
             };
           }),
         custom_fields_attributes: customFields,
@@ -686,6 +711,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             <thead className="bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-3 py-2 text-left font-medium">Omschrijving</th>
+                <th className="px-3 py-2 text-left font-medium w-48">Grootboek</th>
                 <th className="px-3 py-2 text-right font-medium w-24">BTW</th>
                 <th className="px-3 py-2 text-right font-medium w-36">Bedrag (incl.)</th>
                 <th className="px-3 py-2 w-10" />
@@ -705,6 +731,22 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
                         disabled={!!factuurId}
                         placeholder="Omschrijving"
                       />
+                    </td>
+                    <td className="px-3 py-2">
+                      <select
+                        className="w-full bg-transparent text-sm text-foreground border-0 focus:outline-none focus:ring-0 disabled:opacity-60 truncate"
+                        value={r.ledgerAccountId || ""}
+                        onChange={(e) => updateRegel(r.id, { ledgerAccountId: e.target.value || undefined })}
+                        disabled={!!factuurId}
+                        title={ledgerAccounts.find((a) => a.id === r.ledgerAccountId)?.name || ""}
+                      >
+                        <option value="">Standaard (workflow)</option>
+                        {ledgerAccounts.map((a) => (
+                          <option key={a.id} value={a.id}>
+                            {a.name}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td className="px-3 py-2 text-right">
                       <select
@@ -746,7 +788,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
               })}
               {!factuurId && (
                 <tr className="border-t border-border">
-                  <td colSpan={4} className="px-3 py-2">
+                  <td colSpan={5} className="px-3 py-2">
                     <button
                       type="button"
                       onClick={addExtraRegel}
@@ -758,21 +800,21 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
                 </tr>
               )}
               <tr className="border-t border-border bg-muted/20">
-                <td className="px-3 py-2 text-right text-xs text-muted-foreground" colSpan={2}>
+                <td className="px-3 py-2 text-right text-xs text-muted-foreground" colSpan={3}>
                   Subtotaal excl. BTW
                 </td>
                 <td className="px-3 py-2 text-right tabular-nums">{formatEur(subtotaal)}</td>
                 <td />
               </tr>
               <tr className="bg-muted/20">
-                <td className="px-3 py-2 text-right text-xs text-muted-foreground" colSpan={2}>
+                <td className="px-3 py-2 text-right text-xs text-muted-foreground" colSpan={3}>
                   BTW
                 </td>
                 <td className="px-3 py-2 text-right tabular-nums">{formatEur(btwTotaal)}</td>
                 <td />
               </tr>
               <tr className="bg-muted/40">
-                <td className="px-3 py-2.5 text-right font-semibold" colSpan={2}>
+                <td className="px-3 py-2.5 text-right font-semibold" colSpan={3}>
                   Totaal incl. BTW
                 </td>
                 <td className="px-3 py-2.5 text-right font-semibold tabular-nums">{formatEur(totaal)}</td>
