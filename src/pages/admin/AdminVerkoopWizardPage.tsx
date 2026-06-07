@@ -3835,6 +3835,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
             <div className="text-sm font-medium text-foreground mb-1">Koopovereenkomst genereren</div>
             <p className="text-xs text-muted-foreground max-w-md">
               Genereer een professionele PDF op basis van bovenstaande gegevens. De overeenkomst opent in een nieuw tabblad om te printen.
+              De klant ontvangt automatisch een kopie van de algemene voorwaarden per e-mail.
             </p>
           </div>
           <button
