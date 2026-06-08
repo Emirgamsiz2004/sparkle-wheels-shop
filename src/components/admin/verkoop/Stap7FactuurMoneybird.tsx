@@ -270,12 +270,15 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         if (r.kind === "inruil" && !r.ledgerAccountId) {
           const match =
             ledgerAccounts.find((a) => /inruil.*verreken/i.test(a.name)) ||
-            ledgerAccounts.find((a) => /inruil/i.test(a.name));
+            ledgerAccounts.find((a) => /inruil/i.test(a.name)) ||
+            ledgerAccounts.find((a) => a.reference === "14510") ||
+            ledgerAccounts.find((a) => /^verrekening/i.test(a.name));
           if (match) {
             changed = true;
             return { ...r, ledgerAccountId: match.id };
           }
         }
+
         return r;
       });
       return changed ? next : prev;
