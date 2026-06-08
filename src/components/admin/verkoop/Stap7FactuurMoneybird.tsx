@@ -221,7 +221,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   };
 
   const [regels, setRegels] = useState<Regel[]>(buildInitialRegels);
-  const [ledgerAccounts, setLedgerAccounts] = useState<Array<{ id: string; name: string }>>([]);
+  const [ledgerAccounts, setLedgerAccounts] = useState<Array<{ id: string; name: string; reference?: string }>>([]);
 
   // Haal grootboekrekeningen op uit Moneybird
   useEffect(() => {
@@ -234,10 +234,11 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           setLedgerAccounts(
             list
               .filter((a) => a?.id && a?.name)
-              .map((a) => ({ id: String(a.id), name: String(a.name) }))
+              .map((a) => ({ id: String(a.id), name: String(a.name), reference: a.reference ? String(a.reference) : undefined }))
               .sort((a, b) => a.name.localeCompare(b.name))
           );
         }
+
       } catch (e) {
         console.error("Ophalen grootboekrekeningen mislukt:", e);
       }
@@ -269,12 +270,15 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         if (r.kind === "inruil" && !r.ledgerAccountId) {
           const match =
             ledgerAccounts.find((a) => /inruil.*verreken/i.test(a.name)) ||
-            ledgerAccounts.find((a) => /inruil/i.test(a.name));
+            ledgerAccounts.find((a) => /inruil/i.test(a.name)) ||
+            ledgerAccounts.find((a) => a.reference === "14510") ||
+            ledgerAccounts.find((a) => /^verrekening/i.test(a.name));
           if (match) {
             changed = true;
             return { ...r, ledgerAccountId: match.id };
           }
         }
+
         return r;
       });
       return changed ? next : prev;
