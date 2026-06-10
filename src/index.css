@@ -60,14 +60,9 @@ input[type="number"] {
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 50%;
 
-    --accent: 11 82% 57%;
-    --accent-foreground: 0 0% 100%;
-    --accent-glow: 11 90% 62%;
+    --accent: 0 0% 78%;
+    --accent-foreground: 0 0% 5%;
 
-    --gradient-accent: linear-gradient(135deg, hsl(11 82% 57%), hsl(18 88% 60%));
-    --gradient-accent-soft: linear-gradient(135deg, hsl(11 82% 57% / 0.15), hsl(18 88% 60% / 0.05));
-    --shadow-accent: 0 10px 40px -10px hsl(11 82% 57% / 0.45);
-    --shadow-accent-strong: 0 20px 60px -15px hsl(11 82% 57% / 0.55);
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
