@@ -108,8 +108,9 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/50 mb-5"
+          className="inline-flex items-center gap-2.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/60 mb-5"
         >
+          <span className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_10px_hsl(var(--accent))] animate-pulse" />
           Platin Automotive
         </motion.p>
 
@@ -133,11 +134,14 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-extrabold leading-[0.95] mb-6 text-foreground tracking-tight"
+          className="relative text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-extrabold leading-[0.95] mb-6 text-foreground tracking-tight pl-5 md:pl-7"
         >
+          <span className="absolute left-0 top-1 bottom-1 w-[3px] bg-accent shadow-[0_0_20px_hsl(var(--accent)/0.6)]" />
           Occasions kopen
           <br />
-          & verkopen
+          <span className="bg-gradient-to-r from-accent via-[hsl(var(--accent-glow))] to-accent bg-clip-text text-transparent">
+            &amp; verkopen
+          </span>
         </motion.h1>
 
 
@@ -149,10 +153,10 @@ const HeroSection = () => {
         >
           <Link
             to="/voorraad"
-            className="group/cta relative bg-muted border border-border text-foreground px-8 py-3.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.25em] uppercase overflow-hidden transition-all duration-500 hover:border-accent hover:text-accent"
+            className="group/cta relative bg-accent text-accent-foreground border border-accent px-8 py-3.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.25em] uppercase overflow-hidden transition-all duration-500 hover:shadow-[var(--shadow-accent-strong)] hover:-translate-y-0.5"
           >
-            <span className="absolute inset-0 bg-accent/10 origin-left scale-x-0 group-hover/cta:scale-x-100 transition-transform duration-500 ease-out" />
-            <span className="relative z-10">Bekijk ons aanbod</span>
+            <span className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--accent-glow))] to-accent opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500" />
+            <span className="relative z-10">Bekijk ons aanbod →</span>
           </Link>
           <Link
             to="/consignatie"
