@@ -108,8 +108,9 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/50 mb-5"
+          className="inline-flex items-center gap-2.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.35em] uppercase text-foreground/60 mb-5"
         >
+          <span className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_10px_hsl(var(--accent))] animate-pulse" />
           Platin Automotive
         </motion.p>
 
