@@ -133,11 +133,14 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-extrabold leading-[0.95] mb-6 text-foreground tracking-tight"
+          className="relative text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-extrabold leading-[0.95] mb-6 text-foreground tracking-tight pl-5 md:pl-7"
         >
+          <span className="absolute left-0 top-1 bottom-1 w-[3px] bg-accent shadow-[0_0_20px_hsl(var(--accent)/0.6)]" />
           Occasions kopen
           <br />
-          & verkopen
+          <span className="bg-gradient-to-r from-accent via-[hsl(var(--accent-glow))] to-accent bg-clip-text text-transparent">
+            &amp; verkopen
+          </span>
         </motion.h1>
 
 
