@@ -153,10 +153,10 @@ const HeroSection = () => {
         >
           <Link
             to="/voorraad"
-            className="group/cta relative bg-muted border border-border text-foreground px-8 py-3.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.25em] uppercase overflow-hidden transition-all duration-500 hover:border-accent hover:text-accent"
+            className="group/cta relative bg-accent text-accent-foreground border border-accent px-8 py-3.5 text-[10px] md:text-xs font-body font-semibold tracking-[0.25em] uppercase overflow-hidden transition-all duration-500 hover:shadow-[var(--shadow-accent-strong)] hover:-translate-y-0.5"
           >
-            <span className="absolute inset-0 bg-accent/10 origin-left scale-x-0 group-hover/cta:scale-x-100 transition-transform duration-500 ease-out" />
-            <span className="relative z-10">Bekijk ons aanbod</span>
+            <span className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--accent-glow))] to-accent opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500" />
+            <span className="relative z-10">Bekijk ons aanbod →</span>
           </Link>
           <Link
             to="/consignatie"
