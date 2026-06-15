@@ -418,6 +418,8 @@ const WinstVerliesTab = () => {
       /\bcars?\b|\bauto'?s?\b|automotive|autohandel|autobedrijf|car ?trading|exclusive cars|motors\b|garage\b/i.test(text);
 
     const decideCategorie = (text: string, bedrag: number, isParticulier: boolean): Categorie => {
+      // Sparks Cars: bewust NIET meetellen als voertuiginkoop (eigen grootboek in Moneybird)
+      if (/sparks/i.test(text)) return classify(text, bedrag);
       // 1. Match met bestaande inkoopverklaring in dezelfde maand → zeker inkoop voertuig
       if (bedrag >= 500 && matchesInkoopverklaring(bedrag)) return "inkoop_voertuigen";
       // 2. Particulier + groot bedrag → vermoedelijk voertuig inkoop
