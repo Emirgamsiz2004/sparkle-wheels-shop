@@ -498,7 +498,8 @@ const WinstVerliesTab = () => {
   );
   const operationeleKosten = operationeleKostPosten.reduce((s, p) => s + p.bedrag, 0);
 
-  // Informatieve voertuig-marge (uit voertuigregistratie) — los van de P&L
+  // Voertuig-marge: matching principle — inkoop hoort bij de verkoopmaand,
+  // niet bij de maand waarin de inkoopfactuur is geboekt.
   const cogs = useMemo(() => {
     let inkoop = 0, voertuigKosten = 0, voertuigOmzet = 0, margeTotaal = 0;
     for (const v of soldVehicles) {
@@ -520,8 +521,17 @@ const WinstVerliesTab = () => {
     return { mbInkoop, voertuigKostenMaand, totaal: mbInkoop + voertuigKostenMaand };
   }, [kostPosten]);
 
-  // Brutowinst = verkoopfacturen − alle kosten
-  const brutowinst = omzet.incl - totaleKosten;
+  // Voor de details-tabel
+  const voertuigWinst = cogs.margeTotaal;
+  const dienstenOmzet = Math.max(0, omzet.incl - cogs.voertuigOmzet);
+  const dienstenWinst = dienstenOmzet - operationeleKosten;
+
+  // === Brutowinst (matching principle) ===
+  // = marge op auto's verkocht in deze maand (verkoop − inkoop − voertuigkosten)
+  //   + diensten-marge (overige omzet − operationele kosten)
+  // De voertuiginkoop die in deze maand toevallig in Moneybird geboekt is wordt
+  // NIET nog eens afgetrokken — die hoort bij de verkoopmaand van de auto.
+  const brutowinst = voertuigWinst + dienstenWinst;
 
   // BTW: alleen wat je op je verkoopfacturen aan BTW opneemt (Moneybird levert dit).
   // Marge-BTW laten we hier weg — die hoort bij de marge-aangifte, niet bij de winst.
@@ -533,11 +543,6 @@ const WinstVerliesTab = () => {
 
   // Vermogensgroei = nettowinst (voorraad-aankoop is geen verlies, het is omgezet kapitaal)
   const vermogensGroei = nettoResultaat;
-
-  // Voor de details-tabel
-  const voertuigWinst = cogs.margeTotaal;
-  const dienstenOmzet = Math.max(0, omzet.incl - cogs.voertuigOmzet);
-  const dienstenWinst = dienstenOmzet - operationeleKosten;
 
   // Groepering per categorie (alleen operationele)
   const perCategorie = useMemo(() => {
