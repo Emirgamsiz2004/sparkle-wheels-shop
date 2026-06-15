@@ -598,7 +598,7 @@ const WinstVerliesTab = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6">
         <Metric label="Omzet" value={formatEuroDecimal(omzet.incl)} />
         <Metric label="Kosten" value={formatEuroDecimal(totaleKosten)} subtle={`${kostPosten.length} posten`} />
-        <Metric label="Brutowinst" value={formatEuroDecimal(brutowinst)} tone={brutowinst >= 0 ? "pos" : "neg"} subtle={`omzet − kosten`} />
+        <Metric label="Brutowinst" value={formatEuroDecimal(brutowinst)} tone={brutowinst >= 0 ? "pos" : "neg"} subtle={`voertuigmarge + diensten`} />
         <Metric label="Nettowinst" value={formatEuroDecimal(nettoResultaat)} tone={nettoResultaat >= 0 ? "pos" : "neg"} subtle={`na BTW ${formatEuroDecimal(totaalBTW)}`} />
 
       </div>
