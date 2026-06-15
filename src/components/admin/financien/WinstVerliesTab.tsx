@@ -657,7 +657,11 @@ const WinstVerliesTab = () => {
         <div className="space-y-4 text-xs">
           <div className="space-y-2">
             <Row k={`Verkoopfacturen (${omzet.count})`} v={formatEuroDecimal(omzet.incl)} />
-            <Row k="− Alle kosten (bonnen + inkoopfacturen + Platin)" v={formatEuroDecimal(totaleKosten)} />
+            <Row k="− Voertuigomzet (zit in voertuigmarge)" v={formatEuroDecimal(cogs.voertuigOmzet)} />
+            <Row k="= Dienstenomzet" v={formatEuroDecimal(dienstenOmzet)} />
+            <Row k="− Operationele kosten" v={formatEuroDecimal(operationeleKosten)} />
+            <Row k="= Dienstenwinst" v={formatEuroDecimal(dienstenWinst)} />
+            <Row k="+ Voertuigmarge (verkoop − inkoop − voertuigkosten)" v={formatEuroDecimal(voertuigWinst)} />
             <Row k="= Brutowinst" v={formatEuroDecimal(brutowinst)} bold />
           </div>
           <div className="border-t border-border/60 pt-3 space-y-2">
