@@ -65,6 +65,8 @@ export interface Stap7Props {
 
   // Bedragen
   verkoopprijs: number | "";
+  kortingBedrag?: number;
+  kortingOmschrijving?: string | null;
   afleverkosten: number | "";
   leges: number | "";
   aanbetalingBedrag: number | "";
