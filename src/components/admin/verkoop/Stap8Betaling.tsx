@@ -191,12 +191,17 @@ const Stap8Betaling = ({
   };
 
   const handleAddRij = () => {
-    // Voeg toe als nieuwe laatste (auto), maak vorige laatste handmatig zodat hij vast staat
+    // Voeg toe als nieuwe rij. Markeer alle bestaande als handmatig zodat ze niet
+    // automatisch leeg getrokken worden, en geef de nieuwe rij ook 'manueel' zodat
+    // het bedrag direct bewerkbaar is.
     setRijen((p) => {
-      const next = p.map((r, i) =>
-        i === p.length - 1 ? { ...r, manueel: true } : r,
+      const next = p.map((r) => ({ ...r, manueel: true }));
+      const ingevuld = next.reduce(
+        (sum, r) => sum + (typeof r.bedrag === "number" ? r.bedrag : 0),
+        0,
       );
-      next.push({ methode: "bank", bedrag: "", manueel: false });
+      const rest = Math.max(0, nogTeOntvangen - ingevuld);
+      next.push({ methode: "bank", bedrag: rest, manueel: true });
       return next;
     });
   };
