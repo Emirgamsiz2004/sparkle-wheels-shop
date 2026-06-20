@@ -373,6 +373,12 @@ const AdminVerkoopWizardPage = () => {
         setVerkoopId(existing.id);
         setActiveStap(existing.wizard_stap || 1);
         setVerkoopprijs(existing.verkoopprijs ?? vehicle.verkoopprijs ?? "");
+        setKortingBedrag(
+          existing.korting_bedrag != null && Number(existing.korting_bedrag) > 0
+            ? Number(existing.korting_bedrag)
+            : "",
+        );
+        setKortingOmschrijving(existing.korting_omschrijving || "");
         setAfleverkosten(existing.afleverkosten ?? "");
         setLeges(existing.leges ?? "");
         if (existing.verkoop_type === "marge" || existing.verkoop_type === "btw" || existing.verkoop_type === "consignatie") {
