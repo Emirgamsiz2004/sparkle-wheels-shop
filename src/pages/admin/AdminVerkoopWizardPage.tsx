@@ -1593,6 +1593,10 @@ interface Stap1Props {
   setKmStand: (v: number | "") => void;
   verkoopprijs: number | "";
   setVerkoopprijs: (v: number | "") => void;
+  kortingBedrag: number | "";
+  setKortingBedrag: (v: number | "") => void;
+  kortingOmschrijving: string;
+  setKortingOmschrijving: (v: string) => void;
   voertuigType: "marge" | "btw" | "consignatie";
   setVoertuigType: (v: "marge" | "btw" | "consignatie") => void;
   afleverkosten: number | "";
