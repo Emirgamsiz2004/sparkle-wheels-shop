@@ -146,6 +146,8 @@ const AdminVerkoopWizardPage = () => {
   // Stap 1 state
   const [kmStand, setKmStand] = useState<number | "">("");
   const [verkoopprijs, setVerkoopprijs] = useState<number | "">("");
+  const [kortingBedrag, setKortingBedrag] = useState<number | "">("");
+  const [kortingOmschrijving, setKortingOmschrijving] = useState<string>("");
   const [voertuigType, setVoertuigType] = useState<"marge" | "btw" | "consignatie">("marge");
   const [afleverkosten, setAfleverkosten] = useState<number | "">("");
   const [leges, setLeges] = useState<number | "">("");
