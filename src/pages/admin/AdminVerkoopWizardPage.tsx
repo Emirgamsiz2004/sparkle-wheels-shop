@@ -647,7 +647,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, leadSource, leadSourceAnders, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
+  }, [verkoopId, activeStap, verkoopprijs, kortingBedrag, kortingOmschrijving, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, leadSource, leadSourceAnders, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
 
   const handleVolgende = async () => {
     // Centrale validatie eerst
