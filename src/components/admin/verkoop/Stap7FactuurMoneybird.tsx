@@ -297,12 +297,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     });
   }, [ledgerAccounts, factuurId]);
 
-  // Voertuig-BTW% volgt workflow live
+  // Voertuig- en korting-BTW% volgen workflow live
   useEffect(() => {
     setRegels((prev) =>
       prev.map((r) =>
-        r.kind === "voertuig" ? { ...r, btwPercent: isBtwWorkflow ? 21 : 0 } : r
-      )
+        r.kind === "voertuig" || r.kind === "korting"
+          ? { ...r, btwPercent: isBtwWorkflow ? 21 : 0 }
+          : r,
+      ),
     );
   }, [isBtwWorkflow]);
 
