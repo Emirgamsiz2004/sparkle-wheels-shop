@@ -1123,6 +1123,10 @@ const AdminVerkoopWizardPage = () => {
                 setKmStand={setKmStand}
                 verkoopprijs={verkoopprijs}
                 setVerkoopprijs={setVerkoopprijs}
+                kortingBedrag={kortingBedrag}
+                setKortingBedrag={setKortingBedrag}
+                kortingOmschrijving={kortingOmschrijving}
+                setKortingOmschrijving={setKortingOmschrijving}
                 voertuigType={voertuigType}
                 setVoertuigType={setVoertuigType}
                 afleverkosten={afleverkosten}
