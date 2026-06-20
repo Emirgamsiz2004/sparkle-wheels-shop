@@ -1393,7 +1393,7 @@ const AdminVerkoopWizardPage = () => {
                 factuurMbId={factuurMbId}
                 factuurMbNummer={factuurMbNummer}
                 factuurTotaal={
-                  verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum
+                  verkoopprijsNum - kortingNum + afleverkostenNum + legesNum + garantiePrijsNum
                 }
                 aanbetalingBedrag={aanbetalingNum}
                 inruilBedrag={inruilWaardeNum}
