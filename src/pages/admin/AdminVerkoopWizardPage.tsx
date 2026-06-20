@@ -1903,7 +1903,51 @@ const Stap1Voertuig = (p: Stap1Props) => {
             className={inputCls}
             placeholder="0"
           />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            De standaard verkoopprijs van de auto. Pas dit alleen aan als de geadverteerde prijs
+            wijzigt — geef een eenmalige korting hieronder op.
+          </p>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-4">
+          <div>
+            <label className={labelCls}>Korting (€)</label>
+            <input autoComplete="off"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              value={p.kortingBedrag}
+              onChange={(e) =>
+                p.setKortingBedrag(e.target.value === "" ? "" : Math.max(0, Number(e.target.value)))
+              }
+              className={inputCls}
+              placeholder="0"
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Omschrijving korting (optioneel)</label>
+            <input autoComplete="off"
+              type="text"
+              value={p.kortingOmschrijving}
+              onChange={(e) => p.setKortingOmschrijving(e.target.value)}
+              className={inputCls}
+              placeholder="Bijv. Actiekorting, onderhandelde korting"
+            />
+          </div>
+        </div>
+        {p.kortingBedrag !== "" && Number(p.kortingBedrag) > 0 && p.verkoopprijs !== "" && (
+          <p className="text-[12px] text-muted-foreground">
+            Komt als aparte regel <span className="font-medium text-foreground">Korting –{" "}
+            {new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(
+              Number(p.kortingBedrag),
+            )}</span> op de factuur. Effectieve verkoopprijs:{" "}
+            <span className="font-medium text-foreground">
+              {new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(
+                Math.max(0, Number(p.verkoopprijs) - Number(p.kortingBedrag)),
+              )}
+            </span>
+          </p>
+        )}
 
         <div>
           <label className={labelCls}>Voertuigtype</label>
