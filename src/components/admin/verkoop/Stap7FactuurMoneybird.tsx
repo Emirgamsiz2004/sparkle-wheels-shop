@@ -161,7 +161,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const num = (v: number | "" | null | undefined) => (typeof v === "number" ? v : 0);
 
   // ─── Bewerkbare factuurregels (preview) ───
-  type RegelKind = "voertuig" | "garantie" | "inruil" | "aanbetaling" | "extra";
+  type RegelKind = "voertuig" | "korting" | "garantie" | "inruil" | "aanbetaling" | "extra";
   type Regel = {
     id: string;
     kind: RegelKind;
