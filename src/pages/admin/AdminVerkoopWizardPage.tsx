@@ -146,6 +146,8 @@ const AdminVerkoopWizardPage = () => {
   // Stap 1 state
   const [kmStand, setKmStand] = useState<number | "">("");
   const [verkoopprijs, setVerkoopprijs] = useState<number | "">("");
+  const [kortingBedrag, setKortingBedrag] = useState<number | "">("");
+  const [kortingOmschrijving, setKortingOmschrijving] = useState<string>("");
   const [voertuigType, setVoertuigType] = useState<"marge" | "btw" | "consignatie">("marge");
   const [afleverkosten, setAfleverkosten] = useState<number | "">("");
   const [leges, setLeges] = useState<number | "">("");
@@ -371,6 +373,12 @@ const AdminVerkoopWizardPage = () => {
         setVerkoopId(existing.id);
         setActiveStap(existing.wizard_stap || 1);
         setVerkoopprijs(existing.verkoopprijs ?? vehicle.verkoopprijs ?? "");
+        setKortingBedrag(
+          existing.korting_bedrag != null && Number(existing.korting_bedrag) > 0
+            ? Number(existing.korting_bedrag)
+            : "",
+        );
+        setKortingOmschrijving(existing.korting_omschrijving || "");
         setAfleverkosten(existing.afleverkosten ?? "");
         setLeges(existing.leges ?? "");
         if (existing.verkoop_type === "marge" || existing.verkoop_type === "btw" || existing.verkoop_type === "consignatie") {
@@ -577,6 +585,10 @@ const AdminVerkoopWizardPage = () => {
     const payload: any = {
       wizard_stap: activeStap,
       verkoopprijs: verkoopprijs === "" ? 0 : Number(verkoopprijs),
+      korting_bedrag: kortingBedrag === "" ? 0 : Number(kortingBedrag),
+      korting_omschrijving: kortingBedrag !== "" && Number(kortingBedrag) > 0
+        ? (kortingOmschrijving.trim() || null)
+        : null,
       verkoop_type: voertuigType,
       afleverkosten: afleverkosten === "" ? null : Number(afleverkosten),
       leges: leges === "" ? null : Number(leges),
@@ -635,7 +647,7 @@ const AdminVerkoopWizardPage = () => {
       return false;
     }
     return true;
-  }, [verkoopId, activeStap, verkoopprijs, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, leadSource, leadSourceAnders, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
+  }, [verkoopId, activeStap, verkoopprijs, kortingBedrag, kortingOmschrijving, voertuigType, afleverkosten, leges, inruil, inruilKenteken, inruilMerk, inruilModel, inruilKm, inruilWaarde, inruilVerkoper, inruilBedrijfsnaam, inruilKvk, inruilBtw, afleverwijze, afleveradres, laterOphalen, leverdatum, aanbetalingBedrag, aanbetalingBetaalwijze, aanbetalingBankrekening, customerId, klantZakelijk, leadSource, leadSourceAnders, garantieType, garantiePakket, garantieLooptijd, garantiePrijs, overeenkomstnummer, opmerkingen, contractGetekend, restBetaalwijze, financieringMaatschappij, betaalwijzeDetails, stap6DocType, inrVerkVoornaam, inrVerkAchternaam, inrVerkGeboortedatum, inrVerkAdres, inrVerkPostcode, inrVerkWoonplaats, inrVerkTelefoon, inrContactpersoon, inrBetaalwijze, inkoopverklaringId]);
 
   const handleVolgende = async () => {
     // Centrale validatie eerst
@@ -812,6 +824,7 @@ const AdminVerkoopWizardPage = () => {
   // Centrale validatie
   // ───────────────────────────────────────────────────────────
   const verkoopprijsNum = verkoopprijs === "" ? 0 : Number(verkoopprijs);
+  const kortingNum = kortingBedrag === "" ? 0 : Math.max(0, Number(kortingBedrag));
   const afleverkostenNum = afleverkosten === "" ? 0 : Number(afleverkosten);
   const legesNum = leges === "" ? 0 : Number(leges);
   const garantiePrijsNum = garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0;
@@ -819,7 +832,7 @@ const AdminVerkoopWizardPage = () => {
   const inruilWaardeNum = inruil && inruilWaarde !== "" ? Number(inruilWaarde) : 0;
   const restbedragGlobal = Math.max(
     0,
-    verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum - inruilWaardeNum,
+    verkoopprijsNum - kortingNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum - inruilWaardeNum,
   );
 
   const wizardState: WizardState = useMemo(
@@ -1110,6 +1123,10 @@ const AdminVerkoopWizardPage = () => {
                 setKmStand={setKmStand}
                 verkoopprijs={verkoopprijs}
                 setVerkoopprijs={setVerkoopprijs}
+                kortingBedrag={kortingBedrag}
+                setKortingBedrag={setKortingBedrag}
+                kortingOmschrijving={kortingOmschrijving}
+                setKortingOmschrijving={setKortingOmschrijving}
                 voertuigType={voertuigType}
                 setVoertuigType={setVoertuigType}
                 afleverkosten={afleverkosten}
@@ -1316,6 +1333,8 @@ const AdminVerkoopWizardPage = () => {
                 voertuigKilometerstand={vehicle?.kilometerstand ?? null}
                 voertuigType={voertuigType}
                 verkoopprijs={verkoopprijs}
+                kortingBedrag={kortingNum}
+                kortingOmschrijving={kortingOmschrijving}
                 afleverkosten={afleverkosten}
                 leges={leges}
                 aanbetalingBedrag={aanbetalingBedrag}
@@ -1380,7 +1399,7 @@ const AdminVerkoopWizardPage = () => {
                 factuurMbId={factuurMbId}
                 factuurMbNummer={factuurMbNummer}
                 factuurTotaal={
-                  verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum
+                  verkoopprijsNum - kortingNum + afleverkostenNum + legesNum + garantiePrijsNum
                 }
                 aanbetalingBedrag={aanbetalingNum}
                 inruilBedrag={inruilWaardeNum}
@@ -1576,6 +1595,10 @@ interface Stap1Props {
   setKmStand: (v: number | "") => void;
   verkoopprijs: number | "";
   setVerkoopprijs: (v: number | "") => void;
+  kortingBedrag: number | "";
+  setKortingBedrag: (v: number | "") => void;
+  kortingOmschrijving: string;
+  setKortingOmschrijving: (v: string) => void;
   voertuigType: "marge" | "btw" | "consignatie";
   setVoertuigType: (v: "marge" | "btw" | "consignatie") => void;
   afleverkosten: number | "";
@@ -1882,7 +1905,51 @@ const Stap1Voertuig = (p: Stap1Props) => {
             className={inputCls}
             placeholder="0"
           />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            De standaard verkoopprijs van de auto. Pas dit alleen aan als de geadverteerde prijs
+            wijzigt — geef een eenmalige korting hieronder op.
+          </p>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-4">
+          <div>
+            <label className={labelCls}>Korting (€)</label>
+            <input autoComplete="off"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              value={p.kortingBedrag}
+              onChange={(e) =>
+                p.setKortingBedrag(e.target.value === "" ? "" : Math.max(0, Number(e.target.value)))
+              }
+              className={inputCls}
+              placeholder="0"
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Omschrijving korting (optioneel)</label>
+            <input autoComplete="off"
+              type="text"
+              value={p.kortingOmschrijving}
+              onChange={(e) => p.setKortingOmschrijving(e.target.value)}
+              className={inputCls}
+              placeholder="Bijv. Actiekorting, onderhandelde korting"
+            />
+          </div>
+        </div>
+        {p.kortingBedrag !== "" && Number(p.kortingBedrag) > 0 && p.verkoopprijs !== "" && (
+          <p className="text-[12px] text-muted-foreground">
+            Komt als aparte regel <span className="font-medium text-foreground">Korting –{" "}
+            {new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(
+              Number(p.kortingBedrag),
+            )}</span> op de factuur. Effectieve verkoopprijs:{" "}
+            <span className="font-medium text-foreground">
+              {new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(
+                Math.max(0, Number(p.verkoopprijs) - Number(p.kortingBedrag)),
+              )}
+            </span>
+          </p>
+        )}
 
         <div>
           <label className={labelCls}>Voertuigtype</label>

@@ -65,6 +65,8 @@ export interface Stap7Props {
 
   // Bedragen
   verkoopprijs: number | "";
+  kortingBedrag?: number;
+  kortingOmschrijving?: string | null;
   afleverkosten: number | "";
   leges: number | "";
   aanbetalingBedrag: number | "";
@@ -159,7 +161,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const num = (v: number | "" | null | undefined) => (typeof v === "number" ? v : 0);
 
   // ─── Bewerkbare factuurregels (preview) ───
-  type RegelKind = "voertuig" | "garantie" | "inruil" | "aanbetaling" | "extra";
+  type RegelKind = "voertuig" | "korting" | "garantie" | "inruil" | "aanbetaling" | "extra";
   type Regel = {
     id: string;
     kind: RegelKind;
@@ -183,6 +185,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       price: voertuigPrijs,
       btwPercent: isBtwWorkflow ? 21 : 0,
     });
+    if (num(p.kortingBedrag) > 0) {
+      const omschrijving = (p.kortingOmschrijving || "").trim();
+      list.push({
+        id: "korting",
+        kind: "korting",
+        description: omschrijving ? `Korting — ${omschrijving}` : "Korting",
+        price: -num(p.kortingBedrag),
+        btwPercent: isBtwWorkflow ? 21 : 0,
+      });
+    }
     if (p.garantieType === "autotrust" && num(p.garantiePrijs) > 0) {
       const looptijd = num(p.garantieLooptijd);
       const pakket = p.garantiePakket || "Autotrust";
@@ -247,7 +259,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   }, [invoke]);
 
   useEffect(() => {
-    const fresh = buildInitialRegels().filter((r) => ["voertuig", "garantie", "inruil", "aanbetaling"].includes(r.kind));
+    const fresh = buildInitialRegels().filter((r) => ["voertuig", "korting", "garantie", "inruil", "aanbetaling"].includes(r.kind));
     setRegels((prev) => {
       const extras = prev.filter((r) => r.kind === "extra");
       const same =
@@ -259,7 +271,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       return same ? prev : [...fresh, ...extras];
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [p.verkoopprijs, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow]);
+  }, [p.verkoopprijs, p.kortingBedrag, p.kortingOmschrijving, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow]);
 
   // Auto-suggest grootboekrekening voor inruil-regel zodra accounts geladen zijn
   useEffect(() => {
@@ -285,12 +297,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     });
   }, [ledgerAccounts, factuurId]);
 
-  // Voertuig-BTW% volgt workflow live
+  // Voertuig- en korting-BTW% volgen workflow live
   useEffect(() => {
     setRegels((prev) =>
       prev.map((r) =>
-        r.kind === "voertuig" ? { ...r, btwPercent: isBtwWorkflow ? 21 : 0 } : r
-      )
+        r.kind === "voertuig" || r.kind === "korting"
+          ? { ...r, btwPercent: isBtwWorkflow ? 21 : 0 }
+          : r,
+      ),
     );
   }, [isBtwWorkflow]);
 

@@ -2854,6 +2854,8 @@ export type Database = {
           inruil_verkoper_woonplaats: string | null
           inruil_waarde: number | null
           klant_type: string | null
+          korting_bedrag: number
+          korting_omschrijving: string | null
           later_ophalen: boolean | null
           lead_source: string | null
           lead_source_anders: string | null
@@ -2970,6 +2972,8 @@ export type Database = {
           inruil_verkoper_woonplaats?: string | null
           inruil_waarde?: number | null
           klant_type?: string | null
+          korting_bedrag?: number
+          korting_omschrijving?: string | null
           later_ophalen?: boolean | null
           lead_source?: string | null
           lead_source_anders?: string | null
@@ -3086,6 +3090,8 @@ export type Database = {
           inruil_verkoper_woonplaats?: string | null
           inruil_waarde?: number | null
           klant_type?: string | null
+          korting_bedrag?: number
+          korting_omschrijving?: string | null
           later_ophalen?: boolean | null
           lead_source?: string | null
           lead_source_anders?: string | null
