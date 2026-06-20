@@ -585,6 +585,10 @@ const AdminVerkoopWizardPage = () => {
     const payload: any = {
       wizard_stap: activeStap,
       verkoopprijs: verkoopprijs === "" ? 0 : Number(verkoopprijs),
+      korting_bedrag: kortingBedrag === "" ? 0 : Number(kortingBedrag),
+      korting_omschrijving: kortingBedrag !== "" && Number(kortingBedrag) > 0
+        ? (kortingOmschrijving.trim() || null)
+        : null,
       verkoop_type: voertuigType,
       afleverkosten: afleverkosten === "" ? null : Number(afleverkosten),
       leges: leges === "" ? null : Number(leges),
