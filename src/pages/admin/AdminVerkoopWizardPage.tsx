@@ -824,6 +824,7 @@ const AdminVerkoopWizardPage = () => {
   // Centrale validatie
   // ───────────────────────────────────────────────────────────
   const verkoopprijsNum = verkoopprijs === "" ? 0 : Number(verkoopprijs);
+  const kortingNum = kortingBedrag === "" ? 0 : Math.max(0, Number(kortingBedrag));
   const afleverkostenNum = afleverkosten === "" ? 0 : Number(afleverkosten);
   const legesNum = leges === "" ? 0 : Number(leges);
   const garantiePrijsNum = garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0;
@@ -831,7 +832,7 @@ const AdminVerkoopWizardPage = () => {
   const inruilWaardeNum = inruil && inruilWaarde !== "" ? Number(inruilWaarde) : 0;
   const restbedragGlobal = Math.max(
     0,
-    verkoopprijsNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum - inruilWaardeNum,
+    verkoopprijsNum - kortingNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum - inruilWaardeNum,
   );
 
   const wizardState: WizardState = useMemo(
