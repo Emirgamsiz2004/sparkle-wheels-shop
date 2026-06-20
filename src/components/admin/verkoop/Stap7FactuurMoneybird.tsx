@@ -185,6 +185,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       price: voertuigPrijs,
       btwPercent: isBtwWorkflow ? 21 : 0,
     });
+    if (num(p.kortingBedrag) > 0) {
+      const omschrijving = (p.kortingOmschrijving || "").trim();
+      list.push({
+        id: "korting",
+        kind: "korting",
+        description: omschrijving ? `Korting — ${omschrijving}` : "Korting",
+        price: -num(p.kortingBedrag),
+        btwPercent: isBtwWorkflow ? 21 : 0,
+      });
+    }
     if (p.garantieType === "autotrust" && num(p.garantiePrijs) > 0) {
       const looptijd = num(p.garantieLooptijd);
       const pakket = p.garantiePakket || "Autotrust";
