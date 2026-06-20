@@ -1333,6 +1333,8 @@ const AdminVerkoopWizardPage = () => {
                 voertuigKilometerstand={vehicle?.kilometerstand ?? null}
                 voertuigType={voertuigType}
                 verkoopprijs={verkoopprijs}
+                kortingBedrag={kortingNum}
+                kortingOmschrijving={kortingOmschrijving}
                 afleverkosten={afleverkosten}
                 leges={leges}
                 aanbetalingBedrag={aanbetalingBedrag}
