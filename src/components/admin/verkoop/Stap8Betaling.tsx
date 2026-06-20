@@ -503,12 +503,10 @@ const Stap8Betaling = ({
                     onFocus={() => isAuto && handleUnlockLast(idx)}
                     onClick={() => isAuto && handleUnlockLast(idx)}
                     onBlur={triggerSave}
-                    readOnly={isAuto}
-                    title={isAuto ? "Klik om handmatig te bewerken" : undefined}
                     className={cn(
                       "w-28 border border-border rounded-[8px] px-2 py-1.5 text-sm text-right tabular-nums focus:outline-none focus:ring-1 focus:ring-ring",
                       isAuto
-                        ? "bg-muted/40 text-muted-foreground cursor-pointer"
+                        ? "bg-muted/40 text-muted-foreground"
                         : "bg-background",
                     )}
                     placeholder="0,00"
