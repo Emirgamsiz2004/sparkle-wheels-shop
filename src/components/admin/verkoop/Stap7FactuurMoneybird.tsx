@@ -259,7 +259,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   }, [invoke]);
 
   useEffect(() => {
-    const fresh = buildInitialRegels().filter((r) => ["voertuig", "garantie", "inruil", "aanbetaling"].includes(r.kind));
+    const fresh = buildInitialRegels().filter((r) => ["voertuig", "korting", "garantie", "inruil", "aanbetaling"].includes(r.kind));
     setRegels((prev) => {
       const extras = prev.filter((r) => r.kind === "extra");
       const same =
@@ -271,7 +271,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       return same ? prev : [...fresh, ...extras];
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [p.verkoopprijs, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow]);
+  }, [p.verkoopprijs, p.kortingBedrag, p.kortingOmschrijving, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow]);
 
   // Auto-suggest grootboekrekening voor inruil-regel zodra accounts geladen zijn
   useEffect(() => {
