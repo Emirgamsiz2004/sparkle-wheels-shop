@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Openingstijden in minuten vanaf 00:00
 const OPENING: Record<number, { open: number; close: number } | null> = {
   0: { open: 12 * 60, close: 16 * 60 }, // zondag
-  1: { open: 12 * 60, close: 18 * 60 }, // maandag
+  1: { open: 9 * 60, close: 18 * 60 }, // maandag
   2: { open: 9 * 60, close: 18 * 60 },
   3: { open: 9 * 60, close: 18 * 60 },
   4: { open: 9 * 60, close: 18 * 60 },

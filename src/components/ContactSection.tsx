@@ -84,7 +84,7 @@ const ContactSection = () => {
                 <p className="text-[10px] tracking-[0.3em] uppercase font-body text-muted-foreground">Openingstijden</p>
               </div>
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 md:gap-3 mt-1.5 text-xs font-body text-foreground">
-                <span>Maandag: 12:00 – 18:00</span>
+                <span>Maandag: 09:00 – 18:00</span>
                 <span className="text-border">·</span>
                 <span>Di–Vr: 09:00 – 18:00</span>
                 <span className="text-border">·</span>

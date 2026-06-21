@@ -303,7 +303,7 @@ const OnderhoudReparatie = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-body">
                     <span className="text-muted-foreground">Maandag</span>
-                    <span className="text-foreground">12:00 - 18:00</span>
+                    <span className="text-foreground">09:00 - 18:00</span>
                   </div>
                   <div className="flex justify-between text-sm font-body">
                     <span className="text-muted-foreground">Di t/m Vr</span>

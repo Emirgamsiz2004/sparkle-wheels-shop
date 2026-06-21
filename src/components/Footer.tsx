@@ -75,7 +75,7 @@ const Footer = () => {
           {/* Col 4 — Openingstijden + Social */}
           <div className="flex flex-col gap-3">
             <p className="text-[10px] tracking-[0.3em] uppercase font-body font-semibold text-muted-foreground mb-1">Openingstijden</p>
-            <p className="text-[11px] font-body text-muted-foreground/70">Maandag: 12:00 – 18:00</p>
+            <p className="text-[11px] font-body text-muted-foreground/70">Maandag: 09:00 – 18:00</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Di – Vr: 09:00 – 18:00</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Zaterdag: 10:00 – 17:00</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Zondag: 12:00 – 16:00</p>

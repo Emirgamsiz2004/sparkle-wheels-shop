@@ -49,7 +49,7 @@ const contactDetails = [
 ];
 
 const openingHours = [
-  { day: "Maandag", time: "12:00 - 18:00" },
+  { day: "Maandag", time: "09:00 - 18:00" },
   { day: "Dinsdag", time: "09:00 - 18:00" },
   { day: "Woensdag", time: "09:00 - 18:00" },
   { day: "Donderdag", time: "09:00 - 18:00" },
