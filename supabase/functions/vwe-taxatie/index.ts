@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,13 +17,43 @@ const escapeXml = (str: string) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 
+async function requireStaff(req: Request): Promise<Response | null> {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+  const { data, error } = await supabase.auth.getClaims(authHeader.slice(7));
+  if (error || !data?.claims?.sub) {
+    return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const { data: ok } = await supabase.rpc("is_staff", { _user_id: data.claims.sub });
+  if (!ok) {
+    return new Response(JSON.stringify({ success: false, error: "Forbidden" }), {
+      status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  return null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const denied = await requireStaff(req);
+  if (denied) return denied;
+
   try {
     const { kenteken } = await req.json();
+
 
     const VWE_USERNAME = Deno.env.get("VWE_USERNAME");
     const VWE_PASSWORD = Deno.env.get("VWE_PASSWORD");
