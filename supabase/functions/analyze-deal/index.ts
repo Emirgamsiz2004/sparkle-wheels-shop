@@ -682,6 +682,11 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const denied = await requireStaff(req);
+  if (denied) return denied;
+
+
+
   try {
     const { kenteken, vraagprijs, km_stand, staat, schadevrij, onderhoudsboekje, rookvrij, aantal_sleutels, bandenprofiel, opmerkingen } = await req.json();
     if (!kenteken) {
