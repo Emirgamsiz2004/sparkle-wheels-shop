@@ -15,6 +15,18 @@ serve(async (req) => {
   try {
     const { naam, telefoon, merk, model, bouwjaar, kenteken, kmStand } = await req.json();
 
+    // Validate inputs to prevent abuse of WhatsApp messaging from this public endpoint.
+    const isString = (v: unknown, max = 200) => typeof v === "string" && v.length > 0 && v.length <= max;
+    const cleanPhoneInput = typeof telefoon === "string" ? telefoon.replace(/\D/g, "") : "";
+    const validNlMobile = /^(?:06\d{8}|316\d{8}|6\d{8})$/.test(cleanPhoneInput);
+    if (!isString(naam, 120) || !validNlMobile || !isString(merk, 60) || !isString(model, 60)) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Ongeldige invoer" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+
     const WHATSAPP_API_TOKEN = Deno.env.get("WHATSAPP_API_TOKEN");
     const WHATSAPP_PHONE_ID = Deno.env.get("WHATSAPP_PHONE_ID");
     const OWNER_WHATSAPP_NUMBER = Deno.env.get("OWNER_WHATSAPP_NUMBER");
