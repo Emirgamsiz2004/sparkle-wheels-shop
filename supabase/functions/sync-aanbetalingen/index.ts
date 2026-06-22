@@ -250,10 +250,8 @@ Deno.serve(async (req) => {
     if (!token || !adminId) throw new Error("Moneybird credentials missing");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabase = createClient(
-      supabaseUrl,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceKey);
 
     let body: any = {};
     try {
@@ -261,6 +259,36 @@ Deno.serve(async (req) => {
     } catch (_e) {
       body = {};
     }
+
+    // Auth: staff JWT for manual process_single; service_role JWT for cron polling.
+    const authHeader = req.headers.get("Authorization");
+    const jwt = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    if (!jwt) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims(jwt);
+    if (claimsErr || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const role = (claimsData.claims as any).role;
+    if (body?.action === "process_single") {
+      const sub = (claimsData.claims as any).sub;
+      const { data: ok } = await supabase.rpc("is_staff", { _user_id: sub });
+      if (!ok) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else if (role !== "service_role") {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
 
     if (body?.action === "process_single" && body?.aanbetaling_id) {
       const { data: aanbetaling, error: singleError } = await supabase
