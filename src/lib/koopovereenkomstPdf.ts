@@ -88,9 +88,12 @@ const escapeHtml = (s: string) =>
 function buildHtml(data: KoopovereenkomstData): string {
   const garantieKosten = data.garantie.kosten || 0;
   const korting = Math.max(0, data.financieel.korting || 0);
+  const minRegels = (data.financieel.extraMinregels || []).filter(r => (Number(r.bedrag) || 0) > 0);
+  const minRegelsTotaal = minRegels.reduce((s, r) => s + (Number(r.bedrag) || 0), 0);
   const totaal =
     data.financieel.verkoopprijs -
-    korting +
+    korting -
+    minRegelsTotaal +
     (data.financieel.afleverkosten || 0) +
     (data.financieel.leges || 0) +
     garantieKosten;
