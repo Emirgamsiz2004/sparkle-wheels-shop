@@ -33,6 +33,7 @@ export interface KoopovereenkomstData {
     verkoopprijs: number;
     korting?: number;
     kortingOmschrijving?: string;
+    extraMinregels?: Array<{ omschrijving: string; bedrag: number }>;
     afleverkosten?: number;
     leges?: number;
     betaalwijze: string;
