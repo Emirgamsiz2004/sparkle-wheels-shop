@@ -1378,6 +1378,7 @@ const AdminVerkoopWizardPage = () => {
                 initialEmailVerzondenOp={factuurEmailVerzondenOp}
                 initialFactuurVerstuurd={factuurVerstuurd}
                 initialFactuurEmail={factuurEmail}
+                minRegels={minRegels}
                 onSaved={async (extra) => {
                   if (extra.moneybird_factuur_id !== undefined) setFactuurMbId(extra.moneybird_factuur_id);
                   if (extra.moneybird_factuur_url !== undefined) setFactuurMbUrl(extra.moneybird_factuur_url);
