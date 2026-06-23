@@ -3797,7 +3797,71 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
 
               return (
                 <div className="space-y-3">
+                  {/* Minregels (aftrekposten) */}
+                  <div className="space-y-2 pb-3 mb-1 border-b border-border/50">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Minregels (aftrekposten)</div>
+                      {p.minRegels.length > 0 && (
+                        <div className="text-[11px] text-muted-foreground">
+                          Totaal: <span className="font-medium text-foreground">− {fmtEur(p.minRegels.reduce((s, r) => s + (Number(r.bedrag) || 0), 0))}</span>
+                        </div>
+                      )}
+                    </div>
+                    {p.minRegels.length === 0 && (
+                      <div className="text-[12px] text-muted-foreground italic">
+                        Optioneel. Verschijnt als aparte regel op de koopovereenkomst en factuur.
+                      </div>
+                    )}
+                    {p.minRegels.map((row, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <input
+                          autoComplete="off"
+                          type="text"
+                          value={row.omschrijving}
+                          onChange={(e) => {
+                            const next = p.minRegels.map((r, i) => (i === idx ? { ...r, omschrijving: e.target.value } : r));
+                            p.setMinRegels(next);
+                          }}
+                          placeholder="Omschrijving (bijv. Inruilkorting)"
+                          className={cn(inputCls, "flex-1")}
+                        />
+                        <div className="relative w-[160px]">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[13px]">−€</span>
+                          <input
+                            autoComplete="off"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={row.bedrag === 0 ? "" : row.bedrag}
+                            onChange={(e) => {
+                              const next = p.minRegels.map((r, i) => (i === idx ? { ...r, bedrag: e.target.value === "" ? 0 : Number(e.target.value) } : r));
+                              p.setMinRegels(next);
+                            }}
+                            placeholder="0,00"
+                            className={cn(inputCls, "pl-9")}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => p.setMinRegels(p.minRegels.filter((_, i) => i !== idx))}
+                          className="h-9 w-9 rounded-[10px] border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors flex items-center justify-center"
+                          aria-label="Verwijder minregel"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => p.setMinRegels([...p.minRegels, { omschrijving: "", bedrag: 0 }])}
+                      className="text-[12px] font-medium text-foreground hover:text-foreground/70 transition-colors inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Minregel toevoegen
+                    </button>
+                  </div>
+
                   <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Betaalwijze restbedrag</div>
+
 
                   {p.betaalwijzeDetails.length === 0 && (
                     <div className="text-[12px] text-muted-foreground italic">
