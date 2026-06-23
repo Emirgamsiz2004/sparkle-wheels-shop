@@ -232,6 +232,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         locked: true,
       });
     }
+    (p.minRegels || []).forEach((r, idx) => {
+      if (!r || (Number(r.bedrag) || 0) <= 0) return;
+      list.push({
+        id: `minregel-${idx}`,
+        kind: "korting",
+        description: (r.omschrijving || "").trim() || "Aftrekpost",
+        price: -Number(r.bedrag),
+        btwPercent: isBtwWorkflow ? 21 : 0,
+      });
+    });
     return list;
   };
 
