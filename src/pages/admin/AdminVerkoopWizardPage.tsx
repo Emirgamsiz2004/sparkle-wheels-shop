@@ -3538,6 +3538,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
           verkoopprijs: p.verkoopprijs,
           korting: kortingBedrag,
           kortingOmschrijving: p.kortingOmschrijving || undefined,
+          extraMinregels: (p.minRegels || []).filter(r => (Number(r.bedrag) || 0) > 0).map(r => ({ omschrijving: r.omschrijving, bedrag: Number(r.bedrag) || 0 })),
           afleverkosten: p.afleverkosten,
           leges: p.leges,
           betaalwijze: (p.betaalwijzeDetails && p.betaalwijzeDetails.length > 0)
