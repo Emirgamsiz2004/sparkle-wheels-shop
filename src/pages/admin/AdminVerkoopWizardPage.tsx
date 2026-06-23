@@ -205,6 +205,8 @@ const AdminVerkoopWizardPage = () => {
   const [restBetaalwijze, setRestBetaalwijze] = useState<"cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling">("overboeking");
   const [financieringMaatschappij, setFinancieringMaatschappij] = useState<string>("");
   const [betaalwijzeDetails, setBetaalwijzeDetails] = useState<Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>>([]);
+  // Stap 5 — Extra minregels (alleen tijdens wizard sessie, niet opgeslagen in DB)
+  const [minRegels, setMinRegels] = useState<Array<{ omschrijving: string; bedrag: number }>>([]);
 
   // Stap 6 state — Inruil document
   const [stap6DocType, setStap6DocType] = useState<"particulier" | "zakelijk">("particulier");
