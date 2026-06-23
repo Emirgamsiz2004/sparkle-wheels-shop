@@ -3434,7 +3434,11 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
     if ((p.aanbetalingBedrag || 0) > 0) setShowAanbetalingEditor(true);
   }, [p.aanbetalingBedrag]);
 
+  // Auto-sync alleen wanneer het restbedrag wijzigt (niet wanneer de user typt in de bedrag-velden)
+  const lastRestbedragRef = useRef<number>(restbedrag);
   useEffect(() => {
+    if (lastRestbedragRef.current === restbedrag) return;
+    lastRestbedragRef.current = restbedrag;
     if (p.betaalwijzeDetails.length === 0) return;
     const totaalIngevuld = p.betaalwijzeDetails.reduce((s, d) => s + (Number(d.bedrag) || 0), 0);
     const verschil = +(restbedrag - totaalIngevuld).toFixed(2);
@@ -3443,7 +3447,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
     const idx = next.length - 1;
     next[idx] = { ...next[idx], bedrag: Math.max(0, +((Number(next[idx].bedrag) || 0) + verschil).toFixed(2)) };
     p.setBetaalwijzeDetails(next);
-  }, [restbedrag, p.betaalwijzeDetails]);
+  }, [restbedrag]);
 
   const klantNaam = p.klant.zakelijk && p.klant.bedrijfsnaam
     ? p.klant.bedrijfsnaam
