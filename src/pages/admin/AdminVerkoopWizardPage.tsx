@@ -1218,8 +1218,11 @@ const AdminVerkoopWizardPage = () => {
                 kmStand={kmStand === "" ? (vehicle.kilometerstand || 0) : Number(kmStand)}
                 voertuigType={voertuigType}
                 verkoopprijs={verkoopprijs === "" ? 0 : Number(verkoopprijs)}
+                kortingBedrag={kortingNum}
+                kortingOmschrijving={kortingOmschrijving}
                 afleverkosten={afleverkosten === "" ? 0 : Number(afleverkosten)}
                 leges={leges === "" ? 0 : Number(leges)}
+
                 aanbetalingBedrag={aanbetalingNum}
                 aanbetalingBetaalwijze={aanbetalingBetaalwijze}
                 setAanbetalingBedrag={setAanbetalingBedrag}
@@ -3357,8 +3360,11 @@ interface Stap5Props {
   kmStand: number;
   voertuigType: "marge" | "btw" | "consignatie";
   verkoopprijs: number;
+  kortingBedrag: number;
+  kortingOmschrijving: string;
   afleverkosten: number;
   leges: number;
+
   aanbetalingBedrag: number;
   aanbetalingBetaalwijze: Betaalwijze;
   setAanbetalingBedrag: (v: number | "") => void;
@@ -3409,9 +3415,11 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
     new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(n || 0);
 
   const garantieKosten = p.garantie.type === "autotrust" ? (p.garantie.prijs || 0) : 0;
-  const totaal = p.verkoopprijs + (p.afleverkosten || 0) + (p.leges || 0) + garantieKosten;
+  const kortingBedrag = Math.max(0, p.kortingBedrag || 0);
+  const totaal = p.verkoopprijs - kortingBedrag + (p.afleverkosten || 0) + (p.leges || 0) + garantieKosten;
   const inruilWaarde = p.inruil?.waarde || 0;
-  const restbedrag = totaal - (p.aanbetalingBedrag || 0) - inruilWaarde;
+  const restbedrag = Math.max(0, totaal - (p.aanbetalingBedrag || 0) - inruilWaarde);
+
   const [showAanbetalingEditor, setShowAanbetalingEditor] = useState((p.aanbetalingBedrag || 0) > 0);
 
   // Auto-clean: "aanbetaling" is geen geldige betaalwijze meer (wordt automatisch van restbedrag afgetrokken)
@@ -3510,9 +3518,12 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
         },
         financieel: {
           verkoopprijs: p.verkoopprijs,
+          korting: kortingBedrag,
+          kortingOmschrijving: p.kortingOmschrijving || undefined,
           afleverkosten: p.afleverkosten,
           leges: p.leges,
           betaalwijze: (p.betaalwijzeDetails && p.betaalwijzeDetails.length > 0)
+
             ? p.betaalwijzeDetails.map(d => {
                 const labels: Record<string, string> = { cash: "Cash", pin: "Pin", ideal: "iDEAL", overboeking: "Overboeking", financiering: "Financiering", aanbetaling: "Aanbetaling" };
                 return `${labels[d.methode] || d.methode}: ${new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(d.bedrag || 0)}`;
