@@ -359,6 +359,7 @@ function buildHtml(data: KoopovereenkomstData): string {
     <table class="fin">
       <tr class="sub"><td>Voertuigprijs</td><td class="amt">${formatEur(data.financieel.verkoopprijs)}</td></tr>
       ${korting > 0 ? `<tr class="sub"><td>Korting${data.financieel.kortingOmschrijving ? ` — ${escapeHtml(data.financieel.kortingOmschrijving)}` : ""}</td><td class="amt">− ${formatEur(korting)}</td></tr>` : ""}
+      ${minRegels.map(r => `<tr class="sub"><td>${escapeHtml(r.omschrijving || "Aftrekpost")}</td><td class="amt">− ${formatEur(r.bedrag)}</td></tr>`).join("")}
       ${garantieKosten > 0 ? `<tr class="sub"><td>Garantie ${data.garantie.type === "autotrust" ? "AutoTrust" : "Platin"} ${data.garantie.maanden || 12} maanden</td><td class="amt">${formatEur(garantieKosten)}</td></tr>` : ""}
 
       ${(data.financieel.afleverkosten || 0) > 0 ? `<tr class="sub"><td>Afleverkosten</td><td class="amt">${formatEur(data.financieel.afleverkosten || 0)}</td></tr>` : ""}
