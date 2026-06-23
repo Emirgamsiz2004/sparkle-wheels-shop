@@ -139,12 +139,7 @@ export function validateStap5(s: WizardState): string[] {
   if (!s.pdfGenereerd) errors.push("Koopovereenkomst is nog niet gegenereerd");
   if (!s.contractGetekend) errors.push("Bevestig dat de koopovereenkomst getekend is");
   if (!s.restBetaalwijze) errors.push("Betaalwijze restbedrag is niet ingevuld");
-  const totaal = (s.betaalwijzeDetails || []).reduce((a, b) => a + (Number(b.bedrag) || 0), 0);
-  if (s.betaalwijzeDetails && s.betaalwijzeDetails.length > 0 && Math.abs(totaal - s.restbedrag) > 0.5) {
-    errors.push(
-      `Totaal van betaalwijzen (€ ${totaal.toFixed(2)}) komt niet overeen met restbedrag (€ ${s.restbedrag.toFixed(2)})`,
-    );
-  }
+  // Totaal hoeft niet exact te kloppen — verschil is een waarschuwing (zie getStapWarnings), geen blokker.
   return errors;
 }
 
@@ -201,6 +196,14 @@ export function getStapWarnings(stap: number, s: WizardState): string[] {
   const warnings: string[] = [];
   if (stap === 3 && !isFilled(s.klantEmail)) {
     warnings.push("Geen e-mailadres — factuur kan niet per mail verstuurd worden");
+  }
+  if (stap === 5 && s.betaalwijzeDetails && s.betaalwijzeDetails.length > 0) {
+    const totaal = s.betaalwijzeDetails.reduce((a, b) => a + (Number(b.bedrag) || 0), 0);
+    if (Math.abs(totaal - s.restbedrag) > 0.5) {
+      warnings.push(
+        `Totaal van betaalwijzen (€ ${totaal.toFixed(2)}) komt niet overeen met restbedrag (€ ${s.restbedrag.toFixed(2)})`,
+      );
+    }
   }
   return warnings;
 }
