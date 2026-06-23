@@ -3423,7 +3423,8 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
 
   const garantieKosten = p.garantie.type === "autotrust" ? (p.garantie.prijs || 0) : 0;
   const kortingBedrag = Math.max(0, p.kortingBedrag || 0);
-  const totaal = p.verkoopprijs - kortingBedrag + (p.afleverkosten || 0) + (p.leges || 0) + garantieKosten;
+  const minRegelsTotaal = (p.minRegels || []).reduce((s, r) => s + (Number(r.bedrag) || 0), 0);
+  const totaal = p.verkoopprijs - kortingBedrag - minRegelsTotaal + (p.afleverkosten || 0) + (p.leges || 0) + garantieKosten;
   const inruilWaarde = p.inruil?.waarde || 0;
   const restbedrag = Math.max(0, totaal - (p.aanbetalingBedrag || 0) - inruilWaarde);
 
