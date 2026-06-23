@@ -3455,8 +3455,12 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       // Eerst opslaan
       await p.onAutoSave();
 
-      // Verstuur algemene voorwaarden naar klant vóór genereren koopovereenkomst
-      if (p.klant.email) {
+      // Verstuur algemene voorwaarden naar klant vóór genereren koopovereenkomst (slechts 1x per verkoop)
+      const avStorageKey = `av-verzonden-${p.verkoopId || p.overeenkomstnummer || ""}`;
+      const alVerzonden = avStorageKey && typeof window !== "undefined" && !!localStorage.getItem(avStorageKey);
+      if (alVerzonden) {
+        // Sla over: al eerder verstuurd
+      } else if (p.klant.email) {
         try {
           const { error: mailErr } = await supabase.functions.invoke("send-transactional-email", {
             body: {
@@ -3475,6 +3479,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
             console.warn("Versturen algemene voorwaarden mislukt", mailErr);
             toast.warning("Koopovereenkomst wordt gegenereerd, maar het versturen van de algemene voorwaarden naar de klant is mislukt.");
           } else {
+            try { if (avStorageKey) localStorage.setItem(avStorageKey, new Date().toISOString()); } catch {}
             toast.success(`Algemene voorwaarden verstuurd naar ${p.klant.email}`);
           }
         } catch (err) {
@@ -3483,6 +3488,7 @@ const Stap5Koopovereenkomst: React.FC<Stap5Props> = (p) => {
       } else {
         toast.warning("Geen e-mailadres bekend — algemene voorwaarden zijn niet verstuurd naar de klant.");
       }
+
 
 
       const { buildKoopovereenkomstDoc } = await import("@/lib/koopovereenkomstPdf");
