@@ -109,6 +109,9 @@ export interface Stap7Props {
   initialFactuurVerstuurd?: boolean | null;
   initialFactuurEmail?: string | null;
 
+  // Extra minregels (sessie-scoped, vanuit Stap 5)
+  minRegels?: Array<{ omschrijving: string; bedrag: number }>;
+
   onSaved: (extra: Record<string, any>) => Promise<void> | void;
 }
 
