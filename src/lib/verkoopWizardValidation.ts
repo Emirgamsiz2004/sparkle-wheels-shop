@@ -197,5 +197,13 @@ export function getStapWarnings(stap: number, s: WizardState): string[] {
   if (stap === 3 && !isFilled(s.klantEmail)) {
     warnings.push("Geen e-mailadres — factuur kan niet per mail verstuurd worden");
   }
+  if (stap === 5 && s.betaalwijzeDetails && s.betaalwijzeDetails.length > 0) {
+    const totaal = s.betaalwijzeDetails.reduce((a, b) => a + (Number(b.bedrag) || 0), 0);
+    if (Math.abs(totaal - s.restbedrag) > 0.5) {
+      warnings.push(
+        `Totaal van betaalwijzen (€ ${totaal.toFixed(2)}) komt niet overeen met restbedrag (€ ${s.restbedrag.toFixed(2)})`,
+      );
+    }
+  }
   return warnings;
 }
