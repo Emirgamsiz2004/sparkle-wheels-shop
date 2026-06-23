@@ -284,7 +284,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       return same ? prev : [...fresh, ...extras];
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [p.verkoopprijs, p.kortingBedrag, p.kortingOmschrijving, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow]);
+  }, [p.verkoopprijs, p.kortingBedrag, p.kortingOmschrijving, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow, JSON.stringify(p.minRegels || [])]);
 
   // Auto-suggest grootboekrekening voor inruil-regel zodra accounts geladen zijn
   useEffect(() => {
