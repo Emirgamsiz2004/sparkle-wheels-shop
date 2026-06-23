@@ -109,6 +109,9 @@ export interface Stap7Props {
   initialFactuurVerstuurd?: boolean | null;
   initialFactuurEmail?: string | null;
 
+  // Extra minregels (sessie-scoped, vanuit Stap 5)
+  minRegels?: Array<{ omschrijving: string; bedrag: number }>;
+
   onSaved: (extra: Record<string, any>) => Promise<void> | void;
 }
 
@@ -229,6 +232,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         locked: true,
       });
     }
+    (p.minRegels || []).forEach((r, idx) => {
+      if (!r || (Number(r.bedrag) || 0) <= 0) return;
+      list.push({
+        id: `minregel-${idx}`,
+        kind: "korting",
+        description: (r.omschrijving || "").trim() || "Aftrekpost",
+        price: -Number(r.bedrag),
+        btwPercent: isBtwWorkflow ? 21 : 0,
+      });
+    });
     return list;
   };
 
@@ -271,7 +284,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
       return same ? prev : [...fresh, ...extras];
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [p.verkoopprijs, p.kortingBedrag, p.kortingOmschrijving, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow]);
+  }, [p.verkoopprijs, p.kortingBedrag, p.kortingOmschrijving, p.afleverkosten, p.leges, p.garantieType, p.garantiePakket, p.garantieLooptijd, p.garantiePrijs, p.inruil?.waarde, p.inruil?.kenteken, p.aanbetalingBedrag, p.aanbetalingBetaalwijze, isBtwWorkflow, JSON.stringify(p.minRegels || [])]);
 
   // Auto-suggest grootboekrekening voor inruil-regel zodra accounts geladen zijn
   useEffect(() => {

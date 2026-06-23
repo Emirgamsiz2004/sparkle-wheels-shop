@@ -33,6 +33,7 @@ export interface KoopovereenkomstData {
     verkoopprijs: number;
     korting?: number;
     kortingOmschrijving?: string;
+    extraMinregels?: Array<{ omschrijving: string; bedrag: number }>;
     afleverkosten?: number;
     leges?: number;
     betaalwijze: string;
@@ -87,9 +88,12 @@ const escapeHtml = (s: string) =>
 function buildHtml(data: KoopovereenkomstData): string {
   const garantieKosten = data.garantie.kosten || 0;
   const korting = Math.max(0, data.financieel.korting || 0);
+  const minRegels = (data.financieel.extraMinregels || []).filter(r => (Number(r.bedrag) || 0) > 0);
+  const minRegelsTotaal = minRegels.reduce((s, r) => s + (Number(r.bedrag) || 0), 0);
   const totaal =
     data.financieel.verkoopprijs -
-    korting +
+    korting -
+    minRegelsTotaal +
     (data.financieel.afleverkosten || 0) +
     (data.financieel.leges || 0) +
     garantieKosten;
@@ -355,6 +359,7 @@ function buildHtml(data: KoopovereenkomstData): string {
     <table class="fin">
       <tr class="sub"><td>Voertuigprijs</td><td class="amt">${formatEur(data.financieel.verkoopprijs)}</td></tr>
       ${korting > 0 ? `<tr class="sub"><td>Korting${data.financieel.kortingOmschrijving ? ` — ${escapeHtml(data.financieel.kortingOmschrijving)}` : ""}</td><td class="amt">− ${formatEur(korting)}</td></tr>` : ""}
+      ${minRegels.map(r => `<tr class="sub"><td>${escapeHtml(r.omschrijving || "Aftrekpost")}</td><td class="amt">− ${formatEur(r.bedrag)}</td></tr>`).join("")}
       ${garantieKosten > 0 ? `<tr class="sub"><td>Garantie ${data.garantie.type === "autotrust" ? "AutoTrust" : "Platin"} ${data.garantie.maanden || 12} maanden</td><td class="amt">${formatEur(garantieKosten)}</td></tr>` : ""}
 
       ${(data.financieel.afleverkosten || 0) > 0 ? `<tr class="sub"><td>Afleverkosten</td><td class="amt">${formatEur(data.financieel.afleverkosten || 0)}</td></tr>` : ""}
