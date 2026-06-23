@@ -1282,6 +1282,8 @@ const AdminVerkoopWizardPage = () => {
                 setFinancieringMaatschappij={setFinancieringMaatschappij}
                 betaalwijzeDetails={betaalwijzeDetails}
                 setBetaalwijzeDetails={setBetaalwijzeDetails}
+                minRegels={minRegels}
+                setMinRegels={setMinRegels}
                 onAutoSave={() => saveCurrent()}
                 verkoopId={verkoopId}
               />
