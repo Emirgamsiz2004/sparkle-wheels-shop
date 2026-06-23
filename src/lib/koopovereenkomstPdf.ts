@@ -31,6 +31,8 @@ export interface KoopovereenkomstData {
   };
   financieel: {
     verkoopprijs: number;
+    korting?: number;
+    kortingOmschrijving?: string;
     afleverkosten?: number;
     leges?: number;
     betaalwijze: string;
@@ -40,6 +42,7 @@ export interface KoopovereenkomstData {
     aanbetalingBetaalwijze?: string;
     restbedrag?: number;
   };
+
   inruil?: {
     kenteken: string;
     merk: string;
@@ -83,8 +86,10 @@ const escapeHtml = (s: string) =>
 
 function buildHtml(data: KoopovereenkomstData): string {
   const garantieKosten = data.garantie.kosten || 0;
+  const korting = Math.max(0, data.financieel.korting || 0);
   const totaal =
-    data.financieel.verkoopprijs +
+    data.financieel.verkoopprijs -
+    korting +
     (data.financieel.afleverkosten || 0) +
     (data.financieel.leges || 0) +
     garantieKosten;
@@ -94,6 +99,7 @@ function buildHtml(data: KoopovereenkomstData): string {
     data.financieel.restbedrag != null
       ? data.financieel.restbedrag
       : totaal - aanbetaling - inruilWaarde;
+
 
   let garantieTekst = "";
   if (data.garantie.type === "geen") {
@@ -348,7 +354,9 @@ function buildHtml(data: KoopovereenkomstData): string {
     <h3>Financieel</h3>
     <table class="fin">
       <tr class="sub"><td>Voertuigprijs</td><td class="amt">${formatEur(data.financieel.verkoopprijs)}</td></tr>
+      ${korting > 0 ? `<tr class="sub"><td>Korting${data.financieel.kortingOmschrijving ? ` — ${escapeHtml(data.financieel.kortingOmschrijving)}` : ""}</td><td class="amt">− ${formatEur(korting)}</td></tr>` : ""}
       ${garantieKosten > 0 ? `<tr class="sub"><td>Garantie ${data.garantie.type === "autotrust" ? "AutoTrust" : "Platin"} ${data.garantie.maanden || 12} maanden</td><td class="amt">${formatEur(garantieKosten)}</td></tr>` : ""}
+
       ${(data.financieel.afleverkosten || 0) > 0 ? `<tr class="sub"><td>Afleverkosten</td><td class="amt">${formatEur(data.financieel.afleverkosten || 0)}</td></tr>` : ""}
       ${(data.financieel.leges || 0) > 0 ? `<tr class="sub"><td>Leges</td><td class="amt">${formatEur(data.financieel.leges || 0)}</td></tr>` : ""}
       <tr class="divider total"><td>Totaalbedrag</td><td class="amt">${formatEur(totaal)}</td></tr>
