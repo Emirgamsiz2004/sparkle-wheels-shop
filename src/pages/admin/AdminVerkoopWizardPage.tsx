@@ -494,7 +494,8 @@ const AdminVerkoopWizardPage = () => {
         setFactuurDatum((e.factuurdatum as string) || null);
         setFactuurReferentie((e.factuur_referentie as string) || null);
         setFactuurEmailVerzondenOp((e.factuur_email_verzonden_op as string) || null);
-        setFactuurVerstuurd(!!(e as any).factuur_verstuurd);
+        const factuurIsVerstuurd = !!(e as any).factuur_verstuurd || (!!(e as any).stap7_afgerond && !!e.moneybird_factuur_id);
+        setFactuurVerstuurd(factuurIsVerstuurd);
         setFactuurEmail(((e as any).factuur_email as string) || null);
         // Stap 8 hydration — Betaling
         setBetalingDatum((e.betaling_datum as string) || null);

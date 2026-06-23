@@ -162,8 +162,6 @@ export function validateStap6(s: WizardState): string[] {
 export function validateStap7(s: WizardState): string[] {
   const errors: string[] = [];
   if (!s.factuurMbId) errors.push("Factuur is nog niet aangemaakt in Moneybird");
-  if (s.factuurMbId && !s.factuurVerstuurd)
-    errors.push("Factuur is nog niet verstuurd of handmatig bevestigd");
   return errors;
 }
 
