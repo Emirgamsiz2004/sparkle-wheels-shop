@@ -3411,6 +3411,8 @@ interface Stap5Props {
   setFinancieringMaatschappij: (v: string) => void;
   betaalwijzeDetails: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>;
   setBetaalwijzeDetails: (v: Array<{ methode: "cash" | "pin" | "ideal" | "overboeking" | "financiering" | "aanbetaling"; bedrag: number }>) => void;
+  minRegels: Array<{ omschrijving: string; bedrag: number }>;
+  setMinRegels: (v: Array<{ omschrijving: string; bedrag: number }>) => void;
   onAutoSave: () => Promise<any>;
   verkoopId: string | null;
 }
