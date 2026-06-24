@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Phone, MapPin } from "lucide-react";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
+import { isAppointmentOnlyToday } from "@/components/AppointmentOnlyNotice";
 
 const InstagramIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -41,6 +42,10 @@ const fmtTime = (mins: number) => {
 };
 
 const getIsOpen = (): { isOpen: boolean; label: string; openLabel: string } => {
+  if (isAppointmentOnlyToday()) {
+    return { isOpen: false, label: "Vandaag enkel op afspraak", openLabel: "Maak afspraak" };
+  }
+
   const now = new Date();
   const day = now.getDay();
   const time = now.getHours() * 60 + now.getMinutes();
