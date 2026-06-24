@@ -22,7 +22,7 @@ export const isAppointmentOnlyUpcoming = () => {
   return APPOINTMENT_ONLY_DATES.some((d) => d >= today);
 };
 
-const STORAGE_KEY = "appointment-only-notice-dismissed-v1";
+const STORAGE_KEY = "appointment-only-notice-dismissed-v2";
 // Storage value = comma-joined APPOINTMENT_ONLY_DATES; reset wanneer datums veranderen.
 const currentSig = APPOINTMENT_ONLY_DATES.join(",");
 
