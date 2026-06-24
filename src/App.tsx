@@ -66,6 +66,7 @@ import CookiePolicy from "./pages/CookiePolicy";
 import AlgemeneVoorwaarden from "./pages/AlgemeneVoorwaarden";
 import CookieBanner from "./components/CookieBanner";
 import AnnouncementBar from "./components/AnnouncementBar";
+import AppointmentOnlyNotice from "./components/AppointmentOnlyNotice";
 
 
 const queryClient = new QueryClient();
@@ -177,6 +178,7 @@ const App = () => (
           
           {/* <WhatsAppButton /> tijdelijk uitgezet */}
           
+          <AppointmentOnlyNotice />
           <CookieBanner />
         </BrowserRouter>
       </TooltipProvider>
