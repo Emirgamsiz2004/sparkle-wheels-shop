@@ -49,7 +49,7 @@ const CUSTOM_FIELD_IDS = {
 } as const;
 
 type VoertuigType = "marge" | "btw" | "consignatie";
-type GarantieType = "geen" | "autotrust";
+type GarantieType = "geen" | "autotrust" | "huis";
 
 export interface Stap7Props {
   verkoopId: string | null;
@@ -488,6 +488,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         if (pakket && looptijd > 0) {
           garantieValue = `${pakket} · ${looptijd} maanden via Autotrust`;
         }
+      } else if (p.garantieType === "huis") {
+        garantieValue = "Platin Huisgarantie · 3 maanden (kosteloos)";
       }
 
       // Chassisnummer ophalen uit voertuigdata (vehicles.chassis_nummer)
@@ -733,6 +735,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             } else {
               garantieVal = "Autotrust";
             }
+          } else if (p.garantieType === "huis") {
+            garantieVal = "Platin Huisgarantie · 3 maanden (kosteloos)";
           }
           const fields: Array<{ label: string; value: string }> = [
             { label: "Kenteken", value: kentekenVal },

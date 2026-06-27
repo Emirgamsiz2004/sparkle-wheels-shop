@@ -191,7 +191,7 @@ const AdminVerkoopWizardPage = () => {
   const [leadSourceAnders, setLeadSourceAnders] = useState<string>("");
 
   // Stap 4 state
-  const [garantieType, setGarantieType] = useState<"geen" | "autotrust">("geen");
+  const [garantieType, setGarantieType] = useState<"geen" | "autotrust" | "huis">("geen");
   const [garantiePakket, setGarantiePakket] = useState("");
   const [garantieLooptijd, setGarantieLooptijd] = useState<number | "">("");
   const [garantiePrijs, setGarantiePrijs] = useState<number | "">("");
@@ -616,8 +616,8 @@ const AdminVerkoopWizardPage = () => {
       lead_source: leadSource || null,
       lead_source_anders: leadSource === "Anders" ? (leadSourceAnders.trim() || null) : null,
       garantie_type: garantieType,
-      garantie_pakket: garantieType === "autotrust" ? (garantiePakket.trim() || null) : null,
-      garantie_looptijd: garantieType === "autotrust" && garantieLooptijd !== "" ? Number(garantieLooptijd) : null,
+      garantie_pakket: garantieType === "autotrust" ? (garantiePakket.trim() || null) : garantieType === "huis" ? "Platin Huisgarantie" : null,
+      garantie_looptijd: garantieType === "autotrust" && garantieLooptijd !== "" ? Number(garantieLooptijd) : garantieType === "huis" ? 3 : null,
       garantie_prijs: garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0,
       overeenkomstnummer: overeenkomstnummer.trim() || null,
       opmerkingen: opmerkingen.trim() || null,
@@ -3095,8 +3095,8 @@ const formatDateNl = (iso: string) => {
 // Stap 4 — Garantie
 // ─────────────────────────────────────────────────────────────
 interface Stap4Props {
-  garantieType: "geen" | "autotrust";
-  setGarantieType: (v: "geen" | "autotrust") => void;
+  garantieType: "geen" | "autotrust" | "huis";
+  setGarantieType: (v: "geen" | "autotrust" | "huis") => void;
   pakket: string;
   setPakket: (v: string) => void;
   looptijd: number | "";
@@ -3116,7 +3116,7 @@ const Stap4Garantie = ({
   return (
     <div className="space-y-6">
       {/* Twee garantie kaarten */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Geen garantie */}
         <button
           type="button"
@@ -3146,6 +3146,40 @@ const Stap4Garantie = ({
               </div>
               <p className="text-sm text-muted-foreground">
                 Voertuig wordt verkocht in huidige staat zonder garantie
+              </p>
+            </div>
+          </div>
+        </button>
+
+        {/* Huisgarantie Platin */}
+        <button
+          type="button"
+          onClick={() => setGarantieType("huis")}
+          className={cn(
+            "text-left rounded-[14px] border bg-card p-6 transition-all hover:border-emerald-500/50",
+            garantieType === "huis"
+              ? "border-emerald-500 ring-2 ring-emerald-500/20"
+              : "border-border"
+          )}
+        >
+          <div className="flex items-start gap-4">
+            <div className={cn(
+              "h-11 w-11 rounded-full flex items-center justify-center shrink-0 transition-colors",
+              garantieType === "huis" ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"
+            )}>
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <h3 className="text-base font-semibold text-foreground">Huisgarantie Platin</h3>
+                {garantieType === "huis" && (
+                  <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                    <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                3 maanden garantie via Platin Automotive — kosteloos, conform algemene voorwaarden
               </p>
             </div>
           </div>
@@ -3197,6 +3231,23 @@ const Stap4Garantie = ({
               </p>
               <p className="text-muted-foreground italic leading-relaxed">
                 "Het voertuig wordt verkocht zonder garantie, in de staat zoals bezichtigd en geaccepteerd door koper. Koper doet uitdrukkelijk afstand van elk recht op non-conformiteit als bedoeld in artikel 7:17 BW."
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Huisgarantie info */}
+      {garantieType === "huis" && (
+        <div className="rounded-[12px] border border-emerald-500/30 bg-emerald-500/5 p-5">
+          <div className="flex gap-3">
+            <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="space-y-2 text-sm">
+              <p className="font-medium text-foreground">
+                De volgende tekst wordt automatisch vermeld op de koopovereenkomst en factuur:
+              </p>
+              <p className="text-muted-foreground italic leading-relaxed">
+                "Op het voertuig is een huisgarantie van Platin Automotive van toepassing voor een periode van 3 maanden na aflevering, conform onze algemene voorwaarden. Deze garantie wordt kosteloos verstrekt."
               </p>
             </div>
           </div>
@@ -3392,7 +3443,7 @@ interface Stap5Props {
     btw: string;
   };
   garantie: {
-    type: "geen" | "autotrust";
+    type: "geen" | "autotrust" | "huis";
     pakket: string;
     looptijd: number;
     prijs: number;

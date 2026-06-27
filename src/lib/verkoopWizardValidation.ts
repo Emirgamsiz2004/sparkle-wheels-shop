@@ -37,7 +37,7 @@ export interface WizardState {
   klantKvk: string;
 
   // Stap 4
-  garantieType: "geen" | "autotrust";
+  garantieType: "geen" | "autotrust" | "huis";
   garantiePakket: string;
   garantieLooptijd: number | "";
   garantiePrijs: number | "";
