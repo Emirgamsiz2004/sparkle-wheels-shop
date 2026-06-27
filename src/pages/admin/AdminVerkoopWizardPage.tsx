@@ -3237,6 +3237,23 @@ const Stap4Garantie = ({
         </div>
       )}
 
+      {/* Huisgarantie info */}
+      {garantieType === "huis" && (
+        <div className="rounded-[12px] border border-emerald-500/30 bg-emerald-500/5 p-5">
+          <div className="flex gap-3">
+            <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="space-y-2 text-sm">
+              <p className="font-medium text-foreground">
+                De volgende tekst wordt automatisch vermeld op de koopovereenkomst en factuur:
+              </p>
+              <p className="text-muted-foreground italic leading-relaxed">
+                "Op het voertuig is een huisgarantie van Platin Automotive van toepassing voor een periode van 3 maanden na aflevering, conform onze algemene voorwaarden. Deze garantie wordt kosteloos verstrekt."
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Autotrust velden */}
       {garantieType === "autotrust" && (
         <div className="rounded-[14px] border border-border bg-card p-6 space-y-5">
