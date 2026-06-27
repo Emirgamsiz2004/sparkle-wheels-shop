@@ -135,7 +135,7 @@ const Stap12Afsluiting: React.FC<Stap12AfsluitingProps> = (p) => {
       {
         num: 4,
         title: "Garantie",
-        detail: p.garantieType === "autotrust" ? "AutoTrust" : "Geen garantie",
+        detail: p.garantieType === "autotrust" ? "AutoTrust" : p.garantieType === "huis" ? "Platin Huisgarantie · 3 mnd" : "Geen garantie",
         done: !!p.completed[4],
         visible: true,
       },
