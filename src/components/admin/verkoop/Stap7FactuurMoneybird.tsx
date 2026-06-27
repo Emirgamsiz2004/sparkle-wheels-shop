@@ -735,6 +735,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             } else {
               garantieVal = "Autotrust";
             }
+          } else if (p.garantieType === "huis") {
+            garantieVal = "Platin Huisgarantie · 3 maanden (kosteloos)";
           }
           const fields: Array<{ label: string; value: string }> = [
             { label: "Kenteken", value: kentekenVal },
