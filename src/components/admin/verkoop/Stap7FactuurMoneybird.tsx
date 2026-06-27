@@ -488,6 +488,8 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         if (pakket && looptijd > 0) {
           garantieValue = `${pakket} · ${looptijd} maanden via Autotrust`;
         }
+      } else if (p.garantieType === "huis") {
+        garantieValue = "Platin Huisgarantie · 3 maanden (kosteloos)";
       }
 
       // Chassisnummer ophalen uit voertuigdata (vehicles.chassis_nummer)
