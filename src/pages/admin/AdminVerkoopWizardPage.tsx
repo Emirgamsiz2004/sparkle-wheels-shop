@@ -191,7 +191,7 @@ const AdminVerkoopWizardPage = () => {
   const [leadSourceAnders, setLeadSourceAnders] = useState<string>("");
 
   // Stap 4 state
-  const [garantieType, setGarantieType] = useState<"geen" | "autotrust">("geen");
+  const [garantieType, setGarantieType] = useState<"geen" | "autotrust" | "huis">("geen");
   const [garantiePakket, setGarantiePakket] = useState("");
   const [garantieLooptijd, setGarantieLooptijd] = useState<number | "">("");
   const [garantiePrijs, setGarantiePrijs] = useState<number | "">("");
