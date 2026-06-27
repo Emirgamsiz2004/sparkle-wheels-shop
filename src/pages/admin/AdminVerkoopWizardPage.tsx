@@ -3151,6 +3151,40 @@ const Stap4Garantie = ({
           </div>
         </button>
 
+        {/* Huisgarantie Platin */}
+        <button
+          type="button"
+          onClick={() => setGarantieType("huis")}
+          className={cn(
+            "text-left rounded-[14px] border bg-card p-6 transition-all hover:border-emerald-500/50",
+            garantieType === "huis"
+              ? "border-emerald-500 ring-2 ring-emerald-500/20"
+              : "border-border"
+          )}
+        >
+          <div className="flex items-start gap-4">
+            <div className={cn(
+              "h-11 w-11 rounded-full flex items-center justify-center shrink-0 transition-colors",
+              garantieType === "huis" ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"
+            )}>
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <h3 className="text-base font-semibold text-foreground">Huisgarantie Platin</h3>
+                {garantieType === "huis" && (
+                  <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                    <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                3 maanden garantie via Platin Automotive — kosteloos, conform algemene voorwaarden
+              </p>
+            </div>
+          </div>
+        </button>
+
         {/* Autotrust */}
         <button
           type="button"
