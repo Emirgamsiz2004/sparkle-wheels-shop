@@ -191,7 +191,7 @@ const AdminVerkoopWizardPage = () => {
   const [leadSourceAnders, setLeadSourceAnders] = useState<string>("");
 
   // Stap 4 state
-  const [garantieType, setGarantieType] = useState<"geen" | "autotrust" | "huis">("geen");
+  const [garantieType, setGarantieType] = useState<"geen" | "autotrust" | "huis" | "huis">("geen");
   const [garantiePakket, setGarantiePakket] = useState("");
   const [garantieLooptijd, setGarantieLooptijd] = useState<number | "">("");
   const [garantiePrijs, setGarantiePrijs] = useState<number | "">("");
@@ -3095,8 +3095,8 @@ const formatDateNl = (iso: string) => {
 // Stap 4 — Garantie
 // ─────────────────────────────────────────────────────────────
 interface Stap4Props {
-  garantieType: "geen" | "autotrust";
-  setGarantieType: (v: "geen" | "autotrust") => void;
+  garantieType: "geen" | "autotrust" | "huis";
+  setGarantieType: (v: "geen" | "autotrust" | "huis") => void;
   pakket: string;
   setPakket: (v: string) => void;
   looptijd: number | "";
@@ -3392,7 +3392,7 @@ interface Stap5Props {
     btw: string;
   };
   garantie: {
-    type: "geen" | "autotrust";
+    type: "geen" | "autotrust" | "huis";
     pakket: string;
     looptijd: number;
     prijs: number;

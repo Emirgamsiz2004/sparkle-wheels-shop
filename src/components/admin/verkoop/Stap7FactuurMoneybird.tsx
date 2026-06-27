@@ -49,7 +49,7 @@ const CUSTOM_FIELD_IDS = {
 } as const;
 
 type VoertuigType = "marge" | "btw" | "consignatie";
-type GarantieType = "geen" | "autotrust";
+type GarantieType = "geen" | "autotrust" | "huis";
 
 export interface Stap7Props {
   verkoopId: string | null;
