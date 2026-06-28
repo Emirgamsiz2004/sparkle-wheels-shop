@@ -355,7 +355,7 @@ const AdminVerkoopWizardPage = () => {
         .from("verkopen")
         .select("*")
         .eq("vehicle_id", vehicleId)
-        .eq("wizard_status", "bezig")
+        .in("wizard_status", ["bezig", "afgerond"])
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
