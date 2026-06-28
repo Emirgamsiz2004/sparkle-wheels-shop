@@ -346,20 +346,11 @@ const AdminVerkoopWizardPage = () => {
     if (!vehicleId || !vehicle) return;
     let cancelled = false;
     (async () => {
-      // Blokkeer wizard als voertuig al verkocht is
+      // Voertuig al verkocht? Toon waarschuwing, maar laat doorgaan om wizard af te ronden.
       if ((vehicle as any).status === "verkocht") {
-        // Sluit eventuele resterende 'bezig' wizards automatisch
-        await supabase
-          .from("verkopen")
-          .update({ wizard_status: "geannuleerd" } as any)
-          .eq("vehicle_id", vehicleId)
-          .eq("wizard_status", "bezig");
-        if (cancelled) return;
-        toast.error('Dit voertuig is al verkocht. Zet het terug op "te koop" om een nieuwe verkoop te starten.');
-        navigate(`/admin/verkopen/${vehicleId}`, { replace: true });
-        return;
+        toast.warning("Voertuig staat op verkocht — je kunt de wizard nog steeds afmaken/aanpassen.");
       }
-      // Bestaand 'bezig' record zoeken
+      // Bestaand 'bezig' óf 'afgerond' record zoeken (verkocht voertuigen hebben meestal 'afgerond')
       const { data: existing } = await supabase
         .from("verkopen")
         .select("*")
