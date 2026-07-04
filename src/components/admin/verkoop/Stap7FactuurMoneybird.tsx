@@ -522,21 +522,25 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         reference: referentie || undefined,
         invoice_date: factuurdatum,
         due_date: vervaldatum || undefined,
-        prices_are_incl_tax: true,
+        prices_are_incl_tax: false,
         details_attributes: regels
           .filter((r) => (r.description || "").trim() !== "" || r.price !== 0)
           .map((r) => {
             // Gebruik BTW% per regel zoals ingesteld in de preview.
             const taxRateId = r.btwPercent === 21 ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
+            // Regelprijzen worden in de wizard inclusief BTW opgeslagen; op de factuur ex BTW aanleveren.
+            const factor = 1 + r.btwPercent / 100;
+            const priceEx = Math.round((r.price / factor) * 100) / 100;
             return {
               description: r.description,
-              price: r.price,
+              price: priceEx,
               amount: "1",
               btw_percent: r.btwPercent,
               ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
               ...(r.ledgerAccountId && validLedgerAccountIds.has(r.ledgerAccountId) ? { ledger_account_id: r.ledgerAccountId } : {}),
             };
           }),
+
         custom_fields_attributes: customFields,
         ...(notitie.trim() ? { invoice_note: notitie.trim() } : {}),
       });
