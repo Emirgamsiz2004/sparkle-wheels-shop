@@ -785,7 +785,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
                 <th className="px-3 py-2 text-left font-medium">Omschrijving</th>
                 <th className="px-3 py-2 text-left font-medium w-48">Grootboek</th>
                 <th className="px-3 py-2 text-right font-medium w-24">BTW</th>
-                <th className="px-3 py-2 text-right font-medium w-36">Bedrag (incl.)</th>
+                <th className="px-3 py-2 text-right font-medium w-36">Bedrag (ex.)</th>
                 <th className="px-3 py-2 w-10" />
               </tr>
             </thead>
