@@ -1243,7 +1243,7 @@ const AdminVerkoopWizardPage = () => {
                   type: garantieType,
                   pakket: garantiePakket,
                   looptijd: garantieLooptijd === "" ? 0 : Number(garantieLooptijd),
-                  prijs: garantiePrijs === "" ? 0 : Number(garantiePrijs),
+                  prijs: garantiePrijsInc,
                 }}
                 inruil={inruil ? {
                   kenteken: inruilKenteken,
