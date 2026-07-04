@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Send,
   HandCoins,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -141,6 +142,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const [sending, setSending] = useState(false);
   const [marking, setMarking] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [deletingConcept, setDeletingConcept] = useState(false);
   const [bevestigd, setBevestigd] = useState(!!p.initialFactuurVerstuurd);
 
   // Workflow automatisch bepalen
@@ -416,6 +418,44 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     if (!factuurUrl) return;
     if (!(await verifyInvoiceExists())) return;
     window.open(factuurUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleDeleteConcept = async () => {
+    if (!factuurId || factuurVerstuurd) return;
+    setDeletingConcept(true);
+    try {
+      await invoke("delete_sales_invoice", { invoice_id: factuurId });
+
+      if (p.verkoopId) {
+        await supabase
+          .from("vehicle_sales")
+          .update({ moneybird_factuur_id: null })
+          .eq("id", p.verkoopId);
+      }
+
+      await p.onSaved({
+        moneybird_factuur_id: null,
+        moneybird_factuur_url: null,
+        moneybird_factuur_nummer: null,
+        factuur_verstuurd: false,
+        factuur_email_verzonden_op: null,
+        factuur_status: null,
+        stap7_afgerond: false,
+      });
+
+      setFactuurId(null);
+      setFactuurUrl(null);
+      setFactuurNummer(null);
+      setEmailVerzondenOp(null);
+      setFactuurVerstuurd(false);
+      setBevestigd(false);
+      toast.success("Conceptfactuur verwijderd — maak nu een nieuwe aan");
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Concept verwijderen mislukt");
+    } finally {
+      setDeletingConcept(false);
+    }
   };
 
   // ─── Acties ───
@@ -989,16 +1029,27 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             </div>
 
             {/* Controleren */}
-            {factuurUrl && (
+            <div className="flex flex-wrap gap-2">
+              {factuurUrl && (
+                <button
+                  type="button"
+                  onClick={handleOpenInMoneybird}
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Factuur bekijken in Moneybird
+                </button>
+              )}
               <button
                 type="button"
-                onClick={handleOpenInMoneybird}
-                className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
+                onClick={handleDeleteConcept}
+                disabled={deletingConcept || sending || marking}
+                className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-destructive/40 bg-background text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-60"
               >
-                <ExternalLink className="h-4 w-4" />
-                Factuur bekijken in Moneybird
+                {deletingConcept ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                {deletingConcept ? "Verwijderen…" : "Concept verwijderen"}
               </button>
-            )}
+            </div>
 
             {/* E-mailadres veld (vooraf gevuld) */}
             <div>
