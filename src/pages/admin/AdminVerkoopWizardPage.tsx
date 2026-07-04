@@ -3299,7 +3299,7 @@ const Stap4Garantie = ({
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              Garantieprijs <span className="text-destructive">*</span>
+              Garantieprijs <span className="text-muted-foreground font-normal">(excl. BTW)</span> <span className="text-destructive">*</span>
             </label>
             <div className="relative max-w-xs">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">€</span>
@@ -3313,6 +3313,11 @@ const Stap4Garantie = ({
                 className="w-full h-10 pl-7 pr-3 text-sm bg-background border border-input rounded-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
+            {prijs !== "" && Number(prijs) > 0 && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Klant betaalt <span className="font-semibold text-foreground">€ {(Number(prijs) * 1.21).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> incl. 21% BTW (leverancier factureert ons ex BTW).
+              </p>
+            )}
           </div>
 
           {/* Info tekst */}
