@@ -201,14 +201,16 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     if (p.garantieType === "autotrust" && num(p.garantiePrijs) > 0) {
       const looptijd = num(p.garantieLooptijd);
       const pakket = p.garantiePakket || "Autotrust";
-      // AutoTrust prijs is ex BTW ingevoerd; op factuur ex BTW tonen met 21% zodat totaal incl BTW getoond wordt.
+      // AutoTrust prijs is ex BTW ingevoerd; regels-model bewaart incl. BTW → *1.21.
+      const prijsInc = Math.round(num(p.garantiePrijs) * 1.21 * 100) / 100;
       list.push({
         id: "garantie",
         kind: "garantie",
         description: `Garantie ${pakket}${looptijd ? ` · ${looptijd} maanden` : ""} via Autotrust`,
-        price: num(p.garantiePrijs),
+        price: prijsInc,
         btwPercent: 21,
       });
+
 
     }
     if (p.inruil && num(p.inruil.waarde) > 0) {
