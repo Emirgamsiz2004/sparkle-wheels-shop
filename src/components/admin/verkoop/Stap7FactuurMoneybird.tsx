@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Send,
   HandCoins,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -141,6 +142,7 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
   const [sending, setSending] = useState(false);
   const [marking, setMarking] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [deletingConcept, setDeletingConcept] = useState(false);
   const [bevestigd, setBevestigd] = useState(!!p.initialFactuurVerstuurd);
 
   // Workflow automatisch bepalen
@@ -169,11 +171,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     id: string;
     kind: RegelKind;
     description: string;
-    price: number; // incl. BTW (prijs zoals in wizard)
+    price: number; // factuurregelbedrag excl. BTW
     btwPercent: 0 | 21;
     locked?: boolean; // bedrag niet aanpasbaar (aanbetaling)
     ledgerAccountId?: string; // Moneybird grootboekrekening
   };
+
+  const regelTotaalIncl = (r: Pick<Regel, "price" | "btwPercent">) =>
+    Math.round(r.price * (1 + r.btwPercent / 100) * 100) / 100;
 
   const buildInitialRegels = (): Regel[] => {
     const list: Regel[] = [];
@@ -201,13 +206,12 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     if (p.garantieType === "autotrust" && num(p.garantiePrijs) > 0) {
       const looptijd = num(p.garantieLooptijd);
       const pakket = p.garantiePakket || "Autotrust";
-      // AutoTrust prijs is ex BTW ingevoerd; regels-model bewaart incl. BTW → *1.21.
-      const prijsInc = Math.round(num(p.garantiePrijs) * 1.21 * 100) / 100;
       list.push({
         id: "garantie",
         kind: "garantie",
         description: `Garantie ${pakket}${looptijd ? ` · ${looptijd} maanden` : ""} via Autotrust`,
-        price: prijsInc,
+        // AutoTrust pakketten worden ex. BTW ingevoerd; Moneybird telt 21% BTW erbovenop.
+        price: num(p.garantiePrijs),
         btwPercent: 21,
       });
 
@@ -347,15 +351,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     ]);
   };
 
-  // Totalen — prijzen zijn incl. BTW
+  // Totalen — regelprijzen zijn excl. BTW; BTW wordt erbovenop geteld.
   const { subtotaal, btwTotaal, totaal } = useMemo(() => {
     let sub = 0;
     let btw = 0;
     for (const r of regels) {
-      const factor = 1 + r.btwPercent / 100;
-      const excl = r.price / factor;
-      sub += excl;
-      btw += r.price - excl;
+      const regelBtw = regelTotaalIncl(r) - r.price;
+      sub += r.price;
+      btw += regelBtw;
     }
     return { subtotaal: sub, btwTotaal: btw, totaal: sub + btw };
   }, [regels]);
@@ -415,6 +418,44 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
     if (!factuurUrl) return;
     if (!(await verifyInvoiceExists())) return;
     window.open(factuurUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleDeleteConcept = async () => {
+    if (!factuurId || factuurVerstuurd) return;
+    setDeletingConcept(true);
+    try {
+      await invoke("delete_sales_invoice", { invoice_id: factuurId });
+
+      if (p.verkoopId) {
+        await supabase
+          .from("vehicle_sales")
+          .update({ moneybird_factuur_id: null })
+          .eq("id", p.verkoopId);
+      }
+
+      await p.onSaved({
+        moneybird_factuur_id: null,
+        moneybird_factuur_url: null,
+        moneybird_factuur_nummer: null,
+        factuur_verstuurd: false,
+        factuur_email_verzonden_op: null,
+        factuur_status: null,
+        stap7_afgerond: false,
+      });
+
+      setFactuurId(null);
+      setFactuurUrl(null);
+      setFactuurNummer(null);
+      setEmailVerzondenOp(null);
+      setFactuurVerstuurd(false);
+      setBevestigd(false);
+      toast.success("Conceptfactuur verwijderd — maak nu een nieuwe aan");
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Concept verwijderen mislukt");
+    } finally {
+      setDeletingConcept(false);
+    }
   };
 
   // ─── Acties ───
@@ -530,12 +571,9 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
           .map((r) => {
             // Gebruik BTW% per regel zoals ingesteld in de preview.
             const taxRateId = r.btwPercent === 21 ? TAX_RATE_ID_21PROCENT : TAX_RATE_ID_NULPROCENT;
-            // Regelprijzen worden in de wizard inclusief BTW opgeslagen; op de factuur ex BTW aanleveren.
-            const factor = 1 + r.btwPercent / 100;
-            const priceEx = Math.round((r.price / factor) * 100) / 100;
             return {
               description: r.description,
-              price: priceEx,
+              price: Math.round(r.price * 100) / 100,
               amount: "1",
               btw_percent: r.btwPercent,
               ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
@@ -787,13 +825,14 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
                 <th className="px-3 py-2 text-left font-medium">Omschrijving</th>
                 <th className="px-3 py-2 text-left font-medium w-48">Grootboek</th>
                 <th className="px-3 py-2 text-right font-medium w-24">BTW</th>
-                <th className="px-3 py-2 text-right font-medium w-36">Bedrag (incl.)</th>
+                <th className="px-3 py-2 text-right font-medium w-36">Bedrag (ex.)</th>
                 <th className="px-3 py-2 w-10" />
               </tr>
             </thead>
             <tbody>
               {regels.map((r) => {
                 const btwLocked = r.kind === "garantie" || r.kind === "inruil" || r.kind === "aanbetaling";
+                const totaalIncl = regelTotaalIncl(r);
                 return (
                   <tr key={r.id} className="border-t border-border">
                     <td className="px-3 py-2">
@@ -844,6 +883,11 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
                         onChange={(e) => updateRegel(r.id, { price: Number(e.target.value) || 0 })}
                         disabled={!!factuurId || r.locked}
                       />
+                      {r.btwPercent > 0 && (
+                        <div className="mt-1 text-[10px] text-muted-foreground">
+                          incl. {formatEur(totaalIncl)}
+                        </div>
+                      )}
                     </td>
                     <td className="px-3 py-2 text-right">
                       {!factuurId && r.kind === "extra" && (
@@ -985,16 +1029,27 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
             </div>
 
             {/* Controleren */}
-            {factuurUrl && (
+            <div className="flex flex-wrap gap-2">
+              {factuurUrl && (
+                <button
+                  type="button"
+                  onClick={handleOpenInMoneybird}
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Factuur bekijken in Moneybird
+                </button>
+              )}
               <button
                 type="button"
-                onClick={handleOpenInMoneybird}
-                className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-border bg-background text-sm font-medium hover:bg-muted/50 transition-colors"
+                onClick={handleDeleteConcept}
+                disabled={deletingConcept || sending || marking}
+                className="inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border border-destructive/40 bg-background text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-60"
               >
-                <ExternalLink className="h-4 w-4" />
-                Factuur bekijken in Moneybird
+                {deletingConcept ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                {deletingConcept ? "Verwijderen…" : "Concept verwijderen"}
               </button>
-            )}
+            </div>
 
             {/* E-mailadres veld (vooraf gevuld) */}
             <div>
