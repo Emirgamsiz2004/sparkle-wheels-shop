@@ -423,18 +423,77 @@ Deno.serve(async (req) => {
 
         // 2) Verkoopfactuur opbouwen
         const { custom_fields_attributes: wCustomFields } = params as any;
+        let validSalesLedgerAccountIds = new Set<string>();
+        try {
+          const accounts = await mbFetch("ledger_accounts.json");
+          if (Array.isArray(accounts)) {
+            validSalesLedgerAccountIds = new Set(
+              accounts
+                .filter((a: any) => {
+                  const allowed = Array.isArray(a?.allowed_document_types) ? a.allowed_document_types : [];
+                  return a?.id && a?.active !== false && allowed.includes("sales_invoice");
+                })
+                .map((a: any) => String(a.id)),
+            );
+          }
+        } catch (e) {
+          console.warn("Kon ledger_accounts niet valideren, sla meegegeven grootboekrekeningen over:", e);
+        }
+
+        let noTaxRateId: string | null = null;
+        let zeroTaxRateId: string | null = null;
+        let twentyOneTaxRateId: string | null = null;
+        try {
+          const taxRates = await mbFetch("tax_rates.json");
+          if (Array.isArray(taxRates)) {
+            const salesRates = taxRates.filter(
+              (t: any) =>
+                String(t?.tax_rate_type || "").toLowerCase() === "sales_invoice" &&
+                t?.active !== false,
+            );
+            const findRate = (percentage: number, showTax?: boolean) =>
+              salesRates.find(
+                (t: any) =>
+                  Number(t?.percentage) === percentage &&
+                  (showTax === undefined || t?.show_tax === showTax),
+              )?.id || null;
+            noTaxRateId = findRate(0, false) ? String(findRate(0, false)) : null;
+            zeroTaxRateId = findRate(0, true) ? String(findRate(0, true)) : (findRate(0) ? String(findRate(0)) : null);
+            twentyOneTaxRateId = findRate(21, true) ? String(findRate(21, true)) : (findRate(21) ? String(findRate(21)) : null);
+          }
+        } catch (e) {
+          console.warn("Kon tax_rates niet valideren voor verkoopfactuur:", e);
+        }
+
         const invoiceBody: Record<string, unknown> = {
           contact_id: contact.id,
           reference: reference || undefined,
           invoice_date: invoice_date || new Date().toISOString().split("T")[0],
           prices_are_incl_tax: wIncl ?? true,
-          details_attributes: (wDetails || []).map((d: any) => ({
-            description: String(d.description || ""),
-            price: String(d.price ?? 0),
-            amount: String(d.amount ?? "1"),
-            ...(d.tax_rate_id ? { tax_rate_id: String(d.tax_rate_id) } : {}),
-            ...(d.ledger_account_id ? { ledger_account_id: String(d.ledger_account_id) } : {}),
-          })),
+          details_attributes: (wDetails || []).map((d: any) => {
+            const btwPercent = Number(d.btw_percent);
+            const detail: Record<string, unknown> = {
+              description: String(d.description || ""),
+              price: String(d.price ?? 0),
+              amount: String(d.amount ?? "1"),
+            };
+
+            if (btwPercent === 21) {
+              if (twentyOneTaxRateId) detail.tax_rate_id = twentyOneTaxRateId;
+            } else if (btwPercent === 0) {
+              const noVatId = noTaxRateId || zeroTaxRateId;
+              if (noVatId) detail.tax_rate_id = noVatId;
+            } else if (d.tax_rate_id) {
+              detail.tax_rate_id = String(d.tax_rate_id);
+            }
+
+            const ledgerAccountId = d.ledger_account_id ? String(d.ledger_account_id) : null;
+            if (ledgerAccountId && validSalesLedgerAccountIds.has(ledgerAccountId)) {
+              detail.ledger_account_id = ledgerAccountId;
+            }
+
+            return detail;
+          }),
         };
         if (workflow_id) invoiceBody.workflow_id = String(workflow_id);
         if (Array.isArray(wCustomFields) && wCustomFields.length > 0) {

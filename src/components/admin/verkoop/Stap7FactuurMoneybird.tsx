@@ -36,7 +36,7 @@ const BTW_WORKFLOW_IDS: ReadonlySet<string> = new Set([
 
 // BTW-tarieven worden runtime opgehaald uit Moneybird (zie fetchTaxRateIds).
 // Cache binnen module-scope zodat we niet bij elke factuur opnieuw moeten ophalen.
-let CACHED_TAX_RATES: { nul: string | null; eenentwintig: string | null } | null = null;
+let CACHED_TAX_RATES: { noTax: string | null; nul: string | null; eenentwintig: string | null } | null = null;
 
 // Custom field IDs (Moneybird)
 const CUSTOM_FIELD_IDS = {
@@ -260,7 +260,10 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         if (!cancelled) {
           setLedgerAccounts(
             list
-              .filter((a) => a?.id && a?.name)
+              .filter((a) => {
+                const allowed = Array.isArray(a?.allowed_document_types) ? a.allowed_document_types : [];
+                return a?.id && a?.name && a?.active !== false && allowed.includes("sales_invoice");
+              })
               .map((a) => ({ id: String(a.id), name: String(a.name), reference: a.reference ? String(a.reference) : undefined }))
               .sort((a, b) => a.name.localeCompare(b.name))
           );
@@ -461,24 +464,30 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
         try {
           const taxRes = await invoke("get_tax_rates", {});
           const list: any[] = Array.isArray(taxRes) ? taxRes : (taxRes?.tax_rates || []);
-          const findRate = (perc: number) =>
-            list.find(
+          const salesRates = list.filter(
+            (t) =>
+              String(t?.tax_rate_type || "").toLowerCase() === "sales_invoice" &&
+              t?.active !== false
+          );
+          const findRate = (perc: number, showTax?: boolean) =>
+            salesRates.find(
               (t) =>
                 Number(t?.percentage) === perc &&
-                String(t?.tax_rate_type || "").toLowerCase() === "sales_invoice" &&
-                t?.active !== false
+                (showTax === undefined || t?.show_tax === showTax)
             )?.id || null;
           CACHED_TAX_RATES = {
-            nul: findRate(0) ? String(findRate(0)) : null,
-            eenentwintig: findRate(21) ? String(findRate(21)) : null,
+            noTax: findRate(0, false) ? String(findRate(0, false)) : null,
+            nul: findRate(0, true) ? String(findRate(0, true)) : (findRate(0) ? String(findRate(0)) : null),
+            eenentwintig: findRate(21, true) ? String(findRate(21, true)) : (findRate(21) ? String(findRate(21)) : null),
           };
         } catch (e) {
           console.error("Ophalen BTW-tarieven mislukt:", e);
-          CACHED_TAX_RATES = { nul: null, eenentwintig: null };
+          CACHED_TAX_RATES = { noTax: null, nul: null, eenentwintig: null };
         }
       }
-      const TAX_RATE_ID_NULPROCENT = CACHED_TAX_RATES.nul;
+      const TAX_RATE_ID_NULPROCENT = CACHED_TAX_RATES.noTax || CACHED_TAX_RATES.nul;
       const TAX_RATE_ID_21PROCENT = CACHED_TAX_RATES.eenentwintig;
+      const validLedgerAccountIds = new Set(ledgerAccounts.map((a) => a.id));
 
       // Garantie waarde bepalen op basis van stap 4 keuze
       let garantieValue = "";
@@ -523,8 +532,9 @@ export default function Stap7FactuurMoneybird(p: Stap7Props) {
               description: r.description,
               price: r.price,
               amount: "1",
+              btw_percent: r.btwPercent,
               ...(taxRateId ? { tax_rate_id: taxRateId } : {}),
-              ...(r.ledgerAccountId ? { ledger_account_id: r.ledgerAccountId } : {}),
+              ...(r.ledgerAccountId && validLedgerAccountIds.has(r.ledgerAccountId) ? { ledger_account_id: r.ledgerAccountId } : {}),
             };
           }),
         custom_fields_attributes: customFields,
