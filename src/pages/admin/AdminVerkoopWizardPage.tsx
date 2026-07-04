@@ -822,11 +822,13 @@ const AdminVerkoopWizardPage = () => {
   const afleverkostenNum = afleverkosten === "" ? 0 : Number(afleverkosten);
   const legesNum = leges === "" ? 0 : Number(leges);
   const garantiePrijsNum = garantieType === "autotrust" && garantiePrijs !== "" ? Number(garantiePrijs) : 0;
+  // AutoTrust pakketten worden door leverancier ex BTW gefactureerd → wij belasten klant inclusief 21% BTW
+  const garantiePrijsInc = garantieType === "autotrust" ? Math.round(garantiePrijsNum * 1.21 * 100) / 100 : 0;
   const aanbetalingNum = aanbetalingBedrag !== "" && Number(aanbetalingBedrag) > 0 ? Number(aanbetalingBedrag) : lastAanbetalingRef.current;
   const inruilWaardeNum = inruil && inruilWaarde !== "" ? Number(inruilWaarde) : 0;
   const restbedragGlobal = Math.max(
     0,
-    verkoopprijsNum - kortingNum + afleverkostenNum + legesNum + garantiePrijsNum - aanbetalingNum - inruilWaardeNum,
+    verkoopprijsNum - kortingNum + afleverkostenNum + legesNum + garantiePrijsInc - aanbetalingNum - inruilWaardeNum,
   );
 
   const wizardState: WizardState = useMemo(
