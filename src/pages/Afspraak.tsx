@@ -31,7 +31,7 @@ const flowAOptions: { type: FlowAType; icon: any; desc: string }[] = [
 ];
 const flowBOptions: { type: FlowBType; icon: any; desc: string }[] = [
   { type: "poetsbeurt", icon: Sparkles, desc: "Detailing en interieurreiniging" },
-  { type: "onderhoud", icon: Wrench, desc: "Onderhoud, reparatie of APK" },
+  { type: "onderhoud", icon: Wrench, desc: "Onderhoud of reparatie" },
   { type: "anders", icon: MessageSquare, desc: "Iets anders bespreken" },
 ];
 

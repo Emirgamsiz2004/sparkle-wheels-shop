@@ -238,7 +238,7 @@ const InEnVerkoop = () => {
           {
             heading: "Auto in- en verkoop in Roelofarendsveen",
             paragraphs: [
-              "Platin Automotive is een RDW erkend autobedrijf gespecialiseerd in de in- en verkoop van premium occasions in Roelofarendsveen. Wij selecteren onze auto's persoonlijk, hebben elke auto zelf onder handen gehad en leveren standaard rijklaar af met geldige APK, beurt, schone in- en exterieur, AutoTrust garantie en nieuwe set sleutels indien beschikbaar. Geen tussenhandel, geen tweede levens — alleen auto's waar wij zelf in zouden rijden.",
+              "Platin Automotive is een RDW erkend autobedrijf gespecialiseerd in de in- en verkoop van premium occasions in Roelofarendsveen. Wij selecteren onze auto's persoonlijk, hebben elke auto zelf onder handen gehad en leveren standaard rijklaar af met beurt, schone in- en exterieur, AutoTrust garantie en nieuwe set sleutels indien beschikbaar. Geen tussenhandel, geen tweede levens — alleen auto's waar wij zelf in zouden rijden.",
               "Onze klanten komen uit heel de Randstad: Alphen aan den Rijn, Leiden, Leiderdorp, Hoofddorp, Nieuwkoop, Lisse, Zoetermeer, Den Haag, Amsterdam-Zuid en verder. Dankzij onze ligging direct aan de N446 zijn wij snel bereikbaar en bieden wij gratis parkeren voor de deur.",
             ],
           },
