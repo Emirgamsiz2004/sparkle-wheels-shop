@@ -99,8 +99,8 @@ const sections: { title: string; content: React.ReactNode }[] = [
     content: (
       <p>
         Wij adviseren een geldige APK bij aanvang van de consignatieperiode. Is de APK verlopen of bijna verlopen? Dan
-        bespreken wij dit vooraf en kunnen wij de APK-keuring in overleg regelen. De kosten hiervan worden verrekend
-        met de uitbetaling aan de eigenaar. Voertuigen op ons terrein zijn gedekt via onze handelaarsverzekering.
+        bespreken wij dit vooraf. De kosten voor een eventuele APK-keuring zijn voor rekening van de eigenaar; Platin
+        Automotive voert zelf geen APK-keuringen uit. Voertuigen op ons terrein zijn gedekt via onze handelaarsverzekering.
       </p>
     ),
   },
