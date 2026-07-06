@@ -120,9 +120,9 @@ const AlgemeneVoorwaarden = () => (
 
           <Section title="Artikel 9 — APK en technische keuring">
             <ol start={41} className="list-decimal pl-5 space-y-1">
-              <li>Platin Automotive garandeert dat het voertuig op het moment van levering beschikt over een geldige APK, tenzij in de koopovereenkomst uitdrukkelijk schriftelijk anders is overeengekomen.</li>
+              <li>Platin Automotive voert zelf geen APK-keuringen uit. Het voertuig wordt uitsluitend geleverd met een geldige APK indien dit uitdrukkelijk schriftelijk in de koopovereenkomst is overeengekomen.</li>
               <li>Een geldige APK is geen garantie voor de technische staat van het voertuig in zijn geheel. De koper wordt geadviseerd bij twijfel een aanvullende technische keuring te laten uitvoeren.</li>
-              <li>Bij voertuigen verkocht zonder APK (expliciet vermeld in de koopovereenkomst) aanvaardt de koper het voertuig in huidige staat zonder aanspraak te kunnen maken op APK-keuring door Platin Automotive.</li>
+              <li>Bij voertuigen verkocht zonder geldige APK (expliciet vermeld in de koopovereenkomst) aanvaardt de koper het voertuig in huidige staat zonder aanspraak te kunnen maken op APK-keuring door Platin Automotive.</li>
             </ol>
           </Section>
 

@@ -250,7 +250,7 @@ const AutoZoeken = () => {
           {
             heading: "Persoonlijk advies en eerlijke prijzen",
             paragraphs: [
-              "U betaalt geen verborgen kosten — onze marge is transparant en wij geven van tevoren aan welke vergoeding wij rekenen. Daarmee voorkomt u onverwachte tegenvallers. Dankzij ons inkoopnetwerk en bulkkortingen bij detailing, RDW-keuringen en transport komen wij vaak op een totaalprijs uit die lager ligt dan particuliere aankoop.",
+              "U betaalt geen verborgen kosten — onze marge is transparant en wij geven van tevoren aan welke vergoeding wij rekenen. Daarmee voorkomt u onverwachte tegenvallers. Dankzij ons inkoopnetwerk en bulkkortingen bij detailing en transport komen wij vaak op een totaalprijs uit die lager ligt dan particuliere aankoop.",
               "Wij denken bovendien mee over financiering, lease, inruil van uw huidige auto en garantie. Een complete service onder één dak.",
             ],
           },

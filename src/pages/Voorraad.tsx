@@ -32,7 +32,7 @@ const Voorraad = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Occasions Kopen Roelofarendsveen | Platin Automotive</title>
-        <meta name="description" content="Bekijk ons actuele aanbod tweedehands auto's. Alle merken, eerlijke prijzen, APK-gekeurd. Platin Automotive in Roelofarendsveen." />
+        <meta name="description" content="Bekijk ons actuele aanbod tweedehands auto's. Alle merken, eerlijke prijzen. Platin Automotive in Roelofarendsveen." />
         <link rel="canonical" href="https://platinautomotive.nl/voorraad" />
         <meta name="robots" content="index, follow" />
         <meta property="og:title" content="Occasions Kopen Roelofarendsveen | Platin Automotive" />
