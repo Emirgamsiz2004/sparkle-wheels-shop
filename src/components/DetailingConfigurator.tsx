@@ -440,7 +440,7 @@ const PKGS: Pkg[] = [
     name: "Keramische Coating",
     forWho: "Jarenlange bescherming, diepe glans en makkelijker schoonmaken.",
     duration: "± 1,5–2 dagen", totalMinuten: 960,
-    prices: { normaal: 999, grootSuv: 1149, busPickup: 1299 },
+    prices: { normaal: 1249, grootSuv: 1399, busPickup: 1599 },
     sections: [
       {
         title: "Voorbereiding (inbegrepen)",
