@@ -101,12 +101,15 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 const Afspraak = () => {
   const [step, setStep] = useState(1);
   const [type, setType] = useState<AppType | null>(null);
-  const isFlowA = type === "bezichtiging" || type === "proefrit";
+  const isFlowA = type === "bezichtiging_proefrit";
 
-  // Flow A state
+  // Flow A state — vrij invulveld ipv voertuigkeuze
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [vehicleSearch, setVehicleSearch] = useState("");
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [vehicleQuery, setVehicleQuery] = useState("");
+  const [vehicleKleur, setVehicleKleur] = useState("");
+  const [vehicleKenteken, setVehicleKenteken] = useState("");
+  const [matchedVehicle, setMatchedVehicle] = useState<Vehicle | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<{ datum_tijd: string }[]>([]);
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState<string | null>(null);
