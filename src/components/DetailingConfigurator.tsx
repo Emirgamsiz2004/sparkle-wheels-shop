@@ -582,7 +582,7 @@ const DetailingConfigurator = () => {
               <p className="text-[10px] tracking-[0.14em] uppercase text-muted-foreground mb-2 font-semibold">
                 Voertuigmaat
               </p>
-              <div className="inline-flex bg-card border border-white/10 rounded-xl p-1 w-full md:w-auto">
+              <div className="inline-flex bg-card border border-white/10 rounded-md p-1 w-full md:w-auto">
                 {SIZES.map((s) => {
                   const active = size === s.key;
                   return (
@@ -648,13 +648,13 @@ const DetailingConfigurator = () => {
               <article
                 key={p.id}
                 className={cn(
-                  "relative flex flex-col rounded-xl border p-6 transition-all bg-card",
+                  "relative flex flex-col rounded-md border p-6 transition-all bg-card",
                   p.popular ? "border-accent/40" : "border-white/10",
                   active && "ring-2 ring-accent border-accent",
                 )}
               >
                 {p.popular && (
-                  <span className="absolute -top-3 left-6 inline-flex items-center gap-1 px-3 py-1 bg-accent text-accent-foreground rounded-full text-[10px] font-bold tracking-[0.14em] uppercase">
+                  <span className="absolute -top-3 left-6 inline-flex items-center gap-1 px-3 py-1 bg-accent text-accent-foreground rounded-sm text-[10px] font-bold tracking-[0.14em] uppercase">
                     <Sparkles className="w-3 h-3" /> Meest gekozen
                   </span>
                 )}
@@ -768,7 +768,7 @@ const DetailingConfigurator = () => {
               { n: 3, t: "Wij gaan aan de slag", d: "Onze detailers behandelen uw auto met professionele producten en apparatuur." },
               { n: 4, t: "Oplevering", d: "U ontvangt uw auto terug met onderhoudsadvies om het resultaat lang mooi te houden." },
             ].map((s) => (
-              <div key={s.n} className="rounded-xl border border-white/10 bg-card p-6">
+              <div key={s.n} className="rounded-md border border-white/10 bg-card p-6">
                 <div className="w-9 h-9 rounded-full bg-accent text-accent-foreground inline-flex items-center justify-center font-bold text-sm mb-3">
                   {s.n}
                 </div>
@@ -861,7 +861,7 @@ interface AddonGroupProps {
 const AddonGroup = ({ title, hint, allowed, lockedText, options, selected, onToggle }: AddonGroupProps) => (
   <div
     className={cn(
-      "rounded-xl border p-5 transition-opacity",
+      "rounded-md border p-5 transition-opacity",
       allowed ? "border-white/10 bg-card" : "border-white/5 bg-card/40 opacity-60",
     )}
   >
