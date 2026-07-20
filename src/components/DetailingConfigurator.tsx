@@ -14,6 +14,11 @@ const SIZES: { key: SizeKey; label: string; short: string }[] = [
   { key: "busPickup", label: "Bus & Pick-up", short: "Bus / Pick-up" },
 ];
 
+interface FeatureSection {
+  title: string;
+  items: string[];
+}
+
 interface Pkg {
   id: string;
   tab: TabKey;
@@ -25,175 +30,312 @@ interface Pkg {
   duration: string;
   totalMinuten: number;
   prices: Record<SizeKey, number>;
-  features: string[];
+  sections: FeatureSection[];
   popular?: boolean;
   tip?: { text: string; to: string };
 }
 
 const PKGS: Pkg[] = [
-  // Compleet
+  // ============ COMPLEET ============
   {
     id: "compleet-reiniging",
-    tab: "compleet", side: "beide", level: 1, levelLabel: "Niveau 1",
+    tab: "compleet", side: "beide", level: 1, levelLabel: "Niveau 1 · Onderhoud",
     name: "Compleet Reiniging",
     forWho: "Uw auto binnen én buiten weer fris en schoon.",
-    duration: "± 3–4 uur", totalMinuten: 210,
-    prices: { normaal: 169, grootSuv: 199, busPickup: 219 },
-    features: [
-      "Handwas met foam & drogen",
-      "Velgen, banden & deurstijlen",
-      "Ramen binnen en buiten",
-      "Interieur stofzuigen incl. kofferbak",
-      "Dashboard & kunststoffen reinigen en voeden",
-      "Matten reinigen",
-      "Spraywax afwerking",
+    duration: "± 3–4 uur", totalMinuten: 240,
+    prices: { normaal: 189, grootSuv: 229, busPickup: 259 },
+    sections: [
+      {
+        title: "Exterieur",
+        items: [
+          "Voorwas & handwas met pH-neutraal foam",
+          "Velgen, banden & wielkasten reinigen",
+          "Deurstijlen, tankklep & rubbers",
+          "Ramen buiten streeploos",
+          "Bandendressing & spraywax afwerking",
+        ],
+      },
+      {
+        title: "Interieur",
+        items: [
+          "Interieur uitzuigen incl. kofferbak",
+          "Dashboard & kunststoffen reinigen en voeden",
+          "Ramen binnen streeploos",
+          "Matten reinigen & instaplijsten",
+        ],
+      },
     ],
   },
   {
     id: "compleet-premium",
-    tab: "compleet", side: "beide", level: 2, levelLabel: "Niveau 2",
+    tab: "compleet", side: "beide", level: 2, levelLabel: "Niveau 2 · Premium",
     name: "Compleet Premium",
     forWho: "Diepe glans buiten, dieptereiniging binnen. Ons meest complete dagpakket.",
-    duration: "± 1 dag", totalMinuten: 480,
-    prices: { normaal: 549, grootSuv: 629, busPickup: 679 },
+    duration: "± 1 dag", totalMinuten: 540,
+    prices: { normaal: 649, grootSuv: 749, busPickup: 829 },
     popular: true,
-    features: [
-      "Alles van Compleet Reiniging",
-      "Kleibehandeling van de lak",
-      "1-staps machinale polijst (swirls & lichte krassen)",
-      "Sealant voor maandenlange lakbescherming",
-      "Stoelen & bekleding shampooën óf leer reinigen en voeden",
-      "Naden, kieren & hemelbekleding",
-      "Uitgebreide vlekverwijdering",
+    sections: [
+      {
+        title: "Exterieur",
+        items: [
+          "Alles van Compleet Reiniging",
+          "Kleibehandeling (verwijdert aanslag & vliegroest)",
+          "1-staps machinale polijst — swirls en lichte krassen weg",
+          "Kunststof exterieurdelen voeden",
+        ],
+      },
+      {
+        title: "Interieur",
+        items: [
+          "Stoelen & bekleding shampooën óf leer reinigen en voeden",
+          "Naden, kieren & hemelbekleding oppervlakkig",
+          "Uitgebreide vlekverwijdering",
+        ],
+      },
+      {
+        title: "Bescherming",
+        items: [
+          "Sealant voor 4–6 maanden lakbescherming",
+          "Onderhoudsadvies",
+        ],
+      },
     ],
   },
   {
     id: "compleet-signature",
-    tab: "compleet", side: "beide", level: 3, levelLabel: "Niveau 3",
+    tab: "compleet", side: "beide", level: 3, levelLabel: "Niveau 3 · Signature",
     name: "Compleet Signature",
     forWho: "Maximale correctie en jarenlange bescherming met keramische coating.",
-    duration: "± 1,5–2 dagen", totalMinuten: 900,
-    prices: { normaal: 1099, grootSuv: 1249, busPickup: 1349 },
-    features: [
-      "Alles van Compleet Premium",
-      "Digitale lakdiktemeting vooraf",
-      "2-staps lakcorrectie voor maximaal glansherstel",
-      "Keramische coating",
-      "Velgen- en glascoating",
-      "Onderhoudsadvies voor uw coating",
+    duration: "± 1,5–2 dagen", totalMinuten: 960,
+    prices: { normaal: 1499, grootSuv: 1699, busPickup: 1899 },
+    sections: [
+      {
+        title: "Exterieur & lakcorrectie",
+        items: [
+          "Alles van Compleet Premium",
+          "Digitale lakdiktemeting per paneel",
+          "2-staps lakcorrectie voor maximaal glansherstel",
+          "IR-uitharden per paneel",
+        ],
+      },
+      {
+        title: "Interieur",
+        items: [
+          "Volledige dieptereiniging",
+          "Leerbehandeling of textielimpregnatie",
+        ],
+      },
+      {
+        title: "Bescherming (2–5 jaar)",
+        items: [
+          "Professionele keramische coating op de lak",
+          "Velgencoating & glascoating",
+          "Onderhoudskit + advies mee",
+        ],
+      },
     ],
   },
   {
     id: "verkoopklaar",
-    tab: "compleet", side: "beide", level: null, levelLabel: "Speciaal",
+    tab: "compleet", side: "beide", level: null, levelLabel: "Speciaal · Verkoop",
     name: "Verkoopklaar",
     forWho: "Uw auto op z'n best voor verkoop of inruil — verdient zichzelf terug in de verkoopprijs.",
     duration: "± 1 dag", totalMinuten: 480,
-    prices: { normaal: 499, grootSuv: 569, busPickup: 619 },
-    features: [
-      "Complete reiniging binnen & buiten",
-      "Kleibehandeling + 1-staps polijst",
-      "Dieptereiniging interieur",
-      "Presentatie-afwerking voor bezichtiging",
-      "Optioneel: professionele verkoopfoto's",
+    prices: { normaal: 549, grootSuv: 629, busPickup: 699 },
+    sections: [
+      {
+        title: "Wat wij doen",
+        items: [
+          "Complete reiniging binnen & buiten",
+          "Kleibehandeling + 1-staps polijst",
+          "Dieptereiniging interieur & vlekverwijdering",
+          "Presentatie-afwerking voor bezichtiging",
+        ],
+      },
+      {
+        title: "Optioneel",
+        items: [
+          "Professionele verkoopfoto's",
+          "Direct inruilen bij Platin Automotive",
+        ],
+      },
     ],
     tip: { text: "Uw auto direct bij ons inruilen kan ook", to: "/#inruil" },
   },
-  // Exterieur
+
+  // ============ EXTERIEUR ============
   {
     id: "ext-reiniging",
-    tab: "exterieur", side: "exterieur", level: 1, levelLabel: "Niveau 1",
+    tab: "exterieur", side: "exterieur", level: 1, levelLabel: "Niveau 1 · Onderhoud",
     name: "Exterieur Reiniging",
     forWho: "Grondige handwas — de veilige basis voor elke auto.",
     duration: "± 1,5–2 uur", totalMinuten: 120,
-    prices: { normaal: 99, grootSuv: 119, busPickup: 129 },
-    features: [
-      "Handwas met foam & drogen",
-      "Velgen & banden reinigen",
-      "Bandendressing",
-      "Deurstijlen & tankklep",
-      "Ramen buiten",
-      "Spraywax afwerking",
+    prices: { normaal: 109, grootSuv: 129, busPickup: 149 },
+    sections: [
+      {
+        title: "Wassen",
+        items: [
+          "Voorwas met pH-neutraal foam",
+          "Handwas met 2-emmer methode",
+          "Microvezel drogen (krasvrij)",
+        ],
+      },
+      {
+        title: "Details",
+        items: [
+          "Velgen & banden reinigen",
+          "Bandendressing",
+          "Deurstijlen & tankklep",
+          "Ramen buiten streeploos",
+          "Spraywax afwerking",
+        ],
+      },
     ],
   },
   {
     id: "ext-premium",
-    tab: "exterieur", side: "exterieur", level: 2, levelLabel: "Niveau 2",
+    tab: "exterieur", side: "exterieur", level: 2, levelLabel: "Niveau 2 · Premium",
     name: "Exterieur Premium",
     forWho: "Swirls en lichte krassen weg, diepe glans terug.",
-    duration: "± halve tot hele dag", totalMinuten: 360,
-    prices: { normaal: 399, grootSuv: 449, busPickup: 499 },
+    duration: "± halve tot hele dag", totalMinuten: 420,
+    prices: { normaal: 449, grootSuv: 529, busPickup: 599 },
     popular: true,
-    features: [
-      "Alles van Exterieur Reiniging",
-      "Kleibehandeling (verwijdert aanslag uit de lak)",
-      "1-staps machinale polijst",
-      "Sealant voor maandenlange bescherming",
-      "Kunststof exterieurdelen voeden",
+    sections: [
+      {
+        title: "Voorbereiding",
+        items: [
+          "Alles van Exterieur Reiniging",
+          "Kleibehandeling (aanslag uit de lak)",
+          "IJzerdeeltjesverwijderaar",
+        ],
+      },
+      {
+        title: "Polijsten",
+        items: [
+          "1-staps machinale polijst rondom",
+          "Kunststof exterieurdelen voeden",
+        ],
+      },
+      {
+        title: "Bescherming",
+        items: [
+          "Sealant voor 4–6 maanden bescherming",
+        ],
+      },
     ],
   },
   {
     id: "ext-signature",
-    tab: "exterieur", side: "exterieur", level: 3, levelLabel: "Niveau 3",
+    tab: "exterieur", side: "exterieur", level: 3, levelLabel: "Niveau 3 · Signature",
     name: "Exterieur Signature",
     forWho: "Volledige lakcorrectie afgesloten met keramische coating.",
-    duration: "± 1,5–2 dagen", totalMinuten: 900,
-    prices: { normaal: 999, grootSuv: 1099, busPickup: 1199 },
-    features: [
-      "Alles van Exterieur Premium",
-      "Digitale lakdiktemeting vooraf",
-      "2-staps lakcorrectie",
-      "Keramische coating",
-      "Velgen- en glascoating",
-      "Onderhoudsadvies",
+    duration: "± 1,5–2 dagen", totalMinuten: 960,
+    prices: { normaal: 1349, grootSuv: 1499, busPickup: 1699 },
+    sections: [
+      {
+        title: "Analyse & voorbereiding",
+        items: [
+          "Alles van Exterieur Premium",
+          "Digitale lakdiktemeting per paneel",
+        ],
+      },
+      {
+        title: "Lakcorrectie",
+        items: [
+          "2-staps lakcorrectie",
+          "Cutting + finishing stap",
+          "Ontvetten voor coating",
+        ],
+      },
+      {
+        title: "Bescherming (2–5 jaar)",
+        items: [
+          "Keramische coating op de lak",
+          "Velgen- en glascoating",
+          "Onderhoudsadvies",
+        ],
+      },
     ],
   },
-  // Interieur
+
+  // ============ INTERIEUR ============
   {
     id: "int-reiniging",
-    tab: "interieur", side: "interieur", level: 1, levelLabel: "Niveau 1",
+    tab: "interieur", side: "interieur", level: 1, levelLabel: "Niveau 1 · Onderhoud",
     name: "Interieur Reiniging",
     forWho: "Fris en stofvrij interieur, klaar in een ochtend.",
     duration: "± 1,5–2 uur", totalMinuten: 120,
-    prices: { normaal: 89, grootSuv: 109, busPickup: 109 },
-    features: [
-      "Interieur stofzuigen incl. kofferbak",
-      "Dashboard & kunststoffen reinigen en voeden",
-      "Ramen binnen",
-      "Matten reinigen",
-      "Instaplijsten",
+    prices: { normaal: 99, grootSuv: 119, busPickup: 129 },
+    sections: [
+      {
+        title: "Reinigen",
+        items: [
+          "Interieur uitzuigen incl. kofferbak",
+          "Dashboard & kunststoffen reinigen en voeden",
+          "Ramen binnen streeploos",
+        ],
+      },
+      {
+        title: "Details",
+        items: [
+          "Matten uitkloppen & reinigen",
+          "Instaplijsten & deurpanelen",
+        ],
+      },
     ],
   },
   {
     id: "int-diepte",
-    tab: "interieur", side: "interieur", level: 2, levelLabel: "Niveau 2",
+    tab: "interieur", side: "interieur", level: 2, levelLabel: "Niveau 2 · Dieptereiniging",
     name: "Interieur Dieptereiniging",
     forWho: "Stoelen, bekleding en naden écht schoon — als nieuw van binnen.",
-    duration: "± halve dag", totalMinuten: 240,
-    prices: { normaal: 189, grootSuv: 219, busPickup: 229 },
+    duration: "± halve dag", totalMinuten: 300,
+    prices: { normaal: 249, grootSuv: 289, busPickup: 319 },
     popular: true,
-    features: [
-      "Alles van Interieur Reiniging",
-      "Stoelen & bekleding shampooën óf leer reinigen en voeden",
-      "Naden & kieren detailen",
-      "Hemelbekleding oppervlakkig reinigen",
-      "Uitgebreide vlekverwijdering",
-      "Kofferbak dieptereiniging",
+    sections: [
+      {
+        title: "Basis",
+        items: [
+          "Alles van Interieur Reiniging",
+        ],
+      },
+      {
+        title: "Dieptereiniging",
+        items: [
+          "Stoelen & bekleding shampooën met extractor",
+          "Leer reinigen en voeden (bij lederen interieur)",
+          "Naden & kieren detailen",
+          "Hemelbekleding oppervlakkig reinigen",
+        ],
+      },
+      {
+        title: "Vlekken & kofferbak",
+        items: [
+          "Uitgebreide vlekverwijdering",
+          "Kofferbak dieptereiniging",
+        ],
+      },
     ],
   },
-  // Polijsten & Coating (losse behandelingen)
+
+  // ============ POLIJSTEN & COATING ============
   {
     id: "polish-spot",
     tab: "polijsten", side: "exterieur", level: 1, levelLabel: "Losse behandeling",
     name: "Spot-correctie",
     forWho: "Eén paneel of specifieke kras/swirl-plek machinaal wegwerken.",
     duration: "± 1 uur", totalMinuten: 60,
-    prices: { normaal: 55, grootSuv: 55, busPickup: 65 },
-    features: [
-      "Per onderdeel of zone (motorkap, deur, bumper)",
-      "Machinale polijst met professionele pads",
-      "Voorreiniging van het paneel",
-      "Ideaal bij lokale krassen of matte plek",
+    prices: { normaal: 65, grootSuv: 65, busPickup: 79 },
+    sections: [
+      {
+        title: "Behandeling",
+        items: [
+          "Per onderdeel of zone (motorkap, deur, bumper)",
+          "Voorreiniging & ontvetten van het paneel",
+          "Machinale polijst met professionele pads",
+          "Ideaal bij lokale krassen of matte plek",
+        ],
+      },
     ],
   },
   {
@@ -201,15 +343,31 @@ const PKGS: Pkg[] = [
     tab: "polijsten", side: "exterieur", level: 2, levelLabel: "Volledige auto",
     name: "1-Staps Polijst",
     forWho: "Verwijdert swirls en lichte krassen — de auto knapt zichtbaar op.",
-    duration: "± halve dag", totalMinuten: 300,
-    prices: { normaal: 329, grootSuv: 379, busPickup: 429 },
+    duration: "± halve dag", totalMinuten: 360,
+    prices: { normaal: 449, grootSuv: 519, busPickup: 589 },
     popular: true,
-    features: [
-      "Volledige handwas & drogen vooraf",
-      "Kleibehandeling van de gehele lak",
-      "Machinale 1-staps polijst rondom",
-      "Sealant voor maandenlange bescherming",
-      "Kunststof exterieurdelen voeden",
+    sections: [
+      {
+        title: "Voorbereiding",
+        items: [
+          "Volledige handwas & drogen vooraf",
+          "Kleibehandeling van de gehele lak",
+          "IJzerdeeltjesverwijderaar",
+        ],
+      },
+      {
+        title: "Polijsten",
+        items: [
+          "Machinale 1-staps polijst rondom",
+          "Kunststof exterieurdelen voeden",
+        ],
+      },
+      {
+        title: "Bescherming",
+        items: [
+          "Sealant voor 4–6 maanden bescherming",
+        ],
+      },
     ],
   },
   {
@@ -217,29 +375,64 @@ const PKGS: Pkg[] = [
     tab: "polijsten", side: "exterieur", level: 3, levelLabel: "Volledige auto",
     name: "2-Staps Lakcorrectie",
     forWho: "Diepe krassen en holograms weg. Maximaal glansherstel.",
-    duration: "± 1–1,5 dag", totalMinuten: 600,
-    prices: { normaal: 499, grootSuv: 579, busPickup: 649 },
-    features: [
-      "Digitale lakdiktemeting vooraf",
-      "Kleibehandeling van de gehele lak",
-      "Cutting stap — diepere krassen weg",
-      "Finishing stap — maximale gloss",
-      "Sealant of voorbereiding voor coating",
+    duration: "± 1–1,5 dag", totalMinuten: 660,
+    prices: { normaal: 699, grootSuv: 799, busPickup: 899 },
+    sections: [
+      {
+        title: "Analyse",
+        items: [
+          "Digitale lakdiktemeting per paneel",
+          "Testspot om beste combinatie te bepalen",
+        ],
+      },
+      {
+        title: "Correctie",
+        items: [
+          "Kleibehandeling van de gehele lak",
+          "Cutting stap — diepere krassen weg",
+          "Finishing stap — maximale gloss",
+        ],
+      },
+      {
+        title: "Afwerking",
+        items: [
+          "Sealant of voorbereiding voor coating",
+        ],
+      },
     ],
   },
   {
     id: "polish-coating",
-    tab: "polijsten", side: "exterieur", level: null, levelLabel: "Bescherming",
+    tab: "polijsten", side: "exterieur", level: null, levelLabel: "Bescherming · Premium",
     name: "Keramische Coating",
     forWho: "Jarenlange bescherming, diepe glans en makkelijker schoonmaken.",
-    duration: "± 1,5–2 dagen", totalMinuten: 900,
-    prices: { normaal: 549, grootSuv: 649, busPickup: 749 },
-    features: [
-      "Vereist 1- of 2-staps polijst als basis",
-      "Professionele keramische coating (2–5 jaar)",
-      "Velgen- en glascoating optioneel",
-      "IR-uitharden per paneel",
-      "Onderhoudskit & advies mee",
+    duration: "± 1,5–2 dagen", totalMinuten: 960,
+    prices: { normaal: 999, grootSuv: 1149, busPickup: 1299 },
+    sections: [
+      {
+        title: "Voorbereiding (inbegrepen)",
+        items: [
+          "Volledige exterieurreiniging & kleibehandeling",
+          "1-staps polijst als basis (2-staps optioneel bijboeken)",
+          "Ontvetten volgens fabrikantenprotocol",
+        ],
+      },
+      {
+        title: "Coating",
+        items: [
+          "Professionele keramische coating (2–5 jaar)",
+          "IR-uitharden per paneel",
+          "Meerdere lagen op verticale panelen",
+        ],
+      },
+      {
+        title: "Extra's & nazorg",
+        items: [
+          "Velgen- en glascoating optioneel bijboekbaar",
+          "Onderhoudskit & advies mee",
+          "Jaarlijkse inspectie mogelijk",
+        ],
+      },
     ],
     tip: { text: "Keramische coating is altijd inclusief voorbereidend polijstwerk", to: "#" },
   },
