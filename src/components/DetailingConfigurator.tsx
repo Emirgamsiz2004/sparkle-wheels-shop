@@ -705,7 +705,7 @@ const DetailingConfigurator = () => {
                   type="button"
                   onClick={() => setSelectedId(active ? null : p.id)}
                   className={cn(
-                    "w-full py-3 rounded-xl text-sm font-semibold transition-colors",
+                    "w-full py-3 rounded-md text-sm font-semibold transition-colors",
                     active
                       ? "bg-white/10 text-white hover:bg-white/15"
                       : "bg-accent text-accent-foreground hover:bg-accent/85",
