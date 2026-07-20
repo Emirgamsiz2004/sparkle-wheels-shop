@@ -18,7 +18,7 @@ type AppType = FlowAType | FlowBType;
 const TIMESLOTS = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 
 const TYPE_LABELS: Record<AppType, string> = {
-  bezichtiging_proefrit: "Bezichtiging & proefrit",
+  bezichtiging_proefrit: "Bezichtiging / proefrit",
   poetsbeurt: "Poetsbeurt",
   onderhoud: "Reparatie / onderhoud",
   anders: "Anders",
