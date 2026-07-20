@@ -489,7 +489,7 @@ const Afspraak = () => {
             <motion.div key="s3a" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <Card>
                 <h2 className="text-lg font-semibold mb-1">Kies datum en tijd</h2>
-                <p className="text-xs text-white/50 mb-4">{selectedVehicle?.merk} {selectedVehicle?.model}</p>
+                <p className="text-xs text-white/50 mb-4">{vehicleQuery || (matchedVehicle ? `${matchedVehicle.merk} ${matchedVehicle.model}` : "")}</p>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <Calendar
