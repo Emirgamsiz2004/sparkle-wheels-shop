@@ -326,7 +326,7 @@ const PKGS: Pkg[] = [
     name: "Interieur Signature",
     forWho: "Volledige restauratie van het interieur — als nieuw en beschermd voor de toekomst.",
     duration: "± dag", totalMinuten: 480,
-    prices: { normaal: 399, grootSuv: 449, busPickup: 499 },
+    prices: { normaal: 499, grootSuv: 559, busPickup: 619 },
     sections: [
       {
         title: "Basis",
