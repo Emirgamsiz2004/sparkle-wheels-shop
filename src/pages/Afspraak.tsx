@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Car, Check, Eye, MessageSquare, Search, Sparkles, Wrench } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Car, Check, Eye, MessageSquare, Sparkles, Wrench } from "lucide-react";
 import { z } from "zod";
 import { format, addDays, isSameDay, startOfDay } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -11,23 +11,30 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-type FlowAType = "bezichtiging" | "proefrit";
+type FlowAType = "bezichtiging_proefrit";
 type FlowBType = "poetsbeurt" | "onderhoud" | "anders";
 type AppType = FlowAType | FlowBType;
 
 const TIMESLOTS = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 
 const TYPE_LABELS: Record<AppType, string> = {
-  bezichtiging: "Bezichtiging",
-  proefrit: "Proefrit",
+  bezichtiging_proefrit: "Bezichtiging & proefrit",
   poetsbeurt: "Poetsbeurt",
   onderhoud: "Reparatie / onderhoud",
   anders: "Anders",
 };
 
+// Map de klant-optie naar het waarde-veld in de database (blijft "bezichtiging"
+// zodat bestaande admin-filters en agenda-logica ongewijzigd blijven).
+const DB_TYPE: Record<AppType, string> = {
+  bezichtiging_proefrit: "bezichtiging",
+  poetsbeurt: "poetsbeurt",
+  onderhoud: "onderhoud",
+  anders: "anders",
+};
+
 const flowAOptions: { type: FlowAType; icon: any; desc: string }[] = [
-  { type: "bezichtiging", icon: Eye, desc: "Bekijk een auto in onze showroom" },
-  { type: "proefrit", icon: Car, desc: "Test een auto op de weg" },
+  { type: "bezichtiging_proefrit", icon: Car, desc: "Bekijk de auto in onze showroom, met optioneel een proefrit." },
 ];
 const flowBOptions: { type: FlowBType; icon: any; desc: string }[] = [
   { type: "poetsbeurt", icon: Sparkles, desc: "Detailing en interieurreiniging" },
@@ -94,12 +101,15 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 const Afspraak = () => {
   const [step, setStep] = useState(1);
   const [type, setType] = useState<AppType | null>(null);
-  const isFlowA = type === "bezichtiging" || type === "proefrit";
+  const isFlowA = type === "bezichtiging_proefrit";
 
-  // Flow A state
+  // Flow A state — vrij invulveld ipv voertuigkeuze
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [vehicleSearch, setVehicleSearch] = useState("");
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [vehicleQuery, setVehicleQuery] = useState("");
+  const [vehicleKleur, setVehicleKleur] = useState("");
+  const [vehicleKenteken, setVehicleKenteken] = useState("");
+  const [matchedVehicle, setMatchedVehicle] = useState<Vehicle | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<{ datum_tijd: string }[]>([]);
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState<string | null>(null);
@@ -124,24 +134,30 @@ const Afspraak = () => {
       .then(({ data }) => setVehicles((data as any) || []));
   }, [isFlowA, step]);
 
-  // Load booked slots for chosen vehicle
+  // Load booked slots wanneer we een echte match hebben (voor slot-blokkade)
   useEffect(() => {
-    if (!isFlowA || !selectedVehicle) return;
+    if (!isFlowA || !matchedVehicle) { setBookedSlots([]); return; }
     supabase
       .from("appointment_slots")
       .select("datum_tijd")
-      .eq("vehicle_id", selectedVehicle.id)
+      .eq("vehicle_id", matchedVehicle.id)
       .gte("datum_tijd", new Date().toISOString())
       .then(({ data }) => setBookedSlots((data as any) || []));
-  }, [selectedVehicle, isFlowA]);
+  }, [matchedVehicle, isFlowA]);
 
-  const filteredVehicles = useMemo(() => {
-    const q = vehicleSearch.trim().toLowerCase();
-    if (!q) return vehicles;
-    return vehicles.filter((v) =>
-      [v.merk, v.model, v.kenteken, String(v.bouwjaar)].filter(Boolean).join(" ").toLowerCase().includes(q)
-    );
-  }, [vehicles, vehicleSearch]);
+  const vehicleSuggestions = useMemo(() => {
+    const q = vehicleQuery.trim().toLowerCase();
+    if (!q || q.length < 2) return [];
+    return vehicles
+      .filter((v) =>
+        [v.merk, v.model, v.kenteken, String(v.bouwjaar)]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      )
+      .slice(0, 6);
+  }, [vehicles, vehicleQuery]);
 
   const slotTaken = (slot: string) => {
     if (!date) return false;
@@ -152,7 +168,8 @@ const Afspraak = () => {
   };
 
   const reset = () => {
-    setStep(1); setType(null); setSelectedVehicle(null); setDate(undefined); setTime(null);
+    setStep(1); setType(null); setMatchedVehicle(null); setDate(undefined); setTime(null);
+    setVehicleQuery(""); setVehicleKleur(""); setVehicleKenteken(""); setShowSuggestions(false);
     setForm({ voornaam: "", achternaam: "", telefoon: "", email: "", opmerking: "", kenteken: "", omschrijving: "", voorkeursdatum: "" });
     setErrors({}); setDone(false);
   };
@@ -174,7 +191,7 @@ const Afspraak = () => {
   };
 
   const submitFlowA = async () => {
-    if (!validateCustomer() || !selectedVehicle || !date || !time || !type) return;
+    if (!validateCustomer() || !vehicleQuery.trim() || !date || !time || !type) return;
     setSubmitting(true);
     try {
       const [hh, mm] = time.split(":").map(Number);
@@ -183,24 +200,35 @@ const Afspraak = () => {
       const eind = new Date(dt);
       eind.setHours(eind.getHours() + 1);
 
+      const autoDescriptor = [
+        `Auto: ${vehicleQuery.trim()}`,
+        vehicleKleur.trim() && `Kleur: ${vehicleKleur.trim()}`,
+        vehicleKenteken.trim() && `Kenteken: ${vehicleKenteken.trim().toUpperCase()}`,
+      ].filter(Boolean).join(" · ");
+
+      const notitie = [autoDescriptor, form.opmerking].filter(Boolean).join("\n");
+
       const { data: inserted, error } = await supabase.from("appointments").insert({
-        type,
+        type: DB_TYPE[type],
         datum_tijd: dt.toISOString(),
         eind_datum_tijd: eind.toISOString(),
-        vehicle_id: selectedVehicle.id,
+        vehicle_id: matchedVehicle?.id ?? null,
         status: "gepland",
         bron: "website",
         is_aanvraag: false,
-        notities: form.opmerking || null,
+        notities: notitie || null,
         aanvrager_voornaam: form.voornaam,
         aanvrager_achternaam: form.achternaam,
         aanvrager_telefoon: form.telefoon,
         aanvrager_email: form.email,
+        aanvrager_kenteken: vehicleKenteken.trim().toUpperCase() || null,
       }).select("id").single();
 
       if (error) throw error;
 
-      const voertuig = `${selectedVehicle.merk} ${selectedVehicle.model}${selectedVehicle.kenteken ? ` (${selectedVehicle.kenteken})` : ""}`;
+      const voertuig = matchedVehicle
+        ? `${matchedVehicle.merk} ${matchedVehicle.model}${matchedVehicle.kenteken ? ` (${matchedVehicle.kenteken})` : ""}`
+        : autoDescriptor.replace(/^Auto: /, "");
       const datumStr = format(dt, "EEEE d MMMM yyyy", { locale: nl });
 
       await Promise.all([
@@ -357,7 +385,7 @@ const Afspraak = () => {
               <Card>
                 <div className="mb-6">
                   <p className="text-[11px] tracking-[0.15em] uppercase text-emerald-400 font-semibold mb-3">Direct bevestigd</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {flowAOptions.map((opt) => (
                       <button key={opt.type} onClick={() => pickType(opt.type)}
                         className="text-left p-4 rounded-xl border border-white/10 hover:border-primary/40 hover:bg-white/[0.03] transition-all group">
@@ -386,31 +414,74 @@ const Afspraak = () => {
           ) : isFlowA && step === 2 ? (
             <motion.div key="s2a" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <Card>
-                <h2 className="text-lg font-semibold mb-4">Kies een voertuig</h2>
-                <div className="relative mb-4">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                  <Input placeholder="Zoek op merk, model of kenteken..." value={vehicleSearch}
-                    onChange={(e) => setVehicleSearch(e.target.value)} className="pl-10" />
-                </div>
-                <div className="max-h-[420px] overflow-y-auto space-y-1">
-                  {filteredVehicles.length === 0 && (
-                    <p className="text-white/50 text-sm text-center py-8">Geen voertuigen gevonden.</p>
-                  )}
-                  {filteredVehicles.map((v) => (
-                    <button key={v.id} onClick={() => { setSelectedVehicle(v); setStep(3); }}
-                      className="w-full text-left p-3 rounded-lg hover:bg-white/[0.06] transition-colors flex items-center gap-3 border-b border-white/5">
-                      <Car className="w-4 h-4 text-white/40 shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <div className="font-medium text-sm truncate">{v.merk} {v.model}</div>
-                        <div className="text-xs text-white/50 truncate">
-                          {[v.bouwjaar, v.kenteken, v.kilometerstand ? `${v.kilometerstand.toLocaleString("nl-NL")} km` : null].filter(Boolean).join(" • ")}
-                        </div>
+                <h2 className="text-lg font-semibold mb-1">Welke auto komt u bekijken?</h2>
+                <p className="text-xs text-white/50 mb-5">Vul in wat u weet — merk en model volstaan.</p>
+
+                <div className="space-y-4">
+                  <div className="relative">
+                    <Label>Auto (merk + model) *</Label>
+                    <Input
+                      placeholder="Bijv. BMW 3-serie"
+                      value={vehicleQuery}
+                      onChange={(e) => {
+                        setVehicleQuery(e.target.value);
+                        setMatchedVehicle(null);
+                        setShowSuggestions(true);
+                      }}
+                      onFocus={() => setShowSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                    />
+                    {showSuggestions && vehicleSuggestions.length > 0 && (
+                      <div className="absolute z-20 left-0 right-0 mt-1 bg-[#0f0f0f] border border-white/10 rounded-[10px] overflow-hidden shadow-2xl max-h-64 overflow-y-auto">
+                        <p className="px-3 pt-2 pb-1 text-[10px] tracking-[0.14em] uppercase text-white/40 font-semibold">Uit onze voorraad</p>
+                        {vehicleSuggestions.map((v) => (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              setVehicleQuery(`${v.merk} ${v.model}${v.bouwjaar ? ` (${v.bouwjaar})` : ""}`);
+                              if (v.kenteken) setVehicleKenteken(v.kenteken);
+                              setMatchedVehicle(v);
+                              setShowSuggestions(false);
+                            }}
+                            className="w-full text-left px-3 py-2.5 hover:bg-white/[0.06] transition-colors flex items-center gap-3 border-t border-white/5"
+                          >
+                            <Car className="w-4 h-4 text-white/40 shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-medium text-sm truncate">{v.merk} {v.model}</div>
+                              <div className="text-xs text-white/50 truncate">
+                                {[v.bouwjaar, v.kenteken].filter(Boolean).join(" • ")}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                    </button>
-                  ))}
+                    )}
+                    {matchedVehicle && (
+                      <p className="text-[11px] text-emerald-400 mt-1.5 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Gekoppeld aan onze voorraad
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Kleur (optioneel)</Label>
+                      <Input placeholder="Bijv. antraciet" value={vehicleKleur}
+                        onChange={(e) => setVehicleKleur(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>Kenteken (optioneel)</Label>
+                      <Input placeholder="XX-000-XX" value={vehicleKenteken}
+                        onChange={(e) => setVehicleKenteken(e.target.value.toUpperCase())} />
+                    </div>
+                  </div>
                 </div>
+
                 <div className="flex justify-between mt-6">
                   <Btn variant="ghost" onClick={() => setStep(1)}><ArrowLeft className="w-4 h-4" /> Terug</Btn>
+                  <Btn onClick={() => setStep(3)} disabled={!vehicleQuery.trim()}>Volgende <ArrowRight className="w-4 h-4" /></Btn>
                 </div>
               </Card>
             </motion.div>
@@ -418,7 +489,7 @@ const Afspraak = () => {
             <motion.div key="s3a" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <Card>
                 <h2 className="text-lg font-semibold mb-1">Kies datum en tijd</h2>
-                <p className="text-xs text-white/50 mb-4">{selectedVehicle?.merk} {selectedVehicle?.model}</p>
+                <p className="text-xs text-white/50 mb-4">{vehicleQuery || (matchedVehicle ? `${matchedVehicle.merk} ${matchedVehicle.model}` : "")}</p>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <Calendar

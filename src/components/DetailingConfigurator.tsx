@@ -498,10 +498,18 @@ const EXT_ADDONS: AddOn[] = [
 
 const WHATSAPP = "https://wa.me/31717812525";
 
+const QUICK_PICKS: { pkgId: string; tab: TabKey; label: string; sub: string }[] = [
+  { pkgId: "compleet-reiniging", tab: "compleet", label: "Wasbeurt compleet", sub: "Binnen én buiten fris" },
+  { pkgId: "compleet-premium", tab: "compleet", label: "Premium detail", sub: "Meest gekozen" },
+  { pkgId: "polish-2staps", tab: "polijsten", label: "Lakcorrectie", sub: "Krassen & swirls weg" },
+  { pkgId: "polish-coating", tab: "polijsten", label: "Keramische coating", sub: "Jarenlang beschermd" },
+];
+
 const DetailingConfigurator = () => {
   const [size, setSize] = useState<SizeKey>("normaal");
   const [tab, setTab] = useState<TabKey>("compleet");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [addons, setAddons] = useState<Set<string>>(new Set());
   const [bookingOpen, setBookingOpen] = useState(false);
 
@@ -575,6 +583,36 @@ const DetailingConfigurator = () => {
           </p>
         </div>
 
+        {/* Quick picks — direct de meest gekozen pakketten */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+          {QUICK_PICKS.map((qp) => {
+            const pkg = PKGS.find((p) => p.id === qp.pkgId);
+            if (!pkg) return null;
+            const active = selectedId === qp.pkgId;
+            return (
+              <button
+                key={qp.pkgId}
+                type="button"
+                onClick={() => {
+                  setTab(qp.tab);
+                  setSelectedId(qp.pkgId);
+                  setTimeout(() => {
+                    document.getElementById(`pkg-${qp.pkgId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }, 50);
+                }}
+                className={cn(
+                  "text-left rounded-md border p-4 bg-card transition-all hover:border-white/25",
+                  active ? "border-accent ring-1 ring-accent" : "border-white/10",
+                )}
+              >
+                <p className="text-[10px] tracking-[0.14em] uppercase text-white/50 font-semibold mb-1">{qp.sub}</p>
+                <p className="font-display text-sm md:text-base font-semibold text-foreground mb-1 truncate">{qp.label}</p>
+                <p className="text-xs text-white/70">vanaf <span className="text-accent font-semibold">€{pkg.prices[size].toLocaleString("nl-NL")}</span></p>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Sticky voertuigmaat */}
         <div className="sticky top-16 z-30 -mx-6 lg:-mx-16 px-6 lg:px-16 bg-background/90 backdrop-blur-md border-y border-white/5 py-4 mb-10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -643,12 +681,16 @@ const DetailingConfigurator = () => {
         <div className="grid gap-5 md:gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
           {visiblePackages.map((p) => {
             const active = selectedId === p.id;
+            const isExpanded = expandedIds.has(p.id);
             const price = p.prices[size];
+            const [firstSection, ...restSections] = p.sections;
+            const restItemCount = restSections.reduce((n, s) => n + s.items.length, 0);
             return (
               <article
+                id={`pkg-${p.id}`}
                 key={p.id}
                 className={cn(
-                  "relative flex flex-col rounded-md border p-6 transition-all bg-card",
+                  "relative flex flex-col rounded-md border p-6 transition-all bg-card scroll-mt-32",
                   p.popular ? "border-accent/40" : "border-white/10",
                   active && "ring-2 ring-accent border-accent",
                 )}
@@ -672,8 +714,26 @@ const DetailingConfigurator = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mb-5">{p.duration}</p>
 
-                <div className="space-y-4 mb-6 flex-1">
-                  {p.sections.map((sec) => (
+                <div className="space-y-4 mb-4 flex-1">
+                  {firstSection && (
+                    <div>
+                      <p className="text-[10px] tracking-[0.18em] uppercase text-white/45 font-semibold mb-2">
+                        {firstSection.title}
+                      </p>
+                      <ul className="space-y-1.5">
+                        {firstSection.items.slice(0, isExpanded ? undefined : 3).map((f) => {
+                          const dim = f.toLowerCase().startsWith("alles van");
+                          return (
+                            <li key={f} className="flex items-start gap-2 text-sm">
+                              <Check className={cn("w-3.5 h-3.5 mt-1 flex-shrink-0", dim ? "text-white/40" : "text-accent")} />
+                              <span className={cn("leading-snug", dim ? "text-white/55 italic" : "text-white/85")}>{f}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                  {isExpanded && restSections.map((sec) => (
                     <div key={sec.title}>
                       <p className="text-[10px] tracking-[0.18em] uppercase text-white/45 font-semibold mb-2">
                         {sec.title}
@@ -693,6 +753,21 @@ const DetailingConfigurator = () => {
                   ))}
                 </div>
 
+                {(restItemCount > 0 || (firstSection && firstSection.items.length > 3)) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExpandedIds((prev) => {
+                        const next = new Set(prev);
+                        next.has(p.id) ? next.delete(p.id) : next.add(p.id);
+                        return next;
+                      });
+                    }}
+                    className="text-xs text-white/60 hover:text-white text-left mb-4 font-medium"
+                  >
+                    {isExpanded ? "− Minder tonen" : "+ Toon volledige inhoud"}
+                  </button>
+                )}
 
                 {p.tip && (
                   <p className="text-xs text-muted-foreground mb-4 pb-4 border-b border-white/5">
