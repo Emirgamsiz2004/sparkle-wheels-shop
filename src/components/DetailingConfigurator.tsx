@@ -163,10 +163,10 @@ const PKGS: Pkg[] = [
     tip: { text: "Uw auto direct bij ons inruilen kan ook", to: "/#inruil" },
   },
 
-  // ============ EXTERIEUR ============
+  // ============ EXTERIEUR (alleen reiniging) ============
   {
     id: "ext-reiniging",
-    tab: "exterieur", side: "exterieur", level: 1, levelLabel: "Niveau 1 · Onderhoud",
+    tab: "exterieur", side: "exterieur", level: 1, levelLabel: "Niveau 1 · Basis wasbeurt",
     name: "Exterieur Reiniging",
     forWho: "Grondige handwas — de veilige basis voor elke auto.",
     duration: "± 1,5–2 uur", totalMinuten: 120,
@@ -194,68 +194,71 @@ const PKGS: Pkg[] = [
   },
   {
     id: "ext-premium",
-    tab: "exterieur", side: "exterieur", level: 2, levelLabel: "Niveau 2 · Premium",
-    name: "Exterieur Premium",
-    forWho: "Swirls en lichte krassen weg, diepe glans terug.",
-    duration: "± halve tot hele dag", totalMinuten: 420,
-    prices: { normaal: 449, grootSuv: 529, busPickup: 599 },
+    tab: "exterieur", side: "exterieur", level: 2, levelLabel: "Niveau 2 · Premium reiniging",
+    name: "Exterieur Premium Wash",
+    forWho: "Diepe reiniging met kleibehandeling en langdurige bescherming — geen polijstwerk.",
+    duration: "± halve dag", totalMinuten: 240,
+    prices: { normaal: 199, grootSuv: 229, busPickup: 259 },
     popular: true,
     sections: [
       {
-        title: "Voorbereiding",
+        title: "Grondige reiniging",
         items: [
           "Alles van Exterieur Reiniging",
-          "Kleibehandeling (aanslag uit de lak)",
-          "IJzerdeeltjesverwijderaar",
+          "Kleibehandeling (verwijdert aanslag)",
+          "IJzerdeeltjesverwijderaar op lak en velgen",
+          "Grondige velgen- en wielkastreiniging",
         ],
       },
       {
-        title: "Polijsten",
+        title: "Afwerking",
         items: [
-          "1-staps machinale polijst rondom",
-          "Kunststof exterieurdelen voeden",
+          "Kunststof exterieurdelen reinigen & voeden",
+          "Deurrubbers voeden",
         ],
       },
       {
         title: "Bescherming",
         items: [
-          "Sealant voor 4–6 maanden bescherming",
+          "Sealant voor 4–6 maanden lakbescherming",
         ],
       },
     ],
+    tip: { text: "Krassen of doffe lak? Bekijk de Polijsten & coating pakketten", to: "#configurator" },
   },
   {
-    id: "ext-signature",
-    tab: "exterieur", side: "exterieur", level: 3, levelLabel: "Niveau 3 · Signature",
-    name: "Exterieur Signature",
-    forWho: "Volledige lakcorrectie afgesloten met keramische coating.",
-    duration: "± 1,5–2 dagen", totalMinuten: 960,
-    prices: { normaal: 1349, grootSuv: 1499, busPickup: 1699 },
+    id: "ext-showroom",
+    tab: "exterieur", side: "exterieur", level: 3, levelLabel: "Niveau 3 · Showroom reiniging",
+    name: "Exterieur Showroom Clean",
+    forWho: "Onze meest complete reiniging van elk detail — nog steeds zonder polijstwerk.",
+    duration: "± dag", totalMinuten: 420,
+    prices: { normaal: 299, grootSuv: 349, busPickup: 399 },
     sections: [
       {
-        title: "Analyse & voorbereiding",
+        title: "Volledige reiniging",
         items: [
-          "Alles van Exterieur Premium",
-          "Digitale lakdiktemeting per paneel",
+          "Alles van Exterieur Premium Wash",
+          "Detailwerk in naden, kieren en emblemen",
+          "Koplampen ontvetten & opfrissen",
+          "Uitlaten polijsten",
         ],
       },
       {
-        title: "Lakcorrectie",
+        title: "Kunststof & rubber",
         items: [
-          "2-staps lakcorrectie",
-          "Cutting + finishing stap",
-          "Ontvetten voor coating",
+          "Alle kunststofdelen dieper voeden",
+          "Bandenwand grondig reinigen & dressen",
         ],
       },
       {
-        title: "Bescherming (2–5 jaar)",
+        title: "Bescherming",
         items: [
-          "Keramische coating op de lak",
-          "Velgen- en glascoating",
-          "Onderhoudsadvies",
+          "Premium sealant tot 6 maanden",
+          "Optioneel: glascoating (regenafstotend) bijboekbaar",
         ],
       },
     ],
+    tip: { text: "Voor echte glansherstel of coating: zie Polijsten & coating", to: "#configurator" },
   },
 
   // ============ INTERIEUR ============
@@ -317,8 +320,38 @@ const PKGS: Pkg[] = [
       },
     ],
   },
-
-  // ============ POLIJSTEN & COATING ============
+  {
+    id: "int-signature",
+    tab: "interieur", side: "interieur", level: 3, levelLabel: "Niveau 3 · Signature",
+    name: "Interieur Signature",
+    forWho: "Volledige restauratie van het interieur — als nieuw en beschermd voor de toekomst.",
+    duration: "± dag", totalMinuten: 480,
+    prices: { normaal: 399, grootSuv: 449, busPickup: 499 },
+    sections: [
+      {
+        title: "Basis",
+        items: [
+          "Alles van Interieur Dieptereiniging",
+        ],
+      },
+      {
+        title: "Restauratie",
+        items: [
+          "Hemelbekleding intensief reinigen",
+          "Volledige leerbehandeling (reinigen + voeden + conditioner)",
+          "Alle naden, roosters en ventilatie grondig",
+          "Airco-desinfectie & geurbehandeling (ozon)",
+        ],
+      },
+      {
+        title: "Bescherming",
+        items: [
+          "Textielimpregnatie tegen vlekken",
+          "Leerbeschermer voor duurzaam behoud",
+        ],
+      },
+    ],
+  },
   {
     id: "polish-spot",
     tab: "polijsten", side: "exterieur", level: 1, levelLabel: "Losse behandeling",
