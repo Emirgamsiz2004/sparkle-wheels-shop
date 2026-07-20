@@ -591,7 +591,7 @@ const DetailingConfigurator = () => {
                       type="button"
                       onClick={() => setSize(s.key)}
                       className={cn(
-                        "flex-1 md:flex-none px-4 md:px-5 py-2 rounded-lg text-xs md:text-sm font-medium transition-all whitespace-nowrap",
+                        "flex-1 md:flex-none px-4 md:px-5 py-2 rounded-md text-xs md:text-sm font-medium transition-all whitespace-nowrap",
                         active
                           ? "bg-accent text-accent-foreground shadow-sm"
                           : "text-white/70 hover:text-white",
