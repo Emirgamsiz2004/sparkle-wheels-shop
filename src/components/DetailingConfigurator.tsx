@@ -498,10 +498,18 @@ const EXT_ADDONS: AddOn[] = [
 
 const WHATSAPP = "https://wa.me/31717812525";
 
+const QUICK_PICKS: { pkgId: string; tab: TabKey; label: string; sub: string }[] = [
+  { pkgId: "compleet-reiniging", tab: "compleet", label: "Wasbeurt compleet", sub: "Binnen én buiten fris" },
+  { pkgId: "compleet-premium", tab: "compleet", label: "Premium detail", sub: "Meest gekozen" },
+  { pkgId: "polish-2staps", tab: "polijsten", label: "Lakcorrectie", sub: "Krassen & swirls weg" },
+  { pkgId: "polish-coating", tab: "polijsten", label: "Keramische coating", sub: "Jarenlang beschermd" },
+];
+
 const DetailingConfigurator = () => {
   const [size, setSize] = useState<SizeKey>("normaal");
   const [tab, setTab] = useState<TabKey>("compleet");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [addons, setAddons] = useState<Set<string>>(new Set());
   const [bookingOpen, setBookingOpen] = useState(false);
 
