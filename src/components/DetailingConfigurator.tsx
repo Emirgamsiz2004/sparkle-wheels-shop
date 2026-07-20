@@ -639,17 +639,27 @@ const DetailingConfigurator = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mb-5">{p.duration}</p>
 
-                <ul className="space-y-2 mb-6 flex-1">
-                  {p.features.map((f) => {
-                    const dim = f.toLowerCase().startsWith("alles van");
-                    return (
-                      <li key={f} className="flex items-start gap-2 text-sm">
-                        <Check className={cn("w-4 h-4 mt-0.5 flex-shrink-0", dim ? "text-white/40" : "text-amber-400")} />
-                        <span className={cn(dim ? "text-white/55 italic" : "text-white/85")}>{f}</span>
-                      </li>
-                    );
-                  })}
-                </ul>
+                <div className="space-y-4 mb-6 flex-1">
+                  {p.sections.map((sec) => (
+                    <div key={sec.title}>
+                      <p className="text-[10px] tracking-[0.18em] uppercase text-white/45 font-semibold mb-2">
+                        {sec.title}
+                      </p>
+                      <ul className="space-y-1.5">
+                        {sec.items.map((f) => {
+                          const dim = f.toLowerCase().startsWith("alles van");
+                          return (
+                            <li key={f} className="flex items-start gap-2 text-sm">
+                              <Check className={cn("w-3.5 h-3.5 mt-1 flex-shrink-0", dim ? "text-white/40" : "text-amber-400")} />
+                              <span className={cn("leading-snug", dim ? "text-white/55 italic" : "text-white/85")}>{f}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+
 
                 {p.tip && (
                   <p className="text-xs text-muted-foreground mb-4 pb-4 border-b border-white/5">
