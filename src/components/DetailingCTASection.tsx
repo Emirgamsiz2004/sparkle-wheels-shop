@@ -71,18 +71,23 @@ const DetailingCTASection = () => {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={handleToggle}
-                    className="group inline-flex items-center justify-center gap-2 px-6 py-4 bg-amber-400 text-background font-display font-semibold text-sm hover:bg-amber-300 transition-colors"
+                    className="group relative inline-flex items-center justify-between gap-6 px-6 py-4 bg-foreground text-background font-display font-semibold text-sm tracking-wide hover:bg-foreground/90 transition-colors"
                   >
                     {expanded ? (
                       <>
-                        <X className="w-4 h-4" />
-                        Sluit configurator
+                        <span className="inline-flex items-center gap-2">
+                          <X className="w-4 h-4" />
+                          Sluit pakketten
+                        </span>
+                        <span className="text-[10px] tracking-[0.3em] uppercase opacity-60">Close</span>
                       </>
                     ) : (
                       <>
-                        <Calculator className="w-4 h-4" />
-                        Stel pakket samen
-                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                        <span className="inline-flex items-center gap-2">
+                          <Calculator className="w-4 h-4" />
+                          Bekijk pakketten & prijzen
+                        </span>
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                       </>
                     )}
                   </button>
