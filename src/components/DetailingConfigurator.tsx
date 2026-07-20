@@ -409,7 +409,7 @@ const PKGS: Pkg[] = [
     name: "2-Staps Lakcorrectie",
     forWho: "Diepe krassen en holograms weg. Maximaal glansherstel.",
     duration: "± 1–1,5 dag", totalMinuten: 660,
-    prices: { normaal: 699, grootSuv: 799, busPickup: 899 },
+    prices: { normaal: 849, grootSuv: 949, busPickup: 1099 },
     sections: [
       {
         title: "Analyse",
