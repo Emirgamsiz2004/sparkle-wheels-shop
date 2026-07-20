@@ -661,7 +661,7 @@ const DetailingConfigurator = () => {
                 id={`pkg-${p.id}`}
                 key={p.id}
                 className={cn(
-                  "relative flex flex-col rounded-md border p-6 transition-all bg-card scroll-mt-32",
+                  "relative flex flex-col rounded-md border p-5 transition-all bg-card scroll-mt-32",
                   p.popular ? "border-accent/40" : "border-white/10",
                   active && "ring-2 ring-accent border-accent",
                 )}
