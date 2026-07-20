@@ -591,7 +591,7 @@ const DetailingConfigurator = () => {
                       type="button"
                       onClick={() => setSize(s.key)}
                       className={cn(
-                        "flex-1 md:flex-none px-4 md:px-5 py-2 rounded-lg text-xs md:text-sm font-medium transition-all whitespace-nowrap",
+                        "flex-1 md:flex-none px-4 md:px-5 py-2 rounded-md text-xs md:text-sm font-medium transition-all whitespace-nowrap",
                         active
                           ? "bg-accent text-accent-foreground shadow-sm"
                           : "text-white/70 hover:text-white",
@@ -627,7 +627,7 @@ const DetailingConfigurator = () => {
                 type="button"
                 onClick={() => setTab(t.key)}
                 className={cn(
-                  "px-5 py-2.5 rounded-xl text-sm font-medium transition-all border",
+                  "px-5 py-2.5 rounded-md text-sm font-medium transition-all border",
                   active
                     ? "bg-white/10 text-white border-white/20"
                     : "bg-transparent text-white/60 border-white/10 hover:text-white hover:border-white/20",
@@ -705,7 +705,7 @@ const DetailingConfigurator = () => {
                   type="button"
                   onClick={() => setSelectedId(active ? null : p.id)}
                   className={cn(
-                    "w-full py-3 rounded-xl text-sm font-semibold transition-colors",
+                    "w-full py-3 rounded-md text-sm font-semibold transition-colors",
                     active
                       ? "bg-white/10 text-white hover:bg-white/15"
                       : "bg-accent text-accent-foreground hover:bg-accent/85",
@@ -806,7 +806,7 @@ const DetailingConfigurator = () => {
                 <button
                   type="button"
                   onClick={() => setBookingOpen(true)}
-                  className="col-span-3 md:col-span-1 px-5 py-3 rounded-xl bg-accent text-accent-foreground text-sm font-semibold hover:bg-accent/85 transition-colors"
+                  className="col-span-3 md:col-span-1 px-5 py-3 rounded-md bg-accent text-accent-foreground text-sm font-semibold hover:bg-accent/85 transition-colors"
                 >
                   Boek online
                 </button>
@@ -814,13 +814,13 @@ const DetailingConfigurator = () => {
                   href={whatsappHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors"
                 >
                   <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
                 <a
                   href="tel:+31717812525"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors"
                 >
                   <Phone className="w-4 h-4" /> <span className="hidden sm:inline">071-781 25 25</span><span className="sm:hidden">Bellen</span>
                 </a>
@@ -883,7 +883,7 @@ const AddonGroup = ({ title, hint, allowed, lockedText, options, selected, onTog
               disabled={!allowed}
               onClick={() => onToggle(o.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm transition-colors border",
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left text-sm transition-colors border",
                 !allowed && "cursor-not-allowed border-transparent",
                 allowed && checked && "bg-accent/10 border-accent/40 text-white",
                 allowed && !checked && "border-white/5 hover:border-white/15 hover:bg-white/[0.03] text-white/85",
@@ -891,7 +891,7 @@ const AddonGroup = ({ title, hint, allowed, lockedText, options, selected, onTog
             >
               <span
                 className={cn(
-                  "w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors",
+                  "w-4 h-4 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors",
                   checked ? "bg-accent border-accent" : "border-white/25",
                 )}
               >
