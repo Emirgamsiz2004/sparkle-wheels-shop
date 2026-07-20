@@ -134,24 +134,30 @@ const Afspraak = () => {
       .then(({ data }) => setVehicles((data as any) || []));
   }, [isFlowA, step]);
 
-  // Load booked slots for chosen vehicle
+  // Load booked slots wanneer we een echte match hebben (voor slot-blokkade)
   useEffect(() => {
-    if (!isFlowA || !selectedVehicle) return;
+    if (!isFlowA || !matchedVehicle) { setBookedSlots([]); return; }
     supabase
       .from("appointment_slots")
       .select("datum_tijd")
-      .eq("vehicle_id", selectedVehicle.id)
+      .eq("vehicle_id", matchedVehicle.id)
       .gte("datum_tijd", new Date().toISOString())
       .then(({ data }) => setBookedSlots((data as any) || []));
-  }, [selectedVehicle, isFlowA]);
+  }, [matchedVehicle, isFlowA]);
 
-  const filteredVehicles = useMemo(() => {
-    const q = vehicleSearch.trim().toLowerCase();
-    if (!q) return vehicles;
-    return vehicles.filter((v) =>
-      [v.merk, v.model, v.kenteken, String(v.bouwjaar)].filter(Boolean).join(" ").toLowerCase().includes(q)
-    );
-  }, [vehicles, vehicleSearch]);
+  const vehicleSuggestions = useMemo(() => {
+    const q = vehicleQuery.trim().toLowerCase();
+    if (!q || q.length < 2) return [];
+    return vehicles
+      .filter((v) =>
+        [v.merk, v.model, v.kenteken, String(v.bouwjaar)]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      )
+      .slice(0, 6);
+  }, [vehicles, vehicleQuery]);
 
   const slotTaken = (slot: string) => {
     if (!date) return false;
@@ -162,7 +168,8 @@ const Afspraak = () => {
   };
 
   const reset = () => {
-    setStep(1); setType(null); setSelectedVehicle(null); setDate(undefined); setTime(null);
+    setStep(1); setType(null); setMatchedVehicle(null); setDate(undefined); setTime(null);
+    setVehicleQuery(""); setVehicleKleur(""); setVehicleKenteken(""); setShowSuggestions(false);
     setForm({ voornaam: "", achternaam: "", telefoon: "", email: "", opmerking: "", kenteken: "", omschrijving: "", voorkeursdatum: "" });
     setErrors({}); setDone(false);
   };
