@@ -385,7 +385,7 @@ const Afspraak = () => {
               <Card>
                 <div className="mb-6">
                   <p className="text-[11px] tracking-[0.15em] uppercase text-emerald-400 font-semibold mb-3">Direct bevestigd</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {flowAOptions.map((opt) => (
                       <button key={opt.type} onClick={() => pickType(opt.type)}
                         className="text-left p-4 rounded-xl border border-white/10 hover:border-primary/40 hover:bg-white/[0.03] transition-all group">
