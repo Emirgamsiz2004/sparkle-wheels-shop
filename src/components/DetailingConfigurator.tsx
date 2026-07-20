@@ -594,7 +594,7 @@ const DetailingConfigurator = () => {
                 type="button"
                 onClick={() => setTab(t.key)}
                 className={cn(
-                  "px-5 py-2.5 rounded-full text-sm font-medium transition-all border",
+                  "px-5 py-2.5 rounded-xl text-sm font-medium transition-all border",
                   active
                     ? "bg-white/10 text-white border-white/20"
                     : "bg-transparent text-white/60 border-white/10 hover:text-white hover:border-white/20",
