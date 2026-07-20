@@ -139,7 +139,7 @@ const DetailingCTASection = () => {
                 className="overflow-hidden border-t border-border scroll-mt-24"
               >
                 <div ref={configRef} className="relative">
-                  <DetailingConfigurator embedded />
+                  <DetailingConfigurator />
                 </div>
               </motion.div>
             )}
