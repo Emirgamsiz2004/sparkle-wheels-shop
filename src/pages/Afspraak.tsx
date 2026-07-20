@@ -414,31 +414,74 @@ const Afspraak = () => {
           ) : isFlowA && step === 2 ? (
             <motion.div key="s2a" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <Card>
-                <h2 className="text-lg font-semibold mb-4">Kies een voertuig</h2>
-                <div className="relative mb-4">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                  <Input placeholder="Zoek op merk, model of kenteken..." value={vehicleSearch}
-                    onChange={(e) => setVehicleSearch(e.target.value)} className="pl-10" />
-                </div>
-                <div className="max-h-[420px] overflow-y-auto space-y-1">
-                  {filteredVehicles.length === 0 && (
-                    <p className="text-white/50 text-sm text-center py-8">Geen voertuigen gevonden.</p>
-                  )}
-                  {filteredVehicles.map((v) => (
-                    <button key={v.id} onClick={() => { setSelectedVehicle(v); setStep(3); }}
-                      className="w-full text-left p-3 rounded-lg hover:bg-white/[0.06] transition-colors flex items-center gap-3 border-b border-white/5">
-                      <Car className="w-4 h-4 text-white/40 shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <div className="font-medium text-sm truncate">{v.merk} {v.model}</div>
-                        <div className="text-xs text-white/50 truncate">
-                          {[v.bouwjaar, v.kenteken, v.kilometerstand ? `${v.kilometerstand.toLocaleString("nl-NL")} km` : null].filter(Boolean).join(" • ")}
-                        </div>
+                <h2 className="text-lg font-semibold mb-1">Welke auto komt u bekijken?</h2>
+                <p className="text-xs text-white/50 mb-5">Vul in wat u weet — merk en model volstaan.</p>
+
+                <div className="space-y-4">
+                  <div className="relative">
+                    <Label>Auto (merk + model) *</Label>
+                    <Input
+                      placeholder="Bijv. BMW 3-serie"
+                      value={vehicleQuery}
+                      onChange={(e) => {
+                        setVehicleQuery(e.target.value);
+                        setMatchedVehicle(null);
+                        setShowSuggestions(true);
+                      }}
+                      onFocus={() => setShowSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                    />
+                    {showSuggestions && vehicleSuggestions.length > 0 && (
+                      <div className="absolute z-20 left-0 right-0 mt-1 bg-[#0f0f0f] border border-white/10 rounded-[10px] overflow-hidden shadow-2xl max-h-64 overflow-y-auto">
+                        <p className="px-3 pt-2 pb-1 text-[10px] tracking-[0.14em] uppercase text-white/40 font-semibold">Uit onze voorraad</p>
+                        {vehicleSuggestions.map((v) => (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              setVehicleQuery(`${v.merk} ${v.model}${v.bouwjaar ? ` (${v.bouwjaar})` : ""}`);
+                              if (v.kenteken) setVehicleKenteken(v.kenteken);
+                              setMatchedVehicle(v);
+                              setShowSuggestions(false);
+                            }}
+                            className="w-full text-left px-3 py-2.5 hover:bg-white/[0.06] transition-colors flex items-center gap-3 border-t border-white/5"
+                          >
+                            <Car className="w-4 h-4 text-white/40 shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-medium text-sm truncate">{v.merk} {v.model}</div>
+                              <div className="text-xs text-white/50 truncate">
+                                {[v.bouwjaar, v.kenteken].filter(Boolean).join(" • ")}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                    </button>
-                  ))}
+                    )}
+                    {matchedVehicle && (
+                      <p className="text-[11px] text-emerald-400 mt-1.5 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Gekoppeld aan onze voorraad
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Kleur (optioneel)</Label>
+                      <Input placeholder="Bijv. antraciet" value={vehicleKleur}
+                        onChange={(e) => setVehicleKleur(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>Kenteken (optioneel)</Label>
+                      <Input placeholder="XX-000-XX" value={vehicleKenteken}
+                        onChange={(e) => setVehicleKenteken(e.target.value.toUpperCase())} />
+                    </div>
+                  </div>
                 </div>
+
                 <div className="flex justify-between mt-6">
                   <Btn variant="ghost" onClick={() => setStep(1)}><ArrowLeft className="w-4 h-4" /> Terug</Btn>
+                  <Btn onClick={() => setStep(3)} disabled={!vehicleQuery.trim()}>Volgende <ArrowRight className="w-4 h-4" /></Btn>
                 </div>
               </Card>
             </motion.div>
