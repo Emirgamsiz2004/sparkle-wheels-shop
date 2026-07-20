@@ -107,7 +107,7 @@ const PKGS: Pkg[] = [
     name: "Compleet Signature",
     forWho: "Maximale correctie en jarenlange bescherming met keramische coating.",
     duration: "± 1,5–2 dagen", totalMinuten: 960,
-    prices: { normaal: 1499, grootSuv: 1699, busPickup: 1899 },
+    prices: { normaal: 1799, grootSuv: 1999, busPickup: 2249 },
     sections: [
       {
         title: "Exterieur & lakcorrectie",
@@ -326,7 +326,7 @@ const PKGS: Pkg[] = [
     name: "Interieur Signature",
     forWho: "Volledige restauratie van het interieur — als nieuw en beschermd voor de toekomst.",
     duration: "± dag", totalMinuten: 480,
-    prices: { normaal: 399, grootSuv: 449, busPickup: 499 },
+    prices: { normaal: 499, grootSuv: 559, busPickup: 619 },
     sections: [
       {
         title: "Basis",
@@ -409,7 +409,7 @@ const PKGS: Pkg[] = [
     name: "2-Staps Lakcorrectie",
     forWho: "Diepe krassen en holograms weg. Maximaal glansherstel.",
     duration: "± 1–1,5 dag", totalMinuten: 660,
-    prices: { normaal: 699, grootSuv: 799, busPickup: 899 },
+    prices: { normaal: 849, grootSuv: 949, busPickup: 1099 },
     sections: [
       {
         title: "Analyse",
@@ -440,7 +440,7 @@ const PKGS: Pkg[] = [
     name: "Keramische Coating",
     forWho: "Jarenlange bescherming, diepe glans en makkelijker schoonmaken.",
     duration: "± 1,5–2 dagen", totalMinuten: 960,
-    prices: { normaal: 999, grootSuv: 1149, busPickup: 1299 },
+    prices: { normaal: 1249, grootSuv: 1399, busPickup: 1599 },
     sections: [
       {
         title: "Voorbereiding (inbegrepen)",
