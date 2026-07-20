@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import DetailingBookingDialog from "./DetailingBookingDialog";
 
 type SizeKey = "normaal" | "grootSuv" | "busPickup";
-type TabKey = "compleet" | "exterieur" | "interieur";
+type TabKey = "compleet" | "exterieur" | "interieur" | "polijsten";
 type Side = "interieur" | "exterieur" | "beide";
 
 const SIZES: { key: SizeKey; label: string; short: string }[] = [
