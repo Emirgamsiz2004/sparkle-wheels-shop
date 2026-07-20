@@ -181,7 +181,70 @@ const PKGS: Pkg[] = [
       "Kofferbak dieptereiniging",
     ],
   },
+  // Polijsten & Coating (losse behandelingen)
+  {
+    id: "polish-spot",
+    tab: "polijsten", side: "exterieur", level: 1, levelLabel: "Losse behandeling",
+    name: "Spot-correctie",
+    forWho: "Eén paneel of specifieke kras/swirl-plek machinaal wegwerken.",
+    duration: "± 1 uur", totalMinuten: 60,
+    prices: { normaal: 55, grootSuv: 55, busPickup: 65 },
+    features: [
+      "Per onderdeel of zone (motorkap, deur, bumper)",
+      "Machinale polijst met professionele pads",
+      "Voorreiniging van het paneel",
+      "Ideaal bij lokale krassen of matte plek",
+    ],
+  },
+  {
+    id: "polish-1staps",
+    tab: "polijsten", side: "exterieur", level: 2, levelLabel: "Volledige auto",
+    name: "1-Staps Polijst",
+    forWho: "Verwijdert swirls en lichte krassen — de auto knapt zichtbaar op.",
+    duration: "± halve dag", totalMinuten: 300,
+    prices: { normaal: 329, grootSuv: 379, busPickup: 429 },
+    popular: true,
+    features: [
+      "Volledige handwas & drogen vooraf",
+      "Kleibehandeling van de gehele lak",
+      "Machinale 1-staps polijst rondom",
+      "Sealant voor maandenlange bescherming",
+      "Kunststof exterieurdelen voeden",
+    ],
+  },
+  {
+    id: "polish-2staps",
+    tab: "polijsten", side: "exterieur", level: 3, levelLabel: "Volledige auto",
+    name: "2-Staps Lakcorrectie",
+    forWho: "Diepe krassen en holograms weg. Maximaal glansherstel.",
+    duration: "± 1–1,5 dag", totalMinuten: 600,
+    prices: { normaal: 499, grootSuv: 579, busPickup: 649 },
+    features: [
+      "Digitale lakdiktemeting vooraf",
+      "Kleibehandeling van de gehele lak",
+      "Cutting stap — diepere krassen weg",
+      "Finishing stap — maximale gloss",
+      "Sealant of voorbereiding voor coating",
+    ],
+  },
+  {
+    id: "polish-coating",
+    tab: "polijsten", side: "exterieur", level: null, levelLabel: "Bescherming",
+    name: "Keramische Coating",
+    forWho: "Jarenlange bescherming, diepe glans en makkelijker schoonmaken.",
+    duration: "± 1,5–2 dagen", totalMinuten: 900,
+    prices: { normaal: 549, grootSuv: 649, busPickup: 749 },
+    features: [
+      "Vereist 1- of 2-staps polijst als basis",
+      "Professionele keramische coating (2–5 jaar)",
+      "Velgen- en glascoating optioneel",
+      "IR-uitharden per paneel",
+      "Onderhoudskit & advies mee",
+    ],
+    tip: { text: "Keramische coating is altijd inclusief voorbereidend polijstwerk", to: "#" },
+  },
 ];
+
 
 interface AddOn {
   id: string;
