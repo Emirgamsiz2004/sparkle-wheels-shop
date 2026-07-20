@@ -191,7 +191,7 @@ const Afspraak = () => {
   };
 
   const submitFlowA = async () => {
-    if (!validateCustomer() || !selectedVehicle || !date || !time || !type) return;
+    if (!validateCustomer() || !vehicleQuery.trim() || !date || !time || !type) return;
     setSubmitting(true);
     try {
       const [hh, mm] = time.split(":").map(Number);
@@ -200,24 +200,35 @@ const Afspraak = () => {
       const eind = new Date(dt);
       eind.setHours(eind.getHours() + 1);
 
+      const autoDescriptor = [
+        `Auto: ${vehicleQuery.trim()}`,
+        vehicleKleur.trim() && `Kleur: ${vehicleKleur.trim()}`,
+        vehicleKenteken.trim() && `Kenteken: ${vehicleKenteken.trim().toUpperCase()}`,
+      ].filter(Boolean).join(" · ");
+
+      const notitie = [autoDescriptor, form.opmerking].filter(Boolean).join("\n");
+
       const { data: inserted, error } = await supabase.from("appointments").insert({
-        type,
+        type: DB_TYPE[type],
         datum_tijd: dt.toISOString(),
         eind_datum_tijd: eind.toISOString(),
-        vehicle_id: selectedVehicle.id,
+        vehicle_id: matchedVehicle?.id ?? null,
         status: "gepland",
         bron: "website",
         is_aanvraag: false,
-        notities: form.opmerking || null,
+        notities: notitie || null,
         aanvrager_voornaam: form.voornaam,
         aanvrager_achternaam: form.achternaam,
         aanvrager_telefoon: form.telefoon,
         aanvrager_email: form.email,
+        aanvrager_kenteken: vehicleKenteken.trim().toUpperCase() || null,
       }).select("id").single();
 
       if (error) throw error;
 
-      const voertuig = `${selectedVehicle.merk} ${selectedVehicle.model}${selectedVehicle.kenteken ? ` (${selectedVehicle.kenteken})` : ""}`;
+      const voertuig = matchedVehicle
+        ? `${matchedVehicle.merk} ${matchedVehicle.model}${matchedVehicle.kenteken ? ` (${matchedVehicle.kenteken})` : ""}`
+        : autoDescriptor.replace(/^Auto: /, "");
       const datumStr = format(dt, "EEEE d MMMM yyyy", { locale: nl });
 
       await Promise.all([
