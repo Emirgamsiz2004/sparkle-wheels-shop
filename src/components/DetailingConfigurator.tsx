@@ -391,6 +391,7 @@ const DetailingConfigurator = () => {
             { key: "compleet", label: "Compleet" },
             { key: "exterieur", label: "Alleen exterieur" },
             { key: "interieur", label: "Alleen interieur" },
+            { key: "polijsten", label: "Polijsten & coating" },
           ] as { key: TabKey; label: string }[]).map((t) => {
             const active = tab === t.key;
             return (
