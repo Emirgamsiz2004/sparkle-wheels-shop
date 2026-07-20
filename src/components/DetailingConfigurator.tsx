@@ -107,7 +107,7 @@ const PKGS: Pkg[] = [
     name: "Compleet Signature",
     forWho: "Maximale correctie en jarenlange bescherming met keramische coating.",
     duration: "± 1,5–2 dagen", totalMinuten: 960,
-    prices: { normaal: 1499, grootSuv: 1699, busPickup: 1899 },
+    prices: { normaal: 1799, grootSuv: 1999, busPickup: 2249 },
     sections: [
       {
         title: "Exterieur & lakcorrectie",
