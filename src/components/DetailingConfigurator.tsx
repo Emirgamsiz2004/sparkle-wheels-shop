@@ -649,7 +649,7 @@ const DetailingConfigurator = () => {
         </div>
 
         {/* Cards */}
-        <div className="grid gap-5 md:gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
+        <div className="grid gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-12">
           {visiblePackages.map((p) => {
             const active = selectedId === p.id;
             const isExpanded = expandedIds.has(p.id);
