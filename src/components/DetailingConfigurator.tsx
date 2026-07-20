@@ -806,7 +806,7 @@ const DetailingConfigurator = () => {
                 <button
                   type="button"
                   onClick={() => setBookingOpen(true)}
-                  className="col-span-3 md:col-span-1 px-5 py-3 rounded-xl bg-accent text-accent-foreground text-sm font-semibold hover:bg-accent/85 transition-colors"
+                  className="col-span-3 md:col-span-1 px-5 py-3 rounded-md bg-accent text-accent-foreground text-sm font-semibold hover:bg-accent/85 transition-colors"
                 >
                   Boek online
                 </button>
@@ -814,13 +814,13 @@ const DetailingConfigurator = () => {
                   href={whatsappHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors"
                 >
                   <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
                 <a
                   href="tel:+31717812525"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-colors"
                 >
                   <Phone className="w-4 h-4" /> <span className="hidden sm:inline">071-781 25 25</span><span className="sm:hidden">Bellen</span>
                 </a>
