@@ -560,7 +560,7 @@ const DetailingConfigurator = () => {
                       className={cn(
                         "flex-1 md:flex-none px-4 md:px-5 py-2 rounded-lg text-xs md:text-sm font-medium transition-all whitespace-nowrap",
                         active
-                          ? "bg-amber-400 text-background shadow-sm"
+                          ? "bg-accent text-accent-foreground shadow-sm"
                           : "text-white/70 hover:text-white",
                       )}
                     >
@@ -572,7 +572,7 @@ const DetailingConfigurator = () => {
             </div>
             <p className="text-xs text-muted-foreground md:text-right">
               Camper, caravan of vrachtwagen?{" "}
-              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="text-amber-400 hover:underline font-medium">
+              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="text-accent hover:underline font-medium">
                 Vraag een prijs op maat
               </a>
             </p>
@@ -594,7 +594,7 @@ const DetailingConfigurator = () => {
                 type="button"
                 onClick={() => setTab(t.key)}
                 className={cn(
-                  "px-5 py-2.5 rounded-full text-sm font-medium transition-all border",
+                  "px-5 py-2.5 rounded-xl text-sm font-medium transition-all border",
                   active
                     ? "bg-white/10 text-white border-white/20"
                     : "bg-transparent text-white/60 border-white/10 hover:text-white hover:border-white/20",
@@ -615,17 +615,17 @@ const DetailingConfigurator = () => {
               <article
                 key={p.id}
                 className={cn(
-                  "relative flex flex-col rounded-2xl border p-6 transition-all bg-card",
-                  p.popular ? "border-amber-400/40" : "border-white/10",
-                  active && "ring-2 ring-amber-400 border-amber-400",
+                  "relative flex flex-col rounded-xl border p-6 transition-all bg-card",
+                  p.popular ? "border-accent/40" : "border-white/10",
+                  active && "ring-2 ring-accent border-accent",
                 )}
               >
                 {p.popular && (
-                  <span className="absolute -top-3 left-6 inline-flex items-center gap-1 px-3 py-1 bg-amber-400 text-background rounded-full text-[10px] font-bold tracking-[0.14em] uppercase">
+                  <span className="absolute -top-3 left-6 inline-flex items-center gap-1 px-3 py-1 bg-accent text-accent-foreground rounded-full text-[10px] font-bold tracking-[0.14em] uppercase">
                     <Sparkles className="w-3 h-3" /> Meest gekozen
                   </span>
                 )}
-                <p className="text-[10px] tracking-[0.14em] uppercase text-amber-400/80 font-semibold mb-2">
+                <p className="text-[10px] tracking-[0.14em] uppercase text-accent/80 font-semibold mb-2">
                   {p.levelLabel}
                 </p>
                 <h3 className="font-display text-xl font-semibold text-foreground mb-2">{p.name}</h3>
@@ -650,7 +650,7 @@ const DetailingConfigurator = () => {
                           const dim = f.toLowerCase().startsWith("alles van");
                           return (
                             <li key={f} className="flex items-start gap-2 text-sm">
-                              <Check className={cn("w-3.5 h-3.5 mt-1 flex-shrink-0", dim ? "text-white/40" : "text-amber-400")} />
+                              <Check className={cn("w-3.5 h-3.5 mt-1 flex-shrink-0", dim ? "text-white/40" : "text-accent")} />
                               <span className={cn("leading-snug", dim ? "text-white/55 italic" : "text-white/85")}>{f}</span>
                             </li>
                           );
@@ -664,7 +664,7 @@ const DetailingConfigurator = () => {
                 {p.tip && (
                   <p className="text-xs text-muted-foreground mb-4 pb-4 border-b border-white/5">
                     {p.tip.text} —{" "}
-                    <Link to={p.tip.to} className="text-amber-400 hover:underline">meer info</Link>
+                    <Link to={p.tip.to} className="text-accent hover:underline">meer info</Link>
                   </p>
                 )}
 
@@ -675,7 +675,7 @@ const DetailingConfigurator = () => {
                     "w-full py-3 rounded-xl text-sm font-semibold transition-colors",
                     active
                       ? "bg-white/10 text-white hover:bg-white/15"
-                      : "bg-amber-400 text-background hover:bg-amber-300",
+                      : "bg-accent text-accent-foreground hover:bg-accent/85",
                   )}
                 >
                   {active ? "Gekozen — klik om te wisselen" : "Kies dit pakket"}
@@ -735,8 +735,8 @@ const DetailingConfigurator = () => {
               { n: 3, t: "Wij gaan aan de slag", d: "Onze detailers behandelen uw auto met professionele producten en apparatuur." },
               { n: 4, t: "Oplevering", d: "U ontvangt uw auto terug met onderhoudsadvies om het resultaat lang mooi te houden." },
             ].map((s) => (
-              <div key={s.n} className="rounded-2xl border border-white/10 bg-card p-6">
-                <div className="w-9 h-9 rounded-full bg-amber-400 text-background inline-flex items-center justify-center font-bold text-sm mb-3">
+              <div key={s.n} className="rounded-xl border border-white/10 bg-card p-6">
+                <div className="w-9 h-9 rounded-full bg-accent text-accent-foreground inline-flex items-center justify-center font-bold text-sm mb-3">
                   {s.n}
                 </div>
                 <h4 className="font-display text-base font-semibold text-foreground mb-2">{s.t}</h4>
@@ -765,7 +765,7 @@ const DetailingConfigurator = () => {
               </div>
               <div className="flex items-baseline gap-2 md:border-l md:border-white/10 md:pl-6">
                 <span className="text-xs text-white/50">vanaf</span>
-                <span className="font-display text-2xl md:text-3xl font-bold text-amber-400">
+                <span className="font-display text-2xl md:text-3xl font-bold text-accent">
                   €{total.toLocaleString("nl-NL")}
                 </span>
               </div>
@@ -773,7 +773,7 @@ const DetailingConfigurator = () => {
                 <button
                   type="button"
                   onClick={() => setBookingOpen(true)}
-                  className="col-span-3 md:col-span-1 px-5 py-3 rounded-xl bg-amber-400 text-background text-sm font-semibold hover:bg-amber-300 transition-colors"
+                  className="col-span-3 md:col-span-1 px-5 py-3 rounded-xl bg-accent text-accent-foreground text-sm font-semibold hover:bg-accent/85 transition-colors"
                 >
                   Boek online
                 </button>
@@ -828,7 +828,7 @@ interface AddonGroupProps {
 const AddonGroup = ({ title, hint, allowed, lockedText, options, selected, onToggle }: AddonGroupProps) => (
   <div
     className={cn(
-      "rounded-2xl border p-5 transition-opacity",
+      "rounded-xl border p-5 transition-opacity",
       allowed ? "border-white/10 bg-card" : "border-white/5 bg-card/40 opacity-60",
     )}
   >
@@ -852,20 +852,20 @@ const AddonGroup = ({ title, hint, allowed, lockedText, options, selected, onTog
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm transition-colors border",
                 !allowed && "cursor-not-allowed border-transparent",
-                allowed && checked && "bg-amber-400/10 border-amber-400/40 text-white",
+                allowed && checked && "bg-accent/10 border-accent/40 text-white",
                 allowed && !checked && "border-white/5 hover:border-white/15 hover:bg-white/[0.03] text-white/85",
               )}
             >
               <span
                 className={cn(
                   "w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors",
-                  checked ? "bg-amber-400 border-amber-400" : "border-white/25",
+                  checked ? "bg-accent border-accent" : "border-white/25",
                 )}
               >
                 {checked && <Check className="w-3 h-3 text-background" strokeWidth={3} />}
               </span>
               <span className="flex-1">{o.name}</span>
-              <span className={cn("tabular-nums font-medium", checked ? "text-amber-400" : "text-white/60")}>
+              <span className={cn("tabular-nums font-medium", checked ? "text-accent" : "text-white/60")}>
                 €{o.price}
               </span>
             </button>
