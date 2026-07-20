@@ -36,9 +36,6 @@ const DB_TYPE: Record<AppType, string> = {
 const flowAOptions: { type: FlowAType; icon: any; desc: string }[] = [
   { type: "bezichtiging_proefrit", icon: Car, desc: "Bekijk de auto in onze showroom — met optioneel een proefrit ter plekke." },
 ];
-const _unused_marker = [
-  { type: "bezichtiging_proefrit", icon: Car, desc: "Bekijk de auto in onze showroom, met optioneel een proefrit." },
-];
 const flowBOptions: { type: FlowBType; icon: any; desc: string }[] = [
   { type: "poetsbeurt", icon: Sparkles, desc: "Detailing en interieurreiniging" },
   { type: "onderhoud", icon: Wrench, desc: "Onderhoud of reparatie" },
