@@ -266,7 +266,8 @@ const EXT_ADDONS: AddOn[] = [
   { id: "motorruimte", name: "Motorruimte reinigen & detailen", price: 49 },
   { id: "dak", name: "Dak reinigen & waxen (hoge voertuigen)", price: 89 },
   { id: "koplampen", name: "Koplampen polijsten (set)", price: 55 },
-  { id: "spot", name: "Polijsten per onderdeel (spot-correctie)", price: 55 },
+  { id: "glascoating", name: "Glascoating (regenafstotend)", price: 79 },
+  { id: "velgencoating", name: "Velgencoating los", price: 89 },
 ];
 
 const WHATSAPP = "https://wa.me/31717812525";
