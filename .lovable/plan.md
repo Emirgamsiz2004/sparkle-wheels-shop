@@ -1,61 +1,47 @@
-## Doel
-Planning module functioneler + minimalistischer maken, met inline detailpaneel en 1-klik Moneybird factuur.
 
-## Database (1 migratie)
-- `diensten.standaard_prijs_cent` (int, nullable) — vaste prijs per dienst.
-- `appointments.prijs_regels` (jsonb, default `[]`) — array `{omschrijving, aantal, prijs_cent, btw_pct}` voor handmatige regels.
-- `appointments.totaal_prijs_cent` (int, nullable) — totaalprijs cache (optioneel ingevuld).
-- `appointments.moneybird_invoice_id` (text, nullable) + `moneybird_invoice_url` (text, nullable) — voorkomt dubbele facturen.
+# Plan: Afspraak-flow vereenvoudigen + detailingpagina strakker
 
-## Nieuwe layout `/admin/planning`
+## 1. Bezichtiging & proefrit samenvoegen (`src/pages/Afspraak.tsx`)
 
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│ Planning           [Agenda | Lijst]            [+ Afspraak]     │
-├──────────────────────────────────┬──────────────────────────────┤
-│  Week-agenda (compacter,         │  Detailpaneel (sticky)       │
-│  minder kleur, 1 dot per type)   │  – geselecteerde afspraak    │
-│                                  │  – of "Vandaag" samenvatting │
-│  Mo Di Wo Do Vr Za Zo            │    als niets geselecteerd    │
-│  ...                             │                              │
-└──────────────────────────────────┴──────────────────────────────┘
-```
+Nieuw type: één optie **"Bezichtiging & proefrit"** (`bezichtiging_proefrit`). Deze vervangt de twee losse tegels bovenaan stap 1. Tijdens de afspraak zelf bepalen of er ook echt gereden wordt — dat maakt voor de planning niets uit.
 
-- Geen popup meer. Klik op afspraak vult rechterpaneel. Op mobile valt het paneel terug naar een bottom-sheet.
-- Agenda zelf: rustiger — neutrale tegels, alleen kleine type-dot + tijd + naam.
+- `TYPE_LABELS`: label = "Bezichtiging & proefrit".
+- Backend: waarde blijft opgeslagen als `bezichtiging` (zelfde slot-/agenda-logica, geen migratie nodig; alle bestaande admin-filters blijven werken).
+- Stap 1 toont dus nog maar één "Direct bevestigd"-kaart + de drie service-kaarten eronder.
 
-## Detailpaneel (rechterzijde, minimalistisch)
-Vaste opbouw, weinig knoppen:
-1. **Header:** type · tijd · datum.
-2. **Klant + voertuig** (1 regel elk, geen iconen-overdaad).
-3. **Reparatiepunten / checklist** (inline bewerkbaar, blijft zoals nu).
-4. **Diensten / prijsregels** — tabel met per regel: omschrijving · aantal · prijs. Prijs auto-gevuld vanuit `diensten.standaard_prijs_cent`, handmatig te overschrijven. Toon totaal onderaan.
-5. **Status segment** (Bevestigd / Afgerond / No-show).
-6. **Acties (max 3 knoppen):**
-   - `Bellen` / `WhatsApp` (samen 1 rij, compact)
-   - **`Factuur in Moneybird`** — alleen zichtbaar bij types `poetsbeurt`, `onderhoud`, `aflevering` en wanneer er prijsregels zijn. Disabled als al gefactureerd; toont dan link naar Moneybird.
-7. Footer: Bewerken · Verwijderen.
+## 2. Voertuigkeuze vervangen door vrij invulveld
 
-## Moneybird-knop flow (concept-factuur)
-Eén klik → roept `moneybird` edge function aan met action `create_wizard_invoice` (bestaat al):
-- `contact_payload` opgebouwd uit klant (CRM-klant of losse klant) + kenteken in `reference`.
-- `details_attributes` = prijsregels van de afspraak (omschrijving = dienstnaam, prijs = `prijs_cent/100`, aantal = `aantal`). Werkzaamheden-omschrijving wordt eerste regel als er geen diensten zijn.
-- `prices_are_incl_tax: true`, geen `workflow_id`.
-- Resultaat → `moneybird_invoice_id` + `moneybird_invoice_url` opslaan op de afspraak; toast met "Concept aangemaakt – open in Moneybird".
+Stap 2 (nu: lijst uit `vehicles`-tabel) wordt vervangen door een klein formulier:
 
-Geen automatische verzending — concept blijft in Moneybird ter controle.
+- **Auto (merk + model)** — verplicht, vrij tekstveld met suggesties uit onze voorraad terwijl je typt (autocomplete, maar niet-verplicht kiezen).
+- **Kleur** — optioneel.
+- **Kenteken** — optioneel.
 
-## Bestanden
-- Migratie (nieuwe kolommen).
-- Nieuw `src/components/admin/planning/AppointmentDetailPanel.tsx` (vervangt popover-gebruik op desktop).
-- `AdminPlanningPage.tsx`: 2-koloms layout (agenda + paneel), simpelere tegels.
-- `AppointmentDetailDialog.tsx`: hergebruikt op mobile als bottom-sheet wrapper rondom het paneel.
-- `AppointmentFormDialog.tsx`: prijsregels-sectie toevoegen.
-- `useAppointments.ts`: types uitbreiden met `prijs_regels`, `moneybird_invoice_id`, `moneybird_invoice_url`.
-- Geen nieuwe edge function nodig — `create_wizard_invoice` bestaat.
+Effect: klanten hoeven de auto niet meer uit een lijst te herkennen; ze schrijven gewoon wat ze komen bekijken. Bij het kiezen van een suggestie koppelen we alsnog `vehicle_id` (zodat de admin ziet welk voertuig), anders slaan we de vrije tekst op in `notities` / `aanvraag_omschrijving`.
 
-## Wat blijft hetzelfde
-- Lijstweergave, openstaande aanvragen, agenda-data-source, Google Calendar sync.
-- Checklist / reparatiepunten in notities-veld (recent toegevoegd).
+- Slot-blokkade op vehicle_id vervalt als er geen match is; anders blijft die werken.
+- `appointments.insert` krijgt `vehicle_id` alleen als er een match is; anders `null` + de vrije tekst in `notities` (`"Auto: {merk_model} · Kleur: {kleur} · Kenteken: {kenteken}"`).
 
-Akkoord? Dan start ik met de migratie en bouw daarna stap voor stap.
+Stap 3 (datum/tijd) en stap 4 (gegevens) blijven identiek. Totaal stappen blijft 4.
+
+## 3. Detailingpagina strakker (`src/pages/AutoDetailing.tsx` + `DetailingConfigurator.tsx`)
+
+Doel: klanten zien direct wat er is en kunnen zonder scrollmoeras boeken.
+
+- **Boven** de configurator een compacte "prijskaart-strip": 4 tegels (Reiniging / Premium / Signature / Coating) met vanaf-prijs en één regel omschrijving, elk met een "Kies" knop die direct de juiste tab + pakket voorselecteert in de configurator eronder.
+- **Configurator zelf**: 
+  - Tabs blijven, maar met korte ondertitels ("Reiniging" / "Polijsten" / "Coating" — geen jargon).
+  - Per pakket alleen top-3 highlights zichtbaar; overige features achter "Toon alles" (details-toggle) zodat de kaarten korter en scanbaarder worden.
+  - Sticky boekbalk onderaan blijft, maar krijgt tekst "Direct boeken — {pakket} · vanaf €X" i.p.v. alleen prijs.
+- Behandelingen-grid (`behandelingen` array) wordt ingekort naar 3 items ipv 5 en verplaatst onder de configurator (context, niet keuzestress).
+
+## Technisch
+
+- `Afspraak.tsx`: nieuwe `flowAOptions` met 1 item; typedef `FlowAType = "bezichtiging_proefrit"`; mapping bij insert naar `type: "bezichtiging"`. Stap 2 rewriten (verwijder vehicle-lijst render + `vehicles` query behouden alléén voor autocomplete-suggesties).
+- `DetailingConfigurator.tsx`: voeg `expanded` state per pakket toe, splits features in `primary` (max 3) + `rest`.
+- `AutoDetailing.tsx`: nieuwe `<QuickPicks />` sectie boven `<DetailingConfigurator />`, klik zet URL-hash zoals `#configurator?tab=coating&pkg=signature` — configurator leest deze bij mount.
+
+## Wat er niet verandert
+
+- Admin-agenda, appointment-tabel, e-mailtemplates, WhatsApp-flow: allemaal ongewijzigd.
+- Prijzen en pakketinhoud van detailing blijven zoals nu.
