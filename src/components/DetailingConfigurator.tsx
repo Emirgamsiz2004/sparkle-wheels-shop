@@ -583,35 +583,6 @@ const DetailingConfigurator = () => {
           </p>
         </div>
 
-        {/* Quick picks — direct de meest gekozen pakketten */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          {QUICK_PICKS.map((qp) => {
-            const pkg = PKGS.find((p) => p.id === qp.pkgId);
-            if (!pkg) return null;
-            const active = selectedId === qp.pkgId;
-            return (
-              <button
-                key={qp.pkgId}
-                type="button"
-                onClick={() => {
-                  setTab(qp.tab);
-                  setSelectedId(qp.pkgId);
-                  setTimeout(() => {
-                    document.getElementById(`pkg-${qp.pkgId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-                  }, 50);
-                }}
-                className={cn(
-                  "text-left rounded-md border p-4 bg-card transition-all hover:border-white/25",
-                  active ? "border-accent ring-1 ring-accent" : "border-white/10",
-                )}
-              >
-                <p className="text-[10px] tracking-[0.14em] uppercase text-white/50 font-semibold mb-1">{qp.sub}</p>
-                <p className="font-display text-sm md:text-base font-semibold text-foreground mb-1 truncate">{qp.label}</p>
-                <p className="text-xs text-white/70">vanaf <span className="text-accent font-semibold">€{pkg.prices[size].toLocaleString("nl-NL")}</span></p>
-              </button>
-            );
-          })}
-        </div>
 
         {/* Sticky voertuigmaat */}
         <div className="sticky top-16 z-30 -mx-6 lg:-mx-16 px-6 lg:px-16 bg-background/90 backdrop-blur-md border-y border-white/5 py-4 mb-10">
