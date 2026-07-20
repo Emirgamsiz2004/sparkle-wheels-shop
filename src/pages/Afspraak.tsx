@@ -11,23 +11,30 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-type FlowAType = "bezichtiging" | "proefrit";
+type FlowAType = "bezichtiging_proefrit";
 type FlowBType = "poetsbeurt" | "onderhoud" | "anders";
 type AppType = FlowAType | FlowBType;
 
 const TIMESLOTS = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 
 const TYPE_LABELS: Record<AppType, string> = {
-  bezichtiging: "Bezichtiging",
-  proefrit: "Proefrit",
+  bezichtiging_proefrit: "Bezichtiging & proefrit",
   poetsbeurt: "Poetsbeurt",
   onderhoud: "Reparatie / onderhoud",
   anders: "Anders",
 };
 
+// Map de klant-optie naar het waarde-veld in de database (blijft "bezichtiging"
+// zodat bestaande admin-filters en agenda-logica ongewijzigd blijven).
+const DB_TYPE: Record<AppType, string> = {
+  bezichtiging_proefrit: "bezichtiging",
+  poetsbeurt: "poetsbeurt",
+  onderhoud: "onderhoud",
+  anders: "anders",
+};
+
 const flowAOptions: { type: FlowAType; icon: any; desc: string }[] = [
-  { type: "bezichtiging", icon: Eye, desc: "Bekijk een auto in onze showroom" },
-  { type: "proefrit", icon: Car, desc: "Test een auto op de weg" },
+  { type: "bezichtiging_proefrit", icon: Car, desc: "Bekijk de auto in onze showroom, met optioneel een proefrit." },
 ];
 const flowBOptions: { type: FlowBType; icon: any; desc: string }[] = [
   { type: "poetsbeurt", icon: Sparkles, desc: "Detailing en interieurreiniging" },
