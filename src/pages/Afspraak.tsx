@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Car, Check, Eye, MessageSquare, Search, Sparkles, Wrench } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Car, Check, Eye, MessageSquare, Sparkles, Wrench } from "lucide-react";
 import { z } from "zod";
 import { format, addDays, isSameDay, startOfDay } from "date-fns";
 import { nl } from "date-fns/locale";
