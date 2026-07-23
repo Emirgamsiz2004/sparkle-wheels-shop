@@ -770,59 +770,91 @@ const DetailingConfigurator = () => {
           })}
         </div>
 
-        {/* Cards — Mobile visible overview */}
-        <div className="md:hidden mb-10 space-y-4">
-          <div className="grid grid-cols-2 gap-2.5">
+        {/* Cards — Mobile clear comparison list */}
+        <div className="md:hidden mb-10 space-y-3">
+          <div className="rounded-md border border-white/10 bg-card overflow-hidden divide-y divide-white/10">
             {visiblePackages.map((p) => {
               const active = selectedId === p.id;
               const focused = mobileDetailPackage?.id === p.id;
               const price = p.prices[size];
+              const highlights = p.sections.flatMap((sec) => sec.items).filter((item) => !item.toLowerCase().startsWith("alles van")).slice(0, 3);
 
               return (
-                <button
+                <article
                   key={p.id}
                   id={`pkg-m-${p.id}`}
-                  type="button"
-                  onClick={() => setMobileDetailId(p.id)}
                   className={cn(
-                    "relative min-h-[144px] rounded-md border p-3 text-left flex flex-col transition-colors scroll-mt-32",
-                    focused ? "bg-accent/10 border-accent" : "bg-card border-white/10",
-                    active && "ring-1 ring-accent",
+                    "scroll-mt-32 p-4 transition-colors",
+                    focused && "bg-accent/5",
+                    active && "bg-accent/10",
                   )}
                 >
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <p className="text-[9px] tracking-[0.12em] uppercase text-accent/80 font-semibold leading-snug">
-                      {p.levelLabel}
-                    </p>
-                    {p.popular && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-accent text-accent-foreground rounded-sm text-[9px] font-bold uppercase whitespace-nowrap">
-                        <Sparkles className="w-2.5 h-2.5" /> Top
-                      </span>
-                    )}
-                  </div>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <button type="button" onClick={() => setMobileDetailId(p.id)} className="min-w-0 flex-1 text-left">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <p className="text-[9px] tracking-[0.14em] uppercase text-accent/80 font-semibold leading-none">
+                          {p.levelLabel}
+                        </p>
+                        {p.popular && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-accent text-accent-foreground rounded-sm text-[9px] font-bold uppercase whitespace-nowrap">
+                            <Sparkles className="w-2.5 h-2.5" /> Top
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-display text-lg font-semibold text-foreground leading-tight">
+                        {p.name}
+                      </h3>
+                    </button>
 
-                  <h3 className="font-display text-[15px] font-semibold text-foreground leading-tight mb-2">
-                    {p.name}
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground leading-snug mb-3">
-                    {p.duration}
-                  </p>
-
-                  <div className="mt-auto flex items-end justify-between gap-2">
-                    <div>
+                    <button type="button" onClick={() => setMobileDetailId(p.id)} className="text-right flex-shrink-0">
                       <p className="text-[9px] text-muted-foreground leading-none">vanaf</p>
-                      <p className="font-display text-xl font-bold text-foreground leading-tight">
+                      <p className="font-display text-2xl font-bold text-foreground leading-tight">
                         €{price.toLocaleString("nl-NL")}
                       </p>
-                    </div>
-                    <span className={cn(
-                      "px-2 py-1 rounded-sm text-[10px] font-semibold",
-                      focused ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground",
-                    )}>
-                      Bekijk
-                    </span>
+                      <p className="text-[10px] text-muted-foreground">{p.duration}</p>
+                    </button>
                   </div>
-                </button>
+
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                    {p.forWho}
+                  </p>
+
+                  <ul className="space-y-1.5 mb-3">
+                    {highlights.map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-sm text-foreground">
+                        <Check className="w-3.5 h-3.5 mt-1 flex-shrink-0 text-accent" />
+                        <span className="leading-snug">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="grid grid-cols-[1fr_auto] gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(active ? null : p.id)}
+                      className={cn(
+                        "py-2.5 px-3 rounded-md text-sm font-semibold transition-colors",
+                        active
+                          ? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                          : "bg-accent text-accent-foreground hover:bg-accent/85",
+                      )}
+                    >
+                      {active ? "Gekozen" : "Kies pakket"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMobileDetailId(p.id)}
+                      className={cn(
+                        "py-2.5 px-3 rounded-md text-sm font-semibold border transition-colors",
+                        focused
+                          ? "border-accent bg-accent/10 text-foreground"
+                          : "border-white/10 bg-secondary text-secondary-foreground",
+                      )}
+                    >
+                      Details
+                    </button>
+                  </div>
+                </article>
               );
             })}
           </div>
