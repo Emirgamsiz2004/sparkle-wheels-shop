@@ -498,17 +498,11 @@ const EXT_ADDONS: AddOn[] = [
 
 const WHATSAPP = "https://wa.me/31717812525";
 
-const QUICK_PICKS: { pkgId: string; tab: TabKey; label: string; sub: string }[] = [
-  { pkgId: "compleet-reiniging", tab: "compleet", label: "Wasbeurt compleet", sub: "Binnen én buiten fris" },
-  { pkgId: "compleet-premium", tab: "compleet", label: "Premium detail", sub: "Meest gekozen" },
-  { pkgId: "polish-2staps", tab: "polijsten", label: "Lakcorrectie", sub: "Krassen & swirls weg" },
-  { pkgId: "polish-coating", tab: "polijsten", label: "Keramische coating", sub: "Jarenlang beschermd" },
-];
-
 const DetailingConfigurator = () => {
   const [size, setSize] = useState<SizeKey>("normaal");
   const [tab, setTab] = useState<TabKey>("compleet");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [mobileDetailId, setMobileDetailId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [addons, setAddons] = useState<Set<string>>(new Set());
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -531,6 +525,18 @@ const DetailingConfigurator = () => {
 
   const visiblePackages = useMemo(() => PKGS.filter((p) => p.tab === tab), [tab]);
 
+  useEffect(() => {
+    setMobileDetailId((prev) => {
+      if (visiblePackages.some((p) => p.id === prev)) return prev;
+      return visiblePackages.find((p) => p.popular)?.id ?? visiblePackages[0]?.id ?? null;
+    });
+  }, [visiblePackages]);
+
+  const mobileDetailPackage = useMemo(
+    () => visiblePackages.find((p) => p.id === mobileDetailId) ?? visiblePackages.find((p) => p.popular) ?? visiblePackages[0] ?? null,
+    [visiblePackages, mobileDetailId],
+  );
+
   const addonsSum = useMemo(() => {
     let sum = 0;
     [...INT_ADDONS, ...EXT_ADDONS].forEach((a) => {
@@ -541,7 +547,7 @@ const DetailingConfigurator = () => {
 
   const total = (selected?.prices[size] ?? 0) + addonsSum;
 
-  const sizeLabel = SIZES.find((s) => s.key === size)!.label;
+  const sizeLabel = SIZES.find((s) => s.key === size)?.label ?? "Normaal";
 
   const selectedAddonNames = useMemo(
     () => [...INT_ADDONS, ...EXT_ADDONS].filter((a) => addons.has(a.id)).map((a) => a.name),
@@ -764,111 +770,137 @@ const DetailingConfigurator = () => {
           })}
         </div>
 
-        {/* Cards — Mobile compact accordion */}
-        <div className="md:hidden mb-10 rounded-md border border-white/10 bg-card divide-y divide-white/5 overflow-hidden">
-          {visiblePackages.map((p) => {
-            const active = selectedId === p.id;
-            const isExpanded = expandedIds.has(p.id);
-            const price = p.prices[size];
-            return (
-              <div
-                key={p.id}
-                id={`pkg-m-${p.id}`}
-                className={cn(
-                  "transition-colors scroll-mt-32",
-                  active && "bg-accent/5",
-                )}
-              >
+        {/* Cards — Mobile visible overview */}
+        <div className="md:hidden mb-10 space-y-4">
+          <div className="grid grid-cols-2 gap-2.5">
+            {visiblePackages.map((p) => {
+              const active = selectedId === p.id;
+              const focused = mobileDetailPackage?.id === p.id;
+              const price = p.prices[size];
+
+              return (
                 <button
+                  key={p.id}
+                  id={`pkg-m-${p.id}`}
                   type="button"
-                  onClick={() => {
-                    setExpandedIds((prev) => {
-                      const next = new Set(prev);
-                      next.has(p.id) ? next.delete(p.id) : (next.clear(), next.add(p.id));
-                      return next;
-                    });
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-4 text-left"
+                  onClick={() => setMobileDetailId(p.id)}
+                  className={cn(
+                    "relative min-h-[144px] rounded-md border p-3 text-left flex flex-col transition-colors scroll-mt-32",
+                    focused ? "bg-accent/10 border-accent" : "bg-card border-white/10",
+                    active && "ring-1 ring-accent",
+                  )}
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-[9px] tracking-[0.14em] uppercase text-accent/80 font-semibold truncate">
-                        {p.levelLabel}
-                      </p>
-                      {p.popular && (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-accent text-accent-foreground rounded-sm text-[9px] font-bold tracking-[0.1em] uppercase whitespace-nowrap">
-                          <Sparkles className="w-2.5 h-2.5" /> Top
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="font-display text-base font-semibold text-foreground truncate">
-                      {p.name}
-                    </h3>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">{p.duration}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-[9px] text-white/50 leading-none">vanaf</p>
-                    <p className="font-display text-lg font-bold text-foreground leading-tight">
-                      €{price.toLocaleString("nl-NL")}
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <p className="text-[9px] tracking-[0.12em] uppercase text-accent/80 font-semibold leading-snug">
+                      {p.levelLabel}
                     </p>
-                  </div>
-                  <div
-                    className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center border border-white/15 text-white/60 transition-transform flex-shrink-0",
-                      isExpanded && "rotate-45 bg-accent border-accent text-accent-foreground",
+                    {p.popular && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-accent text-accent-foreground rounded-sm text-[9px] font-bold uppercase whitespace-nowrap">
+                        <Sparkles className="w-2.5 h-2.5" /> Top
+                      </span>
                     )}
-                    aria-hidden
-                  >
-                    <span className="text-lg leading-none">+</span>
+                  </div>
+
+                  <h3 className="font-display text-[15px] font-semibold text-foreground leading-tight mb-2">
+                    {p.name}
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground leading-snug mb-3">
+                    {p.duration}
+                  </p>
+
+                  <div className="mt-auto flex items-end justify-between gap-2">
+                    <div>
+                      <p className="text-[9px] text-muted-foreground leading-none">vanaf</p>
+                      <p className="font-display text-xl font-bold text-foreground leading-tight">
+                        €{price.toLocaleString("nl-NL")}
+                      </p>
+                    </div>
+                    <span className={cn(
+                      "px-2 py-1 rounded-sm text-[10px] font-semibold",
+                      focused ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground",
+                    )}>
+                      Bekijk
+                    </span>
                   </div>
                 </button>
+              );
+            })}
+          </div>
 
-                {isExpanded && (
-                  <div className="px-4 pb-4 -mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
-                    <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{p.forWho}</p>
-                    <div className="space-y-3 mb-4">
-                      {p.sections.map((sec) => (
-                        <div key={sec.title}>
-                          <p className="text-[10px] tracking-[0.18em] uppercase text-white/45 font-semibold mb-1.5">
-                            {sec.title}
-                          </p>
-                          <ul className="space-y-1">
-                            {sec.items.map((f) => {
-                              const dim = f.toLowerCase().startsWith("alles van");
-                              return (
-                                <li key={f} className="flex items-start gap-2 text-sm">
-                                  <Check className={cn("w-3.5 h-3.5 mt-1 flex-shrink-0", dim ? "text-white/40" : "text-accent")} />
-                                  <span className={cn("leading-snug", dim ? "text-white/55 italic" : "text-white/85")}>{f}</span>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                    {p.tip && (
-                      <p className="text-xs text-muted-foreground mb-3">
-                        {p.tip.text} —{" "}
-                        <Link to={p.tip.to} className="text-accent hover:underline">meer info</Link>
-                      </p>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedId(active ? null : p.id)}
-                      className={cn(
-                        "w-full py-3 rounded-md text-sm font-semibold transition-colors",
-                        active
-                          ? "bg-white/10 text-white hover:bg-white/15"
-                          : "bg-accent text-accent-foreground hover:bg-accent/85",
-                      )}
-                    >
-                      {active ? "Gekozen — tik om te wisselen" : "Kies dit pakket"}
-                    </button>
+          {mobileDetailPackage && (
+            <article className="rounded-md border border-white/10 bg-card p-4 animate-in fade-in duration-200">
+              <div className="border-b border-white/10 pb-4 mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-[10px] tracking-[0.14em] uppercase text-accent/80 font-semibold">
+                    {mobileDetailPackage.levelLabel}
+                  </p>
+                  {mobileDetailPackage.popular && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-accent text-accent-foreground rounded-sm text-[9px] font-bold uppercase">
+                      <Sparkles className="w-2.5 h-2.5" /> Meest gekozen
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-display text-xl font-semibold text-foreground mb-2">
+                  {mobileDetailPackage.name}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  {mobileDetailPackage.forWho}
+                </p>
+                <div className="flex items-end justify-between gap-3 rounded-md bg-secondary p-3">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">
+                      Richtprijs
+                    </p>
+                    <p className="font-display text-2xl font-bold text-foreground">
+                      €{mobileDetailPackage.prices[size].toLocaleString("nl-NL")}
+                    </p>
                   </div>
-                )}
+                  <p className="text-xs text-muted-foreground text-right">{mobileDetailPackage.duration}</p>
+                </div>
               </div>
-            );
-          })}
+
+              <div className="space-y-3 mb-4">
+                {mobileDetailPackage.sections.map((sec) => (
+                  <div key={sec.title} className="rounded-md border border-white/10 p-3">
+                    <p className="text-[10px] tracking-[0.16em] uppercase text-muted-foreground font-semibold mb-2">
+                      {sec.title}
+                    </p>
+                    <ul className="space-y-1.5">
+                      {sec.items.map((f) => {
+                        const dim = f.toLowerCase().startsWith("alles van");
+                        return (
+                          <li key={f} className="flex items-start gap-2 text-sm">
+                            <Check className={cn("w-3.5 h-3.5 mt-1 flex-shrink-0", dim ? "text-muted-foreground" : "text-accent")} />
+                            <span className={cn("leading-snug", dim ? "text-muted-foreground italic" : "text-foreground")}>{f}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              {mobileDetailPackage.tip && (
+                <p className="text-xs text-muted-foreground mb-3">
+                  {mobileDetailPackage.tip.text} —{" "}
+                  <Link to={mobileDetailPackage.tip.to} className="text-accent hover:underline">meer info</Link>
+                </p>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setSelectedId(selectedId === mobileDetailPackage.id ? null : mobileDetailPackage.id)}
+                className={cn(
+                  "w-full py-3 rounded-md text-sm font-semibold transition-colors",
+                  selectedId === mobileDetailPackage.id
+                    ? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    : "bg-accent text-accent-foreground hover:bg-accent/85",
+                )}
+              >
+                {selectedId === mobileDetailPackage.id ? "Gekozen — tik om te wisselen" : "Kies dit pakket"}
+              </button>
+            </article>
+          )}
         </div>
 
 
