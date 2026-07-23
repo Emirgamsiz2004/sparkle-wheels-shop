@@ -648,8 +648,8 @@ const DetailingConfigurator = () => {
           })}
         </div>
 
-        {/* Cards */}
-        <div className="grid gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-12">
+        {/* Cards — Desktop grid */}
+        <div className="hidden md:grid gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-12">
           {visiblePackages.map((p) => {
             const active = selectedId === p.id;
             const isExpanded = expandedIds.has(p.id);
@@ -763,6 +763,114 @@ const DetailingConfigurator = () => {
             );
           })}
         </div>
+
+        {/* Cards — Mobile compact accordion */}
+        <div className="md:hidden mb-10 rounded-md border border-white/10 bg-card divide-y divide-white/5 overflow-hidden">
+          {visiblePackages.map((p) => {
+            const active = selectedId === p.id;
+            const isExpanded = expandedIds.has(p.id);
+            const price = p.prices[size];
+            return (
+              <div
+                key={p.id}
+                id={`pkg-m-${p.id}`}
+                className={cn(
+                  "transition-colors scroll-mt-32",
+                  active && "bg-accent/5",
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExpandedIds((prev) => {
+                      const next = new Set(prev);
+                      next.has(p.id) ? next.delete(p.id) : (next.clear(), next.add(p.id));
+                      return next;
+                    });
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-4 text-left"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-[9px] tracking-[0.14em] uppercase text-accent/80 font-semibold truncate">
+                        {p.levelLabel}
+                      </p>
+                      {p.popular && (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-accent text-accent-foreground rounded-sm text-[9px] font-bold tracking-[0.1em] uppercase whitespace-nowrap">
+                          <Sparkles className="w-2.5 h-2.5" /> Top
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-display text-base font-semibold text-foreground truncate">
+                      {p.name}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{p.duration}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-[9px] text-white/50 leading-none">vanaf</p>
+                    <p className="font-display text-lg font-bold text-foreground leading-tight">
+                      €{price.toLocaleString("nl-NL")}
+                    </p>
+                  </div>
+                  <div
+                    className={cn(
+                      "w-6 h-6 rounded-full flex items-center justify-center border border-white/15 text-white/60 transition-transform flex-shrink-0",
+                      isExpanded && "rotate-45 bg-accent border-accent text-accent-foreground",
+                    )}
+                    aria-hidden
+                  >
+                    <span className="text-lg leading-none">+</span>
+                  </div>
+                </button>
+
+                {isExpanded && (
+                  <div className="px-4 pb-4 -mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{p.forWho}</p>
+                    <div className="space-y-3 mb-4">
+                      {p.sections.map((sec) => (
+                        <div key={sec.title}>
+                          <p className="text-[10px] tracking-[0.18em] uppercase text-white/45 font-semibold mb-1.5">
+                            {sec.title}
+                          </p>
+                          <ul className="space-y-1">
+                            {sec.items.map((f) => {
+                              const dim = f.toLowerCase().startsWith("alles van");
+                              return (
+                                <li key={f} className="flex items-start gap-2 text-sm">
+                                  <Check className={cn("w-3.5 h-3.5 mt-1 flex-shrink-0", dim ? "text-white/40" : "text-accent")} />
+                                  <span className={cn("leading-snug", dim ? "text-white/55 italic" : "text-white/85")}>{f}</span>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    {p.tip && (
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {p.tip.text} —{" "}
+                        <Link to={p.tip.to} className="text-accent hover:underline">meer info</Link>
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(active ? null : p.id)}
+                      className={cn(
+                        "w-full py-3 rounded-md text-sm font-semibold transition-colors",
+                        active
+                          ? "bg-white/10 text-white hover:bg-white/15"
+                          : "bg-accent text-accent-foreground hover:bg-accent/85",
+                      )}
+                    >
+                      {active ? "Gekozen — tik om te wisselen" : "Kies dit pakket"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
 
         {/* Add-ons */}
         <div className="mb-12">
