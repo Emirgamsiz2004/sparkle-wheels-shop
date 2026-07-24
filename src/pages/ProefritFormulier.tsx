@@ -143,7 +143,7 @@ const ProefritFormulier = () => {
     try {
       // Upload rijbewijs foto
       const fileExt = (rijbewijsFoto.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-      const filePath = `${testDrive.id}/rijbewijs-${Date.now()}.${fileExt}`;
+      const filePath = `${testDrive.id}/${token}/rijbewijs-${Date.now()}.${fileExt}`;
       const { error: uploadErr } = await supabase.storage
         .from("test-drive-files")
         .upload(filePath, rijbewijsFoto, { upsert: false, contentType: rijbewijsFoto.type || "image/jpeg" });
