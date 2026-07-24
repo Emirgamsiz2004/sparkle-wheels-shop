@@ -3208,6 +3208,10 @@ export type Database = {
       }
     }
     Functions: {
+      consignatie_submission_exists: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -3333,6 +3337,10 @@ export type Database = {
       }
       test_drive_accepts_anon_upload: {
         Args: { p_id: string }
+        Returns: boolean
+      }
+      test_drive_accepts_anon_upload_with_token: {
+        Args: { p_id: string; p_token: string }
         Returns: boolean
       }
       test_drive_exists: { Args: { p_id: string }; Returns: boolean }
