@@ -16,8 +16,13 @@ const Voorraad = () => {
     ?.filter((v) => v.dbStatus !== "verkocht")
     ?.sort((a, b) => b.prijs - a.prijs) ?? [];
   const verkocht = voertuigen
-    ?.filter((v) => v.dbStatus === "verkocht" && !!v.afbeelding)
-    ?.sort((a, b) => b.prijs - a.prijs) ?? [];
+    ?.filter((v) => v.dbStatus === "verkocht")
+    ?.sort((a, b) => {
+      const da = a.verkochtOp ? new Date(a.verkochtOp).getTime() : 0;
+      const db = b.verkochtOp ? new Date(b.verkochtOp).getTime() : 0;
+      if (da !== db) return db - da;
+      return b.prijs - a.prijs;
+    }) ?? [];
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
