@@ -35,12 +35,20 @@ function extractFeedStatus(block: string): FeedStatus {
   return "te_koop";
 }
 
+const FEED_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "nl-NL,nl;q=0.9,en;q=0.8",
+};
+
 async function fetchList() {
-  const res = await fetch(LIST_URL);
+  const res = await fetch(LIST_URL, { headers: FEED_HEADERS });
   if (!res.ok) throw new Error(`Feed returned ${res.status}`);
   const html = await res.text();
 
   const blocks = html.split(/(?=<div[^>]+class="advertisement)/);
+
   const vehicles: any[] = [];
 
   for (const block of blocks) {
@@ -74,12 +82,19 @@ async function fetchList() {
     });
   }
 
+  if (vehicles.length === 0) {
+    console.error(
+      `[fetch-voorraad] Feed gaf 0 advertenties terug (html lengte ${html.length}). Mogelijk geblokkeerd door leverancier.`
+    );
+  }
+
   return vehicles;
 }
 
 async function fetchDetail(detailPath: string) {
   const url = `${BASE}${detailPath}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: FEED_HEADERS });
+
   if (!res.ok) throw new Error(`Detail page returned ${res.status}`);
   const html = await res.text();
 
@@ -241,6 +256,10 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const vehicleId = url.searchParams.get("id");
 
+
+
+
+
     if (vehicleId) {
       // Fetch list first to get the detail path for this vehicle
       const vehicles = await fetchList();
@@ -268,7 +287,12 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    await syncAutodealersPricesToDatabase(supabase, vehicles);
+    // Alleen prijzen syncen als de feed daadwerkelijk voertuigen teruggaf,
+    // zodat een geblokkeerde/lege feed geen data overschrijft.
+    if (vehicles.length > 0) {
+      await syncAutodealersPricesToDatabase(supabase, vehicles);
+    }
+
 
     const { data: dbVehicles } = await supabase
       .from("vehicles")
