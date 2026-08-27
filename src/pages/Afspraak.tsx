@@ -10,6 +10,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AppointmentOnlyBanner from "@/components/AppointmentOnlyBanner";
+
 
 type FlowAType = "bezichtiging_proefrit";
 type FlowBType = "poetsbeurt" | "onderhoud" | "anders";
@@ -359,6 +361,9 @@ const Afspraak = () => {
             Kies wat u wilt en plan binnen een minuut uw afspraak.
           </p>
         </header>
+
+        <AppointmentOnlyBanner className="mb-8" />
+
 
         {!done && <StepIndicator step={step} total={totalSteps} />}
 

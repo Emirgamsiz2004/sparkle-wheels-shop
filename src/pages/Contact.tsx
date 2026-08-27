@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AppointmentOnlyBanner from "@/components/AppointmentOnlyBanner";
+
 
 const contactFormSchema = z.object({
   naam: z.string().trim().min(1, "Vul uw naam in").max(100),
@@ -271,6 +273,8 @@ const Contact = () => {
                   Openingstijden
                 </p>
               </div>
+              <AppointmentOnlyBanner className="mb-6" />
+
               <div className="space-y-0">
                 {openingHours.map((item) => (
                   <div
