@@ -360,6 +360,9 @@ const Afspraak = () => {
           </p>
         </header>
 
+        <AppointmentOnlyBanner className="mb-8" />
+
+
         {!done && <StepIndicator step={step} total={totalSteps} />}
 
         <AnimatePresence mode="wait">
