@@ -271,6 +271,8 @@ const Contact = () => {
                   Openingstijden
                 </p>
               </div>
+              <AppointmentOnlyBanner className="mb-6" />
+
               <div className="space-y-0">
                 {openingHours.map((item) => (
                   <div
