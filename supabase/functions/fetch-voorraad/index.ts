@@ -283,7 +283,12 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    await syncAutodealersPricesToDatabase(supabase, vehicles);
+    // Alleen prijzen syncen als de feed daadwerkelijk voertuigen teruggaf,
+    // zodat een geblokkeerde/lege feed geen data overschrijft.
+    if (vehicles.length > 0) {
+      await syncAutodealersPricesToDatabase(supabase, vehicles);
+    }
+
 
     const { data: dbVehicles } = await supabase
       .from("vehicles")
