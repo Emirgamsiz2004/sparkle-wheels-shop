@@ -1,47 +1,24 @@
+# Voorraad toont geen auto's
 
-# Plan: Afspraak-flow vereenvoudigen + detailingpagina strakker
+## Wat er aan de hand is
 
-## 1. Bezichtiging & proefrit samenvoegen (`src/pages/Afspraak.tsx`)
+De voorraadpagina haalt de auto's op bij de externe occasionfeed (autodealers.nl). Die feed geeft op dit moment een lege pagina terug aan onze server, waardoor er nul actuele auto's binnenkomen. Wat je nog wel ziet zijn alleen de verkochte auto's, die uit onze eigen database komen.
 
-Nieuw type: één optie **"Bezichtiging & proefrit"** (`bezichtiging_proefrit`). Deze vervangt de twee losse tegels bovenaan stap 1. Tijdens de afspraak zelf bepalen of er ook echt gereden wordt — dat maakt voor de planning niets uit.
+Getest en bevestigd:
+- De feed opgehaald met een normale browser-identificatie: 14 auto's.
+- Dezelfde feed opgehaald zonder browser-identificatie (zoals onze serverfunctie nu doet): 0 auto's, wel een 200-respons.
+- De backendfunctie levert daardoor 45 items terug, allemaal met status "verkocht", en 0 beschikbare auto's.
 
-- `TYPE_LABELS`: label = "Bezichtiging & proefrit".
-- Backend: waarde blijft opgeslagen als `bezichtiging` (zelfde slot-/agenda-logica, geen migratie nodig; alle bestaande admin-filters blijven werken).
-- Stap 1 toont dus nog maar één "Direct bevestigd"-kaart + de drie service-kaarten eronder.
+De leverancier blokkeert dus stilzwijgend verzoeken zonder herkenbare browser-identificatie.
 
-## 2. Voertuigkeuze vervangen door vrij invulveld
+## Oplossing
 
-Stap 2 (nu: lijst uit `vehicles`-tabel) wordt vervangen door een klein formulier:
-
-- **Auto (merk + model)** — verplicht, vrij tekstveld met suggesties uit onze voorraad terwijl je typt (autocomplete, maar niet-verplicht kiezen).
-- **Kleur** — optioneel.
-- **Kenteken** — optioneel.
-
-Effect: klanten hoeven de auto niet meer uit een lijst te herkennen; ze schrijven gewoon wat ze komen bekijken. Bij het kiezen van een suggestie koppelen we alsnog `vehicle_id` (zodat de admin ziet welk voertuig), anders slaan we de vrije tekst op in `notities` / `aanvraag_omschrijving`.
-
-- Slot-blokkade op vehicle_id vervalt als er geen match is; anders blijft die werken.
-- `appointments.insert` krijgt `vehicle_id` alleen als er een match is; anders `null` + de vrije tekst in `notities` (`"Auto: {merk_model} · Kleur: {kleur} · Kenteken: {kenteken}"`).
-
-Stap 3 (datum/tijd) en stap 4 (gegevens) blijven identiek. Totaal stappen blijft 4.
-
-## 3. Detailingpagina strakker (`src/pages/AutoDetailing.tsx` + `DetailingConfigurator.tsx`)
-
-Doel: klanten zien direct wat er is en kunnen zonder scrollmoeras boeken.
-
-- **Boven** de configurator een compacte "prijskaart-strip": 4 tegels (Reiniging / Premium / Signature / Coating) met vanaf-prijs en één regel omschrijving, elk met een "Kies" knop die direct de juiste tab + pakket voorselecteert in de configurator eronder.
-- **Configurator zelf**: 
-  - Tabs blijven, maar met korte ondertitels ("Reiniging" / "Polijsten" / "Coating" — geen jargon).
-  - Per pakket alleen top-3 highlights zichtbaar; overige features achter "Toon alles" (details-toggle) zodat de kaarten korter en scanbaarder worden.
-  - Sticky boekbalk onderaan blijft, maar krijgt tekst "Direct boeken — {pakket} · vanaf €X" i.p.v. alleen prijs.
-- Behandelingen-grid (`behandelingen` array) wordt ingekort naar 3 items ipv 5 en verplaatst onder de configurator (context, niet keuzestress).
+1. In de voorraad-backendfunctie bij elk verzoek naar de externe feed (zowel de lijst als de detailpagina's) een normale browser-`User-Agent` en `Accept`-header meesturen.
+2. Een veiligheidscheck toevoegen: als de feed 0 auto's teruggeeft terwijl er wel een geldige respons was, wordt dat als fout gelogd en worden de bestaande statussen niet als "leeg" doorgezet — zo verdwijnt de voorraad niet meer stil.
+3. Daarna controleren dat /voorraad weer de beschikbare auto's toont naast het blok "Onlangs verkocht".
 
 ## Technisch
 
-- `Afspraak.tsx`: nieuwe `flowAOptions` met 1 item; typedef `FlowAType = "bezichtiging_proefrit"`; mapping bij insert naar `type: "bezichtiging"`. Stap 2 rewriten (verwijder vehicle-lijst render + `vehicles` query behouden alléén voor autocomplete-suggesties).
-- `DetailingConfigurator.tsx`: voeg `expanded` state per pakket toe, splits features in `primary` (max 3) + `rest`.
-- `AutoDetailing.tsx`: nieuwe `<QuickPicks />` sectie boven `<DetailingConfigurator />`, klik zet URL-hash zoals `#configurator?tab=coating&pkg=signature` — configurator leest deze bij mount.
-
-## Wat er niet verandert
-
-- Admin-agenda, appointment-tabel, e-mailtemplates, WhatsApp-flow: allemaal ongewijzigd.
-- Prijzen en pakketinhoud van detailing blijven zoals nu.
+- Bestand: `supabase/functions/fetch-voorraad/index.ts` — `fetchList()` en `fetchDetail()` krijgen headers mee (`User-Agent: Mozilla/5.0 ...`, `Accept: text/html`).
+- Extra logging bij 0 geparste blokken, zodat een toekomstige blokkade direct zichtbaar is in de functielogs.
+- Geen frontendwijzigingen nodig; `useVoorraadFeed`, `Voorraad.tsx` en `InventorySection.tsx` blijven ongewijzigd.
