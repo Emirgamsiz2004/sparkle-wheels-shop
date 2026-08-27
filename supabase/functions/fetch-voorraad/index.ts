@@ -35,12 +35,20 @@ function extractFeedStatus(block: string): FeedStatus {
   return "te_koop";
 }
 
+const FEED_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "nl-NL,nl;q=0.9,en;q=0.8",
+};
+
 async function fetchList() {
-  const res = await fetch(LIST_URL);
+  const res = await fetch(LIST_URL, { headers: FEED_HEADERS });
   if (!res.ok) throw new Error(`Feed returned ${res.status}`);
   const html = await res.text();
 
   const blocks = html.split(/(?=<div[^>]+class="advertisement)/);
+
   const vehicles: any[] = [];
 
   for (const block of blocks) {
