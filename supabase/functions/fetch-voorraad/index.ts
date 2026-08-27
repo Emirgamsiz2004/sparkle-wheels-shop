@@ -82,12 +82,19 @@ async function fetchList() {
     });
   }
 
+  if (vehicles.length === 0) {
+    console.error(
+      `[fetch-voorraad] Feed gaf 0 advertenties terug (html lengte ${html.length}). Mogelijk geblokkeerd door leverancier.`
+    );
+  }
+
   return vehicles;
 }
 
 async function fetchDetail(detailPath: string) {
   const url = `${BASE}${detailPath}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: FEED_HEADERS });
+
   if (!res.ok) throw new Error(`Detail page returned ${res.status}`);
   const html = await res.text();
 
