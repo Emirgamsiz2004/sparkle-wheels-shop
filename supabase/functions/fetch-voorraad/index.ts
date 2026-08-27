@@ -256,6 +256,21 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const vehicleId = url.searchParams.get("id");
 
+    if (url.searchParams.get("debug") === "1") {
+      const r = await fetch(LIST_URL, { headers: FEED_HEADERS });
+      const h = await r.text();
+      return new Response(
+        JSON.stringify({
+          status: r.status,
+          length: h.length,
+          ads: (h.match(/data-merk=/g) || []).length,
+          head: h.slice(0, 400),
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+
     if (vehicleId) {
       // Fetch list first to get the detail path for this vehicle
       const vehicles = await fetchList();
