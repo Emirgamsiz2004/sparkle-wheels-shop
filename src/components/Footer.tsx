@@ -1,6 +1,8 @@
 import logo from "@/assets/logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import { Link } from "react-router-dom";
+import { APPOINTMENT_ONLY, isAppointmentOnlyActive } from "@/config/appointmentOnly";
+
 
 const InstagramIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
