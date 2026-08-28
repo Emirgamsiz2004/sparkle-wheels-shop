@@ -254,13 +254,21 @@ serve(async (req) => {
     // Mark vehicles that disappeared from feed as verkocht
     // ONLY if their current status is "te_koop" — never touch manually set statuses
     // (gereserveerd, consignatie, in_behandeling, inkoop, etc.)
+    // Een voertuig telt als "verdwenen" wanneer zijn feed_id én kenteken niet meer
+    // in de feed voorkomen. Zo raakt een dubbele DB-rij nooit onterecht op verkocht.
     let removed = 0;
     for (const dbVehicle of (existing || [])) {
+      const stillInFeed =
+        matchedDbIds.has(dbVehicle.id) ||
+        (dbVehicle.feed_id && feedIdSet.has(dbVehicle.feed_id)) ||
+        (dbVehicle.kenteken && feedKentekenSet.has(normalizeKenteken(dbVehicle.kenteken)));
+
       if (
         dbVehicle.feed_id &&
-        !matchedDbIds.has(dbVehicle.id) &&
+        !stillInFeed &&
         dbVehicle.status === "te_koop"
       ) {
+
         await supabase
           .from("vehicles")
           .update({ status: "verkocht", verkoop_datum: new Date().toISOString().split("T")[0] })
