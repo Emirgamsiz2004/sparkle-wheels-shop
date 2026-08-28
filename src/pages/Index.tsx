@@ -8,7 +8,7 @@ import ReviewsSection from "@/components/ReviewsSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import FinancieringSection from "@/components/FinancieringSection";
-import DetailingCTASection from "@/components/DetailingCTASection";
+import DetailingPakkettenSection from "@/components/DetailingPakkettenSection";
 import HomeAboutSection from "@/components/HomeAboutSection";
 
 const Index = () => {
@@ -46,9 +46,9 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <InventorySection />
+      <DetailingPakkettenSection />
+      <FinancieringSection />
       <CoreServicesSection />
-      <FinancieringSection showCalculator={false} />
-      <DetailingCTASection />
       <HomeAboutSection />
       <ServicesCompactSection />
       <ReviewsSection />
