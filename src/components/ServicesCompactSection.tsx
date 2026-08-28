@@ -46,7 +46,7 @@ const CompactServiceCard = ({ service, delay }: { service: Service; delay: numbe
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-xs font-display font-semibold text-foreground truncate">
+            <h3 className="text-xs md:text-sm font-display font-semibold text-foreground">
               {service.title}
             </h3>
             <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-accent transition-colors duration-300 shrink-0" />
@@ -82,7 +82,7 @@ const ServicesCompactSection = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-border">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-border">
           {services.map((service, i) => (
             <CompactServiceCard key={service.title} service={service} delay={i * 0.06} />
           ))}
