@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Car, Sparkles, Percent, Wrench, Search, Paintbrush, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Helmet } from "react-helmet";
 import verkoopImg from "@/assets/service-verkoop.webp";
 import detailingImg from "@/assets/service-detailing.webp";
-import financieringImg from "@/assets/financiering-hero.webp";
+import financieringImg from "@/assets/hero-slide-1.webp";
 import onderhoudImg from "@/assets/service-onderhoud.webp";
 import customizingImg from "@/assets/service-customizing.webp";
 import autoZoekenImg from "@/assets/service-zoeken.webp";
@@ -93,7 +93,7 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 export default function Diensten() {
