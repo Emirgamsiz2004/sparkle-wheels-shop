@@ -112,6 +112,15 @@ serve(async (req) => {
 
     // Track which DB vehicles are still in the feed
     const matchedDbIds = new Set<string>();
+    // Alle feed-identifiers (id + kenteken). Hiermee bepalen we of een voertuig
+    // ECHT uit de feed verdwenen is — ook als er meerdere DB-rijen naar dezelfde
+    // advertentie verwijzen (dubbelen matchten voorheen niet en werden onterecht
+    // op verkocht gezet).
+    const feedIdSet = new Set(feedVehicles.map((v: any) => v.feed_id).filter(Boolean));
+    const feedKentekenSet = new Set(
+      feedVehicles.map((v: any) => normalizeKenteken(v.kenteken)).filter(Boolean)
+    );
+
 
     let created = 0;
     let updated = 0;
