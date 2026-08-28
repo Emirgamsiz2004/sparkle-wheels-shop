@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { ArrowRight, ShieldCheck, Sparkles, Users, Wrench } from "lucide-react";
 
 const pillars = [
   {
@@ -18,11 +18,16 @@ const pillars = [
     title: "Persoonlijk",
     text: "Een familiair team dat de tijd voor u neemt om u écht verder te helpen.",
   },
+  {
+    icon: Wrench,
+    title: "Garantie",
+    text: "Officiële AutoTrust-garantie op geschikte auto's. Europese dekking, pechhulp en vervangend vervoer.",
+  },
 ];
 
 const HomeAboutSection = () => {
   return (
-    <section className="py-20 md:py-28 bg-background border-t border-border">
+    <section className="py-20 md:py-28 bg-card border-t border-border">
       <div className="container mx-auto px-6 lg:px-16">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left — narrative */}
@@ -31,18 +36,14 @@ const HomeAboutSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="lg:col-span-6 space-y-8"
+            className="lg:col-span-5 space-y-8"
           >
             <div className="space-y-4">
               <span className="block text-[10px] tracking-[0.4em] uppercase font-body font-semibold text-amber-400">
                 Over ons
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground tracking-tight leading-[1.15]">
-                Jong, ambitieus &amp;
-                <br />
-                <span className="text-muted-foreground">
-                  met passie voor auto&apos;s.
-                </span>
+                Waarom Platin?
               </h2>
             </div>
 
@@ -65,7 +66,7 @@ const HomeAboutSection = () => {
           </motion.div>
 
           {/* Right — pillars */}
-          <div className="lg:col-span-6 flex flex-col gap-4">
+          <div className="lg:col-span-7 grid sm:grid-cols-2 gap-4">
             {pillars.map((p, i) => {
               const Icon = p.icon;
               return (
@@ -75,7 +76,7 @@ const HomeAboutSection = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: i * 0.1 }}
-                  className="group p-6 flex gap-5 items-start bg-foreground/[0.02] border border-foreground/5 hover:bg-foreground/[0.04] transition-all duration-500"
+                  className="group p-6 flex gap-5 items-start bg-background border border-border hover:border-foreground/10 transition-all duration-500"
                 >
                   <Icon
                     className="w-5 h-5 mt-1 shrink-0 text-muted-foreground group-hover:text-amber-400 transition-colors duration-500"

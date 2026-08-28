@@ -1,154 +1,77 @@
-import { useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles, Calculator, Info, X } from "lucide-react";
-import DetailingConfigurator from "./DetailingConfigurator";
 import polishImg from "@/assets/detailing/polish.webp";
-import foamFrontImg from "@/assets/detailing/foam-front.webp";
 import interiorImg from "@/assets/detailing/interior.webp";
 
 const DetailingCTASection = () => {
-  const [expanded, setExpanded] = useState(false);
-  const configRef = useRef<HTMLDivElement>(null);
-
-  const scrollToConfiguratorCenter = () => {
-    const target = configRef.current?.querySelector<HTMLElement>('[data-configurator-step="vehicle"]') ?? configRef.current;
-    if (!target) return;
-
-    const rect = target.getBoundingClientRect();
-    const visualHeight = Math.min(rect.height, window.innerHeight * 0.5);
-    const top = rect.top + window.scrollY - (window.innerHeight - visualHeight) / 2;
-
-    window.scrollTo({
-      top: Math.max(0, top),
-      behavior: "smooth",
-    });
-  };
-
-  const handleToggle = () => {
-    setExpanded((v) => {
-      const next = !v;
-      if (next && typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches) {
-        setTimeout(() => {
-          scrollToConfiguratorCenter();
-        }, 550);
-      }
-      return next;
-    });
-  };
-
   return (
     <section className="py-16 md:py-24 bg-background border-t border-border">
-      <div className="container mx-auto px-6 lg:px-16">
+      <div className="mx-auto px-5 md:px-[90px] max-w-[1920px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="relative overflow-hidden border border-border bg-gradient-to-br from-card via-card to-background"
+          className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center"
         >
-          {/* Decorative amber accent */}
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Compact CTA header */}
-          <div className="relative p-8 md:p-12 lg:p-16">
-            <div className="grid lg:grid-cols-[1.2fr_auto] gap-10 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 mb-4">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-amber-400">
-                    Auto Detailing
-                  </p>
-                </div>
-                <h2 className="text-2xl md:text-4xl lg:text-5xl font-display font-bold text-foreground tracking-tight mb-4 leading-tight">
-                  Stel uw detailing&shy;pakket samen
-                </h2>
-                <p className="text-muted-foreground font-body font-light max-w-xl text-base md:text-lg leading-relaxed mb-8">
-                  Bereken direct de prijs voor uw voertuig, kies extras en boek
-                  eenvoudig een afspraak. Transparant, snel en zonder verrassingen.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={handleToggle}
-                    className="group relative inline-flex items-center justify-between gap-6 px-6 py-4 bg-foreground text-background font-display font-semibold text-sm tracking-wide hover:bg-foreground/90 transition-colors"
-                  >
-                    {expanded ? (
-                      <>
-                        <span className="inline-flex items-center gap-2">
-                          <X className="w-4 h-4" />
-                          Sluit pakketten
-                        </span>
-                        <span className="text-[10px] tracking-[0.3em] uppercase opacity-60">Close</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="inline-flex items-center gap-2">
-                          <Calculator className="w-4 h-4" />
-                          Bekijk pakketten & prijzen
-                        </span>
-                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </>
-                    )}
-                  </button>
-                  <Link
-                    to="/diensten/auto-detailing"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-4 border border-border text-foreground font-display font-semibold text-sm hover:border-foreground/40 hover:bg-card transition-colors"
-                  >
-                    <Info className="w-4 h-4" />
-                    Meer informatie
-                  </Link>
-                </div>
-              </div>
-
-              {!expanded && (
-                <div className="hidden lg:grid grid-cols-2 grid-rows-2 gap-2 w-[320px] h-[320px]">
-                  <div className="row-span-2 overflow-hidden group">
-                    <img
-                      src={foamFrontImg}
-                      alt="Foamwash van een BMW in de detailing studio"
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="overflow-hidden group">
-                    <img
-                      src={polishImg}
-                      alt="Polijstmachine op zwarte autolak"
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="overflow-hidden group">
-                    <img
-                      src={interiorImg}
-                      alt="Gereinigd lederen interieur"
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                </div>
-              )}
+          {/* Text */}
+          <div>
+            <div className="inline-flex items-center gap-2 mb-4">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <p className="text-[10px] tracking-[0.5em] uppercase font-body font-medium text-amber-400">
+                Auto Detailing
+              </p>
             </div>
+            <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground tracking-tight mb-5 leading-tight">
+              Uw auto als nieuw.
+            </h2>
+            <p className="text-muted-foreground font-body font-light leading-relaxed mb-8 max-w-xl">
+              Interieur, exterieur, polijsten en keramische bescherming — onze
+              detailingpakketen maken uw auto weer showroomwaardig. Bereken direct
+              de prijs voor uw voertuig.
+            </p>
+            <Link
+              to="/diensten/auto-detailing"
+              className="group inline-flex items-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+            >
+              Bekijk pakketten
+              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
           </div>
 
-          {/* Expandable configurator */}
-          <AnimatePresence initial={false}>
-            {expanded && (
-              <motion.div
-                key="configurator"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="overflow-hidden border-t border-border scroll-mt-24"
-              >
-                <div ref={configRef} className="relative">
-                  <DetailingConfigurator />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Images */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="row-span-2 overflow-hidden">
+              <img
+                src={interiorImg}
+                alt="Gereinigd lederen interieur"
+                loading="lazy"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden">
+              <img
+                src={polishImg}
+                alt="Polijstmachine op zwarte autolak"
+                loading="lazy"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden bg-card border border-border flex items-center justify-center p-6">
+              <p className="text-center text-sm font-display font-semibold text-foreground leading-tight">
+                Interieur
+                <br />
+                <span className="text-muted-foreground font-body font-light">+</span>
+                <br />
+                Exterieur
+                <br />
+                <span className="text-muted-foreground font-body font-light">+</span>
+                <br />
+                Polijsten
+              </p>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>

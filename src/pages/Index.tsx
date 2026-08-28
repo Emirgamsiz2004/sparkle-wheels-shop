@@ -2,12 +2,12 @@ import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import InventorySection from "@/components/InventorySection";
-import ServicesSection from "@/components/ServicesSection";
+import CoreServicesSection from "@/components/CoreServicesSection";
+import ServicesCompactSection from "@/components/ServicesCompactSection";
 import ReviewsSection from "@/components/ReviewsSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import FinancieringSection from "@/components/FinancieringSection";
-import GarantieSection from "@/components/GarantieSection";
 import DetailingCTASection from "@/components/DetailingCTASection";
 import HomeAboutSection from "@/components/HomeAboutSection";
 
@@ -46,11 +46,11 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <InventorySection />
+      <CoreServicesSection />
+      <FinancieringSection showCalculator={false} />
       <DetailingCTASection />
       <HomeAboutSection />
-      <FinancieringSection showCalculator={false} />
-      <GarantieSection />
-      <ServicesSection />
+      <ServicesCompactSection />
       <ReviewsSection />
       <ContactSection />
       <Footer />

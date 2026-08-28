@@ -30,7 +30,7 @@ const voordelen = [
   {
     icon: Percent,
     title: "Vaste rente",
-    description: "Lage vaste rente vanaf 7,9% — geen verrassingen.",
+    description: "Lage vaste rente vanaf 10,9% — geen verrassingen.",
   },
   {
     icon: FileCheck,
@@ -178,7 +178,7 @@ const Financiering = () => {
                 {[
                   "Auto direct op de zaak",
                   "BTW & afschrijving aftrekbaar",
-                  "Vaste lage rente (vanaf 7,9%)",
+                  "Vaste lage rente (vanaf 10,9%)",
                   "Looptijd 24 tot 72 maanden",
                   "Aanbetaling vanaf 10%",
                   "Eigendom na laatste termijn",

@@ -3,7 +3,7 @@
 // Werkt volgens hetzelfde principe als de calculator van financiallease.nl.
 
 export const LEASE_DEFAULTS = {
-  rente: 0.079, // 7,9% jaarrente (financial lease)
+  rente: 0.109, // 10,9% jaarrente (financial lease)
   halalVergoeding: 0.095, // 9,5% kredietvergoeding p/j (halal lease, indicatief)
   looptijd: 72, // maanden
   aanbetalingPct: 0.10, // 10%

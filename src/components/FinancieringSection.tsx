@@ -53,7 +53,7 @@ const FinancieringSection = ({ showCalculator = true }: FinancieringSectionProps
               {[
                 { icon: Briefcase, label: "Financial Lease", desc: "Voor ondernemers" },
                 { icon: User, label: "Private Lease", desc: "Voor particulieren" },
-                { icon: Percent, label: "Vaste rente", desc: "Vanaf 7,9%" },
+                { icon: Percent, label: "Vaste rente", desc: "Vanaf 10,9%" },
               ].map((item) => (
                 <div key={item.label} className="bg-card p-4">
                   <item.icon className="w-4 h-4 text-muted-foreground mb-2" />
