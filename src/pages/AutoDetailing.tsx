@@ -128,48 +128,6 @@ const AutoDetailing = () => {
         </div>
       </section>
 
-      {/* Onze detailing diensten */}
-      <section className="py-16 md:py-28 bg-card">
-        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
-              Onze detailing diensten
-            </h2>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
-                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
-                <span><strong className="text-foreground font-medium">Handwas &amp; foamwash</strong> — grondige reiniging van buiten</span>
-              </li>
-              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
-                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
-                <span><strong className="text-foreground font-medium">Polijsten &amp; ontkrassen</strong> — krassen en matte lak herstellen</span>
-              </li>
-              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
-                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
-                <span><strong className="text-foreground font-medium">Interieur dieptereiniging</strong> — stoelen, tapijt, dashboard</span>
-              </li>
-              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
-                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
-                <span><strong className="text-foreground font-medium">Velgen &amp; banden behandeling</strong></span>
-              </li>
-              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
-                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
-                <span><strong className="text-foreground font-medium">Lakbescherming &amp; keramische coating</strong></span>
-              </li>
-              <li className="flex items-start gap-3 text-muted-foreground font-body font-light text-base md:text-lg">
-                <CheckCircle className="w-4 h-4 text-primary mt-1 shrink-0" />
-                <span><strong className="text-foreground font-medium">Voor &amp; na foto's</strong> van elk werk</span>
-              </li>
-            </ul>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Intro */}
       <section className="py-16 md:py-28 bg-card">
         <div className="container mx-auto px-6 lg:px-16">
