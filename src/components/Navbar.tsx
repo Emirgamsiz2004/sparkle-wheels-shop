@@ -4,43 +4,39 @@ import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
-const services = [
+const dienstenServices = [
   { label: "In- & Verkoop", href: "/diensten/in-en-verkoop" },
   { label: "Onderhoud & Reparatie", href: "/diensten/onderhoud-reparatie" },
-  { label: "Detailing", href: "/diensten/auto-detailing" },
   { label: "Customizing", href: "/diensten/auto-customizing" },
   { label: "Auto op Aanvraag", href: "/diensten/auto-zoeken" },
   { label: "Consignatie", href: "/consignatie" },
 ];
 
-const navLinks = [
-  { label: "Home", href: "/", section: "home" },
-  { label: "Voorraad", href: "/voorraad" },
-  { label: "Diensten", href: "/#diensten", section: "diensten", hasDropdown: true },
-  { label: "Garantie", href: "/garantie" },
-  { label: "Financiering", href: "/financiering" },
+const overOnsItems = [
   { label: "Over Ons", href: "/over-ons" },
+  { label: "Garantie", href: "/garantie" },
   { label: "Contact", href: "/contact" },
+];
+
+const topLevelLinks = [
+  { label: "Voorraad", href: "/voorraad" },
+  { label: "Detailing", href: "/diensten/auto-detailing" },
+  { label: "Financiering", href: "/financiering" },
+  { label: "Diensten", href: "/diensten", hasDropdown: true, items: dienstenServices },
+  { label: "Over ons", href: "/over-ons", hasDropdown: true, items: overOnsItems },
 ];
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
-  
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [dienstenOpen, setDienstenOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleNavClick = (href: string, section?: string) => {
-    if (section && location.pathname === "/") {
-      const el = document.getElementById(section);
-      if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
-    }
-    if (section) {
-      navigate("/" + (section !== "home" ? `#${section}` : ""));
-    } else {
-      navigate(href);
-    }
+  const handleNavClick = (href: string) => {
+    navigate(href);
+    setMobileOpen(false);
+    setOpenDropdown(null);
   };
 
   useEffect(() => {
@@ -67,12 +63,12 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-10">
-            {navLinks.map((link) =>
-              (link as any).hasDropdown ? (
+          <div className="hidden md:flex items-center gap-8 lg:gap-10">
+            {topLevelLinks.map((link) =>
+              link.hasDropdown ? (
                 <div key={link.label} className="relative group/dropdown">
                   <button
-                    onClick={() => handleNavClick(link.href, link.section)}
+                    onClick={() => handleNavClick(link.href)}
                     className="relative flex items-center gap-1 text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-all duration-500 after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[1px] after:bg-foreground after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-500 after:ease-out"
                   >
                     {link.label}
@@ -80,13 +76,13 @@ const Navbar = () => {
                   </button>
                   <div className="absolute top-full left-0 pt-2 opacity-0 invisible translate-y-1 group-hover/dropdown:opacity-100 group-hover/dropdown:visible group-hover/dropdown:translate-y-0 transition-all duration-200 ease-out">
                     <div className="bg-card border border-border min-w-[190px] py-1.5 shadow-lg shadow-background/50">
-                      {services.map((service) => (
+                      {link.items?.map((item) => (
                         <Link
-                          key={service.label}
-                          to={service.href}
+                          key={item.label}
+                          to={item.href}
                           className="block px-4 py-2.5 text-[10px] font-body font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors duration-150"
                         >
-                          {service.label}
+                          {item.label}
                         </Link>
                       ))}
                     </div>
@@ -95,7 +91,7 @@ const Navbar = () => {
               ) : (
                 <button
                   key={link.label}
-                  onClick={() => handleNavClick(link.href, link.section)}
+                  onClick={() => handleNavClick(link.href)}
                   className="relative text-[10px] font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-all duration-500 after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[1px] after:bg-foreground after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-500 after:ease-out"
                 >
                   {link.label}
@@ -146,7 +142,7 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
             className="md:hidden fixed inset-0 z-[55] bg-background/70 backdrop-blur-xl flex flex-col items-center justify-center gap-6"
           >
-            {navLinks.map((link, i) => (
+            {topLevelLinks.map((link, i) => (
               <motion.div
                 key={link.label}
                 initial={{ opacity: 0, y: 20 }}
@@ -155,17 +151,17 @@ const Navbar = () => {
                 transition={{ duration: 0.3, delay: i * 0.05 }}
                 className="flex flex-col items-center"
               >
-                {(link as any).hasDropdown ? (
+                {link.hasDropdown ? (
                   <>
                     <button
-                      onClick={() => setDienstenOpen(!dienstenOpen)}
+                      onClick={() => setOpenDropdown(openDropdown === link.label ? null : link.label)}
                       className="flex items-center gap-2 text-sm font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
-                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${dienstenOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${openDropdown === link.label ? 'rotate-180' : ''}`} />
                     </button>
                     <AnimatePresence>
-                      {dienstenOpen && (
+                      {openDropdown === link.label && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
@@ -173,14 +169,14 @@ const Navbar = () => {
                           transition={{ duration: 0.25 }}
                           className="overflow-hidden flex flex-col items-center gap-3 mt-3"
                         >
-                          {services.map((service) => (
+                          {link.items?.map((item) => (
                             <Link
-                              key={service.label}
-                              to={service.href}
-                              onClick={() => { setMobileOpen(false); setDienstenOpen(false); }}
+                              key={item.label}
+                              to={item.href}
+                              onClick={() => { setMobileOpen(false); setOpenDropdown(null); }}
                               className="text-xs font-body font-light tracking-[0.2em] uppercase text-muted-foreground/70 hover:text-foreground transition-colors"
                             >
-                              {service.label}
+                              {item.label}
                             </Link>
                           ))}
                         </motion.div>
@@ -189,7 +185,7 @@ const Navbar = () => {
                   </>
                 ) : (
                   <button
-                    onClick={() => { handleNavClick(link.href, link.section); setMobileOpen(false); setDienstenOpen(false); }}
+                    onClick={() => handleNavClick(link.href)}
                     className="text-sm font-body font-medium tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.label}
@@ -201,7 +197,7 @@ const Navbar = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.3, delay: navLinks.length * 0.05 }}
+              transition={{ duration: 0.3, delay: topLevelLinks.length * 0.05 }}
               href="tel:+31717812525"
               className="group/call relative flex items-center gap-2 bg-muted border border-border text-foreground px-6 py-3 text-[10px] font-semibold tracking-[0.2em] uppercase overflow-hidden h-[42px] mt-4 transition-all duration-500 hover:border-accent hover:text-accent"
             >
