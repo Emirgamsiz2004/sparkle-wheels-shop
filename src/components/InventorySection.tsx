@@ -1,25 +1,14 @@
 import { motion } from "framer-motion";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useVoorraadFeed } from "@/hooks/useVoorraadFeed";
 import VoorraadCard from "@/components/VoorraadCard";
-import useEmblaCarousel from "embla-carousel-react";
-import { useCallback } from "react";
 
 const InventorySection = () => {
   const { data: alleVoertuigen, isLoading } = useVoorraadFeed();
   const voertuigen = alleVoertuigen
     ?.filter((v) => v.dbStatus !== "verkocht")
     ?.sort((a, b) => b.prijs - a.prijs);
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    slidesToScroll: 1,
-    containScroll: "trimSnaps",
-    loop: false,
-  });
-
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
     <section id="voorraad" className="py-16 md:py-28 lg:py-36 bg-card">
@@ -38,25 +27,13 @@ const InventorySection = () => {
             <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground tracking-tight">
               Onze auto's
             </h2>
+            {voertuigen && voertuigen.length > 0 && (
+              <p className="text-muted-foreground font-body font-light mt-4">
+                {voertuigen.length} auto's direct beschikbaar.
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-4 mt-6 md:mt-0">
-            {/* Slider nav buttons */}
-            {voertuigen && voertuigen.length > 3 && (
-              <div className="hidden md:flex items-center gap-2">
-                <button
-                  onClick={scrollPrev}
-                  className="w-10 h-10 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors duration-300"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={scrollNext}
-                  className="w-10 h-10 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors duration-300"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
             <Link
               to="/voorraad"
               className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase text-foreground hover:text-primary transition-colors"
@@ -74,27 +51,13 @@ const InventorySection = () => {
           </div>
         )}
 
-        {/* Slider */}
+        {/* Alle actieve auto's */}
         {voertuigen && voertuigen.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-          >
-            <div className="overflow-hidden" ref={emblaRef}>
-              <div className="flex gap-5">
-                {voertuigen.map((v, i) => (
-                  <div
-                    key={v.id}
-                    className="flex-[0_0_85%] min-w-0 sm:flex-[0_0_calc(50%-10px)] lg:flex-[0_0_calc(33.333%-14px)]"
-                  >
-                    <VoorraadCard voertuig={v} index={i} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {voertuigen.map((v, i) => (
+              <VoorraadCard key={v.id} voertuig={v} index={i} />
+            ))}
+          </div>
         )}
 
         {/* Empty / fallback */}
@@ -121,3 +84,4 @@ const InventorySection = () => {
 };
 
 export default InventorySection;
+
