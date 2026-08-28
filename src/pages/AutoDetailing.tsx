@@ -108,26 +108,6 @@ const AutoDetailing = () => {
       {/* Configurator */}
       <DetailingConfigurator />
 
-      {/* Waarom professionele detailing? */}
-      <section className="py-16 md:py-28 bg-background">
-        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
-              Waarom professionele detailing?
-            </h2>
-            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
-              <p>Een professionele poetsbeurt is meer dan alleen een schone auto.</p>
-              <p>Het beschermt je lak, verhoogt de waarde van je auto en zorgt dat hij er altijd als nieuw uitziet. Bij Platin Automotive behandelen we elke auto met dezelfde zorg — of het nu een dagelijkse rijder is of een topmodel.</p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Intro */}
       <section className="py-16 md:py-28 bg-card">
         <div className="container mx-auto px-6 lg:px-16">
@@ -145,14 +125,13 @@ const AutoDetailing = () => {
               </h2>
               <div className="space-y-4">
                 <p className="text-muted-foreground font-body font-light leading-relaxed">
-                  Bij Platin Automotive geven we uw auto de behandeling die het verdient.
-                  Van een uitgebreide handwas tot een complete interieur- en exterieurreiniging —
-                  wij maken uw auto zo goed als nieuw.
+                  Een professionele poetsbeurt is meer dan alleen een schone auto. Het beschermt je lak, verhoogt de waarde en zorgt dat hij er altijd als nieuw uitziet.
                 </p>
                 <p className="text-muted-foreground font-body font-light leading-relaxed">
-                  Of uw auto nu toe is aan een grondige poetsbeurt of u wilt hem in showroom-conditie
-                  brengen: wij pakken het professioneel aan. Elke auto wordt met de hand behandeld
-                  en krijgt de aandacht die het verdient.
+                  Bij Platin Automotive geven we elke auto de behandeling die het verdient — van een uitgebreide handwas tot een complete interieur- en exterieurreiniging. Elke auto wordt met de hand behandeld en krijgt de aandacht die het verdient.
+                </p>
+                <p className="text-muted-foreground font-body font-light leading-relaxed">
+                  Wij detailen zowel particuliere auto's als bedrijfswagens en lease-auto's. Klanten komen naar ons toe vanuit Alphen aan den Rijn, Leiden, Lisse, Sassenheim en de wijde omgeving.
                 </p>
               </div>
             </motion.div>
@@ -177,26 +156,6 @@ const AutoDetailing = () => {
               </div>
             </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* Voor particulieren en bedrijven */}
-      <section className="py-16 md:py-28 bg-background">
-        <div className="container mx-auto px-6 lg:px-16 max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-6">
-              Voor particulieren en bedrijven
-            </h2>
-            <div className="space-y-4 text-muted-foreground font-body font-light leading-relaxed text-base md:text-lg">
-              <p>Wij detailen zowel particuliere auto's als bedrijfswagens en lease-auto's.</p>
-              <p>Klanten komen naar ons toe vanuit Alphen aan den Rijn, Leiden, Lisse, Sassenheim en de wijde omgeving.</p>
-            </div>
-          </motion.div>
         </div>
       </section>
 
