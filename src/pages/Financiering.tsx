@@ -464,32 +464,42 @@ const Financiering = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-10 md:mb-14">
-              Hoe werkt het?
+            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground tracking-tight mb-4">
+              Hoe werkt het precies?
             </h2>
+            <p className="text-sm md:text-base font-body text-muted-foreground leading-relaxed mb-10 md:mb-14 max-w-2xl">
+              U hoeft de auto niet per se bij ons te kopen. Vond u een auto bij een
+              andere garage? Ook dan regelen wij de financiering voor u — van
+              aanvraag tot uitbetaling.
+            </p>
           </motion.div>
 
           <div className="space-y-px bg-border">
             {[
               {
                 num: "01",
-                title: "Kies uw auto",
-                desc: "Bekijk onze voorraad. Bij elke auto ziet u direct het indicatieve maandbedrag.",
+                title: "U vindt een auto",
+                desc: "Bij ons in de voorraad, of bij een andere garage of particulier. Elke auto kan in aanmerking komen.",
               },
               {
                 num: "02",
-                title: "Bereken & vraag aan",
-                desc: "Speel met aanbetaling en looptijd in onze calculator. Vraag dan vrijblijvend aan bij financiallease.nl.",
+                title: "Stuur ons de gegevens",
+                desc: "Mail of WhatsApp ons de advertentie (of het kenteken) met uw wensen: gewenst maandbedrag, aanbetaling en looptijd. Voor ondernemers ook graag de KvK-gegevens.",
               },
               {
                 num: "03",
-                title: "Akkoord binnen 24 uur",
-                desc: "Meestal heeft u binnen één werkdag akkoord. Wij regelen daarna het hele aflevertraject.",
+                title: "Wij vragen het voor u aan",
+                desc: "Wij dienen de aanvraag in bij financiallease.nl en zoeken de best passende constructie — financial lease, private lease of halal (rentevrij).",
               },
               {
                 num: "04",
-                title: "Rij weg",
-                desc: "Auto rijklaar, papieren in orde. U rijdt direct weg vanuit onze showroom in Roelofarendsveen.",
+                title: "Akkoord & contract",
+                desc: "Meestal binnen 24 uur uitsluitsel. U ontvangt het contract digitaal en ondertekent online. Wij houden u bij elke stap op de hoogte.",
+              },
+              {
+                num: "05",
+                title: "Uitbetaling & aflevering",
+                desc: "De leasemaatschappij betaalt de verkopende partij. Wij maken de auto rijklaar, regelen de papieren en u rijdt weg.",
               },
             ].map((step) => (
               <div key={step.num} className="bg-card p-6 md:p-8 flex gap-5 md:gap-8 items-start">

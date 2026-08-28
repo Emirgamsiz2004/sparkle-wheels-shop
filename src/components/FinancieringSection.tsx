@@ -70,17 +70,23 @@ const FinancieringSection = ({ showCalculator = true }: FinancieringSectionProps
                 to="/financiering"
                 className="group inline-flex items-center justify-center gap-3 bg-foreground text-background px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase hover:bg-primary hover:text-primary-foreground transition-all duration-300"
               >
-                Meer over lease
+                Hoe werkt het?
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                to="/voorraad"
+                to="/contact"
                 className="group inline-flex items-center justify-center gap-3 border border-foreground/20 hover:border-foreground/50 text-foreground px-7 py-3.5 text-xs font-semibold tracking-[0.15em] uppercase transition-all duration-300"
               >
-                Bekijk voorraad
+                Vraag aan
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
+
+            <p className="text-xs text-muted-foreground/70 font-body mt-5 max-w-xl leading-relaxed">
+              Ook voor een auto die u ergens anders vond: stuur ons de advertentie
+              met uw gewenste maandbedrag, aanbetaling en looptijd — wij vragen het
+              voor u aan.
+            </p>
           </motion.div>
 
           {/* Right — partner card */}
