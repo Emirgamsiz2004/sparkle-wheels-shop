@@ -126,7 +126,18 @@ serve(async (req) => {
     let updated = 0;
     let skipped = 0;
 
+    // Voorkomt dat dezelfde advertentie binnen één run twee keer wordt verwerkt.
+    const processedFeedIds = new Set<string>();
+
     for (const fv of feedVehicles) {
+      if (fv.feed_id) {
+        if (processedFeedIds.has(fv.feed_id)) {
+          skipped++;
+          continue;
+        }
+        processedFeedIds.add(fv.feed_id);
+      }
+
       const normalizedKenteken = normalizeKenteken(fv.kenteken);
 
       const existingByFeed = existingByFeedId.get(fv.feed_id);
@@ -134,6 +145,7 @@ serve(async (req) => {
         ? existingByKenteken.get(normalizedKenteken)
         : null;
       const match = existingByFeed || existingByKent;
+
 
       if (match) {
         matchedDbIds.add(match.id);
