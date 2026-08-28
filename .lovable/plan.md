@@ -41,7 +41,7 @@ Nieuwe volgorde:
 ```
 
 Wat verdwijnt van de homepagina:
-- De volledige 6-kaarts dienstengrid → vervangen door de 3 kernblokken; volledige lijst leeft op `/diensten` en in de footer.
+- De 6-kaarts dienstengrid blijft op de homepagina, maar wordt compacter/subtieler weergegeven — bijvoorbeeld als een smalle strook met kleinere kaarten of iconenlijst, geen volledige grid meer.
 - De losse garantiesectie → opgenomen in het vertrouwensblok.
 - De losse consignatie-strook (staat al in footer/diensten).
 
