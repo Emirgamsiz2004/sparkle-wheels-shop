@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Calculator, ExternalLink, X, Info } from "lucide-react";
+import { Calculator, ExternalLink, X } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -15,7 +15,6 @@ import {
   LOOPTIJDEN,
   MAX_AANBETALING_PCT,
   MAX_SLOTTERMIJN_PCT,
-  type LeaseMode,
 } from "@/lib/lease";
 
 interface Props {
@@ -25,7 +24,6 @@ interface Props {
 
 const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
   const isMobile = useIsMobile();
-  const [mode, setMode] = useState<LeaseMode>("financial");
   const [aanbetalingPct, setAanbetalingPct] = useState<number>(
     LEASE_DEFAULTS.aanbetalingPct * 100
   );
@@ -45,9 +43,8 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
         aanbetalingPct: aanbetalingPct / 100,
         slottermijnPct: effSlot / 100,
         looptijd,
-        mode,
       }),
-    [prijs, aanbetalingPct, effSlot, looptijd, mode]
+    [prijs, aanbetalingPct, effSlot, looptijd]
   );
 
   const handleBedragChange = (
@@ -71,33 +68,15 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
     </button>
   );
 
-  const tarief = mode === "halal" ? LEASE_DEFAULTS.halalVergoeding : LEASE_DEFAULTS.rente;
-  const tariefLabel = mode === "halal" ? "Kredietvergoeding" : "Rente";
-  const kostenLabel = mode === "halal" ? "Totale kredietvergoeding" : "Totale rente";
+  const tarief = LEASE_DEFAULTS.rente;
+  const tariefLabel = "Rente";
+  const kostenLabel = "Totale rente";
 
   const body = (
     <div className="space-y-6">
-      {/* Mode switch */}
-      <div className="grid grid-cols-2 gap-1.5 p-1 bg-background border border-border">
-        {(["financial", "halal"] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => setMode(m)}
-            className={`h-9 text-[11px] font-body font-semibold tracking-[0.12em] uppercase transition-colors ${
-              mode === m
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {m === "financial" ? "Financial" : "Halal"} Lease
-          </button>
-        ))}
-      </div>
-
       <div>
         <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
-          Indicatie {mode === "halal" ? "halal lease" : "financial lease"}
+          Indicatie financiering
         </p>
         <p className="font-display text-3xl font-bold text-foreground">
           {formatEuro(result.maandbedrag)}
@@ -212,17 +191,6 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
         {tariefLabel} <span className="text-foreground/60">{(tarief * 100).toFixed(1).replace(".", ",")}% (vast)</span>
       </p>
 
-      {mode === "halal" && (
-        <div className="flex gap-2 p-3 bg-background border border-border">
-          <Info className="w-3.5 h-3.5 text-foreground/60 shrink-0 mt-0.5" />
-          <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Bij <span className="text-foreground font-medium">halal lease</span> betaal je geen
-            rente, maar een vooraf vastgestelde <span className="text-foreground font-medium">
-            kredietvergoeding</span> (murabaha-principe). Het totaalbedrag staat vast en wijzigt niet.
-          </p>
-        </div>
-      )}
-
       <a
         href={LEASE_DEFAULTS.partnerUrl}
         target="_blank"
@@ -234,10 +202,8 @@ const LeaseCalculatorPopover = ({ prijs, trigger }: Props) => {
       </a>
 
       <p className="text-[10px] leading-relaxed text-muted-foreground/70">
-        Indicatief bedrag. Onder voorbehoud van kredietgoedkeuring.{" "}
-        {mode === "financial"
-          ? "Lease via financiallease.nl."
-          : "Halal lease via een sharia-conforme partner."}
+        Indicatief bedrag. Onder voorbehoud van kredietgoedkeuring. Financiering via
+        financiallease.nl.
       </p>
     </div>
   );
