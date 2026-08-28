@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Calculator, ExternalLink, X, Info } from "lucide-react";
+import { Calculator, ExternalLink, X } from "lucide-react";
 import {
   Popover,
   PopoverContent,
