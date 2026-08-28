@@ -22,6 +22,7 @@ import OnderhoudReparatie from "./pages/OnderhoudReparatie";
 import AutoDetailing from "./pages/AutoDetailing";
 import AutoZoeken from "./pages/AutoZoeken";
 import AutoCustomizing from "./pages/AutoCustomizing";
+import Diensten from "./pages/Diensten";
 import AdminLogin from "./pages/AdminLogin";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
@@ -126,6 +127,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/afspraak" element={<Afspraak />} />
               <Route path="/over-ons" element={<OverOns />} />
+              <Route path="/diensten" element={<Diensten />} />
               <Route path="/diensten/in-en-verkoop" element={<InEnVerkoop />} />
               <Route path="/diensten/onderhoud-reparatie" element={<OnderhoudReparatie />} />
               <Route path="/diensten/auto-detailing" element={<AutoDetailing />} />
