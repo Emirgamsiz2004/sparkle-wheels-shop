@@ -280,6 +280,23 @@ const Consignatie = () => {
 
       if (dbError) throw dbError;
 
+      await sendLeadToAutoRM({
+        name: data.naam,
+        email: data.email,
+        phone: data.telefoon,
+        subject: "Consignatie",
+        vehicle: [data.merk, data.model, data.bouwjaar, data.kenteken].filter(Boolean).join(" "),
+        message: [
+          `Kilometerstand: ${data.kmStand}`,
+          `Brandstof: ${data.brandstof}`,
+          `Transmissie: ${data.transmissie}`,
+          `Kleur: ${data.kleur}`,
+          data.staat ? `Staat: ${data.staat}` : "",
+          data.opmerkingen ? `Opmerkingen: ${data.opmerkingen}` : "",
+        ].filter(Boolean).join("\n"),
+      });
+
+
       // Stuur e-mailnotificatie
       try {
         await supabase.functions.invoke("send-transactional-email", {
