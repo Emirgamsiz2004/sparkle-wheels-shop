@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AppointmentOnlyBanner from "@/components/AppointmentOnlyBanner";
+import { sendLeadToAutoRM } from "@/lib/autorm";
 
 
 type FlowAType = "bezichtiging_proefrit";
@@ -233,6 +234,15 @@ const Afspraak = () => {
         : autoDescriptor.replace(/^Auto: /, "");
       const datumStr = format(dt, "EEEE d MMMM yyyy", { locale: nl });
 
+      await sendLeadToAutoRM({
+        name: `${form.voornaam} ${form.achternaam}`,
+        email: form.email,
+        phone: form.telefoon,
+        subject: TYPE_LABELS[type],
+        vehicle: voertuig,
+        message: [`Afspraak: ${datumStr} om ${time}`, form.opmerking].filter(Boolean).join("\n"),
+      });
+
       await Promise.all([
         supabase.functions.invoke("send-transactional-email", {
           body: {
@@ -290,6 +300,15 @@ const Afspraak = () => {
       }).select("id").single();
 
       if (error) throw error;
+
+      await sendLeadToAutoRM({
+        name: `${form.voornaam} ${form.achternaam}`,
+        email: form.email,
+        phone: form.telefoon,
+        subject: TYPE_LABELS[type],
+        vehicle: form.kenteken || "",
+        message: [form.omschrijving, form.voorkeursdatum ? `Voorkeursdatum: ${form.voorkeursdatum}` : ""].filter(Boolean).join("\n"),
+      });
 
       await Promise.all([
         supabase.functions.invoke("send-transactional-email", {
