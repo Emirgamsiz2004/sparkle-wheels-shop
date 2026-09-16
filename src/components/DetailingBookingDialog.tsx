@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { sendLeadToAutoRM } from "@/lib/autorm";
 
 // Openingstijden in minuten vanaf 00:00
 const OPENING: Record<number, { open: number; close: number } | null> = {
@@ -221,6 +222,15 @@ const DetailingBookingDialog = ({
       const inserted = { id: newId as string };
 
       const datumLabel = format(date, "EEEE d MMMM yyyy", { locale: nl });
+
+      await sendLeadToAutoRM({
+        name: naam,
+        email: form.email,
+        phone: form.telefoon,
+        subject: "Detailing",
+        vehicle: voertuigType,
+        message: `${datumLabel} om ${starttijd}\n${dienstenNotitie}`,
+      });
 
       // Mails (best-effort)
       await Promise.all([

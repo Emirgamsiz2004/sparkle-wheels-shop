@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar } from "@/components/ui/calendar";
 import {
+import { sendLeadToAutoRM } from "@/lib/autorm";
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -72,6 +73,14 @@ const ServiceForm = ({ dienst }: ServiceFormProps) => {
       const tijdTekst = tijd || "Nog niet gekozen";
       message = `Hallo, ik wil graag een afspraak maken voor ${dienst}.%0A%0ANaam: ${encodeURIComponent(result.data.naam)}%0ATelefoon: ${encodeURIComponent(result.data.telefoon)}%0AAuto: ${encodeURIComponent(result.data.auto)}%0AVoorkeursdatum: ${encodeURIComponent(datumTekst)}%0AVoorkeurstijd: ${encodeURIComponent(tijdTekst)}%0A%0A${encodeURIComponent(result.data.omschrijving)}`;
     }
+
+    void sendLeadToAutoRM({
+      name: result.data.naam,
+      phone: result.data.telefoon,
+      subject: `${dienst} - ${activeTab === "offerte" ? "Offerte" : "Afspraak"}`,
+      vehicle: result.data.auto,
+      message: [result.data.omschrijving, date ? `Voorkeursdatum: ${format(date, "d MMMM yyyy", { locale: nl })}` : "", tijd ? `Voorkeurstijd: ${tijd}` : ""].filter(Boolean).join("\n"),
+    });
 
     window.open(`https://wa.me/31717812525?text=${message}`, "_blank");
     setSubmitted(true);

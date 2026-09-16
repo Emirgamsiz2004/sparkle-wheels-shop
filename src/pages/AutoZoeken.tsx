@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ServiceSEOContent from "@/components/ServiceSEOContent";
 import verkoopImg from "@/assets/verkoop.jpg";
+import { sendLeadToAutoRM } from "@/lib/autorm";
 
 const zoekSchema = z.object({
   naam: z.string().trim().min(1, "Vul uw naam in").max(100),
@@ -57,6 +58,14 @@ const AutoZoeken = () => {
     ].filter(Boolean).join("\n");
 
     const message = encodeURIComponent(parts);
+    void sendLeadToAutoRM({
+      name: d.naam,
+      phone: d.telefoon,
+      subject: "Auto zoeken",
+      vehicle: [d.merk, d.model, d.bouwjaar].filter(Boolean).join(" "),
+      message: [d.budget ? `Budget: ${d.budget}` : "", d.wensen].filter(Boolean).join("\n"),
+    });
+
     window.open(`https://wa.me/31717812525?text=${message}`, "_blank");
 
     setSubmitted(true);

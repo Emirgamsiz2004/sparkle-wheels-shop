@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Calendar } from "@/components/ui/calendar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { sendLeadToAutoRM } from "@/lib/autorm";
 
 type FlowAType = "bezichtiging" | "proefrit";
 type FlowBType = "poetsbeurt" | "onderhoud" | "anders";
@@ -188,6 +189,15 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
         const voertuig = `${selectedVehicle.merk} ${selectedVehicle.model}${selectedVehicle.kenteken ? ` (${selectedVehicle.kenteken})` : ""}`;
         const datumStr = format(dt, "EEEE d MMMM yyyy", { locale: nl });
 
+        await sendLeadToAutoRM({
+          name: `${form.voornaam} ${form.achternaam}`,
+          email: form.email,
+          phone: form.telefoon,
+          subject: TYPE_LABELS[type],
+          vehicle: voertuig,
+          message: `Afspraak: ${datumStr} om ${time}`,
+        });
+
         await Promise.all([
           supabase.functions.invoke("send-transactional-email", { body: {
             templateName: "afspraak-bevestiging", recipientEmail: form.email,
@@ -218,6 +228,15 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
           aanvrager_kenteken: form.kenteken || null,
         }).select("id").single();
         if (error) throw error;
+
+        await sendLeadToAutoRM({
+          name: `${form.voornaam} ${form.achternaam}`,
+          email: form.email,
+          phone: form.telefoon,
+          subject: TYPE_LABELS[type],
+          vehicle: form.kenteken || "",
+          message: [form.omschrijving, form.voorkeursdatum ? `Voorkeursdatum: ${form.voorkeursdatum}` : ""].filter(Boolean).join("\n"),
+        });
 
         await Promise.all([
           supabase.functions.invoke("send-transactional-email", { body: {

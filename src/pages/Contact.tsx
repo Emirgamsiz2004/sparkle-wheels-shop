@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AppointmentOnlyBanner from "@/components/AppointmentOnlyBanner";
+import { sendLeadToAutoRM } from "@/lib/autorm";
 
 
 const contactFormSchema = z.object({
@@ -92,6 +93,14 @@ const ContactForm = () => {
         email: result.data.email,
         telefoon: result.data.telefoon || null,
         bericht: result.data.bericht,
+      });
+
+      await sendLeadToAutoRM({
+        name: result.data.naam,
+        email: result.data.email,
+        phone: result.data.telefoon || "",
+        subject: "Contact",
+        message: result.data.bericht,
       });
 
       // Send email notification

@@ -7,6 +7,7 @@ import {
 import { format, addDays, startOfDay, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
+import { sendLeadToAutoRM } from "@/lib/autorm";
 
 type FlowAType = "bezichtiging" | "proefrit";
 type FlowBType = "poetsbeurt" | "onderhoud" | "anders";
@@ -208,6 +209,15 @@ const MobileBookingSheet = ({ open, onClose, preselected = null }: Props) => {
         }).select("id").single();
         if (error) throw error;
 
+        await sendLeadToAutoRM({
+          name: `${form.voornaam} ${form.achternaam}`,
+          email: form.email,
+          phone: form.telefoon,
+          subject: TYPE_LABELS[type],
+          vehicle: voertuig,
+          message: `Afspraak: ${datumStr} om ${time}`,
+        });
+
         await Promise.all([
           supabase.functions.invoke("send-transactional-email", { body: {
             templateName: "afspraak-bevestiging", recipientEmail: form.email,
@@ -236,6 +246,14 @@ const MobileBookingSheet = ({ open, onClose, preselected = null }: Props) => {
           aanvrager_telefoon: form.telefoon, aanvrager_email: form.email,
         }).select("id").single();
         if (error) throw error;
+
+        await sendLeadToAutoRM({
+          name: `${form.voornaam} ${form.achternaam}`,
+          email: form.email,
+          phone: form.telefoon,
+          subject: TYPE_LABELS[type],
+          message: [form.omschrijving, form.voorkeursdatum ? `Voorkeursdatum: ${form.voorkeursdatum}` : ""].filter(Boolean).join("\n"),
+        });
 
         await Promise.all([
           supabase.functions.invoke("send-transactional-email", { body: {

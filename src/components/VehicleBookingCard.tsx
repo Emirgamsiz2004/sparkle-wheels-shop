@@ -5,6 +5,7 @@ import { format, addDays, isBefore, startOfDay, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import MobileBookingSheet from "./MobileBookingSheet";
+import { sendLeadToAutoRM } from "@/lib/autorm";
 
 interface Props {
   feedId: string;
@@ -105,6 +106,15 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
         notities: dbVehicleId ? null : `Voertuig (geen DB-koppeling): ${voertuig}`,
       }).select("id").single();
       if (error) throw error;
+
+      await sendLeadToAutoRM({
+        name: `${form.voornaam} ${form.achternaam}`,
+        email: form.email,
+        phone: form.telefoon,
+        subject: type === "proefrit" ? "Proefrit" : "Bezichtiging",
+        vehicle: voertuig,
+        message: `Afspraak: ${datumStr} om ${time}`,
+      });
 
       await Promise.all([
         supabase.functions.invoke("send-transactional-email", { body: {
