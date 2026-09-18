@@ -4,7 +4,6 @@
 
 export const LEASE_DEFAULTS = {
   rente: 0.109, // 10,9% jaarrente (financial lease)
-  halalVergoeding: 0.095, // 9,5% kredietvergoeding p/j (halal lease, indicatief)
   looptijd: 72, // maanden
   aanbetalingPct: 0.10, // 10%
   slottermijnPct: 0.30, // 30% slottermijn
@@ -16,15 +15,12 @@ export const LOOPTIJDEN = [12, 24, 36, 48, 60, 72];
 export const MAX_AANBETALING_PCT = 50; // cf. financiallease.nl
 export const MAX_SLOTTERMIJN_PCT = 50;
 
-export type LeaseMode = "financial" | "halal";
-
 export interface LeaseInput {
   prijs: number;
   aanbetalingPct?: number; // 0 - 0.50
   slottermijnPct?: number; // 0 - 0.50
   looptijd?: number;
   rente?: number;
-  mode?: LeaseMode;
 }
 
 export interface LeaseResult {
@@ -54,7 +50,6 @@ export function berekenLeaseDetail({
   slottermijnPct = LEASE_DEFAULTS.slottermijnPct,
   looptijd = LEASE_DEFAULTS.looptijd,
   rente,
-  mode = "financial",
 }: LeaseInput): LeaseResult {
   const safePrijs = Math.max(0, prijs || 0);
   const aPct = clamp(aanbetalingPct, 0, MAX_AANBETALING_PCT / 100);
@@ -65,24 +60,6 @@ export function berekenLeaseDetail({
   const aanbetaling = Math.round(safePrijs * aPct);
   const slottermijn = Math.round(safePrijs * sPct);
   const leasebedrag = Math.max(0, safePrijs - aanbetaling);
-
-  if (mode === "halal") {
-    // Halal: geen rente, maar een vaste kredietvergoeding/markup (murabaha-principe).
-    // Totale vergoeding wordt vooraf bepaald en gelijkmatig over de looptijd verdeeld.
-    const vergoedingPj = rente ?? LEASE_DEFAULTS.halalVergoeding;
-    const totaalVergoeding = (leasebedrag - slottermijn) * vergoedingPj * (looptijd / 12);
-    const maandbedrag = looptijd > 0
-      ? (leasebedrag - slottermijn + totaalVergoeding) / looptijd
-      : 0;
-    return {
-      maandbedrag: Math.ceil(maandbedrag),
-      aanbetaling,
-      slottermijn,
-      leasebedrag,
-      totaalKosten: Math.round(totaalVergoeding),
-      totaalTeBetalen: Math.round(aanbetaling + maandbedrag * looptijd + slottermijn),
-    };
-  }
 
   const jaarRente = rente ?? LEASE_DEFAULTS.rente;
   const maandRente = jaarRente / 12;
