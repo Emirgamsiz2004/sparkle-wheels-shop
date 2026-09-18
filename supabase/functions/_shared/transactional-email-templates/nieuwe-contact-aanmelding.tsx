@@ -17,7 +17,8 @@ interface Props {
 
 const NieuweAanmeldingEmail = ({ type, naam, email, telefoon, bericht, merk, model, bouwjaar, kenteken }: Props) => {
   const isConsignatie = type === 'consignatie'
-  const title = isConsignatie ? 'Nieuwe consignatie-aanmelding' : 'Nieuw contactformulier'
+  const isInruil = type === 'inruil'
+  const title = isConsignatie ? 'Nieuwe consignatie-aanmelding' : isInruil ? 'Nieuwe inruilaanvraag' : 'Nieuw contactformulier'
 
   return (
     <EmailLayout preview={`${title} van ${naam || 'onbekend'}`} eyebrow="Admin notificatie" title={title}>
@@ -28,7 +29,7 @@ const NieuweAanmeldingEmail = ({ type, naam, email, telefoon, bericht, merk, mod
         <DetailRow label="E-mail" value={email || '-'} />
         <DetailRow label="Telefoon" value={telefoon || '-'} />
 
-        {isConsignatie && (
+        {(isConsignatie || isInruil) && (
           <>
             <Hr style={{ borderColor: '#e8eaee', margin: '12px 0' }} />
             {merk && <DetailRow label="Merk" value={merk} />}
@@ -58,6 +59,8 @@ export const template = {
   subject: (data: Record<string, any>) =>
     data.type === 'consignatie'
       ? `Nieuwe consignatie-aanmelding: ${data.merk || ''} ${data.model || ''}`
+      : data.type === 'inruil'
+        ? `Nieuwe inruilaanvraag: ${data.kenteken || 'onbekend'}`
       : `Nieuw contactformulier: ${data.naam || 'onbekend'}`,
   displayName: 'Nieuwe aanmelding notificatie',
   to: 'info@platinautomotive.nl',

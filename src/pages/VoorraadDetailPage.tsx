@@ -7,14 +7,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKenteken } from "@/lib/kenteken";
 
 import RelatedVehicles from "@/components/RelatedVehicles";
-import VehicleBookingCard, { VehicleBookingMobileButton } from "@/components/VehicleBookingCard";
+import VehicleDetailActions from "@/components/VehicleDetailActions";
 import LeaseCalculatorPopover from "@/components/LeaseCalculatorPopover";
 import { berekenLeaseVanaf, isLeaseEligible, formatEuro, LEASE_DEFAULTS } from "@/lib/lease";
 import { getVoertuigFotoUrl } from "@/lib/vwePhoto";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
-  ArrowLeft, Phone, MessageCircle, ShieldCheck, Calendar,
+  ArrowLeft, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
   ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog, FileCheck,
   Users, Globe, Wrench, Weight, Cylinder, ExternalLink, Hash, UserCheck, Receipt,
@@ -288,24 +288,7 @@ const VoorraadDetailPage = () => {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <a
-                    href="tel:+31717812525"
-                    className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Bel Direct
-                  </a>
-                  <a
-                    href={`https://wa.me/31717812525?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase bg-transparent"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    Stuur WhatsApp
-                  </a>
-                </div>
+                <VehicleDetailActions vehicleId={id} merk={vehicle.merk} model={vehicle.model} bouwjaar={vehicle.bouwjaar} kenteken={formattedKenteken} />
 
                 {dbMarktplaatsUrl && (
                   <a
@@ -329,7 +312,6 @@ const VoorraadDetailPage = () => {
                   ))}
                 </div>
 
-                {/* <VehicleBookingMobileButton merk={vehicle.merk} model={vehicle.model} kenteken={formattedKenteken} /> tijdelijk uitgezet */}
               </div>
 
               {/* Kenmerken — Marktplaats-style grid */}
@@ -426,24 +408,7 @@ const VoorraadDetailPage = () => {
                 </div>
 
 
-                <div className="space-y-3">
-                  <a
-                    href="tel:+31717812525"
-                    className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase transition-all duration-500 hover:bg-primary hover:border-primary hover:text-primary-foreground"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Bel Direct
-                  </a>
-                  <a
-                    href={`https://wa.me/31717812525?text=${encodeURIComponent(`Hallo, ik heb interesse in de ${vehicle.merk} ${vehicle.model} (${vehicle.bouwjaar || ""}).`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2.5 w-full border-2 border-border text-foreground py-4 text-[11px] font-body font-semibold tracking-[0.15em] uppercase bg-transparent transition-all duration-500 hover:border-foreground hover:bg-foreground hover:text-background"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    Stuur WhatsApp
-                  </a>
-                </div>
+                <VehicleDetailActions vehicleId={id} merk={vehicle.merk} model={vehicle.model} bouwjaar={vehicle.bouwjaar} kenteken={formattedKenteken} />
 
                 {dbMarktplaatsUrl && (
                   <a
@@ -466,13 +431,6 @@ const VoorraadDetailPage = () => {
                     </div>
                   ))}
                 </div>
-
-                {/* <VehicleBookingCard
-                  feedId={id || ""}
-                  merk={vehicle.merk}
-                  model={vehicle.model}
-                  kenteken={formattedKenteken}
-                /> tijdelijk uitgezet */}
 
               </div>
             </motion.div>
