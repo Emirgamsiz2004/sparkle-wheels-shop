@@ -70,7 +70,9 @@ const InventorySection = () => {
                   key={v.id}
                   className="basis-full pl-5 sm:basis-1/2 lg:basis-1/3"
                 >
-                  <VoorraadCard voertuig={v} index={i} />
+                  <div className="h-full">
+                    <VoorraadCard voertuig={v} index={i} />
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>

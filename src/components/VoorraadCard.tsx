@@ -31,7 +31,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
   const hasDetail = !isSold && voertuig.detailAvailable !== false;
 
   const cardClass =
-    "group flex flex-col overflow-hidden rounded-lg border border-border bg-card hover:border-accent/40 transition-colors duration-300";
+    "group flex flex-col h-full overflow-hidden rounded-lg border border-border bg-card hover:border-accent/40 transition-colors duration-300";
 
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
     hasDetail ? (
