@@ -30,7 +30,7 @@ const coreServices: CoreService[] = [
   },
   {
     title: "Financiering",
-    description: "Financial lease voor ondernemers, private lease voor particulieren. Vaste lage rente, snel akkoord.",
+    description: "Zakelijke financiering en private lease voor auto's uit onze voorraad. Ook een vaste kredietvergoeding is zakelijk bespreekbaar.",
     image: financieringImg,
     alt: "Auto financiering en lease aanbod",
     href: "/financiering",

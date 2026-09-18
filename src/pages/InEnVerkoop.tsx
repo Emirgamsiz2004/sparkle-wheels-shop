@@ -266,8 +266,8 @@ const InEnVerkoop = () => {
           {
             heading: "Financiering en private lease",
             paragraphs: [
-              "Naast contante aankoop bieden wij verschillende financieringsoplossingen aan via gerenommeerde partners. Of u nu kiest voor een traditioneel autokrediet, een doorlopend krediet of private lease — wij helpen u bij het vinden van de beste vorm met de scherpste rente. De aanvraag verloopt snel en u krijgt vaak binnen één werkdag uitsluitsel.",
-              "Voor zakelijke klanten regelen wij financial lease en operational lease. Profiteer van fiscale voordelen, vrij rijden en een vast maandbedrag. Vraag vrijblijvend een berekening aan via onze lease-calculator of bel ons direct.",
+              "Voor particuliere klanten is private lease uitsluitend mogelijk voor daarvoor geschikte auto's uit onze eigen voorraad. De precieze looptijd, kilometrage en voorwaarden worden vooraf in een persoonlijk aanbod vastgelegd.",
+              "Voor ondernemers regelen wij financial lease, ook voor een auto van een andere garage of particulier. Daarnaast kunnen zakelijke klanten de mogelijkheid bespreken waarbij op de overeenkomst een vooraf vastgestelde kredietvergoeding staat in plaats van rente. Elke aanvraag blijft onder voorbehoud van acceptatie.",
             ],
           },
           {

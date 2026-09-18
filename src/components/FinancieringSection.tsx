@@ -42,11 +42,11 @@ const FinancieringSection = ({ showCalculator = true }: FinancieringSectionProps
               betaal per maand.
             </h2>
             <p className="text-muted-foreground font-body font-light leading-relaxed mb-8 max-w-xl">
-              Elke auto in onze voorraad is direct te financieren of te leasen via
-              onze partner{" "}
+              Wij regelen financiering en lease via onze partner{" "}
               <span className="text-foreground font-medium">financiallease.nl</span>.
-              Voor ondernemers (financial lease) én particulieren (private lease).
-              Vaste lage rente, snel akkoord en volledig online.
+              Voor ondernemers bieden we zakelijke financiering, ook met een vaste
+              kredietvergoeding. Private lease is alleen mogelijk voor auto's uit onze
+              eigen voorraad.
             </p>
 
             <div className="grid sm:grid-cols-3 gap-px bg-border mb-8">
@@ -83,9 +83,9 @@ const FinancieringSection = ({ showCalculator = true }: FinancieringSectionProps
             </div>
 
             <p className="text-xs text-muted-foreground/70 font-body mt-5 max-w-xl leading-relaxed">
-              Ook voor een auto die u ergens anders vond: stuur ons de advertentie
-              met uw gewenste maandbedrag, aanbetaling en looptijd — wij vragen het
-              voor u aan.
+              Ondernemer en een auto ergens anders gevonden? Stuur ons de advertentie
+              met uw gewenste maandbedrag, aanbetaling en looptijd. Financiering van
+              externe auto's is uitsluitend zakelijk mogelijk.
             </p>
           </motion.div>
 
