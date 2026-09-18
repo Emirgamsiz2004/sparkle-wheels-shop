@@ -44,6 +44,7 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
 
   return (
     <motion.div
+      className="h-full"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.05 }}
@@ -91,13 +92,11 @@ const VoorraadCard = ({ voertuig, index }: Props) => {
             {title || "Onbekend voertuig"}
           </h3>
 
-          {voertuig.type && (
-            <p className="text-[11px] text-muted-foreground tracking-wide uppercase -mt-1 line-clamp-1">
-              {voertuig.type}
-            </p>
-          )}
+          <p className="text-[11px] text-muted-foreground tracking-wide uppercase -mt-1 line-clamp-1 min-h-[15px]">
+            {voertuig.type || "\u00A0"}
+          </p>
 
-          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 min-h-[36px]">
             <Spec icon={Calendar} label={voertuig.bouwjaar} />
             <Spec icon={Fuel} label={voertuig.brandstof} />
             <Spec icon={Settings2} label={voertuig.transmissie?.replace(/,?\s*\d+\s*versnellingen?/i, "").trim() || ""} />
