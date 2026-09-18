@@ -24,6 +24,10 @@ Deno.serve(async (req) => {
 
     const { data: storedFiles } = await client.storage.from('inruil-fotos').list(request.id, { limit: 6, sortBy: { column: 'name', order: 'asc' } });
     const photoPaths = (storedFiles || []).map((file) => `${request.id}/${file.name}`);
+    if (photoPaths.length > 0) {
+      const { error: updateError } = await client.from('inruil_aanmeldingen').update({ foto_paths: photoPaths }).eq('id', request.id);
+      if (updateError) console.error('Could not save trade-in photo paths', updateError.message);
+    }
     const signedUrls: string[] = [];
     for (const path of photoPaths) {
       const { data } = await client.storage.from('inruil-fotos').createSignedUrl(path, 60 * 60 * 24 * 30);
