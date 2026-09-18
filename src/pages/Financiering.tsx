@@ -62,13 +62,13 @@ const Financiering = () => {
         <title>Financiering & Lease | Platin Automotive Roelofarendsveen</title>
         <meta
           name="description"
-          content="Auto financieren of leasen bij Platin Automotive? Financial lease voor ondernemers en private lease voor particulieren. In samenwerking met financiallease.nl."
+          content="Auto financieren of leasen bij Platin Automotive? Zakelijke financial lease, financiering met vaste kredietvergoeding en private lease voor auto's uit onze voorraad."
         />
         <link rel="canonical" href="https://platinautomotive.nl/financiering" />
         <meta property="og:title" content="Financiering & Lease | Platin Automotive" />
         <meta
           property="og:description"
-          content="Financial lease voor ondernemers en private lease voor particulieren. Snel, online en met vaste lage rente via financiallease.nl."
+          content="Zakelijke financial lease, financiering met vaste kredietvergoeding en private lease voor auto's uit onze voorraad."
         />
         <meta property="og:url" content="https://platinautomotive.nl/financiering" />
         <meta property="og:type" content="website" />
@@ -94,10 +94,10 @@ const Financiering = () => {
               betaal per maand.
             </h1>
             <p className="text-base md:text-lg text-muted-foreground font-body font-light leading-relaxed max-w-2xl mx-auto">
-              Bij Platin Automotive financier je elke auto eenvoudig via{" "}
+              Bij Platin Automotive regelt u eenvoudig een passende financiering via{" "}
               <span className="text-foreground font-medium">financiallease.nl</span>.
-              Voor ondernemers én particulieren — snel, online en met een vaste
-              lage rente.
+              Zakelijke financiering is ook mogelijk voor een auto van een andere
+              aanbieder. Private lease bieden wij alleen aan voor auto's uit onze voorraad.
             </p>
           </motion.div>
         </div>
@@ -149,7 +149,7 @@ const Financiering = () => {
               Welke lease past bij u?
             </h2>
             <p className="text-muted-foreground font-body font-light max-w-xl mx-auto">
-              Wij bieden twee vormen aan — voor zakelijk én particulier gebruik.
+                Bekijk welke mogelijkheid past bij uw situatie en de auto die u kiest.
             </p>
           </motion.div>
 
@@ -170,9 +170,9 @@ const Financiering = () => {
                 Financial Lease
               </h3>
               <p className="text-sm font-body text-muted-foreground leading-relaxed mb-6">
-                U financiert de auto en wordt direct juridisch eigenaar. De auto
-                komt op uw balans en u kunt BTW en afschrijving fiscaal aftrekken.
-                Na de laatste termijn is de auto helemaal van u.
+                U financiert de auto en wordt economisch eigenaar. De auto komt op
+                uw balans en kan fiscale voordelen bieden. Na betaling van de laatste
+                termijn wordt u ook juridisch eigenaar.
               </p>
               <ul className="space-y-2.5 mb-6">
                 {[
@@ -210,24 +210,24 @@ const Financiering = () => {
             >
               <User className="w-6 h-6 text-foreground mb-5" />
               <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
-                Voor particulieren
+                Voor particulieren · eigen voorraad
               </p>
               <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-4">
                 Private Lease
               </h3>
               <p className="text-sm font-body text-muted-foreground leading-relaxed mb-6">
-                Eén vast maandbedrag — all-in. Geen aanbetaling nodig, geen
-                onverwachte kosten. Wegenbelasting, onderhoud, verzekering en
-                pechhulp zijn meestal inbegrepen. Ideaal voor zorgeloos rijden.
+                Private lease is uitsluitend mogelijk voor een daarvoor geschikt
+                voertuig uit onze eigen voorraad. U betaalt een vast maandbedrag;
+                de precieze dekking en voorwaarden staan in het persoonlijke aanbod.
               </p>
               <ul className="space-y-2.5 mb-6">
                 {[
-                  "Eén vast maandbedrag",
-                  "All-in: belasting, onderhoud, pechhulp",
-                  "Geen aanbetaling vereist",
-                  "Flexibele looptijd",
-                  "Geen restwaarde-risico",
-                  "Voor particulieren én ZZP'ers",
+                  "Alleen auto's uit onze voorraad",
+                  "Vast maandbedrag",
+                  "Voor particuliere klanten",
+                  "Looptijd en kilometrage op maat",
+                  "Voorwaarden vooraf duidelijk",
+                  "Altijd onder voorbehoud van acceptatie",
                 ].map((p) => (
                   <li key={p} className="flex items-start gap-2.5 text-sm font-body text-foreground/80">
                     <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -235,15 +235,13 @@ const Financiering = () => {
                   </li>
                 ))}
               </ul>
-              <a
-                href={LEASE_DEFAULTS.partnerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/contact"
                 className="group inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase font-semibold text-foreground hover:text-primary transition-colors"
               >
-                Bereken private lease
+                Vraag private lease aan
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </a>
+              </Link>
             </motion.div>
 
             {/* Halal lease */}
@@ -256,25 +254,25 @@ const Financiering = () => {
             >
               <Moon className="w-6 h-6 text-foreground mb-5" />
               <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
-                Sharia-conform
+                Uitsluitend voor ondernemers
               </p>
               <h3 className="text-xl md:text-2xl font-display font-bold text-foreground mb-4">
                 Halal Lease
               </h3>
               <p className="text-sm font-body text-muted-foreground leading-relaxed mb-6">
-                Volledig rentevrij financieren volgens islamitische principes. In plaats
-                van rente betaalt u een vooraf vastgestelde{" "}
-                <span className="text-foreground font-medium">kredietvergoeding</span>{" "}
-                (murabaha): het totaalbedrag staat vast en wijzigt nooit.
+                Wat vaak halal lease wordt genoemd, is bij onze partner een zakelijke
+                financiering met duidelijke afspraken. Op de overeenkomst staat geen
+                rente, maar een vooraf vastgestelde{" "}
+                <span className="text-foreground font-medium">kredietvergoeding</span>.
               </p>
               <ul className="space-y-2.5 mb-6">
                 {[
-                  "100% rentevrij (geen riba)",
-                  "Vaste kredietvergoeding vooraf bekend",
-                  "Transparant — totaalbedrag staat vast",
-                  "Voor particulier én zakelijk",
+                  "Alleen voor zakelijke klanten",
+                  "Geen rentevermelding op de overeenkomst",
+                  "Kredietvergoeding vooraf vastgesteld",
+                  "Duidelijke maandtermijnen en looptijd",
                   "Looptijd 12 tot 72 maanden",
-                  "Sharia-conforme partner",
+                  "Onder voorbehoud van acceptatie",
                 ].map((p) => (
                   <li key={p} className="flex items-start gap-2.5 text-sm font-body text-foreground/80">
                     <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -286,7 +284,7 @@ const Financiering = () => {
                 to="/contact"
                 className="group inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase font-semibold text-foreground hover:text-primary transition-colors"
               >
-                Halal lease aanvragen
+                Zakelijke aanvraag bespreken
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </motion.div>
@@ -468,9 +466,10 @@ const Financiering = () => {
               Hoe werkt het precies?
             </h2>
             <p className="text-sm md:text-base font-body text-muted-foreground leading-relaxed mb-10 md:mb-14 max-w-2xl">
-              U hoeft de auto niet per se bij ons te kopen. Vond u een auto bij een
-              andere garage? Ook dan regelen wij de financiering voor u — van
-              aanvraag tot uitbetaling.
+              U kunt een auto uit onze voorraad kiezen. Bent u ondernemer en vond u
+              een auto bij een andere garage of particulier? Dan kunnen wij ook de
+              zakelijke financiering voor u aanvragen. Private lease is uitsluitend
+              mogelijk voor auto's uit onze eigen voorraad.
             </p>
           </motion.div>
 
@@ -479,7 +478,7 @@ const Financiering = () => {
               {
                 num: "01",
                 title: "U vindt een auto",
-                desc: "Bij ons in de voorraad, of bij een andere garage of particulier. Elke auto kan in aanmerking komen.",
+                desc: "Kies een auto uit onze voorraad. Zakelijke klanten kunnen ook een advertentie van een andere garage of particulier aanleveren.",
               },
               {
                 num: "02",
@@ -489,7 +488,7 @@ const Financiering = () => {
               {
                 num: "03",
                 title: "Wij vragen het voor u aan",
-                desc: "Wij dienen de aanvraag in bij financiallease.nl en zoeken de best passende constructie — financial lease, private lease of halal (rentevrij).",
+                desc: "Wij dienen de aanvraag in bij financiallease.nl. Voor ondernemers bespreken we financial lease of de mogelijkheid met een vaste kredietvergoeding. Private lease geldt alleen voor auto's uit onze voorraad.",
               },
               {
                 num: "04",

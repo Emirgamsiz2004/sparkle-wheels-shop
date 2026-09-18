@@ -46,7 +46,7 @@ const mainServices: MainService[] = [
   {
     title: "Financiering",
     href: "/financiering",
-    description: "Financial lease, private lease en halal lease. Vaste lage rente vanaf 10,9%, volledig digitaal en snel akkoord.",
+    description: "Zakelijke financial lease, een mogelijkheid met vaste kredietvergoeding en private lease voor auto's uit onze eigen voorraad.",
     image: financieringImg,
     icon: Percent,
   },
