@@ -14,7 +14,7 @@ import { getVoertuigFotoUrl } from "@/lib/vwePhoto";
 import napLogo from "@/assets/nap-logo.png";
 import marktplaatsLogo from "@/assets/marktplaats-logo.png";
 import {
-  ArrowLeft, ShieldCheck, Calendar,
+  ArrowLeft, Calendar,
   Gauge, Fuel, Settings2, Paintbrush, Car, X, ChevronLeft,
   ChevronRight, Zap, Droplets, Leaf, DoorOpen, Cog, FileCheck,
   Users, Globe, Wrench, Weight, Cylinder, ExternalLink, Hash, UserCheck, Receipt,
@@ -312,7 +312,6 @@ const VoorraadDetailPage = () => {
                   ))}
                 </div>
 
-                {/* <VehicleBookingMobileButton merk={vehicle.merk} model={vehicle.model} kenteken={formattedKenteken} /> tijdelijk uitgezet */}
               </div>
 
               {/* Kenmerken — Marktplaats-style grid */}
