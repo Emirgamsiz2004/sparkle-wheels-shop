@@ -2,7 +2,7 @@
 
 ## Open
 - [ ] Detailingpagina herindelen: rustiger, duidelijker, intuïtiever (ontwerprichting nog te kiezen)
-- [ ] Homepagevoorraad terugzetten naar een compacte, horizontale slider
+- [x] Homepagevoorraad terugzetten naar een compacte, horizontale slider
 - [x] Financieringsteksten corrigeren: halal alleen zakelijk, kredietvergoeding correct uitleggen, private lease alleen eigen voorraad en externe auto's alleen zakelijk
 - [x] Alle website-aanmeldingen doorsturen naar AutoRM leads (contact, consignatie, afspraken, detailing, service/offerte, auto zoeken)
 

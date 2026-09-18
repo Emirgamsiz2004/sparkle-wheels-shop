@@ -3,6 +3,13 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useVoorraadFeed } from "@/hooks/useVoorraadFeed";
 import VoorraadCard from "@/components/VoorraadCard";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const InventorySection = () => {
   const { data: alleVoertuigen, isLoading } = useVoorraadFeed();
@@ -51,13 +58,35 @@ const InventorySection = () => {
           </div>
         )}
 
-        {/* Alle actieve auto's */}
+        {/* Actieve auto's in een compacte slider */}
         {voertuigen && voertuigen.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {voertuigen.map((v, i) => (
-              <VoorraadCard key={v.id} voertuig={v} index={i} />
-            ))}
-          </div>
+          <Carousel
+            opts={{ align: "start", slidesToScroll: 1, containScroll: "trimSnaps" }}
+            className="relative"
+          >
+            <CarouselContent className="-ml-5">
+              {voertuigen.map((v, i) => (
+                <CarouselItem
+                  key={v.id}
+                  className="basis-full pl-5 sm:basis-1/2 lg:basis-1/3"
+                >
+                  <VoorraadCard voertuig={v} index={i} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {voertuigen.length > 1 && (
+              <>
+                <CarouselPrevious
+                  aria-label="Vorige auto"
+                  className="-top-16 left-auto right-12 h-10 w-10 translate-y-0 rounded-none border-border bg-background text-foreground hover:bg-foreground hover:text-background disabled:opacity-30"
+                />
+                <CarouselNext
+                  aria-label="Volgende auto"
+                  className="-top-16 right-0 h-10 w-10 translate-y-0 rounded-none border-border bg-background text-foreground hover:bg-foreground hover:text-background disabled:opacity-30"
+                />
+              </>
+            )}
+          </Carousel>
         )}
 
         {/* Empty / fallback */}
