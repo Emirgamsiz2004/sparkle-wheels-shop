@@ -22,8 +22,10 @@ Deno.serve(async (req) => {
     const { data: request, error } = await client.from('inruil_aanmeldingen').select('*').eq('id', parsed.data.requestId).single();
     if (error || !request) return respond({ error: 'not_found' }, 404);
 
+    const { data: storedFiles } = await client.storage.from('inruil-fotos').list(request.id, { limit: 6, sortBy: { column: 'name', order: 'asc' } });
+    const photoPaths = (storedFiles || []).map((file) => `${request.id}/${file.name}`);
     const signedUrls: string[] = [];
-    for (const path of request.foto_paths || []) {
+    for (const path of photoPaths) {
       const { data } = await client.storage.from('inruil-fotos').createSignedUrl(path, 60 * 60 * 24 * 30);
       if (data?.signedUrl) signedUrls.push(data.signedUrl);
     }

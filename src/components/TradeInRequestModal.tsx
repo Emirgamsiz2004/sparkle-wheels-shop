@@ -108,7 +108,7 @@ export default function TradeInRequestModal({
         gewenste_prijs: parsed.data.gewenstePrijs,
         interesse_voertuig_id: interestedVehicleId || null,
         interesse_voertuig: interestedVehicle,
-        foto_paths: photoPaths,
+        foto_paths: [],
       });
       if (insertError) throw insertError;
 
