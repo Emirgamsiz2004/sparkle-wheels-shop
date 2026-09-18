@@ -1543,6 +1543,63 @@ export type Database = {
           },
         ]
       }
+      inruil_aanmeldingen: {
+        Row: {
+          bouwjaar: string | null
+          created_at: string
+          email: string
+          foto_paths: string[]
+          gewenste_prijs: number
+          id: string
+          interesse_voertuig: string
+          interesse_voertuig_id: string | null
+          kenteken: string
+          km_stand: number
+          merk: string | null
+          model: string | null
+          naam: string
+          status: string
+          telefoon: string
+          updated_at: string
+        }
+        Insert: {
+          bouwjaar?: string | null
+          created_at?: string
+          email: string
+          foto_paths?: string[]
+          gewenste_prijs: number
+          id?: string
+          interesse_voertuig: string
+          interesse_voertuig_id?: string | null
+          kenteken: string
+          km_stand: number
+          merk?: string | null
+          model?: string | null
+          naam: string
+          status?: string
+          telefoon: string
+          updated_at?: string
+        }
+        Update: {
+          bouwjaar?: string | null
+          created_at?: string
+          email?: string
+          foto_paths?: string[]
+          gewenste_prijs?: number
+          id?: string
+          interesse_voertuig?: string
+          interesse_voertuig_id?: string | null
+          kenteken?: string
+          km_stand?: number
+          merk?: string | null
+          model?: string | null
+          naam?: string
+          status?: string
+          telefoon?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       kosten: {
         Row: {
           actief: boolean
@@ -3275,6 +3332,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      inruil_submission_exists: { Args: { p_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
