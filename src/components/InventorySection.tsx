@@ -78,11 +78,11 @@ const InventorySection = () => {
               <>
                 <CarouselPrevious
                   aria-label="Vorige auto"
-                  className="-top-16 left-auto right-12 h-10 w-10 translate-y-0 rounded-none border-border bg-background text-foreground hover:bg-foreground hover:text-background disabled:opacity-30"
+                  className="hidden md:flex -left-5 h-11 w-11 border-border bg-background/90 text-foreground hover:bg-foreground hover:text-background disabled:opacity-30"
                 />
                 <CarouselNext
                   aria-label="Volgende auto"
-                  className="-top-16 right-0 h-10 w-10 translate-y-0 rounded-none border-border bg-background text-foreground hover:bg-foreground hover:text-background disabled:opacity-30"
+                  className="hidden md:flex -right-5 h-11 w-11 border-border bg-background/90 text-foreground hover:bg-foreground hover:text-background disabled:opacity-30"
                 />
               </>
             )}
