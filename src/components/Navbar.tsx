@@ -19,6 +19,7 @@ const overOnsItems = [
 ];
 
 const topLevelLinks = [
+  { label: "Home", href: "/" },
   { label: "Voorraad", href: "/voorraad" },
   { label: "Detailing", href: "/diensten/auto-detailing" },
   { label: "Financiering", href: "/financiering" },
