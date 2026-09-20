@@ -227,9 +227,21 @@ const DetailingBookingDialog = ({
         name: naam,
         email: form.email,
         phone: form.telefoon,
-        subject: "Detailing",
-        vehicle: voertuigType,
-        message: `${datumLabel} om ${starttijd}\n${dienstenNotitie}`,
+        subject: `Detailing — ${pakket}`,
+        vehicle: `${voertuigType} — ${pakket}`,
+        message: [
+          `Pakket: ${pakket}`,
+          `Voertuigmaat: ${voertuigType}`,
+          `Opties: ${extras.length ? extras.join(", ") : "geen"}`,
+          `Totaalprijs: €${totalPrice} incl. BTW`,
+          `Duur: ${fmtMin(totalMinuten)}`,
+          `Afspraak: ${datumLabel} om ${starttijd}`,
+          form.opmerking ? `Opmerking klant: ${form.opmerking}` : null,
+          "",
+          dienstenNotitie,
+        ]
+          .filter(Boolean)
+          .join("\n"),
       });
 
       // Mails (best-effort)
