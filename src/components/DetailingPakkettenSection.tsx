@@ -5,38 +5,78 @@ import { Link } from "react-router-dom";
 const pakketten = [
   {
     naam: "Compleet Reiniging",
-    niveau: "Niveau 1 · Onderhoud",
+    tag: "Binnen & buiten",
     vanaf: 189,
     duur: "± 3–4 uur",
-    punten: [
-      "Handwas, velgen & bandendressing",
-      "Interieur uitzuigen & reinigen",
-      "Ramen binnen en buiten streeploos",
+    groepen: [
+      {
+        titel: "Exterieur",
+        items: [
+          "Handwas & zorgvuldig drogen",
+          "Velgen, banden & wielkasten",
+          "Ramen streeploos",
+        ],
+      },
+      {
+        titel: "Interieur",
+        items: [
+          "Uitzuigen incl. kieren & stoelrails",
+          "Dashboard, panelen & stofvrij afnemen",
+          "Matten reinigen",
+        ],
+      },
     ],
   },
   {
-    naam: "Compleet Premium",
-    niveau: "Niveau 2 · Premium",
-    vanaf: 649,
-    duur: "± 1 dag",
+    naam: "Reiniging + Polijsten",
+    tag: "Meest gekozen",
+    vanaf: 449,
+    duur: "± halve dag",
     populair: true,
-    punten: [
-      "Alles van Niveau 1",
-      "Klei + 1-staps machinale polijst",
-      "Bekleding shampooën of leer voeden",
-      "Sealant: 4–6 maanden bescherming",
+    groepen: [
+      {
+        titel: "Alles van Compleet Reiniging (exterieur)",
+        items: ["Volledige voorreiniging & kleibehandeling van de lak"],
+      },
+      {
+        titel: "Polijsten",
+        items: [
+          "Machinale 1-staps polijst rondom",
+          "Swirls & lichte krassen zichtbaar minder",
+          "Kunststof exterieurdelen gevoed",
+        ],
+      },
+      {
+        titel: "Bescherming",
+        items: ["Sealant — 4 tot 6 maanden bescherming"],
+      },
     ],
   },
   {
-    naam: "Compleet Signature",
-    niveau: "Niveau 3 · Signature",
-    vanaf: 1799,
+    naam: "Signature Coating",
+    tag: "Lakcorrectie & keramiek",
+    vanaf: 1249,
     duur: "± 1,5–2 dagen",
-    punten: [
-      "Alles van Niveau 2",
-      "2-staps lakcorrectie",
-      "Keramische coating (2–5 jaar)",
-      "Velgen- & glascoating",
+    groepen: [
+      {
+        titel: "Voorbereiding",
+        items: [
+          "Volledige reiniging & kleibehandeling",
+          "Polijstwerk als basis voor de coating",
+        ],
+      },
+      {
+        titel: "Coating",
+        items: [
+          "Professionele keramische coating",
+          "2 tot 5 jaar bescherming",
+          "Diepe glans & vuilafstotend",
+        ],
+      },
+      {
+        titel: "Nazorg",
+        items: ["Onderhoudskit & advies meegegeven"],
+      },
     ],
   },
 ];
@@ -63,20 +103,20 @@ const DetailingPakkettenSection = () => {
               Detailingpakketten
             </h2>
             <p className="text-muted-foreground font-body font-light mt-4 max-w-xl">
-              Duidelijke pakketten met vaste prijzen. Ook los te boeken: alleen
-              interieur, exterieur of polijsten.
+              Drie heldere pakketten met vaste vanaf-prijzen. Definitieve prijs
+              altijd vooraf bevestigd bij de intake.
             </p>
           </div>
           <Link
             to="/diensten/auto-detailing"
             className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase text-foreground hover:text-primary transition-colors shrink-0"
           >
-            Alle pakketten
+            Alle pakketten & add-ons
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-3 gap-5 items-stretch">
           {pakketten.map((p, i) => (
             <motion.div
               key={p.naam}
@@ -84,7 +124,7 @@ const DetailingPakkettenSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className={`relative flex flex-col rounded-xl border p-7 bg-card ${
+              className={`relative flex flex-col h-full rounded-xl border p-7 bg-card ${
                 p.populair ? "border-amber-400/50" : "border-border"
               }`}
             >
@@ -94,24 +134,36 @@ const DetailingPakkettenSection = () => {
                 </span>
               )}
               <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
-                {p.niveau}
+                {p.tag}
               </p>
               <h3 className="text-xl font-display font-bold text-foreground mb-3">
                 {p.naam}
               </h3>
               <p className="font-display text-3xl font-bold text-foreground mb-1">
-                vanaf €{p.vanaf}
+                vanaf €{p.vanaf.toLocaleString("nl-NL")}
               </p>
               <p className="text-xs text-muted-foreground mb-6">{p.duur}</p>
 
-              <ul className="space-y-2.5 mb-8 flex-1">
-                {p.punten.map((punt) => (
-                  <li key={punt} className="flex gap-2.5 text-sm font-body text-muted-foreground">
-                    <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    {punt}
-                  </li>
+              <div className="space-y-5 mb-8 flex-1">
+                {p.groepen.map((g) => (
+                  <div key={g.titel}>
+                    <p className="text-[10px] tracking-[0.25em] uppercase text-foreground/80 font-semibold mb-2">
+                      {g.titel}
+                    </p>
+                    <ul className="space-y-2">
+                      {g.items.map((item) => (
+                        <li
+                          key={item}
+                          className="flex gap-2.5 text-sm font-body text-muted-foreground"
+                        >
+                          <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+              </div>
 
               <Link
                 to="/diensten/auto-detailing"
