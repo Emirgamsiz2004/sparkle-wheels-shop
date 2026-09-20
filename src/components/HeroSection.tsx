@@ -23,7 +23,7 @@ const lazySlideImports = [
 
 const slidePositions = [
   { mobilePosition: "center center", desktopPosition: "center center" },
-  { mobilePosition: "65% center", desktopPosition: "center center" },
+  { mobilePosition: "center center", desktopPosition: "center center" },
   { mobilePosition: "50% 40%", desktopPosition: "center center" },
   { mobilePosition: "center 40%", desktopPosition: "center center" },
 ];
