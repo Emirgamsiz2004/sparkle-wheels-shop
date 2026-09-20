@@ -80,7 +80,7 @@ const Footer = () => {
             <p className="text-[11px] font-body text-muted-foreground/70">Maandag: 09:00 – 18:00</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Di – Vr: 09:00 – 18:00</p>
             <p className="text-[11px] font-body text-muted-foreground/70">Zaterdag: 10:00 – 17:00</p>
-            <p className="text-[11px] font-body text-muted-foreground/70">Zondag: 12:00 – 16:00</p>
+            <p className="text-[11px] font-body text-muted-foreground/70">Zondag: op afspraak geopend</p>
             {isAppointmentOnlyActive() && (
               <p className="text-[11px] font-body text-foreground/80 mt-1">
                 {APPOINTMENT_ONLY.periodLabel}: alleen op afspraak
