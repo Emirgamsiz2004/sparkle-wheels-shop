@@ -1,7 +1,8 @@
 # Roadmap
 
 ## Open
-- [ ] Detailingpagina herindelen: rustiger, duidelijker, intuïtiever (ontwerprichting nog te kiezen)
+- [ ] Detailingpagina herindelen in bestaande huisstijl: drie basispakketten (binnen, buiten, volledig), alleen passende extra's en een korte boekingsroute
+- [ ] Beslissen of en hoe iDEAL-betaling via Mollie onderdeel wordt van de detailingboeking
 - [x] Voertuigdetail: functionele actieknoppen en korte inruilaanvraag met foto’s
 - [x] Homepagevoorraad terugzetten naar een compacte, horizontale slider
 - [x] Financieringsteksten corrigeren: halal alleen zakelijk, kredietvergoeding correct uitleggen, private lease alleen eigen voorraad en externe auto's alleen zakelijk
