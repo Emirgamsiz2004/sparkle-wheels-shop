@@ -90,7 +90,7 @@ const ContactSection = () => {
                 <span className="text-border">·</span>
                 <span>Zaterdag: 10:00 – 17:00</span>
                 <span className="text-border">·</span>
-                <span>Zondag: op afspraak geopend</span>
+                <span>Zondag: 10:00 – 17:00 · op afspraak</span>
               </div>
             </div>
           </motion.div>

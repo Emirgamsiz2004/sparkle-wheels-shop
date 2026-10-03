@@ -307,7 +307,7 @@ const AutoCustomizing = () => {
                   </div>
                   <div className="flex justify-between text-sm font-body">
                     <span className="text-muted-foreground">Zondag</span>
-                    <span className="text-foreground">Op afspraak geopend</span>
+                    <span className="text-foreground">10:00 - 17:00 · op afspraak</span>
                   </div>
                 </div>
               </div>

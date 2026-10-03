@@ -23,8 +23,8 @@ const FacebookIcon = ({ className }: { className?: string }) => (
 );
 
 // Opening hours schedule (Google Maps)
-const SCHEDULE: ({ open: number; close: number } | null)[] = [
-  null,                        // Zo: op afspraak geopend
+const SCHEDULE: ({ open: number; close: number; appointmentOnly?: boolean } | null)[] = [
+  { open: 600, close: 1020, appointmentOnly: true }, // Zo: 10:00–17:00 op afspraak
   { open: 540, close: 1080 },  // Ma: 09:00–18:00
   { open: 540, close: 1080 },  // Di: 09:00–18:00
   { open: 540, close: 1080 },  // Wo: 09:00–18:00
@@ -55,7 +55,10 @@ const getIsOpen = (): { isOpen: boolean; label: string; openLabel: string } => {
     return { isOpen: false, label: "Op afspraak geopend", openLabel: "Maak afspraak" };
   }
 
-  if (today.open >= 0 && time >= today.open && time < today.close) {
+  if (time >= today.open && time < today.close) {
+    if (today.appointmentOnly) {
+      return { isOpen: true, label: `Op afspraak tot ${fmtTime(today.close)}`, openLabel: "Maak afspraak" };
+    }
     return { isOpen: true, label: `Open tot ${fmtTime(today.close)}`, openLabel: "Maak afspraak" };
   }
 
