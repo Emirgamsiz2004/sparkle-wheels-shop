@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Open
-- [ ] Detailingpagina herindelen in bestaande huisstijl: drie basispakketten (binnen, buiten, volledig), alleen passende extra's en een korte boekingsroute
+- [ ] Detailingpagina herindelen in bestaande huisstijl: drie basispakketten (binnen, buiten, volledig), een zo compleet mogelijk maar rustig gegroepeerd aanbod passende extra's en een korte boekingsroute
 - [ ] Beslissen of en hoe iDEAL-betaling via Mollie onderdeel wordt van de detailingboeking
 - [x] Voertuigdetail: functionele actieknoppen en korte inruilaanvraag met foto’s
 - [x] Homepagevoorraad terugzetten naar een compacte, horizontale slider
