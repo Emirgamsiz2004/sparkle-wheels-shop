@@ -11,7 +11,7 @@ import { sendLeadToAutoRM } from "@/lib/autorm";
 
 // Openingstijden in minuten vanaf 00:00
 const OPENING: Record<number, { open: number; close: number } | null> = {
-  0: null, // zondag: op afspraak geopend
+  0: { open: 10 * 60, close: 17 * 60 }, // zondag: uitsluitend op afspraak
   1: { open: 9 * 60, close: 18 * 60 }, // maandag
   2: { open: 9 * 60, close: 18 * 60 },
   3: { open: 9 * 60, close: 18 * 60 },
