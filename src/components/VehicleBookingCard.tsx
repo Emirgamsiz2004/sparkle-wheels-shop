@@ -6,6 +6,7 @@ import { nl } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import MobileBookingSheet from "./MobileBookingSheet";
 import { sendLeadToAutoRM } from "@/lib/autorm";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   feedId: string;
@@ -158,8 +159,8 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
 
   return (
     <div
-      className="relative w-full border border-white/10 bg-white/[0.03]"
-      style={{ minHeight: 400, borderRadius: 12, padding: 20 }}
+      className="relative w-full font-body"
+      style={{ minHeight: 400, padding: 4 }}
     >
       <div className="relative overflow-hidden" style={{ minHeight: 360 }}>
       <AnimatePresence mode="wait" custom={direction} initial={false}>
@@ -171,7 +172,7 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
           >
             <div className="flex items-center gap-2">
               <CalIcon className="w-4 h-4 shrink-0 text-muted-foreground" />
-              <span className="text-[10px] font-body font-semibold tracking-[0.15em] uppercase text-foreground/80 px-2 py-0.5 border border-white/10 rounded">{typeLabel}</span>
+              <span className="text-[10px] font-body font-semibold tracking-[0.15em] uppercase text-foreground/80 px-2 py-0.5 border border-border rounded">{typeLabel}</span>
             </div>
             <p className="text-[11px] font-body text-muted-foreground mt-3">Kies een datum</p>
             <div className="mt-2 flex-1 overflow-y-auto scrollbar-hide">
@@ -179,18 +180,18 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
                 {days.slice(0, 25).map((d) => {
                   const sel = date && isSameDay(d, date);
                   return (
-                    <button
+                    <Button
                       key={d.toISOString()}
                       onClick={() => { setDate(d); goTo(2); }}
-                      className={`flex flex-col items-center py-2 border transition-colors ${
-                        sel ? "border-white bg-white text-background" : "border-white/10 hover:border-white/30 text-foreground"
+                      className={`h-auto rounded-none flex flex-col items-center py-2 border transition-colors ${
+                        sel ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground/30 text-foreground"
                       }`}
-                      style={{ borderRadius: 8 }}
+                      style={{ borderRadius: 0 }}
                     >
                       <span className="text-[9px] uppercase tracking-wide opacity-70">{format(d, "EEE", { locale: nl })}</span>
                       <span className="text-sm font-display font-semibold leading-tight">{format(d, "d")}</span>
                       <span className="text-[9px] uppercase opacity-60">{format(d, "MMM", { locale: nl })}</span>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -205,8 +206,8 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
             className="flex flex-col min-h-[360px]"
           >
             <div className="flex items-center gap-2">
-              <button onClick={goBack} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /></button>
-              <span className="text-[10px] font-body font-semibold tracking-[0.15em] uppercase text-foreground/80 px-2 py-0.5 border border-white/10 rounded">{typeLabel}</span>
+              <Button onClick={goBack} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /></Button>
+              <span className="text-[10px] font-body font-semibold tracking-[0.15em] uppercase text-foreground/80 px-2 py-0.5 border border-border rounded">{typeLabel}</span>
               <span className="text-[10px] font-body text-muted-foreground">{format(date, "EEE d MMM", { locale: nl })}</span>
             </div>
             <p className="text-[11px] font-body text-muted-foreground mt-3">Kies een tijd</p>
@@ -215,21 +216,21 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
                 const isBusy = busy.includes(t);
                 const sel = time === t;
                 return (
-                  <button
+                  <Button
                     key={t}
                     disabled={isBusy}
                     onClick={() => { setTime(t); goTo(3); }}
-                    className={`py-2.5 text-sm font-body font-medium border transition-colors ${
+                    className={`py-2.5 h-auto rounded-none text-sm font-display font-medium border transition-colors ${
                       isBusy
-                        ? "border-white/5 bg-white/[0.02] text-muted-foreground/40 cursor-not-allowed line-through"
+                        ? "border-border/50 bg-muted/20 text-muted-foreground/40 cursor-not-allowed line-through"
                         : sel
-                          ? "border-white bg-white text-background"
-                          : "border-white/10 hover:border-white/30 text-foreground"
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-border hover:border-foreground/30 text-foreground"
                     }`}
-                    style={{ borderRadius: 8 }}
+                    style={{ borderRadius: 0 }}
                   >
                     {t}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -243,30 +244,30 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
             className="flex flex-col min-h-[360px]"
           >
             <div className="flex items-center gap-2">
-              <button onClick={goBack} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /></button>
-              <span className="text-[10px] font-body font-semibold tracking-[0.15em] uppercase text-foreground/80 px-2 py-0.5 border border-white/10 rounded">{typeLabel}</span>
+              <Button onClick={goBack} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /></Button>
+              <span className="text-[10px] font-body font-semibold tracking-[0.15em] uppercase text-foreground/80 px-2 py-0.5 border border-border rounded">{typeLabel}</span>
               <span className="text-[10px] font-body text-muted-foreground">{date && format(date, "d MMM", { locale: nl })} · {time}</span>
             </div>
             <div className="mt-3 flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-hide">
               <div className="grid grid-cols-2 gap-2">
                 <input value={form.voornaam} onChange={(e) => setForm({ ...form, voornaam: e.target.value })}
-                  placeholder="Voornaam" className="px-3 py-2 text-sm bg-white/[0.04] border border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/30 outline-none transition-colors" style={{ borderRadius: 8 }} />
+                  placeholder="Voornaam" className="px-3 py-2 text-sm bg-muted/40 border border-border text-foreground placeholder:text-muted-foreground focus:border-foreground/30 outline-none transition-colors" style={{ borderRadius: 0 }} />
                 <input value={form.achternaam} onChange={(e) => setForm({ ...form, achternaam: e.target.value })}
-                  placeholder="Achternaam" className="px-3 py-2 text-sm bg-white/[0.04] border border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/30 outline-none transition-colors" style={{ borderRadius: 8 }} />
+                  placeholder="Achternaam" className="px-3 py-2 text-sm bg-muted/40 border border-border text-foreground placeholder:text-muted-foreground focus:border-foreground/30 outline-none transition-colors" style={{ borderRadius: 0 }} />
               </div>
               <input value={form.telefoon} onChange={(e) => setForm({ ...form, telefoon: e.target.value })}
-                placeholder="Telefoonnummer" type="tel" className="px-3 py-2 text-sm bg-white/[0.04] border border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/30 outline-none transition-colors" style={{ borderRadius: 8 }} />
+                placeholder="Telefoonnummer" type="tel" className="px-3 py-2 text-sm bg-muted/40 border border-border text-foreground placeholder:text-muted-foreground focus:border-foreground/30 outline-none transition-colors" style={{ borderRadius: 0 }} />
               <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="E-mailadres" type="email" className="px-3 py-2 text-sm bg-white/[0.04] border border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/30 outline-none transition-colors" style={{ borderRadius: 8 }} />
-              {errMsg && <p className="text-[11px] text-red-400">{errMsg}</p>}
-              <button
+                placeholder="E-mailadres" type="email" className="px-3 py-2 text-sm bg-muted/40 border border-border text-foreground placeholder:text-muted-foreground focus:border-foreground/30 outline-none transition-colors" style={{ borderRadius: 0 }} />
+              {errMsg && <p className="text-[11px] text-destructive">{errMsg}</p>}
+              <Button
                 onClick={submit}
                 disabled={submitting}
-                className="mt-auto w-full py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase bg-foreground text-background hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-50"
-                style={{ borderRadius: 8 }}
+                className="mt-auto w-full py-3 h-auto rounded-none text-[11px] font-display font-semibold uppercase bg-foreground text-background hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-50"
+                style={{ borderRadius: 0 }}
               >
                 {submitting ? "Bezig…" : "Bevestig afspraak"}
-              </button>
+              </Button>
             </div>
           </motion.div>
         )}
@@ -285,9 +286,9 @@ const VehicleBookingCard = ({ feedId, merk, model, kenteken }: Props) => {
               Uw bezichtiging / proefrit voor de <span className="text-foreground">{merk} {model}</span> op <span className="text-foreground">{doneInfo.datum}</span> om <span className="text-foreground">{doneInfo.tijd}</span> is ingepland.
             </p>
             <p className="text-[11px] font-body text-muted-foreground mt-2">U ontvangt een bevestigingsmail op <span className="text-foreground">{doneInfo.email}</span>.</p>
-            <button onClick={reset} className="mt-4 text-[11px] font-body underline text-muted-foreground hover:text-foreground">
+            <Button onClick={reset} className="mt-4 text-[11px] font-body underline text-muted-foreground hover:text-foreground">
               Nieuwe afspraak plannen
-            </button>
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -306,14 +307,14 @@ export const VehicleBookingMobileButton = ({ merk, model, kenteken }: MobileBtnP
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
         className="flex items-center justify-center gap-2.5 w-full border-2 border-foreground bg-foreground text-background py-3 text-[11px] font-body font-semibold tracking-[0.15em] uppercase"
       >
         <CalIcon className="w-4 h-4" />
         Afspraak maken
-      </button>
+      </Button>
       <MobileBookingSheet
         open={open}
         onClose={() => setOpen(false)}
