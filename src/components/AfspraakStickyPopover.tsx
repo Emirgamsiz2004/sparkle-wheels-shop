@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { Calendar as CalIcon, Car, Check, Eye, MessageSquare, Search, Sparkles, Wrench, X, ArrowLeft } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -50,6 +51,7 @@ interface Props {
 
 const AfspraakStickyPopover = ({ open, onClose }: Props) => {
   const isMobile = useIsMobile();
+  const reducedMotion = useReducedMotion();
 
   // Step index drives the horizontal pager.
   // Flow A pages: 0=type, 1=voertuig, 2=datum, 3=tijd, 4=gegevens, 5=done
@@ -200,12 +202,12 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
         await Promise.all([
           supabase.functions.invoke("send-transactional-email", { body: {
             templateName: "afspraak-bevestiging", recipientEmail: form.email,
-            idempotencyKey: `afspraak-bev-${inserted!.id}`,
+            idempotencyKey: `afspraak-bev-${inserted.id}`,
             templateData: { naam: form.voornaam, type: TYPE_LABELS[type], datum: datumStr, tijdstip: time, voertuig },
           }}),
           supabase.functions.invoke("send-transactional-email", { body: {
             templateName: "afspraak-notificatie-admin", recipientEmail: "info@platinautomotive.nl",
-            idempotencyKey: `afspraak-adm-${inserted!.id}`,
+            idempotencyKey: `afspraak-adm-${inserted.id}`,
             templateData: { isAanvraag: false, type: TYPE_LABELS[type],
               naam: `${form.voornaam} ${form.achternaam}`, email: form.email, telefoon: form.telefoon,
               datum: datumStr, tijdstip: time, voertuig },
@@ -240,12 +242,12 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
         await Promise.all([
           supabase.functions.invoke("send-transactional-email", { body: {
             templateName: "afspraak-aanvraag-ontvangen", recipientEmail: form.email,
-            idempotencyKey: `aanvraag-bev-${inserted!.id}`,
+            idempotencyKey: `aanvraag-bev-${inserted.id}`,
             templateData: { naam: form.voornaam },
           }}),
           supabase.functions.invoke("send-transactional-email", { body: {
             templateName: "afspraak-notificatie-admin", recipientEmail: "info@platinautomotive.nl",
-            idempotencyKey: `aanvraag-adm-${inserted!.id}`,
+            idempotencyKey: `aanvraag-adm-${inserted.id}`,
             templateData: { isAanvraag: true, type: TYPE_LABELS[type],
               naam: `${form.voornaam} ${form.achternaam}`, email: form.email, telefoon: form.telefoon,
               kenteken: form.kenteken, omschrijving: form.omschrijving, voorkeursdatum: form.voorkeursdatum },
@@ -271,22 +273,22 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
   if (!open) return null;
 
   // shared field styles
-  const fieldCls = "w-full bg-[#0f0f0f] border border-white/10 rounded-[10px] px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-primary/60 transition-colors";
-  const labelCls = "block text-[10px] tracking-[0.12em] uppercase text-white/50 mb-1 font-semibold";
+  const fieldCls = "w-full bg-background border border-border rounded-none px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 transition-colors";
+  const labelCls = "block text-[10px] tracking-[0.12em] uppercase text-muted-foreground mb-1 font-semibold";
 
   const containerClass = isMobile
-    ? "fixed left-0 right-0 bottom-0 z-[60] rounded-t-[16px] border-t border-x border-white/10 bg-[#111111] shadow-2xl overflow-hidden"
-    : "fixed z-[60] right-8 bottom-8 w-[340px] rounded-[16px] border border-white/10 bg-[#111111] shadow-[0_12px_40px_rgba(0,0,0,0.5)] overflow-hidden";
+    ? "fixed left-0 right-0 bottom-0 z-[60] rounded-t-[16px] border-t border-x border-border bg-background shadow-2xl overflow-hidden"
+    : "relative w-full max-w-[440px] max-h-[calc(100dvh-64px)] overflow-y-auto border border-border bg-background shadow-2xl font-body";
 
   const BackChip = ({ label }: { label: string }) => (
-    <button
+    <Button
       type="button"
       onClick={goBack}
-      className="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors mb-3"
+      className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-3"
     >
       <ArrowLeft className="w-3.5 h-3.5" />
-      <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">{label}</span>
-    </button>
+      <span className="px-2 py-0.5 rounded-none bg-muted/50 border border-border">{label}</span>
+    </Button>
   );
 
   // Build step contents
@@ -295,18 +297,18 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
   // Step 0 — Type
   slides.push(
     <div key="type" className="p-5">
-      <h3 className="text-base font-semibold text-white mb-1" style={{ fontFamily: "Orbitron, sans-serif" }}>Afspraak maken</h3>
-      <p className="text-xs text-white/50 mb-4">Waar kunnen we u mee helpen?</p>
+      <h3 className="font-display text-lg font-semibold text-foreground mb-1 pr-7">Afspraak maken</h3>
+      <p className="text-xs text-muted-foreground mb-4">Waar kunnen we u mee helpen?</p>
       <ul className="flex flex-col gap-1">
         {typeOptions.map((opt) => (
           <li key={opt.type}>
-            <button
+            <Button
               onClick={() => pickType(opt.type)}
-              className="w-full flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-left text-sm text-white transition-colors hover:bg-white/[0.06]"
+              className="min-h-12 h-auto w-full justify-start gap-3 rounded-none border-border px-3 py-3 text-left font-display text-xs font-semibold whitespace-normal transition-colors duration-500 hover:bg-accent/40"
             >
               <opt.icon className="w-4 h-4 text-primary shrink-0" />
               <span>{TYPE_LABELS[opt.type]}</span>
-            </button>
+            </Button>
           </li>
         ))}
       </ul>
@@ -320,43 +322,43 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
         <BackChip label={TYPE_LABELS[type]} />
         <label className={labelCls}>Voertuig</label>
         <div className="relative mb-2">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
-            className="w-full bg-[#0f0f0f] border border-white/10 rounded-[10px] pl-9 pr-3 text-[14px] text-white placeholder:text-white/30 outline-none focus:border-primary/60 transition-colors"
+            className="w-full bg-background border border-border rounded-none pl-9 pr-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 transition-colors"
             style={{ height: 44 }}
             placeholder="Zoek voertuig..."
             value={vehicleSearch}
             onChange={(e) => setVehicleSearch(e.target.value)}
           />
         </div>
-        <div className="rounded-[10px] border border-white/10 bg-[#0f0f0f] overflow-hidden">
+        <div className="rounded-none border border-border bg-background overflow-hidden">
           {filteredVehicles.length === 0 && (
-            <p className="text-white/40 text-xs text-center py-5">Geen voertuigen.</p>
+            <p className="text-muted-foreground text-xs text-center py-5">Geen voertuigen.</p>
           )}
           {filteredVehicles.map((v) => {
             const active = selectedVehicle?.id === v.id;
             return (
-              <button
+              <Button
                 key={v.id}
                 onClick={() => { setSelectedVehicle(v); goNext(); }}
                 className={cn(
-                  "w-full flex items-center gap-3 text-left border-b border-white/5 last:border-b-0 transition-colors",
-                  active ? "bg-primary/15" : "hover:bg-white/[0.06]"
+                  "w-full flex items-center gap-3 text-left border-b border-border/50 last:border-b-0 transition-colors",
+                  active ? "bg-primary/15" : "hover:bg-accent/40"
                 )}
                 style={{ minHeight: 52, padding: "14px 16px" }}
               >
-                <Car className="w-4 h-4 text-white/40 shrink-0" />
+                <Car className="w-4 h-4 text-muted-foreground shrink-0" />
                 <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] text-white truncate leading-tight">
+                  <span className="block text-[15px] text-foreground truncate leading-tight">
                     {v.merk} {v.model}
                   </span>
                   {v.kenteken && (
-                    <span className="block text-[13px] text-white/50 truncate leading-tight mt-0.5">
+                    <span className="block text-[13px] text-muted-foreground truncate leading-tight mt-0.5">
                       {v.kenteken}
                     </span>
                   )}
                 </span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -368,7 +370,7 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
       <div key="datum" className="p-5">
         <BackChip label={selectedVehicle ? `${selectedVehicle.merk} ${selectedVehicle.model}` : TYPE_LABELS[type]} />
         <label className={labelCls}>Kies een datum</label>
-        <div className="rounded-[10px] border border-white/10 bg-[#0f0f0f] flex justify-center">
+        <div className="rounded-none border border-border bg-background flex justify-center">
           <Calendar
             mode="single"
             selected={date}
@@ -391,21 +393,21 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
             const taken = slotTaken(s);
             const active = time === s;
             return (
-              <button
+              <Button
                 key={s}
                 disabled={taken}
                 onClick={() => { setTime(s); goNext(); }}
                 className={cn(
-                  "px-2 py-3 rounded-[10px] text-sm font-medium border transition-colors",
+                  "px-2 py-3 rounded-none text-sm font-medium border transition-colors",
                   active
                     ? "bg-primary text-primary-foreground border-primary"
                     : taken
-                    ? "bg-white/[0.03] text-white/25 border-white/5 cursor-not-allowed line-through"
-                    : "bg-[#0f0f0f] text-white border-white/10 hover:border-primary/40"
+                    ? "bg-muted/30 text-muted-foreground/50 border-border/50 cursor-not-allowed line-through"
+                    : "bg-background text-foreground border-border hover:border-primary/40"
                 )}
               >
                 {s}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -435,19 +437,19 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
           <input type="email" className={fieldCls} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
 
-        {errMsg && <p className="text-xs text-red-400">{errMsg}</p>}
+        {errMsg && <p className="text-xs text-destructive">{errMsg}</p>}
 
-        <button
+        <Button
           onClick={submit}
           disabled={submitting}
           className={cn(
-            "w-full mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] text-sm font-semibold transition-all",
+            "w-full mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-none font-display text-xs font-semibold uppercase transition-colors duration-500",
             "bg-primary text-primary-foreground hover:opacity-90",
             submitting && "opacity-60 cursor-not-allowed"
           )}
         >
           {submitting ? "Bezig..." : "Bevestig afspraak"}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -493,19 +495,19 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
           <input type="date" className={fieldCls} value={form.voorkeursdatum} onChange={(e) => setForm({ ...form, voorkeursdatum: e.target.value })} />
         </div>
 
-        {errMsg && <p className="text-xs text-red-400">{errMsg}</p>}
+        {errMsg && <p className="text-xs text-destructive">{errMsg}</p>}
 
-        <button
+        <Button
           onClick={submit}
           disabled={submitting}
           className={cn(
-            "w-full mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] text-sm font-semibold transition-all",
+            "w-full mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-none font-display text-xs font-semibold uppercase transition-colors duration-500",
             "bg-primary text-primary-foreground hover:opacity-90",
             submitting && "opacity-60 cursor-not-allowed"
           )}
         >
           {submitting ? "Bezig..." : "Verstuur aanvraag"}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -513,26 +515,26 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
   // Final step — Done
   slides.push(
     <div key="done" className="p-5 text-center py-6">
-      <div className="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 mx-auto flex items-center justify-center mb-3">
+      <div className="w-14 h-14 rounded-none bg-primary/15 text-primary mx-auto flex items-center justify-center mb-3">
         <Check className="w-7 h-7" />
       </div>
       {doneInfo ? (
         <>
-          <h3 className="text-base font-semibold text-white mb-2">Bedankt {doneInfo.naam}!</h3>
-          <p className="text-sm text-white/60 mb-5 leading-relaxed">
+          <h3 className="font-display text-base font-semibold text-foreground mb-2">Bedankt {doneInfo.naam}!</h3>
+          <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
             {isFlowA
-              ? <>Uw afspraak op <span className="text-white">{doneInfo.datum}</span> om <span className="text-white">{doneInfo.tijd}</span> is bevestigd. U ontvangt een bevestigingsmail op <span className="text-white">{doneInfo.email}</span>.</>
+              ? <>Uw afspraak op <span className="text-foreground">{doneInfo.datum}</span> om <span className="text-foreground">{doneInfo.tijd}</span> is bevestigd. U ontvangt een bevestigingsmail op <span className="text-foreground">{doneInfo.email}</span>.</>
               : <>We hebben uw aanvraag ontvangen en nemen binnen 1 uur contact met u op.</>}
           </p>
-          <button
+          <Button
             onClick={onClose}
-            className="inline-flex items-center justify-center px-5 py-2 rounded-[10px] text-sm font-medium bg-white/5 text-white hover:bg-white/10 transition-colors"
+            className="inline-flex items-center justify-center px-5 py-2 rounded-none text-sm font-medium bg-muted/50 text-foreground hover:bg-accent/40 transition-colors"
           >
             Sluiten
-          </button>
+          </Button>
         </>
       ) : (
-        <p className="text-sm text-white/50">Even geduld...</p>
+        <p className="text-sm text-muted-foreground">Even geduld...</p>
       )}
     </div>
   );
@@ -543,33 +545,35 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
   }
 
   return createPortal(
+    <div className={isMobile ? "contents" : "fixed inset-0 z-[60] flex items-center justify-center p-8"}>
+      {!isMobile && <motion.div className="absolute inset-0 bg-background/70" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0 : 0.2 }} onClick={onClose} aria-hidden="true" />}
     <motion.div
-      layoutId="afspraak-cta"
-      initial={isMobile ? { y: "100%", opacity: 0 } : false}
-      animate={isMobile ? { y: 0, opacity: 1 } : undefined}
-      exit={isMobile ? { y: "100%", opacity: 0 } : undefined}
-      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+      initial={reducedMotion ? { opacity: 1 } : isMobile ? { y: "100%", opacity: 0 } : { scale: 0.985, opacity: 0 }}
+      animate={{ y: 0, scale: 1, opacity: 1 }}
+      exit={isMobile ? { y: "100%", opacity: 0 } : { scale: 0.985, opacity: 0 }}
+      transition={{ duration: reducedMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
       className={containerClass}
       style={{
         ...(isMobile ? { paddingBottom: "env(safe-area-inset-bottom, 0px)" } : null),
-        borderRadius: 16,
+        borderRadius: isMobile ? "16px 16px 0 0" : 0,
         willChange: "transform",
       }}
       role="dialog"
       aria-label="Afspraak maken"
+      aria-modal="true"
     >
       {isMobile && (
         <div className="pt-2 pb-1 flex justify-center">
-          <div className="h-1 w-10 rounded-full bg-white/20" />
+          <div className="h-1 w-10 rounded-none bg-white/20" />
         </div>
       )}
-      <button
+      <Button
         onClick={onClose}
-        className="absolute top-3 right-3 z-10 h-8 w-8 inline-flex items-center justify-center rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+        variant="ghost" size="icon" className="absolute top-3 right-3 z-10 h-8 w-8 rounded-none text-muted-foreground hover:text-foreground"
         aria-label="Sluiten"
       >
         <X className="w-4 h-4" />
-      </button>
+      </Button>
 
       {/* Pager viewport — animates height, hides overflow */}
       <div
@@ -602,7 +606,8 @@ const AfspraakStickyPopover = ({ open, onClose }: Props) => {
           ))}
         </div>
       </div>
-    </motion.div>,
+    </motion.div>
+    </div>,
     document.body
   );
 };
