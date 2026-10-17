@@ -139,7 +139,7 @@ export default function TradeInRequestModal({
             <DialogDescription className="mx-auto mt-3 max-w-sm leading-relaxed">
               Bedankt. U ontvangt binnen 24 uur een vrijblijvend inruilvoorstel.
             </DialogDescription>
-            <Button className="mt-7" variant="primary" onClick={() => onOpenChange(false)}>Sluiten</Button>
+            <Button className="mt-7 rounded-none font-display text-xs uppercase" variant="primary" onClick={() => onOpenChange(false)}>Sluiten</Button>
           </div>
         ) : (
           <>
@@ -176,7 +176,7 @@ export default function TradeInRequestModal({
                 <div className="space-y-2"><Label htmlFor="trade-email">E-mailadres</Label><Input id="trade-email" type="email" autoComplete="email" maxLength={255} value={form.email} onChange={(e) => update("email", e.target.value)} required /></div>
               </div>
               {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" variant="primary" size="lg" className="w-full" disabled={submitting}>
+              <Button type="submit" variant="primary" size="lg" className="w-full rounded-none font-display text-xs uppercase" disabled={submitting}>
                 {submitting ? <><Loader2 className="animate-spin" /> Aanvraag verzenden…</> : "Ontvang mijn inruilvoorstel"}
               </Button>
             </form>
