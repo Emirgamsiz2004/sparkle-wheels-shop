@@ -129,7 +129,7 @@ const DialogContent = React.forwardRef<
   };
 
   if (isMobile) {
-    const mobileBottom = Math.max(keyboardViewport.bottomInset, keyboardViewport.focusedInset);
+    const mobileBottom = keyboardViewport.bottomInset;
     const mobileMaxHeight = keyboardViewport.isInputFocused
       ? `min(68vh, calc(${keyboardViewport.height}px - 18px))`
       : `min(85vh, calc(${keyboardViewport.height}px - 16px))`;
@@ -154,7 +154,7 @@ const DialogContent = React.forwardRef<
             willChange: "transform",
             bottom: mobileBottom,
             maxHeight: mobileMaxHeight,
-            transition: "bottom 220ms ease-out, transform 280ms cubic-bezier(0.32,0.72,0,1)",
+            transition: "transform 280ms cubic-bezier(0.32,0.72,0,1)",
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
             ...style,
           }}
@@ -171,7 +171,7 @@ const DialogContent = React.forwardRef<
           <div
             data-sheet-scroll
             onFocusCapture={(e) => keepFocusedFieldVisible(e.target)}
-            className="overflow-y-auto overscroll-contain px-5 pb-2 -mx-px"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-2 -mx-px"
           >
             {children}
           </div>

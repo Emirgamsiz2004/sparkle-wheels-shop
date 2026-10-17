@@ -27,8 +27,8 @@ const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
 >(({ className, children, style, ...props }, ref) => {
-  const { bottomInset, focusedInset, height, isInputFocused } = useKeyboardSafeViewport(true);
-  const mobileBottom = Math.max(bottomInset, focusedInset);
+  const { bottomInset, height, isInputFocused } = useKeyboardSafeViewport(true);
+  const mobileBottom = bottomInset;
 
   return (
     <DrawerPortal>
@@ -36,7 +36,7 @@ const DrawerContent = React.forwardRef<
       <DrawerPrimitive.Content
         ref={ref}
         className={cn(
-          "fixed inset-x-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background transition-[bottom] duration-200 ease-out",
+          "fixed inset-x-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
           className,
         )}
         style={{

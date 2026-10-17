@@ -10,4 +10,5 @@
 - [x] Alle website-aanmeldingen doorsturen naar AutoRM leads (contact, consignatie, afspraken, detailing, service/offerte, auto zoeken)
 
 ## Done
+- Mobiele inruil- en afspraakformulieren aansluiten op de werkelijke toetsenbordhoogte; bezichtiging en proefrit als één afspraak aanbieden
 - Rente overal naar 10,9% en één algemene calculator
