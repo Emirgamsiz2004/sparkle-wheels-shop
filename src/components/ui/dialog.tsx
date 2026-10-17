@@ -207,7 +207,7 @@ const DialogContent = React.forwardRef<
           "ease-out",
           className,
         )}
-        style={{ borderRadius: 16, willChange: "transform" }}
+        style={{ borderRadius: 16, willChange: "transform", ...style }}
         onAnimationEnd={(e) => {
           (e.currentTarget as HTMLElement).style.willChange = "auto";
         }}

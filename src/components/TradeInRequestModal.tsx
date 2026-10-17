@@ -131,7 +131,7 @@ export default function TradeInRequestModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto border-border bg-background sm:max-w-xl">
+      <DialogContent className="max-h-[92vh] overflow-y-auto border-border bg-background font-body sm:max-w-xl" style={{ borderRadius: 0 }}>
         {done ? (
           <div className="py-10 text-center">
             <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-primary text-primary"><Check /></span>

@@ -35,7 +35,7 @@ export default function VehicleDetailActions({ vehicleId, merk, model, bouwjaar,
       </div>
 
       <Dialog open={appointmentOpen} onOpenChange={setAppointmentOpen}>
-        <DialogContent className="border-border bg-background sm:max-w-md">
+        <DialogContent className="border-border bg-background font-body sm:max-w-md" style={{ borderRadius: 0 }}>
           <DialogHeader><DialogTitle className="sr-only">Afspraak plannen</DialogTitle></DialogHeader>
           <VehicleBookingCard feedId={vehicleId || ""} merk={merk} model={model} kenteken={kenteken} />
         </DialogContent>
