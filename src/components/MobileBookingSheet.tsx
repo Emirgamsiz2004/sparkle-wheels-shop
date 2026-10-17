@@ -16,16 +16,15 @@ type AppType = FlowAType | FlowBType;
 const TIMESLOTS = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 
 const TYPE_LABELS: Record<AppType, string> = {
-  bezichtiging: "Bezichtiging",
-  proefrit: "Proefrit",
+  bezichtiging: "Bezichtiging / proefrit",
+  proefrit: "Bezichtiging / proefrit",
   poetsbeurt: "Poetsbeurt",
   onderhoud: "Reparatie / onderhoud",
   anders: "Anders",
 };
 
 const directOptions: { type: FlowAType; icon: any; desc: string }[] = [
-  { type: "bezichtiging", icon: Eye, desc: "Auto bekijken in onze showroom" },
-  { type: "proefrit", icon: Car, desc: "Test een auto op de weg" },
+  { type: "proefrit", icon: Car, desc: "Auto bekijken en een proefrit maken" },
 ];
 const requestOptions: { type: FlowBType; icon: any; desc: string }[] = [
   { type: "poetsbeurt", icon: Sparkles, desc: "Offerte aanvragen" },

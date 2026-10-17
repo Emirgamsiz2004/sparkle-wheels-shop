@@ -24,7 +24,7 @@ export function useKeyboardSafeViewport(enabled = true): KeyboardSafeViewport {
       const isInputFocused = !!active?.matches?.("input, textarea, select, [contenteditable='true']");
 
       if (!visualViewport) {
-        setViewport({ bottomInset: 0, focusedInset: isInputFocused ? 260 : 0, height: window.innerHeight, isInputFocused });
+        setViewport({ bottomInset: 0, focusedInset: 0, height: window.innerHeight, isInputFocused });
         return;
       }
 
@@ -35,7 +35,7 @@ export function useKeyboardSafeViewport(enabled = true): KeyboardSafeViewport {
 
       setViewport({
         bottomInset: detectedInset,
-        focusedInset: isInputFocused ? Math.max(detectedInset, 260) : 0,
+        focusedInset: isInputFocused ? detectedInset : 0,
         height: visualViewport.height,
         isInputFocused,
       });
