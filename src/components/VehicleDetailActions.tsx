@@ -21,10 +21,10 @@ export default function VehicleDetailActions({ vehicleId, merk, model, bouwjaar,
   return (
     <>
       <div className="space-y-3">
-        <Button variant="primary" size="lg" className="w-full font-body uppercase" onClick={() => setAppointmentOpen(true)}>
+        <Button variant="primary" size="lg" className="h-auto min-h-12 w-full rounded-none border px-4 py-3.5 font-display text-xs font-semibold uppercase whitespace-normal transition-colors duration-500 ease-out hover:bg-primary hover:text-primary-foreground hover:border-primary" onClick={() => setAppointmentOpen(true)}>
           <CalendarDays /> Afspraak plannen
         </Button>
-        <Button size="lg" className="w-full font-body uppercase" onClick={() => setTradeInOpen(true)}>
+        <Button size="lg" className="h-auto min-h-12 w-full rounded-none border px-4 py-3.5 font-display text-xs font-semibold uppercase whitespace-normal transition-colors duration-500 ease-out hover:bg-foreground hover:text-background hover:border-foreground" onClick={() => setTradeInOpen(true)}>
           <RefreshCw /> Inruilvoorstel aanvragen
         </Button>
         <div className="flex items-center justify-center gap-5 pt-1 text-xs text-muted-foreground">
