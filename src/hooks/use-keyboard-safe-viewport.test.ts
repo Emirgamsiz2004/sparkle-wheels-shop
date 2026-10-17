@@ -2,12 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, renderHook } from "@testing-library/react";
 import { useKeyboardSafeViewport } from "./use-keyboard-safe-viewport";
 
-afterEach(() => { cleanup(); vi.restoreAllMocks(); document.body.innerHTML = ""; });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); document.body.innerHTML = ""; });
 
 describe("keyboard viewport", () => {
   function setup(height: number, offsetTop = 0) {
     vi.spyOn(window, "innerHeight", "get").mockReturnValue(852);
-    vi.spyOn(window, "visualViewport", "get").mockReturnValue({
+    vi.stubGlobal("visualViewport", {
       height, offsetTop, addEventListener: vi.fn(), removeEventListener: vi.fn(),
     } as unknown as VisualViewport);
     const input = document.createElement("input");
