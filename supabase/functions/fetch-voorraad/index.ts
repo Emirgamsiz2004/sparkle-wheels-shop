@@ -261,22 +261,47 @@ Deno.serve(async (req) => {
 
 
     if (vehicleId) {
-      // Fetch list first to get the detail path for this vehicle
+      const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
       const vehicles = await fetchList();
       const vehicle = vehicles.find((v: any) => v.id === vehicleId);
-      if (!vehicle || !vehicle.detailPath) {
+      if (vehicle && vehicle.detailPath) {
+        const detail = await fetchDetail(vehicle.detailPath);
+        const { data: dbv } = await sb.from("vehicles").select("status").eq("feed_id", vehicleId).maybeSingle();
+        return new Response(
+          JSON.stringify({ vehicle: { ...vehicle, ...detail, dbStatus: dbv?.status === "verkocht" || dbv?.status === "gereserveerd" ? dbv.status : (vehicle.feedStatus || "te_koop") } }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Fallback: verkochte auto die niet meer in de feed staat → uit eigen database
+      const isUuid = /^[0-9a-f-]{36}$/i.test(vehicleId);
+      let q = sb.from("vehicles").select("*").eq("status", "verkocht");
+      q = isUuid ? q.or(`id.eq.${vehicleId},feed_id.eq.${vehicleId}`) : q.eq("feed_id", vehicleId);
+      const { data: rows } = await q.limit(1);
+      const v: any = rows?.[0];
+      if (!v) {
         return new Response(JSON.stringify({ error: "Voertuig niet gevonden" }), {
           status: 404,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-
-      const detail = await fetchDetail(vehicle.detailPath);
-
-      return new Response(
-        JSON.stringify({ vehicle: { ...vehicle, ...detail } }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      const { data: photos } = await sb.from("vehicle_photos").select("file_path, is_hoofdfoto, volgorde")
+        .eq("vehicle_id", v.id).order("is_hoofdfoto", { ascending: false }).order("volgorde", { ascending: true });
+      const fotos: string[] = (photos || []).map((p: any) => sb.storage.from("vehicle-photos").getPublicUrl(p.file_path).data.publicUrl);
+      if (v.feed_afbeelding && !fotos.includes(v.feed_afbeelding)) fotos.unshift(v.feed_afbeelding);
+      const s = (x: any) => (x === null || x === undefined ? "" : String(x));
+      const out = {
+        id: vehicleId, merk: s(v.merk), model: s(v.model), type: s(v.uitvoering ?? v.type), bouwjaar: s(v.bouwjaar),
+        brandstof: s(v.brandstof), transmissie: s(v.transmissie), kilometerstand: s(v.kilometerstand),
+        carrosserie: s(v.carrosserie), kleur: s(v.kleur), prijs: Number(v.feed_verkoopprijs || v.verkoopprijs) || 0,
+        vermogen_pk: s(v.vermogen_pk), afbeelding: fotos[0] || "", kenteken: s(v.kenteken), nap: "",
+        dbStatus: "verkocht", verkochtOp: v.verkoop_datum, fotos, beschrijving: s(v.beschrijving ?? v.omschrijving),
+        opties: [], bovag_garantie: "", garantie_maanden: "", marktplaats_url: s(v.marktplaats_url),
+        aantal_eigenaren: "", btw_marge: "", kenteken_detail: s(v.kenteken),
+        extra: { topsnelheid: "", verbruik: "", co2: "", energielabel: "", bekleding: "", aandrijving: "", deuren: "",
+          cilinders: "", gewicht: "", tankinhoud: "", apk: "", zitplaatsen: "", acceleratie: "" },
+      };
+      return new Response(JSON.stringify({ vehicle: out }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // List all vehicles — merge DB statuses
