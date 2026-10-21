@@ -1,79 +1,49 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import WhatsAppButton from "@/components/WhatsAppButton";
 
-import Afspraak from "./pages/Afspraak";
 import Index from "./pages/Index";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import Voorraad from "./pages/Voorraad";
-import VoertuigDetail from "./pages/VoertuigDetail";
-import VoorraadDetailPage from "./pages/VoorraadDetailPage";
-import Consignatie from "./pages/Consignatie";
-import ConsignatieVoorwaarden from "./pages/ConsignatieVoorwaarden";
-import Contact from "./pages/Contact";
-import OverOns from "./pages/OverOns";
-import InEnVerkoop from "./pages/InEnVerkoop";
-import OnderhoudReparatie from "./pages/OnderhoudReparatie";
-import AutoDetailing from "./pages/AutoDetailing";
-import AutoZoeken from "./pages/AutoZoeken";
-import AutoCustomizing from "./pages/AutoCustomizing";
-import Diensten from "./pages/Diensten";
-import AdminLogin from "./pages/AdminLogin";
-import AdminLayout from "./components/admin/AdminLayout";
-import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
-import AdminVoertuigenPage from "./pages/admin/AdminVoertuigenPage";
-import AdminVoertuigNieuwPage from "./pages/admin/AdminVoertuigNieuwPage";
-import AdminVoertuigDetailPage from "./pages/admin/AdminVoertuigDetailPage";
-import AdminFinancieelPage from "./pages/admin/AdminFinancieelPage";
-import AdminBTWPage from "./pages/admin/AdminBTWPage";
-import DealAnalyzer from "./pages/DealAnalyzer";
-import AdminMoneybirdPage from "./pages/admin/AdminMoneybirdPage";
-import AdminInkoopPage from "./pages/admin/AdminInkoopPage";
-import AdminInstellingenPage from "./pages/admin/AdminInstellingenPage";
-import AdminSocialMediaPage from "./pages/admin/AdminSocialMediaPage";
-import AdminAdvertentiesPage from "./pages/admin/AdminAdvertentiesPage";
-import AdminBlogPage from "./pages/admin/AdminBlogPage";
-import AdminProefrittenPage from "./pages/admin/AdminProefrittenPage";
-import AdminVerkopenPage from "./pages/admin/AdminVerkopenPage";
-import AdminVerkoopWizardPage from "./pages/admin/AdminVerkoopWizardPage";
-import AdminVerkoopDetailPage from "./pages/admin/AdminVerkoopDetailPage";
-import AdminArchiefPage from "./pages/admin/AdminArchiefPage";
-import AdminKlantenPage from "./pages/admin/AdminKlantenPage";
-import AdminKlantDetailPage from "./pages/admin/AdminKlantDetailPage";
-import AdminLeadsPage from "./pages/admin/AdminLeadsPage";
-import AdminLeadDetailPage from "./pages/admin/AdminLeadDetailPage";
-import ProefritFormulier from "./pages/ProefritFormulier";
-import AdminPlanningPage from "./pages/admin/AdminPlanningPage";
-import OccasionsAlphen from "./pages/OccasionsAlphen";
-import OccasionsLeiden from "./pages/OccasionsLeiden";
-import OccasionsZoetermeer from "./pages/OccasionsZoetermeer";
-import OccasionsDenHaag from "./pages/OccasionsDenHaag";
-import Garantie from "./pages/Garantie";
-import Financiering from "./pages/Financiering";
-
-import ReviewsPage from "./pages/ReviewsPage";
-import NotFound from "./pages/NotFound";
-import Unsubscribe from "./pages/Unsubscribe";
-import UnderConstruction from "./pages/UnderConstruction";
 import ScrollToTop from "./components/ScrollToTop";
-import SmoothScroll from "./components/SmoothScroll";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import CookiePolicy from "./pages/CookiePolicy";
-import AlgemeneVoorwaarden from "./pages/AlgemeneVoorwaarden";
 import CookieBanner from "./components/CookieBanner";
 import AnnouncementBar from "./components/AnnouncementBar";
 import AppointmentOnlyNotice from "./components/AppointmentOnlyNotice";
 
+const Afspraak = lazy(() => import("./pages/Afspraak"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Voorraad = lazy(() => import("./pages/Voorraad"));
+const VoorraadDetailPage = lazy(() => import("./pages/VoorraadDetailPage"));
+const Consignatie = lazy(() => import("./pages/Consignatie"));
+const ConsignatieVoorwaarden = lazy(() => import("./pages/ConsignatieVoorwaarden"));
+const Contact = lazy(() => import("./pages/Contact"));
+const OverOns = lazy(() => import("./pages/OverOns"));
+const InEnVerkoop = lazy(() => import("./pages/InEnVerkoop"));
+const OnderhoudReparatie = lazy(() => import("./pages/OnderhoudReparatie"));
+const AutoDetailing = lazy(() => import("./pages/AutoDetailing"));
+const AutoZoeken = lazy(() => import("./pages/AutoZoeken"));
+const AutoCustomizing = lazy(() => import("./pages/AutoCustomizing"));
+const Diensten = lazy(() => import("./pages/Diensten"));
+const ProefritFormulier = lazy(() => import("./pages/ProefritFormulier"));
+const OccasionsAlphen = lazy(() => import("./pages/OccasionsAlphen"));
+const OccasionsLeiden = lazy(() => import("./pages/OccasionsLeiden"));
+const OccasionsZoetermeer = lazy(() => import("./pages/OccasionsZoetermeer"));
+const OccasionsDenHaag = lazy(() => import("./pages/OccasionsDenHaag"));
+const Garantie = lazy(() => import("./pages/Garantie"));
+const Financiering = lazy(() => import("./pages/Financiering"));
+const ReviewsPage = lazy(() => import("./pages/ReviewsPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const AlgemeneVoorwaarden = lazy(() => import("./pages/AlgemeneVoorwaarden"));
 
-const queryClient = new QueryClient();
-
-// ⬇️ Zet op false om de volledige site te tonen
-const UNDER_CONSTRUCTION = false;
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { staleTime: 5 * 60_000, refetchOnWindowFocus: false } },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -83,39 +53,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <SmoothScroll />
           <AnnouncementBar />
-          {UNDER_CONSTRUCTION ? (
-            <Routes>
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboardPage />} />
-                <Route path="dashboard" element={<AdminDashboardPage />} />
-                <Route path="voertuigen" element={<AdminVoertuigenPage />} />
-                <Route path="inkoop" element={<AdminInkoopPage />} />
-                <Route path="voertuigen/nieuw" element={<AdminVoertuigNieuwPage />} />
-                <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
-                <Route path="financieel" element={<AdminFinancieelPage />} />
-                <Route path="btw" element={<AdminFinancieelPage />} />
-                <Route path="moneybird" element={<AdminFinancieelPage />} />
-                <Route path="instellingen" element={<AdminInstellingenPage />} />
-                <Route path="social-media" element={<AdminSocialMediaPage />} />
-                <Route path="advertenties" element={<AdminAdvertentiesPage />} />
-                <Route path="blog" element={<AdminBlogPage />} />
-                <Route path="deals" element={<DealAnalyzer />} />
-                <Route path="proefriten" element={<AdminProefrittenPage />} />
-                <Route path="verkopen" element={<AdminVerkopenPage />} />
-                <Route path="verkopen/:id" element={<AdminVerkoopDetailPage />} />
-                <Route path="archief" element={<AdminArchiefPage />} />
-                <Route path="klanten" element={<AdminKlantenPage />} />
-                <Route path="klanten/:id" element={<AdminKlantDetailPage />} />
-                <Route path="leads" element={<AdminLeadsPage />} />
-                <Route path="leads/:id" element={<AdminLeadDetailPage />} />
-                <Route path="planning" element={<AdminPlanningPage />} />
-              </Route>
-              <Route path="*" element={<UnderConstruction />} />
-            </Routes>
-          ) : (
+          <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/voorraad" element={<Voorraad />} />
@@ -137,7 +76,6 @@ const App = () => (
               <Route path="/cookiebeleid" element={<CookiePolicy />} />
               <Route path="/algemene-voorwaarden" element={<AlgemeneVoorwaarden />} />
               <Route path="/proefrit/:token" element={<ProefritFormulier />} />
-              
               <Route path="/occasions-alphen-aan-den-rijn" element={<OccasionsAlphen />} />
               <Route path="/occasions-leiden" element={<OccasionsLeiden />} />
               <Route path="/occasions-zoetermeer" element={<OccasionsZoetermeer />} />
@@ -146,40 +84,10 @@ const App = () => (
               <Route path="/financiering" element={<Financiering />} />
               <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/verkopen/nieuw/:vehicleId" element={<AdminVerkoopWizardPage />} />
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboardPage />} />
-                <Route path="dashboard" element={<AdminDashboardPage />} />
-                <Route path="voertuigen" element={<AdminVoertuigenPage />} />
-                <Route path="inkoop" element={<AdminInkoopPage />} />
-                <Route path="voertuigen/nieuw" element={<AdminVoertuigNieuwPage />} />
-                <Route path="voertuigen/:id" element={<AdminVoertuigDetailPage />} />
-                <Route path="financieel" element={<AdminFinancieelPage />} />
-              <Route path="btw" element={<AdminFinancieelPage />} />
-              <Route path="moneybird" element={<AdminFinancieelPage />} />
-                <Route path="instellingen" element={<AdminInstellingenPage />} />
-                <Route path="social-media" element={<AdminSocialMediaPage />} />
-                <Route path="advertenties" element={<AdminAdvertentiesPage />} />
-                <Route path="blog" element={<AdminBlogPage />} />
-                <Route path="deals" element={<DealAnalyzer />} />
-                <Route path="proefriten" element={<AdminProefrittenPage />} />
-                <Route path="verkopen" element={<AdminVerkopenPage />} />
-                <Route path="verkopen/:id" element={<AdminVerkoopDetailPage />} />
-                
-                <Route path="archief" element={<AdminArchiefPage />} />
-                <Route path="klanten" element={<AdminKlantenPage />} />
-                <Route path="klanten/:id" element={<AdminKlantDetailPage />} />
-                <Route path="leads" element={<AdminLeadsPage />} />
-                <Route path="leads/:id" element={<AdminLeadDetailPage />} />
-                <Route path="planning" element={<AdminPlanningPage />} />
-              </Route>
+              <Route path="/admin/*" element={<Navigate to="/" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          )}
-          
-          {/* <WhatsAppButton /> tijdelijk uitgezet */}
-          
+          </Suspense>
           <AppointmentOnlyNotice />
           <CookieBanner />
         </BrowserRouter>
